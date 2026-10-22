@@ -1,81 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792670764;
-	b=cwJvobZNUGgPMYTyJ7PYSpvhmjStM6YPLqifqoyZgxvzVRAoee/VfuReniwnfyNxBAsQ
-	 Ms+oXtSQm/F234UO73CSSuSJqzo5PO5xLiyuvmYeNuB13Atl6lLBDtu9Pfi+Nefq9dC/N
-	 97vP3cKNsvChVFqUkyDA1RS2riwjRG/oNZQnbQSjiQk3/Tt8DD2xsKIjr1oAQp3vepoyu
-	 2vJ1nxqLSr10/CbFxAJMdv/oeYCUiKNfiCPoGPAK4MLG04xkPFsEAkbKKPMECdyqsxj5i
-	 TDvW+YaozY4hMNttiJkamgFccBjJMIIPnzaP177GgSzm7y2bSu/vrbka52a8d6vZGcQ==
+	t=1792671323;
+	b=cGVF2dEaa0LQjHT6R0tTnyzejOTTBXtKP+FlUVwqTy8pxwixAIFqugO6jg4oU5XPXggp
+	 u374oFc6soxu9AFfoHg2eiu/ysrNU5M7hNj68VWzDIvL8rMXa4YHB3bPCLf3Z22uBkPZ5
+	 PZfotphvtW3Q2wji1BgI3BZ6b94Gq45rrPa2AC3khPflLI51KHr9omODANESq8yt7t980
+	 T7sTbU52Ub+3J3oXctTaMrHrchAJNqE6ZiUx/yAuMwwpZxo/iZRzpcHAiU11KLtWRek7n
+	 gqNwINKy7kUt5W1EVZ2iRdsYKcBvjSt88lqJI8zgrrDtGQv1dfKrfvY23tvsP8gCdBg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792670764;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792671323;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=KnFWxqJaqz+BFMmEjiHLYkNFi18a7j+dc9NynoQJpBk=;
-	b=o2jV7De3riUzGFs2Mqpiuh5R/I1Pz5oUaDo3nIoeu4yRU+HesT/A2V2JvvbxmRTQqfSE
-	 aBLkM1xFLof24e7++AQjqxWAujPufkfxNT8H/9UHLvg1BhLWrYmcXrEx6pWmgLO3LXT7z
-	 MA1x6TVoE+VILKf6CjpONGjuf1fenTfrbff90sE/noxLQW5Pg2M9R9TPGaqF55LaJHO6P
-	 gXO+kVrcuMND1Bg3DOtAU+AAnk2eZavi7kkeshB/ECpPzHb4yFvKCDj1zr8rUCC7HXZ3c
-	 tLiou2+gVNt9TM4uqpWrXaTao2U8IkzBxfDrQGXFryNBo+WqY7FEdbNLgbVIStc30vA==
+	bh=liXoAECJvGKDAVp+mXVo2aameKZCDOraoLb79YpUHfc=;
+	b=YP/bgwGksILNBXXmLZTJ8GlLvGdRqydkECnekvde6UGDbjrFa9qGi1ZwYLrENHNEyFMk
+	 RISihcYuM0Tz5EiP/6g3vglcX6tV2MC0GwqO26eLES5fkC2tBJmf+0g9mwMlN5/Y9Ah8l
+	 yOQzTPfDI2tG0gBJtypD8Cpj9l+ehVds5qddPRcjVbQu1L+8JQ+LeCkAjh4TYoEWi4cWQ
+	 AejeTLobhaRRWgK6aPZZFhPecR9RC59Wh4JSLrvxuwyvYpHXvtXgsi04oQujWt6Mdzhci
+	 AGr9z3ooe7o8eRgLRvGq5zwLWJe/tAFEBxC/RDbGw6lVORFE7JML+yVJ0p0lpTjsvug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b="BfgrX2/n";
-	arc=none smtp.remote-ip=209.85.210.177
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Cd+z8of7;
+	arc=none smtp.remote-ip=209.85.216.46
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25451606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 12:06:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25451606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21372606A31B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 12:15:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21372606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=BfgrX2/n
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8a089dfee18so465468b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 05:06:03 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Cd+z8of7
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-38d489b6b71so1174625a91.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 05:15:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792670763; x=1793275563; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792671322; x=1793276122; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=KnFWxqJaqz+BFMmEjiHLYkNFi18a7j+dc9NynoQJpBk=;
-        b=BfgrX2/n/k77C+giwBnwX52NoZFfnofVP6YFXrtU0xY7y1IKfOfM84/y2lpBxZVxf0
-         wNjeuYf5ebBA5zp4VHFRgQUzbT6TSwA5g8pLzZarHEhVAWV6PVYc3Ffs6n7vdS6md/xk
-         wROmDo62oRxfbIJSK9WbeVEi4n+wbVhC0/hORJS268ixrD44IGhBtKHvwEEJAutxo3dH
-         1DFTniQSycFVmCkckFKZKDIqPkZwLfEweYtWW+4TpZPbYPTAQ2uY14KxDy1mRAX2nZhq
-         uPlmnPROODTUCH538sgdAJOwriqwgxNcVFD1skvcty3kngbTL+0fDHfoOlj3dBXMfnVF
-         93KA==
+        bh=liXoAECJvGKDAVp+mXVo2aameKZCDOraoLb79YpUHfc=;
+        b=Cd+z8of7rwPCwWQ2vQXVXeTp50yv76LgMCApDqmuLv0/0WmmK2MUDPB8rYf8IHF7jo
+         Vys6rXj2O7SD6s2CIrHj1feFtlRFQEuKrPd+TvtOHCuGDWMyKCDjw0Op04sXQkamxw5b
+         fsy8fS7qvL+8tZA73nB+OeklB0D4HSlIXQbOBkL0cCzpctQFAyVB4COpomsc/SaUfslA
+         smUjlAQtJfXJN8nar+9tqfB/wVboZ99s6uOeFqiClOd6DDcjTORZKKD2KkS9dS+wNjbe
+         3bEq1DztRvBaFBpkUWilcEcAIYD6PZ0+WEhwm9XbvMn1tpL/1FZrND2ojma5ZmxbdBId
+         zcxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792670763; x=1793275563;
+        d=1e100.net; s=20260707; t=1792671322; x=1793276122;
         h=content-transfer-encoding:content-type:mime-version:message-id:date
          :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=KnFWxqJaqz+BFMmEjiHLYkNFi18a7j+dc9NynoQJpBk=;
-        b=M2OjgVU5TVE7jlQruRFGZYe0gXdJGk/JMzdTJ4mxq3aU10uBS11K0Ab5mDv5/9/kqQ
-         IJfnW2Sl1xrK8e2hDQjUvJlzBy3/jJ7iPVYRmIgQ11q7lndSKtv/EiAUfPHD6kE4wsRJ
-         NCXQPajVTp3kSQQEu9URd2npL1eTM0xOz4TrP/EHsv2vAg0j2hemx7FkhTunZhHfrRKo
-         5IFxZQhKdWw/X6MguoNShfVnVtmurhPjejuFA3uEUKwczKCPdiEUjV8yfXB5dNBT5n6K
-         jUkcVXR89HkXyDhS5lnXpe19LxcyyxX+GzhzLY1mCBRRwyCeMrH/6yh8V6uD10uZX8R3
-         y1Lw==
-X-Gm-Message-State: AFq9FYKtyZLQuGR01LKCrSbIGVweZyGiOJ8zWqZ8+QT1D75qKV7/8/Jj
-	vou1U6tXkwNlzJOUKYMyoekP0Ju5F3Zy0xinMtU5IkzLajN/MDpD9WLM
-X-Gm-Gg: AYBFou2Kn+0pGKXc/ppif7R15hNY0OjtFN/FF2uMeLSX2YTwyJfxdMdCavZK4r8tZTC
-	ajb0air6g+38t0RKHPdCFr59Wcd4d40hNNpQYRiFFMJonnKi0PFBaIfuhaoCrRXEr0EFiie2Sow
-	mtUCSvzcQp2f3dY8itrYSRz2v/wp9/u0H7DKcPmYoARhlRoQ6+egX3G1dPQXPINXsCLUREY/zre
-	ot41klMlO0piOJQoyUkXhoCiSgCDPx/5heLi07fTU/nsIBhzfEjbPmT3nqXAvvwMdsZNCdDmJyd
-	x3e7X2/CuboDsOi49ai992chItJZJqJR7UQrPovdRzDQv8/nhulmlhRqT3tgJiX329Tk+8F5u8J
-	tN7W2XSeSVMLVymN5ZRhv/g4MztVRU5XgI+x3ooP+R4uPiSn9JP5kaZiqh7cyjRUfRM/T7D1gI+
-	fr55MYnCLqzxpVivgdOhvq7E3Kb5zJo9SqnhI4oUJnLUEp4PFeR8+CJZ0CK18N9hw8eCSpc5DOR
-	JdHkI5L3J6+w1VE3sJJnxvL0lX9qkFz4OQd/76oqSFxCVKU8MELlKbVoy6pUoQt2VAgMz9b
-X-Received: by 2002:a05:6a21:a09:b0:3e0:c2ce:3f71 with SMTP id adf61e73a8af0-3e2a09ca4a2mr1252245637.37.1792670763144;
-        Thu, 22 Oct 2026 05:06:03 -0700 (PDT)
+        bh=liXoAECJvGKDAVp+mXVo2aameKZCDOraoLb79YpUHfc=;
+        b=BMF/hpwZnCViP01HgH8R7iQrdOjaoJhcdlTJ3A3v93kml+U9jW5a3SUD4qrmwKYO/f
+         AYtnU68aO8umEtt8pqZKJGZFw5crkwva2biyGnAPWB5Gsg9JyDyH8xn5cNQHBJPeBYJf
+         oLHhzmuOhqRPO1qTNi+a68dWK1ffg+Zxfzbzjp/rOXwen8Hws8MrrGmEVNlsv2u7XDLE
+         1Y1ALj8/o47W2ALbGTUX2qJy5qJPpUZuZxwOvgBKQmBiZgkFg5LM2h/N7Ak2K5VILaSd
+         UnZgzW0o0Mbz5b9sMwNHqkz6RXId/M9v9cw1k8xmpUucGWjGuD5qzCezn36RRn2gM0vw
+         kIOQ==
+X-Gm-Message-State: AFq9FYL8g9C2t+qRWj2ZaksN/cfp+MRHwYiRHQ49A82ayDGV01F8vLDV
+	MXAL+mBVQe8ZawBaOP/U4zepo7cpbsXrsYM3f/DU7OLHQ/aZJM6YSaSL
+X-Gm-Gg: AYBFou29lYWVW38zVg0F6ZVL2PbIg9XfK02/ceSjARgNxPJmjVvjvMuOMGqlVYWrF7K
+	m6NN7zfFv4WyeAVY7KOvqXPoVOVJy7bdT3F8/LFYHZ1Ac6aA5CJRvPam9S6VhDKVHbRo0H8y8vh
+	jFI5iXhIWqot7a3+YipI3psR7KRy8JeN+lCTIhHFdy13Qpfzv3OCPHBAMd4pcTocBFFo6A8cXO7
+	VoPLuEeAx35hx5oQv2LQzXO2F61+9xKigCyccac1mlrquGn8gO4NdWmZob0ubKSulbhgUMgllaJ
+	696DWREY/rRAUNjpNhHBbb3iIGdwiSqF62xgHFcDoSc1VIRSaczPjV1uH24DOSnE+bddj7L2kLs
+	LK29TUlhzs15RsJFSXyYCMTaldsghiNNsIfikAItJtzBZk/sRW8FTJhm4TLiOcE71rCSCmOHcB9
+	uB/yfc8VjVsuFTVzCCvOq7v7aXfFnD7Z7q5hN62c9y2HV9kWoKC4yvp5PQWhLLXAJ2+VW8Jh+ki
+	BXDVuLx0TC3lNQsa/1Ks1aWTP/Dpaaxqwlr39CRwVTwobr8HA8=
+X-Received: by 2002:a17:90b:1646:b0:3ac:9669:8464 with SMTP id 98e67ed59e1d1-3ad86cf2be4mr3988163a91.24.1792671322156;
+        Thu, 22 Oct 2026 05:15:22 -0700 (PDT)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8a0895e6b14sm2100312b3a.43.2026.10.22.05.06.00
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ada490d4bfsm4777062a91.10.2026.10.22.05.15.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Oct 2026 05:06:02 -0700 (PDT)
+        Thu, 22 Oct 2026 05:15:21 -0700 (PDT)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -84,9 +84,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH] Bluetooth: hci_sync: Protect resolving-list lookups
-Date: Thu, 22 Oct 2026 20:05:56 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0159-v11-9bd4b4c3c1e56d9ba355@gmail.com>
+Subject: [PATCH v3] Bluetooth: MGMT: Serialize power-on with power-off completion
+Date: Thu, 22 Oct 2026 20:15:15 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0063-v15-e728a3f8014489975c69@gmail.com>
 X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -100,82 +100,60 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The host resolving list is updated under hdev->lock, and each
-bdaddr_list_with_irk entry must remain alive throughout a lookup.
-hci_le_del_resolve_list_sync() and hci_le_add_resolve_list_sync()
-traverse that list without taking the lock.
+mgmt_set_powered_complete() must consume only its own SET_POWERED
+command. __mgmt_power_off() frees that command before its destroy callback
+runs, and mgmt_pending_valid() recognizes pending commands only by address.
 
-On an LE privacy-capable controller with a programmed entry, passive
-scan reconciliation can reach hci_le_del_resolve_list_sync() while a
-privileged HCI_RAW client sends LE Clear Resolving List. The raw
-command does not take req_lock, and its successful completion runs
-on the controller workqueue independently of request work:
+The power-on handler can reuse the address, but it is not the only
+allocator. A concurrent set_mesh() can also publish another pending command
+at that address after close drops hdev->lock:
 
-  Request work                     Raw HCI / event work
-  hci_le_del_resolve_list_sync()
-    lookup loads a list node
-                                   hci_sock_sendmsg()
-                                     queue LE Clear Resolving List
-                                   hci_cc_le_clear_resolv_list()
-                                     take hdev->lock
-                                     unlink and free the node
-                                     release hdev->lock
-    read the node's address/type
+  Close request worker              Management socket
+  --------------------              -----------------
+  __mgmt_power_off(): free cmd
+  hci_dev_close_sync(): unlock
+                                    set_mesh(): allocate replacement
+  completion: claim old address
+                                    submission fails: remove/free cmd
+  completion: access replacement
 
-The clear can free the node after the lookup loads it and before its
-address/type read, causing a use-after-free. The report below shows
-this access with the delete helper on the faulting stack. The add
-helper uses the same unprotected lookup.
+Serialize power-on publication with req_lock, which the request worker
+holds through its destroy callback. Keep power-off cancellation outside
+that mutex and keep the req_lock -> hdev->lock ordering.
 
-Take hdev->lock around each resolving-list membership lookup and
-retain only a boolean result. This serializes traversal with clear
-completion and keeps entry pointers inside the protected section.
-Release the lock before issuing a synchronous HCI command, whose
-completion also needs the lock.
+Also hold hdev->lock while finding the pending SET_POWERED command,
+checking its identity, and consuming it. An unrelated command at the old
+address then fails the opcode-specific lookup without being unlinked.
+Power-on cannot reuse a SET_POWERED address until the old callback drops
+req_lock, and power-off allocates no command once the device is down.
+
+Dequeue pending power requests before settings_rsp() frees their command
+data. Their cancellation callback already returns without touching cmd.
+An already-dequeued request can still be waiting for req_lock. Check its
+opcode under mgmt_pending_lock before copying parameters as well, so it
+cannot interpret an unrelated replacement command as power settings.
 
 KASAN report as below:
 
-    ==================================================================
-    BUG: KASAN: slab-use-after-free in
-    hci_bdaddr_list_lookup_with_irk+0x106/0x120
-    Read of size 1 at addr ffff88810b036e16 by task kworker/u17:0/495
+        BUG: KASAN: slab-use-after-free in
+    mgmt_set_powered_complete+0x450/0x4d0
+    Read of size 2 at addr ffff88810921ab10 by task kworker/u17:0/500
 
-    CPU: 2 UID: 0 PID: 495 Comm: kworker/u17:0 Not tainted
-    7.2.0-rc6-pmb-bt-functional-v1+ #3 PREEMPT(lazy)
-    Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix,
-    1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
     Workqueue: hci0 hci_cmd_sync_work
     Call Trace:
      <TASK>
      dump_stack_lvl+0x93/0xd0
      print_report+0xce/0x630
-     ? hci_bdaddr_list_lookup_with_irk+0x106/0x120
+     ? mgmt_set_powered_complete+0x450/0x4d0
      ? srso_alias_return_thunk+0x5/0xfbef5
      ? __virt_addr_valid+0x20d/0x410
-     ? hci_bdaddr_list_lookup_with_irk+0x106/0x120
+     ? mgmt_set_powered_complete+0x450/0x4d0
      kasan_report+0xe0/0x110
-     ? hci_bdaddr_list_lookup_with_irk+0x106/0x120
-     hci_bdaddr_list_lookup_with_irk+0x106/0x120
-     hci_le_del_resolve_list_sync.isra.0+0xd6/0x3f0
-     ? __pfx_hci_le_del_resolve_list_sync.isra.0+0x10/0x10
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     hci_le_del_accept_list_sync.isra.0+0x11c/0x290
-     ? __pfx_hci_le_del_accept_list_sync.isra.0+0x10/0x10
-     ? hci_passive_scan_sync+0x551/0x1e80
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? lock_release+0xc8/0x280
-     hci_passive_scan_sync+0x71c/0x1e80
-     ? __pfx_hci_passive_scan_sync+0x10/0x10
-     ? find_held_lock+0x2b/0x80
-     ? hci_lookup_le_connect+0xe1/0x3c0
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? find_held_lock+0x2b/0x80
-     ? hci_update_passive_scan_sync+0x437/0x950
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     ? lock_release+0xc8/0x280
-     hci_update_passive_scan_sync+0x461/0x950
-     hci_cmd_sync_work+0x1b3/0x450
-     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? mgmt_set_powered_complete+0x450/0x4d0
+     mgmt_set_powered_complete+0x450/0x4d0
+     ? __pfx_mgmt_set_powered_complete+0x10/0x10
+     hci_cmd_sync_work+0x207/0x450
+     ? __pfx_mgmt_set_powered_complete+0x10/0x10
      process_one_work+0x908/0x19c0
      ? __pfx_process_one_work+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
@@ -194,125 +172,175 @@ KASAN report as below:
      ret_from_fork_asm+0x1a/0x30
      </TASK>
 
-    Allocated by task 495:
+    Allocated by task 531:
      kasan_save_stack+0x33/0x60
      kasan_save_track+0x14/0x30
      __kasan_kmalloc+0xaa/0xb0
      __kmalloc_cache_noprof+0x251/0x610
-     hci_bdaddr_list_add_with_irk+0x183/0x3e0
-     hci_cc_le_add_to_resolv_list+0x18c/0x240
-     hci_cmd_complete_evt+0x373/0xab0
-     hci_event_packet+0x4e8/0xc70
-     hci_rx_work+0x367/0xf00
-     process_one_work+0x908/0x19c0
-     worker_thread+0x65c/0xe40
-     kthread+0x34f/0x460
-     ret_from_fork+0x659/0x940
-     ret_from_fork_asm+0x1a/0x30
+     mgmt_pending_new+0x60/0x230
+     mgmt_pending_add+0x3b/0x180
+     set_powered+0x2a8/0x7e0
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-    Freed by task 497:
+    Freed by task 531:
      kasan_save_stack+0x33/0x60
      kasan_save_track+0x14/0x30
      kasan_save_free_info+0x3b/0x60
      __kasan_slab_free+0x5f/0x80
      kfree+0x307/0x580
-     hci_bdaddr_list_clear+0x134/0x230
-     hci_cc_le_clear_resolv_list+0x13d/0x240
-     hci_cmd_complete_evt+0x373/0xab0
-     hci_event_packet+0x4e8/0xc70
-     hci_rx_work+0x367/0xf00
-     process_one_work+0x908/0x19c0
-     worker_thread+0x65c/0xe40
-     kthread+0x34f/0x460
-     ret_from_fork+0x659/0x940
-     ret_from_fork_asm+0x1a/0x30
-
-    The buggy address belongs to the object at ffff88810b036e00
-    which belongs to the cache kmalloc-64 of size 64
-    The buggy address is located 22 bytes inside of
-    freed 64-byte region [ffff88810b036e00, ffff88810b036e40)
-
-    The buggy address belongs to the physical page:
-    page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0
-    pfn:0x10b036
-    flags: 0x200000000000000(node=0|zone=2)
-    page_type: f5(slab)
-    raw: 0200000000000000 ffff8881000428c0 dead000000000100
-    dead000000000122
-    raw: 0000000000000000 0000000000200020 00000000f5000000
-    0000000000000000
-    page dumped because: kasan: bad access detected
-
-    Memory state around the buggy address:
-     ffff88810b036d00: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-     ffff88810b036d80: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-    >ffff88810b036e00: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-                             ^
-     ffff88810b036e80: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-     ffff88810b036f00: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+     set_powered+0x336/0x7e0
+     hci_sock_sendmsg+0x128b/0x22e0
+     __sys_sendto+0x425/0x470
+     __x64_sys_sendto+0xe5/0x1c0
+     do_syscall_64+0x115/0x6a0
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
     ==================================================================
-    Disabling lock debugging due to kernel taint
 
-Fixes: e8907f76544f ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3")
+Fixes: eec8d2bcc841 ("Bluetooth: Add support for set_powered management command")
 Assisted-by: LLM
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-Sashiko review follow-up: earlier accept-list patch
-  - Address the resolving-list lookup issue raised by Sashiko:
-    https://sashiko.dev/#/patchset/88963
-  - Protect both resolving-list membership lookups with hdev->lock.
+Changes in v3:
+- Address cross-opcode pending-command reuse reported by Sashiko:
+  https://sashiko.dev/#/patchset/88964
+- Validate SET_POWERED identity before claiming it.
+- Cancel queued power requests before freeing their command data.
+- Check the opcode of an already-dequeued request before reading its
+  parameters.
+- Retain the balanced power-on request locking introduced in v2.
 
-Related accept-list membership fix:
-https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0118-v7-e6b713327ef914d6d02a@gmail.com
+Changes in v2:
+- Move the common set_powered command path into a helper and acquire
+  req_lock in the explicit power-on branch, fixing Clang context-analysis
+  errors.
+- Preserve req_lock -> hdev->lock ordering and keep power-off cancellation
+  outside req_lock.
+- Rebase onto current bluetooth-next.
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2448,15 +2448,17 @@
- 					bdaddr_t *bdaddr, u8 bdaddr_type)
- {
- 	struct hci_cp_le_del_from_resolv_list cp;
--	struct bdaddr_list_with_irk *entry;
-+	bool exists;
+Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0063-v7-35a6680c94a332fea155@gmail.com
+Link to v2: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0063-v11-a70581b6877e5fe118a3@gmail.com
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1342,9 +1342,15 @@
+ 	struct mgmt_pending_cmd *cmd = data;
+ 	struct mgmt_mode *cp;
  
- 	if (!ll_privacy_capable(hdev))
- 		return 0;
- 
- 	/* Check if the IRK has been programmed */
--	entry = hci_bdaddr_list_lookup_with_irk(&hdev->le_resolv_list, bdaddr,
--						bdaddr_type);
--	if (!entry)
+-	/* Make sure cmd still outstanding. */
+-	if (err == -ECANCELED || !mgmt_pending_valid(hdev, cmd))
++	if (err == -ECANCELED)
+ 		return;
++
 +	hci_dev_lock(hdev);
-+	exists = hci_bdaddr_list_lookup_with_irk(&hdev->le_resolv_list,
-+						 bdaddr, bdaddr_type);
-+	hci_dev_unlock(hdev);
-+	if (!exists)
- 		return 0;
++
++	/* Other management commands may reuse the old command address. */
++	if (pending_find(MGMT_OP_SET_POWERED, hdev) != cmd ||
++	    !mgmt_pending_valid(hdev, cmd))
++		goto unlock;
  
- 	cp.bdaddr_type = bdaddr_type;
-@@ -2512,8 +2514,8 @@
+ 	cp = cmd->param;
+ 
+@@ -1352,10 +1358,8 @@
+ 
+ 	if (!err) {
+ 		if (cp->val) {
+-			hci_dev_lock(hdev);
+ 			restart_le_actions(hdev);
+ 			hci_update_passive_scan(hdev);
+-			hci_dev_unlock(hdev);
+ 		}
+ 
+ 		send_settings_rsp(cmd->sk, cmd->opcode, hdev);
+@@ -1371,6 +1375,9 @@
+ 	}
+ 
+ 	mgmt_pending_free(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
+ }
+ 
+ static int set_powered_sync(struct hci_dev *hdev, void *data)
+@@ -1380,8 +1387,9 @@
+ 
+ 	mutex_lock(&hdev->mgmt_pending_lock);
+ 
+-	/* Make sure cmd still outstanding. */
+-	if (!__mgmt_pending_listed(hdev, cmd)) {
++	/* A dequeued request may have waited across a controller reset. */
++	if (!__mgmt_pending_listed(hdev, cmd) ||
++	    cmd->opcode != MGMT_OP_SET_POWERED) {
+ 		mutex_unlock(&hdev->mgmt_pending_lock);
+ 		return -ECANCELED;
+ 	}
+@@ -1395,18 +1403,12 @@
+ 	return hci_set_powered_sync(hdev, cp.val);
+ }
+ 
+-static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
+-		       u16 len)
++static int __set_powered(struct sock *sk, struct hci_dev *hdev,
++			 void *data, u16 len)
  {
- 	struct hci_cp_le_add_to_resolv_list cp;
- 	struct smp_irk *irk;
--	struct bdaddr_list_with_irk *entry;
- 	struct hci_conn_params *p;
-+	bool exists;
+ 	struct mgmt_mode *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+ 	int err;
+-
+-	bt_dev_dbg(hdev, "sock %p", sk);
+-
+-	if (cp->val != 0x00 && cp->val != 0x01)
+-		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_POWERED,
+-				       MGMT_STATUS_INVALID_PARAMS);
  
- 	if (!ll_privacy_capable(hdev))
- 		return 0;
-@@ -2536,10 +2538,11 @@
- 		return 0;
+ 	hci_dev_lock(hdev);
  
- 	/* Check if the IK has _not_ been programmed yet. */
--	entry = hci_bdaddr_list_lookup_with_irk(&hdev->le_resolv_list,
--						&params->addr,
--						params->addr_type);
--	if (entry)
-+	hci_dev_lock(hdev);
-+	exists = hci_bdaddr_list_lookup_with_irk(
-+		&hdev->le_resolv_list, &params->addr, params->addr_type);
-+	hci_dev_unlock(hdev);
-+	if (exists)
- 		return 0;
+@@ -1454,6 +1456,32 @@
+ 	return err;
+ }
  
- 	cp.bdaddr_type = params->addr_type;
++static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
++		       u16 len)
++{
++	struct mgmt_mode *cp = data;
++	int err;
++
++	bt_dev_dbg(hdev, "sock %p", sk);
++
++	if (cp->val != 0x00 && cp->val != 0x01)
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_POWERED,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	if (!cp->val)
++		return __set_powered(sk, hdev, data, len);
++
++	/*
++	 * Wait for the previous power-off completion before publishing a
++	 * new command that could reuse its freed pending-command address.
++	 */
++	hci_req_sync_lock(hdev);
++	err = __set_powered(sk, hdev, data, len);
++	hci_req_sync_unlock(hdev);
++
++	return err;
++}
++
+ int mgmt_new_settings(struct hci_dev *hdev)
+ {
+ 	return new_settings(hdev, NULL);
+@@ -1468,6 +1496,11 @@
+ static void settings_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct cmd_lookup *match = data;
++
++	/* A queued power request must not retain the freed command. */
++	if (cmd->opcode == MGMT_OP_SET_POWERED)
++		hci_cmd_sync_dequeue(match->hdev, set_powered_sync, cmd,
++				     mgmt_set_powered_complete);
+ 
+ 	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
+ 
