@@ -1,63 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792785786;
-	b=Z+uec2HmduKzW9ovllRIyhvCUpg+381skumwwcKU+cCpN7NjBL3pi/TVeS43TLc+7jqE
-	 IeXTAzOUnMxB1fQgyXeqgrHip3GfY+nzYKuqpFLFjuRKgEh8KvC9Henx3daprHSOZSCZj
-	 +jC236Byblr7XIx5QWLic3N7Fm5OeZFPMGkNrRPp79PYfy+0P9CMAS4zgMzX5mv9cEQXE
-	 36lQE8OLEV3/mdsqGc+pppyXQwSS3hB7EIm+D9++/ZssR06M3elad92k36snzFzCjv6O/
-	 ipX4swffiWI7ZCnF7fwSk6TNwTWMoaI9vErptf4QGdVbup2SsSgd8sZHhHW7+vjuuTg==
+	t=1792789235;
+	b=pz/oWS2WcNmjUvUfCbyiaQsrUsxy7y4ZArnvc/jTXWBw6jQUIk9wjxv/4YHo7MFpQEGf
+	 VuSnieDyr07UBRgg0T2hfHEMinHzf68J8hgitoxKOzQZZzKFz/BJ7s+Zdg+4xYZKZLsS3
+	 BF+4s14XpBziq4bhuhPwRZL2erpIquSdK+4UZM++xSsYeqdYCpI/YjU9enffwY+AExfjT
+	 Ud+wSq7xQkQWeqOSoIXsoDzSUHXF1XMZm4qJLH07Q18A7yvnb1LcrOmn8JdqtO3YMbOqL
+	 hApMGpRtOOcLoqnGq5yd3KF0EA1ixEwnCqAbsYFE/n9YSvb8L3+vFz+zLTv7dLjRsbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792785786;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=XUIJ+QrJcJYvumQ8S2jYQmzBCArscp7pCGzwOK+IJs4=;
-	b=SF05QrZTeD0oCClFxQlXyrBkh971SJ3kBipC/Ifcm3oN7Ap/+o59h7uKCBKvbn3HY1xN
-	 JiueGPt444PmVp46XlYbP2kHeiy7qzaZPsdZpP6MF8J/5HiM3LK2MOwmoi9KfkHXHyGJ+
-	 dzzv0E7ZANykPwgQJCh9s9cZI/6STGnfUJSeGaLv3SjdyyUGV1T4SV0SD/jA+wF1kpoYv
-	 JJdA7IiFAB3WoIoVXuiTQhEgdXMQwqJ+htk2qtJ5HNku+DE70jOg2lSCXcqxo8wzBwLI1
-	 Hu2mNgziU+moaGbmq5qjxNIoKKJq30gRE+qHX2ykopq47oigTaIo/PtEUAbVoSAMd+w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792789235;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=WezFqdvJ51fZMv8tdbZhyi0ZvZwzseOzl9pim14/ibA=;
+	b=Y8babKiHDSZCVXZrDq5pTkmVZ8YiSXx2owxJSjM3QfkYKOHP89/AgLU9+VKaVErY6Eqo
+	 bYa7pwTc5AeuLRP0pcsE9fsEVYd8ppy+M2eazawSetCS55Tiq5y142AZVshj5ze2XjiUk
+	 2m5JQq2HoA3nFS9Z/pt21AnzmGari3KS5A1qFELeaojwgivKI05mEv0hKns8NBWpQ5q/c
+	 FGJUyirhjB1DN2Um4tJBDlM3gv0ZbhdcWxzZKdtQM8qX9LUqvxbbUuzblgsSuzjTyeyFC
+	 yJQiLWRogMBrRu59jvfYsqo9Ns9eIU5Ny3mtR78f/QF27Nn+TKppoDh6b62QjTUhV2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Vp71jFsP;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCPvHLaE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E274606A31B;
-	Fri, 23 Oct 2026 20:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E937C606A333
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 21:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Vp71jFsP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03161F031E2;
-	Fri, 23 Oct 2026 20:03:04 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCPvHLaE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C655E1F01825;
+	Fri, 23 Oct 2026 21:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792785786;
-	bh=XUIJ+QrJcJYvumQ8S2jYQmzBCArscp7pCGzwOK+IJs4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Vp71jFsP/Mf5njbOOLlzA5gZBuNHEIHWSehC+klURiMV8cZ0rHC8hkeNwkdUhzuyf
-	 Q88IS4qKJURwWnApE0PIRtSwVvPC0mYIG3uBWWoyI7yV6c1B60WtRIXhv9vOrgKrUF
-	 ETWQ6tjgpgifIUMk5oJqwYXq+vUaunpVHHIACeN8f9rd00XIYf+vZq1Cbkse7NAUs7
-	 lzngEaNg/nED/qC9ayjct3UYUq3S0+5Gnjb1oUsVPiJXToXlqLQsUZtf05zkpix9mZ
-	 STidplzd2ZbCPxMQcb9IOVVr+uYTp8/zSPBevF7SbmT6uB/zbQjSLIFGhbyyKt229P
-	 3/D8bEk9X/oqw==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Sasha Levin <sashal@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	netdev@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	regressions@lists.linux.dev,
-	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>,
-	Emanuele Ghidoli <ghidoliemanuele@gmail.com>
-Subject: Re: [PATCH 6.12.y] net: call getsockopt_iter if available
-Date: Fri, 23 Oct 2026 16:02:46 -0400
-Message-ID: <2026-10-23-1-daily-reply-0010-getsockopt-iter-6-12@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261022111535.528099-1-ghidoliemanuele@gmail.com>
-References: <20261022111535.528099-1-ghidoliemanuele@gmail.com>
+	s=k20260515; t=1792789234;
+	bh=WezFqdvJ51fZMv8tdbZhyi0ZvZwzseOzl9pim14/ibA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=LCPvHLaENyfAeT911uSEl0KzW6v50zMfRspnLIAbEVxAuCpjWVucx6UCbVJEzVf+s
+	 rarFVV3H81vp2UYbcRVmjQ5rJCO5wQjz/OPhnz+htjLn8skH6LCo9TM1X25ML5hUeg
+	 ebr8YPvs65Di51BGVSQHwgHqsc4i28qby+LtBaS+qmhq7OTNfNCMd9vPrX8q6he3ps
+	 CBrQZMf3poS8RPT/d9GRICZzHJmAHfVOMLoRttIHapJ9gz3h2jhGlmQfGf9IKP3Khb
+	 JtmNT8kYIJpjpL7ZdvV6XiHSB+ZKsRLe1fBKgLbBzMzWcWOIwWhXEIaBPvwVN2mzDt
+	 o78hp0atOPhcA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BE5C3391B157;
+	Fri, 23 Oct 2026 21:00:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -68,12 +54,40 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Allow COMPILE_TEST without
+ ACPI
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179278923331.1268720.10547122704757097502.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Oct 2026 21:00:33 +0000
+References: <20261022154621.3958803-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261022154621.3958803-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-> Update do_sock_getsockopt() to use the new getsockopt_iter callback
-> when available. Add do_sock_getsockopt_iter() helper that:
+Hello:
 
-Queued for 6.12, thanks.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
+On Thu, 22 Oct 2026 11:46:20 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> The driver only uses ACPI for the product reset method, so make that
+> depend on CONFIG_ACPI and allow the driver with COMPILE_TEST, so it is
+> build tested on architectures without ACPI as well, such as User Mode
+> Linux. Without ACPI the reset method reports it is not supported, as it
+> does when the device has no ACPI handle.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v1] Bluetooth: btintel_pcie: Allow COMPILE_TEST without ACPI
+    https://git.kernel.org/bluetooth/bluetooth-next/c/eb9d9d401c84
+
+You are awesome, thank you!
 -- 
-Thanks,
-Sasha
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
