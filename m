@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792794014;
-	b=ueMwl8YDCJwxQgmpwA5GK5KWpu4cHYg3GyXKBRShTG3ZgokwpPGNBTJzbuX85Igm2dYX
-	 A9hCR6FIBY5X9PvzM5tl9gL74h6reWqzsNHPA3t3cyulUtWdN14Fw3LFbPL9kaUasSmI1
-	 +QZhjkSpvC+eY7jm4SDwlyAxLdFcnin4CfTXtvP7knMsUTIrOWxjEHS1h6u94qf2Uwbb0
-	 4RgJ3AjgiR/gnSEPjHaQFM9CI6wJlm7drG8VRG5fLvx3dP7HNWH0z1yKRAMLgJ+dyQwBp
-	 hc0/Qa+8IAJFGZEw0ggvM4StcjYa1Z3LzTTyNat8L4IFEjo718geh6hzD8JF2I98LBw==
+	t=1792794016;
+	b=fK6Wg0dG9u6eBHf2HP2QYKzh3nKicxHOjVSILzZ+5ZLXWfRH+C7QX9Wlfto3DeN247Y9
+	 zvQ8gnjeD1WjVYL8yVGt0Y4gv3ff/tNQHBWUh9aTI5XzocQyoflFLK5klo5mraop50DGS
+	 vRtTbOyjpvjn4B5COzkTX6126Kzsaf1dOOfMf3A8/ey7eZXE6LrCPKDsSQ8KLGdF7HYj0
+	 z7VinBnhitIhmhUdiP+esgkf+bLgnHQnK2jNbt4z0zMtQdlmA2OI5z3TPoKM8I4MD15fN
+	 W1YRffj/0rnm6d4PX/JNNgtdxPCSzI2ooe4lQ8pDYPv3CUjQxHR+YX50Rm891o44ZdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792794014;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792794016;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=lPJGAhkRWj4/xY6Eh++aiQdpcJwOIqrwUOr0IlI4L0U=;
-	b=k/Ad5eQSYUSEhJZAytXmltH8D3KPVTw25tEijUms2ri3IqkkhiWMRJC1JO/u978Pid9K
-	 0XU8o4G7qIry+wnJOLEYiSPN2sWFp1oZO22xLvvqlz7ZXadPSWWKoLsTEbcxJciFKiVPW
-	 ZvDNyEy51yK2wUPFwvj0GPptV0qv+bLTrKDShXa/R+uRiH2BDiQkBLcJle1k9TsJtJJp7
-	 1r80GjK1B8SO5OwOby5mKVLCQJztWPGYhHtrDU/CDMu2E+SECH5y+wSzzUiFRPO/wdMum
-	 IgB8u7BWjGRuUT7A/YcYU/Y0GR8NT21dmI6By7z/TKQhuGdpBSwEJCGza6LCfFs/PsQ==
+	bh=4Ly8cQoxoPYBxWF88hOaZ8lpCaF+APRwR2uG7g/gOXQ=;
+	b=v7ycB4NZMmYMfglN1EcvfBhWiv7fynR+CPfb32gDgZCdSX7J5c9LJRLBsr/VfVPOezkG
+	 jRgJBsEiZyogScddz0CPMVNuPSCGS+3FFY/CW2GcQaXRnyDlWhhW9QLKaBHNXv4JZzn0z
+	 2ShLNsWFT7DriANK51sbjyfEdOdpehlq55SBPXZkrQa9SAvV9oc+9IpD97eXMvI4Po/OD
+	 zpK3XswaxAI5lpScfSrNpmxEtGwVQoAq5hIk469vxbDWBxH+kPGswa9H55JsagJHCiOdR
+	 vAC9azPnhDYrxyCUwA7Jo49P3+uLy/Gu5UGhzaYmIWEakyoG2U+Kc3qnbXjXEJx7lQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jxa3hncT;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EPtdjyi7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158F5606A322
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 22:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E70606A322
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 22:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jxa3hncT
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C75561F01828;
-	Fri, 23 Oct 2026 22:20:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EPtdjyi7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E9FE1F01825;
+	Fri, 23 Oct 2026 22:20:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792794013;
-	bh=lPJGAhkRWj4/xY6Eh++aiQdpcJwOIqrwUOr0IlI4L0U=;
+	s=k20260515; t=1792794015;
+	bh=4Ly8cQoxoPYBxWF88hOaZ8lpCaF+APRwR2uG7g/gOXQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Jxa3hncTL5jmrQoi0DI0l2FBxuDMw1zmRLdRacWFRYDb3pAVafHAwPw7kYEJTl97V
-	 Sk36QWujdvenlvhKDIDgW5PgUhlUh5FpTYtEozjZCcrArobjKvYLKydzx6OCWGVh8B
-	 KpNFjU+JqqEwUHS4Z6laOmNej7+OnQK6nvAyz7Mj3ffWtMBqmMOZ/Bv5u54uL6t0V/
-	 +agwtZIa79ziyGnILu5QHQM+2cEBa8PWX8Qs3OrpEVSD6U0iHWeY7q52Jg0y+UFa43
-	 t2sCEXvC58XbchszLZ7aSDA6smTsC7kbrJaJahR+TiQeQx1laFQWYTLSJ7ZbzqT3jg
-	 VMfQWPI8RQGlA==
+	b=EPtdjyi7U8neVEVOlOmtOLGdM+MJyL4QzZaGsXEyhYyL4FFHUsxfyQf5tErOMtmUc
+	 uDtn67uRLVSqDE5FEUiBLY//7/eghicNEpObK3eTAc/0RyRB8Nc9vSREruTPDok3K9
+	 uQ7GlXeFsjnPpxRpDAXkCaTX4E6bB8DEbyqr4d8jqXxvbnjtMuExYksms9t/wkhKQ+
+	 XiP2coIexYCC5cByipcUNpOsLkaBtZAELkPev+HImGYXLTthCOS+4MAIhgL9CZrKf/
+	 TLK9H6VlUrSjaUwAcZDzBlGeIojoo2gDNTQIAuGlSo7MoIjk60jLIZeHnqo53jvIvI
+	 l170WnVoUYNBA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BE5EB391B158;
-	Fri, 23 Oct 2026 22:20:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 44772391B158;
+	Fri, 23 Oct 2026 22:20:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,36 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] mesh: Fix Command Disallowed on random address
- change
- in generic IO
+Subject: Re: [PATCH BlueZ] obexd: Handle message read status change events
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179279401231.1297354.6966004828861249806.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Oct 2026 22:20:12 +0000
-References: 
- <AM5P250MB4222047E08E92211215A496AACCB652@AM5P250MB422204.EURP250.PROD.OUTLOOK.COM>
-In-Reply-To: 
- <AM5P250MB4222047E08E92211215A496AACCB652@AM5P250MB422204.EURP250.PROD.OUTLOOK.COM>
-To: =?utf-8?q?Aur=C3=A9lien_Rivet_=3Caurelienrivet=40hotmail=2Efr=3E?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
- luiz.dentz@gmail.com
+ <179279401388.1297354.3202289018145725539.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Oct 2026 22:20:13 +0000
+References: <20261020035617.1089331-1-sadiq@sadiqpk.org>
+In-Reply-To: <20261020035617.1089331-1-sadiq@sadiqpk.org>
+To: Mohammed Sadiq <sadiq@sadiqpk.org>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 22 Oct 2026 18:01:26 +0000 you wrote:
-> send_cancel_done() issues LE Set Random Address at the end of every
-> burst of ADVs. The controller rejects that command with Command
-> Disallowed (0x0c) while scanning is enabled, per Core Spec, Vol 4,
-> Part E, Section 7.8.4, so the address never rotates as long as any
-> scan is registered, such as a provisioner discovering unprovisioned
-> devices.
-> 
-> [...]
+On Tue, 20 Oct 2026 09:26:17 +0530 you wrote:
+> obexd is advertised to support Extended Event Report 1.1.  But it was
+> not handling "ReadStatusChanged" type which made those events being
+> mismarked as MAP_ET_NEW_MESSAGE.  This resulted in existing message to
+> be replaced by new message with only "Status" property set instead of
+> updating the "Status" of the existing message.
+> ---
+>  obexd/client/map-event.h | 3 ++-
+>  obexd/client/map.c       | 3 +++
+>  obexd/client/mns.c       | 2 ++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [BlueZ] mesh: Fix Command Disallowed on random address change in generic IO
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4de4f60f1e78
+  - [BlueZ] obexd: Handle message read status change events
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a0580dad5655
 
 You are awesome, thank you!
 -- 
