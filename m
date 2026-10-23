@@ -1,90 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792711416;
-	b=X+NFPfUqoLaqjH+j35paGV3cL3iSqEApeyFffju3F1g7ucQQx5PucgGuQIB3g9dPbk8F
-	 VW27uwvK5dFksd/Gvn7JiQrdrTH5rO7YpxqAZ95hf0dH7drLhkze67OF1AQWFQDaAvxWz
-	 EwkiLB1dlWNwSIT7pEYGsT6wnZl9B/ivhfMj+SirzD+s87FSgqjMLXaMaj/HK2a5QPn+V
-	 W6ki8ws6J4kKv+K5zdu/Pse6gLz5RpsFz2BgH8WOvvbOVUaT9wDzxpELuFQKvyoM704g0
-	 5vqTpwd+Uh+MPEcZLx3l2+R0LWjrXUEHjYJbRZTvGxKM3NSDzR7DQhu8KbUjnQ2c5Rg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792711416;
-	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
-	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
-	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
-	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
-	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
-	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
-	 Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
-	bh=6Vx4ebXF0tkiO/X4WqL2or6Fpg3v2ufDWlD/5ef9UZA=;
-	b=ZsDkuKfkDG7RgymydF9DHJebqFn+QW6qScW8HSWUs9tVq+hRkATLfZIseehTLwl8vc7a
-	 4euwPNEtr/a+BrCvnYOVSabTsENxy0+LcUStqUaeXs+JvaSEcDelopIkORP+rA5zR39PC
-	 y0RYJCxO/+gqNlbjyGUXQdEiLZ+ntvHAI6QUej8wj6/DfThWJLNopKCXnjUBkjzHjbhjD
-	 DKdPLYxcHN+jusJuLoZFqtEGHKWwl/mwKoCerq5C6cZkmib6fdGSHWpIdJnmYshW4PQUi
-	 tkVALRFSVesH4UhdhexuX2s/Q/9hsGhELGs5PwXQ4ye0fc5xwa1QyO2mhOqDJ8VHd4Q==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=poA5uC9H;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
-Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47BB606A31D
-	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=poA5uC9H
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792732190;
+	b=RN7zfrr7ZCYh+i30P9d3UUlTAkFBpNgqMgf4cl9uQrMDJj7h71aOHmlLr79s59HgC+/D
+	 QPdWClO35aZJebgUBpT/Qt6WNBtYQtJ6nZHhJz5oj5ivDNldxn9gxmh3OGH4JULsK5pjH
+	 Exzruzinx79Fa1Ley3waH4Ywr+SYBOLe/wVtBB69kkobfcI2U2b+QrveL/9eRuw5KNjCM
+	 Z9iHH01n/JqWMxwkdAK7yFNBEkinY9gOoRL+28xDcri349kuCMB3Kl6xnsztB4REGN5cn
+	 ZicI14NsXRKNNc+Qp829zJSHjSWCCHIQM5IloHcxrqR7N2RIec0r1LrrqRldHYDXY8w==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792732190;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-GUID:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=LALDteG/UZkflF4BJzSKAZvIyXFZw8pks8R9WPb8HHc=;
+	b=ZW/1FJmjnPvWpAZLETanm8eHMDluJKLqKFd/f/eOCwyFRGbolwXBUmyCAAaHWj30mG/K
+	 gSVYF9qdAtzeH1/wdyFEdc4FEd6RkM2GVD/TuBa5bhFhxqhKvA9/dafqBZyB41zW9O1W7
+	 7jtUkMixNIWm7+vVZQJAuQXT4h7XRM9WwALoqns1IY068sTUh64gwaAqPxc8rVVo674TH
+	 XQ1MnDGACC4UtFOFJgqcfLUDbrJ0oLAmAJtK/Flr8cEobofOJj5r+Hy+5woPvC6ZPUPap
+	 UWHlLYkERM308EmIrRV9mI4r3q6QUqQwagqKLk00noarKtS/6N9h4Wu5Wz9djSYUIXQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=RJeS5+Eo;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JPUkT2RF;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F4425771
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792711416; cv=none; b=VuPwpHmGHO45WML/n59ehXTgn2e+ydAPDQIFP1wpCa+4AFgTJmjNSdrCG+NYohVZ0i1/pwhqBaPqtFZ7E9hkTHY0D1wnuT6/U4lq3T2Q8Rrynox5SuWwDnbCG1LU6Y32B5Ny7wUtEuzRt0CWWc//2wXTouCMYc9Ua2WixSEMeCU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792711416; c=relaxed/simple;
-	bh=eI5F1HZrkY1Lu0pnBXR3b5fBLkLsqKBUkXclRiD69F4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tfgle8miTd9yIK5uMFnHXWJDoFAuCdm3q1KzrQ7zM6vGLGNWPTWa54wTPfXepCsnBJMpN6FZOftFUjkXAnJbEmCvY2PgXqF3O72srk9AVT5Vgo4kvDz6D9BKVQS/MHgWIPw0Ovvn1gmlbIXm/L73NDy347e8DmL1ARftYuamy5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=poA5uC9H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13B89C2BD00
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 23:23:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792711416;
-	bh=eI5F1HZrkY1Lu0pnBXR3b5fBLkLsqKBUkXclRiD69F4=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=poA5uC9HDvXIa6b857eEE8kReJgDJfCdjWvb48XCNx3U6dtX5RndLcn+qKzh6Wnoi
-	 q4s25cMZ9VkYPESNVjYfIq7Sa9GmeihZtctv5YiQZABWb9rzoGAaDA69FtgiP1MLjn
-	 onAPLMfmMqxsX2Xt6IAJfP+XKt8Op8rTDXeXdC5DQlkchWDnyevENZqaKqq1ixw+Ps
-	 l1YL+0bIOAYJFlv5XFqnhGQV9042dQ8vMYwqLNdQrk8+xbm0dNjFwAoGUi2KktttQG
-	 jECYWS5bA0Uzf6DzOXYk/v8OOlo4WGRdYAX5Zq+h/nc0strtnA9h1FguwzNO/uYqNb
-	 lV/WSBo/VItnQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E1AB8C53BC7; Thu, 22 Oct 2026 23:23:35 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 220344] Intel AX211 bluetooth randomly disconnects and
- reconnects, started after kernel update
-Date: Thu, 22 Oct 2026 23:23:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: akshaym@leastaction.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220344-62941-ANEJMXA2iI@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220344-62941@https.bugzilla.kernel.org/>
-References: <bug-220344-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529A5606A319
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 05:09:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 529A5606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=RJeS5+Eo;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JPUkT2RF
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69N1F3Ux1869056
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 05:09:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	LALDteG/UZkflF4BJzSKAZvIyXFZw8pks8R9WPb8HHc=; b=RJeS5+EoDeJi1vMg
+	Eiz3d3BfH+lSlytnorw2SryWcFbynI/dVqxcy0fjgIC57r2LwsLH1vdfRQqWpc/3
+	XtT33eqAUXP0og0TFQfwbjN/I5yOCqv0q+EWg2TN50oH4Os+BXyp6EvmxddK3TkO
+	DAfkD4foA3KcF8+IYejIyfJo7QBe+Yicvz+gWU+BFXSAw0eU+3c4SWH8Y5O4dKLc
+	EV7QxeumnzfGLH91sexZ+ZTcQiHRxPitRxUmPFWcu2LKxG/I32amDVqdyzXsXFgm
+	tNo02jRB0B1ojUjcs0+3zXAkPHcRyU4I2M0s+ATF6DBH8y4wYmnWaAMGTIXRXGWc
+	of3Qhw==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hfqmja1n8-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 05:09:49 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3ad94b96698so145530a91.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Oct 2026 22:09:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1792732188; x=1793336988; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=LALDteG/UZkflF4BJzSKAZvIyXFZw8pks8R9WPb8HHc=;
+        b=JPUkT2RFfnDkEYnsIe1uPVXZwSbW8bVDshmIMFoxfTg+nPg4wq1FDZg8bBQKhXh+pA
+         fsqBSZEiSAqg5jxMjL/FCBff9W0NjYbTt6IyIi1uND/sjVZZrcg/W5Xs3634sbc+I0iO
+         PT5CvIHB4aVvMeSxCl8HFZ8YHI9r8XMtCbeykptY4+W8cgRAwcWreTlBkKH56WQNHb66
+         FmMNkaZJxTuud32eI79jY2lvjdmrpn09Xf2NjZN9hQG/sIpx/MaXi3+weRsDfUQsiebj
+         lsJI6mLNO51RpFstTiFlUjl3dvgoei2jDeoSo+5LMcYfRRIEpdgve06tPMeoQjMXKyxe
+         N/Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792732188; x=1793336988;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LALDteG/UZkflF4BJzSKAZvIyXFZw8pks8R9WPb8HHc=;
+        b=ryXurAxwQ3MhG7nP82fL+lR0BWMN9pIveTAVwV+fNPp2l8ErYTiKPxDM3A+WvNSz2X
+         M+BqLstaFfDZUeL8KaNM51WtLnBHxeJXLH4NaICuJnKL7zgl/TyEKjKbNEaONek37ec2
+         177aG1yNNgBPkI73by01LHejC3XLaPbSuoB6fnONOwojcSG6syU/5/4G8IGf3il1Upgg
+         zjIJoZeyPwClAM23whvjVsj7JdprOYSuaLxt0a4LcFv/QEhaia2s0/hqfT4G7pFBCkrn
+         Hbl+ilYec6fzEdnBa8z7xVtkxRI3Mvui4Jvm01jD7ThyzjTLKw+lufaORP7les41i0d1
+         vPTA==
+X-Forwarded-Encrypted: i=1; AKwUvBzgK+eZPSZeOrvVbE0K96jdtTwgbY4PUWohZJoZTLaWE6m8mN9wKLMgtAvVJg4jpCZbr0Bhn5iEmEY0klTKXdo=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLdV5+NG2p5EFr8e0YQymUYKye5e3nZX56yZ3pSPZzKSuuDv6zO
+	M0bqsKJJqAq5QdzildD97plyx5iR5iNMONeTro/+ans+hRev9XiIwFh9FI44ftrIgCtELQmt+ai
+	L7daWkYJNo5Pu35wGac4F5XkzJCydPiB/j0o4ZQ2X28iGkAbKrCDxdskiDMKBLuaUpVnrNvQ=
+X-Gm-Gg: AYBFou2ttF3e4aEnfDYT6svIs9T5DNKKqKEvzEfinL1yMX7N91aEFMP2AhFW1dnykGS
+	5JlJcw+uDiX2WFmVimHvEnq4lENroCP0Md3Sh2ICfwzEp2AiUnYmgtSl4brVlsrD8TD7MKyqVAd
+	bLZvVu7OU0bhzUaKPeBnNtmA0AdJD8A5y4ANFM0L0i5cX4qURhogB6MK1CxfdEtwG38t6ziIuXp
+	n3jRwDoPWfO7AKeB+aBMzUOK1PB02D0VTVPqF1ou+l1YcRfrR6PxSYU9YEf6wActQIyu+0HVmfu
+	TVtQytKP6Rbdu0aDJOMfGeaduwVoNIRDMDXJiMGwSWja7nNzBlUgi6Y1AnrL9cD/wRG7PRiRvJI
+	wLmKttdv/ESvr+Qrl8EGGgWxFcoL4tF3ZJY3pXVJ1VOFz0qgOaBF3/hfsHERFU+Py
+X-Received: by 2002:a17:90b:4407:b0:3ad:50ef:f5ef with SMTP id 98e67ed59e1d1-3adce08123cmr1517876a91.3.1792732188178;
+        Thu, 22 Oct 2026 22:09:48 -0700 (PDT)
+X-Received: by 2002:a17:90b:4407:b0:3ad:50ef:f5ef with SMTP id 98e67ed59e1d1-3adce08123cmr1517840a91.3.1792732187636;
+        Thu, 22 Oct 2026 22:09:47 -0700 (PDT)
+Received: from [10.249.18.99] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3adcb1f93e0sm1803501a91.15.2026.10.22.22.09.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Oct 2026 22:09:47 -0700 (PDT)
+Message-ID: <8c868c2a-d5f5-442b-b7cf-997f377ac90c@oss.qualcomm.com>
+Date: Fri, 23 Oct 2026 13:09:44 +0800
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -94,225 +115,55 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] Bluetooth: btusb: disable by default Qualcomm
+ multi-subsystem
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <50f92fe870de717fca6368e750e0a6cbc8f46597.1792683340.git.pabeni@redhat.com>
+ <CABBYNZL_EV5LHaXO4rUGu1jg7domF_h1xfmg1m9odHBfgFPA4Q@mail.gmail.com>
+Content-Language: en-US
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+In-Reply-To: <CABBYNZL_EV5LHaXO4rUGu1jg7domF_h1xfmg1m9odHBfgFPA4Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: QCfJKZRvQsJvQnUj7Lmp6qW15S_Ym11M
+X-Authority-Analysis: v=2.4 cv=cPR1IVeN c=1 sm=1 tr=0 ts=6adaec1d cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=MPfgTQqCwHivTDeqJUUA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+ a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDIzMDAyMCBTYWx0ZWRfX+D8rF6YL3mRr
+ xrO6PXnqErsvunc1dpXcv/WygrGoSpOHhHUY17SzVljbp2vphcRziTD6x01MZ9o8sjPUoGlLwYB
+ zP//vcGn7qlm7sVEGkwp/VpqAXflGNU=
+X-Proofpoint-ORIG-GUID: QCfJKZRvQsJvQnUj7Lmp6qW15S_Ym11M
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDIzMDAyMCBTYWx0ZWRfX45oq9HsqgeEY
+ A1XdfVnmd7HoLpYdmxg8hfrK/yL9e5vLAhzar6ZlnsU3Wo1kueFhI4RCAN/jHvbOUNrFqZcBSK/
+ Vqqv1UEfemsU+Fbefo7JppDvnbecQ0IM95Qi2Vurs2nrNvjdbF5Xxg5xkQqQy44aqWX2qMwI2X2
+ oO0jjWWmZS8rzjjymvt9vmq4DbUgaA3yB9CSHm95opCK2YrEH8SRJ+ASkmTLyKdo+5N8VUFHjPH
+ 3FXblubeZ54tCLOE9EMlXmj09Om/Zt4KdJUWToo9dr3o2b/0QHE4zF6MAJ2YRY7WxBvR2LVgtvL
+ T6JNYvNycIl4R9F1Za34fuJGOIe4MQTSy7x8z8rRkViJHlQNhWz3uZcnWsLAerz2CM9TELd/Ybq
+ cXPDpwzB4fABmSof3HtLZ1ah5xec8kjmXY+V0Jja2uZ9KvNFaEqCnKUJrcjqvH9vsfXJyeqTYZO
+ VyPmdUN6cbkVNsWB9cA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-23_01,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610230020
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220344
+On 10/22/2026 11:44 PM, Luiz Augusto von Dentz wrote:
+> @Zijun Hu lets us know if you have any problem with it being default
+> n, perhaps it can be default y for a specific Qualcomm platform but
+> not in general.
+Hi Luiz,Paolo,Jakub
 
-Akshay (akshaym@leastaction.net) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |akshaym@leastaction.net
-
---- Comment #10 from Akshay (akshaym@leastaction.net) ---
-I have been encountering the same issue and it seems to be due to how the I=
-ntel
-CNVi Bluetooth chips interact with headphones that have both BLE and BR/EDR
-capabilities and how the kernel enabled L2CAP ecred and ertm by default.=20
-
-Setting "ControllerMode =3D bredr" in /etc/bluetooth/main.conf and restarti=
-ng=20=20=20
-bluetooth.service completely and permanently eliminates all dropouts.
-
-Here's a complete description (AI-assisted):
-
-A recurring Bluetooth audio dropout issue affecting Intel CNVi Bluetooth
-adapters (specifically the AX211, 8087:0033) paired with dual-mode (BR/EDR +
-LE) headsets such as the Sennheiser Momentum 4.=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-
-    Below is the detailed bug report along with evidence from=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-    btsnoop packet traces, root-cause analysis, and reproduction steps.=20=
-=20=20=20=20=20=20=20=20
-
-
-    1. ENVIRONMENT & HARDWARE=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20
-    -------------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20
-    - Adapter: Intel Wi-Fi 6E AX211 160MHz CNVi (8087:0033, hci0)
-    - OS: Fedora Linux 44 (KDE Plasma Desktop Edition) x86_64
-    - Kernel: Linux 7.2.11-200.fc44.x86_64=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-    - Firmware: ibt-1040-0041.sfi (both production and build 82200 tested)=
-=20=20=20=20=20=20
-    - Driver: btusb / btintel (Linux 6.11.x through 7.2.x, Fedora 44)=20=20=
-=20=20=20=20=20=20=20=20=20
-    - Audio Stack: PipeWire 1.6.9 + WirePlumber 0.5.18, standard A2DP=20=20=
-=20=20=20=20=20=20=20=20=20
-      (reproduced on SBC, AAC, and aptX HD)=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-    - Headset: Sennheiser MOMENTUM 4 (80:C3:BA:4D:8A:F2)=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      (Also reproducible on other dual-mode BR/EDR+LE headphones)=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20
-
-
-    2. PROBLEM DESCRIPTION=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-    ----------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-    When streaming Classic A2DP audio from Linux to a dual-mode headset, th=
-e=20=20=20=20
-    stream suffers brief audible audio dropouts / glitches every 5.0 to 5.4=
-=20=20=20=20=20
-    seconds.=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-
-    In extended listening sessions, cumulative starvation events eventually=
-=20=20=20=20=20
-    trigger an internal controller watchdog crash:=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      kernel: Bluetooth: hci0: Hardware error 0x0c=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-
-    During each glitch, PipeWire logs:=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20
-      spa.bluez5.sink.media: Missing completion reports for packet:=20=20=
-=20=20=20=20=20=20=20=20=20=20=20
-      Bluetooth adapter firmware bug?=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20
-
-
-    3. EVIDENCE FROM BTSNOOP TRACES=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20
-    ------------------------------------------=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-    In Bluetooth Core Specifications, baseband time is partitioned into=20=
-=20=20=20=20=20=20=20=20
-    discrete 625-microsecond slots.=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20
-
-    Converting the measured stall intervals from btsnoop packet captures=20=
-=20=20=20=20=20=20=20
-    directly into baseband slots proves the collision originates inside the=
-=20=20=20=20=20
-    controller's internal LE baseband scheduling loop:=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-
-    Metric               Measured in btsnoop   Baseband Calculation (625 us=
-)=20=20=20=20
-    -----------------------------------------------------------------------=
---=20=20=20
-    Recurrence Period    5.118s - 5.122s       8,192 slots * 625 us =3D 5.1=
-200s=20=20=20
-    Single-Window Stall  138.7ms - 146.5ms       224 slots * 625 us =3D 140=
-.00ms=20=20
-    Double-Window Stall  281.2ms - 287.0ms       448 slots * 625 us =3D 280=
-.00ms=20=20
-
-    Trace Snapshot (Buffer Credit Depletion):=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      Frame 758 | t =3D 5.0456s | ACL_TX     | in_flight =3D 0=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      Frame 759 | t =3D 5.0589s | ACL_TX     | in_flight =3D 1=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      Frame 760 | t =3D 5.0722s | ACL_TX     | in_flight =3D 2=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      Frame 761 | t =3D 5.0856s | ACL_TX     | in_flight =3D 3 (BUFFER FULL=
-: 0
-credits)=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-      ---------- INTEL CONTROLLER CEASES ACKing FOR 145.6 ms ----------=20=
-=20=20=20=20=20=20=20=20
-      Frame 762 | t =3D 5.2312s | EVT_ACK(1) | in_flight =3D 2 (Controller =
-ACKs)=20=20=20=20
-      Frame 763 | t =3D 5.2313s | ACL_TX     | in_flight =3D 3 (Host sends =
-next
-pkt)=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-
-    During normal streaming, ACL packet intervals are ~12.25 ms. Because th=
-e=20=20=20=20
-    Intel AX211 advertises an ACL buffer depth of only 3 packets (ACL max=
-=20=20=20=20=20=20=20
-    packets: 3), a radio pause of 140 ms requires at least 11 packets of bu=
-ffer=20
-    capacity. The 3-packet buffer fills in ~36 ms, blocking the host stack=
-=20=20=20=20=20=20
-    for the remaining >100 ms and starving the headset DSP buffer.=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20
-
-
-    4. ROOT CAUSE ANALYSIS=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-    ----------------------=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-    1. When BlueZ boots in default "ControllerMode =3D dual", the kernel is=
-sues=20=20=20
-       HCI_OP_WRITE_LE_SUPPORT(1) to the controller.=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-    2. Even with zero active LE connections, entering Dual-Mode activates a=
-n=20=20=20=20
-       internal firmware baseband routine (LE calibration / periodic backgr=
-ound=20
-       scan reservation) scheduled on an exact 2^13 slot cadence
-       (8,192 slots =3D 5.120 seconds).
-    3. When this timer triggers, the AX211 baseband arbiter grants the radio
-       exclusively to the LE state machine for 224 to 448 slots (140 to 280
-ms),
-       completely halting BR/EDR transmission and packet acknowledgments.
-    4. Older audio architectures (PulseAudio with 250-500 ms ALSA buffers)
-       masked this radio blackout in software. Modern low-latency servers
-       (PipeWire) operate with tight pacing (10-20 ms), making the baseband
-       blackout directly audible.
-    5. In pure BR/EDR mode ("ControllerMode =3D bredr"), BlueZ commands
-       MGMT_SET_LE(0) -> HCI_OP_WRITE_LE_SUPPORT(0). The LE state machine
-       remains completely dormant, and the 5.120s timer never runs.
-
-
-    5. WORKAROUND & VERIFICATION
-    ----------------------------
-    Setting "ControllerMode =3D bredr" in /etc/bluetooth/main.conf and rest=
-arting
-    bluetooth.service completely and permanently eliminates all dropouts:
-    - Gaps > 25ms: 0
-    - Inter-packet interval: 12.25 ms +/- 0.08 ms
-    - Audible stutters / dropouts: 0
-    - Hardware error 0x0c resets: 0
-
-    No kernel configuration changes (enable_ecred, disable_ertm), no PipeWi=
-re
-    buffer overrides, no codec changes, and no power management overrides
-    were required. Pure BR/EDR mode alone fixes the issue.
-
-
-    6. PROPOSED PERMANENT SOLUTIONS
-    -------------------------------
-    1. Intel Firmware (ibt-*.sfi):
-       The AX211 baseband scheduler should prioritize active BR/EDR ACL aud=
-io
-       streams over internal LE background calibration/scanning, or preempt
-       the LE routine so that BR/EDR transmission is never paused for more
-       than 15-20 ms.
-
-    2. Kernel Driver (drivers/bluetooth/btintel.c):
-       If the firmware scheduler cannot be updated, btintel could provide a
-       mechanism or quirk to temporarily throttle or mask background LE
-       support/scheduling when high-throughput BR/EDR A2DP streams are acti=
-ve
-       on single-radio CNVi controllers.
-
-
-    I can provide btsnoop packet captures if needed.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Default to y for the following reasons:
+1) Avoid regressions when moving support for many existing Qualcomm controllers from btusb_main.c to btusb_qcom.c
+2) Align with BT_HCIBTUSB_BCM and BT_HCIBTUSB_RTL, which also default to y.
+3) USB devices are hotpluggable
