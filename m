@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792789240;
-	b=tKf/syh1tA/K+ZnvGzL9baDIVtEeaFREeP0PCp6PAtEWpFWUCPghq2Yf7Ga/uKqPbwFt
-	 KHkiICr2XOCfbkz/krmS1u2pLGA3JmckQLNGPgITL9sP1lkYRVxDlinCX5YEy/FSewl5f
-	 TSduThr4BJZ+1yMoVu6WUj4LCLfqFf7EJ+RvKsoyEW2hOb18zuz8sv+59asC/BMYzROWu
-	 S8GTJ+emQwxRVoU6WoLslWzEfF1Ifd4Rprlw/M2U0pVgWQEHXSXWqQsUL9EtWww44kN+v
-	 dyLBVDMRN+VMbEK8RClCV8DSri89i/i3x9sgfQjZP2Mkyd1zknIq3YjQbYRcPOa3mFQ==
+	t=1792789241;
+	b=I2UHnCKrUWiP4YOQylp/7UDw/7JgBy0KByhjvqWxZ1+041p8gRMV8EeCFwoDwUJ4IpCD
+	 5x/jy73kbqcHC+vVAjWFqyl3F7Imf9A+5ZVs4uwChNaVQIUnrTuCSLY+fftkvg+1ANDbD
+	 RcoLSld0KNi53CzCsyuz6Lwn66z3oWZ9l4NtLSB2IEmI/JcbljVzRkBgr++tjRHE8xeXU
+	 DDNk4gwe4eqPS6N/O33b3SrsFQ44TEyKnPax1B6qWBbajpOgrCsKdto/nNn9Bv765tos2
+	 1nLz5k3BRnkOn8RqUTC+zQLyU3FPCDjMIzhD9sItD/hcR7WZHDjz6s0R2tbxTiaAERw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792789240;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792789241;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=nLEWUgkRbsF7oNEnaZx263StjYEEJjVyC65+Hp2uOs8=;
-	b=UHM/S1LAvkBKHjKWk/xkXmu0nMVy5eI+Ag/Xgh5yJHXdKDJK0ArQS84wucXC/LCALo3g
-	 VpDynw4BnvYPkVYSKyXcHfcQbNqbdKdO+shbx6JSKD7YVzhAUCV6nmW4o06SSwBDFIU0m
-	 KkXeoFgZT3y4fAJgdgpGMxC20yXn8GB6w0z5Dcb5QUU5KbgwrCrYEs4304QD1ovUt7vfI
-	 U8igVsSZ3B6uXJ1d8meDJ7VsfyvD1ZaN+CkU+twL/nhwXizTVffzjntu1LwNFIqaENNeq
-	 FRtxkV1aArypr+ypXxSfeqsh9HseZR9puU8BA4S4LmIKI9nd/YtCoqBvdaGBeIiLdbg==
+	bh=Dpo6rOC8b0oZMrJnBpilHYeohIGR7jL97FBiqCtY3kA=;
+	b=ODWcVQsxybmwibHrH2qavbvmzFLjG3IMjQSFI4jB25MVQavIC0kAyWUAqDM1KmVJr274
+	 hnQtIwpZLn+3KPTGsK0NPdthly8LiiTlJwwEROLEKrf41N0JOKUZuXThm65y12RS1+zuV
+	 D023N8/vBe1N58fuEXsaI32/M1geuTvd28V4LE1My3fVZADq0yPxf2spkrVcbaME2cGef
+	 WqiIWJ0HblwegOK15Aal7DX0TV4FeXTK81g4eYlh7CC9b8zGDgL8/qF0bquBmh+zr5SLV
+	 rVPoSXQasp0rR9Fxub3AARu5t3wOtS3dKMkIRkNP9KCG1x2wiT6JOqHKxGQUwpdXSsg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="F5oY4WV/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XbfTA7pL;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA62606A325
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 21:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748B6606A31A;
+	Fri, 23 Oct 2026 21:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=F5oY4WV/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ADE51F031E0;
-	Fri, 23 Oct 2026 21:00:39 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XbfTA7pL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 113C31F031E0;
+	Fri, 23 Oct 2026 21:00:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792789239;
-	bh=nLEWUgkRbsF7oNEnaZx263StjYEEJjVyC65+Hp2uOs8=;
+	s=k20260515; t=1792789241;
+	bh=Dpo6rOC8b0oZMrJnBpilHYeohIGR7jL97FBiqCtY3kA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=F5oY4WV/MYIoB8DtbutuGey1E5RkNlzPIm5bcj+iBd1b+Z1zmbFYMNxTgS4fd2m0H
-	 vMyQyMvFGrofPZNglfZ7rz7GmCAHtKN6CADc4VwQnJLo00bpr3ItC6leJn+vRt2AM/
-	 6DYBp/TndlvxgyrY7+CHOgDpPg491aEN1g00xAghyVqRcll8AKE1opEs8o8rnkYZ84
-	 4mivA9G/amFDb5+2QmXFQ/0P6FwCOj4I3FAQ1QH2kw9MIiz5RIsEIz1Hf3GusBDLKl
-	 lFmvAGoC1fk86gTBCoaIoiQrKK8zBNkJYU6Cxu7z/r+8fhEjD1auS633xfpCKItRlA
-	 sG41VWLKO8EXw==
+	b=XbfTA7pLu8c33dpOytc9kqa2iRxHaAhjmKdguoc10x/jOwMbvboOgxVchPwRY9VLC
+	 1zOTT/+qgXUTqMW65rzcAkCZhMs5XBoUhFGChWUs/vk+5eMwgMW52Ftsla2VL0/Gz2
+	 +Bek2EttiqSP2QQR0SdtQyd3CGaox4dcjbKj+HxAPUbmwaVr1nfWRu5/Iq5Ax0Q6fc
+	 z+Vp2i7ktfjl/GXOmKjVkR1QTFPtYIQM35/wXQMA87WEKAr5TJgS/gaObcCxBK9GB9
+	 HHjcbhaHWWNjN7njK41yP1rRiQFhYIZX8hKQlAb0CS17F4gfwgljlBarQuyDTgzgJI
+	 xb5Rujz4Rcpqg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 815C7391B157;
-	Fri, 23 Oct 2026 21:00:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 07435391B157;
+	Fri, 23 Oct 2026 21:00:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,40 +54,47 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btmtk: remove redundant memory barrier with
- helper
+Subject: Re: [PATCH] Bluetooth: hci_core: Fix queuing rx_work while workqueue
+ is
+ drained
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179278923809.1268720.9672691636919611279.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Oct 2026 21:00:38 +0000
-References: <20261023093645.4669-1-abo@medichon.fr>
-In-Reply-To: <20261023093645.4669-1-abo@medichon.fr>
-To: Arnaud Bonnet <abo@medichon.fr>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, linux-bluetooth@vger.kernel.org,
- linux-mediatek@lists.infradead.org, skhan@linuxfoundation.org,
- jkoolstra@xs4all.nl
+ <179278923956.1268720.15284721723706023982.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Oct 2026 21:00:39 +0000
+References: <20261023161609.253097-1-akhilarul324@gmail.com>
+In-Reply-To: <20261023161609.253097-1-akhilarul324@gmail.com>
+To: Akhil Arul <akhilarul324@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+2344fb8002f3ef5b1712@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 23 Oct 2026 11:36:45 +0200 you wrote:
-> The test_and_clear_bit() call works as a full memory barrier, thus it is
-> not required to emit a barrier using smp_mb__after_atomic() before
-> wake_up_bit().
+On Fri, 23 Oct 2026 21:46:09 +0530 you wrote:
+> hci_recv_frame() drops a frame unless HCI_UP or HCI_INIT is set, but the
+> check is not synchronized with hci_dev_close_sync().  A driver can pass
+> the check, then close clears HCI_UP, flushes rx_work and starts
+> drain_workqueue(), and the late queue_work() of rx_work hits the
+> draining workqueue:
 > 
-> Replace the whole sequences with test_and_clear_wake_up_bit(), which was
-> introduced later in commit 52d633def56c ("sched: Add
-> test_and_clear_wake_up_bit() and atomic_dec_and_wake_up()") as a wrapper
-> for the correct sequence.
+>   workqueue: cannot queue hci_rx_work on wq hci0
+>   WARNING: kernel/workqueue.c:2352 at __queue_work+0x2c0/0x780
+>   Call Trace:
+>    queue_work_on+0xb2/0xc0
+>    hci_recv_frame+0x18f/0x330
+>    vhci_write+0x174/0x240
+>    vfs_write+0x271/0x680
+>    ksys_write+0x7c/0x110
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btmtk: remove redundant memory barrier with helper
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ebb8ee296578
+  - Bluetooth: hci_core: Fix queuing rx_work while workqueue is drained
+    https://git.kernel.org/bluetooth/bluetooth-next/c/63bcf9f4a40d
 
 You are awesome, thank you!
 -- 
