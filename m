@@ -1,74 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.57.137
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792829018;
-	b=IzYEPyZ7If5ojE1RseUbmNHQwqrnECbcM57xmge2Jo/K08p2/MUKsnU76udw4kXp2q9N
-	 YONyiLMVgGWjZUuz9upijnxJmTMn559vWyrEk5I1iF6VdMfh9MGgKP8rsHCXqyJSTob7N
-	 +WgjD0sT0RHW4Y0MvzBo8pa02a5IphS7zpoz8jDS5Bku3mRKGeuRrwqkRsu0FvNhwOPWz
-	 hl6gTaCAQe0qAFIS8jglZxTTBRjuPXjeLzfgiyBDZeMLG+ctiKQU80CoYAcPMdD8q0pd+
-	 UWeBYMUhOVAezZ2L3zvJSnt1BRVUJnJ84X9LeQBtz7Y6l6SBCoT9aY6m+CxHRBeb07A==
+	t=1792838041;
+	b=3jiXIYysy+BvJccSONwBpwjcleO5qk7rykokub3NzjtK2oD5fPpzKtU9aN+l+zU/79Nf
+	 a8Yw3heZT0hn4YYfyhYh0A7eMx00DD42jkG1AQyC3PZJhnnemGqF6tarj3AQpmRzYXM+X
+	 iCFPQFRuVjdR0i8IhyZCxxlU75Avx4CQrthXDzkKk3xappGBnyDubuK9TQJRnxB2bWft0
+	 YSSxDh2K0Sdc/e8P6J4zUZaJxewYJKbpKobkKbkIGo7/xiqmXIkmhcarBHSZ9UxS294hf
+	 Ub0aCRbYLqCHX0chUyxGJe8wtNLGblH2H1Ov7B0UjEePxyvcvNJ54boHvBCWpidUh2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792829018;
-	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=fAmjKfl8qUtugAHsJ7C2J0V4HP8utluGZ0yTkhkDo7o=;
-	b=ri7WF0f0qSTi8y9p/NpmFo5v73WpG+WZYtmxSMnWtT28hGlhxfspTR34S+sTikHXAM6p
-	 YKDlrjV0IMFZzoe8vJpWRdbd1GkU6MA7lPddiO24mlYyPYdj14tXJyIzcQ5FOD+9BN7m1
-	 dpQju5zngRV86tsmcqTvUGeWT/aPyiiSBQs9bXYilDI6M3WxEchCiouEuCqhE8QpiCuio
-	 moRpALO8zHCDtmGvo54r17OIB081vDR5zbDODIcLuh803ye5fYIQU+ccdO/4EqvVc/0XM
-	 lf1CT7a8y4/IUOPwuCirSi91LKsAMq+kveQrh8mw+Ggwi91O+Q/qQPDagl17pCSdXCA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792838041;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=KNaoHxAB8gHqb367OXek7XWTOVPpKL5MAFt+xsGWk3k=;
+	b=S7Z1cOCYDsNxjSZEckBlR7vUXD6VDTdO4IbJQd80D32QzNB85wQC3E/7MCn7LhVdldxG
+	 P6x+T+KByDJUlj1Bd4sDNJmTXpaz5ezehLBaqg8D2HVywyvZZbhLS3G9v3F/OMlYwW7LD
+	 VQ51wXhT0pZ/GFuICBATMLs76KS7Nqnx1oVxcn4E7kLaPKSnTnvIom0JzH0hnPHJH2lmb
+	 IWboWGUkcOT69vUnmSFswcndxeu5xDE5pwPGeRD6jS6ehN8D1UyH8JZRNLB8L4BMP9PCn
+	 ca883uyz/jEUFEyoW9bj6kojW0Fn8LWi/pzGxzM1tAncf+0CJHXIuV1Mcv9iOJ9gFTA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=qq.com;
-	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=dAa9ObnN;
-	arc=none smtp.remote-ip=162.62.57.137
-Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=tooangel.de;
+	spf=pass smtp.mailfrom=tooangel.de;
+	dkim=pass header.d=tooangel.de header.i=@tooangel.de header.a=rsa-sha256 header.s=google header.b=Kyfu6Hxf;
+	arc=none smtp.remote-ip=209.85.218.50
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A963606A31B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 08:03:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8A963606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89343606A31A
+	for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 10:34:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89343606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tooangel.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tooangel.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=dAa9ObnN
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1792829012; bh=fAmjKfl8qUtugAHsJ7C2J0V4HP8utluGZ0yTkhkDo7o=;
-	h=From:To:Cc:Subject:Date;
-	b=dAa9ObnNNzDOwZdUho6iEaTzFQgfyX1iCdR3EbVb6G88H3MR47CboXtKtGKDG3bFX
-	 fLtFIuhgHwyS1Fpin5wKjfUAWu3xcHJB5De56YE3VDTt+Avaa++By9Fc1OuZ1Vsb/s
-	 yGDh6uVgtMJChB/hpHWoP4mUIXmSpZHyEuey+vnY=
-Received: from localhost.localdomain ([2409:8d5c:c30:3b3:dfb:e67e:fa31:2357])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id DC9C8CC; Sat, 24 Oct 2026 16:03:28 +0800
-X-QQ-mid: xmsmtpt1792829008td5aukcfp
-Message-ID: <tencent_8E1E52CF977BFA4D99F205853D3A71F1D306@qq.com>
-X-QQ-XMAILINFO: NI6TJc3opC6Fr2IFouNAGug8qc9hBYDFJwjhm632f5MIvy22cHbv+smSyjjyB0
-	 RdjmCufE3dTtOxteLoJ3PmDtbocMLSKjJa7vdAcPUCtX9AQPPuRxjtJ3aWZCFthdaNOZzDER4lAu
-	 yN/BIMJf55zWk3lvqTLSv9WgYJHdB254ZHmEOecqtATIsaocD3SUG7YKLw36HhJs0YuFLCd1Hfax
-	 E4gN0omUToqY5N/WzDKUL1xJnWBfiAdvalSQ+6zsmTw3qK4vsZOMA1TNiMDIz0A4go8umdjjFmeD
-	 3FwBOJcc2qFUH1rLQpsos+ajCf/ouadcwa9INH6oFMIJ5HpDsLA0pihsFIz0llOBmZBmwB0Dod1N
-	 ch9xglUeVgjycZ9V0iOvdH8qqjv1u8phCHN1A93xUnp9TUQCqXd9K2Ddt26bFpwiHXjREzrTILlU
-	 e4jZZMZNnSaXg1835ox4C9kZDGGFMZnnZWKssUu1MDNeqxoew9Oc0TbJ47gvyhvTVccFcgCoTsy+
-	 1FtavZIUkiKX0WVjLKx788nv7C0vJS/TVD3evlPT8OAYulgRS+FiJxzH971oi12T3rYCCeArkLBo
-	 yHJgkKuSpQyUWMJv/szobgp8FP5fYZH3zLmCQwwYc6DcK7WlK9pvvkFKMxi7xpp6g8CoiWsnlutu
-	 gvOD1BcWOBLNEQZpg7PUY9Gnnp6kIOXpr5DSpWiXiQ2H90td//qfotQ97o09YPVVhCDqiES6CMPp
-	 Qtj1ZbETzIsrhlNM53nt+FLZ/bZ0cQxwujAkv7wEdhLfZqPWkxRcT11NBLbOqg9704NkylaPcd5I
-	 C5boJBODJGMnfP1Uks43H8JdMxcPwP6xw57Upx7teI98guGVJXWCoOmZSp07hjH0HgpWCdYmPjua
-	 D3NFVEaUxpkC+/wrbYZ2knyLRWjo+O6j17dLNYKL6UyxkbXeiOWxSJlk1nrQPSsacrUcrWYDbMMn
-	 dCjEbykk26NWqZyh3OHELuQc2T75GKDsTXTjNLEN7WUAIrmqh4rHojvK7AODZ9DOVdd144Hb4mgj
-	 O5whQkbSoddmVsNbfSgXRbeR402OQjE9g4SVtWj0w5pc1+6hsasF/p9ataSaXRMZTNGVDufB/YaO
-	 zDUfRbl03pZ6+4IudYVJjfvLXc0Q==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-From: Hang Nan <2122295973@qq.com>
+	dkim=pass (2048-bit key, unprotected) header.d=tooangel.de header.i=@tooangel.de header.a=rsa-sha256 header.s=google header.b=Kyfu6Hxf
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c4203bbb1e9so233822966b.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 03:34:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tooangel.de; s=google; t=1792838039; x=1793442839; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KNaoHxAB8gHqb367OXek7XWTOVPpKL5MAFt+xsGWk3k=;
+        b=Kyfu6HxfMyNSetlAIavCD4XM4U92lpTP6sC7MoFmTz77ORZvuIbZi8lh27SBnisWD9
+         Uo9xov1JpCUi7g+OVXW5+Ot2kf+EuU/m824yLHO9q++0glf8K2azDQpyZaqCmLwVuB+D
+         JGorRtqxwmm4mqQQnwLxJLyDHCdM41kLHmvbe3Vz923aT7YvqwlsY2/2Cb5yxsWGdFpv
+         3Prx6frlQOgPjTQlYLhPdBlHEYDfniOkG/QjWgsGGvnfUqgi/xcZ/TDbaZqyS/wJxq3d
+         vVZaPAxZboIJvuX/Me9qpbYAWQWM2oQJBYrQG7VMISieYrhpy9TnY2joFXpUsFdzCR3Q
+         X6mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792838039; x=1793442839;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KNaoHxAB8gHqb367OXek7XWTOVPpKL5MAFt+xsGWk3k=;
+        b=1ZkyAPHufW93Kk0W6ehoMIQ1fUPifTJqJ208Pusol6ivV8DGqS6kJtrXrndBoFT4YZ
+         pQvEoeeJKQ91ca0CpDzmUBNVWBVnI6iFpZTEjHQErhsaWQZAm85VPC9IccbA/sWcMmpN
+         GRs3M8CLKUOkvUCXfnoOKAOnS9mQj+8Hdb28o/w65O5myWUcjKBxXW4Xp7R0H9aEmocB
+         ULBJ97srQkvmCxaHGIXLfHq95O2vdiLXf8dhQERa5Rl5y4il4yBmOS1JgWyaeLbxPu+g
+         LksOGrQNxp8hhrJ38YD3Nfr15Dre7cMTbOph5eqRUcniDDng151cqJ5Q2x27kjD2Jsbq
+         mjbw==
+X-Gm-Message-State: AFq9FYJ/D8ueFff/s2B+3Ol3EAYmxpS7CnjiocoYUnTjE7adtzZP5xtg
+	1WwvMvSah52iS3X+VkDFqLs4IEKyxGPG1QdUaBKBJIgOw72WsKq+KaSn5S+r6nm81fneC0JYy5a
+	yFEGXacZbyQ==
+X-Gm-Gg: AYBFou1A74IjX8Fo0/NR/DMGqlonqnn5/IDKyYw7U6VF8Tag7wQodQsQFlJu0BqfDim
+	2PSQ2dfD0baNjocv7CU/9IF9H2lUVcFH8SvejzFN+ehLtiXQ/u8csXEcLRCwFPg5ckIVOfEthv9
+	l0qIqnBvKo5jB3o0A8CPbJRcGnoE8SDq7I1jsVrM/apHVMk+BisEoRi7R5aVEKxNksHjcxXIXUz
+	0i9ds9O+S7vSR2VjQVDmtWfE8V9qowx7GTnTG0bhXmYiQP4Z8r+LW9RskvdsoGi9Gn6XPDqf+ui
+	Baeop8gwGNrt0QuVmRnBZpQ19RzGe3p7JQN0ZkXH3gOXCrNzorsOI799KEEEnKrLI87jAG47Mh3
+	mbbX613FhtpeEQ1wPyhkFnx+pf7ArThLT04xcEZhReT7vlb0v0C4wJb2e2jH9Qieum5+7aHUoll
+	E+XJqV8YucqrR3bkCmiHuAAdIgTthQzTMzdlycGgtOdBXR38tPbMQPwjd0dmKZWCRHoNRoovUgt
+	h+TKB4F/zebbSRlsHjopYH4C1w3s/ljoQMwAeDz2xLGWz68tiKC2gdLPN4TEBqOHs9iYGCRGZOf
+	dN/E1UWMB4G2dcg22GOLMg5+I7v99nbu/c0PfmCDSBgKK1aD9K0aIfDE1st8FNRl3mmBotfikYV
+	B4K+lHFwhfEvYGMRWqlozEQg0IdC0N7fw75EGKSxzeScyTyYgoXXjEccXtjU+Ew==
+X-Received: by 2002:a17:906:dc8b:b0:c29:659e:2fd6 with SMTP id a640c23a62f3a-c46bddb549fmr161119166b.10.1792838038377;
+        Sat, 24 Oct 2026 03:33:58 -0700 (PDT)
+Received: from toogaming.fritz.box (2a02-8206-7d2e-cf00-f0e4-3f21-43d1-d408.dynamic.ewe-ip-backbone.de. [2a02:8206:7d2e:cf00:f0e4:3f21:43d1:d408])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd4ea0ccsm76501566b.16.2026.10.24.03.33.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Oct 2026 03:33:58 -0700 (PDT)
+From: Tobias Wilken <tooangel@tooangel.de>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Pauli Virtanen <pav@iki.fi>,
-	Cen Zhang <zzzccc427@gmail.com>
-Subject: [PATCH] Bluetooth: RFCOMM: hold the listener across child teardown
-Date: Sat, 24 Oct 2026 16:03:28 +0800
-X-OQ-MSGID: <20261024080328.266825-1-2122295973@qq.com>
+Cc: Tobias Wilken <tooangel@tooangel.de>
+Subject: [PATCH BlueZ] adapter: Don't power on while blocked by rfkill
+Date: Sat, 24 Oct 2026 12:32:55 +0200
+Message-ID: <20261024103255.81769-1-tooangel@tooangel.de>
 X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -81,76 +95,75 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-rfcomm_sk_state_change() takes the listener from bt_sk(sk)->parent,
-unlinks a closing child from the accept queue and then notifies the
-listener through that pointer.  bt_accept_enqueue() retains only the
-child, so once bt_accept_unlink() returns a concurrent close() can free
-the listener:
+btd_adapter_new() reads the rfkill state and sets PowerState to
+off-blocked when the adapter is blocked. With AutoEnable, the default
+since commit 180cf09933b2 ("policy: Change AutoEnable default to
+true"), the policy plugin then calls btd_adapter_restore_powered(),
+which sends Set Powered anyway. It can only fail, so every start with
+Bluetooth turned off logs an error:
 
-    krfcommd                          close(listener)
-    rfcomm_sk_state_change()
-      parent = bt_sk(sk)->parent
-      bt_accept_unlink(sk)
-                                      cleanup_listen(): queue empty
-                                      rfcomm_sock_kill() -> kfree
-      parent->sk_data_ready(parent)   <- use-after-free
+  bluetoothd[1212]: Failed to set mode: Failed (0x03)
 
-KASAN: slab-use-after-free in rfcomm_sk_state_change (read of 8 bytes at
-offset 264), freed by rfcomm_sock_release() -> __sk_destruct(); the window
-between the unlink and the notification was widened for the test.
+or, with a kernel that reports the rfkill block:
 
-Same class as 4020751fd0df (L2CAP) and b4a00dedc5cc (ISO): hold the
-listener before the unlink and drop it after the notification.  Lock order
-is unchanged, the child lock keeps cleanup_listen() out until then.
+  bluetoothd[1212]: Failed to set mode: Blocked through rfkill (0x12)
 
-Cc: stable@vger.kernel.org
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Hang Nan <2122295973@qq.com>
+Don't send Set Powered from btd_adapter_restore_powered() while rfkill
+reports the adapter blocked. The rfkill unblock event calls it again,
+and that powers the adapter on as before. If the rfkill state can't be
+read, keep the current behaviour. Setting the Powered property over
+D-Bus still sends the command and reports the error.
+
+Assisted-by: Claude:claude-opus-5-5
 ---
 
-BUG: KASAN: slab-use-after-free in rfcomm_sk_state_change+0x2ed/0x320
-Read of size 8 at addr ffff888002716908 by task krfcommd/60
-CPU: 1 PID: 60 Comm: krfcommd Tainted: G    B      PREEMPT(full)
-  rfcomm_sk_state_change+0x2ed/0x320
-  __rfcomm_dlc_close+0x16a/0x3d0
-  rfcomm_run+0x1824/0x4000
-  kthread
+Notes:
+    Tested with bluetoothd built from master on Debian's 7.2.9 kernel,
+    Bluetooth soft-blocked, AutoEnable at its default:
+    - without this patch: "Failed to set mode: Failed (0x03)" at start
+    - with it: no error, PowerState off-blocked
+    - bluetoothctl power on while blocked: still fails as before
+    - rfkill unblock: adapter powers on by itself, PowerState on
+    - block again: off-blocked
+    make check passes.
 
-Allocated by task 72:
-  rfcomm_sock_alloc.constprop.0+0x47/0x240
-  rfcomm_sock_create+0xa6/0x2a0
-  __sys_socket+0x116/0x1d0
+ src/adapter.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-Freed by task 72:
-  __sk_destruct+0x499/0x5d0
-  rfcomm_sock_release+0x101/0x140
-  __sock_release+0xa1/0x260
-  __x64_sys_close+0x78/0xd0
-
-The buggy address is located 264 bytes inside of a freed 1024-byte
-region (kmalloc-1k).
-
- net/bluetooth/rfcomm/sock.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 3fb8b5474948..8f59fa1fa07d 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -83,9 +83,14 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 	if (parent) {
- 		if (d->state == BT_CLOSED) {
- 			sock_set_flag(sk, SOCK_ZAPPED);
-+			/* keep the listener alive across the unlink */
-+			sock_hold(parent);
- 			bt_accept_unlink(sk);
-+			parent->sk_data_ready(parent);
-+			sock_put(parent);
-+		} else {
-+			parent->sk_data_ready(parent);
- 		}
--		parent->sk_data_ready(parent);
- 	} else {
- 		if (d->state == BT_CONNECTED)
- 			rfcomm_session_getaddr(d->session,
+diff --git a/src/adapter.c b/src/adapter.c
+index d3aa03f..1561ea3 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -8260,14 +8260,23 @@ int btd_cancel_authorization(guint id)
+ int btd_adapter_restore_powered(struct btd_adapter *adapter)
+ {
+ 	bool powered;
++	int blocked;
+ 
+ 	powered = btd_adapter_get_powered(adapter);
+-	if (adapter->power_state == ADAPTER_POWER_STATE_OFF_BLOCKED &&
+-	    rfkill_get_blocked(adapter->dev_id) == 0) {
+-		adapter_set_power_state(adapter,
+-					powered ?
+-					ADAPTER_POWER_STATE_ON :
+-					ADAPTER_POWER_STATE_OFF);
++	if (adapter->power_state == ADAPTER_POWER_STATE_OFF_BLOCKED) {
++		blocked = rfkill_get_blocked(adapter->dev_id);
++
++		/* Powering on can't succeed while blocked, the rfkill
++		 * unblock event calls this function again.
++		 */
++		if (blocked > 0)
++			return 0;
++
++		if (blocked == 0)
++			adapter_set_power_state(adapter,
++						powered ?
++						ADAPTER_POWER_STATE_ON :
++						ADAPTER_POWER_STATE_OFF);
+ 	}
+ 
+ 	if (powered)
+-- 
+2.47.3
 
