@@ -1,93 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792821823;
-	b=wHPpAps+ac207QwwuMRPtTimNH1LraU6n6spKghZTB3rKggcbq+nqnzsXAl26Ws74uJj
-	 PY4jKVazR9N4E1IkErcbPsZJw/oybe4SNuvCiSHE+1NbKVkZGo4FDa5EZeEARUCGL8nwW
-	 jISgLlMAT/d9MoWdNofDEx3O8wjiLiO09RVFp1IGpost8Ce6ntdoKlVBowp13zSzXQDUE
-	 sEfJad9jSCLTURPJIfeo+5XW+0RYasamdjk9ZspuLmNo4Yw9pqkeG6TgqYzeSiSNukTyA
-	 q0loTtz64D2YtX8jguOttzDy/WreyCmvvC7hUikkLHtPf2QAmiL9ozVfd3W4k77O0DQ==
+	t=1792825421;
+	b=WIIe054CdzyzdJUaKXg69VDXMYUhUThnysv4ehTG8tV5E7ShbvW+ru2fmE/3nRjHnOec
+	 Wm/2t37P9emRpgD8w1PvDLwxQjqaduPULz47HmLQ0wUwc+OJ+/ZrkhJBXpnV8uK8/i942
+	 +etUTtj+fhfg1sJ8XfaW3KurClMKK6YlUtpK7nBN0NUPunidqa6ndE32IUMUkxpXaxlzH
+	 XidWTNC+p3DdvbgblZqUVu3l0O9gEUaRJFWPKuCnoms7+dI85sRoE2laavQk4BedPhVaR
+	 IDaNpkpczZn/fJXOa5tVUrI/OQbAVXAeN77Qs+1Snx0mSYBPjyqhA5otP5T1KSUGyGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792821823;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792825421;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=synWqYbmp4TKDqP3tt+5+3H7Yv3rlDcxUAHgND7ZObE=;
-	b=r/K4ARlZDC/fjOaltNuQeRxwHTregVmst3bJ4hKMqjGMFs+jwi27BqK1G054KKDh5hrq
-	 dompeiSwHmjK+kGIDsSFHOIdXA461WaFq06P290GSbswr1gHAEMUjFY3og4RdTW0+tE1a
-	 oDG0ACPsn6g1+rIT62PfgC++75PTPGlqQbIWZVLMe5li/oJX2RtVZ2CX1x5bEY8rxHnBd
-	 yaaKNCAFFKCQ2AQhtudlrYqHlbojeCSqvvzlvPgJhRgdAbIYteSfRHIhSl2TCTE7V7p25
-	 7NzLi6o3mpxhX04c438nwpn9KyRyda3q3J2IIdDjNK8W5q6UVuN/DuTqv6jXM9pEing==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=ha9mNqJRAj6za7cAI8C2Y5WCJwNWb+5t5YQFkU9ULI4=;
+	b=L2PUuWOkxHMEnqKguB9Ejxw3YNuHoh16q1ZYk2z3RI1nHCbWn9U7+rvMyt1Oz3nZaMoF
+	 6f7Qp1sXvry8GLEG+f7QxVtpcsWHRVy32/RzrdlE5gZkC2DYIY+n/pjSzAIGneRAW42z+
+	 UxfkvrnpCtXxe98sny/x4/tSYtWsIVX3kzjhmE5R8ATvWTWUZB2TrX9/QuPdj+MvyiRNC
+	 /DaXzgAnY4KJWpKAuY5zlbUoDNrIKBlmSHviojVriXucsWlC78SXp4LhFRSOp8TqQ1FOp
+	 JfgygxS4E4zURHmWShqewVA/n9UaT/6ANR5I3d+nDFVoQvN7a8wyIzj+kIE6YXtVRCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=NS9s0YHL;
-	arc=none smtp.remote-ip=209.85.216.41
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=TOI4d4Wb;
+	arc=none smtp.remote-ip=209.85.210.50
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74DC606A31B
-	for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 06:03:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D74DC606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DCA606A31A
+	for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 07:03:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 58DCA606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=NS9s0YHL
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3ac7842c17dso877321a91.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Oct 2026 23:03:42 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=TOI4d4Wb
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-8490a7d6696so858149a34.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Oct 2026 00:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792821822; x=1793426622; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=synWqYbmp4TKDqP3tt+5+3H7Yv3rlDcxUAHgND7ZObE=;
-        b=NS9s0YHLEKDzxHQNG8GHrW2G4rAOvB/28sje2wIMzZaZkOpOBIv/eWcH3e/chqKhyf
-         4KBQ4gdD3eo1JBwX2a5pLI7US07RUWHN1jkY/OJWd6gby7Nh2oLopKIR1kLhm93xAoD7
-         mCGYBckEahJiX8edFjwimSM9AdiASHdV+4yclpHRTQdTffrnKhsl57fBn2Lm7xO/sIYo
-         5imsdmYG3gp09rQYdC88AQX2dezzf6Ek126++SHEVFttBM0hKHq2HngVdFQTJZQ8u8Ni
-         4KDcQRbm28CGReSZpD0/i05TbTmPWyXRS1vCiMRIT0kAbZeVhOpmHwsUVl3OvjZtROkl
-         tqRA==
+        d=gmail.com; s=20251104; t=1792825420; x=1793430220; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ha9mNqJRAj6za7cAI8C2Y5WCJwNWb+5t5YQFkU9ULI4=;
+        b=TOI4d4WbPKYbzdzzluJpfR3kXQYHKAkCJnAnC/8U/Onjhr6oM2+0aWEE9rU8gLscBa
+         9zlmIsmYuls3zZrMrXcS+pvNH5e6f2XjLMwIKJrNO3mzsA2xdYEmupsvDe2onHVxHxMs
+         KkIO45sBtXjaJ3weESgg16p1dhgmlWSTfpk8BUQL340L5/HcI98NVQ4w7LOmlT6F2KZ1
+         4JgI2e/Z55DRhyCuEbmihoNtTwUflbYy0mpmj2UsTxNVt3m6uCsEMXTwurPqA4NN6ptL
+         IeKmGgq3c0VcMlcI+hFimjNHuK0XO9hRs7ydgHfXjhHKxsL3HGKNNqB0+Bj1tmjn8Ho2
+         OMOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792821822; x=1793426622;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=synWqYbmp4TKDqP3tt+5+3H7Yv3rlDcxUAHgND7ZObE=;
-        b=vvYiUGlm1L9XZ1ZiSxnUQzEUv7kS61mMD06IKoTM6g50lvtDtpwbK6WhNT3jH1n2Md
-         vzbgWNhSQ08cE5Ly5l50SkGe10ohwAIzRtskRARR3tfVqSGSXFGf0SvlyyPG9tvskQ8P
-         Ut4NJrV3sRaxd+nWbaZVefuh/hiuuMXxr8aw1P/i6Nyg8ZdAiH/qtI6sN1Lqr8CSw7gl
-         sL9Zi0AyEqETctNfQk8Y57dbd14x6Decow/PDgwmMg2pBygS+KqFTm1XAeyAXjbgOxBc
-         s9kyy74u0GtEPS+Lmyy/agvq5te0UOn+TDiUXhShJ1LEjH3UpSn2d6tDetQX18Z/D9KT
-         8lqg==
-X-Gm-Message-State: AFq9FYIKE75CQf1DrlYntldIMYa/EHsENSNhV0GfgeD3EHFOZ8I+RZJq
-	4ozmr6NW9GouB40Lu8WTRZHHTO5bw2J0RttWLYxlBhyRZNuJsDNqe4JKfwSUvHna
-X-Gm-Gg: AYBFou1zrI8Go7DHLJnhjMl5/+jIjnmqF9D9XEdNGY6aYci99TaJRC6G8rtbZXfw5Kh
-	hKDkdRjGwClxvWgieJ9Nju6mSPLXZbT7RFFS8mJYy1p8nXjGMiUQkPKVz7FlO1YdhMP/MhbriPQ
-	hyzSifJKdNakc3ZLpOYM2oVI5E1BXSbBwDHrFFxfi6If7dL3WOSv6R8Tqz8vaoDMUY4FhnPwnBQ
-	xy6nsTFgrIoP3weAPLnnw78YzvjQLeNsLFDmMwD3GdCKP8Wgckmn52mgIeEaRld5/yxXOdMKbz2
-	LUd5MinYToE92uT0jTzX3rpZfQOeWC5vUxEwn63ZQQh6NKKELBpEx2PmruEGLCZKkwqe/gpf3Fd
-	kEFgHodXCzyHx6OvmmizbFCcZHq77XJqEE7EEF9z+Jj4kqt0t69UwQ9B5TgNITqNXbQ7i1sAwOV
-	HhG5scBv9+IkJDi+dYtTFmr76OwGSW886BxdH/FrOmevHmFXvPja/nyBVKGr8C0xoidmOb+ukzX
-	wQ9vE4m3PzOVR80e5xxJZE+sb5ZbYpoSpiVxcUOsf9KZQFao2o=
-X-Received: by 2002:a17:90b:2d45:b0:3ac:9259:122c with SMTP id 98e67ed59e1d1-3adeae6d89dmr1071274a91.40.1792821822050;
-        Fri, 23 Oct 2026 23:03:42 -0700 (PDT)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3adebae0094sm1664019a91.10.2026.10.23.23.03.38
+        d=1e100.net; s=20260707; t=1792825420; x=1793430220;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ha9mNqJRAj6za7cAI8C2Y5WCJwNWb+5t5YQFkU9ULI4=;
+        b=vzv8hXPdwbCApU7T+g0atCQGDqJxf/ZO1r81kGzaFXG2tB2bxhbjSMwYAZu16FGlcT
+         B8DsKR7UjMqqbCq/G8WJSf32FzzBVxivU+bWQV1mEoblq+SenuwUW4ppMy5JgDFF1tlc
+         t1P84p3R32G8gkPTO9FLolCQjcZvJrevOQXjqNhzgvfgdFvyShiu9kTVXqzQ7YrPGvA+
+         3mSrA4IDiVFtUx4fkkH6uV9hjK1gSADLCA7g9umiqOGWsMozOsz/cUPgWupArbYEInrb
+         rh0T/+m8CwL6379Mx2Rd2AXuRxWGSTbKqnu++NvHlVLp23jiCSy/z+GNFoz6uaPGptLX
+         eLlg==
+X-Gm-Message-State: AFq9FYIPvcRx2iv/6611yVtGOXXhfaZrtXZH3OVxL1ZV63gmgjpPnUEg
+	5l8x1DO+i/wOXzAHO8lAbDE0nAXLxruT+uyBzteoLP07KdvlecDxMscYsUil6N+l
+X-Gm-Gg: AYBFou2+3JbhtXm8bnphugovKQK9s9KJkcyyF8CIm9WufAe/wFuOf6p2lzftj1GeS22
+	oZMQIOU+hfCo88U8XeRVYZl7bw8pPp2fbJe2hZ6tFjRZptXgv+RRF59z0KXoeKApzXT4nz2zCKP
+	qJ2wtR9dw3toDH8BuVpeAFZLvTeGWduma0U7xpDA0D8EeiGE9h9Vla5cMFJ4ttlS2ww6YEdoj4y
+	9/MaHUlfqKnlFIQ8oSkH46+Xv8QioblQPWzPspVfISosnpuPDEAtR18NMQJ2zWYtlJMakUpIc39
+	YTx0A2AnvHiB+EuTpzGMuOAKCVTcU2ye1b0hSYNJzQc55lO6YXAKDFXwVcVJxSX6KRCQjg3HpO+
+	KyQX0VOwN5z+8Z1FSamFw0RFgoxq0HFDq/NwukXtuctrcgvWvVyY5ZuZ+idnh3/Aqhes/bO4HNm
+	1G1nwcDRgWoypVtmBsNcuQTfHnf5BWZs1nG6tJYpytLBr1FX+kljdcYEbgEub05LS0Ke5WiCsYy
+	QyFzieKxa3LapYq5s/epbNq26MHBUqPGxEBEsOVWTlt2/t48Oo+YwvcN8eMFW1A
+X-Received: by 2002:a05:6820:408c:b0:6cd:3fbd:1d63 with SMTP id 006d021491bc7-70ba0f7807cmr434762eaf.77.1792825420199;
+        Sat, 24 Oct 2026 00:03:40 -0700 (PDT)
+Received: from [172.17.0.2] ([135.119.70.128])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-70b9e0417cesm1384933eaf.6.2026.10.24.00.03.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2026 23:03:41 -0700 (PDT)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	jjzuming@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH v3] Bluetooth: Create debugfs directory before running selftests
-Date: Sat, 24 Oct 2026 14:03:35 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0188-v11-36d2c5e734fec40a3363@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sat, 24 Oct 2026 00:03:39 -0700 (PDT)
+Message-ID: <6adc584b.3ae93811.3319eb.c77f@mx.google.com>
+Date: Sat, 24 Oct 2026 00:03:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5010488538737389581=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,158 +88,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
+Subject: RE: [v3] Bluetooth: Create debugfs directory before running selftests
+In-Reply-To: <pm-bluetooth-objects-candidate-0188-v11-36d2c5e734fec40a3363@gmail.com>
+References: <pm-bluetooth-objects-candidate-0188-v11-36d2c5e734fec40a3363@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Selftest debugfs files must be removed before the module storage
-containing their file operations is freed. With CONFIG_BT=m, bt_init()
-calls bt_selftest() before creating bt_debugfs. test_ecdh() and
-run_selftests() therefore pass a NULL parent to debugfs_create_file(),
-publishing selftest_ecdh and selftest_smp at debugfs root. bt_exit()
-removes only the bluetooth directory, leaving these files behind.
+--===============5010488538737389581==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Commit 64aabf94ecccb ("Bluetooth: selftest: Pin module for selftest debugfs
-file operations") already gives both tables a module owner in
-bluetooth-next. With debugfs and either selftest enabled, unloading
-Bluetooth without any open descriptors still leaves the root entries
-pointing at the old module. A later open permits the following ordering:
+This is automated email and please do not reply to this email!
 
-    Module init/unload                Reader
-    bt_init()
-      bt_selftest()
-        publish selftest files at root
-      create bluetooth directory
-    bt_exit()
-      remove bluetooth directory
-    free_module()
-                                      open root selftest file
-                                        full_proxy_open_regular()
-                                          __debugfs_file_get()
-                                            read real_fops members
+Dear submitter,
 
-Here free_module() completes before the reader opens the file. Debugfs
-active-user tracking still permits access because the root entry was
-never removed. The open reads freed file operations before it can acquire
-the owner reference, which can cause a kernel fault.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1192558/
 
-Create bt_debugfs before running the selftests so their result files are
-covered by the existing recursive cleanup on initialization failure and
-module exit. On selftest failure, jump directly to the directory cleanup
-without running cleanup for subsystems that have not been initialized.
-Removing the result files revokes new opens and drains active operations
-before module storage is freed.
+---Test result---
 
-Before the selftest file operations gained module owners, reading a held
-root ECDH descriptor after unload produced the Oops below. The owner
-reference closes that held-descriptor window; removing the root entries
-also closes the remaining post-unload open window.
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.10 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      16.83 seconds
+CheckAllWarning               PASS      19.43 seconds
+CheckSparse                   PASS      21.20 seconds
+BuildKernel32                 PASS      17.13 seconds
+CheckKernelLLVM               PASS      19.59 seconds
+TestRunnerSetup               PASS      382.94 seconds
+TestRunner_l2cap-tester       PASS      12.92 seconds
+TestRunner_iso-tester         PASS      8.66 seconds
+TestRunner_bnep-tester        PASS      2.72 seconds
+TestRunner_mgmt-tester        PASS      80.20 seconds
+TestRunner_rfcomm-tester      PASS      3.91 seconds
+TestRunner_sco-tester         PASS      4.88 seconds
+TestRunner_ioctl-tester       PASS      3.96 seconds
+TestRunner_mesh-tester        PASS      5.53 seconds
+TestRunner_smp-tester         PASS      3.83 seconds
+TestRunner_userchan-tester    PASS      3.27 seconds
+TestRunner_6lowpan-tester     PASS      3.87 seconds
+IncrementalBuild              PASS      17.35 seconds
 
-Oops report as below (preceding and following console output omitted):
 
-    BUG: unable to handle page fault for address: fffffbfff805758f
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 1a7ff6067 P4D 1a7ff6067 PUD 1a7ff2067 PMD 100ad6067 PTE 0
-    Oops: Oops: 0000 [#1] SMP KASAN NOPTI
-    CPU: 3 UID: 0 PID: 424 Comm: cat Not tainted
-    7.2.0-rc6-pmb-bt-functional-v1+ #2 PREEMPT(lazy)
-    Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix,
-    1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-    RIP: 0010:full_proxy_read+0x103/0x180
-    Code: fc ff df 48 c1 e9 03 80 3c 01 00 0f 85 82 00 00 00 48 b8 00 00 00
-    00 00 fc ff df 49 8b 5d 00 48 8d 7b 18 48 89 fa 48 c1 ea 03 <80> 3c 02
-    00 75 70 48 8b 43 18 48 89 ef 48 8b 34 24 4c 89 f9 4c 89
-    RSP: 0018:ffff88810d95fcf0 EFLAGS: 00010212
-    RAX: dffffc0000000000 RBX: ffffffffc02bac60 RCX: 1ffff110220d5080
-    RDX: 1ffffffff805758f RSI: 0000000000000004 RDI: ffffffffc02bac78
-    RBP: ffff888116e98700 R08: 0000000000000001 R09: ffffed1021b2bf8f
-    R10: 0000000000000003 R11: ffff888110d59d00 R12: ffff8881085a82f0
-    R13: ffff8881106a8400 R14: 0000000000040000 R15: ffff88810d95fea8
-    FS:  00007fadb62ba780(0000) GS:ffff8881fdc22000(0000)
-    knlGS:0000000000000000
-    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-    CR2: fffffbfff805758f CR3: 0000000106a42001 CR4: 0000000000770ef0
-    PKRU: 55555554
-    Call Trace:
-     <TASK>
-     ? __pfx_full_proxy_read+0x10/0x10
-     vfs_read+0x1a0/0xc20
-     ? __pfx_vfs_read+0x10/0x10
-     ksys_read+0x111/0x200
-     ? __pfx_ksys_read+0x10/0x10
-     ? irqentry_exit+0xbe/0x820
-     ? srso_alias_return_thunk+0x5/0xfbef5
-     do_syscall_64+0x115/0x6a0
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    RIP: 0033:0x7fadb634c687
-    Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08 03 00 00 59 5e 48 83 f8
-    fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f
-    1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-    RSP: 002b:00007ffd26510c30 EFLAGS: 00000202 ORIG_RAX: 0000000000000000
-    RAX: ffffffffffffffda RBX: 00007fadb62ba780 RCX: 00007fadb634c687
-    RDX: 0000000000040000 RSI: 00007fadb6214000 RDI: 0000000000000000
-    RBP: 0000000000040000 R08: 0000000000000000 R09: 0000000000000000
-    R10: 0000000000000000 R11: 0000000000000202 R12: 00007fadb6214000
-    R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000040000
-     </TASK>
-    Modules linked in: [last unloaded: bluetooth]
-    CR2: fffffbfff805758f
-    ---[ end trace 0000000000000000 ]---
 
-Set bt_debugfs to ERR_PTR(-ENODEV) after initialization cleanup. A NULL
-parent would make later built-in selftests and 6lowpan initialization
-publish files at debugfs root. An error parent makes those creations
-fail safely and is also rejected by existing IS_ERR_OR_NULL checks.
+https://github.com/bluez/bluetooth-next/pull/993
 
-Fixes: 6de50f9fdb60 ("Bluetooth: Export ECDH selftest result in debugfs")
-Fixes: 64dd374eac15 ("Bluetooth: Export SMP selftest result in debugfs")
-Assisted-by: LLM
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
-Changes in v3:
-- Address the NULL-parent cleanup issue raised by Sashiko:
-  https://sashiko.dev/#/patchset/94464
-- Store ERR_PTR(-ENODEV) after initialization cleanup so later debugfs
-  creation fails safely.
-- Clarify that the module-owner fix is already present in bluetooth-next.
+Regards,
+Linux Bluetooth
 
-Changes in v2:
-- Address the stale bt_debugfs pointer concern raised by Sashiko:
-  https://sashiko.dev/#/patchset/87920
-- Clear bt_debugfs after initialization cleanup.
 
-Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0188-v7-e3c91e5159902df34c8c@gmail.com
-Link to v2: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0188-v10-ad807db51e45722aae62@gmail.com
-
-Module-owner prerequisite: already merged in bluetooth-next
-  https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=64aabf94ecccb1120a63b4ee5a6761871a181a41
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 411d66f24393d..3b8c3ecb7cc52 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -935,11 +935,11 @@ static int __init bt_init(void)
- 
- 	BT_INFO("Core ver %s", VERSION);
- 
-+	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
-+
- 	err = bt_selftest();
- 	if (err < 0)
--		return err;
--
--	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
-+		goto cleanup_debugfs;
- 
- 	bt_leds_init();
- 
-@@ -983,7 +983,9 @@ static int __init bt_init(void)
- 	bt_sysfs_cleanup();
- cleanup_led:
- 	bt_leds_cleanup();
-+cleanup_debugfs:
- 	debugfs_remove_recursive(bt_debugfs);
-+	bt_debugfs = ERR_PTR(-ENODEV);
- 	return err;
- }
- 
+--===============5010488538737389581==--
