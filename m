@@ -1,84 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.179
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792934155;
-	b=xBmYDamm88lq4u6eS5iYb8UYl/Lzg0hnM049jCpb7utfO4+ebXrDNEbUJ8ie+RIoFOrZ
-	 B+rp5WW2/rtjzux3tGKR13w3XsRoXYPROcnpDM+spnbKOGJAeuhl7FTbuLJGcDSulSfAZ
-	 QqIEh5P+OsBaOAEuhrtE8mZmTX7HFZ91ktSMYfsi3jgcO+0YaHwmmccczQredu5WgzzYe
-	 /YHvyEqrRwTCfEi1mGeawbUNfyXMysCtvByqkG/af7l/hIt94gMVZJPtRj7f07Y21zPIf
-	 oCKXsgDmpwQ0oCc8i8t8F9W6qjvcpROvjhxrYOlUWO9aXXH7nUKXMynpsrYXTgyveKw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792934155;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.174
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792946875;
+	b=ZS8ZiBRkd+gy7KgrXTwgoNzDtuZolZqt8HJk6Nz63YFH8SWEImVYu5iR82znpgy267bs
+	 Rnw2t53YeXcXU8NATpRCWlsAjZzKTbBDIBuK8aR3SEqJQJMcE0Non9JMGVmaPRs7p+5xB
+	 2iUQuXnbhkW2bpjwshE1WIg+zLSBBKqIUXhh0LOvEkW+rgu0uBxVZtGJEzWqBTaNUwjvX
+	 pUCj/KZw/UQzwVFcGqZWKN1CTuo6cqpFXkshhh1XuaON5r2khFf3i3rUeMC2UXU1Oe2LY
+	 LpiNskMhlr+o5L4w89N4jXhh1Bbt7sezD4hQFD8uNetpc9Kz7ir3y/1sGW/e+VKJwNA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792946875;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=FjOh+DC/Xb/oUu45KCHWmWh/THLkvZtqTx5vo3+S7YI=;
-	b=xkKXohzDtOCz2jki+pReGWVLt6j1VNZPtzJaKS7acDidsNqE2U2cU195sQX9xDOGPkRC
-	 B9+hV6AOo3gqin7lk90rWt6XiwJnIFt5aRvsUF4eSTPg4TFZC9OVMXYPD5jBy6SqFYptr
-	 RaOtnlqAhnnuDBQMqUq8puarGnMZvY30uMQIk14xucFNPmxrrm8frrLUrLIS8Doj4WRsW
-	 tncp7CCDtyD+fMvPbBgfM+ontrmuXxHvHUbWrXf6w5JZrPS+9dkd+TtMMOC9QTeOWhHzJ
-	 SU5Vcxux+OmG9nUNMMpCS+l4IVRLI2noDBwZjaH366MJqCKY1RBkYu6yTg0DkvSL18A==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=HpJEthOBIwEPu1gSMqf8HHsHXBUHMgNP2E4z7So/mi0=;
+	b=zgTzauVPhfXdaK6k3cARK/FuyJgkBNSOlJYn3ALEKxVq/Y5hOESRbPFfpObYU9/iZQoN
+	 rABGJreoqw9Iig6iesUACisVgKkv4annXyrKtXmtpP4AJeRyS78AqqY9zDseO/FnvHcPA
+	 6fZvUQZtnXz3OrHSHyQUemkC8Ktbfk4aZwX59DFgmEu8T6c+PKD+lVczqczmns9Q4lt4J
+	 BQ3B6V0594pe4hIICxl2JAoJ5NN0DE0LBVCSnsDezTCoxr7YuHeUnoibknk6S9bSMk0d9
+	 9B5dot6iEjV3xau6r7GIpCLcjuqmJ7bSZ0ncP8KIcwvpnxUz0+917ZZPoXIEaJH+REg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=FRCQYpwj;
-	arc=none smtp.remote-ip=209.85.222.179
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=okTQbRJQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.174
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A04606A31B
-	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 13:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2A04606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF8D606A31E
+	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 16:47:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7BF8D606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=FRCQYpwj
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-93f269e335eso242252985a.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 06:15:54 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=okTQbRJQ
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-8b0ca1ebc8bso17405077b3.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 09:47:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792946874; cv=none;
+        d=google.com; s=arc-20260327;
+        b=RJUocJv2ObYOBpdzjU/RfgNed7GxwJ5hPqajx/IJTYPgtFXzH4V0yamXpQVhKD/J+l
+         7SP8+UmxAprMtLY0cFI+1ln1RuR1L2vTmLfFzm+7i8M9gqLfNKYDLrMM7hzgUAqhGm7s
+         kipwoDn4w+bsLQlX0k+z2YvCA+FVNSYIiAt3rw+1tF9zHdRuNBIi7WaZB9mwZ70xtWUw
+         XBxyqoWDO1gYthU4HWLgnd1PEXoExlEGm5IKOYIoKyRIMk5wNnNdwl/bSau7yBoYBiq+
+         R//1AstE5R0P6BOluxMN+QWdUj1AOTMoeZaxEbzAUnzcLhD5ML+dsTKGt2G101837cP/
+         wY3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HpJEthOBIwEPu1gSMqf8HHsHXBUHMgNP2E4z7So/mi0=;
+        fh=Nlx59E0rum8bKLSYlTKr14MoVIAmLNhj+mULqiFtAyI=;
+        b=Lggs7UJqVke2/cYsUKvNaS0xEssYdsInIrcXqjkzaBpRHTPYcaZXTwLlyHhv5YnSwO
+         c9TaGRqF8sXoaMBytvCqs82UzSY2Wmpc5Akhk8SscbSaMqw412ue5nmiwIyQ4eB3/TTK
+         1DNwpTGKuNZ+21fIR6VI2lxEscaE8VRSWKxnIZ/p4T0NVxBsnYGIraXTiYSOSk3hpDBQ
+         l5ujIrjcgXUHIlCaD0X0DCsKc+cBoDMkJNcOFTAKwfwPF3qAAtQt1Hs88GUPH0RqsBa6
+         6BSqKsXEStzDZT4hlmM6Nvaw4Kmuf7ivaqz5B0WqStceslW1yjUE7PjE1CBCz7OvqYXc
+         LKcw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792934154; x=1793538954; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=FjOh+DC/Xb/oUu45KCHWmWh/THLkvZtqTx5vo3+S7YI=;
-        b=FRCQYpwjwXMCynFE7/b+NIL8u4+mQnzV8DW3H0SPXS9Wyv4++aVpJMpED9sOUK5KBq
-         I9WmU/A+HzvhgRWLXGWu8BRxz5mBURZvBKlgPjkqsHYj+msttrHQQfBy+neWveN29NCo
-         SuOFJA+mOU51Taz94iXO7iJrIhfaC1sqkf/7/ycgBtz3o3bgKjZFzxWeAqowTgODCRuk
-         t0Xx1F1Z1bzf2asXX/hayAx1l2xHNk6DtgCz+InP+lvRWQyO3aNTckNFpxi9GObvWDw/
-         EHllmR/+jLcEiRuBKU0z8zeE/CKCz3hBzABZHRDuAy7+ESKNBgwKQQX4hJUhYA7XsZQY
-         ixKw==
+        d=gmail.com; s=20251104; t=1792946874; x=1793551674; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=HpJEthOBIwEPu1gSMqf8HHsHXBUHMgNP2E4z7So/mi0=;
+        b=okTQbRJQbLezmfJN3ccNFuzoLXEmr2ojkRHNPcf3DyPe8ey22UiUcMAsVq9vZDtSXy
+         5Q9OTKIr+H5OJiWBn/auTjTG3NrHtQkEJ9BVDzMMVsjKLSe9u8VEDpmaFxXOYq2JMWfK
+         zJCpwwVeudy9lvM64L/wqp3YIeUQpN7AyST0KhjUIVAUOxFwOQq9oh8T4DWTpFrkK8ED
+         wGI4ZSmf3/5sMSU2mhJawHCxIovnS7f/7TBMxLXDwJgJKqqp5WUnVaJR6gM41ajUsSoU
+         bpgtSwE4eOs0EBXvYOWbb8gzjrzfkd/YjotWBEPa+ICUR74UanyVp2rOHJWs2DuNZ/v5
+         jOjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792934154; x=1793538954;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=FjOh+DC/Xb/oUu45KCHWmWh/THLkvZtqTx5vo3+S7YI=;
-        b=s0r/t6v3Isg82tx3bVEyXIDFOPKR3Xwk4ywN9J9EAxCdqf1usCaIlhX1k8EPzFobAa
-         z8sPqgVLIF0nCPH0tCQz05Tp1j9wO8iIo+/eRZRPWclTxTGxV+XFWtgX/MKk/Xniaalf
-         cTrHioAKYNgbdt9fxLxetV/bvWX75yNM58hzfexfqfbI3kRvFDlWf0G/EH1cX8WhwkYT
-         LxUPPhawRdpD5yLgr0di8gjW69MMhTwKBbFYPg4/iUDgxU2vAeuuPzkdPkpZz4zM4hQL
-         Abe/VLOibJUqrig+Nbm1hvxdGuZhB3dFUK3DfTh3oARSDorpT/2clN3zGANURYLxeAhK
-         R2xg==
-X-Gm-Message-State: AFq9FYKxa820VzoHrisOw+1XWKp4lkpDFUo4CKbBUZnie7Ij13h9NmSS
-	1POqLxWzZ5RITJdpvTUx6y6DnWpvhaGsKyqzjV68BYZaWtSuD/aDtB+IifrgPA==
-X-Gm-Gg: AYBFou3MdaL7yu88VCv1iml41ABwAH78LrGItKT1wmLhBSRirmT+4064wjMPG7Tw/bj
-	KbhV0wEeBDyo3sD/rhLhVt1+p25IyNK33f+cHFcPORoiriwFH8Xs18zH2q+fqI5fhCg8fADkbEc
-	SCXg+HKrRs3iHlkVmjye1h8JPB13qkPcdFnqxhUgskDz5wWrYGc3G8WGbPJQtIJr8QFuxUphxF1
-	g16A79NP+tGpL2aXPi2tmD39y7tDxKNlkw7VRCaBWU9tCozFF7gfi/B3xKEHPo5RC2BPQE+VxaR
-	XnCLwN64uj1SUSgh0oXvLrPwktHOmbf5JETbw990BZL6lt4J/9qVdx1FjcaKIY2onhDZzN5wiK/
-	HngUqs5v/645C9Y2+WtGEYpuP+sPux6jKAWttEp9CxWqnAciHK2pGHKYxTuaH1WlpAmKawhPTl9
-	YO7FxVRQYyxdv0c8PTO98qf0VeVyV1MlbwPZ5IeH8k39HnBo50brVVaCOhZOF4kW3ALkVsTWLWW
-	MhD8rbQbHdclDv7cPVmXkjYDYWRCSPnJ00XPLNNJpIg0VQUMrXZueEHEMsDhnw=
-X-Received: by 2002:a05:620a:4144:b0:93f:2c95:658c with SMTP id af79cd13be357-940ef8bea71mr688290085a.14.1792934153594;
-        Sun, 25 Oct 2026 06:15:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.83.158.243])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-940f0787f33sm418820885a.25.2026.10.25.06.15.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Oct 2026 06:15:53 -0700 (PDT)
-Message-ID: <6ade0109.b4e4a258.350353.0a2e@mx.google.com>
-Date: Sun, 25 Oct 2026 06:15:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6182057533854766113=="
+        d=1e100.net; s=20260707; t=1792946874; x=1793551674;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=HpJEthOBIwEPu1gSMqf8HHsHXBUHMgNP2E4z7So/mi0=;
+        b=qb/lftgszSIJpAcavIESIRxigLDm7fsxUAvYK9xRug8JDppvpr7J/HXITpDOwjIovt
+         dIZAyb+28jaSVjIY7iamYEPB4FIJcRFrogWYd4vDER19pZghhEmfYELAXMYS3K1lAiF4
+         RZiDqM+Gmpfcduv1RQnYMps/g1w224F0b+OfaTPi8VnhODqWWWE3G37NbF7ayyo5QTpQ
+         J8pWBhhgVVSjw8ZaawMtKGk1jd+LfaxTc3H017JenyaNpXuJUj6n7JglwOZBXBB1HMg2
+         Y0R4orbag58etEbssfpUz0vSBqSbHClEJRDk1hP2t6sMlF9wFlBP9/Zn6mRvio3cGBUt
+         UE+A==
+X-Gm-Message-State: AFq9FYKD7kTz4IDya/dH0Gh7Q3aWiPbUIKkh5jXwAJi+uchmakwKZnqq
+	7YZBdWsZsl1uryakQKx71FaiNMbwWoWyfycqhXe2QPY2fVTyikKjD/HJVIn7lbETHEeAyS+vBll
+	3sZcEC37omJo2r0ncWyfOV1Y1jjjl8Co=
+X-Gm-Gg: AYBFou0u3T6gkaeiyEORpQS1v5fpsFc7yrGxvf9tSfw4PgcZtGsMy6I0LT8bf3gmary
+	pZHFy3tMjcUNZMjs0+rhrtyGgcZjh5l7hrXASYTwrG88Z/hXjfadcIJSq0ypzC0r1YJi+wmZGyU
+	AvQ3vNPVxfgagxOaLv835qSFGUq7+aeRyo95zSERqlB+fDhnOyfx0FlwWqu9Ue1cVbTO9AY9LSc
+	N7OppvINWQr0wu5GJDYQjKiLBblvSqULVvLYHBvuQ0dCpQikJW8awr4qhZE8hxmvprOZ/y6ADNV
+	4ee2uGEIoj+N064SXg0E9AOEvhJBb1QWwfNkZ75Fk+siFmZRToP44H0V2GqJOiRfoAqprZ94FIZ
+	TEdftNaIX9xRACuIMgwxvJ82zjtEPLzFS+XLXnsoQh2Kqisgj0FE9w5aUUmxMNAVLfsijzYw8/P
+	11uOb4TTVMgypWghBVnHiiBQ==
+X-Received: by 2002:a05:690c:d8f:b0:8a8:7fda:15ee with SMTP id
+ 00721157ae682-8b166c614e3mr33096377b3.50.1792946874322; Sun, 25 Oct 2026
+ 09:47:54 -0700 (PDT)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,49 +104,101 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sadiq@sadiqpk.org
-Subject: RE: [BlueZ] doc: Improve obex MessageAccess Filter Types doc
-In-Reply-To: <20261025071533.2567150-1-sadiq@sadiqpk.org>
-References: <20261025071533.2567150-1-sadiq@sadiqpk.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20261024112435.247650-1-turbine.bmw@gmail.com> <20261024112435.247650-3-turbine.bmw@gmail.com>
+In-Reply-To: <20261024112435.247650-3-turbine.bmw@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 25 Oct 2026 12:47:43 -0400
+X-Gm-Features: AclHuK_TqzE8mkoJOPsB4246SAmXP0WMWait7YWx2jD9DnZw3qYk-XWvevJj1Xs
+Message-ID: <CABBYNZKc1C=q_p3=f+jAVPUZd90=p4o=y2n22e6GoVX6YUq2nA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: SMP: distribute the identity address when bonding
+To: Brandon Williams <turbine.bmw@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6182057533854766113==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Brandon,
 
-This is automated email and please do not reply to this email!
+On Sat, Oct 24, 2026 at 7:25=E2=80=AFAM Brandon Williams <turbine.bmw@gmail=
+.com> wrote:
+>
+> build_pairing_cmd() only offers our Identity Information and Identity
+> Address Information when privacy is enabled. Without privacy the peer
+> never learns our identity address, and bonds without it.
+>
+> Some peripherals need it. The Microsoft Surface Slim Pen 2 only
+> advertises to reconnect, after a button press, if the host it bonded
+> with distributed its identity, as Windows does. Paired by Linux, the pen
+> stays silent. Enabling privacy is no workaround: the host then scans and
+> connects from a resolvable private address, while the pen directs its
+> advertisements at the host's public address.
+>
+> Offer the identity key whenever we bond over LE. Without privacy,
+> hdev->irk is all zeros, which "indicates that a device does not have a
+> valid resolvable private address" (Core Specification, Vol 3, Part H,
+> 3.6.4), so the peer receives our public or static identity address and
+> no usable IRK; the previous patch makes Linux ignore such an IRK. The
+> peer still decides: the Pairing Response masks the distribution down to
+> what it accepts. Cross-transport key derivation over BR/EDR is
+> unchanged.
 
-Dear submitter,
+Well, can't this then create a regression with devices that don't
+interpret the all-zeros IRK properly? And to be honest I think the
+device in question is just plain broken; distributing the identity
+address isn't mandatory, and it never has been without privacy.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1192930/
+Regarding privacy, I think that would be a more acceptable approach
+since it brings better security. That said, we must ensure adapters
+work properly with privacy so we can start default to it in main.conf.
+This difference is likely where Windows diverges from Linux, which
+probably explains why the Pen never even considered connecting without
+an identity address field. Actually, it's not that it doesn't know the
+identity address; it just doesn't interpret a public address as the
+identity address as it should so it expects another address to be
+distributed alongside, which makes no sense when privacy is not
+enabled.
 
----Test result---
+> Tested on a Microsoft Surface Pro 11 (X1E80100, WCN7850): the Slim Pen 2
+> now accepts our identity key, and reconnects on a single click, double
+> click and press-and-hold after it has dropped the link. The Surface Pro
+> Flex Keyboard also accepts our identity key over its out-of-band pairing
+> and still reconnects.
+>
+> Assisted-by: LLM
+> Signed-off-by: Brandon Williams <turbine.bmw@gmail.com>
+> ---
+>  net/bluetooth/smp.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index fc75cf568471..8ce5f92d7ee5 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -636,7 +636,13 @@ static void build_pairing_cmd(struct l2cap_conn *con=
+n,
+>         u8 local_dist =3D 0, remote_dist =3D 0, oob_flag =3D SMP_OOB_NOT_=
+PRESENT;
+>
+>         if (hci_dev_test_flag(hdev, HCI_BONDABLE)) {
+> -               local_dist =3D SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+> +               /* Always distribute our identity address when bonding, s=
+o the
+> +                * peer can tell who it is bonded with. Without privacy t=
+he IRK
+> +                * sent along with it is all zeros, which the specificati=
+on
+> +                * defines as having no resolvable private address. Some
+> +                * peripherals only reconnect to hosts that did this.
+> +                */
+> +               local_dist =3D SMP_DIST_ENC_KEY | SMP_DIST_SIGN | SMP_DIS=
+T_ID_KEY;
+>                 remote_dist =3D SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+>                 authreq |=3D SMP_AUTH_BONDING;
+>         } else {
+> --
+> 2.56.0
+>
 
-Test Summary:
-CheckPatch                    PASS      0.60 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      19.47 seconds
-BluezMake                     PASS      295.64 seconds
-MakeCheck                     PASS      14.53 seconds
-MakeDistcheck                 PASS      141.29 seconds
-CheckValgrind                 PASS      234.07 seconds
-CheckSmatch                   PASS      296.79 seconds
-bluezmakeextell               PASS      95.14 seconds
-TestFunctional                PASS      1121.76 seconds
-IncrementalBuild              PASS      298.20 seconds
-ScanBuild                     PASS      1137.82 seconds
 
-
-
-https://github.com/bluez/bluez/pull/2711
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6182057533854766113==--
+--=20
+Luiz Augusto von Dentz
