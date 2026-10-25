@@ -1,70 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=188.68.63.166
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792915659;
-	b=aOQDpqrR6Dt4BrehoW/ykieUgY7SwPKtxubiFrKQj4L7nZsbl3P478pFrZwHj4RzaXV/
-	 ZmIGwbIaxM+CrTWS7oP1ASSHnW+OYYksp1Vungi2d75NZLW5q3B2SaXqMnulCQz7/aS7p
-	 xUpfIO1Afy5q/h5OyE/ufWBIt5FHOM5uCykx6AhsnGpSCHMxWxr6JWELa2YRCyIRj8kLT
-	 SqECVldC1UEN59quubNo37Tq6YTRiK9I7IbHUfzeVAYEAmWD8DdgtLX6DxyHYp8evwxZG
-	 Dr9t2RnkpH2KWlNikZxjJau/zubh3SSJBqWDv62Dgd3omjYuTcPrtAHo30tyrnEUyLQ==
+	t=1792929821;
+	b=thBkRCmphMH09Vpt1emhqVtzsCoNT1nk1uy6lCIueDu2r3IBnsxnWvha9vXWi01aki93
+	 RZLJPciGEhiMrwEzeyiEnjXCWFbG2GX5F5FWByFL/RQZBWpPDh4ePDUgg7BWuriXChIKt
+	 kKo38l+XaVrn1qbb3jf/+v+4PyIeLvXSxhKDYjaPJ5QGliBNGMMzzKev593Qn3luhYv86
+	 i2oE2dPVZJqq4QQXmQHqx2eFKQdY7nCBWzKniSmCSNEeGmU1gvU/NpSpmotIe10wguvR3
+	 TUrz3muX2E+oke6S/1AW60LW5mf9Hvq7+7pvhoto2OPpF22Ypr6zGJXp3mM0r0HI9yQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792915659;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received-SPF:Message-ID:Date:MIME-Version:User-Agent:Subject:To:
-	 References:From:Content-Language:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-PPP-Message-ID:X-Rspamd-Server:
-	 X-Rspamd-Queue-Id:X-NC-CID;
-	bh=zbSwU0bKBd7RvGs+0XPKASnkrq6zfZU8MhR5qhg9u64=;
-	b=fVs8Mc5q4VFCOEfEsyrUPYI0ZLYECqrtKjwS6UbCCcsjRdkhTEnaxREu9yl7MBm4sYZ0
-	 MOx+w/JkZr2MOfwULC7Gl1JoeiNoEKcsZ8PCywZ4t3cAD0LOtSRxlBDbAq6C2F52gImpj
-	 rO4PamZgyzPORAT0x5861usSlnhvdZL7nRf9q1nPfnYLcKQ+X7d4qSooMD0PfcxjJAljD
-	 z4DWUmoOxwRSo+OSUYn5ENUC8k3dFuGCgwcaD9HYn9I1JOnZDcj/z+COVpJjFJUVih6ej
-	 XXPnz+ZiEzQASmh8Qjlhq/LJlR9NTf3w1q0GqRTZTGS0qu/LYRC3CXEOkTcVFjmjsiw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792929821;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=lS6FkSKLepK9WNXRPUJcPanRUSiz1CS44f0JGtdiWYM=;
+	b=tiYKhRkH3K74SohCHVx7aWE8kqoyX6o+TxFJZH1pDdvjF150Z9bHepCuztoxbIaaV053
+	 TLEKhrr5PjVs7doiSsS/9PZo0onAXqf4lYxDkGH1w+4zsEnEbEM6PzWv2QVTAKw74oEXY
+	 vuP8zeQnlly6K4uVEvE31R3WtM+5+c2h07y0HZFFxVsQ1iiPtYdJBYKKm/k12XocpFXll
+	 YoFQOOVWG1M5FtP93Hxb8l5mqFYvu4zqL+YZzBJqmjrnaS03zzVhdZBBjs/6DW453B6DD
+	 P5vvNxt1i7WcPuiL4+5ly8vB7mfFdmUj+k5MXGYvaEBKsdnUnwB4ICLkBi6hj6yOGIQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=leemhuis.info;
-	spf=pass smtp.mailfrom=leemhuis.info;
-	dkim=pass header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b=XaGnVYV7;
-	arc=none smtp.remote-ip=188.68.63.166
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.166])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=YXwnv65s;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343D3606A31F;
-	Sun, 25 Oct 2026 08:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 343D3606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A38E606A31A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 12:03:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A38E606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=leemhuis.info header.i=@leemhuis.info header.a=rsa-sha256 header.s=key2 header.b=XaGnVYV7
-Received: from mors-relay-8202.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4jC8W670d3z4FdS;
-	Sun, 25 Oct 2026 09:07:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1792915651;
-	bh=e01dwD7Pjn0J7HP4870T+qNA4WbymnKWxim3Mv9VhYA=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=XaGnVYV7ebJzg9awH4PX+UP0+2AjiEobnJkXQXomiEo4Ls20MpfZ+psCUB4H3xtsc
-	 KqFa4+g+Ah10QDAtFmxj0TwK5Lo08FJLbiYCn6m54E7vxesW9qSqErygzYjzEfXjl9
-	 FtnKdg9Cmf7z01tSNofGubYF/Gxn3gnTgk0zDnwIJUuaLJmCYWIO2T4l1Yf4neHkRS
-	 OIKCh83VVhn7Jh4pIsuxabTiCSj1DYw83qjXlN2HcyFFvjbirAvg6DVxNYHdwxAlr1
-	 N/pFujtqEXtzpQB0ZNxYoJyMHbxNlzW4vQo5iEFCupdiI0TtRUt7efBTT+Jddy62sC
-	 b+UxkzBAeC1aQ==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8202.netcup.net (Postfix) with ESMTPS id 4jC8W66HBLz4F5y;
-	Sun, 25 Oct 2026 09:07:30 +0100 (CET)
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4jC8W62XYPz8svC;
-	Sun, 25 Oct 2026 09:07:30 +0100 (CET)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id AC1A05FD42;
-	Sun, 25 Oct 2026 09:07:23 +0100 (CET)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <bdafa01c-f75a-41fa-a264-407400a2cd81@leemhuis.info>
-Date: Sun, 25 Oct 2026 09:07:22 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=YXwnv65s
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a2000d5fb1so13266285e9.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 05:03:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792929820; x=1793534620; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lS6FkSKLepK9WNXRPUJcPanRUSiz1CS44f0JGtdiWYM=;
+        b=YXwnv65ss5ROwHVBdgkBcGHY02RZTVD1ZrhPRejcwxZNFJDTCRoo6/uJDI8wzrS/ga
+         21vPez6rJV6nmLFsA4g5D1jmD4meNdRKz5CM4Q0jT2GO7/yqccwf7SMwo6eednJzIhsE
+         M1LxvwBsN3vTBW6OIbm9JoX6oBTmQvOwVXrkQn6+uFz6S1JhWptdUNm7cDL5CjAqIL+I
+         X+cjyVa6kxSFNdwVn1r/qU7iKCVewhn9e4sBPtcGBDKgdMGz2zXUFzr0mLqyytA72VUC
+         /vN/SlmicZHtZRdvbBNW7MhLcS7D4kG4aI5yBAAD8G8uTq8peR6PE3PbVr5/TlGRl8bv
+         WN7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792929820; x=1793534620;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lS6FkSKLepK9WNXRPUJcPanRUSiz1CS44f0JGtdiWYM=;
+        b=kn6jaj6E01Piw+u8MQUB1GW6eyCf4wvg5iwuXaiuDiGEsjw7ZWJFb96wbSrXOKBJnE
+         05F+86ON5wrxXD3g9Er8XtNTPBMu8BVLHxWbCkEV24RxGG7AUryvEKzdyyDmeg3dvGwP
+         00N3UH0Fdyas0/frMyd/bxBNsosXhwKyR9i4ZUlZQqAdfnAqIVGT6nYadg1dG28BBkdA
+         hQYgqzdW+T2WZsNHWtSfyExMgS8fsfrrseCyi2WnolMVihQQJTaE09FmStQ9m74i8di4
+         6sGbuomf6jMu8R3o+ooGwDHG9u1ZGpjO5REbX9kThzVeWYpUdinMhbJbtnIpgG/J/uSX
+         TTcg==
+X-Gm-Message-State: AFq9FYLdoFAw+hWQQFr9ftC0zC7BLHoF8V01w75DF3pkWEFwdEWE1tWY
+	sDisPxX5C5GrmOGRIngbq3h3JscaTICNS6Vugtk18Z7gqkw63pTT2TdcI+aKFvCKuXY=
+X-Gm-Gg: AYBFou1FjNRHgjzjwZSAEqJv9A7t/PlhAwaQNkfx9TaQOUTE+xZAwiNLJkXI7lt37IT
+	XJsyOtPj81EQVULu378bL0otBUbcuVtEhzn0Iq1+tps1yZs699/ceytPgJM/Jv8WVBhaQXSkSD9
+	dz+rpRYDbX5d7asZv3vqECuKaiLrIj5a+dATueetpzYr6DAWPArOJB3iBijj3MkjcmmAWNaoa6h
+	Iu0+nSsHDmZ65K5Z9Ut+0zS8+dPjCFSfEE4RdYqCrAj0UBeMOi0eS6LSi0760cQD9pPo6XKd6Ce
+	IPqBrpw6HjuE/azF7mxIfTnJUU6TwGc44lG0SpK6Ufsi2INqC6ygnH6e6CEo+nDG01cWalRDlcb
+	JWfm3o7uKwuIgWxskmEX15mMifi16QoJK+K3sGtY2V2oxIvZSRYXFavhPMs6rleGFDJi0+kOf/R
+	RUxRmrb8NRgJzT+oNcoQ9Z6xDRkIQXJgqo2oSf51RHipmyn0qxgkjb6YxgrGjGO8ePuv+jbI9Av
+	G1K8XQdB/ypkhpQMzu/Ib1e9Hsh9qTm9eoub5behtjGHZmunDTEgChYYWLnyXhKKLctXmg2nn3x
+	lPMdxwUzb/8JLHsouYA4kKWUt3JmmTMwiFsNZBzplCbJKUiDx54Zf354GzcvzySKuK9sYcignJn
+	+ybfpnpd2tAVpU8k=
+X-Received: by 2002:a05:600c:870f:b0:4a2:150f:1613 with SMTP id 5b1f17b1804b1-4a35ac9983emr68238125e9.7.1792929819204;
+        Sun, 25 Oct 2026 05:03:39 -0700 (PDT)
+Received: from archlinux.tailbe3ea7.ts.net ([46.1.178.219])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e3ecd39a9sm10010492f8f.46.2026.10.25.05.03.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Oct 2026 05:03:37 -0700 (PDT)
+From: Ismail Tarim <ismailtarim7@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Chris Lu <chris.lu@mediatek.com>,
+	linux-mediatek@lists.infradead.org
+Subject: [BUG] Bluetooth: btmtk: MT7902 does not recover from firmware assert; subsys reset leaves the MCU unresponsive
+Date: Sun, 25 Oct 2026 15:03:27 +0300
+Message-ID: <20261025120328.1312536-1-ismailtarim7@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -74,69 +96,108 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [regression 6.12.y] After backport of 980084de4d9b ("Bluetooth:
- btusb: Add ASUS USB-BT540 for Realtek 8761CU") bluethooth not anymore working
- on 0b05:1bef ASUSTek Computer, Inc. Bluetooth Controller (requests firmware)
-To: Christoph Zwerschke <cito@online.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sasha Levin <sashal@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Salvatore Bonaccorso <carnil@debian.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Erik Brangs <erik.brangs@gmx.de>, benh@debian.org, stable@vger.kernel.org,
- regressions@lists.linux.dev, linux-bluetooth@vger.kernel.org,
- 1149377@bugs.debian.org
-References: <8aa88f3e-2dd7-4bfe-a0f3-e5ecbbade84f@leemhuis.info>
- <2026-10-24-1-daily-reply-0001-bluetooth-asus-rtl8761cu-firmware@kernel.org>
- <2026102508-thicket-duration-c971@gregkh>
- <6299a7bd-a934-41b2-95f9-d68056551714@leemhuis.info>
- <3bc2cf5d-6cd2-49ae-91e2-ed3af96362f2@online.de>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <3bc2cf5d-6cd2-49ae-91e2-ed3af96362f2@online.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: 
- <179291564419.1221425.15793536407934588708@mxe9fb.netcup.net>
-X-Rspamd-Server: rspamd-worker-8404
-X-Rspamd-Queue-Id: AC1A05FD42
-X-NC-CID: vR/EhMdaQBEEeRwv0pWsyWL0oGUNXedsvxrQmjP3ljh1PHTuc/Q=
+Content-Transfer-Encoding: 8bit
 
-On 10/25/26 08:37, Christoph Zwerschke wrote:
-> On 25.10.26 07:27, Thorsten Leemhuis wrote:
->> Feels wrong to me, as
->> Documentation/driver-api/firmware/firmware-usage-guidelines.rst says
->> "Users switching to a newer kernel should *not* have to install newer
->> firmware files to keep their hardware working.". So what those three
->> commits did in mainline even there could be considered a
->> mistake/regression. No worries, mistakes happen. And reverting it now in
->> mainline would do more damage than good. But overall it feels wrong to
->> bring that mistake over to older stable series.
-> 
-> I can confirm the analysis: [...]
+Hi,
 
-Thx for taking the time explaining this in details to us, much appreciated!
+On an MT7902 (USB 13d3:3579) the Bluetooth firmware asserts on its own
+while the machine is idle, at irregular intervals of up to 17 days.
+The three failures on 7.2.11 came 8.5 hours, 46 minutes and 12 hours
+after a cold boot. After the assert the driver's reset fails and the
+device drops off the USB bus. Nothing short of a full power drain
+(AC unplugged, power button held) brings it back: warm reboot, S5,
+rfkill, port power cycling, the ACPI _RST of the port, PCIe FLR/SBR
+of the WiFi half and a WFSYS reset were all tried and none of them
+recover it.
 
-> [...]
-> Regarding your concern that a revert in mainline would do more damage
-> than good: on 7.3 I also compared both variants (with and without the
-> ID entries) with the BT600 for HFP and LE Audio (BlueZ 5.87, PipeWire
-> 1.6.10). mSBC is negotiated and used even without the wide-band-speech
-> flag, and I found no difference between ROM and loaded firmware. So
-> for these two adapters I could not find any damage from reverting the
-> ID entries in mainline. Of course this does not rule out that the
-> loaded firmware contains fixes or improvements that my tests did not
-> cover.
-> [...] 
-> If it helps, I can send reverts of 980084de4d9b and 6f0624b4427e
-> (on top of bluetooth.git master, with Cc: stable). Alternatively,
-> btrtl could fall back to the ROM firmware when rtl8761cu_fw.bin
-> is missing.
-I didn't see any regression reports for 7.x releases about those
-changes, as I suspect that people that regularly switch to the latest
-stable or mainline releases often update their firmware package, too. So
-I'm still inclined to say: leave everything as it is in mainline to
-avoid any risk and revert only the backports of those two in 6.18.y and
-6.12.y.
+This report has three parts: the assert itself, an instrumented trace
+of the reset, and a correction to something I wrote in an earlier
+patch series.
 
-Ciao, Thorsten
+Setup
+-----
+  Machine:   ASUS Vivobook Pro 16X (K3605ZV)
+  Kernel:    7.2.11 (Arch), includes 59c3ee19ca88 and 21b50c24843b
+  Firmware:  mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin,
+             Build Time 20250826211444 (linux-firmware 20260916)
+
+1. The assert
+-------------
+Twelve natural failures since 2026-08-03. Ten of them were captured
+with devcoredump, and all ten carry the same assert:
+
+  <ASSERT> ../bluetooth/system/debug/sys_log_interface_emi.c #811 -
+    0, 0x6455, 0x1010707, 0xFF150001, rc=0, BTSYS, id=0x4 idle,
+    irq=0x2, isr=0x929A5C (five dumps) / 0x929EEA (five dumps)
+
+  Captured: 2026-08-24, 08-26, 09-12, 09-21, 10-05, 10-10, 10-18,
+            10-21, 10-23, 10-25, on kernels from 7.1.8 to 7.2.11
+
+The firmware is idle each time ("id=0x4 idle"); nothing on the host
+side precedes it in the log. The full dumps (about 1 MB each) are
+available on request.
+
+2. What the reset does after the assert
+---------------------------------------
+I enabled dynamic debug for btmtk_usb_uhw_reg_read() and
+btmtk_usb_subsys_reset() and then compared four natural failures,
+2026-10-18 (7.2.6) and 10-21, 10-23, 10-25 (7.2.11), with a reset of
+a healthy chip through /sys/class/bluetooth/hci0/reset, which reaches
+the same btusb_mtk_reset() path. All four natural failures read
+identically:
+
+                              healthy chip     after natural assert
+  reg 0x740003a0 (WDT)        0x00000000       0x00000001
+  reg 0x74000024              0x00000000       0x00000000
+  reg 0x74000308              0x00000000       0x00000000
+  reg 0x70002610 (SUBSYS_RST) 0x00000000       0x00000000
+  reg 0x70002510 (MISC)       0x00000500       0x00000500
+  chip id read (0x70010200)   returns          times out (5.1 s)
+  result                      re-enumerates,   descriptor read -110,
+                              setup 121 ms     port gone
+
+So the generic reset sequence works on a healthy MT7902, and every
+uhw register access still answers after the assert. The RST_DONE bit
+in MISC reads the same in both cases, so the "Reset timeout" check
+cannot tell a failed reset from a good one here. What does fail is
+the vendor read (request 0x63) of the chip id, which times out, and
+from then on the device no longer answers descriptor reads. The WDT
+register is the only value that differs.
+
+The ~10 s between "Mediatek coredump end" and "Can't get device id"
+that shows up on every failure is two USB control timeouts. A
+function_graph trace of a triggered dump shows btusb_mtk_reset()
+taking 10.47 s, of which usb_driver_release_interface() on the ISO
+interface takes 5.35 s: the interface is in altsetting 1, so
+usb_unbind_interface() issues SET_INTERFACE(0) to the dead device and
+waits out the 5000 ms timeout. The id read accounts for the other
+5.1 s. This only adds latency; it does not affect the outcome.
+
+My question for MediaTek: once the firmware has asserted and the WDT
+register at 0x740003a0 reads 1, is there a reset sequence that brings
+the MT7902 Bluetooth MCU back without removing power? The current
+sequence evidently is not enough in that state.
+
+3. Corrections to my earlier series
+-----------------------------------
+In "Bluetooth: btmtk: fix subsystem reset error reporting" (v2,
+https://lore.kernel.org/linux-bluetooth/20260815115624.8309-1-ismailtarim7@gmail.com/)
+I got two things wrong, and I'd like to correct them on the list:
+
+  - The cover letter cites an assert in
+    system/rom/transport/tra_usb3.c #764 as the firmware failure. That
+    assert is produced by triggering a coredump by hand through
+    /sys/class/bluetooth/hci0/device/coredump (2 of 2 manual
+    triggers). The natural failures assert in
+    sys_log_interface_emi.c #811, as above.
+
+  - Patch 1/2 describes the id read succeeding with an id of zero. In
+    the natural failures the read times out instead, which the error
+    branch already reported correctly before that patch. The patch is
+    still correct for the zero-id case, but I had not observed that
+    case, and the log line is identical for both.
+
+Neither correction affects the merged code.
+
+Thanks,
+Ismail
