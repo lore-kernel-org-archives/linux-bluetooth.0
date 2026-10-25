@@ -1,103 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792963825;
-	b=XptHPMMDONXnzsYE9Cxhz0Kc4/34EapbUJd2PHAv3qDVdH+sXcSr54BehILJlVI6Rh9k
-	 xNJNO1WH+FhUihbxwzTap+MCvnl+MuvY9pL08oYbvwsLKrTSlV74S8FxmyCssE7QMvDDc
-	 067r5rGKeojZz8uiHFNp0Xv0hcdYUru6DRgWa8wc1kE1HyW5LZUMA8daT2tnSmdm7HVtb
-	 RLegWzxzrI+8wj+5yw/jl7RWAXqTNj8a2vK7+uBKPugA1UExtHMmn3JzoqPbQgKLHavns
-	 jTBUu7widlWvk4HQjtvL5u6LGkllMw0JaIgBYn56Y8CJcfKSloLcaekiVmAIM9JnmXQ==
+	t=1792971004;
+	b=nUs+KLGZs849edwfz589O+Ms8KylRiBrOhJkL6oGngWZqB9pqsYQvnqQ+6vOakITzml1
+	 Ca8YGdmkdmRpFBCfxI+tKKEcofVyQI/fV6b0fKncgCv6vZrAfG8905OIwlIGlS8BRs5br
+	 E682/eSuZhHgYMUoOLhRu/mO5rDpwTRJhRXHEwhtDvoqSEjNzQvifGC18L4W47PNI9Acd
+	 Jp4r3kyL8P5Ff4ta6GuJQubYzbmTFMZR1rCcwmMNh7FF2yTs6gRz4QoU6AoRuVp8Z694d
+	 yHGsdHyOzxVyDEl/M+rfuv02YVv/uN9PQNjRAHd77h1v4bpP6jsneaB3kq9MaqASMLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792963825;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=xSo6YJyFeQ1zMbTyziwWYIcuPb7sycKW/4CokJbJ79A=;
-	b=Z8S2CxgflS7hU3ojKL7lIxPDz4DWY9Rmvl5eIpLJxDug3+zNn/U86KS/WrfxEpHVko/+
-	 pmQemWF+/TK8s8h2JtCO+fcznIYrjQJcXzOottH5gPfULsJI4ythUrhopgE+1P5mT3q1J
-	 lva9QRQSiY2sIYDuDIfG/mBt/pM0xWzCGg7/2Q1mdn/DmEJLLXuoUJ0PJREXypCS70BzG
-	 3nxQ8WXuKH7KaPik/8Mo4Yf7sO+AubpflG7fY9OCqH9SpAQU2Nz2PgqRyaOhrLvM+gI8P
-	 CMLfym7XC2S9nWHHEdnkK71xf/UQvg1Izp+OUVmdt9GKew45VFnI403M2eNbXsUUZKA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792971004;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=E5YQoaj5YHm1eYEazSEM5pfLF2ybdrxOAMvKmHrv13U=;
+	b=Gr4hXM5Bjt+Qt8OK/iIpTo0mliWIrnPsNUxw7FyZgOwVJQiU+BRYML8kADNEImdSZr2x
+	 ZadKwLq8VOOGZocNrG5tk/9IY9Z2wezTqvvM6Rkacih5Q+JhWEtNdZTQzsqD5jPF9qWJp
+	 SsdxlHlGDW9RHmg9uqIHorzPiZk74sNWYWT1KT4N8dnk9gSIXgb4mNmF1jwOw84G/m9Y5
+	 PmaV0nQD/z4SctCjfDB6poginfd9DfciMs3W0TIq9oEG8ioN7GJPuWgUOKWX88HVuVxZy
+	 dTpYVseb8DDTdZJKF/26IXWBp9sKCuUNvqB9Lo+UWm81Fu40r8NIzQ1EQ1jD1akrFUw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=JZIdBnWy;
-	arc=none smtp.remote-ip=209.85.218.42
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aiZQD0dO;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FE7606A31B
-	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 21:30:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4FE7606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8E6606A327;
+	Sun, 25 Oct 2026 23:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=JZIdBnWy
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c40e02b2ebaso369124466b.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Oct 2026 14:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792963823; x=1793568623; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xSo6YJyFeQ1zMbTyziwWYIcuPb7sycKW/4CokJbJ79A=;
-        b=JZIdBnWyoWNxwt0dJMClhHkij7U/cXI8BSQM3pCxVUOjKg5NdEIVx9wZf7hJIG//cY
-         vRlT8JSCdS9ZVgqp1fmrr/6FQILnYuQR1v3KovBDPUN9nu7SwE2NGCiMfd5KRTjGudQH
-         dxo1SpIygBmtfPsfwDxzaK80fWhWKQcQhZ/1ix3Zqou77fhKBHQCT2uv+5HxGUW2ULxg
-         MOqQo1sJc2Gp4ZpUhTFGjsWObTH8safBwhtbtDvTGG9T8FOpG719OPd8znP8Ge8SM7LP
-         +hvXvrupHKzBNXKVFE6OvpvnS/pKolFe5fM8MtseMOYdKDb7YSUiQBdmuzFUlwvWOFwg
-         HDcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792963823; x=1793568623;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xSo6YJyFeQ1zMbTyziwWYIcuPb7sycKW/4CokJbJ79A=;
-        b=jSyUOgmEoUSB7lJmcCMLAXTJkNivuMcrq5i/Hs4XBtFYV6JjSjmxTfcjiCs9su/C+C
-         tamsQo5AYIRKwSCBAT4P3gVrae6ykrTe5LWEGdMaNC6dCZ8JKRlzUlawZ6LTyUPKhEvM
-         r9VyzslVmn5l4XxLxke1Gp7VtYIATsQfmiSutD641OI54kEuxWz90HgietWSFpVbScFU
-         VsOj7QGUTHMGTe1ky4zfI373zdrIE8bAuAvnJQ4YW0c6+j5qhdbNy0uplHgT8po/wr50
-         jrl3yMalZ8Lc63Gm8Uf5/aDDSKIzsLFQaaMwtw3+7TqHRnoP5QanUZhdJkR/pDDCWvy2
-         RbeA==
-X-Forwarded-Encrypted: i=1; AKwUvBw4ftvZ9fKvNFMrrjQdgWybKBlpmFpoioxuH8rYpuQGIZT+iZvxdzWQo9Qyx5+lwc1xUtWAB0M+1qzQCxAQfCA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJYBgYfMd11eO4RWMnMfE4mtySOe3pZEtYuzFDSemPoTS9iJrKi
-	d8JNlWN5MS8AgxkvdaPf2DrHFFZpD6J/5FFo3ijoIIzTn2xo5fHj6dyC
-X-Gm-Gg: AYBFou2IV0v5mkQpFNkkVf1g9DqECf28y93+1pt3FRYoQofGt2YU3Jala6taWDDg/vZ
-	Hzv/KPwkQKfobIknU72cTNXgEPTNpzdBn3jWLps7WH2DLahsI5JrfmdVVQ3Z0l+OOIOJcLumIAa
-	U7Ow3sEBxwFuicKBHO7DGllvrCkk5XPUx38uV6jOSYlxTifwnR8zVuPZs5Yd5H/TNCD37jX8Mcn
-	qnxD1790zpTSA9LcB55junAxLH2rRHKAZH1TUDVXoCzEf9jnTZYlQe0B7+o6K3GrYzI9jnoDlKy
-	heV+tPzsUotUzxH62GVRfceT6GiABb5oM9trgDUSJe6hl/1OZkhfRZfJLa6yL9FMvYEeVCxQgeq
-	MUSgvRdfvR8t7Ig4JVoEAc2CFDW9FY618EfTdAd+44vIfp9+ib9qyXQ3cy+XEjIuBLeWKyEzNGS
-	xFJrc963Nn2udmkK6ERzoxa6ZaNBIFrJlIWopUzNDDRmadmfXkL5mUQwRh5yghDFbpw9YIely7k
-	UtHJh2G5UF0X7NnU+Lz1W5VITQpHITwAXxybINAquXZcKHhf8fBUapQtyL7jjw=
-X-Received: by 2002:a17:907:2d92:b0:c40:f9ea:7375 with SMTP id a640c23a62f3a-c46bddaed7cmr675175366b.15.1792963822908;
-        Sun, 25 Oct 2026 14:30:22 -0700 (PDT)
-Received: from nb-xps.ts.zxczxc.org ([78.56.243.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd79eb05sm244744266b.79.2026.10.25.14.30.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Oct 2026 14:30:22 -0700 (PDT)
-From: Nikolay Bryskin <nbryskin@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Hans de Goede <hansg@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	Bartosz Golaszewski <brgl@kernel.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aiZQD0dO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA8A1F031E2;
+	Sun, 25 Oct 2026 23:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792971004;
+	bh=E5YQoaj5YHm1eYEazSEM5pfLF2ybdrxOAMvKmHrv13U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=aiZQD0dOYn048Dt5kIdHgZN4+KsVtKW3DNbW92Gy7LWFVxoweBBae7ZkSuxKWZLnl
+	 Vy8ht/HWaJjrCzfwImn8XGM3G1XXSCaI6jdMcbfPeyyMFDRx2bHebW5SKNEhKhTaW+
+	 m0C4+V0/hk7EBqHBt+vdcaOIisX1YZk2iPgvu8dA3Ijw1vTP1z4t2heheQA9rVAD2n
+	 E0FBpPiLvxkIthsFu2baIad4uhsKq8xxvk6zc0AlnTK+VHufrQI/BQwwNm9o3IpDY9
+	 rjXU1MJk2GsvstBb9Xy/ELdH6t1Uva+7d+cbEZzCEkDtCykmuqVE8baPGqzr4TVe3m
+	 9v0/vuqnhfN3w==
+From: Sasha Levin <sashal@kernel.org>
+To: Christoph Zwerschke <cito@online.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
+	Salvatore Bonaccorso <carnil@debian.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: Reprobe QCA6390 after hibernation
-Date: Sun, 25 Oct 2026 23:30:13 +0200
-Message-ID: <20261025213013.12956-1-nbryskin@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <atXiYxot6UZ3MDrp@makrotopia.org>
-References: <20261017174310.22484-1-nbryskin@gmail.com> <atXiYxot6UZ3MDrp@makrotopia.org>
+	Erik Brangs <erik.brangs@gmx.de>,
+	benh@debian.org,
+	stable@vger.kernel.org,
+	regressions@lists.linux.dev,
+	linux-bluetooth@vger.kernel.org,
+	1149377@bugs.debian.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	Thorsten Leemhuis <regressions@leemhuis.info>
+Subject: Re: [regression 6.12.y] After backport of 980084de4d9b ("Bluetooth: btusb: Add ASUS USB-BT540 for Realtek 8761CU") bluethooth not anymore working on 0b05:1bef ASUSTek Computer, Inc. Bluetooth Controller (requests firmware)
+Date: Sun, 25 Oct 2026 19:29:50 -0400
+Message-ID: <2026-10-25-1-daily-reply-0004-bluetooth-asus-rtl8761cu-hold@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <bdafa01c-f75a-41fa-a264-407400a2cd81@leemhuis.info>
+References: <bdafa01c-f75a-41fa-a264-407400a2cd81@leemhuis.info>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -109,19 +70,17 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Daniel,
+> > If it helps, I can send reverts of 980084de4d9b and 6f0624b4427e
+> > (on top of bluetooth.git master, with Cc: stable). Alternatively,
+> > btrtl could fall back to the ROM firmware when rtl8761cu_fw.bin
+> > is missing.
+> I didn't see any regression reports for 7.x releases about those
+> changes, [...] So I'm still inclined to say: leave everything as it is
+> in mainline to avoid any risk and revert only the backports of those
+> two in 6.18.y and 6.12.y.
 
-On Mon, Oct 19, 2026 at 09:30:06AM +0000, Daniel Golle wrote:
-> Would you be fine basing your patch on it once it has landed?
+Yup, that would be appreciated.
 
-Yes, thanks for the review. I'll send v2 on top of
-device_schedule_reprobe() once it has landed, with qca_restore() as
-you suggest.
-
-I tried the combination in the meantime: v4 1/4 plus hci_qca converted
-as above, on 7.2.11 on a Dell XPS 13 9310 (QCA6390 on UART, no BT_EN
-GPIO). After resume from hibernation the reprobe ran, the firmware was
-downloaded again and Bluetooth worked; s2idle suspend did not trigger
-a reprobe. I've replied to 1/4 with a Tested-by.
-
-Nikolay
+-- 
+Thanks,
+Sasha
