@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793050810;
-	b=hKdEALcz9Kd6N2hxAG7rKHbL9sNgA0IHk9g7QmBaXP2lASjtTjcklNVJUptsW6NOgXhL
-	 TlWeu2VhrfTVv6NCXFEeVE6CMjTOIODUJmg6muz6hfE3kw57kjwfePmER4vej8//hS7DA
-	 9hwxm0WiCJHbebsTerHA0I6znMjL1j9Z+bnUgDA20QzLgl3E7JVpU6cNmPZYkk5RCEj7I
-	 sAnH3IW493h3nsg8okcQeQi+HgEteBN5FymJAsr2+pIQzmu0SL5r2QhDeXHJfJ0fdKho6
-	 9BcwmyQtEVxYupXEh1hmS3FtbD7S683g6J0MIJHwSoclXbiCE0mYMmJr4F+sHBvrKJg==
+	t=1793050812;
+	b=y3dXw8eQYRpcmx8FLW2bBbR4QktXTY/Iqzxs9z3s+u+YqRCtB96JfSN+9yhGuaeOgfAC
+	 bzGFyF9tzRWJrZx3h+camndPvwmPZlXNvDdHm9LFxkshuN13nhWtwVl5+Pw0YP0ANF7p5
+	 3ol5ZAQqlHSb3JBpP2cb0HQH0n4U0HSpa/6+OQP7MPCyxahbBIng2popZ633h7z6hGdWM
+	 jcRs9em5zhMbFanf+jmk+iqPHzXVesr3rYRRFueANNShL9ab8LLt4NqlKkkguFqDmNwCe
+	 le4gyzSytrHHoivlM511fedVV2mxTT4jtySarrtLYmHvcVjIw/wWByDIdmmke0FnoSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793050810;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793050812;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=f9ZcLUd5/SxAb0Pfvx3vSPO4xA79VJwyMwHcqMCggPk=;
-	b=CJV4CiFX0fQM7XbzQSBykBZRr668FOgbEXslUJTtYa3QE1n0R/EHzYf4/ZOw3A3rrWOX
-	 CpiDh+6WG7g+Oc8Qr5rwF1j/DQSJAch4koYFUzL1bBUaZQuTsQLMoxcHPYPOBlH/16U1O
-	 qw5HKzLEvPZExUWJ9j11DOzDLgbIBAcu5TLj37wALrOKj4+/QduOCCt8WyRhwFc5j7Ala
-	 NXc9Gs2xK4gXPcm0lq0vdzw1rBQErvN9kUW8nqqQypaZdompmhpItBc1iQctl8a4jkE/G
-	 8pP8Xun1Q6lD0shdgrQFdAlOALsnP6l4XsaS3R43N5RtfVpUJj2lo2T1PJz3e0ztzig==
+	bh=146tge7Dt+FPRE1b/ofUpOPhkU8RIgNzlYaeo2nqC30=;
+	b=0hiUJnWM+4i/LUvrzwjf6YvEpbjN5okyj72Pa7mag934nu0wEXEIjLlrRKnKzjFLtrSX
+	 ILTJU+gefY8PlQL8jncM4uLbTJgKcq62CHu2H403npw3jnRYFG3mBhmpGd2pU8wTh7JRC
+	 P0MDjkUFro9aw8HhwI2vJAdz80b8wAxO7bfGKdwxI93rhHTnIj3ap2w+YmPmU+ZuD2kd1
+	 IbclQ9+b/c2I9qrNaVVh5Eyid6J88zKDVuPh+h5orMmIOkjalOxJ2pfpdH2LH4quXmUlM
+	 yyTDpDMChatBizcUdOCSnYF6h+0kWl2ObdmYZo4laoquNpMcxyQdF0TF7hJrMsPqx5w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SW2srY0p;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UUbMngy2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819C6606A31A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 21:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4898606A31A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 21:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SW2srY0p
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1075B1F01825;
-	Mon, 26 Oct 2026 21:40:10 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UUbMngy2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 893301F01828;
+	Mon, 26 Oct 2026 21:40:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793050810;
-	bh=f9ZcLUd5/SxAb0Pfvx3vSPO4xA79VJwyMwHcqMCggPk=;
+	s=k20260515; t=1793050811;
+	bh=146tge7Dt+FPRE1b/ofUpOPhkU8RIgNzlYaeo2nqC30=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=SW2srY0pVRI3lofukzIzB0NfbyLgupqiLZA2zw9dHOFXKhQafZ4AL3ZQ1Fv7c98s0
-	 Qi22PkVljcVcUuIYNHDtD5+cWwZTDc/+MDXiUnV5vJzY6lVUWq5lSnslcp5IaOkNQm
-	 xi1/ro9FFzrOd+60Hmn7ZhwqDjcTmY6/kQm1uCo0EA/1LEHszrauWVVL+btr52Atk5
-	 NSuAksuyk4wQ9lH6BAZsH34egLN60tD+upGA4FhRChT87aUmjDLkp3zeRUibJNBaWx
-	 /ZiPkWwzbgD1PkH6z+gQJcIuefbfU9nVhzcCr7cJgtevs+PlMEGgT4j3SVEJmhZgzz
-	 6eeZ7luOFQrtw==
+	b=UUbMngy2kfvq/3TD+H8DNV0ZCK8AbrHnn0oEsCQiC6fd5WscTwttezLEeWG/gYB0T
+	 b1RPSmXhuv3IvCnahzT3gD8yfKK7p9TNkInVbhlMjsQ2oCrwT66DIc5g+KGnMJIb75
+	 SlnPhqs7heM2eeRktort/IybPDo0gHyWY/kbBpaEtDsgrWnEk62w/8tyqyjptQHrHb
+	 wk8sCJchHQFwSNWij30poEuVIKr08hl4Y9yw8G31VSXjxs5kPJmJ8u9Of9imt3nB7m
+	 ctsk29z5Y4BxzDBM2slTwbl07mConeY4fWWsiPoJ3XT9VyYo2f4wY7yQ9CUc7Cacx0
+	 fRfBMywKo3IuA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 073C13AA80E9;
-	Mon, 26 Oct 2026 21:40:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 8153A3AA80E9;
+	Mon, 26 Oct 2026 21:40:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,37 +54,42 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ RESEND] gatt-database: Fix freeing wrong client
- notify
- IO
+Subject: Re: [PATCH BlueZ 0/3] Promote the bearer interfaces to stable
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179305080861.3403508.8946558170896367981.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Oct 2026 21:40:08 +0000
-References: <20261026032544.49563-1-jared@kotfu.net>
-In-Reply-To: <20261026032544.49563-1-jared@kotfu.net>
-To: Jared Crapo <jared@kotfu.net>
-Cc: linux-bluetooth@vger.kernel.org, jhs730127@gmail.com
+ <179305081006.3403508.881301264378000551.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Oct 2026 21:40:10 +0000
+References: <20261023223708.76232-1-kevin@simpleble.org>
+In-Reply-To: <20261023223708.76232-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 25 Oct 2026 21:25:44 -0600 you wrote:
-> From: Jerry Wu <jhs730127@gmail.com>
+On Fri, 23 Oct 2026 15:37:05 -0700 you wrote:
+> As offered in the Role series, this marks org.bluez.Bearer.LE1 and
+> org.bluez.Bearer.BREDR1 stable, now that test/functional/test_bearer.py
+> covers them.
 > 
-> When a non-bonded device disconnects, att_disconnected() drops its
-> device state and clear_ccc_state() invokes the CCC callback with a
-> NULL pending operation. ccc_write_cb() then takes the notifications
-> disabled path and calls queue_remove_if() on chrc->notify_ios with a
-> NULL ATT instance.
+> The bearer interfaces are the only way to connect a given bearer of a
+> dual-mode device. Device1.Connect picks one, by default the last used,
+> so an application that only uses LE, such as a GATT library, can end
+> up with only BR/EDR connected, and Device1.Connected does not say which
+> bearer is up. Today such an application has to ask its users to run
+> bluetoothd with --experimental.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,RESEND] gatt-database: Fix freeing wrong client notify IO
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f7e2cd91c266
+  - [BlueZ,1/3] org.bluez.Bearer: Promote to stable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=892d1885af48
+  - [BlueZ,2/3] bearer: Promote to stable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b25019027d3b
+  - [BlueZ,3/3] test: functional: run bearer tests without experimental
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b0bf49270d44
 
 You are awesome, thank you!
 -- 
