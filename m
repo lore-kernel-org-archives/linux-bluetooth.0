@@ -1,88 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.231.200
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793041349;
-	b=BUf/4CjLs3Q9fly3Xjrh0e/cVTt/TmL6V9u9p98FE74C3Drf+JXT/I7RmCXjYNbjcGQb
-	 zydkoiNkohUR8hMmFiB30+Iz65fjcIWIoMq7xNdyAMc4WTgmVcHy9hh7R52wCUXSvqSrY
-	 G17bX3J/N+9uc/PM0QCl8rpF70EDatBsWfoyl9AAmyfXvo/3d8TPwWYfVtmqAswzmThNH
-	 P2wIu8wguMCtSMVs/neuq9qyx64PXvCN2o8h596qd3+NFEuUHtOXx8RJlH2cSjhwrfMqc
-	 OSaEanlYbgOBYu5GCf7+wvlsnJ6OiYpHEC3wNjOoP1kmAkWlFoSZT6CtMQwtBET3Nfg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793041349;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.214.175
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793044531;
+	b=FQqYO2ihL2abxxiuo4cld7zb2Qf1tkJ0wBqVAChoRmUN0pyB3uSqJw/3zD720VQxl4wH
+	 DIZvMenmvO1o28JMJy/6UBw9sxf9p7q1O1EVIuMBxwVlA6lqp0cib2acPbw7aD2DXCoFR
+	 uOBoy9hbVxZusMSCx4SZ3fHGI84If48i4Pf6Auw3YODhQT/g35p4MZBNXUTlPHCQvNnnu
+	 Kk6aGExeN4zry/GO25IdF14kxS3X3pv1yx1BE0JrWle4eCeo8pYav9GsWpOJkk1yZViV0
+	 4QGr1bkumN1hyCdYIsKmGXo+BAgPkFBYFAyGK38vNMah6lh/aYDhgDpyGaUzFClSh6Q==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793044531;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:
-	 X-Developer-Key;
-	bh=07HklJOx/r3iefKPdEdock1PeAL0doe52SrNOxBdYeA=;
-	b=mWCXgfXSXoAUBDP9n7/eJbCwoD3bDlyIoexsVFv7UB8hTtlXPOXMpp9mJ1lIQCqwj/5U
-	 zPKmdvsgmuJmBkPJRerJrMVQ/Rq5/qAbpLVeZXvbpPnpycN6CLxXyiOak/XsN2/kSCl1t
-	 B12yk7M4liIKR7odSIo9QF36lv9uLuozHOjUbDEPENNVlpvmxWh3Et3dvgrHxCEt+cM5S
-	 BH89MMP+PQPcHmn76OOUAT3oxNXJw8kqJq0G+fGeG8XSffyR9qcHKAyq/yu69tJGfmUb9
-	 khncwV/kUxIQEZdYYdUmcs95SRw4o/Z+0l+kHSHDoNIHkLkKfqQUpP9J9FWD6sj/SMw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=KFWLY101kRHD9mssadgRRPoV47HkqjA/2NAH0ex4JXs=;
+	b=Wnr2g6QHlSO9ID/tKYLMIUVhkjqEXsF9LKZM5whESYescKX4UsbEQT4RWpFebXemyqd+
+	 11j32c+ZbLxSVp7u6TjgqbfjYhm3mtWAoq7DZLZdqQ8PHbEHs2NU2Qt6a0YBG8j5RkMMx
+	 QJj6WMcsp/iamkeGdSFzMzTcoeBfRpe0iIiahNyj4SRNixdTBfDwWRDdobv6c9/mzrbF8
+	 /nlgvoZjUlZTKqkF4OCwZxRoa9Yeo7oYI8aWWzed8UibI9lCmADHBvsI08IrcDliEAMqg
+	 aRsHyaS0khilB+tmLtROgLrfd2dTux8vh5ZFsk0MCQF3FNDpic6zRzjnAaIxwi8e5FQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=TnnenxLF;
-	arc=none smtp.remote-ip=74.125.231.200
-Received: from mail-oi2-f8.google.com (mail-oi2-f8.google.com [74.125.231.200])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pnTn02j5;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.214.175
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78736606A31F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 19:02:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78736606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97195606A31D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 19:55:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 97195606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=TnnenxLF
-Received: by mail-oi2-f8.google.com with SMTP id 5614622812f47-53c4858eb76so1444434b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 12:02:28 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pnTn02j5
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2e8246b13cbso30063145ad.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 12:55:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793044529; cv=none;
+        d=google.com; s=arc-20260327;
+        b=dUlmJk2W1q5TXBIiur7kTqh47TSxcIoTxNjvDqzEocSHwMHIZEpTGnAontoh5ts4nt
+         5d12/zciSOw3akdaC3nnlN3YZHlM8qjeJHVOFBfNjsGzTn3x3wuBF3eeLLEItXZrYT3s
+         BWRxGnlWM+6k0IFya58k5hmTktyAAJLant2V1tXw94OrKTtukNH6cm8boU9HBlRtBFqP
+         iGVdI8kaKbWGKBts4Lf1tWsg5sFcn0pClOUtjuNiy9ZRKllMnNka18sLUh0uyFM49zYv
+         f9fvRXmSPP3Zy9M9RSlwDoY6N3WIXRdn90+Y8LYw+phrNoYYBplDd9lxrFXxBTLx1sUM
+         ed8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=KFWLY101kRHD9mssadgRRPoV47HkqjA/2NAH0ex4JXs=;
+        fh=KX8oQQsdwHZEDxIjK3rm0DF+tF80/skxmPBnrW0cwBA=;
+        b=raaVufAqOx/UItsNL27qAe7TgzJX+DNoLs7b0JPQhPc/DjoeqqvrAmSALriF/kGOo+
+         82XXGn29kSEbyo6RVKPBiu+8NYpQBc5epOVaWvEMFl/gVjA6/paw0JTD6njHjs/0d9fz
+         TOpjWn1hajaIKVubu5qhwTA/zTRU9jiyXdx8/uNG2NUa4L+PthiL8XHHKf3q4u9B0hU3
+         ufBhGeMK/wG/v+/m0AYSu69K+/DkEyD6DGBT/Ps19fidzqIcKrS0dydNMwycHRSUk/A2
+         FHHvyyAD7+lWjbr0EcWJHPzwum3JDi9qm8rIPKEeFAUMRLWjCVSGEuNDeZUK9m2Z/uuc
+         yXGg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793041347; x=1793646147; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=07HklJOx/r3iefKPdEdock1PeAL0doe52SrNOxBdYeA=;
-        b=TnnenxLFhymQPrRGj/bT5b7R8zsqQEAG5VGSYdJgHuPySQq2gBq8UYjHwGpK1GjHTd
-         kkBjuKqtu+SpLZkHsn3HqlbvWGcBErqMDpJEUje9BPtFnvGgg9647Q1YTrxMbGU+2gVB
-         ue0v7N0u/gXJDPPrP4aPtzjkzanJ2662JzI3CV4agPqQRAqmojTkFu3/vvVYZGVJF2lU
-         HicYkj6llmIDapSCRGksjP7aKI9o1f8GYWHlVyxC5kG1F3qjT4s7iXYdpKI43FCIpUeB
-         VFdhcmbFol4+k3/thAo13kD/74ow0enfZX5+7ThsWcAAsTJ0q7ecV1bBaPHyRL4Lk9BP
-         lN1Q==
+        d=gmail.com; s=20251104; t=1793044529; x=1793649329; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KFWLY101kRHD9mssadgRRPoV47HkqjA/2NAH0ex4JXs=;
+        b=pnTn02j5dljxn90Fg5vBA5cheL//cy2a41aTckacUQD9EKGcBOYWJ020Kd+XQy1ZJq
+         vpsG7s5j7TmJCV+eCxFbX53lo/kKQi5DB04x6XVPsL5xxa9Jq+z97iptcfjOF4byI7ZN
+         4chCqm+v0QCnAeLB4lHza0rlKZ/BeT4FQQMVwM8mzR9weKxxpRrPoPNGnrifjYHNCtbU
+         Nb0lOLELPiLs9u9+FOkSuWHLYMW+2ktEPqgXh7Wuvvx31Ob7xT9h1d/C8/4wfyGcyHXy
+         7ZcbgbyAkOFU1UlAlPiozxwfAvV/PgbEF5c/K0KA9OU/XujPv36U7bm+DEvX29x8BjVb
+         nnsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793041347; x=1793646147;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=07HklJOx/r3iefKPdEdock1PeAL0doe52SrNOxBdYeA=;
-        b=q/8mFR44DPkClJy9+eYSxc+Z7MyvxgCMR/Zuq48l0dvRMiYnvWaK70aW879p31zBeA
-         Er3TuXC6uplXmhzbcVdSPmcz/HQIji0HHMwC4lWiXxQ4j9WQgCkT5Lrc/jhwaBwZt06F
-         J6QL0aHWeqN2FExnq09ujjsHe6Du7aTrP40EOzK+mmFNxBIr9MV6hTitctFYSKJfK0Jl
-         PozWwOait6sM7UpcLCjr/4K3H+deWQH9nRWaJKUN2rE9ka1M8QcxGSdW6d/E8TyYeX/2
-         R8jguEvzSGJ+JX5TJswkcaDQvCF43oTZ7n8vGl8yAUuoTMEfjcMsfvCC52HdwtEXW54P
-         r8OA==
-X-Gm-Message-State: AFq9FYJsaZNEZxd1x0hHBNtKMMugRg5rj4zxHM8xjHcYaSWncI23LhKE
-	RRQBkScDJ4bUTo2S3I5i28EfyjxexUPsj0fCHFREcVrmnDWVbZK3ok5PqDRY5yw+PAE=
-X-Gm-Gg: AYBFou0EhRhHLWJvO5a0L6OGFuAFTezSWx3bw2V2p9wbxAE4Oye7xkvWFBQNrSe3WoM
-	aAVvc8lED9v++B657/Xat7D+MQo0bWHHT9SgRXZLWCpVvHSbKRvOrGyTx9VULZA2VC23wsGz8x9
-	mjiwbv6EociL4hkeNhtHLHmQHFqqtwGOL782DCiQoE+L8Kisnmjn8365B9NSXyceNPewcxkzf2X
-	1QKdpLVnm2NIMjKOQ9R7DJDZmExfpsxwmBO3tac81cqZuqWbdFhi4f37qjHjD0zoD++gILovxnu
-	gun9HKWEXqZ8fZHJI0wIykSYFUgWagdvC8lfv5kZtn97uf7ouFhNTmCZlKQoMrvhvQ8pq7it8Kt
-	1dTN9gVG2H63PaLRl7cfjHO+OdcUlU4nGKMeWRrjPRXQVB6kYYGpcx9+fgFJhaC/Op6QeC1WMfV
-	AM6ruoaB2bOb6A8oppFiuDlH8lnCRgssS9lNIYH+E56l22TouB3+oDxVHw9uwjZL4YpfjkOeQq9
-	W1YzI4wJDjzHLOSzmWbTjk572kKpsJqNK2nDZI3qStXAnK97+ftjqCSdJqXBAFBnjgQDXFccVNu
-	1JZ36LiCNM0BqMhbZGYmumsjhrNA9lLqnC1+YOS1oK04uA==
-X-Received: by 2002:a05:6808:c226:b0:4e7:851c:23f5 with SMTP id 5614622812f47-55c003fa3f9mr4544096b6e.59.1793041347210;
-        Mon, 26 Oct 2026 12:02:27 -0700 (PDT)
-Received: from [10.10.18.223] (wsip-64-207-253-118.tu.ok.cox.net. [64.207.253.118])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-55c04311a8asm5958356b6e.16.2026.10.26.12.02.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 12:02:25 -0700 (PDT)
-From: Ryan Brue <ryanbrue.dev@gmail.com>
-Date: Mon, 26 Oct 2026 14:02:14 -0500
-Subject: [PATCH 2/2] Bluetooth: btmtksdio: retry enabling the function on
- MT7663/MT7668
+        d=1e100.net; s=20260707; t=1793044529; x=1793649329;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=KFWLY101kRHD9mssadgRRPoV47HkqjA/2NAH0ex4JXs=;
+        b=V/f+632Wu9MkxgVkiGL2y/az3apa7k323dixITVE6Kbdp1wud7G7luINGBOHgqZ3t7
+         W5ktQiBqiOW7bngoLxuAUAypq92CrQpRCLL12xkgsxrE7XZdxtneQeoi0cPiBfr4e0+f
+         jYoYCj20CEQHGcqooEFglcLyjIZe+IVf+WumNFifLpxkrxzzpk6IaKseNonPgtlqMAug
+         cn0USZL77CeOnFiVa8c2YDqybruIFqcZuxkUiu/ulGs2yyu0n1V5dGXI3gpvEU5drUES
+         7+xe0LvCYOtE5EcgTm0IE3LDfSoKhxwAeIVK+3pptlbetgd3D09nWdj29T91BAeOtJ/p
+         xt+A==
+X-Gm-Message-State: AFq9FYI9FXpzk21cMBGNbOZ8VRR/FoN5EAhMiauUPGqFXFT5gVUFig9C
+	W4RB1O4gqt0LYQybL3j5Ii8sEiK0l4+FosebSDhNmdhuQD4hGXmoBIUiKvMZE1SD7k0XzV2RvZn
+	HEEI8d7LtwdoaUV3DjPwu8xr9YBOqnLr4/zjEbTM=
+X-Gm-Gg: AYBFou0DlLyW4uZrpHBDfIoHhlEHFdnyToG98DbRfY+hbSvGbn5whtPJrl3Tlmbd7/6
+	cRP/DSzYdT60hRTUGw7ynptNh9IGN8Lw9tpjE3D4uVQGNW+Bo9M5LXgI4qSgcCPpJhMOOkVDevR
+	/Ps+qT45Urw1PB6lFFsnlbtSEnk/sI+uEKmM9NeV7eMZ+02PQ8QBiqughiodcvfAEdOWOzFs/VJ
+	m17XLpSbg6d4mWM46bTGvYbVjjtuJjnwVx5YBahNuMuk6n4vwHbPxyQsT3TjLFEBLhsyV+zzxIz
+	NKSPEm0QxYvaoJffUo/m9efh/mVmF2TxlXDGBWRbJh8HG+ggJ1UADTGVK2nMjOkkfreiaceVOjy
+	F8ilhR8UGvoQzW6DeCSireaN4Tq2/wlAiuMmBgICVSdiy47lSCIb82NlaOsO3rPzA5+i6oywphm
+	H5QWgs1SrnuRQua//++P5nuNSydTx2BhH1e5SuNkzssjEGQc6Re8uW3XzcOKPXfrXGAuCEtZFwl
+	et1hu0wzXtY
+X-Received: by 2002:a17:902:db0f:b0:2e8:4066:d247 with SMTP id
+ d9443c01a7336-2ea9c697792mr70723705ad.33.1793044529481; Mon, 26 Oct 2026
+ 12:55:29 -0700 (PDT)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -92,91 +101,88 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261026-rbrue-sheldon-upstreaming-btmtksdio-mt7663-v1-2-121792305f72@gmail.com>
-References: <20261026-rbrue-sheldon-upstreaming-btmtksdio-mt7663-v1-0-121792305f72@gmail.com>
-In-Reply-To: <20261026-rbrue-sheldon-upstreaming-btmtksdio-mt7663-v1-0-121792305f72@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Sean Wang <sean.wang@mediatek.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- Ryan Brue <ryanbrue.dev@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793041338; l=2175;
- i=ryanbrue.dev@gmail.com; s=20260906; h=from:subject:message-id;
- bh=p5no/S8PpFqMwynWIKqGncsBNwjfIsmYO/W2PvcD6mQ=;
- b=IJ298NG14mxx/gBOBanVXzZJRrSHN5am2KydNnQfi4ZzU5GBakO03eJI17yPJL1Tz8N0Tb2xS
- iLeV3zN+1+pBrri+wlcCSBgNRlJh/9gFw2i6TTiZ85XBNSg0HrlsWbj
-X-Developer-Key: i=ryanbrue.dev@gmail.com; a=ed25519;
- pk=KsUvVaP//v/2q+ZBuacc7cLbsyEYn+AD71Sn28oZWKo=
+From: Athos Andrade <athosandrade04@gmail.com>
+Date: Mon, 26 Oct 2026 16:55:18 -0300
+X-Gm-Features: AclHuK8hIyLF2cY2Je-JDB_x2NuD_QbnLgqmgjFyM3CEYmAXLDMd_z2lD3A7og8
+Message-ID: <CAAErAfLhrvtQOEqtGhEOmNX+0Lkq7ckLekmgSjot4-7jFD0shA@mail.gmail.com>
+Subject: [BUG] rtl_bt: RTL8852B BT USB FW 0x127C_FD78 stops delivering BLE
+ keyboard input, 0x42D3_4E04 works
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-firmware@kernel.org, hildawu@realtek.com
+Content-Type: text/plain; charset="UTF-8"
 
-Right after the Wi-Fi function of an MT7663 combo chip starts its
-firmware, the WMT function-enable request is refused (the reply's flag
-byte is 2). btmtksdio ignored the reply, so the following low power
-setup command then timed out and setup failed:
+Hi,
 
-  Bluetooth: hci0: command 0xfc7a tx timeout
-  Bluetooth: hci0: Failed to apply low power setting (-110)
+Since linux-firmware commit 4ca3317e ("rtl_bt: Update RTL8852B BT USB
+FW to 0x127C_FD78"), a BLE keyboard connected to the RTL8852BU
+Bluetooth controller of my laptop stops delivering key presses every
+1 to 4 minutes. Going back to the previous firmware only
+(0x42D3_4E04, commit 8bcc91d1) fixes it. I did an A/B test and the
+result is repeatable.
 
-Check the result and retry every 500 ms, up to ten times, as MediaTek's
-own driver retries its power-on command. With mt7663s probing first, the
-function now starts on the second attempt and setup completes.
+Hardware and software
+---------------------
+- Laptop: Lenovo ThinkPad E14 Gen 4 (21E4001GBO), Intel i5-1235U
+- Controller: Realtek RTL8852BE combo card, Bluetooth on USB 0bda:4853
+  (ROM: hci_ver=0b hci_rev=000b lmp_subver=8852)
+- Firmware: rtl_bt/rtl8852bu_fw.bin
+    bad:  0x127cfd78
+    good: 0x42d34e04
+  rtl8852bu_config.bin is the same in both cases
+- Kernel: 7.2.8 (Arch-based distro kernel, linux-omarchy 7.2.8-9)
+- linux-firmware-realtek 20260916 (Arch package)
+- BlueZ 5.87
+- Peripheral: Lofree Flow2-68 keyboard, BLE HID over GATT (HOGP)
+- Other LE devices on the same controller: Logitech MX Master 3S,
+  Logitech MX Ergo S
 
-Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
-Signed-off-by: Ryan Brue <ryanbrue.dev@gmail.com>
----
- drivers/bluetooth/btmtksdio.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+Symptom
+-------
+The keyboard stays connected but stops sending input. In btmon:
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index bb311986271f..239393a15e46 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -909,17 +909,33 @@ static int mt76xx_setup(struct hci_dev *hdev, const char *fwname)
- 		goto ignore_func_on;
- 	}
- 
--	/* Enable Bluetooth protocol */
-+	/*
-+	 * Enable Bluetooth protocol. While the Wi-Fi function of a combo
-+	 * chip is still starting its firmware, the request is refused, so
-+	 * retry it.
-+	 */
- 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
- 	wmt_params.flag = 0;
- 	wmt_params.dlen = sizeof(param);
- 	wmt_params.data = &param;
--	wmt_params.status = NULL;
-+	wmt_params.status = &status;
- 
--	err = mtk_hci_wmt_sync(hdev, &wmt_params);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
--		return err;
-+	for (i = 0; i < 10; i++) {
-+		err = mtk_hci_wmt_sync(hdev, &wmt_params);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)",
-+				   err);
-+			return err;
-+		}
-+
-+		if (status == BTMTK_WMT_ON_DONE)
-+			break;
-+		msleep(500);
-+	}
-+
-+	if (status != BTMTK_WMT_ON_DONE) {
-+		bt_dev_err(hdev, "Bluetooth function refused to start");
-+		return -EIO;
- 	}
- 
- 	set_bit(BTMTKSDIO_PATCH_ENABLED, &bdev->tx_state);
+- The last ATT Handle Value Notification from the keyboard is a
+  key-down report with no matching key-up report.
+- After that, no more ACL data arrives from the keyboard handle.
+- There is no Disconnect Complete event and no supervision timeout.
+- Other LE connections on the same controller (the mouse) keep
+  delivering data during the freeze.
+- The keyboard does not advertise during the freeze.
 
--- 
-2.55.0
+The only way to recover is to reconnect the keyboard from the
+keyboard side (Disconnect Complete, reason 0x13). The kernel logs
+"Bluetooth: hci0: ACL packet for unknown connection handle" at each
+reconnect.
 
+The same keyboard works without problems with macOS, with Windows on
+a different machine, and with a phone.
+
+Connection parameters
+---------------------
+The keyboard sends an L2CAP Connection Parameter Update Request right
+after connecting, and the host accepts it:
+
+  interval 7.5 ms, peripheral latency 44, supervision timeout 1500 ms
+
+Ruled out (all with 0x127C_FD78)
+--------------------------------
+- btusb autosuspend (power/control=on): still freezes
+- reload of btusb (new firmware download): freezes after ~1 min
+- Wi-Fi radio off (rfkill block wlan, wired network): freezes
+  after ~4 min
+- Num Lock LED off (no LED output report): still freezes
+- new pairing on a different keyboard channel: still freezes
+
+A/B test
+--------
+1. 0x127C_FD78 (package default): 3 freezes in 6 minutes.
+2. 0x42D3_4E04 copied to /lib/firmware/updates/rtl_bt/, btusb
+   reloaded: no freeze during normal use.
+3. Override removed (back to 0x127C_FD78), btusb reloaded: freeze
+   after about 1 minute.
+4. Override restored (0x42D3_4E04): no freeze again.
+
+I can capture btmon logs (btsnoop) of a freeze and test new firmware
+builds if that helps.
+
+Thanks,
+Athos Andrade
