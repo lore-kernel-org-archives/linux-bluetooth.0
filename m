@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793050813;
-	b=wnkx5IgHKDO21zRH4AKlVKD4l/QgHm2WzZaktEROZANz8VBUpopBUaC6K+dfzmxPlU2e
-	 YVzUrsaTpuF30aT72e4mXxUO9fPW5EvdZdOFHv0rlfYRsuV6F2IRYxZJkfKH4gNN7Kicl
-	 4WRTsLGeUyELY2wSYVu6IUXuG3i12rL6ZVFtUskFPkK5/EJywMGAi5YBaExcA9hZrbNGv
-	 pY0AxvqwbMpFx/y72ce36L+1oSaX4srGsjVKbAy9yfoAQ3jVd1IeW2qtMSHLTmvqHrFrK
-	 h+zRUeCLuYJ4gNfJQkF3uX8ewRvMNGBq9etXbO5maKD+aS3ZR5L+sMQNsK0lTliSPTw==
+	t=1793050815;
+	b=NE1nKbXPEpzHjtA44gI/WkXyhNsLR8LR+a8G6p3tDGsa0ql88VsrN6zoIVqjFodJzgzA
+	 k4mopvCKlgAgt7N1+ONzI2bRPr594ZqvY7US5oQ+WNyLZ3De66bxpho1NaOmQ0236y3DP
+	 pYRKii4zONPjFOQ14LGT7DR86r+b4iNVAgg0s38gB49HK3/Zjwdg73X1epD9jIlpdBpRS
+	 fkGmTwkTDP5NybesyIKjDQOThOH2tBG8h7n+HWDH7YiDpi0tdASGs5PYKdqyHrsTPibTC
+	 9vroYpIgcIu7yuedztOQp6UOhyO+ugaR/iDA30wXvEm4B8swVaaWTiC5Dpzi3V/10YA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793050813;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793050815;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=jybjVITDNoG5vk2GuEVGf5hOCiMgxTtTuknwSLngsS8=;
-	b=RkT8RBbaFYLrn2/IAKebKpzA/+aG8K7IWJOUAK7FEhzPwBxBXVQN6ZfScMPtZFCR9Ykh
-	 z8kxKvPP1pcuFQEPQ6FSB9pfwppElkjixi2Y3jx5qUgUjxybCeP1qvzXivQk/8tYyUlLg
-	 RbkI0dNkcnBw+lKsJ9dcuuuRhqv+4otBQXH8qH+xyAfUOX0zoIuzQibwn143NDxdBFk2V
-	 Bpr5GKjCwKzUp/Z5doUvX4lufOVtyJbsoPFlZ2aFRd03fFHKJmtXeeQECJlYKhiSzuvr2
-	 lpxQT+gJyljXD4h5FyZnPgo1M0SWu4GyurFeIPUXykn5E92AWyfkgxnJtpzLnjySmCw==
+	bh=atkEgt9SOg6Dz4m57vGAe9WWymJIHXY0SDWH2u0Igsg=;
+	b=PEQDsQnobEGpFgoyD4JDgvGNehCaUSY6/ZA32i7B9a6RzGgnZ/nPIIO6E1+EV51xqMbd
+	 iSuTudCj3IV2sbSXUNM+z/qjnRqvMca6LFinRvO4Zrih/nY6FlYEaNagGjUWpw6mb5Rgh
+	 VPSQLQdz5eX3lPHFC4uvaPvRCe0v6Z3rQL0A6DG2UDzPRGzARuXg8QxFlaFATbCIXniwi
+	 MDlZH0nxH994mlZQV6Z2YY5Dv1FS/D4+rAScPayN6lT3Ud32iJ4+d9SwcYkb2QludAkQc
+	 SI73PeUQtS6RN7wfBoFwNTR00ZnuLiwB9GoonM+aLhLIMQ3Cvkt/nTuSZNLzIEOt+gg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PbWIhqCt;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BxndEocF;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D951606A31A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 21:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC287606A31A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 21:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PbWIhqCt
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F3051F01825;
-	Mon, 26 Oct 2026 21:40:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BxndEocF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89DA61F01828;
+	Mon, 26 Oct 2026 21:40:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793050813;
-	bh=jybjVITDNoG5vk2GuEVGf5hOCiMgxTtTuknwSLngsS8=;
+	s=k20260515; t=1793050814;
+	bh=atkEgt9SOg6Dz4m57vGAe9WWymJIHXY0SDWH2u0Igsg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=PbWIhqCtGHYM1Glbp3Oe7MleF9aHPKKoSBxCh0ohX4+O/b+HQxWyqulVm5ZYhm5hn
-	 /jWjOmtyopmVcB+jOstUbUjBjrdfWCk9jRexz/V7zD1Llob5CCDseFdwZm7Qj1xsrY
-	 BMLENQQYhomdosWWxkiRvbCq9tsEPoOKrJLvH3rxfNDUKoQF1/15SIjE4h2GbmI7V5
-	 ba/5nhV/KZhkRl8kx+GgqV9oqugttx/mOKZG4oGFeI+aZNaXs0f4KBaxjdP26j4cI2
-	 43n/mR+rG1QPk/N4LuxwBZQglMvacqjyIaqPxICuE1v2s24PfnLYzx57wq8ElH3DqE
-	 3wLx8RQhQR+Ew==
+	b=BxndEocFi265QRMfzK9jYL3Cb5DqJ7OE/MfxCsV0Kq68aeLKLoHZN1MRzjVpak0rg
+	 A2EwzcUL2PAdwkde2yp56ojYOqN4Zyb7miajTI2uAC7+pg3AbkIvB6XUrlWgF4+axw
+	 86T+O7Lr4NcrzKdGno67mbwoG68z0V/fbyXG4J6T+bRQYt3+k69CNAxDh+q6Kim6F6
+	 Y7Y2j1pFUMMjzH97MVVyWg/HwZyHUttmuW1faX56PH/e/eSNxhWrY2zFyP8g8jdvCp
+	 LmWS5ZGabHhC+Je/Q10yhZw1+V5JZm6NzngHm9by5M1caKHPgkkRcpfeNnT3Tkp7F2
+	 qdkORUyR+NIuA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 073BB3AA80E9;
-	Mon, 26 Oct 2026 21:40:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 814393AA80E9;
+	Mon, 26 Oct 2026 21:40:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,14 +54,14 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] adapter: Don't power on while blocked by rfkill
+Subject: Re: [PATCH BlueZ] doc: Improve obex MessageAccess Filter Types doc
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179305081156.3403508.3916224596739406026.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Oct 2026 21:40:11 +0000
-References: <20261024103255.81769-1-tooangel@tooangel.de>
-In-Reply-To: <20261024103255.81769-1-tooangel@tooangel.de>
-To: Tobias Wilken <tooangel@tooangel.de>
+ <179305081306.3403508.13118296201106438377.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Oct 2026 21:40:13 +0000
+References: <20261025071533.2567150-1-sadiq@sadiqpk.org>
+In-Reply-To: <20261025071533.2567150-1-sadiq@sadiqpk.org>
+To: Mohammed Sadiq <sadiq@sadiqpk.org>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -69,19 +69,14 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 24 Oct 2026 12:32:55 +0200 you wrote:
-> btd_adapter_new() reads the rfkill state and sets PowerState to
-> off-blocked when the adapter is blocked. With AutoEnable, the default
-> since commit 180cf09933b2 ("policy: Change AutoEnable default to
-> true"), the policy plugin then calls btd_adapter_restore_powered(),
-> which sends Set Powered anyway. It can only fail, so every start with
-> Bluetooth turned off logs an error:
-> 
-> [...]
+On Sun, 25 Oct 2026 12:45:32 +0530 you wrote:
+> ---
+>  doc/org.bluez.obex.MessageAccess.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [BlueZ] adapter: Don't power on while blocked by rfkill
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa3d6c761cb1
+  - [BlueZ] doc: Improve obex MessageAccess Filter Types doc
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b1f3f9e1fea2
 
 You are awesome, thank you!
 -- 
