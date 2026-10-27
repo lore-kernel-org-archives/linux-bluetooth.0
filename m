@@ -1,69 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793095377;
-	b=p9cikaIbed22+n5vWYrN106NzjbdXtcNthE3MVJq3y1IzqPSwzacY+128sN6LXLDWEa8
-	 OZDEY9BxXhNGs7Nx5B4LqoSnZtecEoX9oLMDJtLUX2FBQzVAS336DiIzGm+yvdlpmZm7h
-	 Bi6vpLAD/v5m76DxYcDSTFPhATM2XBmYAVfX2uki9ze9FMjG0qWwe2X/D+Cs88sfST9oY
-	 292IJotY66n707boZ2vgZAJqYMuVrl3B7Mc8bRhDb5A7Y/vWx8/FFSTV9UwX+4K4XtKZl
-	 byaLgLUDg1cts3GyglcHetxkPSUc6OpOx1PefWJN4H1m2Gg5vyVUk+/X1WzRnImCRrg==
+	t=1793099003;
+	b=uOx9e+ulFIYvMgT5Z87hMxjYmBCU3thy/L4RHA05h4aZVnViQvbF3/fdt/VxMSARwMid
+	 MUX8HT/sd5fIJxeFjgB8wQHRwmiiGagXw3hdF8pijQ126MpE0h+lHmdhF2nN/WWkKf+Wr
+	 fu8RORJZLB7IR7YTxll9vy+dxRofsTUynHYm9lL79yUwCHzK6ghiOHnKH0siXgG2tZx7P
+	 ukcpgPvClFvNFDGG5TAWqBM/sA8s4bnpKan2jEPbletLvcRkXHAe0IGuWRq5zmIRqVjUs
+	 JaasZGUQc7+POfUBozsdmTutxRQ6ZzE34rPJCLwURL00RA1BcQYJRUrHvp5hYcYBDpg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793095377;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=GGRD4rHxzGR/0Ca4q08YEFPKFTP39F+dpDG023MGztQ=;
-	b=LEs9T1bpK1RtHE085TB1NH0LhE45JqWqz8Sx/mNjR7ztXVSWqLqia1Cs6e2yWBepwwMn
-	 9y/dx+Sq3Lun4eu7LJtokboU/jWJ8BTp1t32D7nXFyYcG6uC5xcW/GmVy3vZFYRUPnKst
-	 OdSx7Pt78sa6ncJKExfiSTbY621CUqBZ5BAn77jXkF0itphNF14YW1bWFz8a1V5WGqVNb
-	 bekMDMeJ/Q2teRp0hRCFN+ARYAkdyBfZ/UQjDsupA8rFBfe/r1T1LEJhlHf6//CirPPii
-	 u3N2LdnPqo57n8tDfV9/FN+xtcUqmpW51prfdEMVCRqTkZjKJ4MenuohVS5CUKUbrGQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793099003;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=bReMnuJuSQrfJqS4XcR4yG330QUIZjFgZJEKMEnlACQ=;
+	b=Eri7V2FhFKb+RpORWwZwpne0OOTXCcEDeyEtoz+xxTlkSphg3sBu3R6LU6so4NjZOOlE
+	 rOdh/Qv1wcugEeNCy84dYJ6heoHdLG5uzKrpnl6zpAn/KLxzFYTLR+cvYk+/jZM+nTVHB
+	 Sm5HrgLPBTNMx8QD454GocxUX6sxaAfk0mLiiN+Qn4V6zcGWgKcw/zA6//kyrABFvfDif
+	 XVVQrF8oyzvtIb/Yo718+vxOnEfrrtIlsNBut1djoNhrQKqVVZ6ATTh5uiu//LkiftwjF
+	 uhxRQEmVtWhHWviuC/K4CwPpE3QTd2hJ87Qo23aE/h1Rrt7ipMWOe7CxPPorZOknl/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NAV7po4c;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=qiCCp4tu;
+	arc=none smtp.remote-ip=209.85.222.178
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1865606A331;
-	Tue, 27 Oct 2026 10:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6BF606A31B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 11:03:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF6BF606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NAV7po4c
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACBA71F031E2;
-	Tue, 27 Oct 2026 10:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793095376;
-	bh=GGRD4rHxzGR/0Ca4q08YEFPKFTP39F+dpDG023MGztQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NAV7po4clxqLOB0eFidpYCyquPlfwwLy3U5lnPcK+H4LLuBw0jnMIum8/5BA49Ksc
-	 lg6lmt6cfNZJlbbtAlRaCiqtUpuO6DoZIVUALueWJ5JzhMlRkV5f31f61wcUNdSBoK
-	 EjTNsl9LQZ/4G3EWSXk8WtF3wk5bDG/sgS4fVzT4tZLLF5/TI7OD3fC9HV2YEKnxk1
-	 uqZxNRKLejFQ0Hl/sX3vmpu6X9F5ZIFsbd81idFC7utwcYr+u7cvl9Q1da44GlxI4M
-	 GfGsJsDZQoouXZseBHsYzbK0+D9UAy6cfwBPrtu5gBZQOe6nCYfhhVL5E86fJIH2u1
-	 Fs/VvBq6g3LHg==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Maxim Krasnyansky <maxk@qualcomm.com>,
-	Marco Elver <elver@google.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [STABLE v6.1-v5.10 2/2] Bluetooth: L2CAP: refuse __l2cap_chan_add if chan already has conn
-Date: Tue, 27 Oct 2026 10:02:40 +0000
-Message-ID: <20261027100242.2886699-3-lee@kernel.org>
-X-Mailer: git-send-email 2.56.0.307.g5fe7bd680c-goog
-In-Reply-To: <20261027100242.2886699-1-lee@kernel.org>
-References: <20261027100242.2886699-1-lee@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=qiCCp4tu
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-93f079a63b8so374188685a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 04:03:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1793099001; x=1793703801; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=bReMnuJuSQrfJqS4XcR4yG330QUIZjFgZJEKMEnlACQ=;
+        b=qiCCp4tuahf5uWL2ec7IxqD2ZiqfQJin/ZZIJUEw9ygK7n8D8IB5GDpN+c4lqRlNOJ
+         FJWeSDpOthnqDRIR2EPsIjc8/Gwqbf260P51Uy7CIuO8YT9KmgufC/2n7aLruTF8bCpQ
+         S0EklWVjlnqgohNc7fttJdthhxgY9sPx/zKXfBYjsPuih5wYTFESjg8OC7baddQrLk8n
+         SKGNrwRYD1f7WZg2Hi3BzGKyjZGZeZjxRnmt9j3L4PNFRM4svHewZFY7q3bSgCQ9bU48
+         758Q63m9688BFTwvlMIiiMsq0CemMWASgQjrGhJRqa6WLqpynWYQoqT64+ET32XVL8xc
+         c9ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793099001; x=1793703801;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=bReMnuJuSQrfJqS4XcR4yG330QUIZjFgZJEKMEnlACQ=;
+        b=bAxc66RDfRz3rniu2ZhnpQrSweA9xhSTkmdoYAngPFCJVOQgat/cvstYMRMpZoQ4Pk
+         Gc+NGW8pnNK7WfnF3X4e3Z9YNAFGQfYypy0xjx6XwUHhTvrRHDwWQbVtq46UBPa5+TZU
+         0JZN/3lJfXzxEnVKzdNbGt+KAzssW/9bwYSWkMEr3k8dRmCfoZFq3bPIk06byUPitL4b
+         zb4ZKNLVSS+AyOuigMzCSzyhUHsP5RTm+x014fOzB7YBoYRDKnymTZD0JKjusRW7DiFs
+         /UUPQ7VBM8W0xbIxXeInAa4FHX8hcHWKHKD0IbBjPrz61wF50GgFMN5CPeLDz0dv6ixx
+         WB9g==
+X-Gm-Message-State: AFq9FYKVGKHoxhqp3m31+8UUsn9jHpEws+RU4bkkuTAnIabKGItQuZHD
+	SCftzwwT14NxHcI1JVe6FzTd3UX93RA4hUtuBXRebNRLVqxhxBTYlF7YlWl0QA==
+X-Gm-Gg: AYBFou37r3ehEixWmA2RITyv2vXZ9hiaJz2dd4Sy5qhtfXo1THgamvgsJcsw57WbP3h
+	PQGYLlg/o4BJkzIu2UIKls3sEkCm3VivlkyLLd+uQuRDh3Kh8JiaKWrnaN/Luc8mGww6B2jyJzJ
+	6rjOp2h4dksrCF40G5DszCQmEZvPGVPenaqLA/8EsC4aa+e6kZMQyRoYx4diYXXen/AbWFa3ZD4
+	zqiFxcr/VsFpF/l7H+8CdkwsWKeXgKHKxT1azCLHdYYt0dKy0Ph13YbDYrYvt40nkgU/sZxRHf9
+	S6hQKfAB0jriBlrS/rY3jWr9q+bqRqIJEsaOf/reOQ8Oda/A9Pp/jVv7qV1P0ZqKNoYm4l2Tfeu
+	Ao3nZA/OKhL0G33MZSMDlSUXeqZATMONti8QKJTCPVyoPz+S84yojrV1FtCPRaOS7dJUvewj5oR
+	2yQTvPsWEtnEWDDp8tfPGwR2vnCwF+XrDfPkfwmIdict3/q9p4ZlTlbzumCaKoQuR+gKuzV7bgt
+	kfdSfaLP/Q9JWDkJxWTb4/CgWJngi100AVRNAsbul+dOdHC4Gy7lMOTZoZSyjB6gwlocdRp/ohI
+	VgOGhE0x
+X-Received: by 2002:a05:620a:2984:b0:93f:571b:c733 with SMTP id af79cd13be357-940ef901d8bmr1474693385a.13.1793099001580;
+        Tue, 27 Oct 2026 04:03:21 -0700 (PDT)
+Received: from [172.17.0.2] ([145.132.99.22])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-940f0787fe4sm962275785a.27.2026.10.27.04.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Oct 2026 04:03:20 -0700 (PDT)
+Message-ID: <6ae084f8.5179eb23.3a0850.c2b3@mx.google.com>
+Date: Tue, 27 Oct 2026 04:03:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4756855193196978449=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -73,95 +89,41 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, lee@kernel.org
+Subject: RE: Bluetooth: L2CAP: Follow-up fixes for b66774b48dd9 (v6.1-v5.10)
+In-Reply-To: <20261027100242.2886699-2-lee@kernel.org>
+References: <20261027100242.2886699-2-lee@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Pauli Virtanen <pav@iki.fi>
+--===============4756855193196978449==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit 86b55991d3cd690e73c5ef8d20b75ae4905b357a ]
+This is an automated email and please do not reply to this email.
 
-l2cap_chan may be linked to l2cap_conn at most once. This is assumed in
-several places, eg l2cap_chan_del cleanup.
+Dear Submitter,
 
-There is a TOCTOU race where the invariant is violated:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-    [Task 1]                          [Task 2]
-    l2cap_chan_connect                l2cap_sock_bind
-      l2cap_chan_lock                   lock_sock
-      l2cap_state_change                if (sk->sk_state != BT_OPEN)
-        chan->state = BT_CONNECT
-        l2cap_sock_state_change_cb      chan->state = BT_BOUND
-                                        sk->sk_state = BT_BOUND
-          lock_sock <------------------ release_sock
-          sk->sk_state = BT_CONNECT
+----- Output -----
 
-l2cap_sock_connect() does not check sk->sk_state, so since chan->state
-is now BT_BOUND, subsequent connect() ends up with second
-__l2cap_chan_add.
+error: patch failed: net/bluetooth/l2cap_sock.c:437
+error: net/bluetooth/l2cap_sock.c: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
 
-Explicitly document and check the invariant in __l2cap_chan_add with
-WARN_ON_ONCE. The only callsite where it could be hit is
-l2cap_chan_connect, so add pre-check there to avoid relying on
-chan->state. chan->state read/write is not properly guarded currently so
-there can be other TOCTOUC problems.
+Please resolve the issue and submit the patches again.
 
-Add l2cap_lock_chan in l2cap_sock_bind() to guard chan->state write.
 
-Fixes: b66774b48dd9 ("Bluetooth: L2CAP: Fix UAF in channel timeout by holding conn ref")
-Assisted-by: deepseek-4-flash # finding the race condition
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-[Lee: Resolve context conflict around mutex_lock(&conn->chan_lock) prior to commit 56c2b5831d39 ("Bluetooth: L2CAP: fix out-of-bounds write in l2cap_ecred_connect")]
-Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 7 ++++++-
- net/bluetooth/l2cap_sock.c | 2 ++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 88ddd8eabae9..445a43c721f6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -630,6 +630,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
- 	       __le16_to_cpu(chan->psm), chan->dcid);
- 
-+	/* Caller must ensure l2cap_chan is linked to l2cap_conn only once */
-+	if (WARN_ON_ONCE(chan->conn || test_bit(FLAG_DEL, &chan->flags)))
-+		return;
-+
- 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
- 
- 	chan->conn = l2cap_conn_get(conn);
-@@ -7431,7 +7435,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_lock(chan);
- 
--	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
-+	if ((cid && __l2cap_get_chan_by_dcid(conn, cid)) || chan->conn ||
-+	    test_bit(FLAG_DEL, &chan->flags)) {
- 		hci_conn_drop(hcon);
- 		err = -EBUSY;
- 		goto chan_unlock;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index b11558b0dfec..655922aa82f1 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -111,6 +111,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 			return -EINVAL;
- 	}
- 
-+	l2cap_chan_lock(chan);
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_OPEN) {
-@@ -176,6 +177,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 
- done:
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
- 	return err;
- }
- 
--- 
-2.56.0.307.g5fe7bd680c-goog
 
+--===============4756855193196978449==--
