@@ -1,91 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793121559;
-	b=NLPCdAAiIXR4pKwgsx4HAOHyQXJwbMOYPgBDincbqNuzWU+Wjp1r7ww3CaX4SqYlTG8R
-	 QzN1cuJaW5UJGNO4aJrRLtNoSiWHCAcbn6SKSmazM6RUWwqgKS7EqQO2I24WxVuO9Thry
-	 Z1iSeCeMREIbJQ3FJTIswJ87D1g9an60BZFoIF4h0wyq5dWXokK1kIeO5g7QkObuumM3c
-	 Wcx8TLVDwKYbNvFuBlz1tile/RFP1ulnJYI6X32VotuEGfaqm3+Qf98ker5UZeVsthayU
-	 Q+Joc25g45oNbiDwf0p4yjYGKUeSFYnSz9n23C3Jq1w+Hn0kQC1TKbhcfDqxJ+59cqA==
+	t=1793121569;
+	b=jLmaOCfzXVGThLml/BtoPgj+rddqNxkm1XMlYxFoEBoSXuDfdfJKbEFOAZdhSRGjooQU
+	 BaVZeEQabfOEtUfy1NGB++/MUcxK5l+zAt4z5C7zTAFLrML6CTzjH3l6/vXNJQeXobQDn
+	 Z+TCw5hJu2ckSy82YGVpwSyEf/uwCd9ZIt3yfT90JloEe5u9dtej2kBrBmGhxWmP68YpO
+	 ne1t7sa/XlqvWXQF8ekmjio7GqWcbKeiqzkcq0fEk/2CQ6XhQJLQawTPR7VRzOLUJQT0Q
+	 rlCJRU5U+JSGYtq/j2GB1mOKVCO+bXV9/RZ6Ot57p4BPkFQOc81D3erFd4Nlab0+SnA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793121559;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793121569;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-	b=IVjToRu0pqJPdSg3qYHWiK9OlHz/ij1CvTOLP7/3PU++RBoaKrZSxYwyIcgi3LHQi04y
-	 cdpkNWsEz4vfF+BsVYysbjX4bmMoR9Hp0L0MJUmYnmnqO4k1gmIcLPuuCrYSLwnAELEb0
-	 BLd5D/2H5RbHek/60mfGyNsIG2KMWhleY0d6Rl95FA7Vd+BLifx65rf7X+BM87+Y7MVXy
-	 Xp1zoBYsWsFXjyxdlR5rwuAaIJda0Iwgvn8PeEqCIowvMGXT4W1Zg1K5EyDUF41zJRxR9
-	 UiicvqZLYp7JBFby33P3rlaG5UoYs++zzfIVYSMfNPqvRHor6uv8fXrGFe4epdxW2lQ==
+	bh=XVJ4J9prwSFN5KR5YuESJwDdyD6GrgOqoqS4skYwJjk=;
+	b=C5wPtzH9deluOPxi9mSqYcebeaTdLP6LB7de+TToeyvOYOtBr4QgdlYXt2/lmL5uVfDz
+	 2ZzGC7vLaBiELbjCecOyMcWvwhLF/J9P4DCynd5R2samc2pWvkPOLjcnYHDovR5/2ueeV
+	 PkboMZALpbRwISluNrekENei2eUkp+k3M8BGBut646pxFr9lQv/72Q08UMvwxNhgkUxWU
+	 o7pU4kthoOJkMW5y+NLDpd3WLKGK0uZxA3suLq6Art4zRuYUeTRGVUx27GJ0NExnLrEY/
+	 YmbAJMu7hbFBTRGcL9vwAMI+aHgB4XWrZgFezlRHs8rQHmCzC9FktxoiPoQRjwrKW6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=OMV+wd5v;
-	arc=none smtp.remote-ip=74.125.82.51
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=UVu8HBLb;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6FB606A320
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 17:19:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AA6FB606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C78606A31A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 17:19:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1C78606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=OMV+wd5v
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-14394530ec6so27854c88.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 10:19:18 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=UVu8HBLb
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-156cbe59622so57435c88.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 10:19:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1793121558; x=1793726358; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1793121568; x=1793726368; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-        b=OMV+wd5v0uEIfsIZPUPU/X3XoJzGUe4i9Cwr4VY6wWsDBbYeb+h5JeTRDDeLxRr6lB
-         dwV1BYI4lMXjtZxGK0EkpDr6yOVsCRBqQu1xIUgKfQSrHwinwSJa7JhHOQcn4PnNeS8c
-         Pd/vy4FwwvnXu1ke/0eDpmNQOA9kAsPi962pzvDSp7FQDIajDr+TADTPnYhUGwuhajIY
-         llJfKY0zTkz5CQgeB+YDrmjf3+FHpUflAFPav4A0pCA4N25PgVxXZzv93FP9HmtirhC/
-         sqZA6Ag5wPRN1uRh76urKFutUsmBUteki/rCYCNu8oWGk1gCkplQDC2Q4XsORJJDFJjU
-         sI7g==
+        bh=XVJ4J9prwSFN5KR5YuESJwDdyD6GrgOqoqS4skYwJjk=;
+        b=UVu8HBLbWJ5zJxD9LWZT+JmwcA53gfO3Xo6o2q6bkEuNYg7ZM3O2IkkTjmyGJfannV
+         Y2b29XQE++bJde3cc7AEat1EiHUwupxMpHaYXYMaZqO4279nOwxUshrrEUHk/Ay+i7cr
+         GgPX14UQpOr+hwBCi3+KLyoe2tR1fl0Z+T9ZmpbWAlOmJOF3EghJVVw6HHOq0eGsApJ7
+         6xhBfDT1PL3xU/aOb/J/bNpcAerVtORrfelJrmOqP/25ejplm5RVsPQ0aMeEoG7bmEGE
+         GVXAuspe+WuTMhHyAJ2d+SLjrYj1BDXR6QH4gMT7Q5/vvRDIgx++Vthbqp9f+pEvkTxH
+         LueA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793121558; x=1793726358;
+        d=1e100.net; s=20260707; t=1793121568; x=1793726368;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-        b=mnlaXfWGOm4I9ZUL6FBBZCR6WFPVI1/+VZ2rK74LAtNAsZPZu+iLzdKw3kG45FoUsv
-         +8Uvwr0YNqeLeTe+0SZ7j2EU6rmHOm97JP3q0OsYQLfDjWgFiUZ/dX5pJtVmkKVNh5h1
-         A7sTTeipNeSJNQFCzu+v48WnHlxJyMENdIApUEy8v+m1yprrnAoPAp8kPJmIoUstyEBW
-         lW5sESLwbWUlQtwwBDFrA1nuZU45tLh4Yt4ab3K8eIcC7/i9HNI1EE8fz6KYCEcUpCP7
-         EpqW684QsNM9buG66VsDRIfcGSomN0FpMXRdv6IKFo/eVLjtwlbJorw3KJ5rE+y2SJIT
-         Di7g==
-X-Gm-Message-State: AFq9FYJnH67rSz8hJbNjXAt2pvUxdufaHFsDTGf6nptoVFSXodUl7vGz
-	Hzg5KRGisvYk9spv5Nx3eUa7nOyx9MTPlWRBi1CgWpQZ1pORKHGImelGimEOYc/yJhZIXU4fzwc
-	sYzTadMbZOQ==
-X-Gm-Gg: AYBFou0XLQOgbS0Jxc2lTBaVuehmqGCvVkExsXi4K8oDzlk84taANODbe/TN9vr6wPV
-	au+fw1c/3fjQ/loH/u2n21RJ9Awzwpg7g+kJYQWvFotgyerFfmf33uOQW4THawuCRIWRk+/9J1I
-	dXGV+wWxtHQ4LCYzkEZS6UdrFy/OGRrLu+szSpFyrbF4XasD0jTxmUeYRZ1y2YEy50VG+SYHq0L
-	hM3N/pAB6KETMdlfcDJHw7bLeLnJtY1EIRvQX9Vw6rIZ9TKhvnxIKcwtp045ML5sEiv5O0xftsK
-	00nXdLfPs6RoF7keK3d2JyAXZ6WxSpXNqNF0F2n2yhsN2xAaq8us1Qj0PWDp9qJLFvaJMGDxKy9
-	V2SzHao49KNA0iPgwzkjipqlt4xUUpGNPArJl9G1KkA5VR/ECcYnNzNq3ryLLA27dwxEmYfhrhq
-	Pc6lfyyRn/5uFn9boePNpesmCI6YCoxM1hfod1ECqniAWbHtmKEPcOI59J/npnQlc2/U/5Tk97W
-	sUSrb+EbvO0Uhm1fnQ1QMIJJWLRmYail2u6rbLWGN6sSa+HInSpn2GsUGCrt3Kg6J3dpr7aXYqN
-	XO2xdQTs6g8CmSzB5xZBb98Vb2hr/ITepYI4gxr/gAn4tfvYsd4MK4a71nfCkTh85VnEDHMeZkJ
-	g+Achj1tmZxIDzX0pajRiMg==
-X-Received: by 2002:a05:7022:7f12:b0:179:a1d0:be39 with SMTP id a92af1059eb24-19935fcba5amr14595800c88.29.1793121557565;
-        Tue, 27 Oct 2026 10:19:17 -0700 (PDT)
+        bh=XVJ4J9prwSFN5KR5YuESJwDdyD6GrgOqoqS4skYwJjk=;
+        b=bigcq1CkSTloXi0GsK7JrAt6ZBxvc5K72Nwr/s64jR2+jZh7yNsrHgI9BzuPBTWQI8
+         wUfeosVgc1sT4Dk69k0DyeltnaNTDgrd/Yj0BhSx7HMz5XDXLVKsEWPekft9u3A8+j40
+         mswmUt+SyPMQGp2+25IyNbfpm7kdhrWckluHKATU1NcuiToIvzFylfrxN5PbLwt3imtO
+         jwfOATy2UxbuHQmb3XHYVT5NGZuG0mZWgLWazzhMYbP4vAYK6COn1F7vsl7/7iEFYp+q
+         DNDNtghhLo0EyR87hQEsnfOybTuYNUuZbvCxRBa3/yPPvVLox1S7PPM9ui0n0nSMosOy
+         QBcw==
+X-Gm-Message-State: AFq9FYLoMEvRQHxx4WFVthu9cQCEP5Ii9UjaHE+dDaIRzgI/6ndZb1JU
+	bXtfyNrms0Rl1jllo/o94fUN4V+fySUOzM8EfbeijUBZ5YLtqKRhFyB7xN73K3Qn9P1LixfG7bJ
+	xti91K+ewiQ==
+X-Gm-Gg: AYBFou1Ba/s6c7m4c/SB7ecw7urZtPQqhJX1RiacbzxdUU6XAMnewarL5T5ZyVAR47f
+	y+KaYbvJrSCRscXCKRBI70AZO7PfHMeJ3juL871t65BM8+4KZSZhA9c8o2o7nOkgbUzrFvii6In
+	YSaMxsHiMx3pF2ClVGnGw9fsM3QI41Z2+U+JHl0mz4031SiMXNbLfNPRbwSCG+/udOQ6EXt49iD
+	4WOLwejR3LINVsZTkYI+kgqpyjIx589nP9aGCbxbgdOba85X6xZpe5xRWWVSkfs4JNSwrWe9WiR
+	3ZfBCotznhs0MlzB/oI29r+Dq4INtDubWY8fbdiGI8wCWR3Lh63CTY2MLz4943hAY3KzykuExzV
+	gTd3BV3VeKW42F3CZ4IR05MTyPdWJ2owivbC0drsGvNNY1O03yAcc4dbRecdRfcSIXhUzAhy4DJ
+	M1RsYIOQy0SZqecuhDjdOUBXSAtn9MLXK2SmPmh5MhlGoPI6BRW9HTEQllTmT0ZsfOs0VG32aJ6
+	ubZ9ULC3miatnUP9OfsG2E1bX3askqGp7lFrUR4PFWsUcbsJ8aMQcG6mrRhUXSiZWBe/DJrSgCX
+	dhYIOzfbi4iDpR1vEkOzApR4zi8CTxooth56QbJpvrx6gtqT6Vd32c9c3H1pQbfuuKBSKUyZSuu
+	KnKWheR4a76PqY5YGNvwJMg==
+X-Received: by 2002:a05:7022:f519:b0:1a4:9eaa:d01d with SMTP id a92af1059eb24-1a49eaad10dmr2840748c88.45.1793121567560;
+        Tue, 27 Oct 2026 10:19:27 -0700 (PDT)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-19894d5a10csm34517842c88.1.2026.10.27.10.19.16
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-198a1bfaebfsm34440562c88.15.2026.10.27.10.19.27
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 27 Oct 2026 10:19:17 -0700 (PDT)
+        Tue, 27 Oct 2026 10:19:27 -0700 (PDT)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org,
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH] Bluetooth: MGMT: Fix discovery stuck after a failed Stop Discovery
-Date: Tue, 27 Oct 2026 10:19:13 -0700
-Message-ID: <20261027171913.82628-1-kevin@simpleble.org>
+Subject: [PATCH BlueZ 0/2] adapter: Fix Discovering staying true when stopping fails
+Date: Tue, 27 Oct 2026 10:19:21 -0700
+Message-ID: <20261027171923.82919-1-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -98,61 +96,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Stop Discovery moves the discovery to DISCOVERY_STOPPING, and
-stop_discovery_complete() only moves it on to DISCOVERY_STOPPED when
-stopping succeeded. When it fails, for example because LE Set Scan
-Enable times out, nothing else moves the discovery out of
-DISCOVERY_STOPPING, as the LE scan timeout was cancelled before the
-scan was disabled. Until the controller is powered off, every Start
-Discovery then fails with Busy, and hci_update_passive_scan_sync()
-skips background scanning, so devices set to auto-connect are not
-connected anymore.
+When the Stop Discovery bluetoothd sends for the last discovery client
+fails, stop_discovery_complete() removes the client but leaves
+Discovering true. The next StartDiscovery with the same filter then
+returns success without starting a discovery, as reported in
+bluez/bluez#2547 and, before it, #807.
 
-Move the discovery to DISCOVERY_STOPPED also when stopping it failed,
-as start_discovery_complete() does when starting fails. This sends
-Discovering (disabled), and the passive scan update disables the scan
-again if it is still enabled.
+The first patch treats Rejected as stopped: the kernel returns it when
+the discovery already ended, or another mgmt client stopped it, just
+before the command was processed. The second clears Discovering when
+the kernel reports the discovery as stopped with no client left, which
+covers the other failures, such as the scan disable timing out. That
+needs the kernel to leave the stopping state after a failed stop, which
+"Bluetooth: MGMT: Fix discovery stuck after a failed Stop Discovery",
+posted separately, does.
 
-Fixes: 0e05bba6f6f8 ("Bluetooth: Update stop_discovery to use HCI request")
-Assisted-by: Claude:claude-opus-5.5
----
-Reproduced in test-runner with a new mgmt-tester case, "Stop Discovery -
-Scan Disable Failed 1", in which the emulator answers LE Set Scan Enable
-(disable) with Unspecified Error: without this patch no Discovering
-(disabled) event is sent, the scan is left enabled and Start Discovery
-fails with Busy one second later (3 of 3 runs); with it the scan is
-disabled again and Start Discovery succeeds (3 of 3). Freezing the
-emulated controller while bluetoothd stops discovering gives the same
-result through the HCI command timeout. The other kernel testers pass as
-before. Only tested with the emulator, not with real controllers. I can
-send the mgmt-tester case to BlueZ if you want it.
+I reproduced both with functional tests that hold the emulated
+controller by stopping btvirt with SIGSTOP. In the first, a second mgmt
+client stops the discovery before bluetoothd does, so the kernel
+rejects bluetoothd's stop; in the second, the controller stays held
+until the kernel times out the scan disable. Without its patch, the
+first fails with InProgress from StopDiscovery and the second with
+Discovering staying true (3 of 3 runs each); with them both pass (5 of
+5 each, the second on bluetooth-next with the kernel fix). I can send
+the tests as well if you want them.
 
-hci_pause_discovery_sync() has the same pattern on suspend, which I have
-not reproduced.
+make check passes, and so do the functional tests that use discovery.
 
- net/bluetooth/mgmt.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Kevin Dewald (2):
+  adapter: Fix Discovering staying true after a rejected stop
+  adapter: Fix Discovering staying true after a failed stop
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3cb4f9ece8..06595175d9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6322,8 +6322,11 @@ static void stop_discovery_complete(struct hci_dev *hdev, void *data, int err)
- 			  cmd->param, 1);
- 	mgmt_pending_free(cmd);
- 
--	if (!err)
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	/* Leave DISCOVERY_STOPPING also when stopping failed, since nothing
-+	 * else moves the discovery out of it: Start Discovery would keep
-+	 * failing with Busy and passive scanning would not be resumed.
-+	 */
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- }
- 
- static int stop_discovery_sync(struct hci_dev *hdev, void *data)
+ src/adapter.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-base-commit: 47d4d9f67e92d56ef3965f2727f9c98a5a611368
+
+base-commit: b0bf49270d445da0852851f393cd67a0a1e5f05e
 -- 
-2.53.0
+2.54.0 (Apple Git-157)
 
