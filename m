@@ -1,184 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=198.175.65.9
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793105788;
-	b=IcsWWCIIY3QCnlQH+zXcF21so6nh29rUwQqAMkxFHbqCwZUQAKQ2RLqj+jkuHQfArMWQ
-	 XNApfG0ePTOgycJ16MVrbeAtD406Wlf4P0OiR14txcVQEkpLaUVRnYDsaWLACaXpGRdK1
-	 G7qu/VFIDYosSdN2/FeyHNa1uF2kHLU3kmnaxunX+dP6wgEQ7QnTZvFrwYqIrOibiB2Q6
-	 nAxcPTsQKYgUHoPcZ3+H8yx9o+wobZYBq4ESG90X4PPcxKcz8byPmHLp31y60XTtQkFvV
-	 3Rh0yPmY5Nic2HaR5h/QLK4hJHKQ9y21LN2nBBsTjqrZ8BGil0hqWovFf7xECGlAKgg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793105788;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.20
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793105922;
+	b=aY1xmZV3yonNmw85s/gpz/K1ufyyeteOtbDUyCmVtdy6AtkcVyCx0LXCkZ9HomiR6oww
+	 l8GMUKyhYne20ishXvntJG4HEoq1TQyn0hFRdezcukdegJ3WerYkZ5+HDXSM/MV3YN7U8
+	 YPQGjm33iQ3i1EI9B9Liztp8GT3svaXVIcyMxnMgfflBu5Xa+ijOuArDj5nYVLjT3TLWT
+	 CAw+xc3OO9TTYPfEnw5KzVOXvELrWWOxlm1IfSAlKwhO7qgfnVWTTKmLTMk0GIImMRPm2
+	 y3Z+oYAmRXJM7tID/olLpWlYqtMp8D/rE43N+nkgfMGe8WO8XznIeShcCES+xgCxAQQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793105922;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Received:
-	 Received:Received:Received:From:To:CC:Subject:Thread-Topic:
-	 Thread-Index:Date:Message-ID:References:In-Reply-To:Accept-Language:
-	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
-	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
-	 x-ms-office365-filtering-correlation-id:x-ms-exchange-senderadcheck:
-	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
-	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:
-	 X-Exchange-RoutingPolicyChecked:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-	bh=8EaPtQbWbXY3aAslWuO0cVYl2dkvancR7JcEJpK9cPc=;
-	b=xxFBfIkSxPtMLIj84T8jkbfPYE7QbAQh7OTq7WJ6L74lxRekn8axPE+1czAtA9I3+yEc
-	 p5uG5FRmyr3ylQOauBNHcCceqJH4zUnNMPri7m8Ejv9gOAM+xSaqgPBHPphW4D9Yr3hal
-	 8xGsIGP8kH9Vaq6rp8kO0mZGDB4WaO/RnFDPvgsLX+AK9RAxLM1WoQcdLFOYtm+qDGsWg
-	 +1GF82YzTbjXQ391HSB7gQ4KctdYwDYkV24DTPX1hArJ8lFlD6Twje+4o0pNWXdZjckC+
-	 +nRwGqJ7wsvUu0yqTqSg4B8qm0KNY+/uJbm75sfZ56jtBEVT6OhjFpjDYLUjKbSJy2Q==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=4AJDznCeA9VG+iBFg7rwl5hXZF1rbDJgA0xSdCIaVpI=;
+	b=37GWBFUjNy2TKXuHLpCFEBUzC5lsEW4iqd3oMo0HMyrFUY7o6VZFMzSmCp7nP8OEu2U/
+	 ZpS4p6F/TRC1BVbDml+6wzXXOq9mx/K6iC/xfkYM/AFpJUXQA/vJFXxwJ4xXsLiDQtsJu
+	 u1tG5QIhVkbib4Qt1t8gMY33Aa6hp5ALHZhsSEH1UZGkzdOjVX5COP5JS4p0DC26vRy9I
+	 4R2WRwczRZ1AgNCHhaY4HqSCtoUlFhYaLjkWd/odB0biapSkkMY7Ind/g3Dr0ujhWrUQ4
+	 Mmy0dDW2j/byx14884vEIebEJmMZi91dWqq8vWtHf62ot9J3Sjy46LT99vTqAflOU3A==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=hajGkUEf;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=198.175.65.9
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=BqcgWSb+;
+	arc=none smtp.remote-ip=198.175.65.20
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD542606A31B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 12:56:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD542606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9CF606A31A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 12:58:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7C9CF606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=hajGkUEf
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=BqcgWSb+
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793105787; x=1824641787;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8EaPtQbWbXY3aAslWuO0cVYl2dkvancR7JcEJpK9cPc=;
-  b=hajGkUEf5hXMZBJsjiNmvZkbHKogyzpgNZymadsqJ3wbZIhnkZcS651F
-   jiElZRaUrTdN0yzPEj+iqU9f2DFBzq3zrLk6EAVSAdPI+HS7Z3TVTfrCU
-   AQMT6+HSrnoKQ2K18ZlpPQKY+v2PEaa2qN/M15Lt7GsxA2Ucrat7KvZ49
-   9X5U2NlDZOIP7JTeVpXE8de1reVjV5LCC/a2hkJ2dVH+NSzliXE5qlyaH
-   5o7Fh3KJ1N3d/mW5d1khV1qhUOEvGLlifxWZcxyH26Uc8/mvxwiiMVw4T
-   bExfuWqs/IP6Fplpy6Nni5hNOgFqy6Zlhjj+z471RgUbB2qncwpvMRnMp
+  t=1793105920; x=1824641920;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+n3OHO8W1vxogHAiGe27tAYDgrmkL1g5XR+Az42qby0=;
+  b=BqcgWSb+dEbt8GdKfKKeGRhu/opdv25Wl91jubRbCK2J4VBqSl0y5ZsF
+   089DOX/caNJL1aocPH61ofYzhdomqxBHJ7eg1UhI5lckvW3/4bLPaV58X
+   HmSVEUkq2fJNWKGLcesE0gkp+fGhx4Bp7uvHjS3AEVN9fil29695L6cQf
+   W1TGkb87JbXgQ1sgL6n76ZPPYnqtpwP1/x5HYaobJh/gWvLkcQQaUOj2Q
+   bE7zX2C7THFtCxQmH7/EbLEwSe/waLNmzijU5zTqSIyE3wWtpkabNzQtZ
+   f0hgDY/ODyihIFEkQkaKitrJaig0QrDe23XgqamguL1g6mN2ewWJ+9tL5
    A==;
-X-CSE-ConnectionGUID: oKB0BlMsT+CIzEP781oJOg==
-X-CSE-MsgGUID: aKBvxX8kRBOxoDY5PJ1kgA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11947"; a="1684850"
+X-CSE-ConnectionGUID: Bz5TKHrKQFuQLdWRuul2oA==
+X-CSE-MsgGUID: YYntLQaeQLOnUg3wUaCaZQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11948"; a="1824660"
 X-IronPort-AV: E=Sophos;i="6.27,181,1787036400"; 
-   d="scan'208";a="1684850"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2026 05:56:26 -0700
-X-CSE-ConnectionGUID: D/Zn/QsyR9axBjPHwjDQLA==
-X-CSE-MsgGUID: IkmRaMeNS7+k+Omo0rrT3g==
+   d="scan'208";a="1824660"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2026 05:58:40 -0700
+X-CSE-ConnectionGUID: oJGwFZCwTOKrY+bh9iC1/w==
+X-CSE-MsgGUID: Fmy8gTGeTw2L/YeVJ3ow3A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,181,1787036400"; 
-   d="scan'208";a="6295451"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa012.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2026 05:56:27 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.49; Tue, 27 Oct 2026 05:56:25 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.49 via Frontend Transport; Tue, 27 Oct 2026 05:56:25 -0700
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.31) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.49; Tue, 27 Oct 2026 05:56:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BHrp/L4UaldFe1kXgG6Vw1vSNc6HLx5caFYQj2VTzCFt2OuPZA9mZHhqoOYFzmMSOKIEbd+X2t18l3OA06l+r/xVconS7k6JJGVj4uI0qC/cpHZV03Cuy+t9mCJcoX4Z+vgiztH73IDLh1Cmipif2/NMSzKwC9OiXlTaspncqd6gpbZoK9Iuo15tuKqjgurkzrnFHa7hK8lffJ8Cm4q6GkGZkaQ/gsGFXCNLWY37S9aj0mcQalizjrSwtp/6Q+Kkvhxa/Z5XG187yq6bpp3j4tH0a01+LFtENFMaX4TNZDstJb5LTDLMGK1hP+NYW9uh6ZOyR1et0/72tujBqer6nQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8EaPtQbWbXY3aAslWuO0cVYl2dkvancR7JcEJpK9cPc=;
- b=MMIW0t4PlyGHwqt0GBSDquYI1F1Yyf0ANI6UP/0grCNcB994FJBaMyCg9ZAIB4bxNKMsoL4cagtsNogr0+l9LAv7EzM7foG3oEg6hDCPM5E6BHr1CO6m29jzsNWO/C/QlFWmk5e1FwhO8cDBGjvUuEd1d8FxcP+h1EjUzoxH3At94Ou30HjjoURJumuHfiqzJ9n3lTfZy7/Rz9FS2uPxClBBLVg1iM2VzDSAhVkwxQb08ID8+R2OhsSyPnd7DIJYd5APcwSvQd2r68aYc12ovJhw0t7pYLvveD27LXARzdPLVsSS2Dz8TNs0y5guM6MWizqmgOmJBk3rtKP/exwnFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6243.namprd11.prod.outlook.com (2603:10b6:208:3e7::8)
- by SJ5PPF3D06B1BFF.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::822) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.22; Tue, 27 Oct
- 2026 12:56:23 +0000
-Received: from IA1PR11MB6243.namprd11.prod.outlook.com
- ([fe80::55b9:7dc8:2496:bca8]) by IA1PR11MB6243.namprd11.prod.outlook.com
- ([fe80::55b9:7dc8:2496:bca8%5]) with mapi id 15.21.0546.021; Tue, 27 Oct 2026
- 12:56:22 +0000
-From: "K, Kiran" <kiran.k@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>, "Devegowda,
- Chandrashekar" <chandrashekar.devegowda@intel.com>
-Subject: RE: [PATCH v1] Bluetooth: btintel: check FIPS status before firmware
- download
-Thread-Topic: [PATCH v1] Bluetooth: btintel: check FIPS status before firmware
- download
-Thread-Index: AQHdYVnpOe9voa1FGUaRo8vR3TL7G7cLriUAgAWz9bA=
-Date: Tue, 27 Oct 2026 12:56:22 +0000
-Message-ID: <IA1PR11MB6243340391060FA3BAE4393CF5602@IA1PR11MB6243.namprd11.prod.outlook.com>
-References: <20261021130424.3042597-1-kiran.k@intel.com>
- <CABBYNZ+_FwM9U-eCwRrq7z_U92y_msrcSFF_kes=O+TnnkPasA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+_FwM9U-eCwRrq7z_U92y_msrcSFF_kes=O+TnnkPasA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6243:EE_|SJ5PPF3D06B1BFF:EE_
-x-ms-office365-filtering-correlation-id: a3abad9f-7322-443e-ee3c-08df3429b3fb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|261026140227099003|38070700021|4143699003|11063799006|56012099006|261022075727099003|261022115727099003|261021121427099003|261022105027099003|261021123027099003|10067099003|261009223027099003|22082099003|261026121527099003|6133799003|18002099003;
-x-microsoft-antispam-message-info: VOQucqQ4AE/es6GBrNcH77CYZ6BYDOKMGfDVDGcntit6UH1aia4Gewau9OiGW8RVjGmccchPuSewpe3BIMXuCm3JQPlqcvoj/GrSDCkD5HY37sxzFYsjtCjwR0E3hrlNPqisetQqvBs4+DNZbLNpxihINbw43ugek/wYS7viMbj2KseEjzqnEO3AKEulD3TCFLJXAZ786OWQu+mMfDKosCW0O31nzv4pRcJ1KR2einfoTZWvO7NixjNL6tVdUMk1Q7iNOHrmTBOlCqeEX2G3zMYUSQ+oS+8T1yIOH8ukOwBsK/KRFriWDIPz8iyhHPmCa9+AOmdTO9pt97PDNRmj1AugeioJlyOkvSk2zQT3AEmHa8InQyspccTlunDWEzNXGoNoyl+MrchBZ8aG7mXUbWutpHG15enwdmBZvoK8d6HQLD8ZsIkBIt5/NkfdVmbuMFhSpt5aFxtgYbqKsSFNA9Kj0QF1chW1OGOShYTNJFkxlWFE+TK8sNtiJIH7UyldSABEJU9oheT+uA0k8e6/EbFEeuUkhtbYrDsbiZlTyO1p/UZA1K97UqgUClltCykpRBCFUQzLzf2J2jqrv6CBme/s+OaxW3XV05IzSgSdz9FTjQvUrs1qC9urvqwSzIAuQGn7L3lgMWeRdyT2en3+AN6g+E+m/fu0wJRdBqxZNYpkRvEKraD3niN979ATkVU9
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6243.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(261026140227099003)(38070700021)(4143699003)(11063799006)(56012099006)(261022075727099003)(261022115727099003)(261021121427099003)(261022105027099003)(261021123027099003)(10067099003)(261009223027099003)(22082099003)(261026121527099003)(6133799003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UktjdGNFcC9VMHdobld0Smg4cnBSTGVHS0g1ZktvRVhGUGVESHgrcjQySXhD?=
- =?utf-8?B?L0xtbVE1c2tzWkJZZDNGTW13VE95MEU4RmdZZDBhNWRGZXdiYmJ1a21IaUN3?=
- =?utf-8?B?Z2thUUZvSjhTcDRmTmZ3OE9zMXhkS3RoelRkTWJ0cUg5NS9DTnJNWVcxSGZG?=
- =?utf-8?B?ZG5KSGdtQlBrRFRBaVlMRE1PL2dCQ2pMa29ZZEwySTdXZFRoYkFMQ05qUUNq?=
- =?utf-8?B?UE5iOEsxT0IzWFk4SHRaWmUvS04rTTErd0gxTzNENzJrNVJuZnI0REV2M09W?=
- =?utf-8?B?NTAreElaV09GU2FROEM3STFzMzN2TXlwZktQU3kyUWdnNWFCY1h3ZFZKeDlV?=
- =?utf-8?B?WUNRdUtqTElGL3VIZlpqS2h0MVlEM2JWOEJLOUFaK0RCNm9yaFNVbDBJSGla?=
- =?utf-8?B?SUt2bnRyN0pvbW1hbk1xMVBCMkxVRWhTYWFzYnkrQVZKREJNVXUzakFJZm9X?=
- =?utf-8?B?clltbEtBNkcrellNRVFpN2pjUGhwOE5GNWU4ZEZTUTJlRnovbWNTd0R4ampr?=
- =?utf-8?B?SXNGQjNMcVZ3RWIzYWttMkJwQ3JVeHRFWkJqTEZvT3dONk5nSkxXREhxY0Q4?=
- =?utf-8?B?OW1sYWlIK2VDVnhuVFNIWWR2YzVzYUZ3RGRFOGFCRXM2R0hmVE4zZm5Zcllz?=
- =?utf-8?B?cEF2aUJ1QXpneFZqOXlScmNiU25BdXlTSGlCakJQdytnOGJFY044UnNIVTJK?=
- =?utf-8?B?UjkvSGhQUGhCNUlGY1oybnZaTEFNQjlWbmhCTjlvcUEvcmU2b3N5d0M3bzRB?=
- =?utf-8?B?RGpTakRValVGNkpYa1VhQllNZjkxNlZmeU1SSDJTd08zRXFKUWJ2YUc3ZGU5?=
- =?utf-8?B?OENRWDdmbWI2MG11MkdWNS9KR29YSzFuWml6ZjBlY0M5S0F1Q0dpVTBDckZD?=
- =?utf-8?B?ajB4U1VLWC9kL0hBeS9CZW8wZnliSUcydnBpTHZZRWVVM25NWHdKQnZUNHBZ?=
- =?utf-8?B?M2xMbkpjd2dzdVhnTFBQUDhucSs2cmk4WmZoRUlPYkpGTVErOWZzcFpGb0s5?=
- =?utf-8?B?VVA4QmRTLzNLMTNwVWw2b1ZlRVM4RllsSUR6QWEza1l5T3dTUnA3OE4rOEY1?=
- =?utf-8?B?eXhma1hlcWZKUFovMktab0xpNGV2Z0R3L1lOSTVIaVFhcWNabHB5VGtMbHVq?=
- =?utf-8?B?U2daN0tDTkNjL3V4N1dJbFNHYzYvTVhUV3dxQkJuRWY1OEZhd3Z2L1djaTVy?=
- =?utf-8?B?cWZIMnBoa3B5SytJamJOcFB6bmFudGdFRFJDTFBZeVRkb0g4SXJzbmcwV2t0?=
- =?utf-8?B?cHgwN3Y2VERIL2VEaEZDWFVrbWJ4OWR6MnB4cTZnNlFiR3VTWmZ5UzY0RENn?=
- =?utf-8?B?RW1lY1orbGxMa25jckxJTWtIVVNNN1kydkxjYlNja1M5T0E2OVNXVTh5eUgw?=
- =?utf-8?B?alFlTEk5OWtMR3N3b3RlTkJLU0hJSW43d0hXek1uYmNGUElQR0VsOEd4ZDIw?=
- =?utf-8?B?NHFBY0s2NWhjQWtiT2NXblJPdytlYi9HcHFoMWlxZlphSDk2bmM5RlQ3NnZo?=
- =?utf-8?B?cW01SFJuMnZlRC90MlhmYzlnY2pIRUsvR25kTThJS0YzQnpPQVdUMkl6ajkr?=
- =?utf-8?B?S1l5WXVMUlV3WkYyY0xXN1pMdHF6YzhlL29lcGNTaFUwZDhYUkhWc01FUFNO?=
- =?utf-8?B?RGNGOHpyWkxUc05POW9tWGtqVkYwb3VKZUdKWFExZHlkdDQwM3QrejFPUDBJ?=
- =?utf-8?B?ZFlvQTZxSUhXVmhIV0RIVTJvSVY4bWFHZVdjcnZFOVQ2YzVDOXA5MWtUNzBZ?=
- =?utf-8?B?ZGFaTFdwNkh3UUJhWURpVzR4Qk4vZkVqUXhaRlFkVUpJQlg4VWlxbXpFb2ZP?=
- =?utf-8?B?NTY3WlpZV0p4ZlRpSXlkcks5eVFQQWZaRkozRDFVT0RCOVdwV01RdHVwbmNx?=
- =?utf-8?B?UER3MzNDY05ES2lORlYzcThnNXMrZktDWHRBR09ZMVhHckNnZ0R3RWpWTDBz?=
- =?utf-8?B?dzVzblRmNUkyVjFmUG9aZm5iLzMwWTM0cTB1bU80b2ZRSTl1dHlldTMwcXBk?=
- =?utf-8?B?UEpUeWF0V1EyaVVlSmR2NWhKdjlMSk1hY25EdDJPSks0cmN5RHlrc3dxUGY3?=
- =?utf-8?B?bVdsTUI5K3lSaS9zM2N3N3Z0L1l5aHdRVXJPR0tLNkpqaXlXbkxPaGhCUG5z?=
- =?utf-8?B?VkJTN0MxWW10Qnd6TXV5UkdCMVZUMzU2SnRvRUN5eUV1ak5zOTh3djJhWWsv?=
- =?utf-8?B?L2xhVlNDMTBNYVZqTDZQb3lycGI4aTBoL2VyZ2xOdUhKaTFWeVBhbWx6NDJx?=
- =?utf-8?B?S0xrWTlyWjdZTkVCRlgyL1RYODRMY2VQK1EvOVcxbFdldlFBWEJHM0hya3Ny?=
- =?utf-8?Q?k83gMorkjmWzGKLvww?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="4495255"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa003.jf.intel.com with ESMTP; 27 Oct 2026 05:58:38 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel: check FIPS status before firmware download
+Date: Tue, 27 Oct 2026 18:48:50 +0530
+Message-ID: <20261027131850.3652839-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -188,204 +78,252 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: 4fQysHae6q+S9H2b/hg3shac8L/8hB9ExIs02pNgHuyJHJ2lIy+xbb2rot26+AJWY5TnEjFQiXBNC21nK7yeX1gttwugnkvtIWZ/UPLBUPloesu1hJjvcGoKmQFig8HQ98VNHApxi1phX8BJjNwDgiBz9zoG07tAu/a8NxC3lT31N1ZPHrX+8CCIQ3bZKjTuUQHNkcdbsded4RMdop3IzVn9rCBN7Zq4Rk6qCoGOJu/OhBbFsfn9RdSVbfuD1lpwAfP9j4cwcHlpkt6ZGgDkhPn9dYd/OjSW41nt+Ti6BGShmyIaTuFCjXr3A+ZTWH/f2UjIWLJzCF5gOEcivQ2cgw==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6243.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3abad9f-7322-443e-ee3c-08df3429b3fb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2026 12:56:22.7811
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bzhm1g7HDfhcsVTTfvyj8H06nTf9Wbe1GYGJtE3ohiMQCy+eqs5GWNOTxlW/HHb4rl3vlDDFVlagThlvC1aKdw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF3D06B1BFF
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-SGkgTHVpeiwNCg0KPlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjFdIEJsdWV0b290aDogYnRpbnRlbDog
-Y2hlY2sgRklQUyBzdGF0dXMgYmVmb3JlIGZpcm13YXJlDQo+ZG93bmxvYWQNCj4NCj5IaSBLaXJh
-biwNCj4NCj5PbiBXZWQsIE9jdCAyMSwgMjAyNiBhdCA5OjAy4oCvQU0gS2lyYW4gSyA8a2lyYW4u
-a0BpbnRlbC5jb20+IHdyb3RlOg0KPj4NCj4+IEludGVsIEJsdWV0b290aCBjb250cm9sbGVycyAo
-UENJZSBhbmQgVVNCKSBmcm9tIFNjb3JwaXVzIFBlYWsyIG9ud2FyZHMNCj4+IHJlcG9ydCBib290
-bG9hZGVyIHNlbGYtdGVzdCByZXN1bHRzIChDUkMsIHNlY3VyaXR5LCBwYXRjaCkgaW4gdGhlDQo+
-PiBJTlRFTF9UTFZfRklQU19TVFMgVExWIG9mIHRoZSBJbnRlbCBSZWFkIFZlcnNpb24gZXZlbnQu
-IEFjdCBvbiB0aGVtDQo+PiBiZWZvcmUgZmlybXdhcmUgZG93bmxvYWQ6DQo+Pg0KPj4gICAxLiBD
-UkMgZmFpbHVyZSAgICAgIC0+IGFib3J0IGRvd25sb2FkLg0KPj4gICAyLiBTZWN1cml0eSBmYWls
-dXJlIC0+IGFib3J0IG9uIFVTQiAvIEhXIHJlc2V0IGFuZCByZXRyeSBvbiBQQ0llLg0KPj4gICAz
-LiBQYXRjaCBmYWlsdXJlICAgIC0+IGFib3J0IG9uIFVTQiAvIEhXIHJlc2V0IGFuZCByZXRyeSBv
-biBQQ0llLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEtpcmFuIEsgPGtpcmFuLmtAaW50ZWwuY29t
-Pg0KPj4gLS0tDQo+PiAgZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jICAgICAgfCA2NiArKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPj4gIGRyaXZlcnMvYmx1ZXRvb3RoL2J0aW50
-ZWwuaCAgICAgIHwgMTAgKysrKysNCj4+ICBkcml2ZXJzL2JsdWV0b290aC9idGludGVsX3BjaWUu
-YyB8IDE4ICsrKysrKysrLQ0KPj4gIDMgZmlsZXMgY2hhbmdlZCwgOTAgaW5zZXJ0aW9ucygrKSwg
-NCBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRp
-bnRlbC5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jDQo+PiBpbmRleCAwNzA5ZmIzMjEy
-ZjkuLmY2ZGViM2Q3YzVhMCAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50
-ZWwuYw0KPj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jDQo+PiBAQCAtNDg1LDEw
-ICs0ODUsMTggQEAgaW50IGJ0aW50ZWxfcmVhZF92ZXJzaW9uKHN0cnVjdCBoY2lfZGV2ICpoZGV2
-LA0KPj4gc3RydWN0IGludGVsX3ZlcnNpb24gKnZlcikgIH0NCj4+IEVYUE9SVF9TWU1CT0xfR1BM
-KGJ0aW50ZWxfcmVhZF92ZXJzaW9uKTsNCj4+DQo+PiArLyogRklQUyBzZWxmLXRlc3Qgc3RhdHVz
-IGlzIG9ubHkgcmVwb3J0ZWQgYnkgU2NQMiBvbndhcmRzLCBleGNlcHQNCj4+ICtCbGF6YXJJVyAq
-LyBzdGF0aWMgYm9vbCBidGludGVsX2ZpcHNfc3RhdHVzX3N1cHBvcnRlZCh1OCBod192YXJpYW50
-KQ0KPj4gK3sNCj4+ICsgICAgICAgcmV0dXJuIGh3X3ZhcmlhbnQgPj0gQlRJTlRFTF9IV0lEX1ND
-UDIgJiYgaHdfdmFyaWFudCAhPQ0KPj4gK0JUSU5URUxfSFdJRF9CWlJJVzsgfQ0KPj4gKw0KPj4g
-IGludCBidGludGVsX3ZlcnNpb25faW5mb190bHYoc3RydWN0IGhjaV9kZXYgKmhkZXYsDQo+PiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBpbnRlbF92ZXJzaW9uX3RsdiAqdmVy
-c2lvbikgIHsNCj4+ICAgICAgICAgY29uc3QgY2hhciAqdmFyaWFudDsNCj4+ICsgICAgICAgYm9v
-bCBmaXBzX3N0YXR1cyA9IGZhbHNlOw0KPj4gKyAgICAgICB1OCBod192YXJpYW50Ow0KPj4NCj4+
-ICAgICAgICAgLyogVGhlIGhhcmR3YXJlIHBsYXRmb3JtIG51bWJlciBoYXMgYSBmaXhlZCB2YWx1
-ZSBvZiAweDM3IGFuZA0KPj4gICAgICAgICAgKiBmb3Igbm93IG9ubHkgYWNjZXB0IHRoaXMgc2lu
-Z2xlIHZhbHVlLg0KPj4gQEAgLTUwNSw3ICs1MTMsOCBAQCBpbnQgYnRpbnRlbF92ZXJzaW9uX2lu
-Zm9fdGx2KHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPj4gICAgICAgICAgKiBUaGlzIGNoZWNrIGhh
-cyBiZWVuIHB1dCBpbiBwbGFjZSB0byBlbnN1cmUgY29ycmVjdCBmb3J3YXJkDQo+PiAgICAgICAg
-ICAqIGNvbXBhdGliaWxpdHkgb3B0aW9ucyB3aGVuIG5ld2VyIGhhcmR3YXJlIHZhcmlhbnRzIGNv
-bWUgYWxvbmcuDQo+PiAgICAgICAgICAqLw0KPj4gLSAgICAgICBzd2l0Y2ggKElOVEVMX0hXX1ZB
-UklBTlQodmVyc2lvbi0+Y252aV9idCkpIHsNCj4+ICsgICAgICAgaHdfdmFyaWFudCA9IElOVEVM
-X0hXX1ZBUklBTlQodmVyc2lvbi0+Y252aV9idCk7DQo+PiArICAgICAgIHN3aXRjaCAoaHdfdmFy
-aWFudCkgew0KPj4gICAgICAgICBjYXNlIDB4MTc6ICAgICAgLyogVHlQICovDQo+PiAgICAgICAg
-IGNhc2UgMHgxODogICAgICAvKiBTbHIgKi8NCj4+ICAgICAgICAgY2FzZSAweDE5OiAgICAgIC8q
-IFNsci1GICovDQo+PiBAQCAtNTIxLDEwICs1MzAsMTMgQEAgaW50IGJ0aW50ZWxfdmVyc2lvbl9p
-bmZvX3RsdihzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4+ICAgICAgICAgICAgICAgICBicmVhazsN
-Cj4+ICAgICAgICAgZGVmYXVsdDoNCj4+ICAgICAgICAgICAgICAgICBidF9kZXZfZXJyKGhkZXYs
-ICJVbnN1cHBvcnRlZCBJbnRlbCBoYXJkd2FyZSB2YXJpYW50ICgweCV4KSIsDQo+PiAtICAgICAg
-ICAgICAgICAgICAgICAgICAgICBJTlRFTF9IV19WQVJJQU5UKHZlcnNpb24tPmNudmlfYnQpKTsN
-Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgIGh3X3ZhcmlhbnQpOw0KPj4gICAgICAgICAg
-ICAgICAgIHJldHVybiAtRUlOVkFMOw0KPj4gICAgICAgICB9DQo+Pg0KPj4gKyAgICAgICBmaXBz
-X3N0YXR1cyA9IGJ0aW50ZWxfZmlwc19zdGF0dXNfc3VwcG9ydGVkKGh3X3ZhcmlhbnQpICYmDQo+
-PiArICAgICAgICAgICAgICAgdmVyc2lvbi0+aW1nX3R5cGUgPT0gQlRJTlRFTF9JTUdfQk9PVExP
-QURFUjsNCj4+ICsNCj4+ICAgICAgICAgc3dpdGNoICh2ZXJzaW9uLT5pbWdfdHlwZSkgew0KPj4g
-ICAgICAgICBjYXNlIEJUSU5URUxfSU1HX0JPT1RMT0FERVI6DQo+PiAgICAgICAgICAgICAgICAg
-dmFyaWFudCA9ICJCb290bG9hZGVyIjsgQEAgLTU4NCw2ICs1OTYsOSBAQCBpbnQNCj4+IGJ0aW50
-ZWxfdmVyc2lvbl9pbmZvX3RsdihzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4+DQo+PiAgICAgICAg
-IGJ0X2Rldl9pbmZvKGhkZXYsICJVbmxvY2sgcG9saWN5OiAweCUyLjJ4IiwNCj4+IHZlcnNpb24t
-PnVubG9ja19wb2xpY3kpOw0KPj4NCj4+ICsgICAgICAgaWYgKGZpcHNfc3RhdHVzKQ0KPj4gKyAg
-ICAgICAgICAgICAgIGJ0X2Rldl9pbmZvKGhkZXYsICJjcmMgc3RhdHVzOiAldSBzZWN1cml0eSBz
-dGF0dXM6ICV1IHBhdGNoIHN0YXR1czoNCj4ldSIsDQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgdmVyc2lvbi0+Y3JjX3N0cywgdmVyc2lvbi0+c2VjX3N0cywNCj4+ICsgdmVyc2lvbi0+
-cGF0Y2hfc3RzKTsNCj4+ICAgICAgICAgcmV0dXJuIDA7DQo+PiAgfQ0KPj4gIEVYUE9SVF9TWU1C
-T0xfR1BMKGJ0aW50ZWxfdmVyc2lvbl9pbmZvX3Rsdik7DQo+PiBAQCAtNjEyLDYgKzYyNyw3IEBA
-IHN0YXRpYyB1OCBidGludGVsX3ZlcnNpb25fdGx2X21pbl9sZW4odTggdHlwZSkNCj4+ICAgICAg
-ICAgY2FzZSBJTlRFTF9UTFZfVU5MT0NLX1BPTElDWToNCj4+ICAgICAgICAgICAgICAgICByZXR1
-cm4gc2l6ZW9mKHU4KTsNCj4+ICAgICAgICAgY2FzZSBJTlRFTF9UTFZfTUlOX0ZXOg0KPj4gKyAg
-ICAgICBjYXNlIElOVEVMX1RMVl9GSVBTX1NUUzoNCj4+ICAgICAgICAgICAgICAgICByZXR1cm4g
-MzsNCj4+ICAgICAgICAgY2FzZSBJTlRFTF9UTFZfT1RQX0JEQUREUjoNCj4+ICAgICAgICAgICAg
-ICAgICByZXR1cm4gc2l6ZW9mKGJkYWRkcl90KTsgQEAgLTcyMCw2ICs3MzYsMTEgQEAgaW50DQo+
-PiBidGludGVsX3BhcnNlX3ZlcnNpb25fdGx2KHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPj4gICAg
-ICAgICAgICAgICAgIGNhc2UgSU5URUxfVExWX0dJVF9TSEExOg0KPj4gICAgICAgICAgICAgICAg
-ICAgICAgICAgdmVyc2lvbi0+Z2l0X3NoYTEgPSBnZXRfdW5hbGlnbmVkX2xlMzIodGx2LT52YWwp
-Ow0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+PiArICAgICAgICAgICAgICAg
-Y2FzZSBJTlRFTF9UTFZfRklQU19TVFM6DQo+PiArICAgICAgICAgICAgICAgICAgICAgICB2ZXJz
-aW9uLT5jcmNfc3RzID0gdGx2LT52YWxbMF07DQo+PiArICAgICAgICAgICAgICAgICAgICAgICB2
-ZXJzaW9uLT5zZWNfc3RzID0gdGx2LT52YWxbMV07DQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICB2ZXJzaW9uLT5wYXRjaF9zdHMgPSB0bHYtPnZhbFsyXTsNCj4+ICsgICAgICAgICAgICAgICAg
-ICAgICAgIGJyZWFrOw0KPj4gICAgICAgICAgICAgICAgIGNhc2UgSU5URUxfVExWX0ZXX0lEOg0K
-Pj4gICAgICAgICAgICAgICAgICAgICAgICAgc25wcmludGYodmVyc2lvbi0+ZndfaWQsIHNpemVv
-Zih2ZXJzaW9uLT5md19pZCksDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAi
-JS4qcyIsIHRsdi0+bGVuLCB0bHYtPnZhbCk7IEBADQo+PiAtMzgzMSw2ICszODUyLDQzIEBAIHZv
-aWQgYnRpbnRlbF9wcmludF9mc2VxX2luZm8oc3RydWN0IGhjaV9kZXYgKmhkZXYpDQo+PiB9ICBF
-WFBPUlRfU1lNQk9MX0dQTChidGludGVsX3ByaW50X2ZzZXFfaW5mbyk7DQo+Pg0KPj4gK2ludCBi
-dGludGVsX2NoZWNrX2ZpcHNfc3RhdHVzKHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IGludGVsX3ZlcnNpb25fdGx2ICp2ZXIpIHsN
-Cj4+ICsgICAgICAgdTggaHdfdmFyaWFudDsNCj4+ICsNCj4+ICsgICAgICAgLyogRklQUyBzdGF0
-dXMgaXMgcmVwb3J0ZWQgb25seSBpbiB0aGUgYm9vdGxvYWRlciBpbWFnZSAqLw0KPj4gKyAgICAg
-ICBpZiAodmVyLT5pbWdfdHlwZSAhPSBCVElOVEVMX0lNR19CT09UTE9BREVSKQ0KPj4gKyAgICAg
-ICAgICAgICAgIHJldHVybiAwOw0KPj4gKw0KPj4gKyAgICAgICBod192YXJpYW50ID0gSU5URUxf
-SFdfVkFSSUFOVCh2ZXItPmNudmlfYnQpOw0KPj4gKw0KPj4gKyAgICAgICBpZiAoIWJ0aW50ZWxf
-Zmlwc19zdGF0dXNfc3VwcG9ydGVkKGh3X3ZhcmlhbnQpKQ0KPj4gKyAgICAgICAgICAgICAgIHJl
-dHVybiAwOw0KPj4gKw0KPj4gKyAgICAgICAvKiAwIC0+IFRlc3Qgbm90IGV4ZWN1dGVkDQo+PiAr
-ICAgICAgICAqIDEgLT4gVGVzdCBleGVjdXRlZCBhbmQgaXQgcGFzc2VkDQo+PiArICAgICAgICAq
-IGFueSBvdGhlciB2YWx1ZSAtPiBUZXN0IGZhaWxlZA0KPj4gKyAgICAgICAgKi8NCj4+ICsgICAg
-ICAgaWYgKHZlci0+Y3JjX3N0cyA+IDEpIHsNCj4+ICsgICAgICAgICAgICAgICBidF9kZXZfZXJy
-KGhkZXYsICJjcmMgdGVzdCBmYWlsZWQ6ICV1IiwgdmVyLT5jcmNfc3RzKTsNCj4+ICsgICAgICAg
-ICAgICAgICByZXR1cm4gLUVOT0VYRUM7DQo+PiArICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAg
-aWYgKHZlci0+c2VjX3N0cyA+IDEpIHsNCj4+ICsgICAgICAgICAgICAgICBidF9kZXZfZXJyKGhk
-ZXYsICJzZWN1cml0eSB0ZXN0IGZhaWxlZDogJXUiLCB2ZXItPnNlY19zdHMpOw0KPj4gKyAgICAg
-ICAgICAgICAgIHJldHVybiAtRUFHQUlOOw0KPj4gKyAgICAgICB9DQo+PiArDQo+PiArICAgICAg
-IGlmICh2ZXItPnBhdGNoX3N0cyA+IDEpIHsNCj4+ICsgICAgICAgICAgICAgICBidF9kZXZfZXJy
-KGhkZXYsICJwYXRjaCB0ZXN0IGZhaWxlZDogJXUiLCB2ZXItPnBhdGNoX3N0cyk7DQo+PiArICAg
-ICAgICAgICAgICAgcmV0dXJuIC1FQUdBSU47DQo+PiArICAgICAgIH0NCj4+ICsNCj4+ICsgICAg
-ICAgcmV0dXJuIDA7DQo+PiArfQ0KPj4gK0VYUE9SVF9TWU1CT0xfR1BMKGJ0aW50ZWxfY2hlY2tf
-Zmlwc19zdGF0dXMpOw0KPj4gKw0KPj4gIHN0YXRpYyBpbnQgYnRpbnRlbF9zZXR1cF9jb21iaW5l
-ZChzdHJ1Y3QgaGNpX2RldiAqaGRldikgIHsNCj4+ICAgICAgICAgY29uc3QgdTggcGFyYW1bMV0g
-PSB7IDB4RkYgfTsNCj4+IEBAIC00MDU1LDYgKzQxMTMsMTAgQEAgc3RhdGljIGludCBidGludGVs
-X3NldHVwX2NvbWJpbmVkKHN0cnVjdCBoY2lfZGV2DQo+KmhkZXYpDQo+PiAgICAgICAgICAgICAg
-ICAgLyogRGlzcGxheSB2ZXJzaW9uIGluZm9ybWF0aW9uIG9mIFRMViB0eXBlICovDQo+PiAgICAg
-ICAgICAgICAgICAgYnRpbnRlbF92ZXJzaW9uX2luZm9fdGx2KGhkZXYsICZ2ZXJfdGx2KTsNCj4+
-DQo+PiArICAgICAgICAgICAgICAgZXJyID0gYnRpbnRlbF9jaGVja19maXBzX3N0YXR1cyhoZGV2
-LCAmdmVyX3Rsdik7DQo+PiArICAgICAgICAgICAgICAgaWYgKGVycikNCj4+ICsgICAgICAgICAg
-ICAgICAgICAgICAgIGdvdG8gZXhpdF9lcnJvcjsNCj4+ICsNCj4+ICAgICAgICAgICAgICAgICAv
-KiBBcHBseSB0aGUgZGV2aWNlIHNwZWNpZmljIEhDSSBxdWlya3MgZm9yIFRMViBiYXNlZCBkZXZp
-Y2VzDQo+PiAgICAgICAgICAgICAgICAgICoNCj4+ICAgICAgICAgICAgICAgICAgKiBBbGwgVExW
-IGJhc2VkIGRldmljZXMgc3VwcG9ydCBXQlMgZGlmZiAtLWdpdA0KPj4gYS9kcml2ZXJzL2JsdWV0
-b290aC9idGludGVsLmggYi9kcml2ZXJzL2JsdWV0b290aC9idGludGVsLmggaW5kZXgNCj4+IDk1
-MjZhY2Y2NTk1OS4uZDVlMTI1ZWM1MTY4IDEwMDY0NA0KPj4gLS0tIGEvZHJpdmVycy9ibHVldG9v
-dGgvYnRpbnRlbC5oDQo+PiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9idGludGVsLmgNCj4+IEBA
-IC00Myw2ICs0Myw3IEBAIGVudW0gew0KPj4gICAgICAgICBJTlRFTF9UTFZfT1RQX0JEQUREUiwN
-Cj4+ICAgICAgICAgSU5URUxfVExWX1VOTE9DS0VEX1NUQVRFLA0KPj4gICAgICAgICBJTlRFTF9U
-TFZfR0lUX1NIQTEsDQo+PiArICAgICAgIElOVEVMX1RMVl9GSVBTX1NUUyA9IDB4M2IsDQo+PiAg
-ICAgICAgIElOVEVMX1RMVl9VTkxPQ0tfUE9MSUNZID0gMHgzYywNCj4+ICAgICAgICAgSU5URUxf
-VExWX1BMQVRGT1JNX0lEID0gMHgzZCwNCj4+ICAgICAgICAgSU5URUxfVExWX0ZXX0lEID0gMHg1
-MA0KPj4gQEAgLTExMiw2ICsxMTMsNyBAQCBzdHJ1Y3QgaW50ZWxfdmVyc2lvbl90bHYgew0KPj4g
-ICAgICAgICBiZGFkZHJfdCBvdHBfYmRfYWRkcjsNCj4+ICAgICAgICAgdTggICAgICB1bmxvY2tf
-cG9saWN5Ow0KPj4gICAgICAgICB1OCAgICAgIHBsYXRmb3JtX2lkWzZdOw0KPj4gKyAgICAgICB1
-OCAgICAgIGNyY19zdHMsIHNlY19zdHMsIHBhdGNoX3N0czsNCj4+ICB9Ow0KPj4NCj4+ICBzdHJ1
-Y3QgaW50ZWxfdmVyc2lvbiB7DQo+PiBAQCAtMzMxLDYgKzMzMyw4IEBAIGludCBidGludGVsX3No
-dXRkb3duX2NvbWJpbmVkKHN0cnVjdCBoY2lfZGV2DQo+PiAqaGRldik7ICB2b2lkIGJ0aW50ZWxf
-aHdfZXJyb3Ioc3RydWN0IGhjaV9kZXYgKmhkZXYsIHU4IGNvZGUpOyAgdm9pZA0KPj4gYnRpbnRl
-bF9wcmludF9mc2VxX2luZm8oc3RydWN0IGhjaV9kZXYgKmhkZXYpOyAgaW50DQo+PiBidGludGVs
-X2FjcGlfcmVzZXRfbWV0aG9kKHN0cnVjdCBoY2lfZGV2ICpoZGV2KTsNCj4+ICtpbnQgYnRpbnRl
-bF9jaGVja19maXBzX3N0YXR1cyhzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHN0cnVjdCBpbnRlbF92ZXJzaW9uX3RsdiAqdmVyKTsNCj4+ICAj
-ZWxzZQ0KPj4NCj4+ICBzdGF0aWMgaW5saW5lIGludCBidGludGVsX2NoZWNrX2JkYWRkcihzdHJ1
-Y3QgaGNpX2RldiAqaGRldikgQEANCj4+IC00NjgsNCArNDcyLDEwIEBAIHN0YXRpYyBpbmxpbmUg
-aW50IGJ0aW50ZWxfYWNwaV9yZXNldF9tZXRob2Qoc3RydWN0DQo+PiBoY2lfZGV2ICpoZGV2KSAg
-ew0KPj4gICAgICAgICByZXR1cm4gLUVOT0RFVjsNCj4+ICB9DQo+PiArDQo+PiArc3RhdGljIGlu
-bGluZSBpbnQgYnRpbnRlbF9jaGVja19maXBzX3N0YXR1cyhzdHJ1Y3QgaGNpX2RldiAqaGRldiwN
-Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IGlu
-dGVsX3ZlcnNpb25fdGx2DQo+PiArKnZlcikgew0KPj4gKyAgICAgICByZXR1cm4gLUVPUE5PVFNV
-UFA7DQo+PiArfQ0KPj4gICNlbmRpZg0KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3Ro
-L2J0aW50ZWxfcGNpZS5jDQo+PiBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jDQo+
-PiBpbmRleCBkZjk1ZDE2YTE2M2MuLjczODIyYmEyYWNiYiAxMDA2NDQNCj4+IC0tLSBhL2RyaXZl
-cnMvYmx1ZXRvb3RoL2J0aW50ZWxfcGNpZS5jDQo+PiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9i
-dGludGVsX3BjaWUuYw0KPj4gQEAgLTM3ODYsNyArMzc4Niw4IEBAIHN0YXRpYyBpbnQgYnRpbnRl
-bF9wY2llX2dldF9kZWJ1Z19pbmZvX2FkZHIoc3RydWN0DQo+aGNpX2RldiAqaGRldikNCj4+ICAg
-ICAgICAgcmV0dXJuIGVycjsNCj4+ICB9DQo+Pg0KPj4gLXN0YXRpYyBpbnQgYnRpbnRlbF9wY2ll
-X3NldHVwX2ludGVybmFsKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KPj4gK3N0YXRpYyBpbnQgYnRp
-bnRlbF9wY2llX3NldHVwX2ludGVybmFsKHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCAqZmlwc19jcmNfZmFpbGVkKQ0K
-Pj4gIHsNCj4+ICAgICAgICAgc3RydWN0IGJ0aW50ZWxfcGNpZV9kYXRhICpkYXRhID0gaGNpX2dl
-dF9kcnZkYXRhKGhkZXYpOw0KPj4gICAgICAgICBjb25zdCB1OCBwYXJhbVsxXSA9IHsgMHhGRiB9
-Ow0KPj4gQEAgLTM3OTQsNiArMzc5NSw4IEBAIHN0YXRpYyBpbnQgYnRpbnRlbF9wY2llX3NldHVw
-X2ludGVybmFsKHN0cnVjdCBoY2lfZGV2DQo+KmhkZXYpDQo+PiAgICAgICAgIHN0cnVjdCBza19i
-dWZmICpza2I7DQo+PiAgICAgICAgIGludCBlcnI7DQo+Pg0KPj4gKyAgICAgICAqZmlwc19jcmNf
-ZmFpbGVkID0gZmFsc2U7DQo+PiArDQo+PiAgICAgICAgIEJUX0RCRygiJXMiLCBoZGV2LT5uYW1l
-KTsNCj4+DQo+PiAgICAgICAgIHNrYiA9IF9faGNpX2NtZF9zeW5jKGhkZXYsIDB4ZmMwNSwgMSwg
-cGFyYW0sIEhDSV9DTURfVElNRU9VVCk7DQo+PiBAQCAtMzg1NSw2ICszODU4LDEyIEBAIHN0YXRp
-YyBpbnQgYnRpbnRlbF9wY2llX3NldHVwX2ludGVybmFsKHN0cnVjdA0KPmhjaV9kZXYgKmhkZXYp
-DQo+PiAgICAgICAgICAgICAgICAgLyogRGlzcGxheSB2ZXJzaW9uIGluZm9ybWF0aW9uIG9mIFRM
-ViB0eXBlICovDQo+PiAgICAgICAgICAgICAgICAgYnRpbnRlbF92ZXJzaW9uX2luZm9fdGx2KGhk
-ZXYsICZ2ZXJfdGx2KTsNCj4+DQo+PiArICAgICAgICAgICAgICAgZXJyID0gYnRpbnRlbF9jaGVj
-a19maXBzX3N0YXR1cyhoZGV2LCAmdmVyX3Rsdik7DQo+PiArICAgICAgICAgICAgICAgaWYgKGVy
-cikgew0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgKmZpcHNfY3JjX2ZhaWxlZCA9IChlcnIg
-PT0gLUVOT0VYRUMpOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBleGl0X2Vycm9y
-Ow0KPj4gKyAgICAgICAgICAgICAgIH0NCj4+ICsNCj4+ICAgICAgICAgICAgICAgICAvKiBBcHBs
-eSB0aGUgZGV2aWNlIHNwZWNpZmljIEhDSSBxdWlya3MgZm9yIFRMViBiYXNlZCBkZXZpY2VzDQo+
-PiAgICAgICAgICAgICAgICAgICoNCj4+ICAgICAgICAgICAgICAgICAgKiBBbGwgVExWIGJhc2Vk
-IGRldmljZXMgc3VwcG9ydCBXQlMgQEAgLTM5MDAsOA0KPj4gKzM5MDksMTMgQEAgc3RhdGljIGlu
-dCBidGludGVsX3BjaWVfc2V0dXAoc3RydWN0IGhjaV9kZXYgKmhkZXYpICB7DQo+PiAgICAgICAg
-IGludCBlcnIsIGZ3X2RsX3JldHJ5ID0gMDsNCj4+ICAgICAgICAgc3RydWN0IGJ0aW50ZWxfcGNp
-ZV9kYXRhICpkYXRhID0gaGNpX2dldF9kcnZkYXRhKGhkZXYpOw0KPj4gKyAgICAgICBib29sIGZp
-cHNfY3JjX2ZhaWxlZDsNCj4+ICsNCj4+ICsgICAgICAgd2hpbGUgKChlcnIgPSBidGludGVsX3Bj
-aWVfc2V0dXBfaW50ZXJuYWwoaGRldiwgJmZpcHNfY3JjX2ZhaWxlZCkpICYmDQo+PiArICAgICAg
-ICAgICAgICBmd19kbF9yZXRyeSsrIDwgMSkgew0KPj4gKyAgICAgICAgICAgICAgIGlmIChmaXBz
-X2NyY19mYWlsZWQpDQo+PiArICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCj4+DQo+PiAt
-ICAgICAgIHdoaWxlICgoZXJyID0gYnRpbnRlbF9wY2llX3NldHVwX2ludGVybmFsKGhkZXYpKSAm
-JiBmd19kbF9yZXRyeSsrIDwgMSkgew0KPj4gICAgICAgICAgICAgICAgIGJ0X2Rldl9lcnIoaGRl
-diwgIkZpcm13YXJlIGRvd25sb2FkIHJldHJ5IGNvdW50OiAlZCIsDQo+PiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBmd19kbF9yZXRyeSk7DQo+PiAgICAgICAgICAgICAgICAgYnRpbnRlbF9w
-Y2llX2R1bXBfZGVidWdfcmVnaXN0ZXJzKGhkZXYpOw0KPj4gLS0NCj4+IDIuNTQuMA0KPg0KPkxv
-b2tzIGxpa2UgdGhlIHNlY29uZCBpbnN0YW5jZSBvZiBzYXNoaWtvIGZyb20gbmV0ZGV2IGNhdGNo
-IGEgcHJvYmxlbToNCj4NCj5odHRwczovL25ldGRldi0NCj5haS5ib3RzLmxpbnV4LmRldi9zYXNo
-aWtvLyMvcGF0Y2hzZXQvMjAyNjEwMjExMzA0MjQuMzA0MjU5Ny0xLQ0KPmtpcmFuLmslNDBpbnRl
-bC5jb20NCg0KQWNrLiBMb29rcyBsaWtlIHRoZSBjb21taXQgbWVzc2FnZSBuZWVkcyBhbiB1cGRh
-dGUgdG8gZml4IHRoaXMuIEkgd2lsbCBwdWJsaXNoIHYyIHZlcnNpb24uDQo+DQo+LS0NCj5MdWl6
-IEF1Z3VzdG8gdm9uIERlbnR6DQoNClRoYW5rcywNCktpcmFuDQoNCg==
+Intel Bluetooth controllers (PCIe and USB) from Scorpius Peak2 onwards,
+except BlazarIW, report bootloader self-test results (CRC, security,
+and patch) in the INTEL_TLV_FIPS_STS TLV of the Intel Read Version
+event. Act on them before firmware download:
+
+  1. CRC failure      -> abort download.
+  2. Security failure -> abort on USB / HW reset and retry on PCIe.
+  3. Patch failure    -> abort on USB / HW reset and retry on PCIe.
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+changes in v2:
+Update commit message to fix
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261021130424.3042597-1-kiran.k%40intel.com
+
+ drivers/bluetooth/btintel.c      | 66 +++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel.h      | 10 +++++
+ drivers/bluetooth/btintel_pcie.c | 18 ++++++++-
+ 3 files changed, 90 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 929018428c19..b9bb6980bada 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -485,10 +485,18 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+ }
+ EXPORT_SYMBOL_GPL(btintel_read_version);
+ 
++/* FIPS self-test status is only reported by ScP2 onwards, except BlazarIW */
++static bool btintel_fips_status_supported(u8 hw_variant)
++{
++	return hw_variant >= BTINTEL_HWID_SCP2 && hw_variant != BTINTEL_HWID_BZRIW;
++}
++
+ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 			     struct intel_version_tlv *version)
+ {
+ 	const char *variant;
++	bool fips_status = false;
++	u8 hw_variant;
+ 
+ 	/* The hardware platform number has a fixed value of 0x37 and
+ 	 * for now only accept this single value.
+@@ -505,7 +513,8 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 	 * This check has been put in place to ensure correct forward
+ 	 * compatibility options when newer hardware variants come along.
+ 	 */
+-	switch (INTEL_HW_VARIANT(version->cnvi_bt)) {
++	hw_variant = INTEL_HW_VARIANT(version->cnvi_bt);
++	switch (hw_variant) {
+ 	case 0x17:	/* TyP */
+ 	case 0x18:	/* Slr */
+ 	case 0x19:	/* Slr-F */
+@@ -521,10 +530,13 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 		break;
+ 	default:
+ 		bt_dev_err(hdev, "Unsupported Intel hardware variant (0x%x)",
+-			   INTEL_HW_VARIANT(version->cnvi_bt));
++			   hw_variant);
+ 		return -EINVAL;
+ 	}
+ 
++	fips_status = btintel_fips_status_supported(hw_variant) &&
++		version->img_type == BTINTEL_IMG_BOOTLOADER;
++
+ 	switch (version->img_type) {
+ 	case BTINTEL_IMG_BOOTLOADER:
+ 		variant = "Bootloader";
+@@ -584,6 +596,9 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 
+ 	bt_dev_info(hdev, "Unlock policy: 0x%2.2x", version->unlock_policy);
+ 
++	if (fips_status)
++		bt_dev_info(hdev, "crc status: %u security status: %u patch status: %u",
++			    version->crc_sts, version->sec_sts, version->patch_sts);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
+@@ -612,6 +627,7 @@ static u8 btintel_version_tlv_min_len(u8 type)
+ 	case INTEL_TLV_UNLOCK_POLICY:
+ 		return sizeof(u8);
+ 	case INTEL_TLV_MIN_FW:
++	case INTEL_TLV_FIPS_STS:
+ 		return 3;
+ 	case INTEL_TLV_OTP_BDADDR:
+ 		return sizeof(bdaddr_t);
+@@ -720,6 +736,11 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
+ 		case INTEL_TLV_GIT_SHA1:
+ 			version->git_sha1 = get_unaligned_le32(tlv->val);
+ 			break;
++		case INTEL_TLV_FIPS_STS:
++			version->crc_sts = tlv->val[0];
++			version->sec_sts = tlv->val[1];
++			version->patch_sts = tlv->val[2];
++			break;
+ 		case INTEL_TLV_FW_ID:
+ 			snprintf(version->fw_id, sizeof(version->fw_id),
+ 				 "%.*s", tlv->len, tlv->val);
+@@ -3853,6 +3874,43 @@ void btintel_print_fseq_info(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
+ 
++int btintel_check_fips_status(struct hci_dev *hdev,
++			      struct intel_version_tlv *ver)
++{
++	u8 hw_variant;
++
++	/* FIPS status is reported only in the bootloader image */
++	if (ver->img_type != BTINTEL_IMG_BOOTLOADER)
++		return 0;
++
++	hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++
++	if (!btintel_fips_status_supported(hw_variant))
++		return 0;
++
++	/* 0 -> Test not executed
++	 * 1 -> Test executed and it passed
++	 * any other value -> Test failed
++	 */
++	if (ver->crc_sts > 1) {
++		bt_dev_err(hdev, "crc test failed: %u", ver->crc_sts);
++		return -ENOEXEC;
++	}
++
++	if (ver->sec_sts > 1) {
++		bt_dev_err(hdev, "security test failed: %u", ver->sec_sts);
++		return -EAGAIN;
++	}
++
++	if (ver->patch_sts > 1) {
++		bt_dev_err(hdev, "patch test failed: %u", ver->patch_sts);
++		return -EAGAIN;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_check_fips_status);
++
+ static int btintel_setup_combined(struct hci_dev *hdev)
+ {
+ 	const u8 param[1] = { 0xFF };
+@@ -4077,6 +4135,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		/* Display version information of TLV type */
+ 		btintel_version_info_tlv(hdev, &ver_tlv);
+ 
++		err = btintel_check_fips_status(hdev, &ver_tlv);
++		if (err)
++			goto exit_error;
++
+ 		/* Apply the device specific HCI quirks for TLV based devices
+ 		 *
+ 		 * All TLV based devices support WBS
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 9526acf65959..d5e125ec5168 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -43,6 +43,7 @@ enum {
+ 	INTEL_TLV_OTP_BDADDR,
+ 	INTEL_TLV_UNLOCKED_STATE,
+ 	INTEL_TLV_GIT_SHA1,
++	INTEL_TLV_FIPS_STS = 0x3b,
+ 	INTEL_TLV_UNLOCK_POLICY = 0x3c,
+ 	INTEL_TLV_PLATFORM_ID = 0x3d,
+ 	INTEL_TLV_FW_ID = 0x50
+@@ -112,6 +113,7 @@ struct intel_version_tlv {
+ 	bdaddr_t otp_bd_addr;
+ 	u8	unlock_policy;
+ 	u8	platform_id[6];
++	u8	crc_sts, sec_sts, patch_sts;
+ };
+ 
+ struct intel_version {
+@@ -331,6 +333,8 @@ int btintel_shutdown_combined(struct hci_dev *hdev);
+ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ void btintel_print_fseq_info(struct hci_dev *hdev);
+ int btintel_acpi_reset_method(struct hci_dev *hdev);
++int btintel_check_fips_status(struct hci_dev *hdev,
++			      struct intel_version_tlv *ver);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -468,4 +472,10 @@ static inline int btintel_acpi_reset_method(struct hci_dev *hdev)
+ {
+ 	return -ENODEV;
+ }
++
++static inline int btintel_check_fips_status(struct hci_dev *hdev,
++					    struct intel_version_tlv *ver)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 4fbefaa3129a..88da286750fe 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -3786,7 +3786,8 @@ static int btintel_pcie_get_debug_info_addr(struct hci_dev *hdev)
+ 	return err;
+ }
+ 
+-static int btintel_pcie_setup_internal(struct hci_dev *hdev)
++static int btintel_pcie_setup_internal(struct hci_dev *hdev,
++				       bool *fips_crc_failed)
+ {
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
+ 	const u8 param[1] = { 0xFF };
+@@ -3794,6 +3795,8 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
+ 	struct sk_buff *skb;
+ 	int err;
+ 
++	*fips_crc_failed = false;
++
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
+@@ -3855,6 +3858,12 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
+ 		/* Display version information of TLV type */
+ 		btintel_version_info_tlv(hdev, &ver_tlv);
+ 
++		err = btintel_check_fips_status(hdev, &ver_tlv);
++		if (err) {
++			*fips_crc_failed = (err == -ENOEXEC);
++			goto exit_error;
++		}
++
+ 		/* Apply the device specific HCI quirks for TLV based devices
+ 		 *
+ 		 * All TLV based devices support WBS
+@@ -3900,8 +3909,13 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ {
+ 	int err, fw_dl_retry = 0;
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++	bool fips_crc_failed;
++
++	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
++	       fw_dl_retry++ < 1) {
++		if (fips_crc_failed)
++			break;
+ 
+-	while ((err = btintel_pcie_setup_internal(hdev)) && fw_dl_retry++ < 1) {
+ 		bt_dev_err(hdev, "Firmware download retry count: %d",
+ 			   fw_dl_retry);
+ 		btintel_pcie_dump_debug_registers(hdev);
+-- 
+2.54.0
+
