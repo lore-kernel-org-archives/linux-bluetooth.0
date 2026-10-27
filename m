@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793091710;
-	b=at4olJzV+j5v+fqzKgSLl5h+q15vr8LLDUH9r0ZB55KiM9MW69JrJKUH9fWDmnOwtUTS
-	 6nP5cFGbQRG9DmAHKUtiasYXgK5lbC4kjIdSKssmROOQwOv4BhvspoJdx+DJlN1EcOVwL
-	 /mtQ5ihz2xaPa9lJe3aPiYKiFtfxrjgj2DofDZAmZucVzumep7I5pC2se11hMT8EWV6oL
-	 WYYrRI9s1PgCgd6763SZ3KPdKMisgHv+lNdHzAbNOIiDSg49K/otuMTXGmZ2w5QSvlWUf
-	 euxOO7tv938GFQgKyi8f4i08aeeMbnzb7q3bpLZ5rMTHRANfUngROXtHHxKu7ZjYdhg==
+	t=1793092022;
+	b=WFcCNMdgvNu4BFE1lqfjLRG5kUjEd+wnuXwmFReULMSDaFg92Fi1c+mV7HCHZpIS8njD
+	 in24BCsIxb4OCTmzhFFntbPwPBkQ+BeuUg4ybmmk+6C91Sihj8PL5SUjwmRr6DastI5Z1
+	 DHKblmFc+acQl50CcCv2J7kFc6AcSnYesJpEomTe7Qs2LPIsDaLBxYI6lpL59NFHOQ/FV
+	 vSQep/Y4oTmR+fMGysd6uON7Ost3NflDlIWeTR0gdPf/PUMC9V01o26y4EekCi2e+NJrN
+	 6WMFeeJNGMI5cLgNt/J+bSVUe0Dt8Cwdqc15a72Mu0apJux9vvqTZxbh+d3k9rYdGMA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793091710;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793092022;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=7gVwCx57p9veIKCfdgMrCMI/OnEh4Cv+1a9XESfHumA=;
-	b=SON2Xgkt06+5GY/nOpc5cSEY1QXuhIkGBv74EifV2n661QXflj2oDA8KoWz/bVe4ydsM
-	 scu2wo8kqRE0pUxWMWaxCmTwLrTNbMpeUqjEGziOdh8nyEr6iQtsFflbhc3/KXCTDFzW7
-	 FCP4FetP3bZSKPXl4ErUx/sjhXMIrfX56KmJEwHgAL8o4oES2PHOhXmh3qSelAcLoLcCH
-	 y4lTTn5KLSHbA5mKYzJfLa+uxR2NJGk5Xy0Y4MT7nf0OMtNyMTD6hlmt0KbO4qk2XMI8H
-	 pe1VgJGGj7enb3RlqMaAyXNjQfNQRRQYc2L7Ggf6/7CbPzqLImcn8yjOxreBneXeCjQ==
+	bh=e9uLmX2zxjN6cLjxPVbANpzjxtBV1enkmm65swDfU/g=;
+	b=fPlt6bwSbhbvQCbxKQHzeSMKXWpYugj26LXVl+D2Arky3MB/JFlt4LR3/wS0oXFM0Eym
+	 T8OTai1v4kBFWmoR3VM+vikQNSAl7u9rDkN0a1W9KLVXlXSpm8cTbYqTtnNGnOh8z5vQ1
+	 Uxgyxl6S3/T7iLedUOJCJVs/5bHRkEc75wA10XAlT84j+Utgh117Rs4Y8rPr2cLn4wWDZ
+	 9aovn4ePbOBHrIBgE8QX5QxpjtsqXY7X2GtXIptfyjukYN3hg2oFqXNKONVkItHZVNOin
+	 qf4RM6SqIf4mq2qH8y2Rj4HhywdJ/Qpq5EfOQAF++G9DDgCuZTHTkpIKElrj5Lk3Q0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dxrv+9jx;
-	arc=none smtp.remote-ip=209.85.219.47
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=AeqTo8xs;
+	arc=none smtp.remote-ip=209.85.160.169
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3A5606A31B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:01:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD3A5606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFA4606A31A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:07:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3BFA4606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dxrv+9jx
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-91986c5cb75so39090106d6.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 02:01:49 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=AeqTo8xs
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5365d725440so33245401cf.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 02:07:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793091709; x=1793696509; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1793092021; x=1793696821; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=7gVwCx57p9veIKCfdgMrCMI/OnEh4Cv+1a9XESfHumA=;
-        b=dxrv+9jxsPCxb2emcZdVb4daLL3qWrySavEvUPR+WyZDkRY9Gz0KPnbACrsdeoyhei
-         8tbIod/GyJ0MwCTVAF4vFX/pw31rlx98FpZSo+Fa4xHRA6stqkE9+sGONkwA0sbQhNu8
-         JNL4cES94BAjTJI6MYaw0ahTAPqK5xG9JGuG4YqdQqFunur6Rcw64L6nR9BPMnbMCzG9
-         2R5O+UWJj43bIBhfzzn4w5sCm9ACzdEycgNs27haA9bZ6QZTotHXeDd86RIg/etzv8kr
-         1wqIypwexkYSyR0jIuUaRFZN0KS0TOyaCERQkWj6o4qyNV1CcMftCK2HR9m3l7fej/me
-         sSxQ==
+        bh=e9uLmX2zxjN6cLjxPVbANpzjxtBV1enkmm65swDfU/g=;
+        b=AeqTo8xsnu6eof8HcxOh46mFslhIDMNFZ/DN+mWlYDFaP0jE9wJ1+9E5yDL91zTN9A
+         Bzl685jvbZgK/IeKQ3L53i5lRA2vG+BEMH2ale103C3RhCc6K5Q0aKyY4/76rZPWaeFU
+         rUY+QTRjQ9l7uVQbeoaG1AiIIA3TUVdrjxFGmQpItqIIOJMfiw3umtq1i58hUTliEUSN
+         LE2yfXJEmIHO9e1GTF/mTQz1VQu6qj60zZhzHuk6DAk1pehQIOBapDRJ4/72Su9IWGmJ
+         aYwBwQfH8j8nKbkdSHZGmFLtGmai+h8JEwe2oQ4znSIEAR5tL/XolqNC2lwuAhTCRzSH
+         aKlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793091709; x=1793696509;
+        d=1e100.net; s=20260707; t=1793092021; x=1793696821;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=7gVwCx57p9veIKCfdgMrCMI/OnEh4Cv+1a9XESfHumA=;
-        b=PTRcpc8sQWG5xnEG5Y+oLspVJbWKLnndh8zeB2DtQHQsroAyomeb3qZ552uETEGcg5
-         axsvf4WKlIfQdqMoCFQs9QE/EbDxyb8bda5ttCUIRsnfgJjnknPICX/PKE05B0lC3XW9
-         n8/azzkRsYLCmYVh2I87SuUT+Rb0ZwZww/Z2eZcYLO4kP+WQjSBQugeEMG0bCqNghO7p
-         kogmpovvnxqbzIfkCspC3bixvn2y5ieDOUK1pqWv4HALI7ghiZbVVhyaIRUo6ykd1z6J
-         ucRil4QfjAva3ZLpXDJVi8Gqk+Yk40QiQJPIK4xpaR/K7nUWDDqoarXntnFh0K6TQnCN
-         pXGQ==
-X-Gm-Message-State: AFq9FYIDboK2r0Y1SU9V7srj/w1qUl1X1Wb+cGD4y5cC5eMabysK3McK
-	+rOMXGJywhn3beRWu854KY+sbFPWXg7WnCiC1v8JeJDwfeT8jPYgIDC4wfw0+g==
-X-Gm-Gg: AYBFou1HL5FKwUppvQpMZlgv0t/ycBHh/nt4et0DYNpR4dc+3lcFh/g07doQCABdNy0
-	jO7vPgH07m4TXGq1bYvdbKsTikjC4rfux8mVMITExQpZOx5Px0pWYQCm0qS3gOINPnl4iRQW2uZ
-	6cFv9YfgTUCrJ2/kVxDX+xWrTezIR3neOaHKbKSUq9As4rmRCAgrvDkXh+e2JyutyjaLXSRVPan
-	3LQWaYLHUgj3VkGbY98GntMeKckb/7kdPdRxZYsqcIdiTGkeXk4vKXy+VQTS9IyvvKvU9oknem3
-	Z65tq+uv0gCyQBiNQmMO3GZdowH7rqVVrqSJe15+3ELLX2HLdDjaZ/3s79+GQFXRuVtftMIMJiH
-	HpofaUu+WEK6p3jr4A9M8rdG3SGOoP8qmegKJY8UJTWqLVNnwXZr+DJtZ0lsX9zGKd7AFmyILjR
-	EJy+8kuXRZjlIXrzYrMrHPX31FiiQ5S00y+Acq9qDhaqIYbb4VdkFs7fqVdx6Hpa94FCpUM+A1W
-	Kv2QxMOtZxYFcRN4IQ2g/HkhJMLgsIJsT3V1AnxZDR19y4D9rLQL+HuHYNL40o=
-X-Received: by 2002:ad4:5764:0:b0:91b:9536:21c6 with SMTP id 6a1803df08f44-91c48e3e142mr158661046d6.9.1793091708640;
-        Tue, 27 Oct 2026 02:01:48 -0700 (PDT)
-Received: from [172.17.0.2] ([20.62.207.241])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91c47ce49d9sm97612436d6.45.2026.10.27.02.01.40
+        bh=e9uLmX2zxjN6cLjxPVbANpzjxtBV1enkmm65swDfU/g=;
+        b=LDyduWeFWpCiK+YachgXWtCPyW7uUm8jjF53THB+T87dCzmB1CZ3Ext1+HTyQ30gYQ
+         UwSuaLmsZs/1MVqb6n7QbBJMI5krquj2n+gWnyliMvlvvvxLXrEzRgCnUFFUO8qILMWu
+         4AsUKQN+xskohI4yf8gYm1atEXYj32D//lGXrC/ABgFYe/tqABQPgb+CKn6vuTQ4CzFH
+         9FiIxyyiBgDfsp3RDFTLO8jL0Tpi90NtuZP1RxgL99dIGj54pd8Dj9WPHHOQH2nYBzPI
+         CydBtWbRxU78t2uDUspwT+lZZDQyeU4US9ouKBrITi2XOrbU2DcmBiOsrfMwoN3wmxnK
+         dP3Q==
+X-Gm-Message-State: AFq9FYJYfFMFdWxHBOZpkTVrOpLkQBja99cDaIXdf81kImjfIT5t2Yq5
+	7VCsWf6j5IF54DQOrh301GeGps/JcLrSKpgeNnXzI39MNdUpz36MXlFLX35L0A==
+X-Gm-Gg: AYBFou2MTjCVyA5jez5fh9XssExuqdDp3t6+j8oBEBZ7/w3jT8tUXOwW31vIGE+Mz1E
+	0yVcra9PxlX9u7pXIhh2XY95xaQ+R8v3exASIIiO5iIO6rbslHkpXQG36mE/LbwHsr2CAyjqFQX
+	pNOeQ1aEfBFl6Lvra6U6gSF+Kn5bwZ8SZr+0TYkqBp+YreMAW8dhPvTQPD7ndlK1vRiEbr+CZCX
+	P24jVzTPzcyfElnaObXAV8P58402Z2LzoxSbvcWfz+tGVsaH2mw0N4kFj7QJZrj+rrQPjMiAUKG
+	e0hnVIKe4ZMrqKso9KsAD4hwgRMyltA2o4es6p/gDxlZbO7hTcW2h53FSYS0BfKrgTrGcb74SWf
+	29ihJdfs2dmC9OAx/GNUVrftv0VRlqsvefslmsSBCm5VRxv/Q6iRD/TF8QK1s6KyS2ilP8XeFr+
+	rCuGt7XGa61CA6Ew9p1xrkTITh7WS5hxKd5Z+Ky59KbJOCODXkKa3Wz2PjTlWQ2e5UW9Mc23KBd
+	IzVovQTIIDAjZdEtN16lh9z+BUh06oExOKiWNTZFLwzkATnfnUrS//DHoADh0U=
+X-Received: by 2002:a05:622a:a88a:b0:535:a5fb:67fb with SMTP id d75a77b69052e-5383b76c5d4mr151856861cf.71.1793092021062;
+        Tue, 27 Oct 2026 02:07:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.106.231.70])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-538397405e1sm73615501cf.25.2026.10.27.02.07.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 02:01:42 -0700 (PDT)
-Message-ID: <6ae06876.4c9ccf10.91305.2af0@mx.google.com>
-Date: Tue, 27 Oct 2026 02:01:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3045059218621094630=="
+        Tue, 27 Oct 2026 02:07:00 -0700 (PDT)
+Message-ID: <6ae069b4.eb3ee9d5.acd82.0415@mx.google.com>
+Date: Tue, 27 Oct 2026 02:07:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7170355118959533970=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,13 +89,13 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jinwang.li@oss.qualcomm.com
-Subject: RE: obexd/pbap: Fix NewMissedCalls reporting
-In-Reply-To: <20261027071046.2272116-2-jinwang.li@oss.qualcomm.com>
-References: <20261027071046.2272116-2-jinwang.li@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org, contact@capsize.online
+Subject: RE: monitor: validate Return Link Keys length before parsing
+In-Reply-To: <20261027032821.1088858-1-contact@capsize.online>
+References: <20261027032821.1088858-1-contact@capsize.online>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3045059218621094630==
+--===============7170355118959533970==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -106,28 +106,75 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1194324/
+PW Link:https://patchwork.kernel.org/series/1194227/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      1.38 seconds
-GitLint                       PASS      1.23 seconds
-BuildEll                      PASS      20.09 seconds
-BluezMake                     PASS      305.86 seconds
-CheckSmatch                   PASS      298.69 seconds
-bluezmakeextell               PASS      95.71 seconds
-TestFunctional                PASS      1129.11 seconds
-IncrementalBuild              PASS      299.93 seconds
-ScanBuild                     PASS      1142.38 seconds
+CheckPatch                    PASS      1.20 seconds
+GitLint                       PASS      0.35 seconds
+BuildEll                      PASS      19.54 seconds
+BluezMake                     PASS      299.81 seconds
+MakeCheck                     PASS      0.89 seconds
+MakeDistcheck                 PASS      141.88 seconds
+CheckValgrind                 PASS      145.09 seconds
+CheckSmatch                   WARNING   291.45 seconds
+bluezmakeextell               PASS      93.44 seconds
+TestFunctional                FAIL      1147.42 seconds
+IncrementalBuild              PASS      302.65 seconds
+ScanBuild                     PASS      1160.84 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c:2289:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3925:52: warning: array of flexible structuresmonitor/bt.h:3913:40: warning: array of flexible structures
+##############################
+Test: TestFunctional - FAIL
+Desc: Run test-functional
+Output:
+FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_bredr[hosts15-vm2]: pytest_bluezenv.rpc.RemoteError: <pexpect.popen_spawn.PopenSpawn object at 0x7f363325a510>
+    searcher: searcher_re:
+        0: re.compile(b'Changing pairable on succeeded')
+    <pexpect.popen_spawn.PopenSpawn object at 0x7f363325a510>
+    searcher: searcher_re:
+        0: re.compile(b'Changing pairable on succeeded')
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 256, in call_plugin
+            return getattr(self.plugins[name], method)(*a, **kw)
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/host_plugins.py", line 502, in expect
+            ret = self.ctl.expect(*a, **kw)
+          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 354, in expect
+            return self.expect_list(compiled_pattern_list,
+                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+                    timeout, searchwindowsize, async_)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          File "/usr/lib/python3/dist-packages/pexpect/spawnbase.py", line 383, in expect_list
+            return exp.expect_loop(timeout)
+                   ~~~~~~~~~~~~~~~^^^^^^^^^
+          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 181, in expect_loop
+            return self.timeout(e)
+                   ~~~~~~~~~~~~^^^
+          File "/usr/lib/python3/dist-packages/pexpect/expect.py", line 144, in timeout
+            raise exc
+        pexpect.exceptions.TIMEOUT: <pexpect.popen_spawn.PopenSpawn object at 0x7f363325a510>
+        searcher: searcher_re:
+            0: re.compile(b'Changing pairable on succeeded')
+        <pexpect.popen_spawn.PopenSpawn object at 0x7f363325a510>
+        searcher: searcher_re:
+            0: re.compile(b'Changing pairable on succeeded')
 
 
-
-https://github.com/bluez/bluez/pull/2719
+https://github.com/bluez/bluez/pull/2717
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============3045059218621094630==--
+--===============7170355118959533970==--
