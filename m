@@ -1,97 +1,88 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793119823;
-	b=V5XbwJ3s76U1By0qUWREshlLj9TKbKXUlh51hJeuFFo5ejxEjyq9y86I+Dno1i51/Djf
-	 dKfzl9kCnqPVejNVWivZac4sY78/m+Hm2kp++Vzuz9TCI0bLwMQEDrc0l64xA8Vp+7FoX
-	 fwxQ2Jp2L3YuFIWt3Qm1IDOb96wC/h40EK6PNz91WUKuLmI4KsX0drt+tX2K2rTlS0obC
-	 5kSq2Hsy4vzgOiZUTdLWodk5oW3NVdADrBJCF76RyqJ716uAu25XSDAa0LgEEOcr5TXOO
-	 ldoPOLsNu2PlZe9X5CFnPdYYtN+/umAYUcWnhz2vWiMwy343b6TVIbRIv2JD/YakqJA==
+	t=1793119865;
+	b=zxdSlj9m57f964pPcQXaoPzoyl/gCfF7IHwQt/E0idzqFhpdwD2svYOQDMDdn79apDiW
+	 UTZ82OFqeLf4h5RyCdo52Vt7PfgVvHqKjJuAQAKv/WFIsFLkFHjTnc+qIeal/tBZIV1Vg
+	 FVd1QM98EhYEE/uZV0subjjSy7BzI4X7YC7mk2YVO8Ck2SeEZgMweokkpYhujxfClKqK8
+	 v9mzVffikqB4Ivb1iqvOQVGP2E2WDkhMRtR0sGsYfNAhdLhN20vkILmN1nzurnlxiP8QW
+	 IVnnp40RwsacIowCXgQz4E1N9qlh7ApxrXlDwbB6CGVrBap+NJkBjdktsLivwm6/DQQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793119823;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793119865;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=JwYZ8K/HWhh69ZRwdx8vD+GcbFUXkgT4Nh+DRyTzZvc=;
-	b=uQy0XjODXD3NVtPvewgtADeAUe1cu9/ROchoxgu4lf+u587GqhGJJYblNakUxi015BWx
-	 9lGxssK6Ac6gKuTl/NXWgjDb+3WVU3OYk7A34pSPZQiuCrWBVb44Jm7AOti61K4Wp5MJr
-	 q8AnGLS4saUk5DP4r7CV5iaeqhmfUdUTmynA+yQkM5PYZ+2WKRTKd0ubXN4bc0MEgIf6W
-	 XYZK8yFgWJWgjgwtYDAUFxv57qnjmlwx2He2QJK35BcD+wDACXHmVp9AfXXSfStV8sCuR
-	 2Ed7BcJMcaU/0lCJqJRas6tK6vy1K9tx6P5fSFkeKde9yOxMT41gDd6HAsLxWuFd/bw==
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=GgeYVexdXFTQb0ypGFpbEI6BRiONyrul6Kf5hcdzMQQ=;
+	b=zhOplE+EE3zkKesMbieOHOvElhp8zyMMHlCq+gI+/doXB8G7+A0pExZY4KPKWIp9bq1U
+	 Qc4455AX1mFFUKU5DCHr8CMh6gq0ogWdeOr1PHgBdVA8nvrsorheCSmCncI8bJEElYeZH
+	 wj/UogLLF93RzHuyhL5TUFw/4meLHDAf69e/Tqb1daNTql74TNuiBSr6OfG1d9a1V3oQr
+	 haKdT2XlcbqsdkiHOYJPGmMt8gVIUDC6Qi3w+Qjczm6tYT1Kx06tuaYZ93xMlPv6BHMxa
+	 lw7cyKXdw2so1zes8xf1r5mXXcuzOH4yleSRj46emr6ohu2diF1mtEP4mVE8u2ZCaMw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="VCh+/ckQ";
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vdm77vR4;
 	arc=none smtp.remote-ip=209.85.210.54
 Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFD6606A327
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 16:50:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6FFD6606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8730A606A31F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 16:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8730A606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VCh+/ckQ
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-83c1a9bd428so3563a34.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:50:23 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vdm77vR4
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-8437d47592bso2644a34.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:51:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793119822; x=1793724622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=JwYZ8K/HWhh69ZRwdx8vD+GcbFUXkgT4Nh+DRyTzZvc=;
-        b=VCh+/ckQY/TOpJsVYCO2OGK2DoHv3xhYuWxnwbY41ySZzRUjTMsWpo1M/C4l/Sv8+L
-         KDazH3Y0gd3/12WlgfVgkH1Otdg7uE0voIvPIFpK5raI+YX32DBQUq3o5q+5I5ZsxzWb
-         2o09QB2sHbjjBOZJy5RUhleefJtNRPHBBPAVOchIj47UocWY/dFGNIziD0Nnu82HePJ6
-         VuxIcTHaooTJkndMYK2t0kYAsJxsH20ij4ibP6Lhgj5uTzDyPn4dMdPuXLqskX9IvPbw
-         wa0O5t8+WoT06yPH7wWSWjUQqFVTZVQ6TpVgc6fJEBLpxt0aUlCvFN7jRY11NILJZwkI
-         RKow==
+        d=gmail.com; s=20260707; t=1793119863; x=1793724663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GgeYVexdXFTQb0ypGFpbEI6BRiONyrul6Kf5hcdzMQQ=;
+        b=vdm77vR4wxcD7pDtIPPNPrjiTtLBR25viZ98crcp9c4rmmRfdXK7Rf8NrUexOQ8y6p
+         YAkPwNSvuCwHZumKBB+PJEeyaRdvdHWE/Plpuxv89watwtNJhar1NqJu2L4LjW2SksM3
+         Qcxek040sugRHSHRmASAIlbGf5SRZ4xO8g6F1ZLOES/f8mkMKp4ty6h400ENQ8USdH3K
+         bzz57zrlc0N62r2TBoJIk5AVa08fT8E0fTTFyGb8gCLziHZKCPfCodxIVIECsDYhP1TS
+         Cucsaz7yCRC1K+0p3yxawEFfkREfckBhlGL2Qrjlq3tfk7f5DJ/iLsUixQV+ci620gC1
+         MIPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793119822; x=1793724622;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JwYZ8K/HWhh69ZRwdx8vD+GcbFUXkgT4Nh+DRyTzZvc=;
-        b=tYbNS9ECG9LQHY9j2/qSms+JXOzK+7asnsH7iEHJlOF4Yysqz0UFwVKHQMOid6Yr+Z
-         7235nYHlnA2IenKUqJDzk0Sa3VuZUeYYuQANfut+IjWzTQ1n5tgU2p3uXWcfgt9HDUwa
-         RBn4+zbxIXguMGddyKp4YChzG5M8VaiYYBsaWT+RhOw7JjkekwVg4xfd2KRYmN/keNal
-         9w7jl57qlOCAjxfOLICZW+QtsiZ1tQx2zLFZmNh4kOY9FAKQ0htEPFOU1IV5zF25yJRi
-         tIJ9FBZZDAXQTCwncaIkIGriGcorRzpR8r4+LyVvhvlQOL6hjmNVWAu0pUgW9e9dXZAT
-         T7QA==
-X-Gm-Message-State: AFq9FYLKNYDbxZQb63kDiwa7FocZ9eIkCecKIt76ewtF5qcGIB4cYfcy
-	qzeRc+Mu15JHLXs3H/jqje4XlNnCLn56/NlPCOEY9xG9ediymDx2h4FyFF8PQmxytdq9MA==
-X-Gm-Gg: AYBFou1UjCDuXsxYd8Grc8TiLbhF33N6GANLhdCazrGWY7lq43hDVLJIWc2YFpr1Mr9
-	IasebB5xKB4qL8YtxO5g0p2h110aRHcyHuv05Nb0v5hlyPgh684KO7JfiNORUbqILFCPWg0atNa
-	s8L3UfE3xVLb5dzE8fsV2PuHl6Pyx//1qLPTDM+FppQ0Djod7u3EXS2FPJLMkQ9aF0xpfitLoFe
-	f+w5fgMC0tqzFFo0r2LykxQ/xc5kCaBYCl3M0bLSSm5E5cAR4l93h6PnVvxUFEXMfi3+bLyF8Tz
-	3nLeH/QVyeTtwdt/27CKaxTg5hXBd3wdBg7o9fARe2kfkaQEzHSNFb6FgczG4oHvWzgnEpNolwp
-	dR1kP3U7IoPRbvNiu01vwL630zo66ZWnvZSZf6FSCY66txBoiWMI/qARUUTpE24DxAKdNy6OY8h
-	Y73xjIguxmzvB/nsjygURkk0+lMkivI+xaZN8m45EAnxSzjIvCo6dimQfCtDGN7vpth5NoXW1Y3
-	puG+DWT5GYLWZNPFiuVDRbxsH8eLz62ygxyCX4NFQrSD/unTqMexYwHT9W+nOZrMB9Czab3cmX7
-	fYm1Uf8COUfZ02eaod9Yj6+zxMtgzBG3JyQ=
-X-Received: by 2002:a05:6830:658b:b0:7e9:d593:896f with SMTP id 46e09a7af769-85abd31a84cmr44201a34.1.1793119822267;
-        Tue, 27 Oct 2026 09:50:22 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1793119863; x=1793724663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GgeYVexdXFTQb0ypGFpbEI6BRiONyrul6Kf5hcdzMQQ=;
+        b=Nz9VQJY++/MXCl+HKSwYBXW3B3g5Ht6FL81IwlXEd023W6K1lgzJ5vlU4QSw/diVTz
+         Acajm/qXd+ayzczAR3MxM/9i/L9qsZ2ddyV5vfxT2lhU9xoPet9gH1sQ6PaOCFTAnocW
+         jXfklfgIQqxHr8tVFHq2DrtXLhqMeQXgVuzEFiztHfVcRst9r/cuzAFJH1c9cYTEV6AX
+         oe//Bj2QZcE8F3K0CaAXanrIRr208mUTxp6jTSCfwgMJw7E3zu1j7kGwRsWpio2rJNRl
+         q7n1szHA4nOvchHZdTfpX0wNurMNGrFNQb2voGEfnd833AQVfui1/2SOPZbsrcuPdf5H
+         aCNw==
+X-Gm-Message-State: AFq9FYJKZP5yWxmaDA6IsUVGamawlpn0Sd8REFKo+27L3WADJebN1/s2
+	1mryRzYq7hi9QdDIL91RYjxHcJ9GFp/Wihy/E9zhVVXnz+Lqgza6l02mSPUZRLuQXxCERw==
+X-Gm-Gg: AYBFou1zfyGVHkxLqMjEz8K+pJ7udvTw10VEMHQihAV+ieAtT0OHr5Ah1foP1JGGApy
+	SPk3xKFn9s3YzdgDOCp4PuQQVgEbZrckT2qXZw/JlNjO2DyXqsNaBJwwtVcNICi9MWjVggW7x54
+	hud57cCnS7plFNRorAN3QaQ2iwxq9DPj8FuEKsQqnOijLlnPxZUdgJ6lL30ajUa6NH2T72Ffbvw
+	LBUuH1fhIIFmQK6T4I+lzLKvn6CEY+1lwNOxfXyR27ffiH7JWKUnCPXii4KVDfc97rZZc2RiLF/
+	uvxK3rnR71XxQjOWzC/ax+b8vDqISI2V9qjncTrJRtyyI1Y0SrjM3pz5ensShasUBXUyhPZpKOV
+	QveLCssrGMbxWkMjY7c4vKD53jIPDCrcGv44SR5gX2MPxa32jDGQ2pDsVCuSGQPnnUSA3aP/18J
+	6tgHz3cmBKkp0WHT6oyMXqtDOuhcq0+22gL4i/qAbdOM5QNl2WWk1NWx9WxpfgUlXP6l9pbp5f4
+	zISSCQhJVCs7lFfzpXsAUEWZyxixCGIMAdsahLMdO/3OfjBulKW1zaU7ZMGutTeGR/EtU0LqPbQ
+	mlknqfS8xeFlPoZn4Gx9rGuDYwRf0brXEs4uzvXUFDbEtFyoaT0mrAJp
+X-Received: by 2002:a05:6830:6614:b0:805:24d6:cb5 with SMTP id 46e09a7af769-85abf67a3afmr8725a34.3.1793119862914;
+        Tue, 27 Oct 2026 09:51:02 -0700 (PDT)
 Received: from localhost.localdomain ([37.19.221.77])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850fb0749dcsm10927058a34.11.2026.10.27.09.50.19
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850fc005bd7sm11775868a34.24.2026.10.27.09.51.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 09:50:21 -0700 (PDT)
+        Tue, 27 Oct 2026 09:51:02 -0700 (PDT)
 From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Cen Zhang <zzzccc427@gmail.com>,
-	Aldo Ariel Panzardo <qwe.aldo@gmail.com>,
-	Hitalo Souza <enghitalo@gmail.com>,
-	Pauli Virtanen <pav@iki.fi>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: hci_conn: synchronize with SCO disconnect work before reuse
-Date: Tue, 27 Oct 2026 17:50:09 +0100
-Message-ID: <20261027165009.2401154-4-yaroslav.voytovych@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] tools/sco-tester: Add SCO reconnect tests
+Date: Tue, 27 Oct 2026 17:50:59 +0100
+Message-ID: <20261027165059.2402360-1-yaroslav.voytovych@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261027165009.2401154-1-yaroslav.voytovych@gmail.com>
-References: <20261027165009.2401154-1-yaroslav.voytovych@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -103,81 +94,681 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Checking abort_reason before reusing a SCO connection does not
-close the race with a disconnect worker that is already running:
-connect() can still report success just before that worker aborts
-the connection.
+Add three tests where a second socket connects to the peer of a SCO
+link:
 
-hci_conn_hold() uses cancel_delayed_work(), which cancels pending
-work but does not wait for work already running.
-hci_conn_timeout() reads refcnt without hdev->lock and, after
-seeing no holder, calls hci_abort_conn(), which sets abort_reason.
+- "eSCO CVSD - Reconnect After Disconnect": the first link is gone when
+  the second socket connects. It shall get a link of its own: connect()
+  in progress, its own Setup Synchronous Connection and Synchronous
+  Connection Complete, and the link stays up.
 
-A new connect() can check abort_reason and take its hold between
-those two steps. It then gets a connection that the worker is
-about to abort, and the Disconnection Complete closes the new
-socket with ECONNABORTED. This applies both to a connection whose
-link exists and to one the remote device set up, which gets its
-link from hci_conn_link() here.
+- "eSCO CVSD - Reconnect During Disconnect": the emulator processes the
+  Disconnect of the first link as usual, but the Disconnection Complete
+  event is held back until the second connect() has returned. The
+  connect() shall fail with ECONNABORTED or EBUSY, or the second socket
+  shall get a link of its own as above once the event is delivered. A
+  socket reported connected without a link fails the test.
 
-After taking the hold, wait for a running hci_conn_timeout() with
-cancel_delayed_work_sync() and check abort_reason again. If the
-worker has aborted the connection, drop the caller's hold and
-return -ECONNABORTED.
+- "eSCO CVSD - Connect Twice": connect() on a second socket while the
+  link is up shall fail with EBUSY and leave the link alone: no
+  Disconnect, the first socket still connected. Closing both sockets
+  shall disconnect the SCO link and then the ACL link.
 
-The wait is safe under hdev->lock. For a SCO connection,
-hci_conn_timeout() does not take that lock: hci_proto_disconn_ind()
-returns a constant, and hci_abort_conn() only queues the
-Disconnect. hci_conn_del() already waits for disc_work with
-hdev->lock held. For a new connection the work has never been
-queued, so nothing is waited for.
-
-Once the wait returns, the work has finished and cannot be queued
-again while the caller's hold is taken, so the second check does
-not race with it. If the connection had no link before, the link
-hci_conn_link() just made stays with the aborting connection and
-is released with its ACL hold by hci_conn_del(), as for any linked
-SCO connection.
-
-A connect() that comes before the work has started at all still
-cancels it with its hold and keeps the live link, as it does
-without this patch; that case is not changed here.
-
-Reproduced by delaying hci_conn_timeout() after it has seen no
-holder (a debug-only change, not part of this patch), for a link
-set up by the host and for one set up by the remote device:
-without this patch connect() returns 0 and the socket is then
-closed with ECONNABORTED; with it, connect() fails with
--ECONNABORTED.
-
-Fixes: e6720779ae61 ("Bluetooth: SCO: Use kref to track lifetime of sco_conn")
-Cc: stable@vger.kernel.org
-Signed-off-by: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+For a new link the tests check its own Setup Synchronous Connection
+and Synchronous Connection Complete as well as the socket, so a link
+of its own is told apart from reuse of the old connection even when
+the controller reuses the same handle.
 ---
- net/bluetooth/hci_conn.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+"Reconnect During Disconnect" and "Connect Twice" fail on current
+bluetooth-next and pass with the kernel series "[PATCH 0/3] Bluetooth:
+hci_conn: fix SCO connection reuse", sent to this list alongside:
+https://lore.kernel.org/linux-bluetooth/20261027165009.2401154-1-yaroslav.voytovych@gmail.com/
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6b92fd0177857..c1c8d2b29e3c0 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1935,6 +1935,17 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 		}
- 	}
+Please apply this after that series is in bluetooth-next; until then
+the two cases fail there. The During case accepts more than one
+outcome on purpose (an immediate ECONNABORTED or EBUSY, or a new link
+of its own), so that it stays valid on kernels before 6.13, which
+answer EBUSY, and if the kernel later defers such a connect instead of
+refusing it.
+
+This is against current master; if the series moving the testers to
+the mainloop lands first, I will rebase it onto that.
+
+ tools/sco-tester.c | 567 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 566 insertions(+), 1 deletion(-)
+
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index fca99a91c..8149d4dcf 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -27,6 +27,8 @@
+ #include "monitor/bt.h"
+ #include "emulator/bthost.h"
+ #include "emulator/hciemu.h"
++#include "emulator/vhci.h"
++#include "emulator/btdev.h"
  
-+	/* Taking the hold cannot stop a hci_conn_timeout() that is already
-+	 * running: it may have seen no holder and be about to abort the
-+	 * connection. It does not take hdev->lock, so wait for it and check
-+	 * abort_reason again.
+ #include "src/shared/tester.h"
+ #include "src/shared/mgmt.h"
+@@ -50,6 +52,27 @@ struct test_data {
+ 	uint16_t acl_handle;
+ 	uint16_t handle;
+ 	struct tx_tstamp_data tx_ts;
++
++	/* State of the reconnect tests */
++	int sk2;
++	unsigned int io2_id;
++	unsigned int timer_id;
++	bool done;
++	bool disc_held;
++	bool disc_released;
++	bool closing;
++	bool sco_gone;
++	struct bt_hci_evt_disconnect_complete held_evt;
++	unsigned int sync_complete;
++	unsigned int setup_cmds;
++	unsigned int disc_cmds;
++};
++
++enum reconnect_mode {
++	RECONNECT_NONE,
++	RECONNECT_AFTER,	/* Connect again once the first link is gone */
++	RECONNECT_DURING,	/* ... while the completion is held */
++	CONNECT_TWICE,		/* Connect again while the first link is up */
+ };
+ 
+ struct sco_client_data {
+@@ -78,6 +101,9 @@ struct sco_client_data {
+ 
+ 	/* Defer setup when accepting SCO connections */
+ 	bool defer;
++
++	/* A second socket connects to the same peer, see the modes above */
++	enum reconnect_mode reconnect;
+ };
+ 
+ static void print_debug(const char *str, void *user_data)
+@@ -250,6 +276,36 @@ static void test_pre_setup(const void *test_data)
+ static void test_post_teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
++
++	/*
++	 * The reconnect tests own their first socket (its channel does not
++	 * close it), so a test that timed out may have left it open.
 +	 */
-+	cancel_delayed_work_sync(&sco->disc_work);
-+	if (sco->abort_reason) {
-+		hci_conn_drop(sco);
-+		return ERR_PTR(-ECONNABORTED);
++	if (scodata && scodata->reconnect && data->sk >= 0) {
++		if (data->io_id) {
++			g_source_remove(data->io_id);
++			data->io_id = 0;
++		}
++
++		close(data->sk);
++		data->sk = -1;
 +	}
 +
- 	sco->setting = setting;
- 	sco->codec = *codec;
++	if (data->timer_id) {
++		g_source_remove(data->timer_id);
++		data->timer_id = 0;
++	}
++
++	if (data->io2_id) {
++		g_source_remove(data->io2_id);
++		data->io2_id = 0;
++	}
++
++	if (data->sk2 >= 0) {
++		close(data->sk2);
++		data->sk2 = -1;
++	}
+ 
+ 	hciemu_unref(data->hciemu);
+ 	data->hciemu = NULL;
+@@ -269,13 +325,14 @@ static void test_data_free(void *test_data)
+ 					_disable_sco_flowctl, _timeout) \
+ 	do { \
+ 		struct test_data *user; \
+-		user = malloc(sizeof(struct test_data)); \
++		user = calloc(1, sizeof(struct test_data)); \
+ 		if (!user) \
+ 			break; \
+ 		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
+ 		user->io_id = 0; \
+ 		user->err_io_id = 0; \
+ 		user->sk = -1; \
++		user->sk2 = -1; \
+ 		user->test_data = data; \
+ 		user->step = 0; \
+ 		user->disable_esco = _disable_esco; \
+@@ -329,6 +386,18 @@ static const struct sco_client_data connect_failure_reset = {
+ 	.expect_err = ECONNRESET
+ };
+ 
++static const struct sco_client_data reconnect_after = {
++	.reconnect = RECONNECT_AFTER,
++};
++
++static const struct sco_client_data reconnect_during = {
++	.reconnect = RECONNECT_DURING,
++};
++
++static const struct sco_client_data connect_twice = {
++	.reconnect = CONNECT_TWICE,
++};
++
+ const uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+ 
+ static const struct sco_client_data connect_recv_success = {
+@@ -1309,6 +1378,490 @@ static void test_connect_acl_disc(const void *test_data)
+ 	test_connect(test_data);
+ }
+ 
++#define RECONNECT_DELAY_MS	100	/* host handles the last event */
++#define RECONNECT_QUIET_MS	500	/* nothing more shall happen */
++#define RECONNECT_LINK_MS	3000	/* a link or a disconnect shall come */
++#define RECONNECT_ACL_MS	5000	/* the idle ACL link shall go */
++
++static void reconnect_end(struct test_data *data, bool ok)
++{
++	if (data->done)
++		return;
++
++	data->done = true;
++
++	/* The first socket is still open if the test ended early */
++	if (data->io_id) {
++		g_source_remove(data->io_id);
++		data->io_id = 0;
++	}
++
++	if (data->sk >= 0) {
++		close(data->sk);
++		data->sk = -1;
++	}
++
++	if (!ok)
++		tester_warn("Setup commands %u, Disconnect commands %u, "
++				"Synchronous Connection Complete %u",
++				data->setup_cmds, data->disc_cmds,
++				data->sync_complete);
++
++	if (ok)
++		tester_test_passed();
++	else
++		tester_test_failed();
++}
++
++static int sock_error(int sk)
++{
++	int err = 0;
++	socklen_t len = sizeof(err);
++
++	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &err, &len) < 0)
++		return errno;
++
++	return err;
++}
++
++static short sock_poll(int sk)
++{
++	struct pollfd pfd = { .fd = sk, .events = POLLOUT };
++
++	if (poll(&pfd, 1, 0) < 0)
++		return -1;
++
++	return pfd.revents;
++}
++
++static bool sock_connected(int sk, const char *name)
++{
++	short revents = sock_poll(sk);
++	int err = sock_error(sk);
++
++	if (!err && revents > 0 && (revents & POLLOUT) &&
++				!(revents & (POLLERR | POLLHUP)))
++		return true;
++
++	tester_warn("The %s socket is not connected: %s (%d), poll 0x%04x",
++					name, strerror(err), err, revents);
++	return false;
++}
++
++static bool io_connected(GIOCondition cond, int sk, const char *name)
++{
++	if ((cond & G_IO_OUT) && !(cond & (G_IO_ERR | G_IO_HUP)))
++		return sock_connected(sk, name);
++
++	tester_warn("The %s socket failed: condition 0x%x, %s", name, cond,
++						strerror(sock_error(sk)));
++	return false;
++}
++
++static void reconnect_arm(struct test_data *data, guint ms, GSourceFunc func)
++{
++	if (data->timer_id)
++		g_source_remove(data->timer_id);
++
++	data->timer_id = g_timeout_add(ms, func, NULL);
++}
++
++static gboolean reconnect_deadline(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->timer_id = 0;
++
++	tester_warn("Timed out waiting for the next link event");
++	reconnect_end(data, false);
++
++	return FALSE;
++}
++
++static bool hook_reconnect_sync(const void *buf, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct bt_hci_evt_sync_conn_complete *evt = buf;
++
++	if (len < sizeof(*evt) || data->done)
++		return true;
++
++	if (evt->status) {
++		tester_print("Synchronous Connection Complete failed: "
++					"status 0x%02x", evt->status);
++		return true;
++	}
++
++	data->sync_complete++;
++	if (data->sync_complete == 1)
++		data->handle = le16_to_cpu(evt->handle);
++
++	tester_print("Synchronous Connection Complete #%u: handle %u, "
++			"status 0x%02x", data->sync_complete,
++			le16_to_cpu(evt->handle), evt->status);
++
++	return true;
++}
++
++static bool hook_reconnect_acl(const void *buf, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct bt_hci_evt_conn_complete *evt = buf;
++
++	if (len >= sizeof(*evt) && !evt->status)
++		data->acl_handle = le16_to_cpu(evt->handle);
++
++	return true;
++}
++
++static void hook_reconnect_cmd(uint16_t opcode, const void *buf, uint8_t len,
++							void *user_data)
++{
++	struct test_data *data = user_data;
++	const struct sco_client_data *scodata = data->test_data;
++	const struct bt_hci_cmd_disconnect *cmd = buf;
++
++	if (opcode == BT_HCI_CMD_SETUP_SYNC_CONN ||
++			opcode == BT_HCI_CMD_ENHANCED_SETUP_SYNC_CONN) {
++		data->setup_cmds++;
++		tester_print("Setup Synchronous Connection #%u",
++							data->setup_cmds);
++	}
++
++	if (opcode != BT_HCI_CMD_DISCONNECT || len < sizeof(*cmd) ||
++			data->sync_complete < 1 ||
++			le16_to_cpu(cmd->handle) != data->handle)
++		return;
++
++	data->disc_cmds++;
++	tester_print("Disconnect for the first link, handle %u",
++							data->handle);
++
++	if (scodata->reconnect == CONNECT_TWICE && !data->closing) {
++		tester_warn("The first link is disconnected while its socket "
++				"is open");
++		reconnect_end(data, false);
++	}
++}
++
++static gboolean reconnect_connect2(gpointer user_data);
++
++static bool hook_reconnect_disc(const void *buf, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
++	const struct bt_hci_evt_disconnect_complete *evt = buf;
++
++	if (len < sizeof(*evt) || data->done)
++		return true;
++
++	tester_print("Disconnection Complete: handle %u, reason 0x%02x",
++				le16_to_cpu(evt->handle), evt->reason);
++
++	if (le16_to_cpu(evt->handle) == data->acl_handle) {
++		/* The ACL link, once nothing needs it, after the SCO link */
++		if (scodata->reconnect == CONNECT_TWICE && data->closing)
++			reconnect_end(data, data->disc_cmds == 1 &&
++						data->sco_gone && !evt->status);
++		return true;
++	}
++
++	if (le16_to_cpu(evt->handle) != data->handle)
++		return true;
++
++	if (scodata->reconnect == CONNECT_TWICE && data->closing)
++		data->sco_gone = !evt->status;
++
++	if (data->disc_released)
++		return true;
++
++	if (scodata->reconnect == RECONNECT_DURING) {
++		/*
++		 * The emulator has torn the link down; only the event to
++		 * the host is held back.
++		 */
++		data->held_evt = *evt;
++		data->disc_held = true;
++		reconnect_arm(data, 0, reconnect_connect2);
++		tester_print("Holding back the Disconnection Complete");
++		return false;
++	}
++
++	if (scodata->reconnect == RECONNECT_AFTER) {
++		data->disc_released = true;
++		reconnect_arm(data, RECONNECT_DELAY_MS, reconnect_connect2);
++	}
++
++	return true;
++}
++
++static void reconnect_release(struct test_data *data)
++{
++	struct btdev *btdev = vhci_get_btdev(hciemu_get_vhci(data->hciemu));
++
++	data->disc_released = true;
++
++	tester_print("Delivering the held Disconnection Complete");
++	if (btdev_send_event(btdev, BT_HCI_EVT_DISCONNECT_COMPLETE,
++				&data->held_evt, sizeof(data->held_evt))) {
++		tester_warn("Failed to deliver the Disconnection Complete");
++		reconnect_end(data, false);
++	}
++}
++
++static gboolean reconnect_quiet(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
++
++	data->timer_id = 0;
++
++	if (scodata->reconnect == CONNECT_TWICE) {
++		if (!sock_connected(data->sk, "first") || data->disc_cmds) {
++			reconnect_end(data, false);
++			return FALSE;
++		}
++
++		/*
++		 * Both sockets closed: the SCO link and then the ACL link
++		 * shall go.
++		 */
++		tester_print("First link still up, closing both sockets");
++		data->closing = true;
++		close(data->sk2);
++		data->sk2 = -1;
++		close(data->sk);
++		data->sk = -1;
++		reconnect_arm(data, RECONNECT_ACL_MS, reconnect_deadline);
++		return FALSE;
++	}
++
++	/* The connect was refused: no link of its own */
++	if (data->setup_cmds != 1 || data->sync_complete != 1 ||
++						data->disc_cmds != 1) {
++		tester_warn("Unexpected commands after the refused connect");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	reconnect_end(data, true);
++	return FALSE;
++}
++
++static gboolean reconnect_stable(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->timer_id = 0;
++
++	reconnect_end(data, sock_connected(data->sk2, "second") &&
++						data->disc_cmds == 1);
++	return FALSE;
++}
++
++static gboolean reconnect_linked(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->io2_id = 0;
++
++	if (!io_connected(cond, data->sk2, "second")) {
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	/*
++	 * The first link is gone, so the controller reuses its handle: the
++	 * second link is told apart by its own setup and its own completion,
++	 * after the Disconnection Complete of the first.
++	 */
++	if (data->setup_cmds != 2 || data->sync_complete != 2 ||
++						data->disc_cmds != 1) {
++		tester_warn("Second socket connected without a link of its "
++				"own");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	if (!data->disc_released) {
++		tester_warn("Second link before the first one is gone");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	/* The second link shall stay up */
++	reconnect_arm(data, RECONNECT_QUIET_MS, reconnect_stable);
++	return FALSE;
++}
++
++static gboolean reconnect_connect2(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
++	const uint8_t *client_bdaddr;
++	struct sockaddr_sco addr;
++	GIOChannel *io;
++	int ret, err;
++
++	data->timer_id = 0;
++
++	if (data->done)
++		return FALSE;
++
++	if (data->sync_complete != 1 || data->setup_cmds != 1) {
++		tester_warn("The first link was not set up as expected");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	if (scodata->reconnect == RECONNECT_DURING &&
++			(!data->disc_held || data->disc_cmds != 1)) {
++		tester_warn("The Disconnection Complete was not held");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
++	data->sk2 = create_sco_sock(data);
++	if (!client_bdaddr || data->sk2 < 0) {
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sco_family = AF_BLUETOOTH;
++	bacpy(&addr.sco_bdaddr, (void *) client_bdaddr);
++
++	ret = connect(data->sk2, (struct sockaddr *) &addr, sizeof(addr));
++	err = ret < 0 ? errno : 0;
++
++	tester_print("Second connect() returned %d (%s)", ret, strerror(err));
++
++	if (scodata->reconnect == CONNECT_TWICE) {
++		if (ret >= 0 || err != EBUSY) {
++			tester_warn("Expected EBUSY from the second connect()");
++			reconnect_end(data, false);
++			return FALSE;
++		}
++
++		reconnect_arm(data, RECONNECT_QUIET_MS, reconnect_quiet);
++		return FALSE;
++	}
++
++	if (scodata->reconnect == RECONNECT_DURING &&
++				(err == ECONNABORTED || err == EBUSY)) {
++		/* Refused: the caller can connect again later */
++		reconnect_release(data);
++		reconnect_arm(data, RECONNECT_QUIET_MS, reconnect_quiet);
++		return FALSE;
++	}
++
++	if (ret >= 0) {
++		tester_warn("Connected at once, without a link of its own");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	if (err != EINPROGRESS) {
++		tester_warn("Unexpected connect() error: %s", strerror(err));
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	/* Connecting: the new link shall come, after the first one is gone */
++	io = g_io_channel_unix_new(data->sk2);
++	g_io_channel_set_close_on_unref(io, FALSE);
++	data->io2_id = g_io_add_watch(io, G_IO_OUT | G_IO_ERR | G_IO_HUP,
++						reconnect_linked, NULL);
++	g_io_channel_unref(io);
++
++	reconnect_arm(data, RECONNECT_LINK_MS, reconnect_deadline);
++
++	if (scodata->reconnect == RECONNECT_DURING)
++		reconnect_release(data);
++
++	return FALSE;
++}
++
++static gboolean reconnect_first_connected(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct sco_client_data *scodata = data->test_data;
++
++	data->io_id = 0;
++
++	if (!io_connected(cond, data->sk, "first")) {
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	if (data->sync_complete != 1 || data->setup_cmds != 1) {
++		tester_warn("The first link was not set up as expected");
++		reconnect_end(data, false);
++		return FALSE;
++	}
++
++	if (scodata->reconnect == CONNECT_TWICE) {
++		tester_print("First socket connected");
++		reconnect_connect2(NULL);
++		return FALSE;
++	}
++
++	tester_print("First socket connected, closing it");
++	close(data->sk);
++	data->sk = -1;
++
++	/* The Disconnection Complete is the next step */
++	reconnect_arm(data, RECONNECT_LINK_MS, reconnect_deadline);
++
++	return FALSE;
++}
++
++static void test_reconnect(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	GIOChannel *io;
++	int sk;
++
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_CONN_COMPLETE,
++					hook_reconnect_acl, NULL);
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_SYNC_CONN_COMPLETE,
++					hook_reconnect_sync, NULL);
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_DISCONNECT_COMPLETE,
++					hook_reconnect_disc, NULL);
++	hciemu_add_central_post_command_hook(data->hciemu,
++					hook_reconnect_cmd, data);
++
++	sk = create_sco_sock(data);
++	if (sk < 0) {
++		tester_test_failed();
++		return;
++	}
++
++	if (connect_sco_sock(data, sk) < 0) {
++		close(sk);
++		tester_test_failed();
++		return;
++	}
++
++	data->sk = sk;
++
++	io = g_io_channel_unix_new(sk);
++	g_io_channel_set_close_on_unref(io, FALSE);
++
++	data->io_id = g_io_add_watch(io, G_IO_OUT | G_IO_ERR | G_IO_HUP,
++					reconnect_first_connected, NULL);
++
++	g_io_channel_unref(io);
++
++	tester_print("Connect in progress");
++}
++
+ static void test_sco_ethtool_get_ts_info(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1526,6 +2079,18 @@ int main(int argc, char *argv[])
+ 					&connect_failure_reset, setup_powered,
+ 					test_connect_acl_disc);
+ 
++	test_sco_full("eSCO CVSD - Reconnect After Disconnect",
++					&reconnect_after, setup_powered,
++					test_reconnect, false, false, false, 5);
++
++	test_sco_full("eSCO CVSD - Reconnect During Disconnect",
++					&reconnect_during, setup_powered,
++					test_reconnect, false, false, false, 5);
++
++	test_sco_full("eSCO CVSD - Connect Twice",
++					&connect_twice, setup_powered,
++					test_reconnect, false, false, false, 8);
++
+ 	test_sco_11("SCO CVSD 1.1 - Success", &connect_success, setup_powered,
+ 							test_connect);
  
 -- 
 2.43.0
