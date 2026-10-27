@@ -1,77 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793079886;
-	b=h120SViAqAmUmkXJ+3HgOW40vOD8EwPCwRBlNpYsiyuiQu5cX/Hlwr1VypSHttSraoR9
-	 1p+C5AgrNh4Xx5snwltwtNY4J3rDAsFrzjjyNlAZ0+m+ryKDfcfaW1A3FPLQeMh0qZqap
-	 l1E6FfC56GvgZ5lHQ0ook7mUovZ65om/PBaEhc/ceqj093ebUf2SJOzKhsYAKWZMPR3WU
-	 x5QRTMCH9LpE0zFpGAFOfS1D7fbNS443e9zt8jDkX7yr3tRcvRyKYCfdHjW7qRKy+cTma
-	 ILffoqaIAVTxRO4DvjqLHWcPOKk7esq5by6v4gqWuYvK56yFc6kEoEKKzKscKus615A==
+	t=1793085075;
+	b=IR6R9Ql+m3gCMbnB4mCIoU4FTCa8IkVh9vIt7/WprjYiC5T/1XyK9MdFenlCIESwZQkF
+	 7VfG4HP/OZGWaTqNAdgkrLrIGAQVVs9mKKemhC5dNT2WEMZLHrJdqFtSeIQRsxHN7EV17
+	 1gRRfRoXb/hWNDo4wRmbkwYH1qTnHvLmS3PvPNb4Qxlp9d/YIOZxBvQXhK+PknX0QTV6H
+	 e/n91QXT1usCvs6OihK6fVGj63tRbCMcTRdO3VBjhuvR7w111qAcUuoOouzlRM3Q/ZDd5
+	 5c6qj8q8orGn7UX/Uj7mBF8CeowNQwiCreN+Wlg0IqKqtv65qeorr8Fg1XpQbxModig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793079886;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=iSFtXlHX7cugvz3dKK9Xj+sOfYhuwKeWNXNW1lzK3s8=;
-	b=K3uTvPfqmlaEEFBlg8VYZUmWTb1kk4TkyZqDUb6UyWECWHVW+ueicWt//kG4PIwXHmHP
-	 3QYNFsLomYui6A/vFDH8TbpEXgG07FtETjHuQ2lpP0fkXdbEsFOcOgStuYQX6wFDzK03H
-	 fpa+pE1eLnrOwAL/ZydigzhE+AKJVVgstNFyzee3PgQvhj+B8u50xx+ZS3mg1wA+Jw9Il
-	 4QNc2l91sTQobDpEYAWMj7EdpDPy8LRHgx6EprQ+JylL91dymswMOBKfI3wPL8Bnxu9iI
-	 gDuuDkd/H0MNvGNJBb9SoICTAK1n5zndLMU885e2B3YLf3cAZkEFzmk5MqiztAvpuEg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793085075;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-Proofpoint-Reinject:X-QCInternal:
+	 X-QCInternal:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=WSCHjsifJRpNZK1rYg2aybqA5LzG+thsVnEQPkiOZXM=;
+	b=lQGKHftZeU9khN3g6DXEeeLDo6AsAKE8FgQrG1AOKzzBqhhYiAM4rOe+xaM5JbHIssDH
+	 ggVZ/p23YG/xeUaE93BQabH/O4e7wZvop+G1wKUR9KQAhOZZ580pXRaw5MAcKYscLpsdN
+	 r2caDhSC4x86vqhyT2/RhUmYaBrmUoxxPN6QZBA+B9ZzkwQPjdC+8xF95DkygC0Vmqw1i
+	 zQSkAv3T+aK8pQYpj9fNrp9SBwRywquz9Dk7aGmbM9wJWVDQsGkKRaw46ODuTXRUBP9Rq
+	 nxMJx4FeTEok98B/LTOhS16RyZAS9SmbZBS9vR+sGcN4viRqfPQ6SERT6SAxntpEDvw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=nnTNVM+D;
-	arc=none smtp.remote-ip=192.198.163.12
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Cc1Y6RNb;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2098606A320
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 05:44:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2098606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C317606A31B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 07:11:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3C317606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=nnTNVM+D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793079886; x=1824615886;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kF5TkFlY4wylls8urDvcDqNlsXGIcThq7UUcA/ThAaE=;
-  b=nnTNVM+Dm+lyDk7uWX1jdFLlXlAWub6ugnhaEZR+/gExA0gFvasbXOGC
-   nfLUaxVsWCXSLuD6HyEPCoynW6z1TPOSQQ8QeMhzmBrQZzLm2xuam+DSZ
-   wGAgZO3y+k/4gFHaroadlE7dWubQqg7n77ksXg41Kv+P3Nj+Gw7ECyYOS
-   7UHXFmLyG36CQ/xqLYlZJz4VmIN5lfbmCBYcoCMdfaApIJKGr9ySG8buj
-   Hf76SVfCs/e3wBzbplnF1SMfx5munXOiAmMBbq+IAxRpPVmgQsRvSt9tR
-   CJGd9lwBLE268xLYl3q8DIl5VRp7dQJTazP3VR83+th988QGBzkxYo30+
-   w==;
-X-CSE-ConnectionGUID: 0GSo/FCHSaWhJHsFm+MW6g==
-X-CSE-MsgGUID: zlHXwMbbTzmDxnc9E/V9dQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11947"; a="1672604"
-X-IronPort-AV: E=Sophos;i="6.27,180,1787036400"; 
-   d="scan'208";a="1672604"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2026 22:44:46 -0700
-X-CSE-ConnectionGUID: cBisBFfvSi6BgM35dYdNug==
-X-CSE-MsgGUID: +BM22D0lQaGsnRX6QWTP6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,180,1787036400"; 
-   d="scan'208";a="4495606"
-Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
-  by fmviesa004.fm.intel.com with ESMTP; 26 Oct 2026 22:44:44 -0700
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Cc1Y6RNb
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69R5YtN82349818
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 07:11:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=WSCHjsifJRpNZK1rYg2aybqA5LzG+thsVnE
+	QPkiOZXM=; b=Cc1Y6RNbZsIP4zpzzbSXkfB0CMyTg8VtmQ0BL7OJQwHua9gjhJB
+	BBDpFDq5s0YIYW28UnGbJPuQ2WQcsovNzmVO6VSe7bX4r8LMBPZ1DxWi6T0KWS9L
+	xDb46OKv1/mfR2X93nBk/LFYku4ig0X3fag1XJ3G9itKNhf8pVYSOWkqcvE0XUg5
+	0w1crhGVItSifXDu3j6Peg8xJdK/5X3MTb30eoKNJcGJ9SN7ifnKmCY0wFP18cAq
+	YFYTRDSyY6+/QdQYuBeBoljH7QqjXuBNbBCjGdhhHVb9YWjbRT0xtE9NOCbw1ddb
+	9671sFvJ5+FPsP18tIKIoM80CxliERMdkEg==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hjh9197tj-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 07:11:14 +0000 (GMT)
+Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 69R7BCEE1202838;
+	Tue, 27 Oct 2026 07:11:12 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 69R7BCN31202826
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 27 Oct 2026 07:11:12 +0000 (GMT)
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
+	id 42340243AB; Tue, 27 Oct 2026 15:11:11 +0800 (CST)
+From: Jinwang Li <jinwang.li@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: [PATCH v3 2/2] Bluetooth: btintel_pcie: Add TOP silent reset support
-Date: Tue, 27 Oct 2026 11:14:08 +0530
-Message-ID: <20261027054408.318002-2-chandrashekar.devegowda@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261027054408.318002-1-chandrashekar.devegowda@intel.com>
-References: <20261027054408.318002-1-chandrashekar.devegowda@intel.com>
+Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
+        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
+        mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        xiuzhuo.shang@oss.qualcomm.com
+Subject: [PATCH v2 0/2] obexd/pbap: Fix NewMissedCalls reporting
+Date: Tue, 27 Oct 2026 15:10:44 +0800
+Message-Id: <20261027071046.2272116-1-jinwang.li@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -82,921 +82,59 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-ORIG-GUID: knx7yxqwchKmukeqpHN6EVGCaouakhcb
+X-Proofpoint-GUID: knx7yxqwchKmukeqpHN6EVGCaouakhcb
+X-Authority-Analysis: v=2.4 cv=TuxzFzXh c=1 sm=1 tr=0 ts=6ae04e92 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=Um2Pa8k9VHT-vaBCBUpS:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
+ a=l_hNLHxUIP7MVZf_x6sA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI3MDAyOCBTYWx0ZWRfX/zK+GgrO4NcJ
+ GxaRPcp6tKFgqaJ28xPYhSQWhzn7mbFTtV6qIZRHfgvys6rti77y56MoEKPXh/MjzKLZZUGpbJQ
+ z+LDssKwO7OmziBarexAJUIcm+F7fq9BNi8nQ9lHL+kMzwLxDnkt3F6JxVlG5Em7UMT7GRSMZTd
+ XSCmzuoOGidAqNq8vcKXicVa/wSOKue/kO/OOlgJi9+zDYePts7lD4G11AUxfqk3aHW59eopoA+
+ KbtmhqA/bBAH73Ct2p2KBoJ1+eUKNFj93IFAlE95owK3Tt9loNuisTldbrZxov+xsVsRXyYKaaI
+ GaAF/CR5HUxbU8GRHmk9LzCzLk4N8j+3IeXrOTSctrKCkwYJk9AHQJcBBztFsdQRX1rBW50LqE9
+ 1tO7pktq+CTHui2V5sBvCSFu3Q+SbJfrnB62QSkDUpXsoUvvV8qpFsdwr7L6jReg04FEXrdU8vK
+ mZy0DFQPMwpzTFEBecg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI3MDAyOCBTYWx0ZWRfX5SHtSIpWLJwx
+ q8Q3C5uKzjIqU1GLuKGzk1dKA7xfk13PQWoKdjRG49NSoBcy4R2QOnnuA02zIkypjrR+qAlMg/4
+ Gd5C6Pbq6gA8pgzqQExgXzwYfyfkJOA=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-27_02,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 malwarescore=0 spamscore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610270028
 
-Add TOP silent reset as a lighter alternative to PLDR for HW >= SCP2
-on subsystem PEP. After the FLR reprobe, send the Intel soft reset
-with the cached boot_addr, wait for the GP1 mailbox event and boot
-stage 0, then request a final FLR. Any failure falls back to PLDR.
+This series fixes NewMissedCalls reporting in obexd PBAP.
 
-A WiFi-initiated request makes BT follow with PLDR.
-
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
----
-Changes in v3:
-- Rebase onto current bluetooth-next; pass hdev explicitly into
-  btintel_pcie_do_top_reset().
-- Harden WiFi-coordinated reset/recovery handling (role switch
-  timeout, NACK/no-response, PLDR replay, race-safe reset-type
-  tracking).
-- Use a non-blocking PCI lock for ACPI reset; fix ROM fast-path
-  ordering in send_sync().
-- Use ktime_to_us() for the mailbox ack debug print (was ~2% low).
+The first patch fixes the apparam encoding: NewMissedCalls is a
+one-byte value but was encoded as uint16. The second patch makes the
+dummy backend report the actual missed-call count for the mch folder
+instead of always zero, which is required by PTS PBAP/PSE/PBD/BV-05-C.
 
 Changes in v2:
-- Replace generation/deadline tracking with a published timeout,
-  extended on a role switch event.
-- Fall back to PLDR on any mailbox/soft-reset failure; preserve and
-  replay a pending WiFi PLDR request across reprobe.
-- Synchronize IRQs instead of irq_lock when skipping the alive wait.
+- Fix checkpatch LONG_LINE warning.
+- Link to v1:
+https://lore.kernel.org/all/20261026131504.1016687-1-jinwang.li@oss.qualcomm.com/
 
-v2: https://lore.kernel.org/linux-bluetooth/20261023094033.212251-1-chandrashekar.devegowda@intel.com/
-v1: https://lore.kernel.org/linux-bluetooth/20261014114752.174669-1-chandrashekar.devegowda@intel.com/
+Jinwang Li (2):
+  obexd/pbap: Fix NewMissedCalls parameter size
+  obexd/pbap: Report NewMissedCalls for mch
 
- drivers/bluetooth/btintel_pcie.c | 522 ++++++++++++++++++++++++++++---
- drivers/bluetooth/btintel_pcie.h |  40 ++-
- 2 files changed, 512 insertions(+), 50 deletions(-)
+ obexd/plugins/irmc.c              |  4 ++--
+ obexd/plugins/pbap.c              |  8 ++++----
+ obexd/plugins/phonebook-dummy.c   | 23 ++++++++++++++++++++++-
+ obexd/plugins/phonebook-tracker.c |  2 +-
+ obexd/plugins/phonebook.h         |  2 +-
+ 5 files changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 4fbefaa3129a..dcff44bbd216 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -67,6 +67,7 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
- 
- struct btintel_pcie_dev_recovery {
- 	struct list_head list;
-+	unsigned long flags;
- 	u8 count;
- 	time64_t last_error;
- 	char name[];
-@@ -87,6 +88,9 @@ struct btintel_pcie_dev_recovery {
- 
- #define BTINTEL_PCIE_RESET_WINDOW_SECS		5
- #define BTINTEL_PCIE_FLR_MAX_RETRY	1
-+#define BTINTEL_PCIE_TOP_RESET_INTERVAL_MS	250
-+#define BTINTEL_PCIE_TOP_RESET_ROLE_SWITCH_MS	5000
-+#define BTINTEL_PCIE_TOP_RESET_FALLBACK_MS	250
- 
- /* Alive interrupt context */
- enum {
-@@ -690,6 +694,15 @@ static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- 	hci_recv_diag(hdev, skb);
- }
- 
-+static inline bool btintel_pcie_in_rom(struct btintel_pcie_data *data);
-+static void btintel_pcie_reset_ia(struct btintel_pcie_data *data);
-+static int btintel_pcie_start_rx(struct btintel_pcie_data *data);
-+static void btintel_pcie_synchronize_irqs(struct btintel_pcie_data *data);
-+static struct btintel_pcie_dev_recovery *
-+btintel_pcie_get_recovery(struct pci_dev *pdev, struct device *dev);
-+static bool btintel_pcie_request_reset(struct btintel_pcie_data *data,
-+				       enum btintel_pcie_reset_type type);
-+
- static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
- 				  struct sk_buff *skb, u32 pkt_type, u16 opcode)
- {
-@@ -697,6 +710,7 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
- 	u16 tfd_index;
- 	u32 old_ctxt;
- 	bool wait_on_alive = false;
-+	bool top_rom = false;
- 	struct hci_dev *hdev = data->hdev;
- 
- 	struct txq *txq = &data->txq;
-@@ -718,7 +732,20 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
- 	wait_on_alive = (pkt_type == BTINTEL_PCIE_HCI_CMD_PKT &&
- 		(opcode == BTINTEL_HCI_OP_RESET || opcode == HCI_OP_RESET));
- 
--	if (wait_on_alive) {
-+	/* After TOP reset the controller is in ROM; no alive interrupt follows */
-+	if (wait_on_alive && test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags)) {
-+		u32 stage = btintel_pcie_rd_reg32(data,
-+						  BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
-+
-+		top_rom = (stage & BTINTEL_PCIE_CSR_BOOT_STAGE_ROM) &&
-+			  !(stage & (BTINTEL_PCIE_CSR_BOOT_STAGE_IML |
-+				     BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW));
-+	}
-+
-+	if (top_rom) {
-+		/* Set before the doorbell so GP0 never sees a transient context */
-+		data->alive_intr_ctxt = BTINTEL_PCIE_FW_DL;
-+	} else if (wait_on_alive) {
- 		data->gp0_received = false;
- 		old_ctxt = data->alive_intr_ctxt;
- 		data->alive_intr_ctxt =
-@@ -756,6 +783,14 @@ static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
- 		return -ETIME;
- 	}
- 
-+	if (top_rom) {
-+		/* Let the TX completion handler finish updating the IA */
-+		btintel_pcie_synchronize_irqs(data);
-+		btintel_pcie_reset_ia(data);
-+		btintel_pcie_start_rx(data);
-+		return 0;
-+	}
-+
- 	if (wait_on_alive) {
- 		ret = wait_event_timeout(data->gp0_wait_q,
- 					 data->gp0_received,
-@@ -1665,6 +1700,13 @@ static inline bool btintel_pcie_in_iml(struct btintel_pcie_data *data)
- 		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW);
- }
- 
-+static inline bool btintel_pcie_in_rom(struct btintel_pcie_data *data)
-+{
-+	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_ROM &&
-+		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_IML) &&
-+		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW);
-+}
-+
- static inline bool btintel_pcie_in_d3(struct btintel_pcie_data *data)
- {
- 	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY;
-@@ -2049,25 +2091,46 @@ static int btintel_parse_mbox_tlv(struct btintel_pcie_data *data)
- 
- static void btintel_pcie_msix_gp1_handler(struct btintel_pcie_data *data)
- {
-+	ktime_t calltime, delta, rettime;
-+	unsigned long long duration;
-+	bool top_reset_mbox = false;
- 	bool target_access = false;
-+	bool mbox2_status;
- 	u32 addr = 0, size = 0;
- 
-+	calltime = ktime_get();
-+
- 	/* Read the Mail box status and registers */
- 	data->mbox.mbox_status = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_STATUS_REG);
-+	mbox2_status = data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX2;
- 	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX1) {
--		data->mbox.mbox1 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_1_REG);
--		if (data->mbox.mbox1 ==
--		    BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING) {
--			bt_dev_info(data->hdev,
--				    "mailbox for target access");
-+		data->mbox.mbox1 = btintel_pcie_rd_reg32(data,
-+							 BTINTEL_PCIE_CSR_MBOX_1_REG);
-+		if (data->mbox.mbox1 == BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING) {
-+			bt_dev_info(data->hdev, "mailbox for target access");
-+			clear_bit(BTINTEL_PCIE_TOP_RESET_MBOX1_PENDING,
-+				  &data->flags);
- 			target_access = true;
-+		} else if (data->mbox.mbox1 == BTINTEL_PCIE_TOP_SILENT_RESET) {
-+			if (mbox2_status)
-+				top_reset_mbox = true;
-+			else
-+				set_bit(BTINTEL_PCIE_TOP_RESET_MBOX1_PENDING,
-+					&data->flags);
-+		} else {
-+			clear_bit(BTINTEL_PCIE_TOP_RESET_MBOX1_PENDING,
-+				  &data->flags);
- 		}
- 	}
- 
--	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX2) {
--		data->mbox.mbox2 = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_MBOX_2_REG);
-+	if (mbox2_status) {
-+		data->mbox.mbox2 = btintel_pcie_rd_reg32(data,
-+							 BTINTEL_PCIE_CSR_MBOX_2_REG);
- 		if (target_access)
- 			addr = data->mbox.mbox2;
-+		if (test_and_clear_bit(BTINTEL_PCIE_TOP_RESET_MBOX1_PENDING,
-+				       &data->flags))
-+			top_reset_mbox = true;
- 	}
- 
- 	if (data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX3) {
-@@ -2106,10 +2169,106 @@ static void btintel_pcie_msix_gp1_handler(struct btintel_pcie_data *data)
- 		}
- 	}
- 
-+	/* Handle SCU state change inline, just log it */
-+	if ((data->mbox.mbox_status & BTINTEL_PCIE_CSR_MBOX_STATUS_MBOX1) &&
-+	    data->mbox.mbox1 == BTINTEL_PCIE_CNVI_SCU_REG_MAIN_FSM_STICKY &&
-+	    mbox2_status) {
-+		if (data->mbox.mbox2 == BTINTEL_PCIE_SCU_CORE_IDLE_SET)
-+			bt_dev_dbg(data->hdev, "TOP reset SCU CORE IDLE set");
-+		if (data->mbox.mbox2 == BTINTEL_PCIE_SCU_CORE_IDLE_RESET)
-+			bt_dev_dbg(data->hdev, "TOP reset SCU CORE IDLE reset");
-+	}
-+
-+	/* Handle TOP silent reset mbox notification inline */
-+	if (top_reset_mbox) {
-+		struct btintel_pcie_dev_recovery *rec;
-+		u32 expires = BTINTEL_PCIE_TOP_RESET_INTERVAL_MS;
-+		struct hci_dev *hdev = READ_ONCE(data->hdev);
-+		u32 reg;
-+
-+		if (!hdev)
-+			goto skip_top_reset;
-+
-+		rec = btintel_pcie_get_recovery(data->pdev, &hdev->dev);
-+		if (!rec) {
-+			bt_dev_err(hdev,
-+				   "TOP reset: failed to get recovery data");
-+			goto skip_top_reset;
-+		}
-+
-+		switch (data->mbox.mbox2) {
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_REQUEST:
-+			bt_dev_info(hdev,
-+				    "TOP reset request from WiFi, triggering PLDR");
-+			if (!test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags)) {
-+				bt_dev_info(hdev,
-+					    "BT is follower, triggering PLDR");
-+				set_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
-+					&rec->flags);
-+				smp_mb__after_atomic(); /* Order against SETUP_DONE test */
-+				if (btintel_pcie_request_reset(data,
-+							       BTINTEL_PCIE_IOSF_PRR_PLDR)) {
-+					clear_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
-+						  &rec->flags);
-+					set_bit(BTINTEL_PCIE_CORE_HALTED,
-+						&data->flags);
-+				}
-+				goto skip_top_reset;
-+			}
-+			break;
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_ACK:
-+			bt_dev_info(hdev, "TOP reset ack from WiFi");
-+			break;
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_NACK:
-+			bt_dev_info(hdev, "TOP reset NACK from WiFi");
-+			set_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED, &rec->flags);
-+			break;
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_REQ_ROLE_SWITCH:
-+			bt_dev_info(hdev,
-+				    "TOP reset WIFI_REQ_ROLE_SWITCH");
-+			expires = BTINTEL_PCIE_TOP_RESET_ROLE_SWITCH_MS;
-+			reg = btintel_pcie_rd_reg32(data,
-+						    BTINTEL_PCIE_CSR_RESET_DEBUG_AD);
-+			if (reg == BTINTEL_PCIE_TOP_RESET_DBG_RESET_REG)
-+				bt_dev_dbg(hdev,
-+					   "TOP reset initiated by WiFi");
-+			break;
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_NO_RESPONSE:
-+			bt_dev_err(hdev, "TOP reset WIFI_NO_RESPONSE");
-+			set_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED, &rec->flags);
-+			break;
-+		case BTINTEL_PCIE_TOP_RESET_WIFI_RESPONSE_INVALID:
-+			bt_dev_err(hdev,
-+				   "TOP reset WIFI_RESPONSE_INVALID");
-+			set_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED, &rec->flags);
-+			break;
-+		default:
-+			bt_dev_err(hdev,
-+				   "TOP reset with undefined MBOX2 0x%8.8x",
-+				   data->mbox.mbox2);
-+			break;
-+		}
-+
-+		/* A later event must not shorten an earlier role switch timeout */
-+		expires = max(expires, READ_ONCE(data->top_reset_expires));
-+		WRITE_ONCE(data->top_reset_expires, expires);
-+		smp_mb__before_atomic(); /* Publish expires before the flag */
-+		set_bit(BTINTEL_PCIE_MBOX_TOP_RESET, &rec->flags);
-+		bt_dev_info(hdev,
-+			    "TOP reset timer expires in %u ms", expires);
-+		wake_up(&data->gp0_wait_q);
-+	}
-+
-+skip_top_reset:
- 	/* Mailbox is read, ack to FW */
- 	btintel_pcie_set_reg_bits(data,
- 				  BTINTEL_PCIE_CSR_IPC_DOORBELL_VEC_REG,
- 				  BTINTEL_PCIE_CSR_DOORBELL_MBOX_READ_CONFIRM);
-+
-+	rettime = ktime_get();
-+	delta = ktime_sub(rettime, calltime);
-+	duration = ktime_to_us(delta);
-+	bt_dev_dbg(data->hdev, "Mailbox acked in %llu usecs", duration);
- }
- 
- /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
-@@ -2164,9 +2323,9 @@ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
- 		signal_waitq = true;
- 		break;
- 	case BTINTEL_PCIE_FW_DL:
--		/* Error case is already handled. Ideally control shall not
--		 * reach here
--		 */
-+		/* Wake the TOP reset boot-stage wait */
-+		if (test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags))
-+			signal_waitq = true;
- 		break;
- 	case BTINTEL_PCIE_INTEL_HCI_RESET1:
- 		if (btintel_pcie_in_op(data)) {
-@@ -3153,6 +3312,7 @@ static struct btintel_pcie_causes_list causes_list[] = {
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x00 },
- 	{ BTINTEL_PCIE_MSIX_FH_INT_CAUSES_1,	BTINTEL_PCIE_CSR_MSIX_FH_INT_MASK,	0x01 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x20 },
-+	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP1,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x21 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP2,	BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x22 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_HWEXP, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x23 },
- 	{ BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,	0x25 },
-@@ -3581,7 +3741,8 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
- 	if (test_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags))
- 		return -ENODEV;
- 
--	if (test_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags))
-+	if (test_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags) ||
-+	    test_bit(BTINTEL_PCIE_PLDR_RETRY, &data->flags))
- 		return -ENODEV;
- 
- 	/* Account for the 4-byte PCIe type header prepended before the
-@@ -3896,12 +4057,127 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev)
- 	return err;
- }
- 
-+static bool btintel_pcie_top_reset_done(struct btintel_pcie_data *data,
-+					struct btintel_pcie_dev_recovery *rec)
-+{
-+	return !btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_BOOT_STAGE_REG) ||
-+	       test_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED, &rec->flags);
-+}
-+
-+static int btintel_pcie_do_top_reset(struct btintel_pcie_data *data,
-+				     struct hci_dev *hdev)
-+{
-+	struct btintel_data *intel_data = hci_get_priv(hdev);
-+	enum btintel_pcie_reset_type reset_type;
-+	struct btintel_pcie_dev_recovery *rec;
-+	u32 expires, latest;
-+	long ret;
-+	bool failed;
-+	u32 reg;
-+	int err;
-+
-+	rec = btintel_pcie_get_recovery(data->pdev, &hdev->dev);
-+	if (!rec)
-+		return -ENOMEM;
-+
-+	/* Set scratch register to indicate TOP silent reset to FW */
-+	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_FUNC_SCRATCH_CSR,
-+				  BTINTEL_PCIE_CSR_FUNC_SCRATCH_TOP_SILENT_RESET);
-+
-+	/* Clear mbox flag before sending reset to avoid race with ISR */
-+	clear_bit(BTINTEL_PCIE_MBOX_TOP_RESET, &rec->flags);
-+	clear_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED, &rec->flags);
-+
-+	if (!intel_data->boot_addr) {
-+		bt_dev_err(hdev, "TOP reset: no boot address; doing PLDR");
-+		reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+		goto done;
-+	}
-+
-+	err = btintel_send_intel_reset(hdev, intel_data->boot_addr);
-+	if (err) {
-+		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
-+		reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+		goto done;
-+	}
-+
-+	/* First wait: wait for initial mbox event from FW */
-+	ret = wait_event_timeout(data->gp0_wait_q,
-+				 test_bit(BTINTEL_PCIE_MBOX_TOP_RESET, &rec->flags),
-+				 msecs_to_jiffies(BTINTEL_PCIE_TOP_RESET_FALLBACK_MS));
-+
-+	if (!ret) {
-+		bt_dev_warn(hdev,
-+			    "TOP reset: no mbox received within %u ms; doing PLDR",
-+			    BTINTEL_PCIE_TOP_RESET_FALLBACK_MS);
-+		reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+		goto done;
-+	}
-+
-+	/* Second wait: mbox received, wait for boot_stage == 0 using the
-+	 * timeout determined by the GP1 handler based on mbox2.
-+	 */
-+	smp_rmb(); /* Pairs with smp_mb__before_atomic() in the GP1 handler */
-+	expires = READ_ONCE(data->top_reset_expires);
-+	ret = wait_event_timeout(data->gp0_wait_q,
-+				 btintel_pcie_top_reset_done(data, rec),
-+				 msecs_to_jiffies(expires));
-+	latest = READ_ONCE(data->top_reset_expires);
-+	if (!ret && latest > expires)
-+		ret = wait_event_timeout(data->gp0_wait_q,
-+					 btintel_pcie_top_reset_done(data, rec),
-+					 msecs_to_jiffies(latest - expires));
-+
-+	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
-+	bt_dev_info(hdev, "After side band reset boot-stage: 0x%8.8x", reg);
-+
-+	failed = test_and_clear_bit(BTINTEL_PCIE_MBOX_TOP_RESET_FAILED,
-+				    &rec->flags);
-+	if ((!ret && reg != 0) || failed) {
-+		bt_dev_warn(hdev,
-+			    "TOP reset failed (boot_stage:0x%08x), triggering PLDR",
-+			    reg);
-+		reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+	} else {
-+		reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
-+	}
-+
-+done:
-+	clear_bit(BTINTEL_PCIE_MBOX_TOP_RESET, &rec->flags);
-+	btintel_clear_flag(hdev, INTEL_TOP_RESET);
-+	btintel_pcie_clr_reg_bits(data, BTINTEL_PCIE_CSR_FUNC_SCRATCH_CSR,
-+				  BTINTEL_PCIE_CSR_FUNC_SCRATCH_TOP_SILENT_RESET);
-+
-+	/* TOP_RESET lets request_reset() proceed without SETUP_DONE */
-+	if (!btintel_pcie_request_reset(data, reset_type))
-+		return -EIO;
-+
-+	/* Fail the open; reset_work reprobes the device */
-+	return -ECANCELED;
-+}
-+
- static int btintel_pcie_setup(struct hci_dev *hdev)
- {
--	int err, fw_dl_retry = 0;
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+	struct btintel_pcie_dev_recovery *rec;
-+	int err, fw_dl_retry = 0;
-+
-+	/* Restore TOP reset intent saved across device_reprobe() */
-+	rec = btintel_pcie_get_recovery(data->pdev, &hdev->dev);
-+	if (rec && test_and_clear_bit(BTINTEL_PCIE_REC_TOP_RESET_PENDING,
-+				      &rec->flags)) {
-+		set_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+		btintel_set_flag(hdev, INTEL_TOP_RESET);
-+	}
- 
- 	while ((err = btintel_pcie_setup_internal(hdev)) && fw_dl_retry++ < 1) {
-+		if (err == -ENODEV)
-+			break;
-+
-+		if ((err == -ECANCELED || err == -EALREADY) &&
-+		    test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags))
-+			break;
-+
- 		bt_dev_err(hdev, "Firmware download retry count: %d",
- 			   fw_dl_retry);
- 		btintel_pcie_dump_debug_registers(hdev);
-@@ -3924,11 +4200,38 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 		btintel_pcie_start_rx(data);
- 	}
- 
-+	if (err == -ECANCELED && test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags))
-+		return btintel_pcie_do_top_reset(data, hdev);
-+
-+	if (err && test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags)) {
-+		bt_dev_err(hdev, "TOP silent reset setup failed (%d), doing PLDR",
-+			   err);
-+		if (btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_PLDR))
-+			return -ECANCELED;
-+
-+		clear_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+		btintel_clear_flag(hdev, INTEL_TOP_RESET);
-+	}
-+
- 	if (!err) {
-+		clear_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+		btintel_clear_flag(hdev, INTEL_TOP_RESET);
- 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
- 		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
- 		btintel_pcie_unmask_hw_rfkill(data);
- 		btintel_delayed_hw_rfkill(data, true);
-+
-+		if (rec && test_and_clear_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
-+					      &rec->flags)) {
-+			if (btintel_pcie_request_reset(data,
-+						       BTINTEL_PCIE_IOSF_PRR_PLDR)) {
-+				set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
-+				return -ECANCELED;
-+			}
-+
-+			set_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
-+				&rec->flags);
-+		}
- 	}
- 	return err;
- }
-@@ -3940,15 +4243,17 @@ btintel_pcie_get_recovery(struct pci_dev *pdev, struct device *dev)
- 	const char *name = pci_name(pdev);
- 	const size_t name_len = strlen(name) + 1;
- 	struct hci_dev *hdev = to_hci_dev(dev);
-+	unsigned long flags;
- 
--	spin_lock(&btintel_pcie_recovery_lock);
-+	/* Also called from the GP1 irq thread */
-+	spin_lock_irqsave(&btintel_pcie_recovery_lock, flags);
- 	list_for_each_entry(tmp, &btintel_pcie_recovery_list, list) {
- 		if (strcmp(tmp->name, name))
- 			continue;
- 		data = tmp;
- 		break;
- 	}
--	spin_unlock(&btintel_pcie_recovery_lock);
-+	spin_unlock_irqrestore(&btintel_pcie_recovery_lock, flags);
- 
- 	if (data) {
- 		bt_dev_dbg(hdev, "Found restart data for BDF: %s", data->name);
-@@ -3960,9 +4265,17 @@ btintel_pcie_get_recovery(struct pci_dev *pdev, struct device *dev)
- 		return NULL;
- 
- 	strscpy(data->name, name, name_len);
--	spin_lock(&btintel_pcie_recovery_lock);
-+	spin_lock_irqsave(&btintel_pcie_recovery_lock, flags);
-+	/* Recheck: another caller may have added this BDF meanwhile */
-+	list_for_each_entry(tmp, &btintel_pcie_recovery_list, list) {
-+		if (strcmp(tmp->name, name))
-+			continue;
-+		spin_unlock_irqrestore(&btintel_pcie_recovery_lock, flags);
-+		kfree(data);
-+		return tmp;
-+	}
- 	list_add_tail(&data->list, &btintel_pcie_recovery_list);
--	spin_unlock(&btintel_pcie_recovery_lock);
-+	spin_unlock_irqrestore(&btintel_pcie_recovery_lock, flags);
- 
- 	return data;
- }
-@@ -4033,6 +4346,10 @@ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
- 		return -ENODEV;
- 	}
- 
-+	/* Unbind may hold the device lock while waiting for reset_work. */
-+	if (!pci_dev_trylock(data->pdev))
-+		return -EAGAIN;
-+
- 	argv4.buffer.type = ACPI_TYPE_BUFFER;
- 	argv4.buffer.length = sizeof(mode);
- 	argv4.buffer.pointer = (void *)&mode;
-@@ -4041,17 +4358,18 @@ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
- 				BTINTEL_PCIE_DSM_DYNAMIC_PLDR, &argv4);
- 	if (!obj) {
- 		bt_dev_err(data->hdev, "Failed to call dsm to set reset method");
--		return -EIO;
-+		ret = -EIO;
-+		goto out_unlock;
- 	}
- 	ACPI_FREE(obj);
- 
--	pci_dev_lock(data->pdev);
- 	pci_save_state(data->pdev);
- 	ret = btintel_acpi_reset_method(hdev);
- 	if (ret)
- 		bt_dev_err(data->hdev, "ACPI _PRR reset failed (%d), PLDR incomplete",
- 			   ret);
- 	pci_restore_state(data->pdev);
-+out_unlock:
- 	pci_dev_unlock(data->pdev);
- 	return ret;
- }
-@@ -4063,7 +4381,7 @@ static int btintel_pcie_acpi_reset_method(struct btintel_pcie_data *data)
- }
- #endif
- 
--static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
-+static int btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
- {
- 	struct pci_dev *pdev = data->pdev;
- 	struct pci_dev *wifi = NULL;
-@@ -4084,7 +4402,7 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
- 
- 	bus = pdev->bus;
- 	if (!bus)
--		return;
-+		return -ENODEV;
- 
- 	list_for_each_entry(tmp, &bus->devices, bus_list) {
- 		if (pci_match_id(wifi_device_ids, tmp)) {
-@@ -4112,9 +4430,19 @@ static void btintel_pcie_perform_pldr(struct btintel_pcie_data *data)
- 	}
- 
- 	if (!ret) {
-+		struct btintel_pcie_dev_recovery *rec;
-+
-+		/* This PLDR also reset WiFi; do not replay its request */
-+		rec = btintel_pcie_get_recovery(pdev, &data->hdev->dev);
-+		if (rec)
-+			clear_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
-+				  &rec->flags);
-+
- 		if (device_reprobe(&pdev->dev))
- 			BT_ERR("BT reprobe failed for BDF:%s", pci_name(pdev));
- 	}
-+
-+	return ret;
- }
- 
- /*
-@@ -4151,6 +4479,33 @@ static int btintel_pcie_perform_flr(struct btintel_pcie_data *data)
- 	return 0;
- }
- 
-+/* No reprobe will follow a failed reset; undo the reset state */
-+static void btintel_pcie_reset_failed(struct btintel_pcie_data *data)
-+{
-+	struct btintel_pcie_dev_recovery *rec;
-+
-+	rec = btintel_pcie_get_recovery(data->pdev, &data->hdev->dev);
-+
-+	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR)
-+		set_bit(BTINTEL_PCIE_PLDR_RETRY, &data->flags);
-+	if (rec)
-+		clear_bit(BTINTEL_PCIE_REC_TOP_RESET_PENDING, &rec->flags);
-+	clear_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+	btintel_clear_flag(data->hdev, INTEL_TOP_RESET);
-+	enable_work(&data->coredump_work);
-+	enable_work(&data->hwexp_work);
-+	enable_work(&data->fwtrigger_work);
-+	enable_work(&data->mbox_work);
-+	enable_delayed_work(&data->hw_rfkill_work);
-+	clear_bit_unlock(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
-+
-+	if (rec && test_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING, &rec->flags) &&
-+	    btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_PLDR)) {
-+		clear_bit(BTINTEL_PCIE_REC_WIFI_PLDR_PENDING, &rec->flags);
-+		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
-+	}
-+}
-+
- static void btintel_pcie_reset_work(struct work_struct *wk)
- {
- 	struct btintel_pcie_data *data =
-@@ -4184,7 +4539,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	/* Both reset paths follow the same contract: on success they
- 	 * destroy 'data' via device_reprobe() (a fresh probe re-INIT_WORKs
- 	 * the dump workers with disable count 0), so enable_work() must
--	 * NOT be called on the success path. Only the FLR path can fail
-+	 * NOT be called on the success path. Either reset can fail
- 	 * with 'data' still alive, in which case we balance the
- 	 * disable_work_sync() calls above so a later successful reset is
- 	 * not permanently blocked.
-@@ -4194,16 +4549,28 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	 * or removed from the bus list while this code runs.
- 	 */
- 	if (data->reset_type == BTINTEL_PCIE_IOSF_PRR_PLDR) {
--		btintel_pcie_perform_pldr(data);
-+		if (btintel_pcie_perform_pldr(data))
-+			btintel_pcie_reset_failed(data);
- 		goto out;
- 	}
- 
- 	if (btintel_pcie_perform_flr(data)) {
--		enable_work(&data->coredump_work);
--		enable_work(&data->hwexp_work);
--		enable_work(&data->fwtrigger_work);
--		enable_work(&data->mbox_work);
--		enable_delayed_work(&data->hw_rfkill_work);
-+		if (test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags)) {
-+			struct btintel_pcie_dev_recovery *rec;
-+
-+			bt_dev_warn(data->hdev,
-+				    "FLR failure after TOP silent reset, falling back to PLDR");
-+			data->reset_type = BTINTEL_PCIE_IOSF_PRR_PLDR;
-+			rec = btintel_pcie_get_recovery(data->pdev,
-+							&data->hdev->dev);
-+			if (rec)
-+				clear_bit(BTINTEL_PCIE_REC_TOP_RESET_PENDING,
-+					  &rec->flags);
-+			if (!btintel_pcie_perform_pldr(data))
-+				goto out;
-+		}
-+
-+		btintel_pcie_reset_failed(data);
- 	}
- 
- out:
-@@ -4228,31 +4595,63 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
-  *     in-flight one (whose recovery will reinitialize the device
-  *     regardless of the dropped trigger's variant).
-  *
-- * The bit is cleared only by .remove() / re-probe via fresh devm
-- * allocation, which is the intended one-shot semantics: a reset
-- * tears down and re-probes 'data', so there is no "in-flight"
-- * reset to follow up after device_reprobe() succeeds.
-+ * Successful resets tear down and re-probe 'data'. On failure,
-+ * reset_failed() releases the bit after restoring the recovery state.
-  */
--static void btintel_pcie_request_reset(struct btintel_pcie_data *data,
-+static bool btintel_pcie_request_reset(struct btintel_pcie_data *data,
- 				       enum btintel_pcie_reset_type type)
- {
--	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
--		return;
-+	struct btintel_pcie_dev_recovery *rec = NULL;
-+
-+	/* Allow TOP recovery and retries of a failed PLDR before SETUP_DONE. */
-+	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags) &&
-+	    !test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags) &&
-+	    !(type == BTINTEL_PCIE_IOSF_PRR_PLDR &&
-+	      test_bit(BTINTEL_PCIE_PLDR_RETRY, &data->flags)))
-+		return false;
- 
- 	if (test_and_set_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags))
--		return;
-+		return false;
-+
-+	if (type == BTINTEL_PCIE_IOSF_TOP_RESET) {
-+		rec = btintel_pcie_get_recovery(data->pdev, &data->hdev->dev);
-+		if (!rec) {
-+			clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
-+				  &data->flags);
-+			return false;
-+		}
-+
-+		set_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+		set_bit(BTINTEL_PCIE_REC_TOP_RESET_PENDING, &rec->flags);
-+	}
- 
- 	data->reset_type = type;
- 
- 	pci_dev_get(data->pdev);
--	schedule_work(&data->reset_work);
-+	if (!schedule_work(&data->reset_work)) {
-+		pci_dev_put(data->pdev);
-+		if (type == BTINTEL_PCIE_IOSF_TOP_RESET) {
-+			clear_bit(BTINTEL_PCIE_TOP_RESET, &data->flags);
-+			clear_bit(BTINTEL_PCIE_REC_TOP_RESET_PENDING,
-+				  &rec->flags);
-+		}
-+		clear_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
-+		return false;
-+	}
-+
-+	return true;
- }
- 
- static void btintel_pcie_hci_reset(struct hci_dev *hdev)
- {
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 
--	btintel_pcie_request_reset(data, BTINTEL_PCIE_IOSF_PRR_FLR);
-+	/* Any failure during a TOP silent reset falls back to PLDR */
-+	btintel_pcie_request_reset(data,
-+				   (test_bit(BTINTEL_PCIE_TOP_RESET, &data->flags) ||
-+				    test_bit(BTINTEL_PCIE_PLDR_RETRY, &data->flags)) ?
-+				   BTINTEL_PCIE_IOSF_PRR_PLDR :
-+				   BTINTEL_PCIE_IOSF_PRR_FLR);
- }
- 
- static ssize_t vendor_reset_store(struct device *dev,
-@@ -4292,10 +4691,41 @@ static struct attribute *btintel_pcie_attrs[] = {
- 
- ATTRIBUTE_GROUPS(btintel_pcie);
- 
-+static const char *btintel_pcie_resettype_to_str(u8 reset_type)
-+{
-+	switch (reset_type) {
-+	case BTINTEL_PCIE_IOSF_PRR_FLR:
-+		return "FLR";
-+	case BTINTEL_PCIE_IOSF_PRR_PLDR:
-+		return "PLDR";
-+	case BTINTEL_PCIE_IOSF_TOP_RESET:
-+		return "TOP_RESET";
-+	default:
-+		return "UNKNOWN";
-+	}
-+}
-+
-+static bool btintel_pcie_top_reset_supported(struct btintel_pcie_data *data)
-+{
-+	struct btintel_data *cnvi_data = hci_get_priv(data->hdev);
-+	u8 hw_variant = INTEL_HW_VARIANT(cnvi_data->cnvi_bt);
-+
-+	if (hw_variant >= BTINTEL_HWID_SCP2 &&
-+	    data->pdev->subsystem_device == BTINTEL_PCIE_SUBSYSTEM_ID_PEP) {
-+		bt_dev_info(data->hdev, "HW variant 0x%02x supports top-reset",
-+			    hw_variant);
-+		return true;
-+	}
-+
-+	bt_dev_dbg(data->hdev,
-+		   "HW variant 0x%02x does not support top-reset", hw_variant);
-+	return false;
-+}
-+
- static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- {
--	struct btintel_pcie_dev_recovery *rec;
- 	struct btintel_pcie_data *dev_data = hci_get_drvdata(hdev);
-+	struct btintel_pcie_dev_recovery *rec;
- 	struct pci_dev *pdev = dev_data->pdev;
- 	enum btintel_pcie_reset_type type;
- 	time64_t retry_window;
-@@ -4309,11 +4739,14 @@ static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- 	if (!rec)
- 		return;
- 
--	type = (code == 0x13) ? BTINTEL_PCIE_IOSF_PRR_PLDR
--			      : BTINTEL_PCIE_IOSF_PRR_FLR;
-+	if (code == 0x13 && btintel_pcie_top_reset_supported(dev_data))
-+		type = BTINTEL_PCIE_IOSF_TOP_RESET;
-+	else
-+		type = (code == 0x13) ? BTINTEL_PCIE_IOSF_PRR_PLDR
-+				      : BTINTEL_PCIE_IOSF_PRR_FLR;
- 
- 	bt_dev_err(hdev, "Encountered exception err:0x%x triggering: %s", code,
--		   type == BTINTEL_PCIE_IOSF_PRR_PLDR ? "PLDR" : "FLR");
-+		   btintel_pcie_resettype_to_str(type));
- 	retry_window = ktime_get_boottime_seconds() - rec->last_error;
- 
- 	if (retry_window < BTINTEL_PCIE_RESET_WINDOW_SECS &&
-@@ -4326,8 +4759,9 @@ static void btintel_pcie_hw_error(struct hci_dev *hdev, u8 code)
- 			   rec->last_error);
- 		return;
- 	}
--	btintel_pcie_inc_recovery_count(pdev, &hdev->dev);
--	btintel_pcie_request_reset(dev_data, type);
-+
-+	if (btintel_pcie_request_reset(dev_data, type))
-+		btintel_pcie_inc_recovery_count(pdev, &hdev->dev);
- }
- 
- static bool btintel_pcie_wakeup(struct hci_dev *hdev)
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index fff31ac8f87a..0de2e48bc135 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -12,6 +12,7 @@
- #define BTINTEL_PCIE_CSR_BASE			(0x000)
- #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG		(BTINTEL_PCIE_CSR_BASE + 0x024)
- #define BTINTEL_PCIE_CSR_HW_REV_REG		(BTINTEL_PCIE_CSR_BASE + 0x028)
-+#define BTINTEL_PCIE_CSR_FUNC_SCRATCH_CSR	(BTINTEL_PCIE_CSR_BASE + 0x02C)
- #define BTINTEL_PCIE_CSR_RF_ID_REG		(BTINTEL_PCIE_CSR_BASE + 0x09C)
- #define BTINTEL_PCIE_CSR_BOOT_STAGE_REG		(BTINTEL_PCIE_CSR_BASE + 0x108)
- #define BTINTEL_PCIE_CSR_IPC_CONTROL_REG	(BTINTEL_PCIE_CSR_BASE + 0x10C)
-@@ -26,6 +27,7 @@
- #define BTINTEL_PCIE_CSR_MBOX_3_REG		(BTINTEL_PCIE_CSR_BASE + 0x178)
- #define BTINTEL_PCIE_CSR_MBOX_4_REG		(BTINTEL_PCIE_CSR_BASE + 0x17C)
- #define BTINTEL_PCIE_CSR_MBOX_STATUS_REG	(BTINTEL_PCIE_CSR_BASE + 0x180)
-+#define BTINTEL_PCIE_CSR_RESET_DEBUG_AD	(BTINTEL_PCIE_CSR_BASE + 0x220)
- #define BTINTEL_PCIE_PRPH_DEV_ADDR_REG		(BTINTEL_PCIE_CSR_BASE + 0x440)
- #define BTINTEL_PCIE_PRPH_DEV_RD_REG		(BTINTEL_PCIE_CSR_BASE + 0x458)
- #define BTINTEL_PCIE_CSR_HBUS_TARG_WRPTR	(BTINTEL_PCIE_CSR_BASE + 0x460)
-@@ -135,6 +137,13 @@
- #define BTINTEL_PCIE_DEVICE_ID_NVL_Hx_SCP2	0xD346
- #define BTINTEL_PCIE_DEVICE_ID_PTL_FMP2		0xE476
- 
-+#define BTINTEL_PCIE_SUBSYSTEM_ID_PEP	0x0012
-+
-+#define BTINTEL_PCIE_TOP_RESET_DBG_RESET_REG		0x0AAAFFFF
-+#define BTINTEL_PCIE_CSR_FUNC_SCRATCH_TOP_SILENT_RESET	BIT(9)
-+#define BTINTEL_PCIE_SCU_CORE_IDLE_SET			0x0000000F
-+#define BTINTEL_PCIE_SCU_CORE_IDLE_RESET		0x0000000E
-+
- /* Causes for the FH register interrupts */
- enum msix_fh_int_causes {
- 	BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0	= BIT(0),	/* cause 0 */
-@@ -172,7 +181,14 @@ enum {
- 	BTINTEL_PCIE_SETUP_DONE,
- 	BTINTEL_PCIE_MAIL_BOX_INTR,
- 	BTINTEL_PCIE_MBOX_PARSE_PENDING,
--	BTINTEL_PCIE_MBOX_PARSE_READY
-+	BTINTEL_PCIE_MBOX_PARSE_READY,
-+	BTINTEL_PCIE_TOP_RESET,
-+	BTINTEL_PCIE_PLDR_RETRY,
-+	BTINTEL_PCIE_MBOX_TOP_RESET,
-+	BTINTEL_PCIE_MBOX_TOP_RESET_FAILED,
-+	BTINTEL_PCIE_TOP_RESET_MBOX1_PENDING,
-+	BTINTEL_PCIE_REC_TOP_RESET_PENDING,
-+	BTINTEL_PCIE_REC_WIFI_PLDR_PENDING,
- };
- 
- enum btintel_pcie_tlv_type {
-@@ -202,14 +218,25 @@ enum msix_mbox_int_causes {
- enum btintel_pcie_reset_type {
- 	BTINTEL_PCIE_IOSF_PRR_FLR = 0,
- 	BTINTEL_PCIE_IOSF_PRR_PLDR = 1,
-+	BTINTEL_PCIE_IOSF_TOP_RESET = 2,
- };
- 
--enum btintel_pcie_mbox_msg {
-+enum btintel_pcie_mbox1_msg {
- 	BTINTEL_PCIE_NO_USE = 0,
--	BTINTEL_PCIE_TOP_SILENT_RESET,
--	BTINTEL_PCIE_SB_AUDIO_DEVICE_REPORT,
--	BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING,
--	BTINTEL_PCIE_LAST_MESSAGE = 4095
-+	BTINTEL_PCIE_TOP_SILENT_RESET = 1,
-+	BTINTEL_PCIE_SB_AUDIO_DEVICE_REPORT = 2,
-+	BTINTEL_PCIE_BUILD_SPECIFIC_RESOURCES_MAPPING = 3,
-+	BTINTEL_PCIE_CNVI_SCU_REG_MAIN_FSM_STICKY = 0xC08,
-+	BTINTEL_PCIE_LAST_MESSAGE = 0xFFF,
-+};
-+
-+enum btintel_pcie_mbox2_msg {
-+	BTINTEL_PCIE_TOP_RESET_WIFI_REQUEST = 257, /* 0x101 */
-+	BTINTEL_PCIE_TOP_RESET_WIFI_ACK = 513, /* 0x201 */
-+	BTINTEL_PCIE_TOP_RESET_WIFI_NACK = 514, /* 0x202 */
-+	BTINTEL_PCIE_TOP_RESET_WIFI_REQ_ROLE_SWITCH = 515, /* 0x203 */
-+	BTINTEL_PCIE_TOP_RESET_WIFI_NO_RESPONSE = 771, /* 0x303 */
-+	BTINTEL_PCIE_TOP_RESET_WIFI_RESPONSE_INVALID = 4095, /* 0xFFF */
- };
- 
- #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
-@@ -827,6 +854,7 @@ struct btintel_pcie_data {
- 	/* Timestamp captured in GP1 handler when mbox interrupt is received */
- 	ktime_t	mbox_intr_ts;
- 	bool		pcie_alloc_init;
-+	u32			top_reset_expires;
- };
- 
- static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
 -- 
-2.43.0
+2.34.1
 
