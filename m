@@ -1,90 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793077932;
-	b=JYDQY8F8l0IlX1fja99q4uLPUdeBaouzqbGTQkhOOtoiSk/Y8dvkeZRJnky/+bjU6UL4
-	 DQjueaGjkU9Q0kMnfcsSNUUEw5k4UFiZMwFmxra4ZOI6CDt8K7JO/odtFqrofzT8NoDlo
-	 9d2PxyEcbuRgWHPLxAn/OEX9N9d4qf1+nOzotsK3VaZM2R2eZFt98KSnZQ2+XuJhJF71X
-	 6PwrpQpYHFmUQgzF3H/3yWIhNCx3YAjlOpubvoeeUP4VX98cK6LoAqm6oZ02zZMs8XtLS
-	 cht+wqCLZKxH+1VKzk/xC3C7NPezyZNwIJkchWp0W4qlCUFHA+2Ik95D9PHUD1+OJNw==
+	t=1793079883;
+	b=T3xMuo4+M+3YtIFAAcWmY3+LZFGg2T3IVht+5LqDUqX5XgQ8WkbTqKV0l+PHKg1ZSHq/
+	 QbgB8CCoEimD5zSqMNnrxzivQ4BSvbXLy1LCNHTfAiOSd3q47Bx99FJEYE9FIa8QwGrJs
+	 q5jOVEaheyZWdabiP8ujf291Bzy00KBRICaESO/2ZU6MB1PQzZPSLRpoClLGv+eTY0h4T
+	 cROG7aaytv03M2+ZH3YwalqTY179F9qehX0XcVyO0o4wbisvzmcpZ0MHKpOD4fxpn3NZK
+	 N8ulosCbsgPlUcGYaRLH7epIdq0CpQuUVRfpwNRTXHLJt8gtOskS11MKt09BWXjL4ZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793077932;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793079883;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=DDC6E10EfEydyVw1LBoKyG+x83QvpFDQkS+xhhY+5v4=;
-	b=KHITUiUFjve3U8Xy+DDkeSCijkN3fZoyN6R1Q1+65ebo7FAIrqorbxJ22fLudNJ/XEwd
-	 Ib/6MFNFp7bZEN4bCbD/3erJht3dVeS7RqnKqfTLRKJqpjCtsVpd8tdmCRnRBEJiirgcm
-	 UwAtAaQqKECx19Cap3uyDB90ccEnYw4Br8DY0oplUzaY9vhGT/XB83XphMG98rvmhdnvh
-	 lo+fca+n4UbwUmKKeFTCiXoZkL1hGUooU8hHDM//pV467kFjuAV18Sj9TMPYQGadeW1z3
-	 vJiOabUzVHW0tuVw0ZlmmEMW+4DVxeoqxTy4hzVlQ765L/ZXHRPPS8eKJzaSS/krkww==
+	bh=7ta212U/g8gwqHDmGcYaShLLHe+pGsZ8xbuHgSknCW8=;
+	b=sd7V1Nt1ibq13ISRVVdsc7ATwLxjlSz3nDIvo0ieEiIknWuZjEsyLrVO73s2X50Bibfy
+	 owS0r7CqUIsbBqL0gE3WM/JjiY2DuCj0MirF9D3AGPsT0CtT5LIAOXfA2sT4V79vTZdo1
+	 TuXeADgT+Y8XlbI/5lp0GNrBAgL2XrMG8MF6CSSJVcIIy2jyJgIx9emTnJT8iB8txslhE
+	 LeFBtRLFE9wb0TBOU7PTASqYc9rk1zUMxALPZJzIIU/7pQhtIqzJKdkMohg42MB4En5Zc
+	 EWGVqC+a89pEo16vsZMpyz24PRLXy1QBI2XDZq5OHx3RMZqRTc3FBv/Z5MMOzz8uNaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=simpleble.org;
-	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=KMm1YvEW;
-	arc=none smtp.remote-ip=74.125.82.51
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=DV1tPYMy;
+	arc=none smtp.remote-ip=192.198.163.12
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC71F606A31A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 05:12:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC71F606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745B3606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 05:44:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 745B3606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=KMm1YvEW
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-1438d9363fbso606537c88.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Oct 2026 22:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1793077931; x=1793682731; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=DDC6E10EfEydyVw1LBoKyG+x83QvpFDQkS+xhhY+5v4=;
-        b=KMm1YvEW9L3//ya+R3bdjboe2+cj3SAKPonpTbcGR/ExCxur1gC5EM2fgADtpJJ/8I
-         GDaJI2iTq/eGLppqYfkZh7+GBlZoQ6qQNtr6mSQuIyOLmTvFMMyQJtVzXnx4M7eIi4N+
-         hFgNnGaPl+DJ+dpwns1vNpU8DhdgwZbfGFJkv8EDlax4TC+UAKCxCaKvjLuVqbg/KHYb
-         DlAS826ihvAnyBORqCSSGLy6J7MGJJP8yRt8AfdZAInB4r7HTN5xGZIfsAQMdiNmsMI/
-         Zz4aH1CrBFttyFghs1Db/r9aSATsXpU8PTAVPZD81AgkrikZ4xQSmDkc0j9Em3k1fADR
-         056w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793077931; x=1793682731;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DDC6E10EfEydyVw1LBoKyG+x83QvpFDQkS+xhhY+5v4=;
-        b=YDupMDanUPGlB1E7vY/5HMdt1cJbsMscMz3fMagA6Y5rKcn4ozyoYNA6htI6Id0C+c
-         kmsyjQTdxJHur5cjfVSLGIoSHzdb6OFfWIAqcByv7PRdPEk4ec5UDty2RWeE9Q+VGVL5
-         50c4O7igEARXh8cds5hyT/TOCPwWRqhF9r3qFGsmRT7xMZa3aPk4w6mQAi/juJcFHlUB
-         AttXNqidu0RdAXDP7ow/tU5HYJqq+d32DVdTEn6X5dcErmK0BXeXGOeuJZirJdDWsBAt
-         5rpvcMvyt5FfDheeUxX2Vwy+A5/Nt+3VZSFZ6KFI+7QZBlDd+0VTZfJjYr/UaojUsbwQ
-         FQPA==
-X-Gm-Message-State: AFq9FYIdDHdTUHE32cDbbUld+8PrDGCkc7MU7QUnR2+MHQErI84v/Om/
-	GzrFSElFIhgOZtzQMrWQd+aLKBKwkH3ScWwRO9JNrhPOewaEzyUZ9+awWgoKyOg51tIuvSiUVaM
-	nKLt0yj8=
-X-Gm-Gg: AYBFou2JWpb9azc8OcNKsSkAr+vnKV6x9oRGbNYq5jmMWdHp4eNUB3tmrt7GaoEKlNO
-	q3zxROIFxMoD7bjkMDIK0Kb+wPSyvUAloY7Vu9UbqX2UkBiANT4V0mgeUTSbm4p2aTrPZu94P2l
-	A7M4YZGWrACxXJjSesn0HCRB8G5eiGpE+euaZcRwK2yHfjC6Kfb8G+lrtj043gQorUvNdQDKAWj
-	CItMHtCF3wpdh4+EKM5unJs2kF2lFmCzgQ92KqU6wOtbi/FyCkoyrlJKbmSyvkO2Z/koUJ5wZM4
-	U4R2MXRoSl5YigKZzuc+QcIBKT9HLE7RsrOfo0Gxsqfb5YHlFPOshbCe9woIvsj/Nf8DZZRzINI
-	PjNFBAL9Z/Uy8c3wwMXEC1NWUyE6QftqhnlxM2dEAfJLrbOpjvYBOIi05zdF1l3XutLbtNH/fZ5
-	NEzqiNxqOccoJWZQJW6EMTiZvwb1wt8DehOvhIhrn15H9BeUzdID1NSiWapFyaIIR6/5NpgKkRS
-	jklPeFWQbSdjyLcRnop/BrZpy+XOcIFoqb+1NHf0GZ1I+fpuA6yIh6AB0/cm/DB1G+8VdYTqb9G
-	B+9ZvERtKT+sagcZgOK5QjnhGu3houkzRN+1hcX9xSRgNOf1gphGi0lBpBog33Jgv46o9oh9p4Z
-	HdRsXb9hikQj2KCbzRC4z2w==
-X-Received: by 2002:a05:701b:204f:10b0:151:7831:e403 with SMTP id a92af1059eb24-1a3c48541a6mr2223759c88.13.1793077930674;
-        Mon, 26 Oct 2026 22:12:10 -0700 (PDT)
-Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-198a1bfaf25sm30406607c88.14.2026.10.26.22.12.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 26 Oct 2026 22:12:10 -0700 (PDT)
-From: Kevin Dewald <kevin@simpleble.org>
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=DV1tPYMy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793079882; x=1824615882;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=M4oOOFuK+2T8GUYUbhEO+rk6H7uANLLOnSUVkEq+8XU=;
+  b=DV1tPYMy8gLDA6Yii7GWP3da9ttV/NcNfks2ohGZkklH2XBp2CkxNFZq
+   Cg9BvCpjN4AsiMmMKczGwsT/vFpqLOd1wCbJNerI2+JK2MDYwOCMy9scS
+   3FdkeE+QhgRhnz7SRqYbKJawDqSCMccOlvrik20z2pYIl8c+gpij4beHW
+   YREp8IyfiQa7ygGQ7ZriN0yryjCyqnXc5asFFfPaacfIn8hnYGhybTYWv
+   wTPfe9zC+zDMAskaW3pJzJHEOJeYOmwDXFaAC9A4cPilB4B3TAoxf1iSy
+   0fZiiiK3X5Ksy3FnocMZC06I3Ic/d8AMzpQSO624An15p92urDm3k+d/W
+   g==;
+X-CSE-ConnectionGUID: yw8QG6QPSnSpGcaafcrcKw==
+X-CSE-MsgGUID: ILM02Z4nQ8Gq8kS7pLa8qw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11947"; a="1672593"
+X-IronPort-AV: E=Sophos;i="6.27,180,1787036400"; 
+   d="scan'208";a="1672593"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2026 22:44:41 -0700
+X-CSE-ConnectionGUID: xgyV0RsbR7a8vPB0y1l/XQ==
+X-CSE-MsgGUID: X+oBwquxRnydSInHifTUWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,180,1787036400"; 
+   d="scan'208";a="4495595"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by fmviesa004.fm.intel.com with ESMTP; 26 Oct 2026 22:44:40 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ] advertising: Fix leaking clients that exit while registering
-Date: Mon, 26 Oct 2026 22:12:06 -0700
-Message-ID: <20261027051206.92829-1-kevin@simpleble.org>
-X-Mailer: git-send-email 2.54.0
+Cc: chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: [PATCH v3 1/2] Bluetooth: btintel: Add TOP silent reset hooks
+Date: Tue, 27 Oct 2026 11:14:07 +0530
+Message-ID: <20261027054408.318002-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,71 +80,126 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RegisterAdvertisement allocates an instance and adds the client to the
-list ActiveInstances counts, but only watches for the client
-disconnecting once the advertisement has been added. A client that goes
-away before that, for example one that never answers GetAll on its
-advertisement object, is never removed, and its instance stays
-allocated until bluetoothd restarts. Once all instances have leaked,
-every registration fails with "Maximum advertisements reached".
+Add an INTEL_TOP_RESET flag so btintel_boot() returns -ECANCELED and
+the transport can run its own TOP silent reset instead of the Intel
+soft reset. Cache boot_addr in struct btintel_data for the replay.
 
-Watch for the disconnection when registering instead, and clear the
-watch on the registration failure paths, which free the client from an
-idle callback.
+No functional change on its own.
 
-Closes: https://github.com/bluez/bluez/issues/969
-Fixes: cf99200d1505 ("core/advertising: Implement RegisterAdvertisement")
-Assisted-by: Claude:claude-opus-5.5
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 ---
-Reproduced with a functional test that kills a client while it is
-registering an advertisement: on master, ActiveInstances stays at 1
-after the client exits (3 of 3 runs); with this patch it goes back to 0
-(5 of 5). I can send the test as well if you want it.
+Changes in v3:
+- Rebase onto current bluetooth-next; fail TOP reset setup if the
+  device is already in the operational image, falling back to PLDR.
 
- src/advertising.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Changes in v2:
+- Check INTEL_TOP_RESET directly in btintel_boot() instead of a
+  separate pending helper; clear the cached boot_addr on version read.
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 1ed09c902..5c929d6c2 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1388,6 +1388,7 @@ static void add_client_complete(struct btd_adv_client *client, uint8_t status)
- 		reply = btd_error_failed(client->reg,
- 					"Failed to register advertisement");
- 		queue_remove(client->manager->clients, client);
-+		g_dbus_client_set_disconnect_watch(client->client, NULL, NULL);
- 		g_idle_add(client_free_idle_cb, client);
+v2: https://lore.kernel.org/linux-bluetooth/20261023094033.212251-1-chandrashekar.devegowda@intel.com/
+v1: https://lore.kernel.org/linux-bluetooth/20261014114752.174669-1-chandrashekar.devegowda@intel.com/
+
+ drivers/bluetooth/btintel.c | 30 +++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel.h |  2 ++
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 929018428c19..912cb025b76c 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1260,6 +1260,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ {
+ 	const u8 *fw_ptr;
  
- 	} else {
-@@ -1427,8 +1428,6 @@ static void add_adv_callback(uint8_t status, uint16_t length,
- 
- 	client->instance = rp->instance;
- 
--	g_dbus_client_set_disconnect_watch(client->client, client_disconnect_cb,
--									client);
- 	DBG("Advertisement registered: %s", client->path);
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-@@ -1641,6 +1640,7 @@ static void client_proxy_added(GDBusProxy *proxy, void *data)
- 
- 	/* Failed to publish for some reason, remove. */
- 	queue_remove(client->manager->clients, client);
-+	g_dbus_client_set_disconnect_watch(client->client, NULL, NULL);
- 
- 	g_idle_add(client_free_idle_cb, client);
- 
-@@ -1757,6 +1757,9 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
- 
- 	queue_push_tail(manager->clients, client);
- 
-+	g_dbus_client_set_disconnect_watch(client->client, client_disconnect_cb,
-+									client);
++	if (hdev->bus == HCI_PCI) {
++		struct btintel_data *data = hci_get_priv(hdev);
 +
- 	return NULL;
- }
++		data->boot_addr = 0;
++	}
++
+ 	fw_ptr = fw->data;
  
-
-base-commit: b0bf49270d445da0852851f393cd67a0a1e5f05e
+ 	while (fw_ptr - fw->data < fw->size) {
+@@ -1277,6 +1283,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ 
+ 			*boot_addr = le32_to_cpu(params->boot_addr);
+ 
++			if (hdev->bus == HCI_PCI) {
++				struct btintel_data *data = hci_get_priv(hdev);
++
++				data->boot_addr = *boot_addr;
++			}
++
+ 			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+ 
+ 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+@@ -2086,6 +2098,13 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ 	ktime_t calltime;
+ 	int err;
+ 
++	/* Let the transport replace the Intel soft reset for a TOP reset */
++	if (hdev->bus == HCI_PCI &&
++	    btintel_test_flag(hdev, INTEL_TOP_RESET)) {
++		bt_dev_info(hdev, "TOP reset pending, skipping Intel soft reset");
++		return -ECANCELED;
++	}
++
+ 	calltime = ktime_get();
+ 
+ 	btintel_set_flag(hdev, INTEL_BOOTING);
+@@ -3571,6 +3590,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	struct intel_version_tlv new_ver;
+ 	struct btintel_data *data = hci_get_priv(hdev);
+ 	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++	bool top_reset = btintel_test_flag(hdev, INTEL_TOP_RESET);
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+@@ -3587,6 +3607,9 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	for (int i = 0; i < __INTEL_NUM_FLAGS; i++)
+ 		btintel_clear_flag(hdev, i);
+ 
++	if (top_reset)
++		btintel_set_flag(hdev, INTEL_TOP_RESET);
++
+ 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+ 
+ 	data->unlocker = false;
+@@ -3619,8 +3642,13 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 		return err;
+ 
+ 	/* check if controller is already having an operational firmware */
+-	if (ver->img_type == BTINTEL_IMG_OP)
++	if (ver->img_type == BTINTEL_IMG_OP) {
++		if (top_reset) {
++			bt_dev_err(hdev, "TOP reset requested on operational image");
++			return -EALREADY;
++		}
+ 		goto finish;
++	}
+ 
+ 	err = btintel_boot(hdev, boot_param);
+ 	if (err)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 9526acf65959..97fbe0ddf2d3 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -257,6 +257,7 @@ enum {
+ 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 	INTEL_ACPI_RESET_ACTIVE,
+ 	INTEL_WAIT_FOR_D0,
++	INTEL_TOP_RESET,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+@@ -265,6 +266,7 @@ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+ 	int (*acpi_reset_method)(struct hci_dev *hdev);
+ 	u32 cnvi_bt;
++	u32 boot_addr;
+ 	bool	unlocker;
+ };
+ 
 -- 
-2.54.0 (Apple Git-157)
+2.43.0
 
