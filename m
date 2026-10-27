@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793119896;
-	b=Paqy197BEIwhstei3Q+zTdobxVyIHgdGnMlMSzcgfoLWnDIuuI6oVFFa2Mp3lM+uCLtz
-	 8/2YDrGtE+0qIAgK9G6eaySHMUOM8n4HZnJ00fSiOSonqt+MYorfnO2kYvN3DNcxokK2x
-	 pshIIzGpWgad/vH0kE7vjiFcAtcc/KJznWiu++jhKo67olmKWUpdIS71pNm8wpn5UkFNq
-	 nPjuwx98KYFSs4zHmi+tpNbm0N+IqFiU3ECzWLXag0Yl0wzf38G0XbLZYWbefFPxKPKIS
-	 HEbpmiKNIkv1G6wk6bIyJrFdIhR8Bx5s+//KYjlb/vpQ88x3V9Zy51lhBcsAxD04SfQ==
+	t=1793119910;
+	b=neshPzpUYk4hv/C24B+c3ItayUx2jMTy+L3aJNUorvrH0kcyqXp70O5adWiXY0Xd4Taa
+	 +CnBfVhvIgME9qsfMEUPMyLBdMxmCIPzKDVJPv38vGKvtloXVeGf4zlH0nBLf5dWbLVsg
+	 8HvOvP6Gnr1D+MREcDK8tDnhYXxP7JJNRfPXqGiKwwTzTuYyFYy1FE6JBVtVBd4LWjJE7
+	 VIyj4o43bZgDJe6AlwFRloqJgqHPAJeLipXz6+r2fNuTYo1dOPC/GagnmeNhMrhVcjlnF
+	 EoblsYSpSzlhoecc2OWgvuTtq9AIlQreODILaKAE0ygEFPu1KA7d2Ci4UceHzCF7O2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793119896;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793119910;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
 	bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-	b=Of8AUKF7DlTUwPMtZBZid6dlHtwcwYrlggaJeHyZXzm7riKAwmUz2LNE5HfJWtjsejmK
-	 X2vq+slZWoC8YBBzxlc9wh5L3C8Ht0cPEqmCVyJ4BEDrtDfW3P02eHL4CSbXVw5P2jdXm
-	 2Gtwxpf75vAPDefHrDGe54mTbJd0hAd/iP6oFySqA8W95my9T7PUJwg6Mr/ViQCz+W+DE
-	 zBYbca3PoLAsVBChmIEJwVGacHG6j3zRX2s0d2iv0xrvxBjitoLzabltBZBXspBBYmRAi
-	 GUXm+fy7kr97Li4jP2cb5vHMPyH6CJPy0B4hFotfloshb3BogzzjqLjNBqHW6gf1U0g==
+	b=bYg1iLY6hzsqfPnJkbbwdbNKPoBJiK5jjA5M75DjmExcgLxQ5i6azphQQxtw/uvJia02
+	 fbFr3iMNPaZGKnWLPG48aNJ518GQCQLUaMjBKzUeDiCIk8iaRbS7s9dDS15OlFYfq3Lsh
+	 lJ3BspvB45rJZuaMB3cJkQTck6tj9ycrYpUY1cJKeqJCyMb6e7oliEceI9yGzyo7XJwdK
+	 i9v7JEyQIOSFo1jRGCt8FJs7xbJhGyozROf4Xch8Qc+b3U0RPBaPyt80nDEF1jkpTngoZ
+	 nvHybexI9+LeOvPvL1b2T5jfqnHOIdrr9N1U/0zmGva6jba2B3zqo+SH/qycrPF3eGw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=ln0SPSKU;
-	arc=none smtp.remote-ip=74.125.82.170
-Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=avL7x7D3;
+	arc=none smtp.remote-ip=74.125.82.52
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9044D606A31A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 16:51:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9044D606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAEB606A31D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 16:51:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEAEB606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=ln0SPSKU
-Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-36661f953e4so98651eec.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:51:35 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=avL7x7D3
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1a3c08d6928so20615c88.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 09:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1793119895; x=1793724695; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1793119908; x=1793724708; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
         bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-        b=ln0SPSKUgrarXzwNmH9xP9RtnX3Xmam1Y+XCMj1HIYO6IxoKRHEXJQZU5FWaP0SGSF
-         1Ouh/C6WipUr8cOUnmIXKFJzGMwZ7FIvfoGWQHEw/dPYqyVIJrGhnb+oTDlEGQH6xrno
-         HMAkD1UKct1cVcvH2UHVC9IVWRJ04zUN1DlEB3lAQdQAP5WD7UpNDpPd+IWH6sgIRbhv
-         GdviVtB4uvjxAlV04LinAZDtZFk+yVj1SnDeWegziMSA5ELrvxAuxKt2S8yUUCUXfosm
-         pEzxJv5QvvmyEjTSbiuLn3bVR30oIvja+KMrkZogNcWY476xvq29eAKh2+tyAeOISAfK
-         aKWw==
+        b=avL7x7D38BpE7bqjyGyVziff6PpmnBwDe9Yl1ufs/u922LMszIu0XxXweYGggEmAHr
+         IM4w253lGOHOZ18/tKqehpt9vhoo+CXlPgMy0Eb9xpohhEuyML5xOs/dTndSslEU13zh
+         bomgeHyT0/nPzCz/RrUtu6O8Ax4LJgXBm2fX0aZeXP/UFa6bRZzuhMXPA5oviyJ7fxYj
+         tHsPpdHQlNzKFV1A2P+QB+kG1uXUY90i5Qgo3iHAWUEh8PhKfng908FY4i59d7QGtRth
+         CYBKItmyf1J9aq0NhyyhVmTOU/GFKbWSy5ed8e7zMeLueaAUNP6TYsHTowL4Kv3WDqIC
+         92Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793119895; x=1793724695;
+        d=1e100.net; s=20260707; t=1793119908; x=1793724708;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
         bh=aAVYI7hzWz0Ro36eEs5zq4Y7AqRKeB23+7GHTzj26rY=;
-        b=X7tJhJ0/LE5jqd+/FJ4+bihqpjE5XcGe5whb7I3MNufp2BPpfEATe1ohP/ZHRAIP0f
-         v4A6ux9zKgOySp5UF3P9yJ3X//JIMDnSR+MiJZhZRwWO6wxLLnUpVpJey5SlgYM3hgar
-         rTKfNOHSzP8zhLXBZQCEUqsqA98PeTVbVzVV26F6hDlCjlUJ3NqLIP7ve6XtXXnyWjuD
-         PTFw3CR5j6zM+of68rzamP7YlfAgkgUGKvk/TLnzvHu/AFqzssB3lKT7YXGwgE3SiNZB
-         QLW/dFCnYmfRE/G0EoisZiOEUCYOx3E4FHeggdeISerPrESXoWo2iRp/DLxxiHObekzM
-         n7Zw==
-X-Gm-Message-State: AFq9FYI3G+VeEnMkuDxV45RlpdJcq0b/ETh3fcY7VV+bw6hWNmoSc3WO
-	s/fjnRtmfIIci+Jr/2SDJpGaWdnIvQpysX1yB+fFnH8A2SOEQHHp+R+Cr4RIm0k9WVHrZL9mU1i
-	nBI5k5GG2rg==
-X-Gm-Gg: AYBFou04+1Lr8wq0s9LZy//vslCjAsS0hp5pESnXj9Ww0gyZYfzGlKknETUx20LHmLw
-	+z2mf5UMmRhn4Cl/eyudBh+Tz/SaWTriGFzZyAqPECPXGQwxtL4qnRAtO5eh9j1/LvMsJlB3X9P
-	PpKmBEyEDl2e0QIPqO23QBhPhcpdEv1yNE3CUQOCugyPzo3afeB2I7nUgvTgVl/dLgiIju+Zl/N
-	ADFTvloN28QdD7smG9W5FY7xnXZ4ai7Ctw3AB7VukWZ0tnBv70KnRr+blfWxL/U7ckiNPP+Qgm+
-	FP/l568t2heqmY/E2HSpHoW75kmUotwnovd7AwRybyyB5YDkhDtq3JierQVFbB/LTY+dWBCOa+f
-	iMpM+VUD8gIJfvXWs7oLd5WJT6GHQNG7pHgYl3Jj4wYQKGdz0Y/+2761zIXAiT+R1EagKWWv7WP
-	XGkQq7eKhaYUO3aSgzv3iLcVXTTE+N4sez/V49MQSKccWTXCGy6njOjigSEQxBHX9xyzqOZmQtH
-	RaIqrhtolPyXgCxtUUuvQP1Idzgwt94Yb/Ehqfj+DXbaDYP+ZAn8H4eI5f4X512L1CF3lnKvR+T
-	+7F564AqQlqENFLxEGkgRUk9YJJhdhr3y6DlPsZtF3XvCVY+pT5JtpIugNhZnVwh9cXZ8jShq9t
-	alc6w+DuAn3DXcFes+r5avg==
-X-Received: by 2002:a05:7301:6f09:b0:35d:eafd:5737 with SMTP id 5a478bee46e88-369e84e382dmr14261708eec.22.1793119894351;
-        Tue, 27 Oct 2026 09:51:34 -0700 (PDT)
+        b=H+zV+33uwLzoLbxEmB+9bUHl2CHHBb3/j9XOqdhpp58k3YHkTF6DDn+/dclaKnH0O1
+         4epO6bypicnZ+zvH9CoAwLYx1vTJmOaRERaGsaE6Yhu+YPuDEiWPXGs0FraghUaal6Wg
+         qPijUXawngNwGaPmseveuxlWYt5IqlQfYxBuFrHQXvYnFiyXCm3q13lcHTSIcqFDMsP3
+         Q3s/QR6N77xH+Ed6ZRjHCMCYkBt3WURmFI+kmS2ia/5K4Gu75R/iaSe32xaZYckHs8Gb
+         7bD7UGNqAhZ36P5y6D3GUbx3DBRYNgyxLkdBNY//mnRg2swbe8THiG6aV9nJkuS/xODc
+         sJIg==
+X-Gm-Message-State: AFq9FYLdpXtvZurmr8/l4zcBn6wDc0hqqVbqBOABSnGWlDms8907SAcp
+	cAx8dk0Nw37qN2oWbf8i04kSIrnuYRiXgPm7NcV3MMF4any93GDOkZXQzeLL6MF/AJk20JHhkwW
+	L+QOOrd8ttg==
+X-Gm-Gg: AYBFou31u+lWBfFF+U8ToAcGJJjGqZEhqI2n0PjsHvVKznWJHH4KIbkmVZd8soULaq7
+	JC09ztNhf3mxUfCtSoj+mVFbx9XwKxiczWjJM50OFSGmJl/Cc4buJQTHo2qp7D8/hnK+GvT9wtm
+	aH9M4T0JmCXrg/kRVkQ9sRHuIW8oRztXUgBIfMHQm0YGHkCBvBxb2F3hfApSm587gvOq0BwVP3v
+	ubuE727IKZqPdg4txCY2wftRZB9eLDIJW2gQsjdKhqMw/ZhgytNL4Xhd1ZjGYI9Zk2P/JFJEgQn
+	xVfVPa/Wxyv3vB0Lh06eS2YgZiuc28Z+UULSmx0lVe/Q3w6Irg0lQFsvPiKqs2l0JfP9w/Ry8N7
+	bJi8FFzfm26Yg/yNW+sD1uQZNuqqHKaQ+OaDOTqmS9eoj4FWo1lhydo59KAkXPo3HsAUamUFg1I
+	GHRaYcYLU7aRo5lNOcWTOh85fJUmFK5Ct6SqB5FHbVgVEpgDR5SzXU/rbBT4kBrFi8/ab/Sfnnb
+	alXYZBUYtGXyTgKxH47ML6ls2Z48AWCGplK6IN4JTJstSXXB69cKLRIyfnpDToUi/SdMPPNL6pU
+	JM0NfEKcF1uwYUcwXX34u46Q/Bn/SGYoiGwfWQ7awnk3jcdFRIj//dkE63o1E+EQRJp+2pETs1c
+	QAIvxfMDNIsEokEGCqY7vKw==
+X-Received: by 2002:a05:701b:4209:20b0:14a:d8fe:3390 with SMTP id a92af1059eb24-1a631c9284fmr820274c88.32.1793119907564;
+        Tue, 27 Oct 2026 09:51:47 -0700 (PDT)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-369e8db7e73sm35314092eec.20.2026.10.27.09.51.32
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-19894d5a10csm34399611c88.1.2026.10.27.09.51.46
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 27 Oct 2026 09:51:33 -0700 (PDT)
+        Tue, 27 Oct 2026 09:51:47 -0700 (PDT)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -84,8 +84,8 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-kernel@vger.kernel.org,
 	Kevin Dewald <kevin@simpleble.org>
 Subject: [PATCH] Bluetooth: MGMT: Fix discovery stuck after a failed Stop Discovery
-Date: Tue, 27 Oct 2026 09:51:29 -0700
-Message-ID: <20261027165130.74821-1-kevin@simpleble.org>
+Date: Tue, 27 Oct 2026 09:51:44 -0700
+Message-ID: <20261027165144.75105-1-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
