@@ -1,90 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.231.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.21
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793113468;
-	b=Q8CsnFtIXWSU0O0kGltAcDMBQZDDCa9SuUKhJxEaMNCl9/Ld5itX14QGD0qYYrt+bbuu
-	 PgR4gjS5toJ0+vnqxDmb1zYQwPuiLnGEVfkRMdjWMF/tiu0kxu5xo3Yi/NL/EEzL+EEn4
-	 BcTFcylfkyUyjHRrrkN2yakDqSBnTfmjvJS1H80ApFijeI4lPv1f+oE/8I+MheN0/UneP
-	 HNOY6r1jljG9A0IFa293k55q87C7zwrRXsufxQXDGb+H9216AyFJ+WfRJQQqeKYjJo2RZ
-	 7F+bs1xP8fs7gIL8gLCdQS3pTLP5fTywHahLFB9OscinqLeLEvoZAssyAaBRg4X5VqA==
+	t=1793114414;
+	b=hS8efLjJTmb2Fojbh09C0B99nMQt/aOT0SRO6kb7toKwDdJkORqkh7qs5FFM2b0yiwJ7
+	 y01pCmIGL83v3CbdLS0RW0IO4+0CmwQc0wuTnVlHIka1z+nl2s8KzVf29xGMGlUgIbj3K
+	 A6CA0eh3yyU8/et9RwDAhJq5Dct5JMb5DISrw67GIEbSxbkpHxwZ0FdVcANAEYHW/sjPP
+	 JsfDSe9hpFqhiT65zLYdxEX76iCZHPDMHKCJZNTvyjMy53WW/q5EM7VslNNPjswrHgNSn
+	 PU67jEngjGhoijnqPLv3GQxeZv4deiJuPsXa4HL3KvrV99EjRDkdmI4zMFrm/uXtvrQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793113468;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793114414;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=+XtXpqT5FEcCOgiw9Ofa4pd6QtfZfviQBxyFezmRJqo=;
-	b=e41KVW2g8P2IUCixIXfbcbfP6l+CuImssjxTZ4a0Pkg6rtQIXcwFwJWlmYRuXs2upIfz
-	 tGpSa5u1pvOXacF013uof6NDT7QCynb0Ly0CSkwO3vxxnrGD9N+hwuIvd08WYFur5aBXW
-	 G9qAaU15N5cPRC5PPjmxlabeOjfb+9nEalBfEUH6HimKpBF30OydjQSGf1ZatwTka13jB
-	 DfE4VJyqBT1Ju6OgMLQY9o55/qHMRpn5ovvbNcuII0viTKWGlrhKp6zffviTq2hTvxTM/
-	 nuJvyhFp/pMs23jB5vmifEqEPI1Plg/u11WgSuhLoyAoPX6lHdH0Bub1yxLtmKnLqtg==
+	bh=QuQo6uzjkbQQahNIXdsu/2FrZB4rL+Fv8PmMYnbTxh8=;
+	b=dD1cMewkag0mPnSd0WFojCumrtklyX6s5ScCFZiZKGIgnDDHtenXe2H9YnkwjEyn56DA
+	 jGzaC3SAxVRFSKmclHzXyHies9cz4nwC+nfPY3ND6iUeQLlr1BZTtOowhyo4tMBbayX9G
+	 wcQP7iHhA9SmY0t5KByNy5+qCkL3fXW+IZwzZLa4qa3FRJPmsHG5hrprc8vVVpvpYQaQa
+	 Lki5klqHHPCEjA+rk7TFJKHoj6y+iYA/578bCiUpqAe3IwDFN03MSIchZ1yu1YTCwPY0A
+	 MAqHNRSJirzE2Q4ugGfczO0ofcF14ZllXZ7UvE/Y+3nDw34MKjwp1Ap2kLljx/7U0Kg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AQf6+6Bx;
-	arc=none smtp.remote-ip=74.125.231.130
-Received: from mail-oo2-f2.google.com (mail-oo2-f2.google.com [74.125.231.130])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=kHf+FmeY;
+	arc=none smtp.remote-ip=198.175.65.21
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3535A60A2604
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 15:04:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3535A60A2604
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A449160A2602
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 15:20:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A449160A2602
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AQf6+6Bx
-Received: by mail-oo2-f2.google.com with SMTP id 46e09a7af769-824f3901d55so4568509a34.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 08:04:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793113467; x=1793718267; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+XtXpqT5FEcCOgiw9Ofa4pd6QtfZfviQBxyFezmRJqo=;
-        b=AQf6+6Bx1UX3xOT7oQVjv5r9sYWhX8WV13c56tZGSKSDRCu4xL1MthyWQoqseGeaku
-         ZGRz1e0I+h4JNGJ72AU6zJF+RxjMkKlT8G3ssX4jpj3cakliQCoyr05xhCvF34bzsZts
-         u8i06m0lqjLAKpYtdQ0X1n3gG5XRjSa91qE7yvr3mU0fTe8jKMwxHOL4EvFKYOCiG8mD
-         rIQv/LeV7Cw57C7JJBh+MU+Tt+bZvN1GgldoPp+OBB3HHpu1amY+bDr2MbFAPLRgn9AI
-         +ePvGLlp/j1Z2d9SbsblMdCMKtJqSaBY35Gr6KT1xnJtimxNlfofjrUxKVq3QX2SePCP
-         +3iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793113467; x=1793718267;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+XtXpqT5FEcCOgiw9Ofa4pd6QtfZfviQBxyFezmRJqo=;
-        b=z/VtEFxJx3LdVm9doN+UNo0V2cW/IOm7yTssBV7+zOF1SmoiQHbJ/yyh1cyuIouZSl
-         jWBTw0Z46xukdQEI06wNfnLRHDKbtxLUKbLVgFPEKFdk92KvmwRxCCamEq7u3yhJEkfI
-         2VyKEEtZlBNhhU7LDfv2vOk+nFDAYOY+kSdj6L4zwjECXAa5bbGDB1xpqGbT16SAW49R
-         Nwo8DIqzVJ/aS+dzhcjgkQmPA15LVUyZuQL6GwuZjwa8g89wz/fo3bC0LX0tNnxqVqRD
-         Vi9/hAf7ToI3zzCRn7TKyuZtHP1FGGyyM1dAo55kegzaVFt0rjEkyntEWfPgnqIZGCtE
-         sLGA==
-X-Gm-Message-State: AFq9FYJlulwSCHq4TSRZAqEhk+Pq+RFhTpreVToo37l3VHeq3NmsBBhr
-	U/zOcBgrsNeJAj4qeuWMdj3MNaLbYJM4SuUWZ+j9f44ftzOMZMfV4B0rMK/6saCebbA=
-X-Gm-Gg: AYBFou1jARRWLS+g2zCRe0PxB4HSxi5WUElrxCKm8BqlLIakpWvT/Ixl4LUUcwVKT3r
-	cP5CbMViXwiWCwUyORkxDvaM3FRmEtZwtvvbtI5IzllOJVXNHf6i59Exn5VAJ2nGedS91NWT/VS
-	BPRGj63y3kWmOPzw5oX4hzjWR3Q5AZNBvCZUQ0nUlOnQerIlQ6/gZdtV0tsFgLEnVGc1s7yZq+C
-	CZiiEMarRJfemyjIpNCu58SgaAJEJxJYb1lLGl+D+0Dn8t0Q47F6LbpQ0jm8KR5koHsNKZnOoV5
-	tQW2bavqgE4xy+ZoBNqwcx9qotpmGRni3J4E/Zgc8BduKep1Cu0ozJqNlHmmokCd7qc2VXtgaqT
-	bHU7Es7gmWLyKw6IIpXD19ZUuY9vNVt0n64dvpepPGnTUGAOm3eARkcppaZU9XKhBeArY3AUdaL
-	z3m2wpx0zdyXDeHjBTwF0PUOkWbArAPRg/EfwIbGvabJiXHYt3SoLNE3R97exfUYfHyRjaJEJi9
-	PYqtVa60OBZAloYqb596VGNDOm6uQt0nwZA8/NgAY7VgIfGe/mce6aC0gEzcC2lGQDNwiuLXign
-	WMhhRq+V+yWwwPNV9w==
-X-Received: by 2002:a05:6830:2406:b0:845:7cb:69f7 with SMTP id 46e09a7af769-850fae80212mr8574590a34.3.1793113466823;
-        Tue, 27 Oct 2026 08:04:26 -0700 (PDT)
-Received: from localhost.localdomain ([14.22.11.163])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850fbb25f59sm10837058a34.20.2026.10.27.08.04.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 08:04:25 -0700 (PDT)
-From: Henry Martin <bsdhenrymartin@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>
-Subject: [PATCH] Bluetooth: L2CAP: fix memory leak from repeated configuration of a connected ERTM channel
-Date: Tue, 27 Oct 2026 23:04:17 +0800
-Message-ID: <20261027150417.942699-1-bsdhenrymartin@gmail.com>
-X-Mailer: git-send-email 2.43.7
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=kHf+FmeY
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793114413; x=1824650413;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Mptgmy1UE8LNyC0mK0XYOJHPh5Y7S/UZBn7MuZImbPc=;
+  b=kHf+FmeY8ozhhYccTyN8FpDuTfdC2DwKtNLRRTcSevGHqewpxQ3EMUBO
+   tnpTqTbfa4hosj7QqoPmKOB11WIxIBgQiAUpMJb16buXiFIOcyP57G7Gw
+   boY5ovXfulkqWm4H5aYpkixvBVzclWRyYWzq6sewNdp4HY1FxXK+x4apn
+   UsdX16vaZxWel0dqXaM0pZ6hkjOPWhOi748ShVub3prdABRbf+Ps3wN3s
+   Pp8da4i6a8GStalfBSGHnUOUhrgvEyI5+d0NEwP4J2daG+SNa2AjRpgB4
+   ldh8LSkaUQeoOGYIWPXAmJQ0lFsipQi01brRwityhYr8EdaKj8+8vrTtJ
+   A==;
+X-CSE-ConnectionGUID: I+QSDXjOQWuLh0hxPtTCIg==
+X-CSE-MsgGUID: Jl7sm3WwSWyEJD9LnW057g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11948"; a="1907157"
+X-IronPort-AV: E=Sophos;i="6.27,181,1787036400"; 
+   d="scan'208";a="1907157"
+Received: from fmviesa012.fm.intel.com ([10.60.135.152])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2026 08:20:06 -0700
+X-CSE-ConnectionGUID: yohiXN8sR2aY0Doix1CV0Q==
+X-CSE-MsgGUID: buTF7oKDTYC1fFDhPv+Ffg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,181,1787036400"; 
+   d="scan'208";a="6324614"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by fmviesa012.fm.intel.com with ESMTP; 27 Oct 2026 08:20:04 -0700
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: [PATCH v4 1/2] Bluetooth: btintel: Add TOP silent reset hooks
+Date: Tue, 27 Oct 2026 20:49:29 +0530
+Message-ID: <20261027151930.386971-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,70 +80,123 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-l2cap_config_req() accepts a CONF_REQ on a channel that is already
-BT_CONNECTED (the state check explicitly allows it), and
-l2cap_config_rsp() has no state check at all. A misbehaving BR/EDR peer
-can therefore drive a connected ERTM channel through the configuration
-procedure any number of times:
+Add an INTEL_TOP_RESET flag so btintel_boot() returns -ECANCELED and
+the transport can run its own TOP silent reset instead of the Intel
+soft reset. Cache boot_addr in struct btintel_data for the replay.
 
- 1. CONF_REQ on the connected channel re-arms CONF_OUTPUT_DONE
-    (l2cap_parse_conf_req() sets it on a successful parse);
- 2. CONF_RSP(SUCCESS) sets CONF_INPUT_DONE and, because
-    CONF_OUTPUT_DONE is set, calls l2cap_ertm_init() once more.
+No functional change on its own.
 
-Every re-entry of l2cap_ertm_init() leaks memory and resets the ERTM
-state machine on a live channel:
-
-  - chan->sdu = NULL drops a partially reassembled skb (leak);
-  - skb_queue_head_init(&chan->tx_q / &chan->srej_q) detaches every
-    queued frame from the lists (leak);
-  - l2cap_seq_list_init() overwrites chan->srej_list.list /
-    chan->retrans_list.list without freeing the previous arrays (leak
-    of two kmalloc arrays per round).
-
-Normally l2cap_chan_ready() clears conf_state so the re-entry cannot
-happen; but l2cap_chan_ready() returns early when the channel is
-already BT_CONNECTED, so a peer that keeps the channel connected
-while replaying CONF_REQ/CONF_RSP pairs bypasses that reset entirely.
-
-Drop BT_CONNECTED from the states that accept a CONF_REQ, and have
-l2cap_config_rsp() bail out when the channel is connected, keeping the
-configuration procedure strictly pre-connection.
-
-This issue was discovered by Tencent CodeBuddy Security.
-
-Fixes: 96298f640104 ("Bluetooth: L2CAP: handle l2cap config request during open state")
-Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Changes in v4:
+- Reject a TOP reset on an operational image for all variants.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index aaa2a1cd489a5..ffd771a799510 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4382,8 +4382,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		return 0;
- 	}
+Changes in v3:
+- Fail TOP reset setup on an operational image, falling back to PLDR.
+
+Changes in v2:
+- Check INTEL_TOP_RESET directly in btintel_boot(); clear the cached
+  boot_addr on version read.
+
+v3: https://lore.kernel.org/linux-bluetooth/20261027054408.318002-1-chandrashekar.devegowda@intel.com/
+v2: https://lore.kernel.org/linux-bluetooth/20261023094033.212251-1-chandrashekar.devegowda@intel.com/
+v1: https://lore.kernel.org/linux-bluetooth/20261014114752.174669-1-chandrashekar.devegowda@intel.com/
+
+ drivers/bluetooth/btintel.c | 28 ++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  2 ++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 929018428c19..f1d228d89c8e 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1260,6 +1260,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ {
+ 	const u8 *fw_ptr;
  
--	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
--	    chan->state != BT_CONNECTED) {
-+	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
- 				       chan->dcid);
- 		goto unlock;
-@@ -4493,6 +4492,12 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 	if (!chan)
- 		return 0;
- 
-+	if (chan->state == BT_CONNECTED) {
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
-+		return 0;
++	if (hdev->bus == HCI_PCI) {
++		struct btintel_data *data = hci_get_priv(hdev);
++
++		data->boot_addr = 0;
 +	}
 +
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
- 		l2cap_conf_rfc_get(chan, rsp->data, len);
+ 	fw_ptr = fw->data;
+ 
+ 	while (fw_ptr - fw->data < fw->size) {
+@@ -1277,6 +1283,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ 
+ 			*boot_addr = le32_to_cpu(params->boot_addr);
+ 
++			if (hdev->bus == HCI_PCI) {
++				struct btintel_data *data = hci_get_priv(hdev);
++
++				data->boot_addr = *boot_addr;
++			}
++
+ 			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+ 
+ 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+@@ -2086,6 +2098,13 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ 	ktime_t calltime;
+ 	int err;
+ 
++	/* Let the transport replace the Intel soft reset for a TOP reset */
++	if (hdev->bus == HCI_PCI &&
++	    btintel_test_flag(hdev, INTEL_TOP_RESET)) {
++		bt_dev_info(hdev, "TOP reset pending, skipping Intel soft reset");
++		return -ECANCELED;
++	}
++
+ 	calltime = ktime_get();
+ 
+ 	btintel_set_flag(hdev, INTEL_BOOTING);
+@@ -3571,6 +3590,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	struct intel_version_tlv new_ver;
+ 	struct btintel_data *data = hci_get_priv(hdev);
+ 	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++	bool top_reset = btintel_test_flag(hdev, INTEL_TOP_RESET);
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+@@ -3587,10 +3607,18 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	for (int i = 0; i < __INTEL_NUM_FLAGS; i++)
+ 		btintel_clear_flag(hdev, i);
+ 
++	if (top_reset)
++		btintel_set_flag(hdev, INTEL_TOP_RESET);
++
+ 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+ 
+ 	data->unlocker = false;
+ 
++	if (top_reset && ver->img_type == BTINTEL_IMG_OP) {
++		bt_dev_err(hdev, "TOP reset requested on operational image");
++		return -EALREADY;
++	}
++
+ 	/* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak):
+ 	 * Boot ROM -> unlocker.sfi -> IML -> OPFW
+ 	 *
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 9526acf65959..97fbe0ddf2d3 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -257,6 +257,7 @@ enum {
+ 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 	INTEL_ACPI_RESET_ACTIVE,
+ 	INTEL_WAIT_FOR_D0,
++	INTEL_TOP_RESET,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+@@ -265,6 +266,7 @@ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+ 	int (*acpi_reset_method)(struct hci_dev *hdev);
+ 	u32 cnvi_bt;
++	u32 boot_addr;
+ 	bool	unlocker;
+ };
+ 
 -- 
-2.43.7
+2.43.0
+
