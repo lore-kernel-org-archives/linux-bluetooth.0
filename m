@@ -1,88 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793164583;
-	b=c+4yPhnBgydp7we4GifPThxi1lvrtyDMnyYeUW6yG7yQNG4ykEp/6ao0QTmV3Wi2kYLv
-	 MkrZ8cscMAy3z8armm1WoZRnRGkavaau78j/oumLBV+cZSo7RlwulCuX+e4hRXhy12eJG
-	 4xD00n0eg0rA9ycGQroIUsLRWNu+01B+GwMzPACpEwUmPM8ualKj0ijSDNvaLfaAMJ1P8
-	 KsiKh3eMxsy+uWFGhh5XneoWaGVbOefNHSKllZekyzA6+1PrmpBBIp7RhrL0ir5aP+iWQ
-	 OiBYmApa2sTpJenecpioj2sOk2TxTXl2Dlz2tdqIaWckTlYsOX4N8LmfzsSnYkFjA8g==
+	t=1793169966;
+	b=SwhVBHk5arM7ZhONRey0VISy1N119KQ+RTsLQhZCXZlQboGRIDeUt9qjfg7nPwEjfmF+
+	 RP1GNEKwPcb4CYn+X9Z6ktxqXjr6ZRHmDo+Jf6g28AkqMUHPImsmkcdMQn2DP6Rpzk2TO
+	 6azRj+ZCk3F8b1beypd4donz7ZhvfwI9yNCj1TyBDqpmvn7GK18Zz42YcdWYL2jdTD4vr
+	 HLnYzGK4NCjV9JdiVg8+869uTl6KYvaxwD1zNlVuAEw+KZEZsG1E3gs4EnFOXRdX7M9Lq
+	 wf6RqzKixaS1OCqRoxmWZ+b0ZB9ap5MxWjpWgvM8AZBGX308gepP0IPC+lQJx+pyYtw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793164583;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=cgrYYxO4twklz04CjwBfgMsOlN3ePVUhOB6z5WX4DfQ=;
-	b=Olf519HpHj50CWiYFd48GYqJTwCJzEGjSvGFsJx/HnUqH1wvgxjZhpmdjngrZ3Uaf5MH
-	 XAeeMcWJRN1ZV2S7WVs4z1jj1qfaMgmsmtTG01QY7otZNV+YMMmdef4QwMNAxWHZ8QWEY
-	 wl2CyW4qAIzG6xsmqQIX7ZfrUiOCYZmBE19ETd+PDL1orJ9F7AIFR4u63X55lyNFkV1JH
-	 KEIXpFVHG6PWHIc4H6IH7aZjOJSLzAp13eoyAjOMjht1lD1AaT1mM408DKU8zKflXRhFW
-	 yczVy94O7hNMw3BR78paXBibUt5/Hm5HPvhHJsUGRR8jUBxa3Lg/3B8gCGCWbHho2EQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793169966;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:
+	 Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=k8F8cGTvmMsFshCRhL1fra8RRiVCEztXuR4FcSJSdGU=;
+	b=Ddld2l0aJBhyYd/dPyNw1mgYkW7d+YuXy1m3ZSOppa0uIDIPItN5emBkyzkugj2ZwYP2
+	 w2I1s66blCJvd5QhckDP+HngPKZIyrnsgeSPBpJL0EH2pKFYHmaLWE3QZYnPYjOBlerBh
+	 Jvr+TTXR849DJiUCpqDONcWN0Ue43flgd68Nj7XwrxV/vgxWbO9Z9npqKY14cGidfZOFD
+	 isBX6paGOxuL9XKarsE5q18L7mRTfQUS6UMCbbV/2EaTXK8LpEJ0qVL1Ss3uMIPA/doPh
+	 09hVKJXf9ddwFtjlOKQ/Wy5s00K36IdfwVxODxbTAYeCCB/3IzgWB3OfJs2p+T0e5Xg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HzdHv82c;
-	arc=none smtp.remote-ip=209.85.128.47
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=QaPLEgUH;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=VDJMddY8;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A9E606A31A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 05:16:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 22A9E606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8701F606A31D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8701F606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HzdHv82c
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4a215344409so1011235e9.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 22:16:22 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=QaPLEgUH;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=VDJMddY8
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69S4PQ8M655215
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=k8F8cGTvmMsFshCRhL1fra
+	8RRiVCEztXuR4FcSJSdGU=; b=QaPLEgUHqeClGkbiu3FAAAKY2ZbhSe8vWQereQ
+	U7RNb4oqnekJ+HEGJx8u+gSBRvKh5LaXJwCAmE+sLvtdZYIWgm7gT0lxpYi/cvBE
+	5Ch2Z4LieDjeQZ7rAS6wkS7mQXB9Ob+5Jo/fMvSfN09SiSGib3hFEqRsP48fxgJT
+	sCYc/EbyvryJQ8mPRCtLXSlVtkga8wKDZs5osSAJmEGtJnU4OhLWKZEQtkIGUt48
+	35N1U73zg2SQ7d+4Tsh415CHbTcY7XqoD+KoT7/TrRYlW+y5wddy9FTSjXlUataL
+	5aXB0AJHX+9Su7ZOie/4WdaMB9lAAsg0lpcpgPa76N2prKIQ==
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hk7g7gxmr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:04 +0000 (GMT)
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-84cac522117so127597a34.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 23:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793164581; x=1793769381; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cgrYYxO4twklz04CjwBfgMsOlN3ePVUhOB6z5WX4DfQ=;
-        b=HzdHv82cuLqLOanFFwStCFsJkXA2Cziq6Cj1RHcw5n9vNA6fUgT5eIn0YuJaGRTEAV
-         +60rwi1UI2Kv6Lxd+4Y4xCiItWrvoMq1rWS9/1GUZrtdEsFCbkILA8S9TISXY8a0TmW8
-         3uo7L0+OI/OgvAbG8cnqkKH9DLQfeJFdxFbq+sf+AIPb6J0pW/kE+7dXpnVKPGwlxuTD
-         krkyEvWeuVKoFqIQM/+ldP0Dmz/gOGOsxAfpCt72/aIDMy2FqIIvwaDpYGFaBv1FwzbB
-         Vo6xwrgHB/Ra3+gnRYZEcv+WKJVI2nWYiPK88678V1UpavNBsP8G98xluySmpIHzGHIh
-         QNKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793164581; x=1793769381;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=oss.qualcomm.com; s=google; t=1793169964; x=1793774764; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=cgrYYxO4twklz04CjwBfgMsOlN3ePVUhOB6z5WX4DfQ=;
-        b=k+CB8xEXF8AqHoBMK1I/OCtS7kL/4DRD3WFGNTvU0MFaLHL5s2kBVtRvHYbVDutSKe
-         Yrtemm7o5S1/qnlgrQBLQJTOKixvot+og0KRUQ+79TWBg/4UTxT97rjGqmfH1RRU6otl
-         vV2YuFnc/81zgPI6S4XM3kVsRyl5h66TXZDopqyrwPlWT3vtqOK4MIOtEtHRezQjaHZ9
-         n9wtpjl2fQiU9Treh+9rmBxKoHiApK6hvFd8YlmewaCt0oAcHdd/0dhLxuF24qQf8723
-         ZqFEXVo3hx3rkagSabsnh0mhY6D5Gi4wqskW5iP7nS94OGdGOJjeygjic7/kuLDp2Qfz
-         yCZw==
-X-Gm-Message-State: AFq9FYKEvGjC6+9uemPRwM9sMTRk+Y2s22HeVVy3pTi4ykZpAQm2eiU1
-	Q8aqFKPQmsNnQIZZoCGJ6japmrHgOCO5tXY65uUOYdsM1vlTvL9/4JFj6r4iBj4MXMg=
-X-Gm-Gg: AYBFou3UtTWaB0Bc1MG6UUsdVCWPgoIfleW4vOEgss5CC01Cqhdb3hKY3uqXspxdmhS
-	r3ki5RTi9NbhqQ76dNtMZBYv550NENLIk748QMTCt9QCpsJhGTZtOLG4wM01rs4DqiJJzI6JgD1
-	cb1vuNM7zLOPGnP663pMNH8OgSPXKQx0IU6mgnb006mGvHTXaZDVjvlR4Xu4yoIwEtivZh7b3WE
-	GyFJ3n83tbCJNiIsZFrU5KyY2WbQIJBGYYApLdgEr8d7SVnZBwc2+amGNHLNV+gi9gmAZBN4/aJ
-	GK4csre1LxEveNYGQke+YOAvkao34W4bsCw7VF1zylUPT7Hb8wiZQ5HlHuI5zxfhjRW8rsb34PT
-	tsa/39EtTPuvisZDTr0iXgYj2/EGg07qbU+W+PXnqVGAkfJZ8h9+iKwexiYdT2v58z2GrS6GWtW
-	lay5xGP8GD2rI+fjIjOAJWK1ZD97YqBnsqHWR4GmYxIKeWA1u+/yI5YMIgmNOb/xdsSmArqIUh0
-	TuHo7xDFGX4J3aOskf2FZXm/Xc7+VilwX9WcWBx++uGiBDg7Cu8cVMAOxHWhS2GiiLuHVM9hRIq
-	p/VHmWHcpVSeyJ1SPSdufJoIPrfXy3RsoIDQZ3lLjq/D3JYTZlebMwBssj33bkhw7ssKqD351Ge
-	RpScbbn11Ew==
-X-Received: by 2002:a05:600c:4286:b0:4a2:6ef:d1dc with SMTP id 5b1f17b1804b1-4a965cdc67bmr13423685e9.1.1793164581407;
-        Tue, 27 Oct 2026 22:16:21 -0700 (PDT)
-Received: from localhost.localdomain ([194.36.104.180])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a978795f42sm20772505e9.8.2026.10.27.22.16.20
-        for <linux-bluetooth@vger.kernel.org>
+        bh=k8F8cGTvmMsFshCRhL1fra8RRiVCEztXuR4FcSJSdGU=;
+        b=VDJMddY89UrzLe9HfaRvtB4iNB0zze1OPn40cjVIdU/zt9FP/vwIv29ytMJ3YvIomz
+         7t8NAvsAot2O0Hcz81KxLbItjlR4bttHB2+EgsUdiHA4zOJAQIv0kONwptQOEm/4oZMH
+         4byIS/8+TxZDg1qibwsD81O7JGAcpkGJ84WzPUSGCO1HMdJMsQygPPvFBHtKxh0NPYU1
+         V2AfsioEc7llqkpVih7402fJe5KtriX1EHXKkt4YQaTqXFlghM+wPvJEOmc/jC3e1elM
+         Jh+jcgF4Nfc5P/iercTfxGfRAQ1gXeVLzPMm51NQxMB99u1hqiQL8pjLC4CcVAMSXFyy
+         s1og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793169964; x=1793774764;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=k8F8cGTvmMsFshCRhL1fra8RRiVCEztXuR4FcSJSdGU=;
+        b=gBLbcmiMLY5V804+QrJRw9xsKztYVClKqLWm0csvmdvMN/Wj/ufU/wM0o3o9m3Bdut
+         glfNArBnlvlgNIptVaSFRyLAYc/Qj8ZRC9nGosPZ/J8IbezUlZFnonCrmzThig9bRNOy
+         K7rVv7ODwwjkd6GlWhnT5oJDTwulWNa+wgQUvzg6P/TAk11G8BB9ew4s9vbXaW6jzBuV
+         LO95d4hdIvDYHJEK1Pli09X/AjzVC0b/ielbD8RFpvgsrk7pBJdK9LhTh06H0t4EDO0K
+         N3a90q4fJUufphMS9i077kCDiKYRAeNENSZDEl9bnwsoxN0A946mwf+EXW6h/gRo8K2D
+         fkmg==
+X-Forwarded-Encrypted: i=1; AKwUvBxVz0aj+FhUpO+l2pe0dYa79z51zQwZbhzd4fLoaO58JmkfSQJLX4766CMMtta5DgUHDNCrl9ZBu9BNTZGzhoo=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKZ9wPSW3CBPqbtOdDbwRwtF8wGpeZbbj7+1lyuv2KwUNGxvpVm
+	5o89axPU6I7NKHBomYpk3ec2FpxlE6d9n2LHVgwzQ5WPzCRBcCA6/fiYz/fyUMxlwMGsNlo2TCs
+	aPTVqPIK5wLTitmK7dkslwPw4vwdP5iCu+uXu2PNYfHhE5Kzma4UGNT/3ztrI2pHJHjHe92TReq
+	B6irI=
+X-Gm-Gg: AYBFou2ru9gL7yo305W6On6CsuyZ0ZZvxdiXgUN00aEZNNB1yLGnf3KEbD4cDv+xi0k
+	653chsEvnpwsru2oaA6nXBvn3YzCUWSAnKGWGa5t1vVQIHURFjYcOXvcBVk5WDt/rGln3Yxlq1L
+	rTHLLpSZSUYyWotG3D9Ec5mEesMeuxbGrdSPuT/EWPupHnqluX0H3/NHsde6f8ERjQRThRU7CwK
+	ueiWjY9JYcZYIp+qO7tP320hhYkY+sfGxTZHVhfisBYHIOxbUS4Y4cJJmGBsrxdYLYkwMMnAWnj
+	KGgJW7SQBjVuX84UKEc5b8Q7pxv21EgGBWNWcs6NZoNP7rFHlVIZ15eQFgINja6FpsmUcFiXURO
+	3/pPAdrzVg6aae6fDAkSWqPBnf9+jryedgiE7TWN6e6Xr8LplsCShrKKSaMzZsqfmNUBSwuPUSL
+	fXMEklItMFwGjRrUGujoVg
+X-Received: by 2002:a05:6830:1292:b0:828:f53c:92f8 with SMTP id 46e09a7af769-85ab743f9e5mr1656615a34.2.1793169963595;
+        Tue, 27 Oct 2026 23:46:03 -0700 (PDT)
+X-Received: by 2002:a05:6830:1292:b0:828:f53c:92f8 with SMTP id 46e09a7af769-85ab743f9e5mr1656601a34.2.1793169963264;
+        Tue, 27 Oct 2026 23:46:03 -0700 (PDT)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b1fd30d98sm860727a34.14.2026.10.27.23.46.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 22:16:21 -0700 (PDT)
-From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] ioctl-tester: Fix name of the 3-DH packet type test
-Date: Wed, 28 Oct 2026 06:16:20 +0100
-Message-ID: <20261028051620.3167775-1-yaroslav.voytovych@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 27 Oct 2026 23:46:02 -0700 (PDT)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Subject: [PATCH bluez 0/2] obexd/bluetooth: Fix profile registration race
+ and clean up
+Date: Tue, 27 Oct 2026 23:45:49 -0700
+Message-Id: <20261027-fix_obex-v1-0-3d91aed181b6@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -92,30 +116,67 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB6a4WoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDAyNz3bTMivj8pNQK3WRLQ6NEM4tUc+NEUyWg8oKiVKAc2KhopaSc0tQ
+ qpViIcHFpUlZqcgnIGKXaWgBTn3VvcwAAAA==
+X-Change-ID: 20261027-fix_obex-c912a68e73a5
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfX4Fwu0ECYv2jD
+ VvtkqDOMqMqkDJ92IHrWpfie/eYRYzpiHNgt64VK+tgqSf7OytRegWulm58q6/TiqT0plzCDMX1
+ 3CNFQp/uUXhX7fAJ5IL+xCEzGUcy7lk=
+X-Authority-Analysis: v=2.4 cv=SoIFe/O0 c=1 sm=1 tr=0 ts=6ae19a2c cx=c_pps
+ a=7uPEO8VhqeOX8vTJ3z8K6Q==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=EUspDBNiAAAA:8 a=XgosEfYsB3rBOOHaGfUA:9 a=QEXdDO2ut3YA:10
+ a=EXS-LbY8YePsIyqnH6vw:22
+X-Proofpoint-GUID: OF74u-FJ8fxFZ0zESLmw4OPeQ0yEx9w1
+X-Proofpoint-ORIG-GUID: OF74u-FJ8fxFZ0zESLmw4OPeQ0yEx9w1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfX/MmeIvL8asUL
+ gbLSHvQDbZsae6eu5QnFoLtgNr5wWDw1nTgzzsoJj4RCppjNFuO6lZ+yizm7pfHZRIawqATlEwi
+ oN+TdZTts3fHAiRyLw/J/Jq0V+BaidgybSkGjXV5r9Ejy7qpw3ezF7i8nZ5Z7AKQ/+5Q1R03NzR
+ DC6bNI9afBRGYjTo5pM032lRmLuyXDIBrHjOh77HLXX4uGJ5XUn1/qOyovE/rs3zAXiS1dPAMZ+
+ p3wf/I4ZXw87to7ON9Mzp9voq0UV2NtGDT5kpJWlTkpG8GnhEYoYNAH9LNN66qmn6+cV4GphbzV
+ JxGMyK6xuY4hgrN0+UN6z/XLFFHoEll+0MORZixzSQI1S2U4hsRzz1JHHJOcjWhiIaeX1v2k91k
+ SF5EGXp8ZKmgXtDu5tiD56sBZN7YuxbGazC96hSxdYJnMC/T1TFL1LWI+2ypRSkk9n2MTX9RMoT
+ UobEIdcv4zC+7DBkt/A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-28_02,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0 phishscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 clxscore=1015 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610280026
 
-The test for set_pkt_type_3dh was registered as "Set Pkt Type - 2-DH",
-the name of the test before it, so both cases were reported under the
-same name and a 3-DH failure would be shown as a 2-DH one.
+This series is to fix below profile registration issue and do clean up:
 
-Fixes: 0da759f1a36d ("tools/ioctl-tester - Add ioctl-tester")
+After boot on Debian, bluetoothd and obexd are both running but none of
+the obexd server profiles (OPP, FTP, PBAP, ...) is registered.
+
+obexd registers profiles from name_acquired(), but only adds them to its
+list later in bluetooth_start(). If org.bluez appears first, nothing is
+registered.
+
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
 ---
- tools/ioctl-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Zijun Hu (2):
+      obexd/bluetooth: Register profiles added after org.bluez appeared
+      obexd/bluetooth: Clean up redundant code
 
-diff --git a/tools/ioctl-tester.c b/tools/ioctl-tester.c
-index e957b0d01..2143a7c6d 100644
---- a/tools/ioctl-tester.c
-+++ b/tools/ioctl-tester.c
-@@ -918,7 +918,7 @@ int main(int argc, char *argv[])
- 	test_ioctl("Set Pkt Type - 2-DH", &set_pkt_type_2dh,
- 				NULL, test_ioctl_common);
- 
--	test_ioctl("Set Pkt Type - 2-DH", &set_pkt_type_3dh,
-+	test_ioctl("Set Pkt Type - 3-DH", &set_pkt_type_3dh,
- 				NULL, test_ioctl_common);
- 
- 	test_ioctl("Set Pkt Type - ALL", &set_pkt_type_all,
--- 
-2.43.0
+ obexd/plugins/bluetooth.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
+---
+base-commit: b0bf49270d445da0852851f393cd67a0a1e5f05e
+change-id: 20261027-fix_obex-c912a68e73a5
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
