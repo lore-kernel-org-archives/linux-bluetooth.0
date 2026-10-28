@@ -1,85 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.172
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793187270;
-	b=dWza++wVp3tQe1KCplDJUUSycnR9l66M4uJwntrZ3ZkbF6xuey8knL0Zlvx7ULos9Xgv
-	 SIBnwsDCnuNwOpg8dpjIOFPaDFjs48ee2ty7MLPCuddpb8ePDijzAoBuNleAo4gmQbCGs
-	 pT5nqR4LLATUNd/Xh3qieVkzDtxut8lOLaQixBya1bjDw4nLFOXlGbOWevbWJANsaUYNA
-	 ZEJfEGR1Vjn6WZDXI/HhLRZXkMngZ7rsq3asEvWZ86Eh0nnIki/IRGkHwAx+3xui4oL/P
-	 J2Dut29Ux+ZdSm1uT0qQ2bbR6MiRhkN0Ap02JPyIHI6nq/5Npl9ZPusIAPsQHsLbGoA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793187270;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=MOBE2wHupzfEvJUsOQ8fjBUBbozp+URjY0JLReeXgvU=;
-	b=ZsBFz4TbvwNLW//kU+TLxsVyd93mS7sLwoMVXrlevDraSS0zZXxm/96LGQvME1TWIbew
-	 GXbib4/wliXPvLwRhFmMsR5Sg1+z8f3W9GbkSA5IYy0aI6eM3Hh0vWcouPrSAMNUEWX6Z
-	 biIVLs5mBDE4Imy7VsBE1v/XyzKild8mF7yQiLd36iasD9bsei1qLUgOygUY6OqqqNYAy
-	 qoxCrg55PrnzoWEK+oMlMccElM9SP0gnXvlKZncDSKq4KvgJCaRvuHM8IA9+5AbjdEnIG
-	 AdZ7KAmPG30hWjqXyWyt4ryHTXNVJLbut/tx5OjgH9y5Pn+QK1dblJiFIkMdOQ27alg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Xbw61Mei;
-	arc=none smtp.remote-ip=209.85.160.172
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048D3606A31A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 11:34:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 048D3606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793189525;
+	b=RVw2QxQH1wSZOtXIJjeeoeW/1obIf7ryK+BHIdx2J4FxQSCsjvulqSyeWJWOMq5X6Zaa
+	 zlJPQYmRYMWoihiCDn9uQKpzYOHZh0eZksC4JbkQ7yjvpa2cg205a4nE9gjdbdkMWIDrz
+	 UqwgabpMdKlZ0MFX0frY/ZJ/jnWk0r5rboTrDzxwXszsFogbdgRmPFZM809HfyXberUnI
+	 gb1SYZAEzrYMYLddO4HaRdC4bIx1RmjedSGk80HVsDasycfdhF2WKjkx9Jb3+CeEAJDFr
+	 xtiPP4nkaS1TCC3wPJVWHQItc0kmaZ+Uz8Jwb5YluR0gD9YeJFYtxygFS9rLSxBYXYw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793189525;
+	h=Received:Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
+	bh=Jn7OD8JNuaHi3Gv+2mblL/UjhhCE8AMUHJyMPpAYvFg=;
+	b=vLscsQ2zq8HI0NHTZ6BU69rLQXtuNZ6j3GeJ8J1ARWqIj6B2p6cknwwXgyFv8qsTtv4D
+	 Bn/rq2iIsPOG1Nk5Uh/O9TxNwIIgqysl0pIjLp/x5E5evKGVVeuGDryZKbse6gl2Wnl0Y
+	 n2RdTGg1WSCS/yM7Yqod7/FSxra3+SB+I6n7b2uED0JKgIYCscrn2DyTF1gVDSYuDj/w4
+	 yX5+iBMiJ2L4/o13qgGpgZ8OL4ma1gWFjm5p2UqFavwivCc2e9QYGpruVb79chnEtnCgo
+	 vXWCe9n4OOCqyk+Gg3ZmlmqgRcxu3ClnVXLk1qj+H+qbRpuO5ZsQqaBuae0PQcq4P2A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b="Hm/kX7R0";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=10.30.226.211
+Received: from aws-us-west-2-korg-listserv-1.web.codeaurora.org (ip-10-30-226-211.us-west-2.compute.internal [10.30.226.211])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E59F606A31E
+	for <linux-bluetooth.vger.kernel.org@localhost.mlmmj>; Wed, 28 Oct 2026 12:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Xbw61Mei
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5366463571cso12244541cf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 04:34:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793187269; x=1793792069; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MOBE2wHupzfEvJUsOQ8fjBUBbozp+URjY0JLReeXgvU=;
-        b=Xbw61MeiO17LINw/DdWCJXBLehXaYctpfSdvsbYC+iglf0SsdicsYvHAl9+bjPtOOg
-         UP+WuKnJo3UQCogr4amn1udqPxrO+KJdYuWK4u08KvMiof2MdBf4aqkTvD0oJSlP6Pbx
-         6lDRgEO8cQvj8LiLLSO46FPfgJathvWDdlOpmjITX2GacW9y1x193sINVx/OQnGlCTtg
-         owG4y9O74OjRB7XvhGuKZWqMZ1fpGxdKjOEpHAI9744KXE8Gpg3OlOitvxzVkbmiTMfe
-         tMeXCPcbmFINyfUSLMHTdByN3tTAmK191b/ezKJp968lJYAMsCCQ30hI8xFmnkKLvqZU
-         ZK5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793187269; x=1793792069;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=MOBE2wHupzfEvJUsOQ8fjBUBbozp+URjY0JLReeXgvU=;
-        b=DrZRPh397KicySyFPTd/HqDeP+ObduDe+xB9CkvbH60zM9ej/jWxX2fyGnnQiw6KJc
-         is2MoX8rFyA2PFIrHoNQADLncjE4ubsalr2D1BbAtEXjZYvDn1X8GHmXFxOtks86ZD2i
-         JrH/ovOUW07OXj25Ad9unwDHk26s0ykScnL8pDbAKXBO8KZBKmHoBFqLCBQRymgLY37H
-         G/5vSol08SSvS0Hpw3O+aCD42yxl1k9TT2D0ucW7RncPs8V2MxHVW6v+xESyFY751ZAR
-         eh7URjNyC6pFm74eR+d/K081fq97JohMG3Wgc2YynpnnFDw/2H9ypjo77bu0SJDNjzAV
-         3LRA==
-X-Gm-Message-State: AFq9FYK5K3r2tJd+jVWVxtmYOefOHZk4v+feV55ythHhmoFDs/DJNmzO
-	peKpjcA5a4AVd6WO3ANrs3OZe3O/5CljzTylZF7aoxgzrFqlE2rU6sZkJqKZDw==
-X-Gm-Gg: AYBFou35+Ce+dHC0DWqrg51da5DsMBozw0c1c0/+BrzkkKe5a2OTMzqW1YtW54A6d7n
-	M7OYpBgY4JSQTTQISaP6yseNDnUbS2yDNJqyejDOlVQAcLDU32xu8e8ZbDWnjRAEibWlFbG/e2r
-	YZEpVCzKOFW8DOkBkS/z1CIPmQ6Luj+P1NHjBbpdy6lrNdlJRx9wDWGyrVl5tYLM6V9aPvhFLwo
-	yYnoQV9UuE0kWrMNgriN5I+nlUCkjxwBeg2SgUzHB/v93oaWd/PhaqA4YaKjj0EVMasxWDym/3M
-	6eXLPy0QjCPnAu0eUxCgEDnrAZpeqmcxyStOFfMtvoDe7ntMk4z0YBvU5VP67K8HJpZW0DDSy51
-	9w0TBw7S9e1icb1YZzHBSq4rUEqjGy8k7pj5WAz6Z1ryFOmciA78T+GZj5wnzAs1mQPDkpZbVLb
-	jCl3V1FJLkZqC5TgF+uDSHGoMP3PvWT69tetb6twrY1axmj6lr1O2wAz9tip8jlPmhzPZg0zC9y
-	txsZrYPB+xRUPbGf15Y04+cQXUPmF/mA5Z4tV7PQ7Nqxp057SHxprQH4K8+e1AgbaGO5tdqVn4/
-	YS3N9grgKw==
-X-Received: by 2002:a05:622a:1f10:b0:535:162c:2e87 with SMTP id d75a77b69052e-53fcb509feemr33142151cf.13.1793187268657;
-        Wed, 28 Oct 2026 04:34:28 -0700 (PDT)
-Received: from [172.17.0.2] ([172.208.93.179])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53838458772sm103447511cf.0.2026.10.28.04.34.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 04:34:28 -0700 (PDT)
-Message-ID: <6ae1ddc4.e9a23c7b.1bd298.3af0@mx.google.com>
-Date: Wed, 28 Oct 2026 04:34:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2628231878187203010=="
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=Hm/kX7R0
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86596513C0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 12:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1793189525; cv=none; b=Y+JRbgry4PO3iH3jZfmP0dEgNfppsxlpY1H3nANJqkMW+A6ZEPG6YtmYBh3gs7+iSAXRCCD38Myds1XmQFvTcdfM7gZJMU9qyYadxjLW1BU+09u4ZYtO3f32jkDGPqR4DEKs5dBAyjBNQXo5vulZGfNbtr0I8VXFWVjNF/YIouE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1793189525; c=relaxed/simple;
+	bh=H3a+/LaEqysK4SGiMnOp+TuUvunECtp9mFQ88KuIQQk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TRjMfrC46HZXeL4s2ctuqkUNJ8Oi86VG5IadvVNOzgCI0VVqILo7pGs7pa5pE8UX6Df39BMdu6Mcrd0ySXaDz6exnoAtujnqskZgHombaygSDmeMVrssMAUHx2675+pe09DnspIxIsgiGxJPcu7LshjfDeTjPG3VMm8ptK71Nm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hm/kX7R0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 25EFDC2BCFA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 12:12:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1793189524;
+	bh=H3a+/LaEqysK4SGiMnOp+TuUvunECtp9mFQ88KuIQQk=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Hm/kX7R0xBHnOYw01sw7IplmW8j1TFIeQtfrDqoDohJI4Y+qHvEtyaanlxb2rlCpN
+	 dNd7tvyewFMoSfGZaQ6Ic3Jwbk79Tj39pixPxo5CbFtGR9L9auo50zSzN/kZFftN71
+	 yPZan1RbISVmQungTflEaEPeKQH82EriMiwTW2ft+CsxCf86pKLhNU3DJ5tOd1yBvB
+	 jVyXq5WDfchukb09PDNjJpWSDkr53XfcO0GRNZghx1HshtTeUr1HAeYPmzBt5ctsVn
+	 OIZZboW42dRZ5GfKo3pZnuuhcxbfNacc7/w/Sx+f+goXEHnsIve9ngQ35GWo1oQUEg
+	 Qgruvys2qAdnw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id E8BD0C41613; Wed, 28 Oct 2026 12:12:03 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 222151] MT7925 (0489:e111): BT firmware 20260813113236
+ (linux-firmware 50e034a2) breaks HFP calls and fails WMT init; 20260605184935
+ works
+Date: Wed, 28 Oct 2026 12:12:03 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: purpleritza@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-222151-62941-U86ivLQYv0@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-222151-62941@https.bugzilla.kernel.org/>
+References: <bug-222151-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,51 +95,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yaojiale02@163.com
-Subject: RE: Bluetooth: MGMT: Free unlisted commands on queue failure
-In-Reply-To: <20261028050652.134403-1-yaojiale02@163.com>
-References: <20261028050652.134403-1-yaojiale02@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============2628231878187203010==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222151
 
-This is automated email and please do not reply to this email!
+--- Comment #1 from purpleritza@gmail.com ---
+Correction after further analysis: most of the call failures in my original
+report were NOT caused by the firmware. The repeating failures correlate wi=
+th
+the wireplumber version, not the BT firmware build.
 
-Dear submitter,
+Per boot, counting "Failure in Bluetooth audio transport" loops (>=3D 4 wit=
+hin
+3 minutes: HFP/A2DP profile flip-flopping, both bluez nodes going to error):
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1195135/
+  Boot start        wireplumber  BT firmware build          Loops
+  ----------------  -----------  -------------------------  -----
+  2026-09-28 12:40  0.5.15       20260813113236                 0
+  2026-10-03 11:07  0.5.18       20260605 + 20260813            3
+  2026-10-07 11:36  0.5.18       20260605184935                 1
+  2026-10-07 11:59  0.5.15       20260605184935                 0
+  2026-10-15 11:00  0.5.15       20260605184935                 0
+  2026-10-17 19:53  0.5.15       20260605 + 20260813            0
+  2026-10-25 15:49  0.5.18       20260605184935                 5
 
----Test result---
+Every loop happened on wireplumber 0.5.18, with either firmware build; none
+on 0.5.15. I will report that part to wireplumber separately.
 
-Test Summary:
-CheckPatch                    PASS      0.80 seconds
-VerifyFixes                   PASS      0.13 seconds
-VerifySignedoff               PASS      0.14 seconds
-GitLint                       PASS      0.36 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      33.66 seconds
-CheckAllWarning               PASS      38.89 seconds
-CheckSparse                   PASS      41.80 seconds
-BuildKernel32                 PASS      33.97 seconds
-CheckKernelLLVM               PASS      37.75 seconds
-TestRunnerSetup               PASS      778.04 seconds
-TestRunner_mgmt-tester        PASS      89.18 seconds
-TestRunner_mesh-tester        PASS      11.23 seconds
-IncrementalBuild              PASS      31.85 seconds
+What remains attributable to firmware 20260813113236:
 
+1. WMT init failure on this machine:
 
+  BT build        Loads  WMT init failures
+  20260605184935     71  0
+  20260813113236     16  2 (2026-09-27, 2026-10-17)
 
-https://github.com/bluez/bluetooth-next/pull/1014
+2. Single mid-call HFP drops with wireplumber 0.5.15:
 
----
-Regards,
-Linux Bluetooth
+  BT build        Time on wireplumber 0.5.15  Mid-call HFP drops
+  20260605184935  ~16 days                    0
+  20260813113236  ~7.5 days                   2 (2026-09-28, 2026-10-19
+12:02:56)
 
+   The 2026-10-19 drop is the log in my original report. The only drop seen
+   on 20260605184935 was during A2DP playback, not a call. Small sample, so
+   weaker evidence than the WMT init failure.
 
---===============2628231878187203010==--
+Current setup, no call problems so far: linux-firmware-mediatek 20260810-2
+(BT build 20260605184935) + wireplumber 0.5.15, kernel 7.2.11.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
