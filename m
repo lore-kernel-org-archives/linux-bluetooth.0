@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793216407;
-	b=xvu1Q6hTccYxkv+GVR0mnYJkk+QX1YD7z3w0Pohwx1d0DGyzVQMxdI/IpB7YXFMIVwbD
-	 FgpFZioMEce2jJbwB+gH+FishQf32xYT7nVKoCY6A2+3693gfQqTjrPTbYH+siNMgSg6F
-	 /tUNAdhfQB9FccT3SlxO+SpukF/uEk7a98dCRNhANiaFqp8HISwN9SzECauP8UD5k/NIn
-	 4ne4xbqQ0D8T/T4uAIfmPZ9PBErKay9CevXUxvCPJIa9UidhMnxFQ8z+0FgcrkxHhqWkj
-	 MOTe2GDRurqn/r4KHuGQNBzqi/OE4gkrscndkOuQYA+lYnzpHX5owjL5qIm3SR/N/aQ==
+	t=1793217020;
+	b=efzWbYA6yNW3FeCfvLYyXSbY/Cl5a/dbGsPUhBvdKyltBbwGpNMYhvTADrqW81/7F87H
+	 xA6/cnuG1Lt/aHPHCZRxzaLdFJeh6fAx5MzBxJFg8HlEZL65v05INAagcdA+NWD2A/RKZ
+	 KzaKcqfIgojEKuf2NJtOi90huEfCtpYnN7jkbO0T8Xvq3UHyjq/LHBWzG52btss8c6yVd
+	 xVyFpIrajDP6QQC7LzVqQSbcC8yi0hf6IKPdcZtJyve8HKGaAQLYiNdyEdgSi7WLlNNfl
+	 7o9XxKfO7eiSJQMIE4ySp3m195LuGwkIjhx/XndhVXiMLClIYxDoRGSP/4v4XSQiZ4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793216407;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793217020;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=ZrXqopOLSxEUJjMcZQ43gj4y8VT4PGUkCNte6NUf4U8=;
-	b=w2P1HZScN7bhM3+QMOlcsMJSdi5pycS6EmElXbQD93Wuv9vJVWcT7Otrunro0y8iagCa
-	 ewx2ov+HTbyV7qGu3bA98z19k9E8KLKXiB+Oi/wC2Giqtm+vS2Hp/nCaByDXR9Vd6zBu9
-	 poW6Z5Jxc+JawTPsqD6YTKFbYbym51VNGrbVzKbfqqA43b87Rsed7spq0M++TsW2n6tcx
-	 x1siL+rBVw4eoDpGFW08vvcrHYQOtVpgKolZMxl6IlWaLckAKMsS07P7Q3jKCJHPFNCOm
-	 iszhglFNUMWn/YW3YkZ3DnnMGHjHcaTenFTj/v3BhNsOuW8b5rQt7aTlCz0noYRwGXA==
+	bh=Oct+5Rp+NaZuwuTkKCrvO5WTwXBHeDFgsYmLkIXWGSs=;
+	b=gCoYC4cu5am5llnWrj20JsFOvTqDynoPL9ZqAu8wZUSvWKIEwbWisRp7Jo1HP809GwV8
+	 vP+wTRpBrJzRbAtTHY+wmmYaHiIrG4eoLU3QoeyrRWJgPtsXY9vjma4dwYRwCQitBUX6a
+	 wtKD+t4vbg7JJkYDb4IH1E40KF2AeKOCX3xyfOuQKRUN/EImzoDdPaKFQ3gJEYnO/0FuB
+	 2Re7p0Du3klaD3fjv9Gfm++Mq9aOYWT/+0Fq7GiVlAjesedX/8luAFk5HuAx+vZiRfOle
+	 Werwg2SAnmHTqxV7yoFXuFiuhVjxg2jUWlNDAoTZIh5O6nnbsz1+RN9cPSrZsnw0xWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="VMviZo7/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XOxNLl+a;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E1D60A260B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56927606A330
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VMviZo7/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7A0A1F031E3;
-	Wed, 28 Oct 2026 19:40:06 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XOxNLl+a
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 133941F01828;
+	Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793216406;
-	bh=ZrXqopOLSxEUJjMcZQ43gj4y8VT4PGUkCNte6NUf4U8=;
+	s=k20260515; t=1793217020;
+	bh=Oct+5Rp+NaZuwuTkKCrvO5WTwXBHeDFgsYmLkIXWGSs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=VMviZo7/spwSgwEXi8C+nac8Cgucdn/Kj9oRqcWQIryKjBAzImmigDTj5wNJsA5FR
-	 4eXR5BGE9aCUvPNjAmfgBRIN32CcO8ImhqOTCzjGIx8mZSxqhKN+k4HDamXUI1WQqE
-	 s9wSX/3+MlYm5qSd5XzQG1PkSJetIskHhuhodrBwpuZsr3kR0qw8m67FinQE0oeNC3
-	 HhQ+T5yF4VUHThCtyCjrrAtAUdkyCYuGvjDAjJhTy7HaYefhCUW5bi7eC7tIFP4Kyl
-	 zB0jnvYW/+IvwkcZZTuWHkS96bQqBDEBRkW8LFJ7peIkhbxDMfk+7GAL0ODyMJnne1
-	 Wn3GP0ub8iROw==
+	b=XOxNLl+aF4T8MKSKTtaQ4dSKtYrnXCyohq1ZINfsBXmH8HThwlsWHLHgeTFB7NiBi
+	 5LBRjLOzapHRYuvg+vmxQLbDwtxYurxzIm7MObdTkOAn8RCUhdcHwtbH/OkF4JEQlB
+	 VX2JUaNRAmhGlrDM7u9cCEMbHzT8sfJv2JgalQzkM7ZE5KeGLBx5dc4IjdsicL7k/7
+	 t+fYZMLkeENGyhbRqpbBb9qpVOnQ2HIc8TORimbC67J0dabQPpx2j/7zpdtzarjDjI
+	 vaagkzazgAj5MaBXkPr6mCqtax8SPJ5ENe0gakF1v7dfvbffdPyCvDt3pHE6ZJTOSB
+	 zlZpPlJy793Jg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BE4FB3AAA76F;
-	Wed, 28 Oct 2026 19:40:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 073B23AAA770;
+	Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,38 +54,39 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btintel: check FIPS status before firmware
- download
+Subject: Re: [PATCH BlueZ v1 1/3] shared/bap: Fix line over 80 columns in
+ set_base_subgroup
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179321640558.1390808.2098882383641688916.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Oct 2026 19:40:05 +0000
-References: <20261027131850.3652839-1-kiran.k@intel.com>
-In-Reply-To: <20261027131850.3652839-1-kiran.k@intel.com>
-To: Kiran K <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
- chandrashekar.devegowda@intel.com
+ <179321701882.1394536.10614046807601326911.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Oct 2026 19:50:18 +0000
+References: <20261028135517.2395290-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261028135517.2395290-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 27 Oct 2026 18:48:50 +0530 you wrote:
-> Intel Bluetooth controllers (PCIe and USB) from Scorpius Peak2 onwards,
-> except BlazarIW, report bootloader self-test results (CRC, security,
-> and patch) in the INTEL_TLV_FIPS_STS TLV of the Intel Read Version
-> event. Act on them before firmware download:
+On Wed, 28 Oct 2026 09:55:15 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
->   1. CRC failure      -> abort download.
->   2. Security failure -> abort on USB / HW reset and retry on PCIe.
->   3. Patch failure    -> abort on USB / HW reset and retry on PCIe.
+> Replace the tab between the compare_ltv() arguments with a space.
 > 
-> [...]
+> Assisted-by: OpenCode:claude-opus-5.5
+> ---
+>  src/shared/bap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v2] Bluetooth: btintel: check FIPS status before firmware download
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1081a6ef8f1e
+  - [BlueZ,v1,1/3] shared/bap: Fix line over 80 columns in set_base_subgroup
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a1a423e2ef3b
+  - [BlueZ,v1,2/3] shared/bap: Move LTV type defines to bap-defs.h
+    (no matching commit)
+  - [BlueZ,v1,3/3] shared/bap: Accept all defined metadata types
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
