@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793217020;
-	b=efzWbYA6yNW3FeCfvLYyXSbY/Cl5a/dbGsPUhBvdKyltBbwGpNMYhvTADrqW81/7F87H
-	 xA6/cnuG1Lt/aHPHCZRxzaLdFJeh6fAx5MzBxJFg8HlEZL65v05INAagcdA+NWD2A/RKZ
-	 KzaKcqfIgojEKuf2NJtOi90huEfCtpYnN7jkbO0T8Xvq3UHyjq/LHBWzG52btss8c6yVd
-	 xVyFpIrajDP6QQC7LzVqQSbcC8yi0hf6IKPdcZtJyve8HKGaAQLYiNdyEdgSi7WLlNNfl
-	 7o9XxKfO7eiSJQMIE4ySp3m195LuGwkIjhx/XndhVXiMLClIYxDoRGSP/4v4XSQiZ4w==
+	t=1793217022;
+	b=xLlzfGBrYoKVvQEWzdXTpbWdeSUtTY5Sch1sZEwT38mrqTAQxD0H33ZFbo/58wW6XSba
+	 mHcIz73Xu5tncw7GD2lWrGEUJVWpWJkbuLCX/872V/ugXf/fxE4WjM3MTWyp3C5Ax4SD1
+	 ioE2hq9eEcAxMVELgJD3JzTgacOV2Lb3BOyGf11dKQk77D65AmcDNt1dl4DPs2zA7l4P3
+	 PM/DQm4m3LKiabZL+lExJDuS8egg7vSHONAC3JDgQMio/hxQ6navM0CJ9KeergZoMA9B5
+	 tT00QBSjSsNZsgUIOAb12y1Xz1cwlqXeRNM4NNhozesZM2TyPGglKtrcY2Q1WEyud5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793217020;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793217022;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=Oct+5Rp+NaZuwuTkKCrvO5WTwXBHeDFgsYmLkIXWGSs=;
-	b=gCoYC4cu5am5llnWrj20JsFOvTqDynoPL9ZqAu8wZUSvWKIEwbWisRp7Jo1HP809GwV8
-	 vP+wTRpBrJzRbAtTHY+wmmYaHiIrG4eoLU3QoeyrRWJgPtsXY9vjma4dwYRwCQitBUX6a
-	 wtKD+t4vbg7JJkYDb4IH1E40KF2AeKOCX3xyfOuQKRUN/EImzoDdPaKFQ3gJEYnO/0FuB
-	 2Re7p0Du3klaD3fjv9Gfm++Mq9aOYWT/+0Fq7GiVlAjesedX/8luAFk5HuAx+vZiRfOle
-	 Werwg2SAnmHTqxV7yoFXuFiuhVjxg2jUWlNDAoTZIh5O6nnbsz1+RN9cPSrZsnw0xWA==
+	bh=hyRErXTquKsuhtJlr8zzLss0mtFs+g2kmUxEpzLS74s=;
+	b=020zeBkbTIELHPZ8CUEwViTv/2DJWv23b5yEth6KZP1e4g+LFL7sUSQhM4Ivq1aTrDdY
+	 O4QAYwCF8AzuvQd8how2eT0a9q84zZoyNer+wb2ET49nsfHlOjB0sdLR03OxEgZ0QrWlh
+	 o028FVt9Ov8QkimeC2gJdpVmK+BBbsnvaX/ulPGycBM+QuOxubKKwRiS7qK12zZ8a45kP
+	 j05cz5DOEqQMoY1DVszniT7gdBoDWhJCuoTgjDnPUdLTj8i68+B+hJn6dcV2H8zi0p2qg
+	 5dcZXxUFP/ifEZc/QWN0hQ1T6NI+buDfWtv5y7BF66DfmoRmDBH4eM9ZxsnQlDh8j7Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XOxNLl+a;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJRLK+yu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56927606A330
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6017606A320
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XOxNLl+a
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 133941F01828;
-	Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJRLK+yu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C42A1F01825;
+	Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793217020;
-	bh=Oct+5Rp+NaZuwuTkKCrvO5WTwXBHeDFgsYmLkIXWGSs=;
+	s=k20260515; t=1793217021;
+	bh=hyRErXTquKsuhtJlr8zzLss0mtFs+g2kmUxEpzLS74s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=XOxNLl+aF4T8MKSKTtaQ4dSKtYrnXCyohq1ZINfsBXmH8HThwlsWHLHgeTFB7NiBi
-	 5LBRjLOzapHRYuvg+vmxQLbDwtxYurxzIm7MObdTkOAn8RCUhdcHwtbH/OkF4JEQlB
-	 VX2JUaNRAmhGlrDM7u9cCEMbHzT8sfJv2JgalQzkM7ZE5KeGLBx5dc4IjdsicL7k/7
-	 t+fYZMLkeENGyhbRqpbBb9qpVOnQ2HIc8TORimbC67J0dabQPpx2j/7zpdtzarjDjI
-	 vaagkzazgAj5MaBXkPr6mCqtax8SPJ5ENe0gakF1v7dfvbffdPyCvDt3pHE6ZJTOSB
-	 zlZpPlJy793Jg==
+	b=nJRLK+yu/XeCV+Y3KNM4KM0y6Xz+srRHF1bN6VVB4gN3yFYxVrtHXzVihhRgobleP
+	 KVuw0IV4FlAnxemeLpyS5mqC07jz7/wiTsY2wbH4H5sIIPcU2bm+Pw1i3cM2qoVOFg
+	 f6EwY8oXkwvs1BUAHHaeibjXwDH0LdW53FCO9ZntDU6PcLlDAIv008HETWih8CyFt4
+	 0t+M6vfQnRd29XgjOduadBn9g9Y2E5RqF5p4yVslkkHsDNxEByCuRO+WPRp2uZc8MF
+	 QY2jbS8Re4e6dw8X19Af8TwSRIfWOBTlbDoope7TyrInVghBvHQK0dCqF2vaoWq5Cj
+	 UGzkaxHc3y9JA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 073B23AAA770;
-	Wed, 28 Oct 2026 19:50:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 814B23AAA770;
+	Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,37 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/3] shared/bap: Fix line over 80 columns in
- set_base_subgroup
+Subject: Re: [PATCH] adapter: Fix Discovering staying true after a rejected
+ stop
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179321701882.1394536.10614046807601326911.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Oct 2026 19:50:18 +0000
-References: <20261028135517.2395290-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261028135517.2395290-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <179321702006.1394536.2604695616484204299.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Oct 2026 19:50:20 +0000
+References: <20261027160852.54689-1-kevin@simpleble.org>
+In-Reply-To: <20261027160852.54689-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 28 Oct 2026 09:55:15 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, 27 Oct 2026 09:08:52 -0700 you wrote:
+> The kernel rejects Stop Discovery when no discovery is active by the
+> time it processes the command, because the discovery ended or another
+> mgmt client stopped it just before. stop_discovery_complete() then
+> removes the client but keeps the discovery state, so Discovering stays
+> true with no client left, and the next StartDiscovery with the same
+> filter returns without starting a discovery. The client that called
+> StopDiscovery also gets an InProgress error, and "No discovery started"
+> if it tries again.
 > 
-> Replace the tab between the compare_ltv() arguments with a space.
-> 
-> Assisted-by: OpenCode:claude-opus-5.5
-> ---
->  src/shared/bap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v1,1/3] shared/bap: Fix line over 80 columns in set_base_subgroup
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a1a423e2ef3b
-  - [BlueZ,v1,2/3] shared/bap: Move LTV type defines to bap-defs.h
-    (no matching commit)
-  - [BlueZ,v1,3/3] shared/bap: Accept all defined metadata types
-    (no matching commit)
+  - adapter: Fix Discovering staying true after a rejected stop
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4f3428e9df2f
 
 You are awesome, thank you!
 -- 
