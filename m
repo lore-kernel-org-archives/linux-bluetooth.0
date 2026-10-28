@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793217022;
-	b=xLlzfGBrYoKVvQEWzdXTpbWdeSUtTY5Sch1sZEwT38mrqTAQxD0H33ZFbo/58wW6XSba
-	 mHcIz73Xu5tncw7GD2lWrGEUJVWpWJkbuLCX/872V/ugXf/fxE4WjM3MTWyp3C5Ax4SD1
-	 ioE2hq9eEcAxMVELgJD3JzTgacOV2Lb3BOyGf11dKQk77D65AmcDNt1dl4DPs2zA7l4P3
-	 PM/DQm4m3LKiabZL+lExJDuS8egg7vSHONAC3JDgQMio/hxQ6navM0CJ9KeergZoMA9B5
-	 tT00QBSjSsNZsgUIOAb12y1Xz1cwlqXeRNM4NNhozesZM2TyPGglKtrcY2Q1WEyud5A==
+	t=1793217025;
+	b=YyBzKPh3tlmw2UWTg+atXCOAlBGvSVb3F43k1CZafS1rwxxuZLLTzsYL6NjOjKNL6Bf4
+	 Wvtk8/u2wYw5/muIrnki+O8PD+ajzwO28Ps/ng+NazlyUoWs14m7UUzSNjipJVxAJXC9V
+	 qx1gAwHpp44KQjNgNEBK7d8mOED0lInEeV9wqsCxCjnuW3aWsr/HgXetvNI/oPRtXjjvz
+	 2x1e4g3wZ4aEZMlXsbyqTYzQMWR67QqIWA0vvqxDH+ToJcK8vePy7b6QUu3BQVOwbB3MG
+	 W3uPxozsyW6HpQM0Y94Tj7fQhyIBWmt/eNpfLh5mNOd6MOUFJHQJBqj89NRym2Z0y8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793217022;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793217025;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=hyRErXTquKsuhtJlr8zzLss0mtFs+g2kmUxEpzLS74s=;
-	b=020zeBkbTIELHPZ8CUEwViTv/2DJWv23b5yEth6KZP1e4g+LFL7sUSQhM4Ivq1aTrDdY
-	 O4QAYwCF8AzuvQd8how2eT0a9q84zZoyNer+wb2ET49nsfHlOjB0sdLR03OxEgZ0QrWlh
-	 o028FVt9Ov8QkimeC2gJdpVmK+BBbsnvaX/ulPGycBM+QuOxubKKwRiS7qK12zZ8a45kP
-	 j05cz5DOEqQMoY1DVszniT7gdBoDWhJCuoTgjDnPUdLTj8i68+B+hJn6dcV2H8zi0p2qg
-	 5dcZXxUFP/ifEZc/QWN0hQ1T6NI+buDfWtv5y7BF66DfmoRmDBH4eM9ZxsnQlDh8j7Q==
+	bh=rBpT+JQssQ0oplSiJBn6nhzU/bHNe4XYv5w/XMbMTxc=;
+	b=iDvVRQTJVCHR5Z0tVzHX/9YQW9p+8wPHq3D+PEN7YNGQ81zaaNrvMB8WyUsV5hPcUzi+
+	 DHKab0gonkyCrAvr3Jk/rRA2NtOW4s0tkkWeAxnsjnSVu3JbBomlTLUpptwvHQfY7UBP2
+	 zwUDYwwU5B4mc+rYJ7JbuoxTjAsyIHaOY8m+Ah71AN6xrFBVjJpcrpnSh85kpihzYkZdB
+	 WK5r4SEsbXA8lalWCG1jiZDERLskeN1/+wypghZQMEJMpHFiNnwebIMjgl08TfkzqqGIy
+	 j1s/4i5l8ezFpD/ovPskKxWhAHUoU9MO+/ozu4QX9UmBY1DFQI76I2oB5KN4wAg5Kyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJRLK+yu;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UMa4atpw;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6017606A320
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7548960A260B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJRLK+yu
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C42A1F01825;
-	Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UMa4atpw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 119A21F01828;
+	Wed, 28 Oct 2026 19:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793217021;
-	bh=hyRErXTquKsuhtJlr8zzLss0mtFs+g2kmUxEpzLS74s=;
+	s=k20260515; t=1793217025;
+	bh=rBpT+JQssQ0oplSiJBn6nhzU/bHNe4XYv5w/XMbMTxc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=nJRLK+yu/XeCV+Y3KNM4KM0y6Xz+srRHF1bN6VVB4gN3yFYxVrtHXzVihhRgobleP
-	 KVuw0IV4FlAnxemeLpyS5mqC07jz7/wiTsY2wbH4H5sIIPcU2bm+Pw1i3cM2qoVOFg
-	 f6EwY8oXkwvs1BUAHHaeibjXwDH0LdW53FCO9ZntDU6PcLlDAIv008HETWih8CyFt4
-	 0t+M6vfQnRd29XgjOduadBn9g9Y2E5RqF5p4yVslkkHsDNxEByCuRO+WPRp2uZc8MF
-	 QY2jbS8Re4e6dw8X19Af8TwSRIfWOBTlbDoope7TyrInVghBvHQK0dCqF2vaoWq5Cj
-	 UGzkaxHc3y9JA==
+	b=UMa4atpwW5y70kOwolm6h5hzrtfaIWgReoVXS6TW4UUaQ93hbQIQOU5nYQww/MqVb
+	 lasvJMAAKInZfkoVzf4B2H7n5w8+mCqwZWHMemNV8O2UaX5AD+PKQycKZWhIjkkaSG
+	 bR0qqBkrz4/8u53TG/ToaK9PZht0ZtM84mDMLHIAtn2umuqOBWZIsiAsBhIuuSv59w
+	 osmFE6k5zRQ57SrNmySZXQp9e2aCew6qINE1VpKVk8S6xbd6R40wkF4QYSOCVUKbSG
+	 /UfdopnWShbUSK4ulxgZqIN4r8mbd1jTeAeJJE0Ku0Q8Pag5TpMRGmjoyfqenUGmEe
+	 CGPGNkvUoAPYg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 814B23AAA770;
-	Wed, 28 Oct 2026 19:50:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 073093AAA770;
+	Wed, 28 Oct 2026 19:50:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,37 +54,34 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] adapter: Fix Discovering staying true after a rejected
- stop
+Subject: Re: [PATCH BlueZ] ioctl-tester: Fix name of the 3-DH packet type test
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179321702006.1394536.2604695616484204299.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Oct 2026 19:50:20 +0000
-References: <20261027160852.54689-1-kevin@simpleble.org>
-In-Reply-To: <20261027160852.54689-1-kevin@simpleble.org>
-To: Kevin Dewald <kevin@simpleble.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+ <179321702352.1394536.5341195369695217645.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Oct 2026 19:50:23 +0000
+References: <20261028051620.3167775-1-yaroslav.voytovych@gmail.com>
+In-Reply-To: <20261028051620.3167775-1-yaroslav.voytovych@gmail.com>
+To: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 27 Oct 2026 09:08:52 -0700 you wrote:
-> The kernel rejects Stop Discovery when no discovery is active by the
-> time it processes the command, because the discovery ended or another
-> mgmt client stopped it just before. stop_discovery_complete() then
-> removes the client but keeps the discovery state, so Discovering stays
-> true with no client left, and the next StartDiscovery with the same
-> filter returns without starting a discovery. The client that called
-> StopDiscovery also gets an InProgress error, and "No discovery started"
-> if it tries again.
+On Wed, 28 Oct 2026 06:16:20 +0100 you wrote:
+> The test for set_pkt_type_3dh was registered as "Set Pkt Type - 2-DH",
+> the name of the test before it, so both cases were reported under the
+> same name and a 3-DH failure would be shown as a 2-DH one.
 > 
-> [...]
+> Fixes: 0da759f1a36d ("tools/ioctl-tester - Add ioctl-tester")
+> ---
+>  tools/ioctl-tester.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - adapter: Fix Discovering staying true after a rejected stop
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4f3428e9df2f
+  - [BlueZ] ioctl-tester: Fix name of the 3-DH packet type test
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3e5b0da969c2
 
 You are awesome, thank you!
 -- 
