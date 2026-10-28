@@ -1,84 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793185256;
-	b=gQRQpN+h2IAxwxpF6vPFWiGnC2gLo4kvgulxdIejeZEHR8jxiqLdXBsp/4Lt//lUJ7kV
-	 ktPxHFU2rPEBlVQrBDGnjEn2bz9QDpCWUOd8wc02YnOP3QoC1uqX4g//EFN/8ZHjq3BXK
-	 ADF5CWsWtGR8OibzP8SWlG011TgkzNXTRhsEKI2rdWKe9peHhmsv/pGAfwZ4lHVr44BDW
-	 DcfEjXV1Mrad6yeX+8JIoGEDWii6oMUQ43JWSBUQzVF6ZIXICLydAXYBb+Z3XgaFyWGub
-	 UiZr+aJzAGijltu3DxpRv76LrtduFNYXR96dXuyOBdlUQkOKcg05cXQ+ceuUJ0gEFnQ==
+	t=1793186330;
+	b=c+Fubz6Y7fLX8ij44mTfIBCUMQOSNrqc55G9iZKrMkZ8TASPiLjJP2ZDNAGYVRYUGnyt
+	 XHpmQ34VbC/9mY6QYfPiflxMF1OcLYdz/6VaoZ0QUxDUteDtzFp/MmdSuBMx1NM2oGaw0
+	 VdvRA84yC99B+0EdTsQ6z3oDY278Ktxas6uSFdeGdvJX+ftG1XMKacnhEqSx2MAiIk0Si
+	 UaQEybwRgMDHPzRwSj5ZE4WuYkqCClgmbHzy6Yk4BJFPjtWrlhvqCVZR5uxq7dge/43hN
+	 JmHNIYvKIDpbW5MepG7mKRSqei4XFAvzY8QjTPShKvoc1LRvaHZ5WPdo7D0Rawozhdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793185256;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=VAN2JLXiVdtggCB4Z4MBTUK9lMN8Jp+OnH9Ejr3SruE=;
-	b=GNneuW59rvtjDy8BHzfpTo3JE8lJQdsoWLJBpT3v2A/KqaEjoF4qbo7KwKqxDmBAcx6+
-	 YT1t+khxqfBeAZhpj4W0QskdCwAibtjitHx7HmaM5zHKkEtuDjhGs2CARdvVOb5Wb5LMW
-	 n2jI2CugiQJkkJkgak6nljIm1okNbMrz8NNxCiWjp7EkQhfX6Cam8YAI2/kFY1Kbhj4L1
-	 /CJ2oUTrDqcgbSXO6B1IUzNWRC7j7ZZhe0F+2cAQ9dR5ZKDAWzMBbIUZK3Y1vcLn4+pJN
-	 QgvtF0vJoq/ljReDTBeWkya+Elh+ypfF9V2Cwbdh0LuviwXl9Rv12ozX03R/I0uHhJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793186330;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding:
+	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:X-Authority-Analysis:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=UHAg2pLmqH8v1pfUE8pjCG6fL2Tv/JRtlo3awaOg+BY=;
+	b=Xv7GzQDvTT+P/HwdzGnH3/gwY/lcw2psWZ2JqZRVC3m/83x0sNZSCtQeYqLcqgee0onr
+	 mI0Gjdiq0Y82UUUXfPOjxyRMqD/QAo7p/j/CsKTYr6Ab13f2LWTODAYG+6hduu2Vi+SZY
+	 kHTAdhyCJq3IB6DBkJizl7053gsfLy5mZbbQAV8ItQSuX3REIHVLUUxdWbfNNa6TbxrqC
+	 ZXH9t9PAZtX3nJl3dUcIEpLexOinngKBnaLvpxs1HpuefRM/HJgui3hEjxGTjaRF9h7Yp
+	 yfE/MZeUfgUoy1VsTMlkgh/Y508B6+UwZj0R+Y1rgcaaJl/L+HpL1algd7LVwyvMM1A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fRXk9ELU;
-	arc=none smtp.remote-ip=209.85.210.45
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=R8rWGQ2S;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6740606A324
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 11:00:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6740606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAAC606A31C;
+	Wed, 28 Oct 2026 11:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7FAAC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fRXk9ELU
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-843cf077f10so970053a34.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 04:00:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793185255; x=1793790055; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=VAN2JLXiVdtggCB4Z4MBTUK9lMN8Jp+OnH9Ejr3SruE=;
-        b=fRXk9ELUK8Idpo3GShxNNj7KDaxjrulIzcjRJpyV4l4dbFbyKM4bUprO9B51t5pimI
-         EivxIO1vRq2MHVsKNm440NyNZm6YdojA0esbIpOT2CbAw0MBb5y5PLo1AM4Pd6L066I7
-         bHHuAV+q+yNY0vFybfRZmb+XzI2Cne1XNrnTw7sEzBFKMghUIYrzAkEMcltSZx9GTwXl
-         nkGbvOCHXOput4Z0kRcEkMKFOk5C30nfQZA453qU02GoFLJTGcwBgSrnvNiGYc3T4ZhD
-         Gpg02h+jN2GYnjtP10DfIzNJAq28/ra9MCivO7VysT9Q7pFKVjj1/GGoPLVO8tKCsbed
-         zQsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793185255; x=1793790055;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=VAN2JLXiVdtggCB4Z4MBTUK9lMN8Jp+OnH9Ejr3SruE=;
-        b=x702sV8xwN8tFLbXhcsSl6YqEdnmFQeavKUfDj5Xw5eaXlYzhZ2M9RBAg6+XYT+ZNR
-         dnayN05q6bAYq8bS2x2z1+Dbz4A4pC1wc0UN2u67Z+64foHgaiODJgcY0ApK3XkmdbDS
-         ZifhKeRKESYzDZJ03JJRDExvY+4QCa+/WFvo3BSKsT2QuCLussWNtuJMi98rXa3upNaU
-         dgKy/oJTeiOPKaa8I2oC7vJhHPd+oe4PuenHQFD5v65gYduBfaF3Yk6oUsXpyzTmo+zx
-         SF2khvSO0WGXs/fibeEyYk09XM0vMM3RUwGUOkV2WzQg38acBt8eRCtYkaq1ONcb5Dhj
-         tpmA==
-X-Gm-Message-State: AFq9FYKIXjSvBtUNh9r4KS1Logjnn0qMErb950BdicoTudQa0T/JxPpH
-	OHDMKNqjovLmgwucWmd7dWmZpoUKozurJ1BgGB9c4i4G7JLXLREvRE5jz9I0KsVz
-X-Gm-Gg: AYBFou38WQsicdnTD4rFO5v1p0/E2ubIEVuC+CEfmFOvMAKC7KwyOmjvR1YsyX/trMe
-	nfHhjFDJ4lI1V1C+RcIhPLh+b5Gfb3uas5EXxxU8viMxFjhI3Hv92e77mx2d5WHrLS9KGRf+Sii
-	w+i0z5srtC0LjoFNJemvS3boTMc3HgF1b6LPJSTSAvJZiVxPil948tXxb9db0O1i1/MTmAh4yRe
-	JZt5r3AyYjIfBYEFl5algDAMH3O5t3mFzx0UPX5YpUhf22eiSkjbuwS8xW4ZUWTRj9qswQRQfdJ
-	pxvjxXebW2VPnZlm31Xhskpus1AKh1qh2sNDbSYoUZyvjJpsnm3Pd6XG2q8ca6Zwe8eoSAH01+j
-	zIq5BhlU7vQLIYAnqHKiHOgt9+dwaY7gzZxqGmrnZKG2O2gwchBaqTzsDtL0XxGevsNDHKdYkBf
-	oKGN7WHPa7vNSpHZcBx+C5LoLo+rcDkZrt8wXQHsgl5ub95OEY/n36mLwqmkHRk37JfVfvVwNB6
-	waGBXJrDEs6Cz73eP75byu7OZWQcyDTVvvq1RT/DDIBUKiNjfi5+DFWPex/R6A=
-X-Received: by 2002:a05:6820:828:b0:6e2:4cc3:b142 with SMTP id 006d021491bc7-713f0baff78mr921475eaf.29.1793185254701;
-        Wed, 28 Oct 2026 04:00:54 -0700 (PDT)
-Received: from [172.17.0.2] ([48.214.149.50])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a8b7979514sm1997918fac.17.2026.10.28.04.00.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 04:00:53 -0700 (PDT)
-Message-ID: <6ae1d5e5.3d33c982.a4cfe.6507@mx.google.com>
-Date: Wed, 28 Oct 2026 04:00:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0115188075432305504=="
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=R8rWGQ2S
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69S8K4nB066004;
+	Wed, 28 Oct 2026 11:18:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=UHAg2pLmqH8
+	v1pfUE8pjCG6fL2Tv/JRtlo3awaOg+BY=; b=R8rWGQ2SV5VLCZ9704kxJ+cevoW
+	Jdc9KgC2tJ2mERjT7qrKTDeLz8y81HmBOMWNvO+6yQ6bzy6+vYoDmz+tqn7lR67I
+	NgpkrPxy0bDZR1Pt5x9Yl0J1IW2cPIw1O81ZAg/s9yJIMXdbantoLJZ9/k7Yom/S
+	iXs8ri3/b1f7kVpJ4bOcZHHTqPHcinIxIRpEPk/ItQNBM8BXjIZWQ+BAjYUonw+9
+	LSjMjAqwvgtIa8D1a2hJ+amRnFw5TQIc/TEMraEbEt9oV4KwdtsATt10dOIAIL7O
+	zjOMV4ZkjqtVNo9VjAVyF3fQg0+F+egysWK8jQAvXd9/c7PRQ/xTOffULAw==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hjy6g3u1p-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 28 Oct 2026 11:18:43 +0000 (GMT)
+Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 69SBIgTO3253971;
+	Wed, 28 Oct 2026 11:18:42 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 69SBIfiI3253938
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 28 Oct 2026 11:18:41 +0000 (GMT)
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id BCFAC683; Wed, 28 Oct 2026 19:18:40 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chejiang@qti.qualcomm.com,
+        quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
+        jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com,
+        Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Subject: [PATCH v3 2/2] Bluetooth: hci_qca: Don't use the serdev port after a failed reopen
+Date: Wed, 28 Oct 2026 19:18:39 +0800
+Message-Id: <20261028111839.2148515-3-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20261028111839.2148515-1-shuai.zhang@oss.qualcomm.com>
+References: <20261028111839.2148515-1-shuai.zhang@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,40 +86,152 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
-Subject: RE: obexd/bluetooth: Fix profile registration race and clean up
-In-Reply-To: <20261027-fix_obex-v1-1-3d91aed181b6@oss.qualcomm.com>
-References: <20261027-fix_obex-v1-1-3d91aed181b6@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDA0NCBTYWx0ZWRfXzrw4uScmI6vu
+ jBlMklTfPJELBvgaYvFLBdkBsxquHhH6O5v/ZpBsSJRw1Z663RP5VhYwTM0QmhQCIHBZ+6yAhv6
+ ovhf94g688Pl8/Ss7IoNBrFjhpW4Bd3dEgTocXqFEThIIh9gF8KOo0tid19I+OLnYZ0OH/24mNa
+ IdqsppVjpj+G/r2/HIXqScu3DRFqJR8zLEbIyf7OnTuKvkINAGLg/tngC34izGpDKVQE0oEgPIZ
+ t6mqJtmpgCZx+zVXlhM8AlSKSieu0+X3zmhjmEgyb4bX7/1h0iiDCP1Tf3pRAC8QsabXUZHl+HG
+ wRMI9x1Nv/ZUf7UqFgOmyJzc3i3rvzXktMz2RHh678v7B82WR0RwMhQOitF/yNFZM9eLhF7RW/5
+ 7yToXChyNW3GsHiIWc7eR+z9TD/dS+u5kZKqFbhOeydUS2V9Mj8TClTx2MEskvuf86qFlo1glVC
+ lnZjr4+fWKbhTeXy/+g==
+X-Proofpoint-GUID: RU1m9lrdhYUlA14kHzzS8qeV1UHsuieC
+X-Proofpoint-ORIG-GUID: RU1m9lrdhYUlA14kHzzS8qeV1UHsuieC
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDA0NCBTYWx0ZWRfX8stVN0M3Nqfm
+ Epvg0DteMwlXGnX8IA2vQCqArGRNd1fDodKwdTpmFIRlIB8Ux8i2+MIRmn7KXlWLVL3bLH2bk/X
+ zQvhn3XDNOu6MoW8m9U2gd6e/1PPAi4=
+X-Authority-Analysis: v=2.4 cv=dKgzC+Zb c=1 sm=1 tr=0 ts=6ae1da13 cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8 a=6kjjVuEVlcK_fzh3hnQA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-28_03,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 spamscore=0
+ suspectscore=0 priorityscore=1501 clxscore=1015 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610280044
 
---===============0115188075432305504==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+If serdev_device_open() fails in qca_port_reopen(), qca_regulator_init()
+or the qca_setup() retry path, the port is left closed but
+HCI_UART_PROTO_READY stays set. The error reaches qca_setup(), whose
+retry loop calls serdev_device_close() again, and hci_uart_close() or
+hci_uart_unregister_device() close it once more later. The HCI core
+also calls hci_uart_flush() from hci_dev_close_sync() before
+hdev->close(), which writes to the closed port.
 
-This is an automated email and please do not reply to this email.
+serdev_device_close() and serdev_device_write_flush() have no "not open"
+check. ttyport_open() clears serport->tty when it fails, so both end up
+passing NULL to the tty layer, and the runtime PM usage count is dropped
+once too often.
 
-Dear Submitter,
+Keep HCI_UART_PROTO_READY in sync with the port state in hci_qca: clear
+it when the port is closed, set it only after a successful open, and
+only call serdev_device_close() when it was set. hci_uart_open() already
+treats the flag as "port is open" and reopens the port when it is
+clear, so the next power on recovers. Make hci_uart_flush() skip the
+port flush when the flag is clear, as it already does for the proto
+flush.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: obexd/plugins/bluetooth.c: does not exist in index
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_qca.c    | 33 +++++++++++++++++++++++++++------
+ drivers/bluetooth/hci_serdev.c |  6 ++++--
+ 2 files changed, 31 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ee3ccb59e..66332e744 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1745,6 +1745,27 @@ static bool qca_wakeup(struct hci_dev *hdev)
+ 	return wakeup;
+ }
+ 
++static void qca_port_close(struct hci_uart *hu)
++{
++	/* HCI_UART_PROTO_READY tracks whether the port is open, so a port
++	 * left closed by a failed qca_port_open() is not closed again by
++	 * hci_uart_close() or hci_uart_unregister_device().
++	 */
++	if (test_and_clear_bit(HCI_UART_PROTO_READY, &hu->flags))
++		serdev_device_close(hu->serdev);
++}
++
++static int qca_port_open(struct hci_uart *hu)
++{
++	int ret;
++
++	ret = serdev_device_open(hu->serdev);
++	if (!ret)
++		set_bit(HCI_UART_PROTO_READY, &hu->flags);
++
++	return ret;
++}
++
+ static int qca_port_reopen(struct hci_uart *hu)
+ {
+ 	int ret;
+@@ -1754,8 +1775,8 @@ static int qca_port_reopen(struct hci_uart *hu)
+ 	 * Without this, we will have RTS and CTS synchronization
+ 	 * issues.
+ 	 */
+-	serdev_device_close(hu->serdev);
+-	ret = serdev_device_open(hu->serdev);
++	qca_port_close(hu);
++	ret = qca_port_open(hu);
+ 	if (ret) {
+ 		bt_dev_err(hu->hdev, "failed to open port");
+ 		return ret;
+@@ -1779,12 +1800,12 @@ static int qca_regulator_init(struct hci_uart *hu)
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
+ 
+ 	if (!qcadev->bt_power->vregs_on) {
+-		serdev_device_close(hu->serdev);
++		qca_port_close(hu);
+ 		ret = qca_regulator_enable(qcadev);
+ 		if (ret)
+ 			return ret;
+ 
+-		ret = serdev_device_open(hu->serdev);
++		ret = qca_port_open(hu);
+ 		if (ret) {
+ 			bt_dev_err(hu->hdev, "failed to open port");
+ 			return ret;
+@@ -2073,8 +2094,8 @@ static int qca_setup(struct hci_uart *hu)
+ 		if (retries < MAX_INIT_RETRIES) {
+ 			bt_dev_warn(hdev, "Retry BT power ON:%d", retries);
+ 			if (hu->serdev) {
+-				serdev_device_close(hu->serdev);
+-				ret = serdev_device_open(hu->serdev);
++				qca_port_close(hu);
++				ret = qca_port_open(hu);
+ 				if (ret) {
+ 					bt_dev_err(hdev, "failed to open port");
+ 					return ret;
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 48ba017e2..d2c48df34 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -101,11 +101,13 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ 		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
+ 	}
+ 
++	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
++		return 0;
++
+ 	/* Flush any pending characters in the driver and discipline. */
+ 	serdev_device_write_flush(hu->serdev);
+ 
+-	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+-		hu->proto->flush(hu);
++	hu->proto->flush(hu);
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
 
---===============0115188075432305504==--
