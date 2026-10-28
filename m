@@ -1,57 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793194380;
-	b=4Hy79Z5CgpWrW91q7+ZKD2nuCXlCTFnXc6DPMuAWKEgRzYRhn8oXCfM+2uCkznW4dd/m
-	 eLJwQ8kPwmWqDYayNlx45NaDvhSmGKlsnasIyz8Ewb+8Q4GrU4QGo94KIGHAsM70DP9p/
-	 OwGH4AiEIgR3w8j5b08Qo7aSdxaDJr/z/1cSuas1P0JjAEqYqG6QfyVlnBfKsOhdb3aXI
-	 +jHeKVVPr8gUrW9KVdXX46f5zLWIIiQu5djioSMw+0O9qmYpvp1/8TJQGTSa8qHtjdjTk
-	 wSAmq2eHIPrjEmYyraGzc89716aTh8WLPOu7yiCly1qqXfsVifTtRh261MbpnuxWx5w==
+	t=1793194756;
+	b=wMK5NEXTMiX1XL2TgewnZkpwCZrWGC5lKE6VhmT7cFEFwcEcjJA4jrqujYAJwYx+Em61
+	 QjZW9Vr5llBz/gMgJVXrOXFpWCTKHAMLAODNKr3MKlIFSOQP9SgXeKzJIpCjodgzZjrTk
+	 j2hs9ZBtr9PkzZYBPQQJA4w63PoxfNWE0SzxWkgw9bXgIwTAvgterUAZfUgncXGtgQyIf
+	 5+bB9G9Ypj+gQy/7Cu5f5x3J6vEKWeRMTymNQE4NbIEbppg4TKxAirDYMN2Zp2zbZsg53
+	 tsxV/Qm+ZWThiVPmb5QYqeNyqWS7lzMi9/bWjxUVOXeE5OaFhlxNWReB6T4Y71fF4hw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793194380;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=TMQT8ztWNsJp5Fu4KvUQuCogRflfF3hpX0RFbeHeY9I=;
-	b=dY+s558KV6QU6+vX88QMAiCHMciygKYodsAAm7m+wn4g0nUVi6G8pK/eunNzFk9208n/
-	 a9HJBykPZjGhYKBPKMSNz9A7MoYCurGBb1lP+LQK9WciWDxRQxFN++hD+81DpZNadUJJu
-	 IQI6c/dNnvAaOY+Im9rNGzdnI8hS6KBu7WEbaOgeLM0Wo+oPnXUQo+SEwpiV7k6x/Nw7y
-	 hvgys3ERm1Y5uZ8/YoW0XDL7AEZmJevGoufZvUTw8deEIYCkMZgEmmWkNjYg0cO0slYDX
-	 6SHhlHdqbgzsIFVAj5ijBDiUda0D5AkE4T94Jxj7Tk44QQkDr2C14swFVacLU/KzPLQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793194756;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
+	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=m+Ne4+mem7clbk7diUwLgzqxNtPillBEGVAT9SSEH4U=;
+	b=Ae/CsMTWY0CbWEsqOvKRnVzh6XYyVakJeTkBU5QjYdXMhvZ0EDGrm1e52sv98GafxXyK
+	 xVDptZpn4HjlDbFUtMqtyO9t5ydqj5Apku+6mYte2OZv354ovcimORSr9BDE6BZzA6y+m
+	 ySopBcl0BvH0S+FBAYc++x5CZXcneEHPqkRxQXVf7MSdyE7yF/DgVAh1MaIv+SuIjPDvQ
+	 QlY2786cefejfWq4rfgFamy9YxQOy9Z3THFA82n9ZyFAywIPr7dHCImdh/uFeHa1D8UBx
+	 3rG/0bAKg8Jd8E2u9HZFOPvKP0TqQ3Sn+gySlI3b5cgB2ds33E2MwKeyhfkwVlUdXIQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=sR9nPPmJ;
-	arc=none smtp.remote-ip=109.224.244.18
-Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=di2j29zY;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=XWxQ6PMN;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DADB606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:32:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3DADB606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987EA606A31C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:39:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 987EA606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=sR9nPPmJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793194377; x=1793453577;
-	bh=TMQT8ztWNsJp5Fu4KvUQuCogRflfF3hpX0RFbeHeY9I=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=sR9nPPmJ+/qXzBmb16Q8SV8frSfWh4iaSvwemlza0j8yKC9mmTXP7Hxpno57PnAlg
-	 aUUY4ZnuOIVQT37p3DRpmYSShY0c1vb1rmKBKNVdKnfJ28H7m/Vgsglnv60R81m+PK
-	 7g0LwclesvVuNSkpsn16oVoR9Mu2mbmMTg+gpDuIZjoBE7N+VWWEYCwncnMVaScISD
-	 TBH2YdzdeoWY3/doY24VdPANDvqdP5lwbjSXxLwf2CKPGcQSxn8RpYkmNpqzk2Z+5G
-	 nSFqq3qSft44bF7PuoEjNYo6HeKL4fSXfhUdYSNOQ6qM+Bmm3lrYlL+pyqnVC0MGGe
-	 +Hq/61SZ7Zy2A==
-Date: Wed, 28 Oct 2026 13:32:53 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [RFC PATCH RESEND] asha: Defer BR/EDR inquiry while streaming
-Message-ID: <20261028133243.262314-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: ce30ecf58e4b7816861fd7665d24017ccec969a1
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=di2j29zY;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=XWxQ6PMN
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69SBdtmF137566
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:39:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=m+Ne4+mem7clbk7diUwLgz
+	qxNtPillBEGVAT9SSEH4U=; b=di2j29zYseF2kVmIw9AQuqgbb83seqjgGCS0rE
+	93NcV2yt+nM8bkTMmUnT7w+xLKFIb7vIZ61Rk7MrF0NFxJMneICNpGe4eJEXb+6S
+	Op9um7CxhQeyBtbHcDMw24+lRSTCbHHovfp7K1tjtYDdbI3oK204pygbY2/nMqd/
+	9y19Z7wMIwdDO8Zs0bIBD9BZ+217o1oHyG9tMBfbkwqKprZsLS3FjcyoR8EIwT0M
+	n63CgS5fVAC3TLCp1rrpfRHA8HNgmg7XcRad9LdUr5O4r7PDEmACoYyl3nsh0gEE
+	l88Y0W0IyLOk4wN3Ixv7h2keQF889jm5Ukjw5CexK+zo5Trw==
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com [209.85.128.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hk6f92nvm-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:39:14 +0000 (GMT)
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-8b0f5e7cc16so1096807b3.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:39:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1793194754; x=1793799554; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=m+Ne4+mem7clbk7diUwLgzqxNtPillBEGVAT9SSEH4U=;
+        b=XWxQ6PMNKGJ+IuDt7DI6eAAJduV8gd4a0ZjWRVdLSiz9ogH6wgsJoJ7cGEbo9z5UDj
+         FziMeK5auMnlVbOcyrNEE0rD9FywGvMTWeTQtCdFk4mNK6bUB94BNcQzK2BaZGlM4dLD
+         HYs1ffKyQrZhNRq7l2xnSrXYX6mi/RYYxe1lV3S0762NOt6le3+MWBMG5E4ZVDZH2nw6
+         /K/jnC/7phIfOlIPsYm7vyc5pRsnfk6D9tUrnZF8Hi2vC2UNgcmTI9zgJAg+a0zzbj50
+         b/KT6Pz6tLwOgtXlJBsiBG5ZnG07j1z7jfT0agStDf5xIrL0b8vwpWKpKEPIE8e8kFxP
+         W+XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793194754; x=1793799554;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=m+Ne4+mem7clbk7diUwLgzqxNtPillBEGVAT9SSEH4U=;
+        b=g/DnZIWjRSqwAAbZ1OTMTbBn6cYgxdbFciXEFpAnY7hhpmaODTqnsmiAtKJofci3qP
+         jY45YmeGXeVLGPOKbfa7XnohP2+78Q/iZOkTTktw8yAqWj8pPWj/zUMhAKvf8in8yfsp
+         kma7BF2uMrzXLccTZwbeKwmyUglpJW6fJtBrKkkqOXzfDbN+z25v6AuHcC/4C9f2cL93
+         vhSZb/9EcdC/+aurxO2d5tqydLzOQ3R/d23aFSyx5WohNy4iR5c9qabxCjplYTbeQsof
+         OYpingWEvexpQta9lHXNDM3tzH0biI2LlFUX63mrhMmaRVvr7/qcftw2TGf0MaiXJdWS
+         ATyg==
+X-Forwarded-Encrypted: i=1; AKwUvBxIYkMLfaA578ejiQ1+Auucyh2hv+oGAExmiS5AdbLrBXft7VRjTbDy3Z2Bn5aGzubA6CKETAot5trtejdd0CE=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJg1HDJ+CrugoGfOZGCYFKvlaKGP7gawV0Wok4WG3KMnOJoI2O6
+	6GOy2aTrP+fr7rj/PZcV7bgWvoahG/WsoB1uZxq/SX5sL86sSq2sny/beQvV7VQUgtjGtNb5x4g
+	Po/L1OdUcj8LKzRvpCcsLuZZKIXXX0hAnGLmNDJq4kpmFeHyZpsJ+JHgYAENHWnTahEnmMUY=
+X-Gm-Gg: AYBFou2rbGRm1wzb8h3kB6KcBjX2KWaoocCi1guOQ36fc/CxBQJT/l8dq5lLbtm2byo
+	I2NmtN5sk2F+awHOsVqeIkGkxB4gVgJCkEm9J3pjuRa4wYif46ZiwcF5kqj+Y6E0SGi5WBlkIkE
+	jjmfiNKFscrkqFT3eghVweiZxvk8ZOwZ67JPNx7wvjmDAgiIP0lzD8HSjsCdnE76y4URg5pT0MD
+	Bl+LZ4b8kOcOycbm7wr4qRM/mHikvikIrLx+KPlw8qiRUyNelXC4RvnnHSUItP3WLFzxqZ45RYX
+	9qGPNdZEywcWsMyZ3hwaTrE9dciE7xiBpn/O0uiz5mB9SFdvGVBZPcIDvptoFUbQFg5BqRIra9B
+	LuGCu2CHnfskGBJnIUypL+UvmDPxnEO0q8NcdGrPISILBe8rfRJ+FKrIdUM/UvbiQWBqV6yVM2n
+	b0BZyZL71hs3giAm6ZDn0z
+X-Received: by 2002:a05:690c:a083:10b0:8b1:a4b1:7abd with SMTP id 00721157ae682-8b1b595b3femr22089437b3.1.1793194753956;
+        Wed, 28 Oct 2026 06:39:13 -0700 (PDT)
+X-Received: by 2002:a05:690c:a083:10b0:8b1:a4b1:7abd with SMTP id 00721157ae682-8b1b595b3femr22089197b3.1.1793194753373;
+        Wed, 28 Oct 2026 06:39:13 -0700 (PDT)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b19e6365b6sm28184207b3.41.2026.10.28.06.39.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2026 06:39:12 -0700 (PDT)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Date: Wed, 28 Oct 2026 06:39:09 -0700
+Subject: [PATCH] Bluetooth: hci_uart: Remove redundant NVMEM dependency
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -61,354 +113,84 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261028-fix_kconf-v1-1-624788921368@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAPz64WoC/yXM4QpAMBSG4VvR+W01S4xbkWRzxqFGG1LavRt+P
+ n1f7w0eHaGHOrnB4UmeVhuRpQnoqbcjMhqiQXBRZFxIZujqFr1aw/JBoixzqVRlIP43h3H8Wk3
+ 72x9qRr2/AQjhAeK8BzhtAAAA
+X-Change-ID: 20261028-fix_kconf-4d8e8748bb9f
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Authority-Analysis: v=2.4 cv=frhJ914f c=1 sm=1 tr=0 ts=6ae1fb02 cx=c_pps
+ a=g1v0Z557R90hA0UpD/5Yag==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22
+ a=EUspDBNiAAAA:8 a=4keN-7vRS7seC8qMJf0A:9 a=QEXdDO2ut3YA:10
+ a=MFSWADHSvvjO3QEy5MdX:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDA1NCBTYWx0ZWRfX1C4Y3yf2RR70
+ S3TI2HlpR8PCyuBEGEAfyJxDPTLmSlNnx4d9NHzuCHUIbVdYcrGtM/5iJGwmVWmKyleID4kUIuM
+ 7+mswhNcL16hX81Pv4qWbYRlHnEpVUs=
+X-Proofpoint-GUID: U4A9rL1otmYuONwVZok1a9qokodbRe5R
+X-Proofpoint-ORIG-GUID: U4A9rL1otmYuONwVZok1a9qokodbRe5R
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDA1NCBTYWx0ZWRfXzlyLsqPYIHDH
+ +6jmKT0i6VillS08BMZjFriXy8K4A6yjoAmK3h3sOT6y7kpFVv3r3k27+KZQqNZtjjjxKmqmzf7
+ DybZ7wLfcsbkYsTjuCS75uF5bLWX+SQZ+p+uP7UQux3oc59kEDLghD/2Ae6z/YZntX1nCQdML/w
+ ZGcW7oQ36cNwfI8R5Cvw1RT2/ImPeUUwDiyVw961Eg6WcQYaaC1ZWjXWmR5yYNICCJyKjkDiUm/
+ ALM2d1CjegBYukMkGNPiI1d07saTtS/QUKxhmzQCiV5LRc4INSUMDSuwPN6EcG+y7VbVh+x20s1
+ 1coGkJ8bP/P6KyUBSiTZ3JAHEALLujJAm32BpQzIroDk70ZTglDHCLDdqyOsLJlauO3mZq1YeJc
+ bN+MZWujjDpzyuBYDrqDHiNyhV5uQnYO2IOvCV7EXkVNYlvbbA4SAKciafkr/Y8do68JgtVsJnc
+ x/NNyDw0MXNqIfpEKKA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-28_04,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1015 suspectscore=0 adultscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610280054
 
-Defer BR/EDR discovery while ASHA streams are active on the adapter.
-Keep client filters intact and leave LE discovery available.
+The dependency always evaluates to y since the following commit changed
+NVMEM type from tristate to bool:
 
-Reject a new BR/EDR-only discovery request with Busy rather than
-leaving its reply pending. Re-evaluate the scan type after START
-completes, and leave suspended discovery suspended.
+Commit 2a37ce25d9f2 ("nvmem: disallow modular CONFIG_NVMEM")
 
-Assisted-by: OpenCode:gpt-6.1-sol
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
 ---
-Resending unchanged after automated CI PR2668 expiry; no source changes.
-Previous submission: https://lore.kernel.org/linux-bluetooth/20261013035348=
-.525335-1-cochcoder@proton.me/
-Earlier remote functional, lowercase checkpatch, Codacy Security Scan and
-outer-CI failures remain unresolved. Historical local passes do not
-establish remote success; no new hardware or functional test is claimed.
+ drivers/bluetooth/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-Submission review notes (not part of the commit message):
-Local validation is for base 7428ca2df9356363079db0f48412c20cbdb9471f.
-Compatibility with newer upstream tips has not been verified locally.
-October 12 N8/UB500 capture 182750 has successful LE discovery during
-streaming, 5342 audio SDUs, no in-stream Inquiry, and BR/EDR Inquiry after
-STOP. This tests the combined package. Native MGMT acknowledgments,
-cancellation, failure unwind and concurrent-client arbitration remain
-review gates. A separate baseline SPA plugin crash occurs at daemon swap;
-the capture does not establish the source-level cause of that crash.
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 68929d12f608..fd4525255dd6 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -113,17 +113,16 @@ config BT_HCIBTSDIO
+ 	  SDIO interface.
+ 
+ 	  Say Y here to compile support for Bluetooth SDIO devices into the
+ 	  kernel or say M to compile it as module (btsdio).
+ 
+ config BT_HCIUART
+ 	tristate "HCI UART driver"
+ 	depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
+-	depends on NVMEM || !NVMEM
+ 	depends on POWER_SEQUENCING || !POWER_SEQUENCING
+ 	depends on TTY
+ 	help
+ 	  Bluetooth HCI UART driver.
+ 	  This driver is required if you want to use Bluetooth devices with
+ 	  serial port interface. You will also need this driver if you have
+ 	  UART based Bluetooth PCMCIA and CF devices like Xircom Credit Card
+ 	  adapter and BrainBoxes Bluetooth PC Card.
 
- profiles/audio/asha.c |  30 ++++++++++-
- src/adapter.c         | 119 ++++++++++++++++++++++++++++++++++++++++--
- src/adapter.h         |   5 ++
- 3 files changed, 147 insertions(+), 7 deletions(-)
+---
+base-commit: 47d4d9f67e92d56ef3965f2727f9c98a5a611368
+change-id: 20261028-fix_kconf-4d8e8748bb9f
 
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-index 8e625fdca3..602da68da4 100644
---- a/profiles/audio/asha.c
-+++ b/profiles/audio/asha.c
-@@ -60,8 +60,26 @@ struct bt_asha_device {
- =09uint16_t imtu, omtu;
-=20
- =09unsigned int resume_id;
-+=09bool streaming_counted;
- };
-=20
-+/*
-+ * Count each device once so inquiry stays deferred until all streams stop=
-.
-+ */
-+static void asha_set_streaming(struct bt_asha_device *asha_dev, bool strea=
-ming)
-+{
-+=09if (streaming =3D=3D asha_dev->streaming_counted)
-+=09=09return;
-+
-+=09if (streaming)
-+=09=09btd_adapter_le_audio_ref(device_get_adapter(asha_dev->device));
-+=09else
-+=09=09btd_adapter_le_audio_unref(
-+=09=09=09=09=09device_get_adapter(asha_dev->device));
-+
-+=09asha_dev->streaming_counted =3D streaming;
-+}
-+
- static char *make_endpoint_path(struct bt_asha_device *asha_dev)
- {
- =09char *path;
-@@ -91,6 +109,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpoi=
-nter user_data)
-=20
- =09if (err) {
- =09=09error("%s", err->message);
-+=09=09asha_set_streaming(asha_dev, false);
- =09=09return;
- =09}
-=20
-@@ -171,12 +190,15 @@ unsigned int bt_asha_device_start(struct bt_asha_devi=
-ce *asha_dev,
-=20
- =09if (ret < 0)
- =09=09return 0;
--=09else
--=09=09return (++asha_dev->resume_id);
-+
-+=09asha_set_streaming(asha_dev, true);
-+=09return (++asha_dev->resume_id);
- }
-=20
- unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev)
- {
-+=09asha_set_streaming(asha_dev, false);
-+
- =09bt_asha_stop(asha_dev->asha);
-=20
- =09if (asha_dev->io) {
-@@ -190,6 +212,8 @@ unsigned int bt_asha_device_stop(struct bt_asha_device =
-*asha_dev)
-=20
- void bt_asha_device_state_reset(struct bt_asha_device *asha_dev)
- {
-+=09asha_set_streaming(asha_dev, false);
-+
- =09if (asha_dev->io) {
- =09=09g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
- =09=09g_io_channel_unref(asha_dev->io);
-@@ -371,6 +395,8 @@ static void asha_source_device_remove(struct btd_servic=
-e *service)
- =09=09return;
- =09}
-=20
-+=09asha_set_streaming(asha_dev, false);
-+
- =09bt_asha_free(asha_dev->asha);
- =09g_free(asha_dev);
- }
-diff --git a/src/adapter.c b/src/adapter.c
-index d3aa03fb70..28c58106dd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -302,6 +302,7 @@ struct btd_adapter {
- =09=09=09=09=09 * without delay */
- =09uint8_t discovery_type;=09=09/* current active discovery type */
- =09uint8_t discovery_enable;=09/* discovery enabled/disabled */
-+=09unsigned int le_audio_active;=09/* Active ASHA streams */
- =09bool discovery_suspended;=09/* discovery has been suspended */
- =09bool discovery_discoverable;=09/* discoverable while discovering */
- =09GSList *discovery_list;=09=09/* list of discovery clients */
-@@ -1833,6 +1834,8 @@ static void discovery_remove(struct discovery_client =
-*client)
- }
-=20
- static void trigger_start_discovery(struct btd_adapter *adapter, guint del=
-ay);
-+static int update_discovery_filter(struct btd_adapter *adapter);
-+static uint8_t discovery_scan_type(struct btd_adapter *adapter, uint8_t ty=
-pe);
-=20
- static struct discovery_client *discovery_complete(struct btd_adapter *ada=
-pter,
- =09=09=09=09=09=09uint8_t status)
-@@ -1867,6 +1870,7 @@ static void start_discovery_complete(uint8_t status, =
-uint16_t length,
- =09struct btd_adapter *adapter =3D user_data;
- =09struct discovery_client *client;
- =09const struct mgmt_cp_start_discovery *rp =3D param;
-+=09uint8_t type;
-=20
- =09DBG("status 0x%02x", status);
-=20
-@@ -1911,6 +1915,16 @@ static void start_discovery_complete(uint8_t status,=
- uint16_t length,
-=20
- =09=09discovery_complete(adapter, status);
-=20
-+=09=09/* Audio or filters may change while START is pending. */
-+=09=09type =3D adapter->current_discovery_filter ?
-+=09=09=09=09adapter->current_discovery_filter->type :
-+=09=09=09=09get_scan_type(adapter);
-+=09=09type =3D discovery_scan_type(adapter, type);
-+
-+=09=09if (!adapter->discovery_suspended &&
-+=09=09=09=09=09=09adapter->discovery_type !=3D type)
-+=09=09=09trigger_start_discovery(adapter, 0);
-+
- =09=09if (adapter->discovering)
- =09=09=09return;
-=20
-@@ -1934,23 +1948,60 @@ static void start_discovery_complete(uint8_t status=
-, uint16_t length,
- =09trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT * 2);
- }
-=20
-+/*
-+ * Defer BR/EDR discovery during ASHA streaming, leaving LE discovery avai=
-lable.
-+ * A zero result means the client requested only BR/EDR discovery.
-+ */
-+static uint8_t discovery_scan_type(struct btd_adapter *adapter, uint8_t ty=
-pe)
-+{
-+=09if ((type & SCAN_TYPE_BREDR) && btd_adapter_le_audio_active(adapter)) {
-+=09=09DBG("LE audio active: deferring BR/EDR inquiry");
-+=09=09type &=3D ~SCAN_TYPE_BREDR;
-+=09}
-+
-+=09return type;
-+}
-+
-+static void defer_discovery(struct btd_adapter *adapter)
-+{
-+=09struct discovery_client *client;
-+
-+=09/* Do not leave a new BR/EDR-only StartDiscovery call unanswered. */
-+=09client =3D discovery_complete(adapter, MGMT_STATUS_BUSY);
-+=09if (client) {
-+=09=09discovery_remove(client);
-+
-+=09=09if (adapter->discovery_list)
-+=09=09=09update_discovery_filter(adapter);
-+
-+=09=09return;
-+=09}
-+
-+=09/* Keep accepted sessions until audio releases the adapter. */
-+=09trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
-+}
-+
- static bool start_discovery_timeout(gpointer user_data)
- {
- =09struct btd_adapter *adapter =3D user_data;
- =09struct mgmt_cp_start_service_discovery *sd_cp;
-+=09size_t sd_len;
- =09uint8_t new_type;
-=20
- =09DBG("");
-=20
- =09adapter->discovery_idle_timeout =3D 0;
-=20
-+=09if (!adapter->discovery_list || adapter->discovery_suspended)
-+=09=09return FALSE;
-+
- =09/* If we're doing filtered discovery, it must be quickly restarted */
- =09adapter->no_scan_restart_delay =3D !!adapter->current_discovery_filter;
-=20
- =09DBG("adapter->current_discovery_filter =3D=3D %d",
- =09    !!adapter->current_discovery_filter);
-=20
--=09new_type =3D get_scan_type(adapter);
-+=09new_type =3D discovery_scan_type(adapter, get_scan_type(adapter));
-=20
- =09if (adapter->discovery_enable =3D=3D 0x01) {
- =09=09struct mgmt_cp_stop_discovery cp;
-@@ -1999,6 +2050,12 @@ static bool start_discovery_timeout(gpointer user_da=
-ta)
- =09=09struct mgmt_cp_start_discovery cp;
-=20
- =09=09cp.type =3D new_type;
-+
-+=09=09if (!cp.type) {
-+=09=09=09defer_discovery(adapter);
-+=09=09=09return FALSE;
-+=09=09}
-+
- =09=09mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
- =09=09=09=09=09adapter->dev_id, sizeof(cp), &cp,
- =09=09=09=09=09start_discovery_complete, adapter,
-@@ -2007,18 +2064,32 @@ static bool start_discovery_timeout(gpointer user_d=
-ata)
- =09=09return FALSE;
- =09}
-=20
--=09/* Filtered discovery is required */
--=09sd_cp =3D adapter->current_discovery_filter;
-+=09/* Filtered discovery is required. Keep the cached client filter intact=
-;
-+=09 * it is needed to restore BR/EDR discovery after audio stops.
-+=09 */
-+=09sd_len =3D sizeof(*sd_cp) +
-+=09=09btohs(adapter->current_discovery_filter->uuid_count) * 16;
-+=09sd_cp =3D util_memdup(adapter->current_discovery_filter, sd_len);
-+=09if (!sd_cp)
-+=09=09return FALSE;
-+
-+=09sd_cp->type =3D discovery_scan_type(adapter, sd_cp->type);
-+=09if (!sd_cp->type) {
-+=09=09free(sd_cp);
-+=09=09defer_discovery(adapter);
-+=09=09return FALSE;
-+=09}
-=20
- =09DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
- =09=09=09=09sd_cp->rssi, sd_cp->type,
- =09=09=09=09btohs(sd_cp->uuid_count));
-=20
- =09mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
--=09=09  adapter->dev_id, sizeof(*sd_cp) +
--=09=09  btohs(sd_cp->uuid_count) * 16,
-+=09=09  adapter->dev_id, sd_len,
- =09=09  sd_cp, start_discovery_complete, adapter, NULL);
-=20
-+=09free(sd_cp);
-+
- =09return FALSE;
- }
-=20
-@@ -6266,6 +6337,44 @@ struct btd_adapter *btd_adapter_ref(struct btd_adapt=
-er *adapter)
- =09return adapter;
- }
-=20
-+void btd_adapter_le_audio_ref(struct btd_adapter *adapter)
-+{
-+=09if (!adapter)
-+=09=09return;
-+
-+=09adapter->le_audio_active++;
-+
-+=09/* First active stream: re-evaluate any running discovery so an
-+=09 * in-progress BR/EDR inquiry is dropped right away rather than only at
-+=09 * the next ~5 s re-arm.
-+=09 */
-+=09if (adapter->le_audio_active =3D=3D 1 && adapter->discovery_list &&
-+=09=09=09=09=09=09!adapter->discovery_suspended) {
-+=09=09DBG("LE audio active: restarting discovery without BR/EDR");
-+=09=09trigger_start_discovery(adapter, 0);
-+=09}
-+}
-+
-+void btd_adapter_le_audio_unref(struct btd_adapter *adapter)
-+{
-+=09if (!adapter || !adapter->le_audio_active)
-+=09=09return;
-+
-+=09adapter->le_audio_active--;
-+
-+=09/* Restore requested discovery after the last stream stops. */
-+=09if (adapter->le_audio_active =3D=3D 0 && adapter->discovery_list &&
-+=09=09=09=09=09=09!adapter->discovery_suspended) {
-+=09=09DBG("LE audio idle: restoring BR/EDR discovery");
-+=09=09trigger_start_discovery(adapter, 0);
-+=09}
-+}
-+
-+bool btd_adapter_le_audio_active(struct btd_adapter *adapter)
-+{
-+=09return adapter && adapter->le_audio_active > 0;
-+}
-+
- void btd_adapter_unref(struct btd_adapter *adapter)
- {
- =09if (__sync_sub_and_fetch(&adapter->ref_count, 1))
-diff --git a/src/adapter.h b/src/adapter.h
-index 583168f4bc..6ad8fb096f 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -119,6 +119,11 @@ bool btd_adapter_uuid_is_allowed(struct btd_adapter *a=
-dapter, const char *uuid);
- struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
- void btd_adapter_unref(struct btd_adapter *adapter);
-=20
-+/* Defer BR/EDR discovery while ASHA streams are active. */
-+void btd_adapter_le_audio_ref(struct btd_adapter *adapter);
-+void btd_adapter_le_audio_unref(struct btd_adapter *adapter);
-+bool btd_adapter_le_audio_active(struct btd_adapter *adapter);
-+
- void btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
- =09=09=09=09=09=09=09uint8_t minor);
- int btd_adapter_set_name(struct btd_adapter *adapter, const char *name);
-
-base-commit: 7428ca2df9356363079db0f48412c20cbdb9471f
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
