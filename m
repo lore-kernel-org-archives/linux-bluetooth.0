@@ -1,60 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793196350;
-	b=myBy+GGODzpK63qGY5yo+nrEgerRfnt1CVssKw/g8gk3XRLIC11bm3pvYiGHwbVQ+XCH
-	 NVmVd93UGtcjfqE3J4f2SBf00PzTwgdVjmX9n+NiSrp85d4b5vsNGW3CoPx730EbJUWny
-	 eqDYHl/t8bRoIekINevc2AAqZikO4aowJQ/0yOoD72MJQZXNNqObnKvHcFsrw86hxQ0B+
-	 5LJxRto5zT4I8mypruVEKUK6XhTFlBzNRbkiva71/Qzh4Ym1ZmQIe3XNY0+3Aq1KEHbN8
-	 HbXJnv+3OS9kMED2FXyD8uyw0MxckZidLl2XirAoqloTH5BsYmi6d6Ij37UbTiyUOtg==
+	t=1793197144;
+	b=0nzzIz1k3nCYQ4OLY8fzmHMznbG5wtITEr5EBybFRhK2AuuqfBcdKjMqS7gftC/34r3B
+	 +F/RTdXqienFlszlopEphBZ8kaOyZ5Nogff8658Vr9YXhOmLkx89NNRudTj+MeJHHu9C0
+	 CZnxHQ3AtAGUcp50RU+cN4We3ItZffKxFDxt9yp/t7mB9J0U0W1xx8cC8Dg7o4zGChLwP
+	 naHc0dbEVedb0Thsgv6IMb/zF8N0BhCvdn5lRxW4pmV/1Q0xK1hR2r3xEXY1KzR9DqoaL
+	 CzF5htfG+9/69hqxdX6amtfH+47lSoA2/DBHDA0ROIlBuaZA0g2FYhrE6Hmqwyrgf5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793196350;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=O1/J+kaNShq80w9shHctpBGI4lPnDdN0hctLUNkIl5g=;
-	b=d2ls14vwKVd3ca4rwB496gM+75RsQS9w1Jhil+Nks3nQuiLVVAZGy8zkfIm3fW+vQ2Xg
-	 kzOAqurBnsae/owkP4e3WmfQd4bUisqyN0mqQHF9fEt5GRKQHpXEbR3ALL1gUeyHxUVhS
-	 yRX3dHcNoDReDDgde9qnbleD6cOnDvUssJKu5HCaMg1e6NLIyO/W6SaxpZ1nGTJPmTR/W
-	 F2Ikmm7N1zog1iOKYn0bviDcGs84SH4kUNWn4MpJz5964VtnnZepfjzmyHtbXGLATHaKm
-	 ogkoykKL+jJNjo7Hv7ZVjRUFwKkV/1rA9Y5IjYTUm99emznbfJSeirzV4nL9iRsgX6w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793197144;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
+	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=vJcqemAVLZEHHjqG5FdeoT2RuY6git3ZTy8KuOQKtb4=;
+	b=RQuZg9S1DSM3yI/hgmZIJUW3FPkg7YG3HMLw4ERpmD7JDBHMTEurO+390BHG4sEF4gX5
+	 660nckZ4fs2j56YTzK2jAt2Na6DeOqS0RF6Tt9qtiLleBgIIo0G4lv+Gd6b6BCk7TiJrW
+	 KUAOJntvw2tUkCt2WQyOsfmsDZnMCLt2sResNmqpLkfox9kUdjUkzSBIWiDR/PUlRiZjZ
+	 mNxP5eAqaMfe6Jouhl7kV3kbHEZve/Kk5lnoF+4x46orROf1SNnZbpiBXTmWwil+rxazd
+	 j/wUmVJyeAEvRmnsFiIzvqy+SfrQ+Npap+nm04zKJ+dvhvwZVpsW/j8vUG8FyVrPYdQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=u8EO6pAF;
-	arc=none smtp.remote-ip=185.70.43.22
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=DAbfw0vn;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Sg3pJ29J;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14405606A31A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 14:05:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14405606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D41606A322
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 14:19:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D1D41606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=u8EO6pAF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793196348; x=1793455548;
-	bh=O1/J+kaNShq80w9shHctpBGI4lPnDdN0hctLUNkIl5g=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=u8EO6pAFgo9QaIsz9wY2u8uGc1G/LR4vzP+7tydOA0thIzIVmlMCrLbf7vG1Cd9Ma
-	 4Us3eCNy1yRBiJIklpPjIchvJTB7pL2HowmXK4eczCt7WmNxm7ypWSEnck62pYV4gD
-	 YEIMLAmz4xQcbbaJVsSWVJCu1vHkBUciTC5XTdPxIlEWw0e6ym1wE/Y7H2AHUywxFy
-	 UYOjiboMCbVEC5JWZd5RnCLbzMBKq+3dj0ek+yh31x4XSbXxJ7NOsqEeapipfgMTsI
-	 rqxAzq98E+/9Z3u0uAYua2jcQ7Yked0V/c3Wp4aJwN3B8UIFtGHNElwNMY0QMy2u1x
-	 l+QEKHFVunX1A==
-Date: Wed, 28 Oct 2026 14:05:44 +0000
-To: linux-bluetooth@vger.kernel.org
-From: cochcoder <cochcoder@proton.me>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [RFC PATCH] mgmt-tester: Add host-resolved RPA scan checks
-Message-ID: <W4oT9LNPKdNNAzhftMlCpyvcs_aogHGz_IyCJwURlkhIrxfhp1qvKSAImKBorEBrhtO0F0ZArWoXRzBrwtKViqTKDQarF9ASqKWsnEO_Z_o=@proton.me>
-In-Reply-To: <20261014052008.413209-1-cochcoder@proton.me>
-References: <20261014052008.413209-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: fbc5354ba54055dee72a6d4588b26013b2f3c4e6
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=DAbfw0vn;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Sg3pJ29J
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69SBdsVt1011769
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 14:19:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=vJcqemAVLZEHHjqG5FdeoT
+	2RuY6git3ZTy8KuOQKtb4=; b=DAbfw0vnINYnAreMLLbRIdLi5J/Htmu9L5hFbS
+	Afatuj0XQ9NMh/ZYWe/O6er9r8kqZgjWW160Yci8+G3Q+stYOWMZc1e7pGizQNdb
+	wTmSty91xH8hm/+xVc+BxqN7d0oJi2VUCf7Urqd/CjdlY8w0FijIfdIcNgdIbKo0
+	KBDGvGaeLqI55BcOrMkPVLaq4yoPr5LVRqZQ7wtFWBVdKW5zHqpQRNzpUvqwScV1
+	ujsk15dSxB5ajAKcCkjYAnQJ4SlFP52+OWB90oBBRV6XztDbiJpVsfdlW0P9SU/q
+	wNDBA2iF00ED3ekcadE3mWuKAnWakhQhmE46pQie1JPnv1fA==
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hkfehgtxg-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 14:19:02 +0000 (GMT)
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-82339aac413so234136a34.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 07:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1793197142; x=1793801942; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=vJcqemAVLZEHHjqG5FdeoT2RuY6git3ZTy8KuOQKtb4=;
+        b=Sg3pJ29JpUA7YO3pzRmjQ1iCPlhUOWoYtreYuczxhnTG/jw6Dq2BFumeNOtIUFBB6N
+         VknmNSWkvJWLHeuZLcViTfY/qQB2hPD56EKxyhvgZb5A4+WJ2CMWbGivMl/t0RW+BJCQ
+         yitivjsSweJjmOXuug0qdOGfYT4ZYdP+XHykKqN7jeC0B14hEEtsikXHbWZ56rJTDju9
+         MT5XCtD/6bC5+mL3RxUxeA1qf9lVt680Sdi6dP8JdMP6LZxUfWn7MMnZ+dMMifPKahJj
+         jcp3LTKgQr/84RjtwzKtBaG9ghogXucH55hOMwrYe3++B8zp2V2FPWrP0YpG4FedFCa4
+         lPzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793197142; x=1793801942;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=vJcqemAVLZEHHjqG5FdeoT2RuY6git3ZTy8KuOQKtb4=;
+        b=gQvC/HCP+bWZRcBMHyMc65GNYNAk+ROiz0IVIJHcZ9U2Qgnc2UchFuHRRBvLPO9oIf
+         cr9ZO0ZENx1foFyRueVbrff8siTtWRmYhoBaHSAj/DOfi/ZQkyDsmfK9vVojrNRTtuBj
+         JI3zr8MUOBA1Ef/tnKFaLdAQEzCZwn2Q3sMSVD+lgrRP5K6c4EM4qBLiKvx7LpoZi3PY
+         0d+Y6JcYRzcRedkcATGn8/Ojr05zGaVM0Sr2cDBQeKPzXrj+Vp2RTvJ4xdwCjA/E0uYy
+         rXxGXGyor2T0+eH9/JDv0Ot+qBfZkIGSRbQ+deyj2ecA5kb6v+5gmYjZStJocX7jbWl8
+         fTCA==
+X-Forwarded-Encrypted: i=1; AKwUvBxuWZVZk55byYCN8ER/K5CRkm60Ho44BNN5UghPPK3ykPutcXT/ZMgMsWmSSy58pWPwEhlU22ntSPHBtEqMhLU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLUaJSXGFULIcPBNtOZuiSnRFA3mphwPspo1UVbpFrgCh+MkF1K
+	dZxcufBjB1LRRmhvLjWhdVKsXTAX0IMckCpIKGxPcbs09Ub6Gux1rWHiQEIVDqq6MNYC3/BVlVs
+	RWosTr7VVYgqfGSVirtFKxWdbP6WiK99dkeadXiMsOZYm7qQmPoN+ag0PXhzlEAqtcnW+0is=
+X-Gm-Gg: AYBFou1xYdszFS6jWHhPjtmjh6HbxQb6MaIJq+IHtgtg9ltyKqSJzOTp4ZRAmXqbe5A
+	Jtfw5cDPggD10ZCsdLlf2V0UcUN4cF1LcE6gwGHYlpJykvQXTfjggCKvN3oITeAGh51TCGlNQTq
+	E7tEaUubDM8W27cHmglr9nyFC7UHojRFAafNdgA3qi6+vxYgnGOUp65V7gsjnlXERlm6Gyi6S7z
+	iROnRgNiU5ZJrHU6/eDtud+yNoaji9uKxht/DIk1IUlyV6gaeC9+Zswm4lzZzqgfnmfL88jWt3F
+	dur2PiJTq8n7thtNfcoiyHJjCD2FB6Q0nF3XiebPSDGda8DIAI2QMNqquN2nBb6/GqtfNv67kSP
+	DAqDi+NlmE7Z+1jLDuKxojwH3JSVyp0hh79uezbe9CU+HaAWynpHk0O/pTNWlS+/GA6BlQtRLax
+	ulSdU0+csnD4JzHgVprBFE
+X-Received: by 2002:a05:6820:6204:b0:6f6:5595:915e with SMTP id 006d021491bc7-713ee85fbbemr1936299eaf.1.1793197141937;
+        Wed, 28 Oct 2026 07:19:01 -0700 (PDT)
+X-Received: by 2002:a05:6820:6204:b0:6f6:5595:915e with SMTP id 006d021491bc7-713ee85fbbemr1936261eaf.1.1793197141306;
+        Wed, 28 Oct 2026 07:19:01 -0700 (PDT)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71429e7b7basm1330411eaf.1.2026.10.28.07.19.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2026 07:19:00 -0700 (PDT)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Date: Wed, 28 Oct 2026 07:18:52 -0700
+Subject: [PATCH bluez] doc: Add CONFIG_POWER_SEQUENCING to tester.config
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,194 +113,98 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261028-fix_tester_cfg-v1-1-e965db9c3c09@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAEsE4moC/yWMUQqDMBAFryL73UCy0CpepRQx8UVXii3ZKKXi3
+ Zu2n/N4MzspkkCprXZK2ETlsRRwp4rC1C8jjAyFiS1fnOXGRHl1GZqRuhBH0w9NbXFmxz5SkZ4
+ J5fELXsnfV7zp9p919TNC/sboOD6o7ttoeQAAAA==
+X-Change-ID: 20261028-fix_tester_cfg-ad870e5212bf
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org,
+        Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDA1NiBTYWx0ZWRfX8hMntTpST2QV
+ En6GbWnFIMNfpTo2R4w7i+e1qiKGT2frMNo7ye3RkYDuOsP17sPU+JnA4u75EKAa0UBl/O7V07V
+ C5QbCVULmGcIgMW9KDFIqLDoaaiDgxU2jis2rkaPYPaUTAQbTIZOo3zKyj2aDLN/zTIt6YbC3Ir
+ ati3Ctr9XHvbHGf4qsOQOJZcTaF8ETitgb20wm/E5P1LjuWfiPqHSqAOdNCVFBegcWdS0/lnhir
+ dnGgepBCKVQiNuk9DQWArr5v/MYYAoIKfOhYoExFaNfkJ5/clQQNNu6CfP4KwzViafEILQd7vBR
+ 5b2TrLkavpxw5jYnD0+GLBqp3yNVYH5+Xfn9U5kyBpL2dXKAszX+FUrj4jxzL2k96QGa7hcC/Jx
+ ZDINSMD5qRPN2/wRhKGgnrWyui3AfwKEjTWBBlzNuS8HpPmZOFk6Hjz7azAkq03tlBQ2+AIJGnB
+ x8j49uwQHy+BMg2rnLw==
+X-Authority-Analysis: v=2.4 cv=A/T5rKWG c=1 sm=1 tr=0 ts=6ae20456 cx=c_pps
+ a=+3WqYijBVYhDct2f5Fivkw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=gn8PFS6gxBoOce5iwNIA:9 a=QEXdDO2ut3YA:10
+ a=eYe2g0i6gJ5uXG_o6N4q:22
+X-Proofpoint-ORIG-GUID: 3Q8xVM71oUb6e2Kn2D1b3S1IaD-woEE0
+X-Proofpoint-GUID: 3Q8xVM71oUb6e2Kn2D1b3S1IaD-woEE0
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDA1NiBTYWx0ZWRfXxXynPl3PT+6L
+ ONStaDIwTVE3rn1740u5YfmaBqhc8pQ0K8F0zgw+5C4mUlhpIJc/te9b6CooG89c53v6BK/PnA2
+ ByFAPuO0U0RSueeICjh+Ky/C2v7U89M=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-28_04,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610280056
 
-Just checking in on this patch. Is there anything else I can do to help it =
-move forward?
+Some x86 /boot/config-$(uname -r) have CONFIG_POWER_SEQUENCING=m,
+which prevents hci_uart from being built-in due to the kernel Kconfig
+dependency:
 
+  config BT_HCIUART
+          depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
+          depends on POWER_SEQUENCING || !POWER_SEQUENCING
 
+This causes the following error in the guest:
 
-On Wednesday, October 14th, 2026 at 1:20 AM, Kyle Pepper <cochcoder@proton.=
-me> wrote:
+  Attaching BR/EDR controller to /dev/hvc1
+  Failed set serial line discipline: Invalid argument
 
-> Check unfiltered passive scanning for IRK peers on controllers without
-> LL Privacy, with auto-connect and background-report controls.
->=20
-> Assisted-by: OpenCode:gpt-6.1-sol
-> ---
-> Companion to the kernel v2 "Bluetooth: hci_sync: scan unfiltered for
-> host-resolved RPAs", responding to Luiz's mgmt-tester request in:
-> https://lore.kernel.org/linux-bluetooth/20261013031329.483597-1-cochcoder=
-@proton.me/
->=20
-> This is the first submission of these BlueZ tests, not a v2 and not a
-> cross-project apply-order series. It applies independently on BlueZ
-> 9dc7e40962f1. The IRK cases intentionally fail on an unfixed kernel.
->=20
-> Native results on bluetooth-next 609a23989d63, KASAN/lockdep enabled:
->                                 upstream   revised kernel
->   Auto-connect with IRK           FAIL       PASS
->   Background report with IRK      FAIL       PASS
->   Auto-connect without IRK        PASS       PASS
->   Background report without IRK   PASS       PASS
->=20
-> These assert passive-scan programming, not physical address rotation or
-> successful radio reconnect. On the complete 512-case mgmt run, upstream
-> has 503 pass/four fail/five not run; revision has 506 pass/one fail/five
-> not run. Both have the "Set Static Address - Success 2" timeout. The
-> upstream run also fails the two new IRK tests and the already-listed
-> flaky "LL Privacy - Set Flags 3 (2 Devices to RL)" test. The latter's
-> pass is not attributed to the RPA fix. No captured KASAN/lockdep alerts.
->=20
-> Maintainer-mode sanitizer build and 35/35 unit binaries pass. The
-> complete mgmt suite is not clean; no physical hardware test is claimed.
->=20
->  tools/mgmt-tester.c | 119 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 119 insertions(+)
->=20
-> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-> index 992351e2e3..850d38e4ce 100644
-> --- a/tools/mgmt-tester.c
-> +++ b/tools/mgmt-tester.c
-> @@ -10667,6 +10667,114 @@ static const char load_irks_le_public_param_1[]=
- =3D {
->  =090x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
->  };
-> =20
-> +static const uint8_t host_rpa_report_param[] =3D {
-> +=090x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
-> +=090x01,
-> +=090x00,
-> +};
-> +
-> +static const struct bt_hci_cmd_le_set_scan_parameters host_rpa_unfiltere=
-d =3D {
-> +=09.filter_policy =3D 0x00,
-> +};
-> +
-> +static const struct bt_hci_cmd_le_set_scan_parameters host_rpa_filtered =
-=3D {
-> +=09.filter_policy =3D 0x01,
-> +};
-> +
-> +static int host_rpa_unfiltered_check(const void *param, uint16_t length)
-> +{
-> +=09const struct bt_hci_cmd_le_set_scan_parameters *cp =3D param;
-> +
-> +=09if (length !=3D sizeof(*cp))
-> +=09=09return -EINVAL;
-> +
-> +=09return cp->type !=3D 0x00 || cp->filter_policy !=3D 0x00;
-> +}
-> +
-> +static int host_rpa_filtered_check(const void *param, uint16_t length)
-> +{
-> +=09const struct bt_hci_cmd_le_set_scan_parameters *cp =3D param;
-> +
-> +=09if (length !=3D sizeof(*cp))
-> +=09=09return -EINVAL;
-> +
-> +=09return cp->type !=3D 0x00 || cp->filter_policy !=3D 0x01;
-> +}
-> +
-> +static const struct generic_data host_rpa_autoconnect =3D {
-> +=09.setup_settings =3D settings_powered_le,
-> +=09.setup_send_opcode =3D MGMT_OP_LOAD_IRKS,
-> +=09.setup_send_param =3D load_irks_le_public_param_1,
-> +=09.setup_send_len =3D sizeof(load_irks_le_public_param_1),
-> +=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-> +=09.send_param =3D add_device_le_public_param_1,
-> +=09.send_len =3D sizeof(add_device_le_public_param_1),
-> +=09.expect_param =3D add_device_rsp_le_public,
-> +=09.expect_len =3D sizeof(add_device_rsp_le_public),
-> +=09.expect_status =3D MGMT_STATUS_SUCCESS,
-> +=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-> +=09.expect_alt_ev_param =3D add_device_le_public_param_1,
-> +=09.expect_alt_ev_len =3D sizeof(add_device_le_public_param_1),
-> +=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-> +=09.expect_hci_param =3D &host_rpa_unfiltered,
-> +=09.expect_hci_len =3D sizeof(host_rpa_unfiltered),
-> +=09.expect_hci_param_check_func =3D host_rpa_unfiltered_check,
-> +};
-> +
-> +static const struct generic_data host_rpa_report =3D {
-> +=09.setup_settings =3D settings_powered_le,
-> +=09.setup_send_opcode =3D MGMT_OP_LOAD_IRKS,
-> +=09.setup_send_param =3D load_irks_le_public_param_1,
-> +=09.setup_send_len =3D sizeof(load_irks_le_public_param_1),
-> +=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-> +=09.send_param =3D host_rpa_report_param,
-> +=09.send_len =3D sizeof(host_rpa_report_param),
-> +=09.expect_param =3D add_device_rsp_le_public,
-> +=09.expect_len =3D sizeof(add_device_rsp_le_public),
-> +=09.expect_status =3D MGMT_STATUS_SUCCESS,
-> +=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-> +=09.expect_alt_ev_param =3D host_rpa_report_param,
-> +=09.expect_alt_ev_len =3D sizeof(host_rpa_report_param),
-> +=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-> +=09.expect_hci_param =3D &host_rpa_unfiltered,
-> +=09.expect_hci_len =3D sizeof(host_rpa_unfiltered),
-> +=09.expect_hci_param_check_func =3D host_rpa_unfiltered_check,
-> +};
-> +
-> +static const struct generic_data host_rpa_no_irk_autoconnect =3D {
-> +=09.setup_settings =3D settings_powered_le,
-> +=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-> +=09.send_param =3D add_device_le_public_param_1,
-> +=09.send_len =3D sizeof(add_device_le_public_param_1),
-> +=09.expect_param =3D add_device_rsp_le_public,
-> +=09.expect_len =3D sizeof(add_device_rsp_le_public),
-> +=09.expect_status =3D MGMT_STATUS_SUCCESS,
-> +=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-> +=09.expect_alt_ev_param =3D add_device_le_public_param_1,
-> +=09.expect_alt_ev_len =3D sizeof(add_device_le_public_param_1),
-> +=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-> +=09.expect_hci_param =3D &host_rpa_filtered,
-> +=09.expect_hci_len =3D sizeof(host_rpa_filtered),
-> +=09.expect_hci_param_check_func =3D host_rpa_filtered_check,
-> +};
-> +
-> +static const struct generic_data host_rpa_no_irk_report =3D {
-> +=09.setup_settings =3D settings_powered_le,
-> +=09.send_opcode =3D MGMT_OP_ADD_DEVICE,
-> +=09.send_param =3D host_rpa_report_param,
-> +=09.send_len =3D sizeof(host_rpa_report_param),
-> +=09.expect_param =3D add_device_rsp_le_public,
-> +=09.expect_len =3D sizeof(add_device_rsp_le_public),
-> +=09.expect_status =3D MGMT_STATUS_SUCCESS,
-> +=09.expect_alt_ev =3D MGMT_EV_DEVICE_ADDED,
-> +=09.expect_alt_ev_param =3D host_rpa_report_param,
-> +=09.expect_alt_ev_len =3D sizeof(host_rpa_report_param),
-> +=09.expect_hci_command =3D BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-> +=09.expect_hci_param =3D &host_rpa_filtered,
-> +=09.expect_hci_len =3D sizeof(host_rpa_filtered),
-> +=09.expect_hci_param_check_func =3D host_rpa_filtered_check,
-> +};
-> +
->  static const uint8_t add_device_le_public_param_2[] =3D {
->  =090x11, 0x22, 0x33, 0x44, 0x55, 0x66,=09/* BDADDR */
->  =090x01,=09=09=09=09=09/* Type - LE Public */
-> @@ -15737,6 +15845,17 @@ int main(int argc, char *argv[])
->  =09=09=09=09&set_exp_feat_unknown,
->  =09=09=09=09NULL, test_command_generic);
-> =20
-> +=09/* Bluetooth 4.0 has no controller-side address resolution. */
-> +=09test_bredrle("Host RPA - Auto-connect with IRK", &host_rpa_autoconnec=
-t,
-> +=09=09=09=09setup_command_generic, test_command_generic);
-> +=09test_bredrle("Host RPA - Background report with IRK", &host_rpa_repor=
-t,
-> +=09=09=09=09setup_command_generic, test_command_generic);
-> +=09test_bredrle("Host RPA - Auto-connect without IRK",
-> +=09=09=09=09&host_rpa_no_irk_autoconnect, NULL,
-> +=09=09=09=09=09=09=09test_command_generic);
-> +=09test_bredrle("Host RPA - Background report without IRK",
-> +=09=09=09&host_rpa_no_irk_report, NULL, test_command_generic);
-> +
->  =09/* LL Privacy
->  =09 * Setup: Enable LE and Power On
->  =09 * Run: Add new device
->=20
-> base-commit: 9dc7e40962f11d1d9a5568f8a7633a695288329c
-> 
+Fix by setting CONFIG_POWER_SEQUENCING=y, as is already done for
+CONFIG_SERIAL_DEV_BUS.
+
+Assisted-by: Claude:claude-opus-5-5
+---
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
+---
+ doc/tester.config | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/doc/tester.config b/doc/tester.config
+index a9d8de22173f..bb0627c216a1 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -69,16 +69,17 @@ CONFIG_LOCKDEP=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_KASAN=y
+ 
+ CONFIG_USB=y
+ CONFIG_USB_XHCI_HCD=y
+ CONFIG_USB_XHCI_PLATFORM=y
+ 
+ CONFIG_SERIAL_DEV_BUS=y
++CONFIG_POWER_SEQUENCING=y
+ 
+ CONFIG_6LOWPAN=y
+ CONFIG_6LOWPAN_DEBUGFS=y
+ CONFIG_BT_6LOWPAN=y
+ CONFIG_PACKET=y
+ 
+ #
+ # Bluetooth device drivers
+
+---
+base-commit: b0bf49270d445da0852851f393cd67a0a1e5f05e
+change-id: 20261028-fix_tester_cfg-ad870e5212bf
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
+
