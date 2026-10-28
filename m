@@ -1,49 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793217023;
-	b=VfzOms/L9RdtwgjjHX2Nj2NENKlaukn/l0IsK8Elb8TrXWGtrVLMcAf3jMdw139nr9q8
-	 YG9xKj8gqM1AptDDua4IYY3mQcZM/YI67WsJ1FFNHRyJC9Lu6bp7H65KcDkqCP2mW+Bkl
-	 oaMwKUTOAC95QyFTG4MCHDzwI2OGcCz34jHijATlQJ10tIgtlrUBE36G1h0HnSwO/arKU
-	 F7qIhPgwg99Ya4XecvcYwzX/O3gf3u9ZoUk4VX/ItVZmsaUf7ej/Bt5UCsAJxeFby2LKA
-	 NHpcS/dQdCe3MkkFN/H+Vw5YqbzE3hUex+rxvgxRVKmke3bUej8yhWXYGOR4CCHK3RA==
+	t=1793227768;
+	b=yyu768qRW4CyDkbIP8sovq/fphBSbK4aaU8R9arljuhVEFinN6dBFS9PyuUUqdBjmxgq
+	 3h/sCBcx1VUJkKTy/8B0iVY+5J6gZX0YQvQrQ/3qyinwtHtvZXF07R08aMTl0lFDHgfrq
+	 Ikl69gBRc1pK/fcadOyhNoxq/55cQHROjFd7bhFwDFYjsn1otO7azh5PX7omVSwuBigAG
+	 NTskHcwBnsU6PkGWb/kuDcQdmz5c2eZYA47zWBfKO3fUnUpQNHQygmSkkepSt+B926Dev
+	 GMrsGmvq0cAmvw0TW73TQa1yCz4SGWrkDhUTcdXi606i8YyqePrbINKXInF/xA7Ovzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793217023;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=Jb0ADzkFytfS6WossXrNl23EVj2qsvIGw4AOr2fJ9yc=;
-	b=hGyC/UWA+BDw6eQYdGMz7jYiKlJC9/Iu+Aws/LtjU2dShe+qW/Q8xH019i9aqz8hoyR3
-	 cixam3V33m/gHfrWmWGKLwlhFRmwtKHzMXn6IyXKQRDlF8rt3ZzxImtNpgUcc3Q5Vz8Tu
-	 G3GxNgBEAAdn38nG7zKsUdTxS2EMFeacBb4a9wHJ2fTlmBxf0jDU+mj8vNBpxEFSaU/oM
-	 X7+8y7wmFdqeeX94QRRMseHVNuvlDy70MiHVRSGD9G+yiZyZVopl57EftzZDkUcKKgG8v
-	 y2nYvKgLYOFwXPzK11Y7btPDAJHg7VceoMc0UPCkY/cXz5HK83kPWZ/eD3MQrQFIabQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793227768;
+	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
+	 Subject:Message-ID:Content-Type:Content-Transfer-Encoding:
+	 MIME-Version;
+	bh=eVgWB4JaqOznGkXuQhaLJs4u9MK1+zgwhbLa6/qCGmc=;
+	b=bkHu90WEFGqWaAqeLntGAZgm5hb0alyrbjzba2h16GKJEdRCAz2xzsSj9lm60Hj/V/li
+	 NCjtDHbdTLvBIdvlcD/KoHq5tVgbSdV7WMUNGSfhb28Gar+dar2yuhKUNXnbrhvg92gzU
+	 tG6skHSeybX+XjMUrPprP6GE/dH4qoeccRwxyYuaBT4XLXGm9r+/tKLaXZbcAq2D4/h33
+	 reNlEMFjrC9gccbC9xOo7IIqEi7jFhuCrsPMyumDmQI8MJbpNAp2Eoqi25EZvJHWJykzD
+	 PmUxncJjAGbmurHr6w84RQUrZeluGlP/v6GwxMQY5gtvXfcMXW0pgal5ESIgrlQV2aQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lWNubBSd;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=michaelmcallister.org;
+	spf=pass smtp.mailfrom=michaelmcallister.org;
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=x6vMcwHd;
+	arc=none smtp.remote-ip=185.70.43.172
+Received: from mail-43172.protonmail.ch (mail-43172.protonmail.ch [185.70.43.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A8A60A2608
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 19:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3C7606A31A;
+	Wed, 28 Oct 2026 22:49:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE3C7606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lWNubBSd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F1471F031E1;
-	Wed, 28 Oct 2026 19:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793217023;
-	bh=Jb0ADzkFytfS6WossXrNl23EVj2qsvIGw4AOr2fJ9yc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=lWNubBSduJmzC1AwEEDfRHIGmhlX5GjEibzUFEy8iPtB0rw1bEL6OISH7TMdfuAVJ
-	 AfbNaXwbysj6tS11snTcltOzWtskFnm0ZQif7sDrqqqC6V04fsGuuJDi1JW0g9EwTD
-	 jbVvVeAsNuScJtsW96tsCRSMUcvbSPqhHcSlKpo9r1Ikb41tAGlxxUSNasfrJraS//
-	 31xuXmqdK4N9gNonpnifas1QYtuymuziIiAXWLADn9bFDVGrOHryhyVdsEWHVWYuSN
-	 kS7c0vXK7ifukUAdzmQ0U8fI5um8DIZVn2D8ccxgE/Y3DsQCV7Gz1RnqLtQVToU+fW
-	 PiK8Ea5FkHnxg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 072E73AAA770;
-	Wed, 28 Oct 2026 19:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=x6vMcwHd
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=michaelmcallister.org; s=protonmail2; t=1793227766; x=1793486966;
+	bh=eVgWB4JaqOznGkXuQhaLJs4u9MK1+zgwhbLa6/qCGmc=;
+	h=From:To:Cc:Date:Subject:Message-ID:From:To:Cc:Date:Subject:
+	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=x6vMcwHdqR9THpZlKI65QYeonFAAEg8C2HIRj9Ho+zOg15UhhBx5+6XBnv/lQ4pBC
+	 6JzIwUSmmcI6+MG8DZKNsN+GYGDNAUoiltc9KmJGDr80/+GSKXF3M8E0Dp4+BXRcMQ
+	 bWRAjywipy4Div3K+uGymwbd8nDzMIgOPea/g1jwsqEN/er98m4M+K2RN9G4QAgvf5
+	 e8z+JrPzuyoorB329h2SVH4gGhWodUWp8yy7425k0S0PS+8GG0Ugi9mxjMDfjAiB48
+	 b0SctSo2TbEAibNEZ+lKQmPOZ+w4lGoxIdaVCk+goGVxuxhkfrkHWsXT5Yib9bVUKc
+	 ZZrz3ny+eww+g==
+X-Pm-Submission-Id: 4jFMxH6f4lz2ScmW
+From: Michael McAllister <me@michaelmcallister.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Bartosz Golaszewski <brgl@kernel.org>, linux-bluetooth@vger.kernel.org
+Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Dmitry Baryshkov <lumag@kernel.org>, Matthias Kaehlcke <mka@chromium.org>,
+ Michael McAllister <me@michaelmcallister.org>
+Date: Wed, 28 Oct 2026 22:34:38 +0000
+Subject: [PATCH 0/4] Bluetooth: qca: Fix WCN3950 power-off
+Message-ID: <179322687810.94538.4628148055419456389.wcn3950-poweroff-v1-0@michaelmcallister.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -53,51 +67,27 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/2] adapter: Fix Discovering staying true when
- stopping
- fails
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179321702155.1394536.16083723483237408640.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Oct 2026 19:50:21 +0000
-References: <20261027171923.82919-1-kevin@simpleble.org>
-In-Reply-To: <20261027171923.82919-1-kevin@simpleble.org>
-To: Kevin Dewald <kevin@simpleble.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
-Hello:
+Hi,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Turning Bluetooth off on my Moto G10 leaves all four WCN3950 regulator
+votes enabled. This series fixes the shared UART cleanup and shutdown
+ordering first, then adds WCN3950 to the existing power-off paths.
 
-On Tue, 27 Oct 2026 10:19:21 -0700 you wrote:
-> When the Stop Discovery bluetoothd sends for the last discovery client
-> fails, stop_discovery_complete() removes the client but leaves
-> Discovering true. The next StartDiscovery with the same filter then
-> returns success without starting a discovery, as reported in
-> bluez/bluez#2547 and, before it, #807.
-> 
-> The first patch treats Rejected as stopped: the kernel returns it when
-> the discovery already ended, or another mgmt client stopped it, just
-> before the command was processed. The second clears Discovering when
-> the kernel reports the discovery as stopped with no client left, which
-> covers the other failures, such as the scan disable timing out. That
-> needs the kernel to leave the stopping state after a failed stop, which
-> "Bluetooth: MGMT: Fix discovery stuck after a failed Stop Discovery",
-> posted separately, does.
-> 
-> [...]
+Thanks,
+Michael
 
-Here is the summary with links:
-  - [BlueZ,1/2] adapter: Fix Discovering staying true after a rejected stop
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4f3428e9df2f
-  - [BlueZ,2/2] adapter: Fix Discovering staying true after a failed stop
-    (no matching commit)
+Michael McAllister (4):
+  Bluetooth: qca: Restore flow control after a failed power pulse
+  Bluetooth: hci_serdev: Track whether the serial port is open
+  Bluetooth: qca: Power off after unregistering the HCI device
+  Bluetooth: qca: Power off WCN3950
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ drivers/bluetooth/hci_mrvl.c   |  4 ++--
+ drivers/bluetooth/hci_qca.c    | 38 ++++++++++------------------------
+ drivers/bluetooth/hci_serdev.c | 37 ++++++++++++++++++++++++++-------
+ drivers/bluetooth/hci_uart.h   |  3 +++
+ 4 files changed, 46 insertions(+), 36 deletions(-)
 
 
+base-commit: 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9
