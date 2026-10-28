@@ -1,111 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793169969;
-	b=k2a/3VMIpwi1ZI5Ut1Dp6FDoaeVBEC86NeAPloDC1bltR96wTYxtcnU36tR1p64bVGN1
-	 x5J3MZHsW3tt8s2pUwiVH52FJP+lAYUdapwkPQR2aK+oZMgz2YyoM0Ci6EhraeuOFa+7F
-	 55C0OaVDkyM8QhpLidWXvK3r5Ht3IleZHshTVGXoBWxWnEnOKP8kG53bybQlt7i8oJA6W
-	 SOm60vaYL8/xxSQ4VQDfUJY77GIZyDHHEiuHQ5PHdWQRAlKhLu8mP3RvL0gTVkGDg6zO6
-	 vy84H1O52zNs1p/E+G7l4dw17N8cL2tOlU2TvAOa4F8ESvx5GPG3PSaHhfomaGs/wXQ==
+	t=1793169973;
+	b=Pg9rU03Z29od5vxoW6+7yuhMpPsoQ8NBCmrO96BtyWxe2j31jRxYW2S+bfC9u98+B9AG
+	 8SpIyCpZRhsIeUfZfBycC/suiCHsECm8tPJeqgkiNDQvHEE0S74CvcMCRY3GCuUnENG0j
+	 /Jhntd/pZg76j6DxnudPZBa+xPTyLYd9RZPWW6gAgZnSoP45VcFH2H4syvQbSjWyIGZah
+	 ryTUgRK34Z7k0Pb+epIvGsE+FYgoXXJ1wN7unCQdf1ZgiW0lOjn87UJ0xM46N5aldqegi
+	 //IER7HUZaoaNY339fi+UDQbLCe4vAvoFg1RRD1OW6TrNDVFMEkm+97EA0+cPz+TdMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793169969;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793169973;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
 	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
 	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:X-Authority-Analysis:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:X-Proofpoint-GUID:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=fNZLE6g13OUkRAJQh2g053ezFujOCllvGhTaZvGIa/w=;
-	b=z4cXNI3TXywf0qBBILB66oBt/3OmnLqIrgLBrSbDvjuaOia2oQ5G1kcHj8XxOfXEZnYK
-	 I8655pSk6MI3IbKtW2U+caElTTqYI0cuJy9EjCioe0YA4Aw3bWpBETFJTMLPJYbKy0Rt0
-	 3y+7H/y2YkYhTcetEgFS22d8kUFwMsvjEvv6NLLYMTB3LC5OJujtPwbFiJofRXbtGTMTP
-	 WXr+XB2I3rbB5oKPmgMWsVvZK9paTL5gpnJc9GoR4fZQZqNuyswrh2RltXBWbgsYnGVMs
-	 5Lsk0p8McRczOAQfKULI9FBCNQaXUyx/zX5r6+98J39SAeORTbVAHA95ss6IqpxOmJQ==
+	bh=ikrSiZhzBMBxrmeIgAuxyX+6kJMDsb1nA1v3nDc7WPI=;
+	b=Z1fBj6tiCYwo70XePNavL+RNRZiNiIXcHlpIggnBcBmzkB0kb8778g0uKsKacfHt758m
+	 nW/ahXAwvt3c90Dy884BS334Ib9MNegiDrAhEH/gN4P8DxZjKAX7d43Xs88UFXiNGENhd
+	 csvoMSmO2pt3ZAOr6hh/cC8cMbkaV4L0irQOpkwGqWxJIgsPYSccnK5FpvPp1TadmIxLr
+	 8qyWqlDnUikiMonEo0Dc+NYv+/bof8mdq8qaDKnNUcT381gtrxZLcvciyGuN9yqYfcoi3
+	 ybxS801+IEnbK+uUribvnn4vSSlU7VIaZ7nb6CdT9FdLmBD3LypIcPSw3W9mReuMQvQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=pj8oBhJu;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JOtYqReV;
-	arc=none smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=B31gd0kp;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=W5gHGLxG;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631CC606A327
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 631CC606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AE6606A32A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1AE6606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=pj8oBhJu;
-	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JOtYqReV
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69S4Pd2i3749793
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:08 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=B31gd0kp;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=W5gHGLxG
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69S4PTE9587912
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:06 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fNZLE6g13OUkRAJQh2g053ezFujOCllvGhTaZvGIa/w=; b=pj8oBhJu5/ZZdJ8l
-	7/EDThTPLYP62orXP4P+P0oHUtcizPruNpd7yDYEjYC1Xjc14Qi8TVta2MnWxuiC
-	qYYDom8iBLuGmwWxoI896XGYg9uLN/MfT4+rbs4K2fTKmDcJMdbNs0BnZBCMCbkN
-	rIsMN3/Lbf1mAFH8H+BXX5YrrWsAEKkUDhG0lDTJh4McYSEROYyfKIaOtLBhStVV
-	jbnEJdr5TVlEGVFIC9c9JUxarsabDxzuVnad5LjEIUBQkxV5Q72yczyR63rTy2e7
-	zN9ZuJkCoTRpbB2Gc8H3FTh2ji3PDn1kgRdiPqj/qYPBxv8/zKMoRmpSbpTGDw2X
-	+E0vrg==
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hjy6g2v2k-1
+	ikrSiZhzBMBxrmeIgAuxyX+6kJMDsb1nA1v3nDc7WPI=; b=B31gd0kpNmEGnRRU
+	NB8I+iZAv4htc9GUFcnw6SgSE4/pi1gClYl4sSxXmo5fPu2EH54Moe/KebBDTdOe
+	/j+QY/1ah8TAyrtP6tnkgAVcXeFH4Bqz/RfEwzwqVtXEYYr/yRTV868LfFSKv94c
+	PIV7QyugRhmq7fhmeOrzgxw5IP57MbLNKxPHBykZpDs+1sL7bqGPjh+fr8cRBwl9
+	Hb3oT21YXkghl9mUzUtsstTYn/X+ayG9BQUI4ABsrJJrAMqUowq0ovTRg1nmijFG
+	d+HDOE+qWfqvyx6bQQ+PX1yyE+KkWR//Z7ncqKdur+3FSFaLCL3heMj4ev2XcYtQ
+	SygaeQ==
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hk2qe1wgx-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:08 +0000 (GMT)
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-483ee5899ffso84200fac.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 23:46:08 -0700 (PDT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:46:06 +0000 (GMT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-80a67aa4e52so149740a34.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Oct 2026 23:46:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1793169968; x=1793774768; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1793169966; x=1793774766; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=fNZLE6g13OUkRAJQh2g053ezFujOCllvGhTaZvGIa/w=;
-        b=JOtYqReV/qd2xHLsz7dwtm1b9BiKx0rni9s/vQOU3DrmApDpg+QjHSYtHVrOdfKuJw
-         jjQ/0oisew66WHwkQB3bJGkjgJA68oEuDqCwrFY6qU0PTLyEGzq8AdXdQqlD0GOZZB5g
-         pkN+e5n5lS7cr/05tH1ZsCTZ43rFKndjl4SKsm2OirZCKIntczoYFfecWV+qpDAOhjNE
-         zv7zjAyjVpYjJK292dkwSgIgGhlhq8X15tBWp1BpH0hWB+U0egStd8+V0YEQXRLI1Y9t
-         h5loDLmbfAVo3jnmitFTgYSl3BpqDZRJiKh27JSw2FInWQ0CCaYtwYhUKmKYDT7M5Mao
-         QbQg==
+        bh=ikrSiZhzBMBxrmeIgAuxyX+6kJMDsb1nA1v3nDc7WPI=;
+        b=W5gHGLxGzaAGR9iUdxCirK7WeF/nWPTJYrj9cJu+nNA+8ZpybKu3X5iwyuPXc0g5qa
+         4ht5CJ24RMTu5EAsecWDbZQya9aVPBnLBPgDfh6vVxEZZjzF+vjcBc3SR0jK8BnxLxiC
+         MFVXXRZCtDyk1fUPs8QdGN+I+9IVYiX9d/Lo4GVL0eJbe+vK5Cn1XThr5SLnwFVKCn6d
+         nTxacPQ066qgFV3vGdLXkYwNqPS8BZsPy4AtLlSmOv1YAN30eD4pBvgK9GIEu2GY9lJT
+         1gGgQQzKx2AsxAZ+P7GyJbcF1Oz3i0fMY4OjC/OVA+qCx87jeQyd7jrnQu/JE58+c1Gi
+         CY9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793169968; x=1793774768;
+        d=1e100.net; s=20260707; t=1793169966; x=1793774766;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=fNZLE6g13OUkRAJQh2g053ezFujOCllvGhTaZvGIa/w=;
-        b=GAHvQDtupH1UoQ2ghzayIWlcSi/+es6A7RwwqYpXpd4IyGNivLLbBo+46/+2efOv57
-         tQPMPqzrMGboDrorIYpMV+AjJVBqi3cdWu3ErCFus84i6/tdOum2ySd9J/CHYzepykCN
-         CB+cZamHsq3zumpiBAIegEik7dCdv02jZJXMQ23QU3wRNmttOydJmHBR85WPzvpm9Nk/
-         k5QwmfmuwIhfijSfPTKKY8PUGwIiAANFgX+OTkAXJMRr1mZKEONEaZ4PPYkh2UfhXy+D
-         yny6ziMIfsTEgG0JlIJBWJBDYauUMyhHEIUBJVst+lMjHOK1OLXPdI0+ILbm4cpfe4ji
-         sUNg==
-X-Forwarded-Encrypted: i=1; AKwUvBy2A9cIT1d4vwpTGKoYEsM9zo0IoMqDjuDQya28dRS9REjoIau8qnA931TfUE6ajzTJBZ8YUp95paPQBIfh8bw=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKBjJXeYeVWVJjmV6QpRxbloXqvlxM7AH4Tr+Mm/7vYC4ilRWiC
-	M207YvrrjjFLYWbfdxjDMPyhdjXuZZypUjcWEIXV5x1GVGuCQXCrmFU0K+EbMrYGKWIg7P+xg8C
-	zanwRVbGZNs3K14KOTpTBDkXWHOA4rA88oMxsMaoueZomxtXCCTsoN0q1e7PbDym3vg5rXQk=
-X-Gm-Gg: AYBFou2l9MnYxzIKSjFKNg73zK9CDyeXpwvFYyl8dJ0jqZa499n+jVHcC/dybKyCFIh
-	HxkLvRVsNIGiOXqU89dJZGQG2GmmqnMVUR957YTop1i+l9frtL1gFkwcimiJLFmGMICgf2qFVju
-	wGCVUZKCw/+CI+2TkYZaWrUfKCKb+Ktmhi0G+O/6MVSYR8EahhZMk13TYeQxaiG3qIEa8o1eS+k
-	aF/1sOKqONvYzuQPRopexMZnFOHrAyWoRH6f6qrPHDTSdiIFr6PqTVf+obl67v4gx0qE10a4KMS
-	TCp/+iRgvKUNq0A33geQyh8euWHFlZiXTH7BEl2qojRrdcxsFczURW45uu3t2O4WhwV/CILPyOR
-	RVDKPdVMH1c4nGUiA2hsCH+Gw8kQGi6pTnUiLdzHMVVVrR4EDCJlEvf/W3oX5LehgyupU3nVLiz
-	MwytnwZBMl0n7V4Cubtlge
-X-Received: by 2002:a05:6830:67fb:b0:843:7bb5:28ad with SMTP id 46e09a7af769-85abf097011mr1938742a34.2.1793169967770;
-        Tue, 27 Oct 2026 23:46:07 -0700 (PDT)
-X-Received: by 2002:a05:6830:67fb:b0:843:7bb5:28ad with SMTP id 46e09a7af769-85abf097011mr1938729a34.2.1793169967375;
-        Tue, 27 Oct 2026 23:46:07 -0700 (PDT)
+        bh=ikrSiZhzBMBxrmeIgAuxyX+6kJMDsb1nA1v3nDc7WPI=;
+        b=PMl6TEb/Ggz0AcIBvgp5P8Ss7dcUn0lsHn8VrL1cGC1C6UOMBCSS/PnuilyVAhRFnZ
+         0heohOeaYhklJEdiwfG4zL87l+X6URDxQCLS94HsuNSDtzzcvQ3lswY1+oQxom1aOVa5
+         Ct5gRURYbXccbJm3CZxva8tC3P15O2F0zhKou8FSmmodZBDlFXCYkkBFIPmJ37zXFEsN
+         o19jeRsqTkKEEEJlaoOeH9oinHuLh88GvAEhHLAOenjRdtnhpzs2n5yU+6yHhfs4/Xeg
+         lrMBwjhU+6vbPjmqzItN7J7GzRmepUseP5iwL0XkfFxNjlu6SyMa3Vklc0+FyRMhsj6C
+         OhsA==
+X-Forwarded-Encrypted: i=1; AKwUvBwqxuxGB2BdVGmf++v4FpClh7/0M83hhygdAytgeWyMSSE/25rnozT3q5g5Gu5NwyGInP8x9XYAnq3IzEEy0rg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJ5GT0OgppuSRrSnKlZwOVI0Xj/0cCPYPKm4ykN1iG8UkMfn9H6
+	fFv4jEJnv11pngXos5W/PeHHJ6tgzd1M7+s5Z3M7Ct97QVRTBxPzGFyDSKZeZ/e/0cDxey9jSxD
+	3y7bQVdhnGcI0qW/mCZPL07bwiwk7sg8mvYLdZPw7ynlL1jX//t7B1IDcm50Z5AYFqiqXBbQ=
+X-Gm-Gg: AYBFou3SqqkZNeTktWQ27U59DKgYGuBtdZXnyQqK60ngc1mnJDXBoSFQZmG8m5rct6q
+	5W0onfjMfklKxPw6meZtduA3MoBtNVJfK/+yDYjNq+xiQmUBAiFOjKugim0KLr8jWHGjr8ui1Ob
+	FGO+6McTAz/rjsk6/UlIhzdeQCiU0N215Daon/fOf4Q/XO7wkVfs7RNA7sWTqJ3GLrz+97/iiAS
+	Wri886oqmvcosCsyKecjTvpoenclOUJdVBiJw5Ynivov1DZlxg6+Ay5JzRhgfEMuzTXQexSDzGl
+	yToLml5w+GF8xaTyDBzslzyVlYkJRxv7984+CqXXHCUSQddHuHlld7bNIyRu1vImViJdZ7E1bYI
+	KXytWkb7NaiCkJmcKbfMr6PeNeOUVw4+3a0I0lkU1hu/RPs0rgIMkZhj8QfHhBLXhANjy96+nGP
+	DOyLApInB1roNxYYkscYju
+X-Received: by 2002:a05:6830:1214:b0:805:98ae:2160 with SMTP id 46e09a7af769-85ab97782d5mr1620823a34.2.1793169965788;
+        Tue, 27 Oct 2026 23:46:05 -0700 (PDT)
+X-Received: by 2002:a05:6830:1214:b0:805:98ae:2160 with SMTP id 46e09a7af769-85ab97782d5mr1620806a34.2.1793169965358;
+        Tue, 27 Oct 2026 23:46:05 -0700 (PDT)
 Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b1fd30d98sm860727a34.14.2026.10.27.23.46.05
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b1fd30d98sm860727a34.14.2026.10.27.23.46.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 23:46:06 -0700 (PDT)
+        Tue, 27 Oct 2026 23:46:04 -0700 (PDT)
 From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Tue, 27 Oct 2026 23:45:51 -0700
-Subject: [PATCH bluez 2/2] obexd/bluetooth: Clean up redundant code
+Date: Tue, 27 Oct 2026 23:45:50 -0700
+Subject: [PATCH bluez 1/2] obexd/bluetooth: Register profiles added after
+ org.bluez appeared
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -117,7 +118,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261027-fix_obex-v1-2-3d91aed181b6@oss.qualcomm.com>
+Message-Id: <20261027-fix_obex-v1-1-3d91aed181b6@oss.qualcomm.com>
 References: <20261027-fix_obex-v1-0-3d91aed181b6@oss.qualcomm.com>
 In-Reply-To: <20261027-fix_obex-v1-0-3d91aed181b6@oss.qualcomm.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
@@ -125,86 +126,104 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, Zijun Hu <zijun.hu@oss.qualcomm.com>
 X-Mailer: b4 0.15.2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfX65tUmtWvS5o9
- WWQtrxCkvdAfY4fkUmQavnpvSd5huMil5b6MFp7YFy1Tw9TodoCcBC+kVikyzClKxtIauurFJOw
- SDeTXmuBi7pmUdyaZK78Iywrg2NRB/jWX7FrQlO8nasiB4W6HtLaFankvhjrAcOp9bugEvkGhz0
- 1T+zzRiTuIDCErkxzhMKtXrUmkgiQFe/mTZvdwAhF6NMCtWodAD7YrOfoTI8k9mvbZNTbv9mhl4
- 8HPD1TmEl97swgHy5iPN6ZF8MmnO8lDLV8jD/FezRHF8K34jjq0yDccszZcxzH32vRRDgpVfT9Z
- rjvhJ8jyf7xVlDpVvukT5tApYRFOQoh3CjyXQ9W7yBR642XCEOtWymIY8EuOgkfZ7EEel8OMmly
- GVnidEsepFD7WTmTR9nPg+U8nsTVawmYYYXUruJvDtT/X8eHy8O6KXRw9rXuv7yjHPpKB5Psb/E
- 4Tf7VR8NR5tVIeoPs1w==
-X-Proofpoint-GUID: G21LC6BjjMz1DFkxYUCgB66mZNdzSyah
-X-Proofpoint-ORIG-GUID: G21LC6BjjMz1DFkxYUCgB66mZNdzSyah
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfXwxBj0eQ3hOkC
- pOc7IYDGwCBNG0DjfAYA4Nghs+j3JwHVRY3pyLrRa0YhmmPiOfXo8iWypu60d9f3bsWM1zBEnFe
- jbB4Ja4E9ckwI7Bo96/AgqUQFY8Uxt8=
-X-Authority-Analysis: v=2.4 cv=dKgzC+Zb c=1 sm=1 tr=0 ts=6ae19a30 cx=c_pps
- a=Z3eh007fzM5o9awBa1HkYQ==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+X-Proofpoint-GUID: KUBdWJZGkuFljljw6YkU9HZQlAGBqdAI
+X-Authority-Analysis: v=2.4 cv=YuGa1IYX c=1 sm=1 tr=0 ts=6ae19a2e cx=c_pps
+ a=z9lCQkyTxNhZyzAvolXo/A==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
  a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=bBOUa_hTYMcDMAnvo84A:9 a=QEXdDO2ut3YA:10 a=eBU8X_Hb5SQ8N-bgNfv4:22
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=R3qYbWmKcKoroIU813UA:9 a=QEXdDO2ut3YA:10 a=EyFUmsFV_t8cxB2kMr4A:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfX4YgDuY9iJri5
+ o1HsvrfwiA4sggHcoj0gaIGbrUNy9mfIgV9lyyDBF32ElaDy76q96CRd7tSdvufLYuaoWyDzIRQ
+ ly9ijq6wIClJ58fUeLwZPs5edsIleF4=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI4MDAyNiBTYWx0ZWRfX4V+FQwwfBEpD
+ vkvjsqqa0CXILFR3ugT+sVeyeqNngUy210MSnWyUL/u+DM6jUIZT095CSROQVXYYzf4RtoYyH/l
+ fn10i2hhRkWU2waTTlmWPtQcY0Qhw0n7TcvrkcXCe94746Wiwdr5vUDLzYdlwooxfWPKH/ZoXwC
+ RBCrhMJh6+BXNSvew72UajOwhk7K2woH7RktlsOZt6ZgVvaTKKisE2Fgsqz8cr9rwWAS48iUfNr
+ TK/r0TmDB/0+12KHFKjiifudqFsoGG3u/vIZBLymxm9ht4B68+YsE1FMbMOU5nPVDfqeObxHom0
+ xJUQQGlJcbPWG83jegh1+BDE/2u+Yvy5N+h6h15OWKFgl9q9xhNngU7IQxr2RZVOjTVf5k8YavZ
+ s7+TspjJ83KEMBqLv5Lc+kqy/10x3fBkj6pLLX3T692s1bQnxZ0LrmRVub9KM/67BliA3c5RipS
+ TeE8tSoL5XjmKnWNizw==
+X-Proofpoint-ORIG-GUID: KUBdWJZGkuFljljw6YkU9HZQlAGBqdAI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-10-28_02,2026-10-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 spamscore=0
- suspectscore=0 priorityscore=1501 clxscore=1015 impostorscore=0 phishscore=0
+ clxscore=1015 impostorscore=0 phishscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501 adultscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610280026
 
-register_profile() already frees profile->path and sets it to NULL when
-it fails, so the same cleanup in name_acquired() does nothing, and the
-error message always prints a NULL path. Drop the cleanup and print the
-profile UUID instead.
+Issue:
+After boot on Debian, bluetoothd and obexd are both running but none of
+the obexd server profiles (OPP, FTP, PBAP, ...) is registered.
 
-Also drop the trailing return in void functions.
+Why:
+A race between name_acquired() and bluetooth_start(). The profiles are
+only registered if org.bluez appears after bluetooth_start() has added
+them:
+	plugin_init()
+	  1. bluetooth_init()           start watching org.bluez
+	  2. pbap_init(), irmc_init()
+	       e_source_registry_new_sync()
+	                                sync call, fails on Debian
+	  3. name_acquired()            fired, but the profiles list is
+	                                empty, so nothing is registered
+	obex_server_init()
+	  4. bluetooth_start()          adds the profiles to the list,
+	                                but nothing registers them
 
+Fix:
+Register profiles in bluetooth_start() that name_acquired() did not
+register, if org.bluez is already available.
+
+Fixes: 23b28ab759ee ("obexd: Port bluetooth plugin to use external profile support")
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- obexd/plugins/bluetooth.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ obexd/plugins/bluetooth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-index b70090971119..0aeb1becdf32 100644
+index 3af1b504d591..b70090971119 100644
 --- a/obexd/plugins/bluetooth.c
 +++ b/obexd/plugins/bluetooth.c
-@@ -88,17 +88,16 @@ done:
- 	if (obex_server_new_connection(server, io, omtu, imtu, stream) < 0)
- 		g_io_channel_shutdown(io, TRUE, NULL);
+@@ -45,16 +45,17 @@ struct bluetooth_profile {
+ 	const struct obex_service_driver *driver;
+ 	char *uuid;
+ 	char *path;
+ };
  
- 	return;
+ static GSList *profiles = NULL;
  
- drop:
- 	error("%s", err->message);
- 	g_io_channel_shutdown(io, TRUE, NULL);
--	return;
- }
+ static DBusConnection *connection = NULL;
++static gboolean bluez_available = FALSE;
  
- static DBusMessage *invalid_args(DBusMessage *msg)
+ static DBusMessage *profile_release(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
  {
- 	return g_dbus_create_error(msg, "org.bluez.Error.InvalidArguments",
- 					"Invalid arguments in method call");
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
-@@ -324,22 +323,19 @@ static void name_acquired(DBusConnection *conn, void *user_data)
- 	bluez_available = TRUE;
+ static void connect_event(GIOChannel *io, GError *err, void *user_data)
+@@ -315,16 +316,18 @@ static const char *service2uuid(uint16_t service)
+ }
  
+ static void name_acquired(DBusConnection *conn, void *user_data)
+ {
+ 	GSList *l;
+ 
+ 	DBG("org.bluez appeared");
+ 
++	bluez_available = TRUE;
++
  	for (l = profiles; l; l = l->next) {
  		struct bluetooth_profile *profile = l->data;
  
  		if (profile->path != NULL)
  			continue;
  
--		if (register_profile(profile) < 0) {
--			error("bluetooth: Failed to register profile %s",
--							profile->path);
--			g_free(profile->path);
--			profile->path = NULL;
--		}
-+		if (register_profile(profile) < 0)
-+			error("bluetooth: Failed to register profile UUID %s",
-+			      profile->uuid);
- 	}
+ 		if (register_profile(profile) < 0) {
+ 			error("bluetooth: Failed to register profile %s",
+@@ -336,16 +339,18 @@ static void name_acquired(DBusConnection *conn, void *user_data)
  }
  
  static void name_released(DBusConnection *conn, void *user_data)
@@ -212,23 +231,61 @@ index b70090971119..0aeb1becdf32 100644
  	GSList *l;
  
  	DBG("org.bluez disappeared");
-@@ -479,14 +475,15 @@ static void bluetooth_exit_cb(gboolean at_unregister)
  
- 	obex_transport_driver_unregister(&driver);
- }
- 
- static int bluetooth_init(void)
- {
- 	return logind_register(bluetooth_init_cb, bluetooth_exit_cb);
- }
++	bluez_available = FALSE;
 +
- static void bluetooth_exit(void)
- {
--	return logind_unregister(bluetooth_init_cb, bluetooth_exit_cb);
-+	logind_unregister(bluetooth_init_cb, bluetooth_exit_cb);
+ 	for (l = profiles; l; l = l->next) {
+ 		struct bluetooth_profile *profile = l->data;
+ 
+ 		if (profile->path == NULL)
+ 			continue;
+ 
+ 		unregister_profile(profile);
+ 	}
+@@ -365,16 +370,25 @@ static void *bluetooth_start(struct obex_server *server, int *err)
+ 			continue;
+ 
+ 		profile = g_new0(struct bluetooth_profile, 1);
+ 		profile->driver = driver;
+ 		profile->server = server;
+ 		profile->uuid = g_strdup(uuid);
+ 
+ 		profiles = g_slist_prepend(profiles, profile);
++
++		/*
++		 * This profile had not been added to the profiles list when
++		 * name_acquired() ran, so it was not registered by that call.
++		 * Register it here.
++		 */
++		if (bluez_available && register_profile(profile) < 0)
++			error("bluetooth: Failed to register profile UUID %s",
++			      profile->uuid);
+ 	}
+ 
+ 	return profiles;
  }
  
- OBEX_PLUGIN_DEFINE(bluetooth, bluetooth_init, bluetooth_exit)
+ static void bluetooth_stop(void *data)
+ {
+ 	g_slist_free_full(profiles, profile_free);
+@@ -441,16 +455,17 @@ static int bluetooth_init_cb(gboolean at_register)
+ }
+ 
+ static void bluetooth_exit_cb(gboolean at_unregister)
+ {
+ 	GSList *l;
+ 	(void)at_unregister;
+ 
+ 	g_dbus_remove_watch(connection, listener_id);
++	bluez_available = FALSE;
+ 
+ 	for (l = profiles; l; l = l->next) {
+ 		struct bluetooth_profile *profile = l->data;
+ 
+ 		if (profile->path == NULL)
+ 			continue;
+ 
+ 		unregister_profile(profile);
 
 -- 
 2.34.1
