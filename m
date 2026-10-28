@@ -1,92 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.31
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793195731;
-	b=OfNc1FYw5iM2kIonFAE2jn8bhKA2u2JAkij3p8acx2zIYF+mWE8niEaeSgR7pBgSERP/
-	 yMhfqiIHQYImyAqC8UdKGr+oTzlQyTkD+ODBFiT7FJVlmBOqxYgCiE4ORRzcjsWJMnAny
-	 aNFO0l5ClNhIQnsM0XFdBt1Y5jcgGc9ipZl+yLuFEdQxgsBbUtjTeitnnWpkKuFIWovCr
-	 DbKC1Ejzh/B0RlsSOWnpyB4Orn6cIJNT9i09Lx6SF/f+0xvXJimlzmoHNOrSpk5AHdwfz
-	 oaf/6lJ2iScDq+CzPRBvaUY/G+FEgzW1ra6TcSonddcFVebJELJb7/xh7Ch1tNqXKrA==
+	t=1793196104;
+	b=GblpeY+fzT5jDNGBOaBvDRKb+71uQq5Yk7elzyzkyyGeb1fwAeDG34QOR3RQb8/G6jDS
+	 Z/Rho1uevXKCKOkqIkd6E2ZpqJsmO/ZrlQRaoLj1Hu7yw6k2OM8esbNYMecGfn58z5vIW
+	 6HgCGueyh8guaDBYJxVmPYVczAU0tF3r1MfrcK/ZnO61d8M35TDQHJ1lJl0i/abXjIU/b
+	 atyc71WO8aUNxjW5vsKDrC+teV3HB6xY3eo5QqU82zfTolL64phTP1kve1Q10VvQKx2XV
+	 tckR3Zy//TqQnpiThGXlytpmtPvADwjBOLwKxqQTk5oHqhno7h0giirc7H6kkvVYAGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793195731;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=obVxC3KbKgBKT9rwhOquCXE+meDlv2iDyi7V8+38jUQ=;
-	b=jl+8g63UXgIbQdif5NEaILSMEmblU8mRISWEwOB9+5A883RlOjeagqXHcx+1fGxV/1+0
-	 7MavTMN4Dt5PJ0A026HlwjPxLp6pdB39NG+KP+cIiOPeGsRUmVEDa1JnyQNBAogoDhiWL
-	 rklHxXfU6ug54fLHyp7biEUyPKEJRThqKM3RtRz/leskUJO9+RnPFo9EbUc+134CiVrUA
-	 ecE1998oqUwJbVGnapUJ/p9q7KaNypB0+kJHSmVtJS18+5o318mEskOK64jst1m22kFyW
-	 K3HNKE8Zf2BMsajKm1V08xRwnz+JJDbfCusLZI3niqQ1DnDmcOiOYv1tbUzV0oZZ9Yg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793196104;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=URvNwBArbK+DIIhLGbBoBXGT5Jx0GevFLVlmjfRlhfg=;
+	b=GB87iYG1/zJdSF4at3B4N2cedmujZfo8IQIDn0owGaeMMd4TlFSgxFS8540NiJxAa/Ex
+	 CiOzlCA8N7vdlfXoApl2B6raCwUEIxjlnhDywHFazOKhYSnaVHdVh/PvpE2JZhe7+RIZv
+	 rshpsDKw9NIVci7D5GdzolfYKaibQ1XH/vXxs7ui5v5rd8x4xEAginAggOlf2gWtfWH1X
+	 uIl98YfN5I5vBpykA9d3om4UOT7IzYte3QKKVKm34hj3wK5jNddZ0exMDgd3kURIzKrP4
+	 WIyTvY2W0rzIjEqQFuBj/i/vY9KWIx3dOIpAxp8N0VvbVSY44FTWhoIVSnecWP4JYmA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="k8/I/8JX";
-	arc=none smtp.remote-ip=209.85.221.181
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=proton.me;
+	spf=pass smtp.mailfrom=proton.me;
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=iYR7ylgx;
+	arc=none smtp.remote-ip=79.135.106.31
+Received: from mail-10631.protonmail.ch (mail-10631.protonmail.ch [79.135.106.31])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4BF606A31F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:55:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F4BF606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E024606A31D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 14:01:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E024606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k8/I/8JX
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5ebf39def3aso334701e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 06:55:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793195730; x=1793800530; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=obVxC3KbKgBKT9rwhOquCXE+meDlv2iDyi7V8+38jUQ=;
-        b=k8/I/8JXEfBLdqUbkrrOMb7Jp13gGtY4RK1CezTEbMmB+MEb/7drxDxCa/Q5q1Xex2
-         UzuRSB1SOWwg1N+vZNgLiNE5DuplMqeRDy2k/3ai/weMM27VtydkH4jmJdCsFLQjIfqp
-         u0A3OJdW6RCA2w6kB5wuO9eKmByHHCRPgjMFgIYxpmDm7EJgwV4Zy8kheqCdGFFm/Mdf
-         QMJPTYk7LFBS2UQOCZhNv8TJ0H/eYlAhBTFrnnaacMMNqZV8733QWNY/X0g/YizwSmls
-         mDKBDJrCrbSOSIqXC8kqhOERNE/9fbOJRBIwR0vY30nt9nBhOcsGNaOQ7chd8GovfUJd
-         NELA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793195730; x=1793800530;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=obVxC3KbKgBKT9rwhOquCXE+meDlv2iDyi7V8+38jUQ=;
-        b=eObrK2dVNowXWENNGeZr6xY5BG/ysogYGnV33zYBMIGiz6vZdlsjwgCCIR6gTOZABY
-         yuqVszm9c9mqzOsS6444hdv5K/ej/LguHI8Xo50N/UprsPqJuRihcM4olZtETJYPT4O7
-         sme8Jkhm3SDglYe8MrI4mF7OpAAnycj7wjZds6Ui9McRv8EJfs3aN8zKE7VuaVEgEifP
-         S/woQL1uqdXqkdwstr2AfiAQl0O+Fb1/zwkGQ+eW1YGmAnCNhaEexhXS0n5RO3zBpS9e
-         FV4fj8XOzK0C4S/NumcX8w1MwjzHGVj8QClJrJCUjhaymmrbavEroJobH/T8x5Pe07pm
-         Qd2Q==
-X-Gm-Message-State: AFq9FYKpZ4a4KecZmE/EkJ+85zqmdPFWuCOND+kt+2hFAsqYUKHwm5ur
-	cBzS2AwVqoKcAy0skpr+rJzUc9ImQV8hDb6pszRpHiMr1QXlBPPSzzChHcWMVqztapg=
-X-Gm-Gg: AYBFou0VPBrnogaqbRpLglV4dxEFfj32QjPXw+odU7qXNu8HjreruNd0mzO6mpQuVGg
-	smdQLjxcJkxQQImo3ncWYs9ou+BQgC1LGIbnLWtpA/2hAe6f+5b/jivOjY0lJHjEEGMVlry5thH
-	5gwTxPMmLR5sQJxMmA9oAbLki10AOWGsJ+Mz6SznrYEdF/VETwl6pZQB0fmDXMwnF7ZFuvi9DVL
-	aFbpnNHKLSZwQyV5EBLOS5o7LY5vaq/d3wec8o0zyCYWkUTiLtBO5sqJxhik1vtma43J1AlPAx/
-	PIo1Dvq1pqGRyBXyudxvOOyuCUABMBG9iiEH9yHtPET1nMFZ145puTz36/M7gGeuBiFOZy9ifRV
-	rUuWbxHk4Pa9JjlV/BmmR2akapOcf2hns0GsbSZ6AEv6Wh+toUsUPKk4GtfE5SMIKu1G/dzy5SN
-	zB8BDECH1F8beEiQBruxRETxPkwq/2RxMCw5oFGViprn5DxX6eXm/1mpYHyCCD9OUr5qBQtnzXD
-	L60f3F1d/JhzEXdAq1tZrYzpiB8piBeJTyaVUqoJ7Yoo0GVnrRvU05zSRHdINU/fv21oldgMIBl
-	dMYI+ktwDugKXSmcoeN0GoWh/vjlbgRAB1vg6IallSTtVtLLX9W+d6M3m8ORVf1F+4yM/p7IvcU
-	mtpcbJUNGmM/t52XGkyw=
-X-Received: by 2002:a05:6122:469b:b0:5ce:ab22:1749 with SMTP id 71dfb90a1353d-5ec4cad0b8cmr1044753e0c.1.1793195730327;
-        Wed, 28 Oct 2026 06:55:30 -0700 (PDT)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec4f99442fsm1809767e0c.15.2026.10.28.06.55.29
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 06:55:29 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=iYR7ylgx
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1793196099; x=1793455299;
+	bh=URvNwBArbK+DIIhLGbBoBXGT5Jx0GevFLVlmjfRlhfg=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=iYR7ylgxJ9WdXgI2g3KsDNRUDkAvg5dWRzWLLNsQtsYrcrIKYM2vlY9+T4VBmnvFb
+	 IjnOMZj84R/oYZzPWmclrge5iWSFlvcFBqqZjTmcjaBMT1kIiHBoA89+KAcA/rqaSs
+	 5UY8UiwuCoxNKuYUwBYVwjklsnUkK8SBnTQ//HACPcSnYwGyrNbU7YhMc2rj3ufnAW
+	 cD/5FPA/o7RiYa+/cS095og2NvEKyf7QBMkMoyEOTuDtbEC90TN6zDB1W5eejX5rr+
+	 xHh686dRJ+0CTHq41F4pW3PqoXC3nh4BXJIg5LPDtOKuxgSadOg8l/6cr9kfqQj77B
+	 ZKB+8nv+GsCyw==
+Date: Wed, 28 Oct 2026 14:01:34 +0000
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] shared/bap: Accept all defined metadata types
-Date: Wed, 28 Oct 2026 09:55:17 -0400
-Message-ID: <20261028135517.2395290-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261028135517.2395290-1-luiz.dentz@gmail.com>
-References: <20261028135517.2395290-1-luiz.dentz@gmail.com>
+From: cochcoder <cochcoder@proton.me>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] Bluetooth: btusb: use shared ACL buffers for TP-Link UB500
+Message-ID: <zcGBYR2UrTkb3I_O3296MnmoOcoKIbmC4udwcPhXqgB9LpQvmYusp_Zmh9Bm5ELvzwywRXJ-yh5gaRcqmQe2WdA73p5E2-OddcKgKgce6VM=@proton.me>
+In-Reply-To: <20261013032742.497402-1-cochcoder@proton.me>
+References: <20261013032742.497402-1-cochcoder@proton.me>
+Feedback-ID: 97716137:user:proton
+X-Pm-Message-ID: 4002498d3f11dad7be2831b0f5f8b9706dcf26e4
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,51 +64,144 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Just checking in on this patch. Is there anything else I can do to help it =
+move forward?
 
-bap_metadata_process() rejected every metadata type other than
-Preferred/Streaming_Audio_Contexts, Program_Info and Language with
-Unsupported Metadata, so valid LTVs such as CCID_List, which the Client
-must include for content control, caused Enable and Update Metadata to
-fail.
 
-Accept all types defined in Assigned Numbers 6.12.6, and reject
-Parental_Rating, Audio_Active_State and Assisted_Listening_Stream as
-Invalid Metadata when their value is not 1 octet.
+On Monday, October 12th, 2026 at 11:28 PM, Kyle Pepper <cochcoder@proton.me=
+> wrote:
 
-Assisted-by: OpenCode:claude-opus-5.5
----
- src/shared/bap.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index d1836afc9ad2..3bdeec2b82e2 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -3443,6 +3443,21 @@ static void bap_metadata_process(size_t i, uint8_t l, uint8_t t, uint8_t *v,
- 		break;
- 	case BT_BAP_META_PROGRAM_INFO:
- 	case BT_BAP_META_LANGUAGE:
-+	case BT_BAP_META_CCID_LIST:
-+	case BT_BAP_META_PROGRAM_INFO_URI:
-+	case BT_BAP_META_BCAST_IMMEDIATE:
-+	case BT_BAP_META_BROADCAST_NAME:
-+	case BT_BAP_META_EXTENDED:
-+	case BT_BAP_META_VENDOR:
-+		break;
-+	case BT_BAP_META_PARENTAL_RATING:
-+	case BT_BAP_META_AUDIO_ACTIVE_STATE:
-+	case BT_BAP_META_ASSISTED_LISTENING:
-+		if (l != sizeof(uint8_t)) {
-+			ascs_ase_rsp_add(data->rsp, data->ep->id,
-+					BT_ASCS_RSP_METADATA_INVALID, t);
-+			data->err = BT_ASCS_RSP_METADATA_INVALID;
-+		}
- 		break;
- 	default:
- 		ascs_ase_rsp_add(data->rsp, data->ep->id,
--- 
-2.56.0
-
+> The TP-Link UB500 (2357:0604) reports a dedicated LE ACL pool of 27
+> bytes by eight packets and a BR/EDR ACL pool of 1021 bytes by six
+> packets. Sustained large-SDU LE CoC traffic exhausts the small pool,
+> although this controller accepts LE traffic through the larger ACL pool.
+>=20
+> Add an explicit HCI quirk and enable it only for the tested USB ID. When
+> set, treat the LE buffer as shared so the existing HCI scheduler uses
+> the ACL pool. Avoid inferring this from buffer sizes globally because
+> other controllers may have legitimate separate pools.
+>=20
+> Assisted-by: OpenCode:gpt-6.1-sol
+> Signed-off-by: Kyle Pepper <cochcoder@proton.me>
+> ---
+> Submission review notes (not part of the commit message):
+> October 12 N8/UB500 no-quirk trial opens CoC, completes START, DLE
+> and 2M, but sends no audio frames and logs two watchdog stalls. The
+> host advertises MPS 23 instead of the baseline 512; peer MPS remains
+> 168. Firmware pool semantics and simultaneous BR/EDR/LE accounting are
+> not established. Keep the quirk device-specific and this proposal RFC.
+>=20
+>  drivers/bluetooth/btusb_main.c |  7 ++++++-
+>  include/net/bluetooth/hci.h    |  7 +++++++
+>  net/bluetooth/hci_event.c      | 22 ++++++++++++++++++++++
+>  3 files changed, 35 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_mai=
+n.c
+> index 71d8dccb2..5e1fb26ab 100644
+> --- a/drivers/bluetooth/btusb_main.c
+> +++ b/drivers/bluetooth/btusb_main.c
+> @@ -70,6 +70,7 @@ static struct usb_driver btusb_driver;
+>  #define BTUSB_INTEL_NO_WBS_SUPPORT=09BIT(26)
+>  #define BTUSB_ACTIONS_SEMI=09=09BIT(27)
+>  #define BTUSB_BARROT=09=09=09BIT(28)
+> +#define BTUSB_USE_BREDR_ACL_BUFFERS_FOR_LE BIT(29)
+>  #define BTUSB_QUALCOMM=09=09=09BIT(30)
+> =20
+>  static const struct usb_device_id btusb_table[] =3D {
+> @@ -872,7 +873,8 @@ static const struct usb_device_id quirks_table[] =3D =
+{
+>  =09{ USB_DEVICE(0x2c4e, 0x0115), .driver_info =3D BTUSB_REALTEK |
+>  =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
+>  =09{ USB_DEVICE(0x2357, 0x0604), .driver_info =3D BTUSB_REALTEK |
+> -=09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
+> +=09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH |
+> +=09=09=09=09=09=09     BTUSB_USE_BREDR_ACL_BUFFERS_FOR_LE },
+>  =09{ USB_DEVICE(0x2357, 0x0607), .driver_info =3D BTUSB_REALTEK |
+>  =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
+>  =09{ USB_DEVICE(0x0b05, 0x190e), .driver_info =3D BTUSB_REALTEK |
+> @@ -4748,6 +4750,9 @@ static int btusb_probe(struct usb_interface *intf,
+>  =09if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+>  =09=09hci_set_quirk(hdev, HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED);
+> =20
+> +=09if (id->driver_info & BTUSB_USE_BREDR_ACL_BUFFERS_FOR_LE)
+> +=09=09hci_set_quirk(hdev, HCI_QUIRK_USE_BREDR_ACL_BUFFERS_FOR_LE);
+> +
+>  =09if (id->driver_info & BTUSB_INVALID_LE_STATES)
+>  =09=09hci_set_quirk(hdev, HCI_QUIRK_BROKEN_LE_STATES);
+> =20
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 1641d879d..d39a64663 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -375,6 +375,13 @@ enum {
+>  =09 */
+>  =09HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
+> =20
+> +=09/* When this quirk is set, LE connections use the BR/EDR ACL buffer
+> +=09 * pool instead of the dedicated LE pool reported by the controller.
+> +=09 * This is required for controllers that expose an unusably small LE
+> +=09 * pool while accepting LE traffic through their shared ACL pool.
+> +=09 */
+> +=09HCI_QUIRK_USE_BREDR_ACL_BUFFERS_FOR_LE,
+> +
+>  =09__HCI_NUM_QUIRKS,
+>  };
+> =20
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index c055d16cf..9936f6365 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1227,6 +1227,24 @@ static u8 hci_cc_pin_code_neg_reply(struct hci_dev=
+ *hdev, void *data,
+>  =09return rp->status;
+>  }
+> =20
+> +/* Use the shared ACL pool for controllers whose dedicated LE pool is kn=
+own to
+> + * be unusable for sustained large-SDU traffic.
+> + */
+> +static void hci_le_use_shared_acl_buffer(struct hci_dev *hdev)
+> +{
+> +=09if (hci_test_quirk(hdev, HCI_QUIRK_USE_BREDR_ACL_BUFFERS_FOR_LE) &&
+> +=09    hdev->le_mtu =3D=3D HCI_MIN_LE_MTU &&
+> +=09    hdev->acl_mtu > hdev->le_mtu && hdev->acl_pkts) {
+> +=09=09bt_dev_dbg(hdev,
+> +=09=09=09   "LE buffer at minimum (%u:%u), sharing ACL buffer %u:%u",
+> +=09=09=09   hdev->le_mtu, hdev->le_pkts,
+> +=09=09=09   hdev->acl_mtu, hdev->acl_pkts);
+> +=09=09hdev->le_mtu =3D 0;
+> +=09=09hdev->le_pkts =3D 0;
+> +=09=09hdev->le_cnt =3D 0;
+> +=09}
+> +}
+> +
+>  static u8 hci_cc_le_read_buffer_size(struct hci_dev *hdev, void *data,
+>  =09=09=09=09     struct sk_buff *skb)
+>  {
+> @@ -1247,6 +1265,8 @@ static u8 hci_cc_le_read_buffer_size(struct hci_dev=
+ *hdev, void *data,
+>  =09if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
+>  =09=09return HCI_ERROR_INVALID_PARAMETERS;
+> =20
+> +=09hci_le_use_shared_acl_buffer(hdev);
+> +
+>  =09return rp->status;
+>  }
+> =20
+> @@ -3939,6 +3959,8 @@ static u8 hci_cc_le_read_buffer_size_v2(struct hci_=
+dev *hdev, void *data,
+>  =09if (hdev->le_mtu && hdev->le_mtu < HCI_MIN_LE_MTU)
+>  =09=09return HCI_ERROR_INVALID_PARAMETERS;
+> =20
+> +=09hci_le_use_shared_acl_buffer(hdev);
+> +
+>  =09return rp->status;
+>  }
+> =20
+>=20
+> base-commit: 964430c038967fd06643e866f68115664e1a1bd1
+> 
