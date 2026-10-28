@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793194209;
-	b=c2okZ/CxS3mZpuKRowy3SHB4SVUoQcgn+nf87aMsRnSgZIr1ETiMKyVVnEVE3OIsV+f5
-	 sUYM0D20xjNTx6cdOvfrYtPQPpN7e6LgF5Dx9BZDlhJNW3ocIGGwB55kYlKeeTDbwvz7s
-	 dBC5byrB+Ui28leU7U2cgniGZzvnilxRMY1gAU8RP0HDl45GrMozuI3RXD3ES7PKgzkfi
-	 XUh69xqAivcFRe3HhdI9cYAv+AgxAUNfdzcIK5ElAM/GPjXjHCVIuwjfGAQzq3QrotHUf
-	 9iVBAzVScHEWB6OA9D5UkeMgnIZ+X08aFxKRQxbVb11ymg1eoKTy5QA7gkjsOQAaosQ==
+	t=1793194210;
+	b=kER8fZw+e3ftN1WS9bII+2rvc3blVhTbRnIGfyKQSw2DOeq5wLhQes2Ku8bYx1eGj/f6
+	 U1EhirjFZoaOiOPCM38tEiyosb1XLwpveS2FMReslKgt9WEZRU0YHu88X007StWMDs6fy
+	 qG2i33yMXoAm7IQpP7i03n9f65xwqsal3aYl5Iv7XrCO2u6TiX+S6OtNwihdAPB2TfxaH
+	 meRsaxbZ5drPBzlSjgdZNkeF3wzvZO0vGS/S2mNyVJrsQcw6EqB0OiHiEjICMLNuO28OP
+	 8PvY/iEY5doTzOYFMum9KA6uiakNSWdMBpG6FsornA6C8jWRCkmVa/OiEFSkV5CImYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793194209;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793194210;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=dHuCFJLGSn0CBksMISsY7LivOs3pg0y1BB/XMByzSI8=;
-	b=dscnQxeSKXG3/77ZxEK1rFjeXIuqlKYSNnD1p54GrA/Hb9M3gIUKpF0ng3OsLWivBugv
-	 wphsWvN/dXQOgOCdFf280uTso/Wp1Rhz9iJLH8myAsq1IMl4X52XGt426Mkhe6Kypm4yY
-	 3AsBOwRyc2+xG7TMr9winuyAkQxpikBnk0yUP8zTvKpgPLaVUgdZp32XgflE4arvmTRrv
-	 Nal0+WNAwDuJJNmGhWiNAAORCRLG9IOVtVtLuJKjvTc4YtoIq02vLoa8m8UTOiN0XvFY4
-	 ZwBxF8nLn4OLZNobQXhHQ+c8TAcML6mlCOWbmZoHY7TS0UNDo/8F7p3NrKUN1OxgpjQ==
+	bh=/oSpqNkjlMkpjW/eur5qqXyua3ueYm8+FgaS+n7v+TM=;
+	b=uXU1vMZnnADFXMCTUzMjN+u3P8+IFHEqdZ2eutNOzs3pqPIMCgiADaJIPidNNMES3QRS
+	 MUgxeHhaHr/0uccHs2sPrAYrHpm3E06deD0sBGo5nuUfZEVRgUl+V+PprkrSAsCf6G7RA
+	 BMr+1V16CLOPk+BR09wisrX3/GcGYH+1BWxfCn35PaazHeb0equ2duZJBt2RMJphebhg0
+	 yWgsAUh/G/RMhEUUXNVJnWveUFGhsUMc2z0dV6Imyi4aizWZLD7Xt7PGRff3TVLPHyVhj
+	 TirW8CU6MSJuaAbTntykNGhJDaZ3DYlbkTkbaU3exocJ6iouXK975WX3UhrB+3Ofbrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DWKPuuVM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=De1yMr+p;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0476606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA2C606A323
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 13:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DWKPuuVM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892FD1F01828;
-	Wed, 28 Oct 2026 13:30:08 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=De1yMr+p
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 125451F031E0;
+	Wed, 28 Oct 2026 13:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793194208;
-	bh=dHuCFJLGSn0CBksMISsY7LivOs3pg0y1BB/XMByzSI8=;
+	s=k20260515; t=1793194210;
+	bh=/oSpqNkjlMkpjW/eur5qqXyua3ueYm8+FgaS+n7v+TM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=DWKPuuVMuBqkZ0RGM22VjEAsd4LsslJpznsT/71I2dyfVkLDq6nIMKWOpnkdRfIjS
-	 UU+AZ21qVQxa7StCJVLLwJSkD5r4LaSLT4VlRgsVvWMB4JVdc4gTqp08e3+2W8XveA
-	 AJ+DDdqbz27fk/9cTw+7tfTIaqOvTW4lbd/fe9g3BikbpRoUur0KfNzcmuSct00Pdv
-	 DVUs8NUM6miYCODUGeNU8UFfPMROtrI5oBjhT7ozd6FHbfR0YB2txppKMBZ2/G9D0W
-	 /tLRrltrqROdCAdEftmYkDaO3SbFyMblSrzFunKpmCgJK3bU5/bUKa4HVXN2sbL2Mp
-	 RQ+JgRKNt5KXw==
+	b=De1yMr+pp1s21dk9V5DzGZ9aOitqSfUujfKGfmvL+Ux059mgkCxImBZb9oBe5Be2L
+	 8ECS2YCLqGj28ziTRKKoYe/Qx2MhRwB4LFJI+I/blddNRTWgO0BIH58i03QfSLGEC1
+	 Eu5aNYoov15eZnzr4ARlFuBTiRy2H5OEIOb5UfWDPzWSD5zylEsjg/fKjmgjm1mexG
+	 G/f965Y7SgrLXfvV24OSAhONnXJDFfaLTvXHs4PkenJZibH8N09JFl6eqnP/Il3qQn
+	 kEqgK6ET6MShm4/aVJvDL77lzZSxai3iVA3n/pD1vl/e1hSQZhS8PGUx3S936LheAs
+	 xIGeiv7TMVGbQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 815703AAA6E8;
-	Wed, 28 Oct 2026 13:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 076563AAA6E8;
+	Wed, 28 Oct 2026 13:30:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,37 +54,43 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] monitor: validate Return Link Keys length before parsing
+Subject: Re: [PATCH BlueZ v1 1/2] ranging: Issue CS Security Enable based on
+ the
+ ACL role
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179319420706.722681.14649729121486411267.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Oct 2026 13:30:07 +0000
-References: <20261027032821.1088858-1-contact@capsize.online>
-In-Reply-To: <20261027032821.1088858-1-contact@capsize.online>
-To: Capsize Security <contact@capsize.online>
+ <179319420856.722681.14638147747357060653.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Oct 2026 13:30:08 +0000
+References: <20261027140953.1854740-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261027140953.1854740-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 26 Oct 2026 21:28:21 -0600 you wrote:
-> return_link_keys_evt() loops i < evt->num_keys dereferencing
-> keys + i*22 while the dispatcher only enforces plen >= 1.  A crafted
-> btsnoop capture (evt 0x15, plen=3, num_keys=85) overflows the on-stack
-> packet buffer (ASan stack-buffer-overflow in print_hexdump via
-> print_link_key).
+On Tue, 27 Oct 2026 10:09:52 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Reject payloads shorter than 1 + num_keys*22 bytes with the file's
-> existing too-short-packet idiom.  No integer-overflow hazard: uint8
-> promotes to int, max 1+255*22=5611.
+> CS Security Enable was only sent when the CS Config Complete reported the
+> local role as Initiator, and a CS Initiator that is the Peripheral of the
+> ACL moved to CS_STATE_HOLD, dropping all further CS events.
+> 
+> The CS Security Start procedure is tied to the ACL role instead
+> ([Vol 6] Part B, 5.1.23: "The Link Layer of the Central initiates the CS
+> Security Start procedure", and [Vol 4] Part E, 7.8.133 disallows the
+> command when the Controller is the Peripheral), so send it whenever the
+> local device is the Central and wait for the event otherwise.
 > 
 > [...]
 
 Here is the summary with links:
-  - monitor: validate Return Link Keys length before parsing
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6475b75e7e0e
+  - [BlueZ,v1,1/2] ranging: Issue CS Security Enable based on the ACL role
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7191f261b596
+  - [BlueZ,v1,2/2] ranging: Fail CS Config Complete on role mismatch
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9f14b93eb37f
 
 You are awesome, thank you!
 -- 
