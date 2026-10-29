@@ -1,84 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793305116;
-	b=dKUM89M9n+tW9vnbGITDCNJiKvWu4ByKXdAYNl0iLX6CKNiALuPUcFQ83bEUzTkwJ0w0
-	 OWKlbkZveAgGY/vjmnAh15jGYIbe+4BBY7+vapsadNK+pK5zOhN7MKdw7fBO7m8wamKOe
-	 bozis/1yCxUj0B6Qmm+/yVPjs41x6Y+t6QNgtSGGV9wfr1q4qseBzg6Lqv6ABN7xAonMA
-	 xH2yYopJCYhUEuBxgmEakt5N1FcWbEsZPsxL6PVho6cCxF/aoP3b/ZaQQgh9x3vSStElN
-	 MZr8VEK3m6SzNQ1thH16aS1GsumC8M2HJO0l1JhA7dJdQHvr5A7RFm4AsMmJyFqJNhw==
+	t=1793305718;
+	b=ELtiOIOFuH28P0qYIZTj14f3sH2CxyUPTE94nL1phcz/Z1sZA+eOD0ZlXzYNonb61YBt
+	 DWTqOzGxL/SEwwF33ApOHhH3j15vK3EzeRqaFoSWFsSfGyXSRl26vONL+43RoYyyYVwq3
+	 IQdviKOfzJfv/bD3WeaamI0mBzu7wPHeuI5sYTdcbeBKlXW6VzwlKMsUEkKeTolQk0+a7
+	 7Oee9xL8joPIr1IBekyB4odhfT1YUC+UHoGuVy3Z33XHgtulcT8ntMoJIXIx6FLOpgvTh
+	 Qo32fLWMW2801tFLkjBK1uribWh7cEQPIAVwUNQKuTa8l4H1BRmMk+KmD8O6xxYqxSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793305116;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793305718;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=YH0YjaT2F1yTXNWYeAI2BYW3BRVPswgJRIMODCfGYts=;
-	b=5my2vBYJRxRhOyZjN0bkNrQgyrr/39DN5+Edf8BlY+wbla0SBt+CsweNIGAMicjmHSNj
-	 N4VeftmPEHJkqPU1GQjh67NK3YmP9MH70hd9l+bkVkJKh0HOUsF8f20UiENZFiG1qpFKa
-	 iCS0f7dLcHzruTA7QnO/LNjA0xjb4n0DlxPcOWPMggmgCJDfBOZ8Ep4Iy/bHkfk9Bvsik
-	 97etdXci9vsBdRjyaBafccX+4X23nuP32ouYgUyP9Xe04Q6MWWZgTh3xQAFeRJz/Xgz+G
-	 EGP45WTvoYnQ8YmiX/qHMYs572xgJeeI7VAD/b1SN3Zm+szGuHmxBaFC9PH75UrEXVA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=lbbKXnXlDWrZBBtTs8TaCdwHJMgkhA2ffCtAIVgiVQM=;
+	b=MyFIkmKWUMpgSD+FS2xZ+MePzPZdYnobFoWTDBM4yIizm145PRD6VcV0bQQI9G4wF6wm
+	 HmugrrcM0HGiau+tq5pb3JitgJLJePP31fLML+bwqnMM+K1m4nWKwO2jv5Bvqp1bfdXCP
+	 6AVnxQSDH0rCoa9E6csHWlntl65y1DJ1iWKOHht7ykU9aTetP0lDafGJgiJr70zRDZbPv
+	 lUbmaf60onrPbWZejJ29ityotI1I35Utc+xwzztOFOaReD0Hoaq9fGvMTcdy4oSF9jsIM
+	 gnjAfOy9weGjXCyJUk1XV5J1YWsfrwguqnwq2R1HpCp06WLBIOLdiYmCtS3hYyaU88w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bFCzQZ+G;
-	arc=none smtp.remote-ip=209.85.222.175
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	dmarc=pass header.from=simpleble.org;
+	spf=pass smtp.mailfrom=californiaopensource.com;
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=Iiw0cjWx;
+	arc=none smtp.remote-ip=74.125.82.179
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD03060A3810
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 20:18:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD03060A3810
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FA9606A338
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 20:28:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F2FA9606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bFCzQZ+G
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-93ead211f14so3543685a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 13:18:35 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=Iiw0cjWx
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-3550c917fd3so115387eec.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 13:28:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793305115; x=1793909915; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=YH0YjaT2F1yTXNWYeAI2BYW3BRVPswgJRIMODCfGYts=;
-        b=bFCzQZ+G3fN9t/ZQo1WAPNx/l1SWLLmvQJARHUgbKa7M4a5actk1MA2FziTl+VfHrc
-         b82CqFGcYXg/HW3Jsn3sv9M/Y2mYvlD/aKSAKaHY94ZEYfCJFRnGJGgvNur9chF0Z2Cm
-         pOt3II/nn0usOGIGUZKASydrvmu7I/+vKvI6JPDcbrcQx4l3prbQWtYf6PnqSbOoUGZ5
-         5xqoX8LyQd+1uq1hlb2jIqCF4whc1ht3siZzUm5PlZzimlOwhhqXr7X9xeO/O5+5IdIp
-         VJHhrKYudbVzBc4wDpYgBf717wmag0ZnTvSM3Ib1UXrMO69HDV9STHa0LjJPxxSgqLOF
-         ylDg==
+        d=simpleble.org; s=google; t=1793305717; x=1793910517; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lbbKXnXlDWrZBBtTs8TaCdwHJMgkhA2ffCtAIVgiVQM=;
+        b=Iiw0cjWxnyG+XhZh6De6QuIAo9FW87ufwsGgMWJWaOb9lX3TCuijcJUqKt+eS7mNd8
+         4F8sscA1hNcmNSGdcegPxznGqIkJFE432QdgkCs+C3rpx6ORZmSIWj/k0Xz+qJFh/vYk
+         al2pJg4/rAc9kfM+3pk/Fvp+AduQumE74Y6EtmrdhORaOEk/xsE6pq8GRTIV5Olucr4p
+         CI9cRt7JlHGKfrek/kORxzgILHLROnuBZne1hIL6ENaamolONDTD03P+bYAQ82sK3SlK
+         CmEvl3AjcOixwbFM50f8492DDcOXuE06Te0d7Xt+aWK71ne0VfvLmkUSImhaXCqqCT/A
+         ooBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793305115; x=1793909915;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=YH0YjaT2F1yTXNWYeAI2BYW3BRVPswgJRIMODCfGYts=;
-        b=l2bk4g0SuNDT12k0/W+kBbfj6MlqjvNmUgQPDUDXvylcfDFvEUuGPBbXfhYG8rK9YZ
-         iFFZjZOdBQadcJKlK1mC8A/vREHhj09eVvNOqQg0ZEzWTSrzXs5BM3C8WUPyXinq+vMd
-         9SbkB+G+VrWqWG3Ex0Ww3+FeEjtv2N9e0r7T1IQyuiaSirzkkKbwLhJ5Y7KqL65XjGKs
-         oNtzVXBS0A/txfRwJMkmdarOS5Q0VoJCIEk7DfoYsoj2enYg8oDZeQL9eaOuCrSMygs/
-         621V5KvKVVit5hdzLHGVcXQLzD1GqyEMRo7voiWUYPtx5v7Qjugou3y9OGEJtyQN3ywa
-         uqwg==
-X-Gm-Message-State: AFq9FYIlOG0ZIsRJ1TTFRBLscdsQW0U1RHmAi9OO1DXmTSFZ/rwnK7zH
-	7osUcm2lHLe4R17FDMKmyYE/tqNDrlVBgsQTybqMLlIOZPezIT0535nMbDiuwA==
-X-Gm-Gg: AYBFou3XaeP+87ljPmvujTFK7z8rFBccMJl0evNqm8Fa6CqA1tB+zevRN6y1xKdpNMM
-	Hobh6AUvdyWODlIiMEcVWezDu8u/p34v2ZVvZ2P/YDXuBrqciP7UHqIT6Tx42XZEzERlAlIirdU
-	6bov14F/DnKR4LGQp2qL0pRRxAUU94uj5j8ijv2xbq+1W42R2YKleBRZfSqLWLgLhqTmytt+Jk8
-	de0MfGUzmWI4hRpwdGmvoMWLRv1vGS5NWBZZccHumodRJ1a6puF3wAd1xUuV1+CAagGqrxIpB8r
-	WrGum7JGHw1dSgBH4o9NUC0Z0wUOpErb/NBTvBVCVxf9nt70hH4lM8ErmY6Eah/ZanG6RWwHBH3
-	/iC8gPY6P07Zx9RUJDaWvDIuxcLwSQgmzwBXXulKfX2Rt2wt7mgyPC8vi/Hvp36INqIEwgv1W2r
-	/xQ9uv1eTZQfkaH9pLw03qpMleer8xX3aPihDHjYAQPIKledh2b3gYZjkgBQds7SRW8vZ1BaWLk
-	FBGMj3rtUBrB3osorZXDaCg1y8+m5tyJSrod2xmxAQ2QKGxSRu6wNU/jylLqg==
-X-Received: by 2002:a05:620a:3950:b0:93e:618f:8127 with SMTP id af79cd13be357-94413359242mr488280585a.8.1793305114707;
-        Thu, 29 Oct 2026 13:18:34 -0700 (PDT)
-Received: from [172.17.0.2] ([74.249.78.32])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-94421252364sm31552485a.28.2026.10.29.13.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 13:18:34 -0700 (PDT)
-Message-ID: <6ae3aa1a.0a372733.bc8ee.27f6@mx.google.com>
-Date: Thu, 29 Oct 2026 13:18:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3012403690348588122=="
+        d=1e100.net; s=20260707; t=1793305717; x=1793910517;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lbbKXnXlDWrZBBtTs8TaCdwHJMgkhA2ffCtAIVgiVQM=;
+        b=zXgcRu7R1eWMNOMsZtWRn3AJgHvIZPBGhhI2QoxknCIfSnwhy3ceZyJLHcObsPArDW
+         WBeKf73Iafx5d1Ppf7z6l1V97CLfctwsyS62M9CRNAYO5pmTvMTmbCw0b/JAzTZ6gefA
+         eczu42LFYACDhLSfNVqZRBEz7E8YZS7qTQVI0usexlLdowrfTCzZcORAkOkhG6tX52Dt
+         fn8pNTpZ37EmzxsOuSMxZvA/4DAe6e2Is08/ihPZLr98b5dYBQv1rmb7j3kPCDa7oTPB
+         vh185yFswA7+KAQHTVUI1Vbc73fIP1os0X1tu9xSylUcCdnKqf5HxyFexsAULOGVnC59
+         bTqg==
+X-Gm-Message-State: AFq9FYJxIH14hFH63psCz3z1hGkY82EmJvq/IZOVRw/cUkB/LHnXsFVs
+	K90cyCbbXZOZ8DUY6hi7ComjTN5vlsgxvJIV1MLU6EH/ehbuXFN8lFNyu2Jtdv2fCIY0ezAuj5G
+	zcRPPFJi96g==
+X-Gm-Gg: AYBFou1zUzeIEzNZrfpyug3e8nFjLkPsC5XiUqvOvtwqmaMIQAD0TbIxDr0elMhFrdI
+	1URBOCc20Mie5xaAsqch9uj1AqIFjvAsDR6N+u+z5/UAQaag9kZTZcjpUE144S9OMvWXka9WmHe
+	MsjyvfLZQMEUfYopUU0dCtHXUwr2cfzZ/wSbshOU74vtXBwvh/yYZ0UEMd3GOzQukGU5G7h+7pB
+	6ruyuN6iFndidPPUF4kM1GFDVotw0KtpZX7juN2YWrpnPeBR/bcCjZZ3FXJAvJLrDNyX8XCeGVo
+	3izN7ohnD6rsA/lywNvmSSEFZrcISJrqN7qB2xCQWTyxtQCkX5uvWgpPZtrzPYxqbYDFkfBB1Bk
+	+qlqqt9+3sm0U6Vh+TbVymnTXvvVAqXyLD2mZTACFBXhGvIyHe5VxalwWJKbyHg9QAw4TMiWWn6
+	0SHK7a8P77zch+wPW+ldFmj9hcXkEChi0PWwDDNAj54PQJxnSG/l7y6/31S7BmJMxxKau0QX2U/
+	zkGd0l3MfC99J21oc2Jf2NdonqXfxzwOziYeB6Ryd+e5mR71bqRg6ptiJVSz71tEP1eFodZODqn
+	cxzBqxI27m16qLrrRmrn8o9HMaUzjvtXDruCK16KIU3nFptVlPxMJ6rDvKOOfy0hRkgvqS7Fcae
+	VdzYB/YR0RhhTIEvj4+s9HyW7FiBCUmnyf6uCB4s95vEpCVEa5PynJ3qZ1nscXMSs5R9tt/Q=
+X-Received: by 2002:a05:693c:601c:b0:36a:270:ce76 with SMTP id 5a478bee46e88-36a424de9abmr612001eec.33.1793305716768;
+        Thu, 29 Oct 2026 13:28:36 -0700 (PDT)
+Received: from localhost.localdomain ([147.185.47.151])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428af1dfsm934519eec.7.2026.10.29.13.28.36
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 29 Oct 2026 13:28:36 -0700 (PDT)
+From: Kevin Dewald <kevin@simpleble.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Kevin Dewald <kevin@simpleble.org>
+Subject: [PATCH] Bluetooth: MGMT: Clear disabled connection parameters when loading none
+Date: Thu, 29 Oct 2026 13:28:32 -0700
+Message-ID: <20261029202832.35354-1-kevin@simpleble.org>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,49 +96,61 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [v4,1/1] Bluetooth: btusb: support larger LE packets on TP-Link UB500
-In-Reply-To: <7136cfd8f427b90d6d931a836e93dad5ea6164a0.1793296023.git.cochcoder@proton.me>
-References: <7136cfd8f427b90d6d931a836e93dad5ea6164a0.1793296023.git.cochcoder@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3012403690348588122==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Load Connection Parameters only clears the disabled connection
+parameters when it loads more than one entry, so that loading a single
+entry can update the parameters of one device without dropping the
+others. Loading no entries does not clear them either, though, which is
+what bluetoothd does when it starts without stored connection
+parameters.
 
-This is automated email and please do not reply to this email!
+Pair Device adds disabled connection parameters for the device it pairs
+with, so these now survive bluetoothd restarts, and new connections to
+the device keep using the parameters they were created with instead of
+the defaults set since, e.g. the connection interval from main.conf.
 
-Dear submitter,
+Clear the disabled connection parameters unless a single entry is
+loaded, as was done for any number of entries before.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1196502/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.47 seconds
-VerifyFixes                   PASS      1.90 seconds
-VerifySignedoff               PASS      0.13 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.29 seconds
-BuildKernel                   PASS      31.72 seconds
-CheckAllWarning               PASS      42.74 seconds
-CheckSparse                   PASS      38.52 seconds
-BuildKernel32                 PASS      31.66 seconds
-CheckKernelLLVM               PASS      35.47 seconds
-TestRunnerSetup               PASS      745.10 seconds
-IncrementalBuild              PASS      29.63 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/1024
-
+Fixes: 0ece498c27d8 ("Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection")
+Assisted-by: Claude:claude-opus-5.5
+Signed-off-by: Kevin Dewald <kevin@simpleble.org>
 ---
-Regards,
-Linux Bluetooth
+Found with the BlueZ functional tests, which run one after another on
+the same VMs: after test_bearer_le_pair, the next LE connection between
+the two hosts kept the parameters the pairing had added.
 
+Reproduced in test-runner: host0 pairs with host1, then bluetoothd is
+restarted on host0 with MinConnectionInterval and MaxConnectionInterval
+of 80 (100 ms) in main.conf and connects to host1 again. Without this
+patch LE Extended Create Connection asks for 30 to 50 ms (3 of 3 runs),
+with it for 100 ms (3 of 3). Without the earlier pairing it asks for
+100 ms either way. The kernel testers pass as before. Only tested with
+the emulator.
 
---===============3012403690348588122==--
+ net/bluetooth/mgmt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3cb4f9ece8..cf5256f4a8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8175,7 +8175,11 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (param_count > 1)
++	/* A single entry may be an update for one device, so keep the other
++	 * disabled parameters then, but clear them otherwise, including when
++	 * no entries are loaded.
++	 */
++	if (param_count != 1)
+ 		hci_conn_params_clear_disabled(hdev);
+ 
+ 	for (i = 0; i < param_count; i++) {
+
+base-commit: 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9
+-- 
+2.53.0
+
