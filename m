@@ -1,60 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.121
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793232846;
-	b=CwBA7K8Fz2+gNQaeqT40FUZhzbQrXAJxspQJvu625IwrvZIYQ+bgWVTnsep/skPPVjsc
-	 jnP74LPAy5SXdIAZp7wGOXfRA6hw/8k89B3oXY/wMNoBdId6DoloRfoww9GkxCnx4crtU
-	 oTnEA3HV9/n5pH1XZWkio+4a0nbNV6HMQUYSozs0fo762ZY0FAvKaQgvZz6Pwc9dzi8aP
-	 iuV331BdaNVt2kbU2zr2cfD6uFzD9UzgXbpwPRkSJIEgT8Pp2H0LKooRY+5Jmw6yVhOBS
-	 +V9HaJnjIOjbCv7Tkj3kQATMAVYnl/lqVMjZRa6gcaHbNDfs3LlGKH+V9ABwffZFJoA==
+	t=1793232849;
+	b=DO7wKUza2fIFS1zVu+HItoWlYEP9+gdqhFxjTex2wF/Mh5QO19ROCv9u67L3JeukKf42
+	 dhgBFE8vB1puS7wnQMBol5zzoENZdgt1rfhIi7wiaLC9YMsldqNEwbX3E9Td2Yg0CoeeN
+	 4r9YGJGVPU2vFCIzomTucNcyzPTFDafn1fFBMDoKbR+/wX59QJVfkCvaDsQk4xJpzm5jT
+	 3dYWd59yKJPsbc3dMDhRBarJUMpovYUKaK6KsEd3J5SWllJgimd1Aqcuu5V9E9UgwG443
+	 trC1EvAGqcl6vmxIqV0iM6Ox3woS7aMA1nVnDxyV9bHeD2Zq0QGGI4EzhreL3UCCcUQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793232846;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793232849;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
 	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=D4C4vAmzl1eQgWL9x+mi9V4ee8DV3yTfcj96A4ftIzk=;
-	b=3fwx9Tst5h9fDfV6u+SY11UcjrKWppQMNa/Jirj/is+0N5An+KegLb4KVblwAMOiaIcz
-	 O5on8UM6RFKnz2W573y+29wk+cN/X49dicLpC+H+fv9m+tu1xJjLglkRflV/2bVJ6PsPj
-	 9taUYUGLL2c7ZBZw0KK9ZpRu8/MpsL2MEdFv7WyuIEP0mQlgJUdYBtCDad5wbeXmnejte
-	 liX6cBIZYvZwAoSoujgTElCHczPY0WLUpiCmvECRkDr5TwSjePnl44rxfM4/4c29xASwV
-	 RQTrc9cvcNMC4o32gEm0bH3/Uk1E3ZmwDz/p99TmOlBJfwrmbYVfCvwdmWnKljQJkFA==
+	bh=fiDsM604MdQpNmemmifyOcmpDnq9oMpXyjw9xDuHIVo=;
+	b=Bw62HRi/43LZfVJkcF7xlZnyABdtJkxhFJbOnWsfS7ZzyWjBKQQIZUdf/uWAwIOKBqFL
+	 JLuuzHgqxr1z+oiun5DAkp0IIAy9CSk+A869tyHpaeMQbXdyq1j0D7M3BHfPVZUCMYf9s
+	 VJv1XX6N9sxdyWBcaNfLaFW8aiE+Nbmv11yJ95QJeUs6N5S4ee9dKNyYR/f0IrQOsjbxw
+	 f4bs4380t9yT42gLQ1olNBsuoiZoxLlgi4hbeth3QGZNNEYrYhVb8lqcmso6ojOGAGZEX
+	 QB2t751QN9Pihv2Te0z1nFBgpiFpjPhpFJYmYKFrMzpegwt5wShXrE0mTS67KNSD5sg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b="UXAzvN/o";
-	arc=none smtp.remote-ip=79.135.106.121
-Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=6q57xwqbcvhnnkrwpyresjknty.protonmail2 header.b=lQlFhO4F;
+	arc=none smtp.remote-ip=185.70.43.102
+Received: from mail-43102.protonmail.ch (mail-43102.protonmail.ch [185.70.43.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D860606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 00:14:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D860606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296DD606A32E;
+	Thu, 29 Oct 2026 00:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 296DD606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=UXAzvN/o
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=6q57xwqbcvhnnkrwpyresjknty.protonmail2 header.b=lQlFhO4F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793232840; x=1793492040;
-	bh=D4C4vAmzl1eQgWL9x+mi9V4ee8DV3yTfcj96A4ftIzk=;
+	s=6q57xwqbcvhnnkrwpyresjknty.protonmail2; t=1793232846;
+	x=1793492046; bh=fiDsM604MdQpNmemmifyOcmpDnq9oMpXyjw9xDuHIVo=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=UXAzvN/ojAWxaAD2cVE2BpCBTwlVQ2nDyICprS2MzElPmXATeArtuCF2MQOJ4UpFD
-	 17arg4frkSG60lmwODEvJSIpVrUCceQaXoTssR2FQTGnvS8w2bnzF83neuxQhjW+aC
-	 OcScUfy/+HkACBdISDJNkye4AXX6C+VZLMAPZGd0kqsct0CBPToJrRMJTVXC+zmPDz
-	 JSVciTn6DY5DjJDhuOxJH8o32RXONZdsosooFSeMhwHCMwSdfRTPERvVFA/wlOQRvi
-	 vrO0LeWLkrX07l8o8r3nnpULGWu7XW1tNGB74a2TC8fAf+XgAo1XFJQ8kxkSx3SI7W
-	 BeACDjraC7Rog==
-Date: Thu, 29 Oct 2026 00:13:55 +0000
+	b=lQlFhO4F3BZh3t5fQKIEXIJL9bdqvYoO2Iw4U70PblIJQ/AqNjVbVnJ1jJ0rB8d1S
+	 rwyHK2yDJhWMEixvMJ6vQJz5NWVPxthrfI2COV3fo+e4I8J+oaTcE/5JYXg+Qzyikd
+	 O+SIYggbJvz418VYwMnyG/0JRZxtVIrpC0NRdpTtaKhd8FGWEzlzpUUyzfB3xKVOTx
+	 rTjnBQd5ACqA4NgVpBBU86TgdJrWMl45JuhAXkQqz6n6iaVfUAnliuHpjZQshEXIEl
+	 W0c5a1fCcRsaKjA7BA7pG7jpzLSvLQjK2dSl+OIOzYnJSpYvzgbAU+vcaR5ZRTHI62
+	 UTDrr79IDubKw==
+Date: Thu, 29 Oct 2026 00:14:03 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH v2 0/1] Bluetooth: btusb: UB500 MTU-only revision
-Message-ID: <20261029001349.1031535-1-cochcoder@proton.me>
-In-Reply-To: <20261013032742.497402-1-cochcoder@proton.me>
-References: <20261013032742.497402-1-cochcoder@proton.me>
+Subject: [RFC PATCH v2 1/1] Bluetooth: btusb: test larger LE packets on TP-Link UB500
+Message-ID: <20261029001349.1031535-2-cochcoder@proton.me>
+In-Reply-To: <20261029001349.1031535-1-cochcoder@proton.me>
+References: <20261013032742.497402-1-cochcoder@proton.me> <20261029001349.1031535-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 590ebf96d2b9f37ba335b46f1e137bf6cd896742
+X-Pm-Message-ID: a44334759a0b84d39271e8ca115edd9187e0f5d1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,63 +67,74 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+The tested TP-Link UB500 (2357:0604, RTL8761BU firmware 0xdfc6d922)
+reports an LE ACL length of 27 bytes and eight packets. It accepts
+167-byte LE HCI ACL packets during ASHA playback. A size-only test
+streams clearly with the eight reported LE credits retained, so the
+previous shared-buffer workaround does not establish shared pools.
 
-> Are you sure that is the case, or did you just assume it because it
-> worked?
+Use post_init to test a host LE ACL length of 167 for this USB ID,
+without changing LE packet/credit counts or BR/EDR fields. Refuse
+unexpected initialization values rather than applying this diagnostic
+to a different reported buffer configuration.
 
-That's my bad for not reviewing the code enough. Turns out that the forced=
-=20
-BR/EDR buffer selection wasn't needed, only changing the UB500's host LE=20
-packet length from 27 to 167 bytes was.=20
+This is an experimental RFC: 167 is a demonstrated working length,
+not a measured maximum. The appropriate general limit and firmware
+scope still need confirmation. Mixed BR/EDR and LE capacity and
+exceptional-congestion behavior have not been established.
 
-I tested your packet-length alternative on USB 2357:0604 with Realtek
-firmware 0xdfc6d922. Initialization still reports LE length 27 and eight
-packets. So I removed forced BR/EDR buffer selection and changed only the
-host LE length to 167, keeping the reported eight LE credits.
+The ASHA 7.2.9 trial completes all 3269 HCI packets, including 3243
+whole audio SDUs, with a maximum of three outstanding packets. The
+human listening verdict is CLEAR. PipeWire and its actual 4608-byte
+socket send buffer are unchanged. Increasing only that socket buffer
+to 8192 with HCI length 27 previously crackled and underfed the stream.
 
-The 60-second single-CI playback sounded clear. The trace contains 3243
-whole 167-byte audio HCI packets and 3269/3269 completed target packets,
-including control traffic. Maximum outstanding was three, with zero
-remaining after the transport suspended. The unchanged PipeWire socket
-requested 672 bytes and received 4608; all 3243 audio sends succeeded
-without EAGAIN. Increasing only that socket to 8192 with HCI length 27
-previously crackled and delivered about 37 audio frames/s instead of 50.
+Prepared with AI assistance for source, evidence analysis and text;
+hardware playback and listening were performed by the submitter.
 
-This shows packets larger than the reported 27 bytes work without
-changing host LE credit selection. I used 167 because it
-was the length already demonstrated by the working ASHA stream; I have
-not established if 251 or 1021-byte LE HCI support exists on this firmware.
-
-The accompanying RFC v2 therefore replaces the shared-pool proposal
-with the size-only diagnostic. It deliberately retains the TEST ONLY
-log and rejects unexpected initialization values. Feedback
-on determining the real limit and firmware scope would help settle that
-design.
-
-The acoustic evidence is from the existing Arch-based ASHA 7.2.9 kernel
-I've been using to test this and the other patches.The mail workflow=20
-separately refreshes bluetooth-next and builds the baseline and revised=20
-btusb_main.o with W=3D1 before sending so it should all still work upstream=
-.
-
-Changes since v1:
-- Do not clear LE packet/credit counts or select BR/EDR accounting.
-- Test only host LE packet length, using the existing post_init hook.
-- Remove the shared-pool/exhaustion explanation and report the limits.
-
-These changes were assisted by an LLM.
-
-Kyle
-
-Kyle Pepper (1):
-  Bluetooth: btusb: test larger LE packets on TP-Link UB500
-
+Assisted-by: LLM
+Signed-off-by: Kyle Pepper <cochcoder@proton.me>
+---
  drivers/bluetooth/btusb_main.c | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
-
-base-commit: 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9
+diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.=
+c
+index 92a78a7e6..2b955ed4b 100644
+--- a/drivers/bluetooth/btusb_main.c
++++ b/drivers/bluetooth/btusb_main.c
+@@ -2972,6 +2972,18 @@ static int btusb_setup_realtek(struct hci_dev *hdev)
+ =09return ret;
+ }
+=20
++/* Private diagnostic: test a known accepted packet size, not a pool claim=
+. */
++static int btusb_ub500_test_post_init(struct hci_dev *hdev)
++{
++=09if (hdev->le_mtu !=3D 27 || hdev->le_pkts !=3D 8)
++=09=09return -EINVAL;
++
++=09bt_dev_info(hdev, "UB500 TEST ONLY: LE ACL MTU 27 -> 167; LE packets %u=
+ unchanged",
++=09=09    hdev->le_pkts);
++=09hdev->le_mtu =3D 167;
++=09return 0;
++}
++
+ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *=
+skb)
+ {
+ =09if (skb->len >=3D HCI_EVENT_HDR_SIZE + 1 &&
+@@ -4715,6 +4727,9 @@ static int btusb_probe(struct usb_interface *intf,
+ =09    (id->driver_info & BTUSB_REALTEK)) {
+ =09=09btrtl_set_driver_name(hdev, btusb_driver.name);
+ =09=09hdev->setup =3D btusb_setup_realtek;
++=09=09if (le16_to_cpu(data->udev->descriptor.idVendor) =3D=3D 0x2357 &&
++=09=09    le16_to_cpu(data->udev->descriptor.idProduct) =3D=3D 0x0604)
++=09=09=09hdev->post_init =3D btusb_ub500_test_post_init;
+ =09=09hdev->shutdown =3D btrtl_shutdown_realtek;
+ =09=09hdev->reset =3D btusb_rtl_reset;
+ =09=09hdev->hw_error =3D btusb_rtl_hw_error;
 --=20
 2.56.0
 
