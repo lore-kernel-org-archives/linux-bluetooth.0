@@ -1,65 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793227782;
-	b=TRnFZKy37RUxjwqFXAZWkHh2Ui4O2ACTySIyqkbZVdbt6kFo8QwbxIH/lGla3P2uvIAA
-	 l2tIJqpB7YIl2tMdIV3Fa6oKP9L/WENmmUCu2VCoBDi6qsfZkjHRnlufnueMdnqScYo8l
-	 kTykW32IcKfv52WNiHhHc5t3ijIzy4adX31hkAvImvyqzbiLIlh5OL5LUhaNMSFfDerJU
-	 wkdsMQ+a0LGgQP75zYT1K+2Yy8HHk3ZC167HX2eAigKAwp0+fRXcVDz6ZRSADwES/U1Dg
-	 AS9NXeADGa8z4P9ce1z67hVLZ3AoJaL+dnWjRU2sH3Gam1rC6SrgxyAY701kHNnmMnA==
+	t=1793232473;
+	b=V1ulvEUP2AI2e1ApEAUV8PKm9ETKSJ4rOMq0TvvsXCzUxyS8eab2xk16l/qDWmgcW7CG
+	 4YvYKNzIuFuICeHQU3PVv0RbO610TE3S+jjlFjDedh6UidbgTqRRej/A4jmBIMjy9kzIM
+	 +5dnOikM1uHqg2nepcbR9KsGA+80JAKOWTq5jQhik7j233mFbFCB90n5axapAirpxMP6d
+	 pBSAEontc0+YCMvKKT9uIc7E54BL5VAgNkVLzQY6PIkDv14xk2Wf7lwt8KkKBUVjjPAvl
+	 AvceIqOh+IgfwEixgVbtXK43aA+rm/GjS/CZrteb4ARM2hlTSUINKaXuycwboiEtEnw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793227782;
-	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
-	 Subject:Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version;
-	bh=ZabFNkWAWqv4s1QhbXT4Kzc6A3MJogz6MVSfuPt/7B0=;
-	b=x81zEN94Gf6v/5CBCC9TRhst+ygp6cjsT8KUsxywpx1tgMaFz+V7E+c0MW5/7EuugqxQ
-	 sVuTKS3HuUrydarbzKdffiT1D/RBEgfyhVYsa5RG2WzZ7IVMNfW354cBq5k1EL/9pVgAu
-	 WbC8sU1yGtN2hZVoXytVr0w6/3xI3n5o9TDpRrpaSgbDRhZu7N6Iz8OX71LamdGtc6cVm
-	 8EpI+Jp0QHKdO2Sdrq7awQdePDp/rd8uLusFXpbCJCbwNJXsWBcwjOwD6avBdBHsVAekP
-	 tgSP2wMOvguj+QDVYTyI8vBN8xcFxnZsn0YvFXf0e06kCcbgxGYENKMpdeVOMw1s1ow==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793232473;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
+	b=0ikEnHj95qnJ3DWN3xvJanPHhkzeClP7b5IO4i1TCAUpTGe5LBGqDyU80TZ+pZylLPuk
+	 D2W8AbKRszLcLyiEzjoR06cEj8ilJLDwAqCfU86u4+BabcpLkd9iPiUYfiqSssTVp9nkp
+	 T9mvMWZQnfzqp88PsNC0xdZJ4SVTxpQBbJgLbcCn2rIn/gAyVA5XN4OZAHhc/wvuqKYdq
+	 WXFkGDwVqJTGtc7ShArKPWD6i7/qTVRtHE57RRenD1+C/UqsG55OXaPv90584vxi3EPfW
+	 bxhHo9JRou7pg8N5sbqDagxcMYw/oHT5xzh5RxXZFeQjmbdbA2C0wFfVDZq7Ft+IhXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=michaelmcallister.org;
-	spf=pass smtp.mailfrom=michaelmcallister.org;
-	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=fXTETyX4;
-	arc=none smtp.remote-ip=185.70.43.171
-Received: from mail-43171.protonmail.ch (mail-43171.protonmail.ch [185.70.43.171])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bn0uB4a6;
+	arc=none smtp.remote-ip=209.85.161.47
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD2060A2608;
-	Wed, 28 Oct 2026 22:49:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8BD2060A2608
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722AC606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 00:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 722AC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=fXTETyX4
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bn0uB4a6
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-6dd4f3f696aso891473eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 17:07:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=michaelmcallister.org; s=protonmail2; t=1793227774; x=1793486974;
-	bh=ZabFNkWAWqv4s1QhbXT4Kzc6A3MJogz6MVSfuPt/7B0=;
-	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
-	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=fXTETyX4ecYTFx8kkm7a4FDc7TpVPxCF0aBXUPREb7Jp4x1Oa2Mun2Xwxj5XpssdV
-	 wj5FT2b9awaQy9Q14PlhTaZeSh8IKjEw3/lgCkLRS2xr6BVfsP8vHVYcTzLh/wIY4y
-	 dqg/NF9SdjNZieADoy9TD0gHSeubr6/SFCOfCdZydlPMk9af+TSfZCniGilO6KE0+j
-	 dLaB9ppaqE1mozSygQkIFWjwQSlDLR4hYhhCgh0eZZ1Zfsl8ARu9I1ijhyErs4cY0W
-	 5uYWPZppDYQfG4L9AKSGhWdVkBtMwvahXodKQsULHOOLOPCrWVZcplFhhYshfR7026
-	 H4oR+beCvTWCA==
-X-Pm-Submission-Id: 4jFMxS2dkMz2Scmh
-From: Michael McAllister <me@michaelmcallister.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <brgl@kernel.org>, linux-bluetooth@vger.kernel.org
-Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Dmitry Baryshkov <lumag@kernel.org>, Matthias Kaehlcke <mka@chromium.org>,
- Michael McAllister <me@michaelmcallister.org>
-Date: Wed, 28 Oct 2026 22:34:38 +0000
-Subject: [PATCH 4/4] Bluetooth: qca: Power off WCN3950
-Message-ID: <179322687811.94538.13174359204402286337.wcn3950-poweroff-v1-4@michaelmcallister.org>
-In-Reply-To: <179322687810.94538.4628148055419456389.wcn3950-poweroff-v1-0@michaelmcallister.org>
-References: <179322687810.94538.4628148055419456389.wcn3950-poweroff-v1-0@michaelmcallister.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+        d=gmail.com; s=20260707; t=1793232472; x=1793837272; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
+        b=bn0uB4a6tNGE+rJB+tHEJ/zBkyDuoeSvIIEXZ98f9mUOeHa8Smo4huvLRcYw7cooqk
+         13mDsth2CPQ2vbqfep4pakPflOVH0ZwFk++ZeL1kE79q/sQ9quB/jDvYhC66UP6msfwl
+         xA4AxwHksqPYiGbktZiL5b6UiUZjRe5t+pFfvUymKvIkAnymYwIyojdtP9V3ubA590Bo
+         22TOdLhN0YMJwzNMQwv2BucXEB/z3gKCeXaEuWv/qPU05ZviDZ/XqmdJmF4nrIF5ijIk
+         ibLQU2VO6eqcQVvH10fQbow9pYrXXsWGg2IgdDRhJJDnfTgELEILlAwba0Jfgow2PEuU
+         mn9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793232472; x=1793837272;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
+        b=rlClHp+UqZ7x9AuHnW187HSAhIi9RfD9T3rO9WIB6u5JqOvfHXDvNzgVXzDwq1dBSP
+         g5xE7Mg7FVNtzaFJIwtAbIFmlkPc3FknsbmIkTojoLphi1oRRRmwQISNca5mwnw/Z6mu
+         KTBosVnGPo36O/uhAlJLVzLC4le06Uc4bdbLKahbBo7YU6j31ZPOD3fdHfvueppHgUSv
+         +4N1marlxd7tapEV3/ZgnAZlfmcBm5IFFcqK2rJcMZkwuKaMA4H44qvVgs6iWRkp1dEL
+         vhJmymvMbfALWeNHM8ncU2dvUkx4nGBTGXi1n7eqf5q/+UXSTtuBiIAZOuoQSzHSMovP
+         ZI4w==
+X-Gm-Message-State: AFq9FYKa4YNH4sy0vNvRoQggika/IKn6nWoXUGV64I7Y6+DEsTqxlIEB
+	4mRgbkT1ussZzMajfHfUXm96kryQNgSiJTeEkn8vZjjsCHxiw6OeKEhSR+m6NA==
+X-Gm-Gg: AYBFou33wmzb3jxMywO9k3aMhuFBYOT5zaWdbD9udL97nR7KwEj3+CDYpqK2l8KhH3o
+	8PfvnZ6JUI4jEv7M0FVGKi9jeUyfADp13Gxmo+4IUnpOXiMQHMlHsIV6Gw2/Pw541CekPoU1mRM
+	GeDtW4vuG8s4onHPeuPDfSl0q+K42MMnuadv2XWdktIbHQp3G7yvLLVi166RpjQ7+MML8UnB49y
+	qslOwDvuOiJ8amOmAZxbR+zuE07N/w/VfHjtgEkiF7KUPyIqSqX3qHdCLdqrOgkudvwPpTMDpGC
+	M65LlJvJkDThMZTY0Zgm8WB3pRRkI1Ii6PwFjAxUYM1iEZ8ych5y6RQJVRUHmsNDHSVMv/aIrsl
+	F1D21YJE/PzbBVkIGE/XVmHpxmPU7JX6A1NvxXVJjxx2j2hyRRiID55AskW5ogZlNbin0GiRm4n
+	ErE6RPhDGjnAGMbNSQwx9v0vvKc/3KppwRz8w5zOX6aURVUdml/xgeTqcxvThpWSduaBSNnim0o
+	PhnS8wigA0niRw/m5fiE0H+9znWKh2jzoH/WdTqlzM72b/fGKdPTYyHTqYOMH5OM9MkEuEXG+b1
+	D5jb85KKjBk=
+X-Received: by 2002:a05:6820:f00f:b0:712:c751:22eb with SMTP id 006d021491bc7-713ec51211amr2190115eaf.11.1793232472184;
+        Wed, 28 Oct 2026 17:07:52 -0700 (PDT)
+Received: from [172.17.0.2] ([172.206.179.242])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71426f16f66sm2640977eaf.0.2026.10.28.17.07.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Oct 2026 17:07:51 -0700 (PDT)
+Message-ID: <6ae28e57.9fe44ef3.c53a8.34ab@mx.google.com>
+Date: Wed, 28 Oct 2026 17:07:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5518135132486193376=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -69,36 +89,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
+Subject: RE: [RFC,v2] asha: Notify connection interval changes
+In-Reply-To: <20261013222556.513513-1-cochcoder@proton.me>
+References: <20261013222556.513513-1-cochcoder@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Turning Bluetooth off on the Moto G10 leaves the WCN3950 regulator
-votes enabled. qca_power_off() handles the other WCN39xx controllers
-but omits WCN3950 from both switches.
+--===============5518135132486193376==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add it to the existing power-off pulse and regulator-disable paths.
+This is an automated email and please do not reply to this email.
 
-Fixes: d5712c511cb3 ("Bluetooth: qca: add WCN3950 support")
-Signed-off-by: Michael McAllister <me@michaelmcallister.org>
+Dear Submitter,
+
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
+
+   Series:       [RFC,v2] asha: Notify connection interval changes
+   Pull Request: https://github.com/bluez/bluez/pull/2675
+   Created:      2026-10-13 23:05:28+00:00
+
+The pull request has been closed and no further action is taken on this
+series.
+
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
+
 ---
- drivers/bluetooth/hci_qca.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 3d688ab75..540014182 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2249,6 +2249,7 @@ static void qca_power_off(struct hci_uart *hu)
- 	power = qcadev->bt_power;
- 
- 	switch (soc_type) {
-+	case QCA_WCN3950:
- 	case QCA_WCN3988:
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
-@@ -2269,6 +2270,7 @@ static void qca_power_off(struct hci_uart *hu)
-         }
- 
- 	switch (soc_type) {
-+	case QCA_WCN3950:
- 	case QCA_WCN3988:
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
+--===============5518135132486193376==--
