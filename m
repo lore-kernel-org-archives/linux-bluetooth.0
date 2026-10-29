@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793232473;
-	b=V1ulvEUP2AI2e1ApEAUV8PKm9ETKSJ4rOMq0TvvsXCzUxyS8eab2xk16l/qDWmgcW7CG
-	 4YvYKNzIuFuICeHQU3PVv0RbO610TE3S+jjlFjDedh6UidbgTqRRej/A4jmBIMjy9kzIM
-	 +5dnOikM1uHqg2nepcbR9KsGA+80JAKOWTq5jQhik7j233mFbFCB90n5axapAirpxMP6d
-	 pBSAEontc0+YCMvKKT9uIc7E54BL5VAgNkVLzQY6PIkDv14xk2Wf7lwt8KkKBUVjjPAvl
-	 AvceIqOh+IgfwEixgVbtXK43aA+rm/GjS/CZrteb4ARM2hlTSUINKaXuycwboiEtEnw==
+	t=1793232478;
+	b=lyjTnkqrOocHffl/8LnoMAqgSfeSyEyWmZaKt6q5ggP5Zm7fs3l8bOscr9LyIVi5Q7Ep
+	 kh7BZdRCIekwDDVBEisLgi0Xv+01uC7+VdLsthlZr52uC+UNMR8YdGDHtq1xhzK2am/E6
+	 gc4YRnlEsEe4nrCqv6Mc5RdP4IhBWPUolvoWBvV+CXcetrcxH238GX/Z6l0sYkwyOAYy6
+	 FaF1K9f8cQDScSQoFqHPrXYhpdiaTT3bjxnMAndSKU40iEUJC7P7lR3CSrgS8zLOzBcXq
+	 qsVUkxRcm/fOH5dCl0GGwpfIz+Gb8PrTf9GYMH/uWYyYA9T/JajoconOAwQ3ejSwMhw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793232473;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793232478;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
-	b=0ikEnHj95qnJ3DWN3xvJanPHhkzeClP7b5IO4i1TCAUpTGe5LBGqDyU80TZ+pZylLPuk
-	 D2W8AbKRszLcLyiEzjoR06cEj8ilJLDwAqCfU86u4+BabcpLkd9iPiUYfiqSssTVp9nkp
-	 T9mvMWZQnfzqp88PsNC0xdZJ4SVTxpQBbJgLbcCn2rIn/gAyVA5XN4OZAHhc/wvuqKYdq
-	 WXFkGDwVqJTGtc7ShArKPWD6i7/qTVRtHE57RRenD1+C/UqsG55OXaPv90584vxi3EPfW
-	 bxhHo9JRou7pg8N5sbqDagxcMYw/oHT5xzh5RxXZFeQjmbdbA2C0wFfVDZq7Ft+IhXw==
+	bh=yyXelGjY1mqyBxl0wiX26V5+TZ4YY+u653q3qsiIgng=;
+	b=h36Un6v3h/ilXEU+J6eXE1PBPjUp5a+RsKKlODciiSMYzqGbk5QM63OaH7LxUgmMppn8
+	 qu+ic1Egri9EOsNm6JANDXU2tzBDkD/YLkq3dNb3ajLnz1i1qb9DZTHE/STqZq/45CPm+
+	 ACb517VyGuwS5Ft5WITRDzAJh0Cm0zUgNm9BfN4GTpQcV1GYXZ4jNOle4ZtgO1v+3nBNk
+	 QWsSElxlysQB8/1LrHXkLRn+MHA7GHkGxJ9wgMkOjNQqL57ZrwHVUve8nsvztSkLo1Uur
+	 /IXiKJzGVhw22ec3w2b/xMBEOYYs7/2FxjKGwkUK/MDIy8jfCpuq9JM5WlphYz5qAUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bn0uB4a6;
-	arc=none smtp.remote-ip=209.85.161.47
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KdKESP3F;
+	arc=none smtp.remote-ip=209.85.210.47
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722AC606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 00:07:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 722AC606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD78606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 00:07:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9FD78606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bn0uB4a6
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-6dd4f3f696aso891473eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 17:07:53 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KdKESP3F
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-854b6e2e41fso785248a34.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Oct 2026 17:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793232472; x=1793837272; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793232476; x=1793837276; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
-        b=bn0uB4a6tNGE+rJB+tHEJ/zBkyDuoeSvIIEXZ98f9mUOeHa8Smo4huvLRcYw7cooqk
-         13mDsth2CPQ2vbqfep4pakPflOVH0ZwFk++ZeL1kE79q/sQ9quB/jDvYhC66UP6msfwl
-         xA4AxwHksqPYiGbktZiL5b6UiUZjRe5t+pFfvUymKvIkAnymYwIyojdtP9V3ubA590Bo
-         22TOdLhN0YMJwzNMQwv2BucXEB/z3gKCeXaEuWv/qPU05ZviDZ/XqmdJmF4nrIF5ijIk
-         ibLQU2VO6eqcQVvH10fQbow9pYrXXsWGg2IgdDRhJJDnfTgELEILlAwba0Jfgow2PEuU
-         mn9A==
+        bh=yyXelGjY1mqyBxl0wiX26V5+TZ4YY+u653q3qsiIgng=;
+        b=KdKESP3F7//5PG5+GemULzQ4T18HYpDAKlIZ8XASThsv5tiUqIK9LL9WWUk/BPTD/4
+         NC30Fl3kPV9z9wntT6LCKSG9DVtfEH8+N8FtMbIfoRnrgiTjR7HpVb7Ejm+zbq746Ae7
+         EPgEWXqJr6IUerWEOew+lydqBX+aua6Y4x6hcGsY4/1xZ7ojSsZ2tEjzFxCupjB+Nfay
+         JV6hHkF3cbzgyBi/M8JbtaTyPEo9kRr6JyXboOGqDxb7pc4kGpMEBzjiZa/sMGDXXWgx
+         ZjPx3brxEEXmNOmaDVnDuepJ7ts+dxuiTtPIfFA8aYwR3+NFj6ogE+XZLqw+GDmqLy+S
+         pCPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793232472; x=1793837272;
+        d=1e100.net; s=20260707; t=1793232476; x=1793837276;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=/TvucdxFq1WpoznyvVEKY3mKi5JnpCpKMNOpefMB+cw=;
-        b=rlClHp+UqZ7x9AuHnW187HSAhIi9RfD9T3rO9WIB6u5JqOvfHXDvNzgVXzDwq1dBSP
-         g5xE7Mg7FVNtzaFJIwtAbIFmlkPc3FknsbmIkTojoLphi1oRRRmwQISNca5mwnw/Z6mu
-         KTBosVnGPo36O/uhAlJLVzLC4le06Uc4bdbLKahbBo7YU6j31ZPOD3fdHfvueppHgUSv
-         +4N1marlxd7tapEV3/ZgnAZlfmcBm5IFFcqK2rJcMZkwuKaMA4H44qvVgs6iWRkp1dEL
-         vhJmymvMbfALWeNHM8ncU2dvUkx4nGBTGXi1n7eqf5q/+UXSTtuBiIAZOuoQSzHSMovP
-         ZI4w==
-X-Gm-Message-State: AFq9FYKa4YNH4sy0vNvRoQggika/IKn6nWoXUGV64I7Y6+DEsTqxlIEB
-	4mRgbkT1ussZzMajfHfUXm96kryQNgSiJTeEkn8vZjjsCHxiw6OeKEhSR+m6NA==
-X-Gm-Gg: AYBFou33wmzb3jxMywO9k3aMhuFBYOT5zaWdbD9udL97nR7KwEj3+CDYpqK2l8KhH3o
-	8PfvnZ6JUI4jEv7M0FVGKi9jeUyfADp13Gxmo+4IUnpOXiMQHMlHsIV6Gw2/Pw541CekPoU1mRM
-	GeDtW4vuG8s4onHPeuPDfSl0q+K42MMnuadv2XWdktIbHQp3G7yvLLVi166RpjQ7+MML8UnB49y
-	qslOwDvuOiJ8amOmAZxbR+zuE07N/w/VfHjtgEkiF7KUPyIqSqX3qHdCLdqrOgkudvwPpTMDpGC
-	M65LlJvJkDThMZTY0Zgm8WB3pRRkI1Ii6PwFjAxUYM1iEZ8ych5y6RQJVRUHmsNDHSVMv/aIrsl
-	F1D21YJE/PzbBVkIGE/XVmHpxmPU7JX6A1NvxXVJjxx2j2hyRRiID55AskW5ogZlNbin0GiRm4n
-	ErE6RPhDGjnAGMbNSQwx9v0vvKc/3KppwRz8w5zOX6aURVUdml/xgeTqcxvThpWSduaBSNnim0o
-	PhnS8wigA0niRw/m5fiE0H+9znWKh2jzoH/WdTqlzM72b/fGKdPTYyHTqYOMH5OM9MkEuEXG+b1
-	D5jb85KKjBk=
-X-Received: by 2002:a05:6820:f00f:b0:712:c751:22eb with SMTP id 006d021491bc7-713ec51211amr2190115eaf.11.1793232472184;
-        Wed, 28 Oct 2026 17:07:52 -0700 (PDT)
+        bh=yyXelGjY1mqyBxl0wiX26V5+TZ4YY+u653q3qsiIgng=;
+        b=i2IW6kz96JWH+C4ZeZko3bfhGD8oiSGOA9bj8DWpNR60oSf3KRV5Mez31xu3NETwIO
+         0FDep7dH4kRZFGSjPYSDHkSZ3zv9qBkR08X91C/Z54MYj2kbmvnFApRzkWA4da7GhdHx
+         XlIbt1JUCe84OmNk72NUOP4PEuFuAZ2Ixt6euvv/Ds0QeqoQkMBNt6KPKk0y4/mpJa5K
+         Wiq+cRP/Iiz4ZIdIyXDDu46aheyG/+1m7vzXCLVgd4pNybWzC0Vk+Bf6/sCQb52ebXra
+         SobKKZnTJRvJbMGyOS4/YlimtVNvwKbMgnUN7U2VvVPeUXipAziv+q6EPJWonkIbAwWD
+         ip2g==
+X-Gm-Message-State: AFq9FYIz/Yu73cszMZaAghG/j5WuDqUJKg+tHkaWRyhAFVcu8CtmhOS6
+	KN3DBWAdMiHE57IbcRcsCNZCRi6tXb5CRTCdhVlwP6fxSoIkqdDAY4BQgX5kVg==
+X-Gm-Gg: AYBFou2KlyvdaY1gdUpUssoh/Bm9YcBoCJL16j7F9EHSvepN4VRsdtH0aVZYUJMp3d5
+	N++Yek5vZqntzNbWeiF/GtNpyr3VJMFzZUqmweE4jnkGi81ufPjL8l55+Nau2qk6/1boSF7E16/
+	Y9EUDZWebVXr74N7TdOvd/FmwN41wsJ8RWjHcujdvLoFjv6xNyxO61rr7laRoFq+UrgZfzrZ10N
+	Nq2FL5qE1ijDnFU06o1/EfGzDgzk9nOi200mKCyr6MlCM8kGHmaxxIisELKJuXa9o7J6HKa+66x
+	zk5gbIrEir6vx06aK0jyJBYYFqUjVjaKbPwBf+loYFBTj2Xw9Pwo95OTebkwEXmpf9ZUI9ByLvu
+	YQL7XnpCAa+Qp0XVh0wfs9oA/n56vjBObEPlH3H/gLDgi3nHDP1IuCdeWSBDHtcORkxtSthakTd
+	0TQjfJufJcmup0ff2gm/j13m0M1GStiK/AnaIO6PoerW6NVS4Qr++8OhRwX0Z8TM/GGM9r8xOFp
+	8xiztGkMGfvejIkg/JZLd/XH0s2idbzNdilMSfxWOYNu1074+vZwvIxvI7EfKvt3UYrN7QTqnAF
+	Y+gC+yeckSE=
+X-Received: by 2002:a05:6830:449e:b0:80c:d30f:97b with SMTP id 46e09a7af769-85abeab270cmr3503830a34.28.1793232476362;
+        Wed, 28 Oct 2026 17:07:56 -0700 (PDT)
 Received: from [172.17.0.2] ([172.206.179.242])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71426f16f66sm2640977eaf.0.2026.10.28.17.07.50
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85b1f436687sm3010752a34.8.2026.10.28.17.07.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 17:07:51 -0700 (PDT)
-Message-ID: <6ae28e57.9fe44ef3.c53a8.34ab@mx.google.com>
-Date: Wed, 28 Oct 2026 17:07:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5518135132486193376=="
+        Wed, 28 Oct 2026 17:07:55 -0700 (PDT)
+Message-ID: <6ae28e5b.c3449938.c1faf.8635@mx.google.com>
+Date: Wed, 28 Oct 2026 17:07:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2489473529778951385=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -91,12 +91,12 @@ Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [RFC,v2] asha: Notify connection interval changes
-In-Reply-To: <20261013222556.513513-1-cochcoder@proton.me>
-References: <20261013222556.513513-1-cochcoder@proton.me>
+Subject: RE: [v2] asha: allow LE 2M PHY on the audio channel
+In-Reply-To: <20261013222355.511390-1-cochcoder@proton.me>
+References: <20261013222355.511390-1-cochcoder@proton.me>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============5518135132486193376==
+--===============2489473529778951385==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -109,9 +109,9 @@ This series was picked up by the CI more than 2 weeks ago and the pull
 request created for it is still open, which means the series was never
 applied to the tree.
 
-   Series:       [RFC,v2] asha: Notify connection interval changes
-   Pull Request: https://github.com/bluez/bluez/pull/2675
-   Created:      2026-10-13 23:05:28+00:00
+   Series:       [v2] asha: allow LE 2M PHY on the audio channel
+   Pull Request: https://github.com/bluez/bluez/pull/2674
+   Created:      2026-10-13 23:05:24+00:00
 
 The pull request has been closed and no further action is taken on this
 series.
@@ -124,4 +124,4 @@ picked up again.
 Regards,
 Linux Bluetooth
 
---===============5518135132486193376==--
+--===============2489473529778951385==--
