@@ -1,96 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.29
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793313693;
-	b=Xy7Hs3w5MEFbdCfYQlBQxW/vbUQHyVxgaOpKr5qa9vDq97B7ZmZFxAdRxK8wE0+i/lg8
-	 4QIgWKbHWwqm1XLWYwrtGjWPXSf2zj9PagpmpFLZ/WBn/BI749mxY+Rvw1x5n48su3VLF
-	 7z/x5GTKRoLZdATwr1xYd3Ovhomz4Y9uvUNzbPucHigIIPcBMz0JTh/EZ66v+FqTDYVAW
-	 ULL9f65FupWrz2roTykER4tV3U49xARn4T+r0rb5JpUXQhZp1sRpw2zO+YKsFuf3Wr6lC
-	 ICWFFNS9DpyRmYpFL13PthkMIzUGPmnDjqplytb00BQGwMLzn1cJesI27EmDTaINUiQ==
+	t=1793315310;
+	b=lXodpl906xX8hulAIxOsvZTUfKEeZNFJbveqQpbMw74B2+L4oM87nErVDl97CjPuJjqv
+	 jko+yNlT0krpqlNu9EHJBTCMJYEGPrid2+zSIhF4+r/BNE/8TB+yXp9KpZOat1wh8tb3v
+	 Z9Q3jVNh5gRJFQn5hZ0qe7ZCxq5qljd6PdlUq3SYwQ5v7KXQvW+Mr7Wqq2KfE1WakSIF9
+	 FDeUPYpxcxcImlD+M/GySUXCFvpP+y2y7xGtovoQMvVU9bhp0uqYFLAL7mhxQkJlKDSbq
+	 GJ+YO/crxhnLi+u8v8x6YxbvIX4sb3DPusXRHglYjpyu1JtbgI9woofJ+BOOhDR1OPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793313693;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=p/lNXcmee9ZNuCiy3sE8z9e8aCfdm1832qnUnHax1I0=;
-	b=Ze/RLF4JGWVgndbNVHLdsq7Fo53dZVxAHQy5gu7ozYYobjxnCThQnnZu1BkL8k46m9Ei
-	 4/MrRFhqzRbEGLM9pq2nVYyeiJY01itBfJkzTpIvBMoLyer2OJNtEXb8zA4gLd4GwL09e
-	 IsArbxOWgbsSfQh1UGZrzcCqdYdt5BKgb5E8XQkjKt1Mk9g5Ldp+y5MEh6SEOdaUW0Pnc
-	 CUnQAvSfQHnWTcRl8smBxOlQ710zxzd88VyTooFm0IC+Wf0E1nyQufnCzCOAUWByvg3R/
-	 +mZCU0FM4UDHRhqSFS103VspYSHXzsF3u/4P+O8+wqGmWFfoDJOR83pjXTH2h/4Z+Qw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793315310;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=1XdQJv7+8NFJgvlf+OSRfglYiAU1NG/C+JqoeMQnMCw=;
+	b=oqO9uPVumdCKJkQfWuMhHqB9GkEQSqvc2+rn8Q0izKQAxcrJHItgu6ScIIjJemRHBWq1
+	 MMaTbk9I/hV4nE+4J7+H09Fp/3wS75sLi65LUCqxHDu1kecxBQ3UAJm0UgZEZaMmitQZK
+	 Qwpq0KBQz2ewT1SUef3sJqdVe3DnJndHa69mlgr8wEtPGKi/IzriOfPQPKXQk1g8beYJD
+	 PO4MUEy71H5opB8UBqa/mVen0c8Pv0b7VPXvEbPx8UG0+LBVv/lVDsBUANvkQPCUgL4gb
+	 eG/W9IkmpxroCgYUHJio7VmYY0N4Lzwe2H7MSDVP0f+NHi5vUJkdAlYvtW1JtVKi9Jg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NRnDXfc1;
-	arc=none smtp.remote-ip=209.85.128.54
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=proton.me;
+	spf=pass smtp.mailfrom=proton.me;
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=frnmfcnawva6nkwpdxaicizlpy.protonmail2 header.b=NzAZc4XV;
+	arc=none smtp.remote-ip=79.135.106.29
+Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE81606A31A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 22:41:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8AE81606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EE6606A31A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 23:08:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00EE6606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NRnDXfc1
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a2153c8525so307055e9.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 15:41:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793313692; x=1793918492; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=p/lNXcmee9ZNuCiy3sE8z9e8aCfdm1832qnUnHax1I0=;
-        b=NRnDXfc1L8HQiAoUUSzdXBA4/kU4JeA9BUmhutMluOoEVVN0mQ5ivfmXdTE0ciz/Kn
-         eY2juSG1NXxDge0BX+ORHnccDpFU0uHSxRwmEUGCOoqxn9tUIA0QQo0AHSEgvvpmfD3o
-         RBFUtfQb6ZDcKxdiRJVFMSI4O7lpsit0zjtJdJmOsCXcNhc6luJA3csWO3yF7cweFhqK
-         AKWlRWGBMn3CXeDiIewZbpRohp7JLpLvwD4a1DpMAaL9Ug40uxzQ8YLtapZSC2D21bR7
-         jZOaG5Vc0tfotegSFdGg72LDCxIY0PXHKIVfMFp3BRbwAMyDHCNrxhlyY3YDTt6/2LYQ
-         PQVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793313692; x=1793918492;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=p/lNXcmee9ZNuCiy3sE8z9e8aCfdm1832qnUnHax1I0=;
-        b=e9xNiIo877zGhC/flWufSCMo19MOfpRqovV9UkL/TuD+3aRNFw9rdIeCrfVFa9YKQV
-         fMSIhC2XFQ3+Ik9ZknS6Pv6mHKJBQ4Pc6TMS7rDfX8bF/CsedZebQhcKuqozhUJhdlr9
-         Dtw8nkkQMbcIASkTpX9cB4SkGsbP3sYDv3IASljOJqWEiJQXUvjaCkXnlkmyxH2pn1cO
-         UrniMh17lvDhnpCqyGqhHSxFj/TnZo7LSkiPGagsAL8q9LP//kZ3HSZCv1V3jmJgyoyn
-         rWIODDkfsiTCudKuUKEIEl2sXo/89ILX7ilyKwyxy78iVTQviVCOjzT95Wn1MJ4ISdQh
-         YNpg==
-X-Gm-Message-State: AFq9FYI7vSTqqA8NZAybFHD9YIF5fFseu/NvKy8C6uViAFq55tnM8bWq
-	xVdoYSXHZtp85h0Y5mtXr2veZWDAF3yvW2WU+/Gx0MKKygHZrXDxb3zj8296TRslc20=
-X-Gm-Gg: AYBFou17cLMR54PLxTyTOSoj6e6hkxc8Zt5Sannw0P88bS+ImnbEiX8vhDPkzflQ73a
-	8gEfutDlTgpRZlRPfjuV592X/8kBY8qPopWmFjq5AUKFxXEhC4SKC+yN8qhXieptlTbBsOMVgNi
-	5YO1swnAEMpuNkw2v964A9hBIfS2LAuc0VzJHUOE1616TJGrheZdo2gNEj2n4CMNgd6ouzfJXl9
-	YtuSpMVaWTdLe+mMX3n5pbjLm6VwJR0OVi32ug7t7j8brgmGfI07BJfmIWYVW2qMml2TaY2lCNM
-	ZRKBGBWsNO2e8aoLgafgqnOSoVHsnvsnaVYyxFWAcTcZTAMoFqVMKvdZvQK3221l7nDfByd2Wbc
-	pv7tTZkX1MLuj7HOkFDfbiYTik2cHd3UQhSbSK58xJrig84MCx0fVlzASibX9zCG/n4mU9bl//y
-	5UCa30hr2a+SSwcKGd10E5u8Y8i3RYTqB0/lb31yOVPXql91Cx193LgmVtVwkg/3iyMtlecGSTK
-	obZ+KqKq276k3WKfzHlN4E4R57ukBZWvBMoDGK5NqgPrE6qcyVYkksutjxRhm0UhvG9c2j7naN4
-	6gUxDMa1K6jJETsa83GSkpwygPTb18/BFXHeW5zm6gTz3IjAAdYfTPp6o58Nxmyk+ZLCQGT6417
-	sHDzcnkts9eOHD0L8ugfuDQTqxq4C9aOphh0iZ/ypj+DLNfPf53YNB2IzcyO7uRjFHpgZ8C5E5h
-	QAhOwzg+f9sDFR
-X-Received: by 2002:a05:600c:811a:b0:4a3:5d5d:48d9 with SMTP id 5b1f17b1804b1-4ac187a80a7mr6995185e9.35.1793313691567;
-        Thu, 29 Oct 2026 15:41:31 -0700 (PDT)
-Received: from archlinux.tailbe3ea7.ts.net ([185.19.153.115])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4aa7f322c46sm89557405e9.2.2026.10.29.15.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 15:41:31 -0700 (PDT)
-From: Ismail Tarim <ismailtarim7@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=frnmfcnawva6nkwpdxaicizlpy.protonmail2 header.b=NzAZc4XV
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=frnmfcnawva6nkwpdxaicizlpy.protonmail2; t=1793315306;
+	x=1793574506; bh=1XdQJv7+8NFJgvlf+OSRfglYiAU1NG/C+JqoeMQnMCw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=NzAZc4XV4mqGFAqVC9i3ki/ePbaZ9dL19jGc5ieqaqPatQV3Fujojs5PLVb6XYjME
+	 FlwBcc0V4znIzn6zF1u2HaxAoLhi2AcfWEo5f/rMWTL5tybuAUt0YIwj07Nvx6T5Ni
+	 QNGG9Yxy/tkwG/77rc05ZTwb18Y/9EOsYkUye/Sn/QFkusGxE5zKoX+B3maou2cd0M
+	 PEbniBKkcsf6wfowQgmzVuSFOhgtbl/kMwnaelSYy8fpj5JhXb+OVzL4iOo81oey5F
+	 18W5t8xiNZs0Bv7so9LBpcIzYsmzT8lXaDS9tlHmnKraBLH6j26RIdHh9NHE7UcT32
+	 wY+JIJf67hfFw==
+Date: Thu, 29 Oct 2026 23:08:21 +0000
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Chris Lu <chris.lu@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] Bluetooth: btmtk: fix error handling in btmtk_usb_isointf_init()
-Date: Fri, 30 Oct 2026 01:40:15 +0300
-Message-ID: <20261029224022.1233751-1-ismailtarim7@gmail.com>
-X-Mailer: git-send-email 2.56.0
+From: Kyle Pepper <cochcoder@proton.me>
+Cc: linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org
+Subject: [PATCH v5 1/1] Bluetooth: btusb: support larger LE packets on TP-Link UB500
+Message-ID: <5a7311d6f4cc94931fd753e5fe0d54a2a65f631a.1793315289.git.cochcoder@proton.me>
+In-Reply-To: <7136cfd8f427b90d6d931a836e93dad5ea6164a0.1793296023.git.cochcoder@proton.me>
+References: <20261013032742.497402-1-cochcoder@proton.me> <20261029023235.1280321-1-cochcoder@proton.me> <20261029023235.1280321-2-cochcoder@proton.me> <7136cfd8f427b90d6d931a836e93dad5ea6164a0.1793296023.git.cochcoder@proton.me>
+Feedback-ID: 97716137:user:proton
+X-Pm-Message-ID: 766f5ce6850717bd5d6d92046eba13d5a9c62978
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -100,56 +64,96 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-btmtk_usb_isointf_init() submits the ISO interrupt IN URB and then
-sends the vendor command 0xfd98. If that command fails, the function
-returns an error without killing the URB it has just submitted. The
-caller then leaves BTMTK_ISOPKT_RUNNING clear, so the driver treats the
-ISO path as inactive while its RX URB is still in flight, and
-btmtk_usb_suspend() skips killing it. Kill the anchored URBs on this
-path, as the URB submission failure path already does.
+The TP-Link UB500 (2357:0604) reports a 27-byte LE ACL packet length and
+eight LE packets, although its reported maximum LE TX data length is
+251 bytes. The small HCI packet length fragments ASHA audio packets.
+Direct controller testing received 251-byte LE HCI packets intact.
 
-The return value of __set_mtk_intr_interface() is also ignored: a
-failure to select the ISO alternate setting or to find its endpoints
-is logged, but the function goes on to submit the URB. Return the
-error instead.
+Set the host LE ACL MTU to the reported maximum after initialization for
+the observed 27/eight/eight-available/251 reports. Skip other reports
+without failing controller initialization.
 
-Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
-Signed-off-by: Ismail Tarim <ismailtarim7@gmail.com>
+Keep the controller-reported packet count and available credits unchanged
+so transfers can use all eight credits. Leave BR/EDR accounting unchanged.
+
+Assisted-by: LLM
+Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-Tested on an MT7902 (USB 13d3:3579) with 7.2.11 by forcing the 0xfd98
-command to fail once with -ENOMEM through a local test-only module
-parameter. Right before the function returns, usb_anchor_empty() on the
-ISO anchor reads 0 without this patch and 1 with it; the rest of the
-controller setup completes in both cases.
+v5:
+- Keep the reported eight LE packet credits instead of reducing them to
+  one, addressing Luiz's throughput concern.
+- Keep automatic MTU selection and nonfatal handling of mismatched reports.
 
- drivers/bluetooth/btmtk.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Matched 60-second single-N8 playback tests on the UB500 passed at host MTU
+167/eight and 251/eight, with CLEAR listening and verified stock restoratio=
+n
+between tests. The control had 3,236 complete audio SDUs and 3,262/3,262 HC=
+I
+completions; the 251-byte setting had 3,234 SDUs and 3,260/3,260 completion=
+s.
+Both used whole 167-byte HCI audio packets, reached three outstanding packe=
+ts,
+returned all credits and had no socket EAGAIN or disconnection. PipeWire's
+actual SO_SNDBUF stayed 4608. Tests used the exact callback ported to the
+Arch-based ASHA 7.2.9 kernel; fresh upstream object builds run before sendi=
+ng.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 6a48ff0192cf..1b3dab0d10bb 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1741,7 +1741,9 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- 
- 	spin_lock_init(&btmtk_data->isorxlock);
- 
--	__set_mtk_intr_interface(hdev);
-+	err = __set_mtk_intr_interface(hdev);
-+	if (err < 0)
-+		return err;
- 
- 	err = btmtk_submit_intr_urb(hdev, GFP_KERNEL);
- 	if (err < 0) {
-@@ -1753,6 +1755,7 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- 	skb = __hci_cmd_sync(hdev, 0xfd98, sizeof(iso_param), &iso_param,
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
-+		usb_kill_anchored_urbs(&btmtk_data->isopkt_anchor);
- 		bt_dev_err(hdev, "Failed to apply iso setting (%ld)", PTR_ERR(skb));
- 		return PTR_ERR(skb);
- 	}
--- 
+An earlier 251/eight trial sounded clear but stalled after about 40 seconds
+of audio transmission and ended with HCI Connection Timeout (0x08), with se=
+ven
+completions pending. Restoration succeeded. Its cause remains unexplained;
+the successful comparison does not erase that failure.
+
+These are normal single-CI playback results. They do not establish eight
+physical 251-byte slots, mixed BR/EDR+LE capacity, bilateral recovery,
+exceptional congestion behavior, other firmware or long-duration reliabilit=
+y.
+
+ drivers/bluetooth/btusb_main.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.=
+c
+index 92a78a7e6..9cc3dd240 100644
+--- a/drivers/bluetooth/btusb_main.c
++++ b/drivers/bluetooth/btusb_main.c
+@@ -2972,6 +2972,19 @@ static int btusb_setup_realtek(struct hci_dev *hdev)
+ =09return ret;
+ }
+=20
++static int btusb_ub500_post_init(struct hci_dev *hdev)
++{
++=09if (hdev->le_mtu !=3D 27 ||
++=09    hdev->le_pkts !=3D 8 || hdev->le_cnt !=3D 8 ||
++=09    hdev->le_max_tx_len !=3D 251)
++=09=09return 0;
++
++=09bt_dev_info(hdev, "LE ACL MTU 27 -> %u; LE packets 8 unchanged",
++=09=09    hdev->le_max_tx_len);
++=09hdev->le_mtu =3D hdev->le_max_tx_len;
++=09return 0;
++}
++
+ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *=
+skb)
+ {
+ =09if (skb->len >=3D HCI_EVENT_HDR_SIZE + 1 &&
+@@ -4715,6 +4728,9 @@ static int btusb_probe(struct usb_interface *intf,
+ =09    (id->driver_info & BTUSB_REALTEK)) {
+ =09=09btrtl_set_driver_name(hdev, btusb_driver.name);
+ =09=09hdev->setup =3D btusb_setup_realtek;
++=09=09if (le16_to_cpu(data->udev->descriptor.idVendor) =3D=3D 0x2357 &&
++=09=09    le16_to_cpu(data->udev->descriptor.idProduct) =3D=3D 0x0604)
++=09=09=09hdev->post_init =3D btusb_ub500_post_init;
+ =09=09hdev->shutdown =3D btrtl_shutdown_realtek;
+ =09=09hdev->reset =3D btusb_rtl_reset;
+ =09=09hdev->hw_error =3D btusb_rtl_hw_error;
+
+base-commit: 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9
+--=20
 2.56.0
+
 
