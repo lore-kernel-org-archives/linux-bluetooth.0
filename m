@@ -1,74 +1,77 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793266416;
-	b=SwrAQdCvpVXgWBTwrYYzfTt5pY9tmuJE0gwcbK/FPPB+/JUJBO8DqJAEQccYYdm4Zigr
-	 kE6+oxn54QI/1uomwHgFw4CV4Ol0ud7R3Gm+FwtMlQPQvb7cYsJcvDeFuhYtOGz8yMRJi
-	 y/oW/JOH11zvDD6JcOwgd6Bq8AOJVgCBULDySBSKzx2tPm3HNWqpczIaEL+A9zXXVRLSt
-	 2op7n19e6QiKxh69ncI8rBt1YgzaqAmATnQkMLFE1oNktNEY7MITlnIKbjXEo4k1stETm
-	 75twOWA2QC5E3CRe89PLaJpLyOQdTAs44qDeagaBuPB1lRmzg1PfbIzgRk+3bpvuHmQ==
+	t=1793266418;
+	b=aJJQ9/81aZpHqfWDJ+49HXs+JhpNAnM7cCQ7PZbtqIq2aIH9w9A7nYItgr/CPOq6j1jg
+	 8z7ENAG+5QXCCHNY1xIIy8rezKsmSCLAdBmXL175OqW3XesSUIl45qOA8Tke2j7kFHFVN
+	 w+Ll68tbxbVRWMvGZacMERuPuE+YUlY5j4ntF9gDRqwqPRtKQI0Mzr5ABAo+lkZYf2xso
+	 ipEVECW36Pyz0H4G2lH+OMAmsvGKwxb4VhhOxLoHU7rJi9gx7RQve556KRQrW4/nN9/sm
+	 sHddWs70uzKpAViCOAos9p+wB8k9XUtO54infG5cspsU73+wxvKIMKmNRpHrC7VqZBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793266416;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793266418;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=ozXMdSqjjZnhD2hoHH1w80FwRdKNa156iMP02v7pC7s=;
-	b=jn56etPjXRqYjQQCAtGB2vUMYVgTY+STAK+BqJkGCnIjVeTltuPcXuq8wlGdX3KgZ28j
-	 l/Z33Vs0ohuM+Nh3z2kifQzo+a32u3Mg/N+UNk8gjxVRC0qOVL7OKZXYMxdHrwkrNDnnP
-	 krKg+F2E4pmM1T4hanOHJp+JfiyBKyyLgHSMR9Hogss1axvdAiFJqqsa6Eg/knyUu/qi4
-	 s4ehR3QyCU6m+1TftXXfmVTrlZ0ASulLJn65W3lUBR+NQ6sjARCpLPXW+mgGAT85dIIpN
-	 7OyAtWrTHEEMcQIz/ja1a0WLFf3XSlETDNm6LiX1GaKFLt+Pv4EhjHCut68lQY7bmtg==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=ipIslu0M2w1vw7w5Y6anaUMXLqT/8SXZvh1slp7DYk4=;
+	b=ewqNTD0VLivT8pbzUG+XBHouyNFhoeAQejST32biHEVsOnT9/PW3DWAjrPJZbdlNMipJ
+	 uCPkjjjX6duBS8gUsARQmPDdIdyubH2jRpV/QG4sWSLtcsRL0jxCx/id+xTfWO0LuBDgZ
+	 U7kA+BPJ0zALGmpR80QhFHf8rad9idUNh3ttRbPwdcSPZxhoj5c/5kSQnF6yPr8gAWa+3
+	 es1zh/Cv/2GsrZZBf74CD80iqEHbnxomUDHU2XBHPYICQ9DHEhwg2OmELgm0mms+/9l4g
+	 LxJ49LNhfSnKePqhkWLzhLroVxQp417kHlBrI/cWjLOFX7kNyhzDSJ5ZF2GKmVAd26g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=RaJHEOeT;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=cnyeNr5K;
 	arc=none smtp.remote-ip=198.175.65.11
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889E6606A31F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 09:33:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 889E6606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C95606A31A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 09:33:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04C95606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=RaJHEOeT
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=cnyeNr5K
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793266414; x=1824802414;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PDAdJcZmSs4mB7ovLT3v4f6ugNTLNltTlxhqgimZ4OM=;
-  b=RaJHEOeT6N1B0P5Eo8t89Im8PdwQOYx0TdlRfNbw1+1HZy6UsayTcy4l
-   +nKSbGhWQKI4J5/xLfPDrN3IuFh+3Lzdwx+8+7yzrO3j62VxSpRQ9jKmr
-   2Uj4GyWag4C3tqgEl+T9FEoExIrU4DiOl47IDiZ3aFUQVKyyHkIGvMKol
-   IqUSsrCKoxTTYmkFrLLVbhiqwFYa7eE9aPG4HTYN6arZLC8FhiDADdyCU
-   pH+/x58x/VQiu56Etquj2G+hvwZ1AtoZlvQs+IEcRCpHkqStKofhHjiFk
-   eo7sf6HV1Gxd4QO3GoDzaiosdMMY+fEZjx7RN4WUcfv8LMnfXKreo5zK2
-   Q==;
-X-CSE-ConnectionGUID: eoNFZaXKTxWkwUg1YX53wQ==
-X-CSE-MsgGUID: xmUDnaO/QGKZwZK7K9KTlw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11949"; a="1887592"
+  t=1793266416; x=1824802416;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LqVgKDc5gLMdJ52xEpXiiKuaZXfhAUfrLGB3BZkeTjs=;
+  b=cnyeNr5KdWX7lswV/Q6bervLYjZFTp8FOPpHY2NFODzfixzetmB2PR16
+   BvbiXvpVIabqdmFp+ku0IV8jBfjMVMIFMwCLHazBR/xdYvqGVReSc4zAP
+   WzRIbNhUA614JtyY0aIPHLlzu9vKaALTKD6XUS2kIk9wu2lGrawKfMwwl
+   Q6Xcoyb/Ai5JX4wZbr8fMFCO/rlXeIKGc7If92fwSdeXWJwmj8UhFRbtv
+   q0GuafM58Np2SqDGVtsOXHL+7tppoJRgNNoOFGhATrOov1o9s6q2Tsebx
+   O1CxuLE6ncehP8getyiY1FSEi/EyYIuTab0IM8FbliJRK9MWeFJpGMyG2
+   g==;
+X-CSE-ConnectionGUID: 8M52tsy0QX2wTJldgiLPHw==
+X-CSE-MsgGUID: /f/cFgNEQEWdvQ9uj3oSwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11949"; a="1887595"
 X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
-   d="scan'208";a="1887592"
+   d="scan'208";a="1887595"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2026 02:33:34 -0700
-X-CSE-ConnectionGUID: QiDFnlPkSE+lX+O0UjkI6g==
-X-CSE-MsgGUID: Nbujwzq8SUmALilnEc2SdA==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2026 02:33:35 -0700
+X-CSE-ConnectionGUID: bl6E078vQweE3gwP03pmyw==
+X-CSE-MsgGUID: SNeIETHpTfminpt3SN/fxQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
-   d="scan'208";a="5183748"
+   d="scan'208";a="5183758"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa003.fm.intel.com with ESMTP; 29 Oct 2026 02:33:32 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 29 Oct 2026 02:33:34 -0700
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: chethan.tumkur.narayan@intel.com,
 	chandrashekar.devegowda@intel.com,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 1/7] Bluetooth: btintel_pcie: Add LOG_MASK parsing from debug INI
-Date: Thu, 29 Oct 2026 15:23:38 +0530
-Message-ID: <20261029095344.3989729-1-kiran.k@intel.com>
+Subject: [PATCH v1 2/7] Bluetooth: btintel_pcie: Add TX/RX packet dumps under LOG_MASK
+Date: Thu, 29 Oct 2026 15:23:39 +0530
+Message-ID: <20261029095344.3989729-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20261029095344.3989729-1-kiran.k@intel.com>
+References: <20261029095344.3989729-1-kiran.k@intel.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -80,148 +83,125 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Read an optional LOG_MASK entry from ibt_bt_dbg_cfg.ini and store it in
-a new log_mask field so that diagnostic logging can be selected per
-device without rebuilding the driver. The mask defaults to 0 and an
-invalid or missing entry leaves it unchanged. Preserve existing DBG_PATH
-and ENABLE_INI handling.
+Log a one-line summary (packet type, opcode/event/handle, length) and a
+hex dump of every HCI packet sent and received, gated independently by
+BTINTEL_PCIE_DUMP_TX (bit 0) and BTINTEL_PCIE_DUMP_RX (bit 1).
 
-Individual logging categories are introduced by follow-up patches.
+Prefix the hex dump with the device name via a btintel_pcie_hex_dump()
+helper, falling back to the PCI device name when hdev is not yet
+registered so early messages do not print "null".
 
 Assisted-by: Copilot:Claude Opus 4.7
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- drivers/bluetooth/btintel_pcie.c | 38 +++++++++++++++++++++++++-------
- drivers/bluetooth/btintel_pcie.h |  3 +++
- 2 files changed, 33 insertions(+), 8 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 73 ++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
 diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 88da286750fe..a25f4d866f57 100644
+index a25f4d866f57..6fdffda6a1a8 100644
 --- a/drivers/bluetooth/btintel_pcie.c
 +++ b/drivers/bluetooth/btintel_pcie.c
-@@ -31,6 +31,8 @@
- 
+@@ -32,6 +32,8 @@
  #define VERSION "0.1"
  
-+/* Runtime diagnostic logging bits loaded from LOG_MASK in the debug INI. */
-+
+ /* Runtime diagnostic logging bits loaded from LOG_MASK in the debug INI. */
++#define BTINTEL_PCIE_DUMP_TX		BIT(0)
++#define BTINTEL_PCIE_DUMP_RX		BIT(1)
+ 
  #define BTINTEL_PCI_DEVICE(dev, subdev)	\
  	.vendor = PCI_VENDOR_ID_INTEL,	\
- 	.device = (dev),		\
-@@ -206,13 +208,13 @@ static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
+@@ -198,6 +200,42 @@ static inline char *btintel_pcie_alivectxt_state2str(u32 alive_intr_ctxt)
+ 	}
  }
  
- /* Name of the optional INI file used to override the default dbg_path
-- * (data->dbg_path_cache) and yoyo ini settings.
-+ * (data->dbg_path_cache), yoyo ini settings and runtime log_mask.
-  */
- #define BTINTEL_PCIE_DBG_INI_FILE "ibt_bt_dbg_cfg.ini"
- 
--/* Loads optional "DBG_PATH=<value>" and ENABLE_INI=<value>
-+/* Loads optional "DBG_PATH=<value>", "ENABLE_INI=<value>" and "LOG_MASK=<value>"
-  * overrides from BTINTEL_PCIE_DBG_INI_FILE
-- * and applies them to data->dbg_path_cache and data->enable_ini.
-+ * and applies them to data->dbg_path_cache, data->enable_ini and data->log_mask.
-  *
-  * DBG_PATH accepts BTINTEL_PCIE_WIFI_DBGC (0x06, default) and
-  * BTINTEL_PCIE_DRAM (0x01, legacy); an invalid or missing entry leaves
-@@ -220,6 +222,9 @@ static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
-  *
-  * ENABLE_INI accepts 1 (enabled) or 0 (disabled); an invalid or missing
-  * entry leaves data->enable_ini unchanged.
-+ *
-+ * LOG_MASK accepts any u32 bitmask (see BTINTEL_PCIE_DUMP_TX and friends).
-+ * An invalid or missing entry leaves data->log_mask unchanged.
-  */
- static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- {
-@@ -227,12 +232,13 @@ static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- 	const char *ini_file = BTINTEL_PCIE_DBG_INI_FILE;
- 	char *buf, *cursor, *line;
- 	bool dbg_path_applied = false;
-+	bool log_mask_applied = false;
- 	int err;
- 
- 	err = request_firmware_direct(&fw, ini_file, &data->pdev->dev);
- 	if (err < 0) {
--		BT_DBG("%s not found (%d), using dbg_path=0x%02x",
--		       ini_file, err, data->dbg_path_cache);
-+		BT_DBG("%s not found (%d), using dbg_path=0x%02x log_mask=0x%08x",
-+		       ini_file, err, data->dbg_path_cache, data->log_mask);
- 		if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
- 			data->enable_ini = false;
- 		return;
-@@ -261,9 +267,7 @@ static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- 		line = strim(line);
- 		val = strim(eq + 1);
- 
--		/* Accept "DBG_PATH"/"dbg_path"
--		 * case-insensitively as the key.
--		 */
-+		/* Keys are case-insensitive. */
- 		if (!strcasecmp(line, "DBG_PATH")) {
- 			BT_INFO("Read DBG_PATH from %s: '%s'", ini_file, val);
- 
-@@ -279,6 +283,18 @@ static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- 				BT_WARN("Invalid DBG_PATH='%s' in %s, using dbg_path=0x%02x",
- 					val, ini_file, data->dbg_path_cache);
- 			}
-+		} else if (!strcasecmp(line, "LOG_MASK")) {
-+			BT_INFO("Read LOG_MASK from %s: '%s'", ini_file, val);
++/* Returns hdev name once registered, else the PCI device name so that
++ * logs emitted before hci_register_dev() do not show "null".
++ */
++static const char *btintel_pcie_dev_name(struct btintel_pcie_data *data)
++{
++	return data->hdev ? data->hdev->name : dev_name(&data->pdev->dev);
++}
 +
-+			if (kstrtouint(val, 0, &parsed) == 0) {
-+				data->log_mask = parsed;
-+				log_mask_applied = true;
-+				BT_INFO("WRT log_mask accepted: 0x%08x",
-+					data->log_mask);
-+			} else {
-+				BT_WARN("Invalid LOG_MASK='%s' in %s, using log_mask=0x%08x",
-+					val, ini_file, data->log_mask);
-+			}
- 		} else if (!strcasecmp(line, "ENABLE_INI")) {
- 			BT_INFO("Read ENABLE_INI from %s: '%s'", ini_file, val);
- 
-@@ -304,6 +320,11 @@ static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- 
- 	BT_DBG("ENABLE_INI effective state: %u", data->enable_ini);
- 
-+	if (log_mask_applied)
-+		BT_DBG("Loaded log_mask=0x%08x from %s", data->log_mask, ini_file);
-+	else
-+		BT_DBG("No valid LOG_MASK in %s, log_mask=0x%08x", ini_file, data->log_mask);
++/* Hex dump with "Bluetooth: <dev>: <tag> " prefix */
++static void btintel_pcie_hex_dump(struct btintel_pcie_data *data,
++				  const char *tag, const void *buf, size_t len)
++{
++	char prefix[64];
 +
- 	kfree(buf);
- }
++	snprintf(prefix, sizeof(prefix), "Bluetooth: %s: %s ",
++		 btintel_pcie_dev_name(data), tag);
++	print_hex_dump(KERN_INFO, prefix, DUMP_PREFIX_OFFSET, 16, 1, buf, len,
++		       false);
++}
++
++static const char * const btintel_pcie_pkt_type_table[] = {
++	[HCI_COMMAND_PKT] = "CMD",
++	[HCI_ACLDATA_PKT] = "ACL",
++	[HCI_SCODATA_PKT] = "SCO",
++	[HCI_EVENT_PKT] = "EVT",
++	[HCI_ISODATA_PKT] = "ISO",
++};
++
++static const char *btintel_pcie_pkt_type_str(u8 pkt_type)
++{
++	if (pkt_type < ARRAY_SIZE(btintel_pcie_pkt_type_table) &&
++	    btintel_pcie_pkt_type_table[pkt_type])
++		return btintel_pcie_pkt_type_table[pkt_type];
++	return "UNK";
++}
++
+ /* Returns true when firmware traces are routed to the WiFi DBGC. In that
+  * mode the host must not allocate DBGC buffers and must not publish their
+  * addresses in the context info.
+@@ -2454,6 +2492,23 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+ 	hdev->stat.byte_rx += plen;
+ 	skb_trim(skb, plen);
  
-@@ -4530,6 +4551,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
- 	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
-+	data->log_mask = 0;
- 	data->pcie_alloc_init = false;
- 	data->enable_ini = false;
- 	btintel_pcie_yoyo_init(&data->yoyo);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index fff31ac8f87a..3e662c34cd02 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -717,6 +717,8 @@ struct btintel_pcie_ini_dump_info {
-  * @boot_stage_cache: cached value of boot stage register
-  * @img_resp_cache: cached value of image response register
-  * @dbg_path_cache: cached debug output routing mode (BT DRAM or WiFi DBGC)
-+ * @log_mask: runtime diagnostic logging mask loaded from LOG_MASK in the
-+ *	debug INI file
-  * @cnvi: CNVi register value
-  * @cnvr: CNVr register value
-  * @gp0_received: condition for gp0 interrupt
-@@ -771,6 +773,7 @@ struct btintel_pcie_data {
- 	u32	boot_stage_cache;
- 	u32	img_resp_cache;
- 	u32	dbg_path_cache;
-+	u32	log_mask;
- 	bool	enable_ini;
- 	struct btintel_pcie_yoyo_ctx yoyo;
++	if (data->log_mask & BTINTEL_PCIE_DUMP_RX) {
++		if (pkt_type == HCI_EVENT_PKT)
++			bt_dev_info(hdev, "RX %s evt=0x%02x len=%u",
++				    btintel_pcie_pkt_type_str(pkt_type),
++				    ((struct hci_event_hdr *)skb->data)->evt,
++				    plen);
++		else if (pkt_type == HCI_ACLDATA_PKT)
++			bt_dev_info(hdev, "RX %s handle=0x%04x len=%u",
++				    btintel_pcie_pkt_type_str(pkt_type),
++				    le16_to_cpu(hci_acl_hdr(skb)->handle) & 0x0fff,
++				    plen);
++		else
++			bt_dev_info(hdev, "RX %s len=%u",
++				    btintel_pcie_pkt_type_str(pkt_type), plen);
++		btintel_pcie_hex_dump(data, "[RX]", skb->data, skb->len);
++	}
++
+ 	if (pcie_pkt_type == BTINTEL_PCIE_HCI_EVT_PKT)
+ 		ret = btintel_pcie_recv_event(hdev, skb);
+ 	else
+@@ -3665,6 +3720,24 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 		return -EILSEQ;
+ 	}
  
++	if (data->log_mask & BTINTEL_PCIE_DUMP_TX) {
++		if (hci_skb_pkt_type(skb) == HCI_COMMAND_PKT)
++			bt_dev_info(hdev, "TX %s opcode=0x%04x len=%u",
++				    btintel_pcie_pkt_type_str(hci_skb_pkt_type(skb)),
++				    opcode, skb->len);
++		else if (hci_skb_pkt_type(skb) == HCI_ACLDATA_PKT &&
++			 skb->len >= HCI_ACL_HDR_SIZE)
++			bt_dev_info(hdev, "TX %s handle=0x%04x len=%u",
++				    btintel_pcie_pkt_type_str(hci_skb_pkt_type(skb)),
++				    le16_to_cpu(hci_acl_hdr(skb)->handle) & 0x0fff,
++				    skb->len);
++		else
++			bt_dev_info(hdev, "TX %s len=%u",
++				    btintel_pcie_pkt_type_str(hci_skb_pkt_type(skb)),
++				    skb->len);
++		btintel_pcie_hex_dump(data, "[TX]", skb->data, skb->len);
++	}
++
+ 	ret = btintel_pcie_send_sync(data, skb, type, opcode);
+ 	if (ret) {
+ 		hdev->stat.err_tx++;
 -- 
 2.54.0
 
