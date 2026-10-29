@@ -1,101 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.170
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793290164;
-	b=DHx9I3VRUx1VZ3a1BijanwpvU9eK/5Q4FfCo4FFnzNpxJbggXy2P3uIz/k3b7aLupS+D
-	 7xWEm8PEq7hZ1+nMqHccKhBqsoe5NmtQh5fSHouR6lFXSSw9mTGvMY0EzDef8+XsjtvRc
-	 PgfuVBBKyEz4iSFya8qdMs5YRhzkG57VJ4Qa7mqfT0sSQMSEf4BgzdGHxdO5lBRlnbGwW
-	 gpJOI/NfsVEHjnBxuXCVhc9nZx3vzayu97A/A0g/fb8nGIjehGRs/A5qFhFjE29LmjYEb
-	 xBxwxbLndE0Rf8ZIQgQoXWojh18t+GigyrW4HxTXKpPp/7HrdBKreTIk6jCD56m4IsA==
+	t=1793291283;
+	b=Kp6IkBlUE1gRJsPQ2SAlEAJYjdk/AaeLkcfBDJbd3L39pcmCsyL+F9eLfsusWhdz6tIZ
+	 X3IpfhF0S1Wlv5YvNs6ElWA3E6keO6+Or4HHZCnIE7uWPU6atSpHLIGjQkRhAGnMcaj1A
+	 BRCa3NzgyzS3b3VNJTO4DrUfQkGm69K2M15mCmg7B1xeLLx/6Ev0BIWlYWQmww5NB7Ald
+	 525cN2FFZNIiFCd2jTs4CTqi0MXcWhbguvvmWDeIXn47uBZiU9cH7JnHFLV/gTKVlRhWL
+	 IzmSDMtiZm04A2TmYOI5G3ctifi449uLO93VlbGJJr6VhdEhJQDdHpobzSYTLeCzGMw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793290164;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793291283;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=epB8RoKxui81tx8KuP3TsTIU8ktJzNyauUMdiyfjpOg=;
-	b=jnowxZIvwkyHm9G0BaCBkPv78LJRsYaIQEdDzajuo/wJs+NAhjLKSYKq0rk0u2eLihkG
-	 FV1VrHUzPdH9KUb2u7p+WfK7Qe8AweBqOFxR/VYPQdEcRH/GFx2HSKQ4fYnQ5dvw6lTAC
-	 blX+aww6EvudjCzW3Ih38EDFKn4JtlTkKxqE5jif7XUI3aKIeocTD+K+4OULh6Bc3o0xz
-	 3g+kLXYERWP3KkfBvwLJmNpcN1UJNLFdbKHF0iPuAHDRJkZrMpvD9Az9D9l7hxjpzDL4W
-	 RU64pWhTYDX9ttCn+JL2DaImBLPzpAZ9uKEsrWcu/voQ8E8Dq3wvxuove8VnYvNRT2Q==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=LQ37hPvquQn330cxCo8SGW3/WEute1UfVq1UF21kzCw=;
+	b=miaEvx51wJnw2xch2Lai6erU6XVNt/FQMpp7LVODKksI3U7MJuMI1kO1fXH++dd/jL12
+	 SNtQTzhKCbTmI7LXnTxlOmw9JWkY0yHtKkj+sAUMKWlZW2NWsXgkzeEp2O3C8StggLIy6
+	 J/hGWPPqu4dj/iXpyIqSJaODytcCJsEnOEuEdJjWaMP6GpAzzVGD/+vRb/M7j+BGVtXuk
+	 wG4F7lxk4aO4zOvGrX79si6GMBSuSq6n7vZ6clR5C7iPSwG8Ji2Lu9B2Qn8XNbFMTaaLk
+	 V7pPl9s13EesXI7l3eO8TTRBRktfzHJZHTzEEHVUFwWP3QY7XNQzsDv2wGfNSrv3xLg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XdHmfZmU;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.180
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="HjoSan8/";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.170
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F772606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 16:09:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F772606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A33D606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 16:28:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1A33D606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XdHmfZmU
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-8b05bf699easo23844747b3.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 09:09:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1793290163; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HjoSan8/
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-8b0e21048f8so21282517b3.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Oct 2026 09:28:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793291282; cv=none;
         d=google.com; s=arc-20260327;
-        b=B/jq39JbnfbJm9Y1wo9uiGyzERuduz6m1pIDRak+ZpcP70ok2VjYOm+Q1V14GW6kvZ
-         BuH2t/2oZRvH43fUhVxAu89PeqVONMYDRWTPF5h5XMtErGjvlP2wQU9MzMZzmFc6iudZ
-         Aw3oAHIL278Z2a0omsErPbGO71SR5x5l8bD/9gm0EXZZAT1cimZWj2c853wrRhIaN3e2
-         y1elQIYZ2+BPiOjClWZuNp6iF8nltpb6SYKzBbE6v6EZcubqDu+OAVCxMbAHCBEsR5aG
-         fvYeqJqAujaBg464ZeN5fzAMy9j6LrMdCMHAKYmXKU4Tv5KYqisH+6mkAll9oqc19uP/
-         q5Ig==
+        b=R3V4HP2+kyNqR9uk+ycJTrfYuO/Qw/tnUPoKr4DrvwATReTd9aOcpZ0WomX3zzBf/8
+         +i1QfbobdB/QklFHNeHmm+t0yHHP8UD31vEaPYM7zoUNbFKoWLuAyzw1RYdL4HhCpbSw
+         mjvcknQU9s5KFGe5ogulxhG/URfCnZ/Ak//ITRiLsW6DsHoOQsR6xIJ2S1bf3pZ199aO
+         NxL7NqLuLyTQKxURqscKEKRq6/ovVAxOaKKTQGKuEGuHtnJifmSmSsHGXYeGKhQXZwnP
+         c+PiiU2Pzr1Y4/mjMuxj83ElalK6bbHo7Ea2tE75nWkQfu77n8/TxkWfHwaQh8CZLNa1
+         r+Sw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=epB8RoKxui81tx8KuP3TsTIU8ktJzNyauUMdiyfjpOg=;
-        fh=UmuMtuhzut2ONexYcEEkTbdXeU9Gb26lzxfylo5uyaY=;
-        b=ev4rTEhVSquPzvY47/ke/9rNmmejE/0bceLyPiYOEiE9gpg8714QftInE6plBLg0W9
-         820up4UqaI1M/k1Ov9yuodTAzFOlIeE2ifKGS29cSpIyHKEzxIgXxHFCp9fNxV/2equd
-         cQXcI1EeO2FI5qwfCYFbw3w7/WfFfIGRUi5e3qDjCf10rvilieDRLMI8pwCRVqHwekr3
-         2qnbpMRvRN2o/el8yrG/BXO3MOZdKsFEvgTO1jhW509EezJAzO5whWeLcHs5PBmw1SXq
-         361WDyhlYRlYF0v7IfkWWNPfccDtHihoWswjWgl3Athe8JwMt63SXOtezDg0F9/UbWO4
-         K9DQ==;
+        bh=LQ37hPvquQn330cxCo8SGW3/WEute1UfVq1UF21kzCw=;
+        fh=7rHMuD/zzN5a2+uVPCwhQxE33SKbG+1zfKojbK79O0c=;
+        b=QP6GcGaoItxiXwwzbpfEMmHaORPrLvHFm0LAcBttQ4cfGFBpN94Q/2acl4DPz20kko
+         4nCFkW7nUrs7EOGKiNeL1K9KXtUMn+RgyMmbn3EeWca/4ZFW3HhD/F9pntAiC4Z2jZVb
+         mlvQYh1O1AGaAR1+lWHGNVQtYR+RwHNpcOm/IE7JjpxwAMpZUkeQadoMdBMOpB6/TBHc
+         HIq9BBVxi2mEyMp3BBlWDygVDFiitlA9eK878RA/Z1T53SojlyPqigV+0AZP43AVDRD8
+         8R0C+t/eAYdstgDuUaEJMgnjEBY1piC5mgBTnhBAhGKw8odHR1wNYFUK4a9Eooc1wj89
+         xFbA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793290163; x=1793894963; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793291282; x=1793896082; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=epB8RoKxui81tx8KuP3TsTIU8ktJzNyauUMdiyfjpOg=;
-        b=XdHmfZmUHaYtadkK8mCBg6rwoPDNBVSyW86SO5+2wkMAAXlNTo/xBN1h9EAjHQpGPG
-         PMM4YwZkRdCMnOvqvDpxYyjWdE64vgmwNOKEw8Bf0sUd7Zgv8EmOyynk/H2TYWTuyW8N
-         1QVJmaAnM9jvbUmaOMuwgZQZyJh8rNghYlzpTCBq0bcc0Vu4LLeZKxsAz3+YmXvzIvRn
-         nSr6iSzEwrX9FZZwj6koh2AvPknLMrNo9QuLk9wZJS6svBHtk7p+1u8Mt+zeBPFB7m0+
-         P06pyH/i578wl474LfGZ/Vc0RE6j6IuELN/8oYeOuweiUH2p8Q79SNBRRQRB0XV/Cxeu
-         8U/g==
+        bh=LQ37hPvquQn330cxCo8SGW3/WEute1UfVq1UF21kzCw=;
+        b=HjoSan8/zv52FMl4OuQXuVzj8JTJSp6j9wKD5+65byXrynFR74lCdsAoDxVmdJnPR8
+         WxAUUtKnd+gjNA5sOV5pXkj2by7gF3+iblhP61asLLJB4/4+wts9YTkkdCV4957ZeCHt
+         E1enKaP20QMf6OfBEz7aqGsjn6T9AdjP4v9YDb6oNq3Gp+uplfQGUq15z4L4F045nPbJ
+         jeJDzp+zVlw+MTCCUI1sdxUPw615ahw2d+Oc0ET/gwIaRcihtqmjObXsEOrGgrXZaFgD
+         yWkl9C+5I8nmx2S6p1XpuIFLMFlAJXB7vNcRcDi7hj0dWi4DdrWXmIVigfIFxDmjodIS
+         OTzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793290163; x=1793894963;
+        d=1e100.net; s=20260707; t=1793291282; x=1793896082;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=epB8RoKxui81tx8KuP3TsTIU8ktJzNyauUMdiyfjpOg=;
-        b=bhOlVp01cQXmgI+bipSx8sBoImAfPDCeLheikoyndd6kj9ll7Lut42qF6qjBqtXnvx
-         /Mlz2fzyHsCketm4DZrpq2+XfzgLGzE6gtFH1XskTWYJ9r813WyUDokjfYzJlU2XL1TO
-         5PsTqmSzlId+sL1D8QoUIjqp2aJ0UifxYNbshibmVMUGG6VKJNkg9UeQ9Jf+oc441eAZ
-         JLouhGm8tRQjG4gCezcPnqd+R3dHdrGabp48hCf4BHFVyGFn0eqgwWTDReiXssWg8IIk
-         orL8ogUfidjk2ERur+3InF1fufpK9Io508TmvwNewGQ8hcJ86o8pmQ4bkJTpDrh0tS0Y
-         K/4g==
-X-Forwarded-Encrypted: i=1; AKwUvBxYBMUlKJMEe3TxCUvvpIMEyQ/wFVh1q2sxmiP8NgKAllrlP5gZ1yb1GiBXR6jrQgui2E1i8PptVCFz2Gzicjc=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJzASyroFWuU//cd6FfuUwa3LHLqPdpLH4T4JCTpSp14kZDsVyv
-	nL/YSdYdmGU47JGXpC+od52hBHQmGlGHi1CofsqQWnpeRlr8iKORKaTp72Fl45/kuvsMFlEUtGJ
-	dsJUw7fywEMRDn8P256V2FvrYWVxjXxk=
-X-Gm-Gg: AYBFou1AWqZJuejX6lcSZE+7TX86XCstaLoJD932v1nw5wOE/or5ptfNkba9EMFuc/n
-	X6CzoE5LPtI3Q+9xXO+NbEsrmXpP1Uc/UbdCZb2+gQ8hEdt8PPOaI2D6h4qlyY1LNPBDBggfuvC
-	fCyNKKi2K8mPLeRTg86RRG3Wzveey1holbwdkdpBIn6dDDIaNJweBT9fCN8faEXJCqzGTY1zPPP
-	G1+8JreyH9Id2obppmt6xHGSc52K1INodo5Sdn6+0V+2IcaXADby3VNq9e92QYQCpZGNuTa6dqB
-	HHd3ucaMZifFv9UNI8kz7IgP2/gin8cEBewn9VUUrZBO7GiQXoPqCLFOKZZeb0QbdhWgMKEOxem
-	2+s2ztGANpq7KjlWKwoCdg2nUrMVNXHlhvM4+pTAZIi3B2dMHKkexKBULJg3ho4RVwMPXQkwa+a
-	hQF+a6Xn4HCKDb5WoqA+4O
-X-Received: by 2002:a05:690c:fc2:b0:8ac:b167:4877 with SMTP id
- 00721157ae682-8b1b5c9ff05mr38036237b3.36.1793290163455; Thu, 29 Oct 2026
- 09:09:23 -0700 (PDT)
+        bh=LQ37hPvquQn330cxCo8SGW3/WEute1UfVq1UF21kzCw=;
+        b=TuHKrmk6XIA6VcXLTCpTKl49wXlG8DoeOVKXL73g0JK9TxFmkS/osbi3fRWcXsm5xJ
+         1sxH/VCXXHSTxDB7nFZoKeYqxSyOhWNVElcgGNN/OWD2c5HVVmTzNpCobBhJrt8GBeq+
+         dRWOsw1K+vTS2nTc9dyU8WdowSompXN66yH+9dwSaBLk5UWN3Dl/QbjGPU4s1hI9s5WV
+         eFGvCm5chZkzMqYHic/k3cekQLpfwSPehsnd4CuPW8eCUMKuugXg+guKoj0xDZjzQrQF
+         Hl6Sj2pd+2kdHhmJHCdzSvsi7d0AHAPhiDoTK/ltXmNBVogqxntT6RfPDm74ePm0EXt1
+         cpPQ==
+X-Gm-Message-State: AFq9FYLzl9i6hj3CdVivLw7mPVzeewEck4U/eTaaDSaTE9rEx4OI3SZ/
+	1XMp78CXngrMkA/5GlElWZARCx2OTryNFJYC/PIA+WlCDMd5eI9EIPXmkKC/vFmhY96XHBQGEMF
+	deL1frq2twcxt/LW5+P+7NMVzDQHZPLY=
+X-Gm-Gg: AYBFou0Niazmss4NLa8n+n3UAKNcAkvSSavMnHCtYLwtVi/Wp5oR7fmxROcl5LI6cJC
+	pyU3Juz0sP1vggD6oIV3957CjGQu1RiBBKg3vYR+cC+98zLZtI29SiFdbSGwg916WWtAQzBg7JF
+	ArOR8DNP2fM4PhxGQcN1fTMn4kiu4BHUfQpiCfabZayrpkikyX5jnvgsu1QlyHCw76N4wrjITyW
+	OJHjygRUgE+6DHiASsk34BpbDJDS5WbcM4zI0JAphn4QG9UA1COjLJvyD4zW4kR9wAN9FvkfLkO
+	QKO2JGRipNRJ1IOmp3bTQhrGtlNLfnpEGO1mFcFf1bYcBb4GKcs1SmrzB+iOE7ClGjwDOWJvfPf
+	SzTfU2INCaJ34Vu08YhhefnKvfYT6NocTzP9e/I4ZUC8AA9ZjHDOZARukoaoMRcfhqnH4ryLPx3
+	z02w5+1zWHcd/JaTXaz8IpVaqhTyfZ+LVC2ErDl53KMM0=
+X-Received: by 2002:a05:690c:e3c9:b0:8b0:e680:6157 with SMTP id
+ 00721157ae682-8b1b5d0f2acmr47617697b3.39.1793291281718; Thu, 29 Oct 2026
+ 09:28:01 -0700 (PDT)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,72 +104,107 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261029094104.2952304-1-jinwang.li@oss.qualcomm.com>
-In-Reply-To: <20261029094104.2952304-1-jinwang.li@oss.qualcomm.com>
+References: <20261013032742.497402-1-cochcoder@proton.me> <20261029023235.1280321-1-cochcoder@proton.me>
+ <20261029023235.1280321-2-cochcoder@proton.me>
+In-Reply-To: <20261029023235.1280321-2-cochcoder@proton.me>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 29 Oct 2026 12:09:11 -0400
-X-Gm-Features: AclHuK_t1FdhNrTPRKMKSpeKGIgS_hB6YvmkkGhHzb48NiF-9DwnIvkJnl0-E9U
-Message-ID: <CABBYNZJ0YZ6hZaRH4jLtKRSdcVYz9_jdaQgCg4RdfB2O9t=TVg@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: L2CAP: Ignore connection responses with
- wrong ident
-To: Jinwang Li <jinwang.li@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com, 
-	wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com, 
-	mengshi.wu@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com
+Date: Thu, 29 Oct 2026 12:27:50 -0400
+X-Gm-Features: AclHuK-NgM6Qw5Y3C2mGCjEAWYJbcX_bTgC3W0mleGrwBRXFkQrCU6Q6Z-A3hJw
+Message-ID: <CABBYNZK7wGJwAsVLWNhLfLXqGLtA-gtj9ZLYww20FpVL0Kcobw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 1/1] Bluetooth: btusb: test reported maximum LE
+ length on TP-Link UB500
+To: Kyle Pepper <cochcoder@proton.me>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	marcel@holtmann.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
- Hi Jinwang,
+Hi Kyle,
 
-On Thu, Oct 29, 2026 at 5:41=E2=80=AFAM Jinwang Li <jinwang.li@oss.qualcomm=
-.com> wrote:
+On Wed, Oct 28, 2026 at 10:33=E2=80=AFPM Kyle Pepper <cochcoder@proton.me> =
+wrote:
 >
-> L2CAP/COS/CED/BI-28-C requires the IUT to ignore a Connection Response
-> that carries an invalid Identifier.
+> The tested TP-Link UB500 (2357:0604, RTL8761BU firmware 0xdfc6d922)
+> reports maximum TX and RX data lengths of 251 octets through LE Read
+> Maximum Data Length, while LE Read Buffer Size reports 27 octets and
+> eight packets. The previous RFC demonstrated 167-byte HCI packets
+> with unchanged LE credits during ASHA playback.
 >
-> l2cap_connect_create_rsp() only checks that a connection request is
-> outstanding, not that the response answers it. Add an ident check
-> against the pending request so that a mismatched response is dropped.
+> Use the reported maximum TX data length as the next experimental host
+> LE ACL length instead of an ASHA-specific 167-byte constant. Require
+> the observed 251-byte maximum and 27/eight buffer reply; preserve LE
+> credits and BR/EDR fields. The maximum-data-length value describes
+> Link Layer capability and is an indication to test, not proof of the
+> physical HCI buffer size or pool layout.
 >
-
-Needs a Fixes tag.
-
-> Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+> A direct HCI user-channel experiment sends sixteen whole packets at
+> each HCI payload length of 27, 167 and 251 octets from UB500 to a
+> MediaTek receiver. All 48 payloads are received byte-for-byte intact
+> and all 48 HCI packets complete, with zero pending. This establishes
+> 251-byte HCI acceptance separately from the reported Link Layer limit.
+> Only one packet is outstanding at a time; the experiment neither
+> installs the revised callback nor streams audio.
+>
+> Keep this a TEST ONLY RFC. Eight simultaneous large packets, larger
+> HCI limits, mixed BR/EDR capacity, other firmware and sustained audio
+> with the revised callback have not been established.
+>
+> Assisted-by: LLM
+> Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 > ---
->  net/bluetooth/l2cap_core.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  drivers/bluetooth/btusb_main.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 83b622a42811..70ad30b091e4 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4480,11 +4480,11 @@ static int l2cap_connect_create_rsp(struct l2cap_=
-conn *conn,
+> diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_mai=
+n.c
+> index 92a78a7e6..b654cf5be 100644
+> --- a/drivers/bluetooth/btusb_main.c
+> +++ b/drivers/bluetooth/btusb_main.c
+> @@ -2972,6 +2972,19 @@ static int btusb_setup_realtek(struct hci_dev *hde=
+v)
+>         return ret;
+>  }
 >
->         lockdep_assert_held(&chan->conn->lock);
->
-> -       /* Only accept a response to a connection request we sent and tha=
-t
-> -        * is still outstanding. A channel waiting in BT_CONNECT for secu=
-rity
-> -        * or the feature mask has not sent one yet.
-> +       /* Only accept a response matching a connection request we sent a=
-nd
-> +        * that is still outstanding. A channel waiting in BT_CONNECT for
-> +        * security or the feature mask has not sent one yet.
->          */
-> -       if (!l2cap_chan_connect_pending(chan))
-> +       if (!l2cap_chan_connect_pending(chan) || chan->ident !=3D cmd->id=
-ent)
->                 goto done;
->
->         switch (result) {
+> +/* Private diagnostic: test the reported Link Layer maximum as an HCI si=
+ze. */
+> +static int btusb_ub500_test_post_init(struct hci_dev *hdev)
+> +{
+> +       if (hdev->le_mtu !=3D 27 || hdev->le_pkts !=3D 8 ||
+> +           hdev->le_max_tx_len !=3D 251)
+> +               return -EINVAL;
+> +
+> +       bt_dev_info(hdev, "UB500 TEST ONLY: LE ACL MTU 27 -> %u; LE packe=
+ts %u unchanged",
+> +                   hdev->le_max_tx_len, hdev->le_pkts);
+> +       hdev->le_mtu =3D hdev->le_max_tx_len;
+> +       return 0;
+> +}
+> +
+>  static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff=
+ *skb)
+>  {
+>         if (skb->len >=3D HCI_EVENT_HDR_SIZE + 1 &&
+> @@ -4715,6 +4728,9 @@ static int btusb_probe(struct usb_interface *intf,
+>             (id->driver_info & BTUSB_REALTEK)) {
+>                 btrtl_set_driver_name(hdev, btusb_driver.name);
+>                 hdev->setup =3D btusb_setup_realtek;
+> +               if (le16_to_cpu(data->udev->descriptor.idVendor) =3D=3D 0=
+x2357 &&
+> +                   le16_to_cpu(data->udev->descriptor.idProduct) =3D=3D =
+0x0604)
+> +                       hdev->post_init =3D btusb_ub500_test_post_init;
+>                 hdev->shutdown =3D btrtl_shutdown_realtek;
+>                 hdev->reset =3D btusb_rtl_reset;
+>                 hdev->hw_error =3D btusb_rtl_hw_error;
 > --
-> 2.34.1
->
+> 2.56.0
 
+Sashiko flagged 2 problem with these changes:
+
+https://sashiko.dev/#/patchset/20261029023235.1280321-1-cochcoder%40proton.=
+me
+
+Both seem valid to me.
 
 --=20
 Luiz Augusto von Dentz
