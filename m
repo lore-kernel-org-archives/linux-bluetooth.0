@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793395786;
-	b=O+/ogOPC+raSWaJ19k/9EDaMzd5E2giy4W0dhW/SWlmcNr0BEOdY63Cx55h7o90tyzP2
-	 iqdpOQwGnrbSDeENIHKXjB7eZ8CSdCfDfGacJ1r6Hq+vXw8SKWdBn1eOfzT9uypyGyPwB
-	 FU4zg95jkQBbwjmafHhBEcz2WxSej257BYmnUkGjhoH0+vXN4QAGDfu0HOnslkOVjTaWn
-	 Chxx/NlBXJzqBlnOOlYtb9Duqjp96ILeoenN93teNVznZWFXD1pGjMCbYOUn9/nsgDg9K
-	 grziVMxRmys9VwRGlDP+6Glir57muJ7xGUgc5wKMbFuxboOh3ygeROT2/HI/QHD2gAQ==
+	t=1793395787;
+	b=YfDCpoSFbmaVd9J79Eo5EmSlipCOWdNM/caT2CmysXEy4err1+bWOuZMLvC09R4Wz8Rl
+	 0etHCqH23kbBWgOOQ4xGCee89NxAVtIPkzLHCUBibp2F0G+qe4D6VFJOuSgGwkEMOmmeu
+	 D7joXPVgA54CEfRqlN5cpo40GU0IYtWDEfVEohWJPZH4Hx1CRRtNwFbXU9Ws6soVlc2zV
+	 JBTwikDKV6hes+nmKn+9YqLS6iib+bdinGfiios8IYzk5zWsL4T0CU1tBPRX/ozf3DBWR
+	 Q2FmYLUhEvwoA9A50vtXlVoPDubGERRaEiVLKdSQSVCHY5sZD8MOQCgGFz0dKfAWrWQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793395786;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793395787;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=GoNTkqst7oggjvkjJNtqv78A2GIJ3OmAHMk3cwWqm50=;
-	b=FaYSw4FBP6XwVdjJ3SnbQ20YqQbdNqER2RWeCModfEQn8vrIRehCdrSvd9DM1kYipiAh
-	 j/kAOyd16lFgSQfbmUEFJZJS9nj4c8OQW+dBG3TGpZ3Jv+VZx7UWl7/l1rv3NBcQ0dJK1
-	 b5n0UXzlo4MJHsreIZ6322hiACv3RQQC/5Dje6du41DVQENOsGMT/Ox+yIo/NpdaKdx6F
-	 D47l88e5JT4FvV2oDWYBJe95RG3AwLeaRJcpwSpLzWmKlRZLH9SgZeePG8NQHRgxu6Ika
-	 ZS9mfWrSzzzUDWi5bSWw7sqrSN37PRGo8GffHnrq+fFUpVQ+ol2p9HfEhwWQWYVuGdA==
+	bh=4pydwJ8BgHpdFFbobeYtNs6z0iVyjlp5s92h+AjMva4=;
+	b=UE5gond1NHg34e4IWa4+JN8/sVzzDqB+UOSPg6kq/DrdaEg23pAOltSiDTVzrw7HXRpa
+	 8SwIpuF9DRSMJbX/GmYvUG5Fxdup0wyg3auvDbSyJU7rk93y5MyFCQmE58IXXYhFmInrc
+	 f4pPj6vsDo2FgTno2PjXouGLzmA5RcquZNCGDm0Ugm9g09QWDpTCiEo++qLQKDikgDwnc
+	 jZVUa0vW/ziUbA0Bhi5ga42Y3xbYISyVTKcyfY1c4X/3ZwLkPrITs+6k2rL8iVlI/hmHj
+	 WyqBbWAqs97VbgBDtmbuxCuzKJ6Qz3Sac8amMPqSFDkCs6o6iN/ZEcVXvrO1ln9kEYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xFotXGzu;
-	arc=none smtp.remote-ip=209.85.222.41
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4UnzCmF;
+	arc=none smtp.remote-ip=209.85.217.51
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2122C606A320
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2122C606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F79E606A327
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F79E606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xFotXGzu
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-9851592ada1so322571241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:45 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4UnzCmF
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-7ce6cb4c6faso687308137.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793395785; x=1794000585; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793395786; x=1794000586; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=GoNTkqst7oggjvkjJNtqv78A2GIJ3OmAHMk3cwWqm50=;
-        b=xFotXGzuy7o3759/7tNruCyyaotw8UyEfiNR3dMgzrNCud4KtkJIW2xvxYej4U56mi
-         PbSO42nISm1qlpMh621iyzVyJIdHnAO56rrhTGNUSY9K+nxYEEc+tBuxuJDH08Vme3WK
-         FFN+UuGhdWzzzdqZdpI60QAVebC9tijBp5ipS35/cr1nI40FI4HvpiYboS9ukXj8exGT
-         JAamg9l88jzTCQO3RbyxubRFPANU6kw71jJQ7sWHtXh6f8rpWb8m5MZAskwMxY9CnmFO
-         lhYlSlvdGdN7WSoyRRy+2AEPikvxTQLtNYxUfxnoToW3hvxQdICSCw2tyQzfSv3/1lrW
-         Qdgg==
+        bh=4pydwJ8BgHpdFFbobeYtNs6z0iVyjlp5s92h+AjMva4=;
+        b=j4UnzCmFv8IPm7CSrdvc4EcJQAt5j6BQAgTQp1UeNGkZb7ReQdv58PIYfvPMTjw25/
+         FM8SVBH/56iwdVzMy0h73y3CPwLpfT0U7l/iUTbCl9jZmz9pYuYZ2H7o0Tb0Faq87mBP
+         +N14Mw7IBZedbOqFQTO6bxrVu1zI4WMUcwmUgTHOktLuawJaLEerqF9vTpmJFOzqjykH
+         dmuKC055SYT1n2t8fsKhVjoKwQNc0XEEF0HrRSPIDimVsgsYxAJjjCBpNxMbYqYamZe+
+         +U5D/fZjxlr0Raw6FqKe15Z3ArRGzCZhOBhNvMtzhgUtowMZeKUyNwccHirr0eyjw8sW
+         7jTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793395785; x=1794000585;
+        d=1e100.net; s=20260707; t=1793395786; x=1794000586;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=GoNTkqst7oggjvkjJNtqv78A2GIJ3OmAHMk3cwWqm50=;
-        b=HV4D4WYw/mWErR6JADrTMjTHb19D9MbQ4TvxotKpm+tUHO6VYsG2gegDheyXrsB4+c
-         6Hbf9WZuUbsPWQPvyVH4xt+bf8lc110UFfgtvq6AT2rHljXwVKnJty4TZ3bamzV50EDw
-         4Z7j3yVC/5nvNaIYzmkacaRemke4bq36mbt4Np9Iz8NN07hLS03++iOkJVRMomcDXowM
-         6FhhIO8o5i/mFTc7qvVDsjhENIFA8j+NKIO4jfkCGN46vWuq8qVaiHNwS1c6djF7rVH5
-         VuNGz9v0oNg5grkRvCyfiMTjHY1ketqSUMWwq6lmZdv3/fXb/+w2Li/ObjsSjJPUP9/U
-         dQFw==
-X-Gm-Message-State: AFq9FYIzJ4CLuazfrJ6HraH2siYWw3wTyPEsGPlIIo2cN9MlIJ6DqY5G
-	0AewEp+bJ3eibsqZk5zc4smiKRExQwz0+8G2r0yRZpTrL/a0uLkohisChKWT8g==
-X-Gm-Gg: AYBFou3EHBYeoPo0iH6Lpwq4Yh9FX8MTNdW+VxHqWyQQWhidrEy0DEkx0D0m4Kdej7m
-	VAZwwG7I25+H0GCH8cnWx7IAcs7kMsRoRrhkcQqJJEjVWjuD8MyFFCoiTwx5E53zRA2xqsAs71P
-	qdwjzNTlIJdp1qjwZYX3g/WWyNGj9Kg/wAoQyscECxFCW4rCE8+nljgFDxkquNJNUJxf6pASVCx
-	x9iVljEPNSBElTH4VmuQgFXPShpG46o85YIcLfUAsjwIiQysyQva1LYuROiUScflz/+fpUTfSAN
-	1ZeAXgClna1WXD5cLIbSOZBe49j0hf02/dJni+CmTQFJ6K78AwrceLFwmgjRcx1AOUqZ0JDzm5E
-	9iikDJwsLar/TBp6q8etzccci95rHmzsfvdgq+Vudo0VgRDViWfpyllM/iYqGCxkvTlm9Sqcw8s
-	O+p18oeDTjPLyKxpPs7vS9b8Shfrl4G/qhXOksCp0Pvi/VQJ6tc9NrYgDq/4ngFP9lzuAqEDBUe
-	D6K9jJTAbD/Z0mMnHC+sqvHHYbhAAZAnBLtvOt7VSEA2KHcoFTJ4tRNC7x4RTyMd56gwvR4qXSN
-	mwbln9FT1Fqxmw4HzihGG29lA9vvbYE4omf/4dk/32QpVmeTtdM3mMiXoiGSkKDdjZkXS4hlsMY
-	knG5/Yt13akKvdzjJ63qCl8VJc1Z6qMvwK+0hlrE5E4QnYXEKHOHIyuK4xyRjIj8+y95ulfyC7z
-	Ps8qp0rtPkbIGzZutdHhekjhp9
-X-Received: by 2002:a05:6102:c49:b0:7cc:33c9:b3d2 with SMTP id ada2fe7eead31-7d0726825bfmr1779760137.25.1793395785128;
-        Fri, 30 Oct 2026 14:29:45 -0700 (PDT)
+        bh=4pydwJ8BgHpdFFbobeYtNs6z0iVyjlp5s92h+AjMva4=;
+        b=LoA4/8U9t+4jBwQaHUC48YM7j3yhP3vTKWMvXx1VFcYDfnWzNJ2M8RLDVAKU7ptoyK
+         Vl/qVbCnDmQ0el1cdqBcAV32p0tuh6y8dkCYMoRXT9kL5L5SAnXlqJu+zckf8HVTjsmd
+         E9hAxCYyW637/WOETZLt4PvqYaSMjL3vrx4NPJi5TO3GU4e3SV93KhNR/W85cuAZ5XfY
+         u0OL5DTbFBZrHegVpT241cla9w7GpD7QJwD2dlKSnOOSqBKOIYN9hlzc63uWr0SPR1xj
+         dd3N0GEsC5j2/tPzXBaMSn/nR5DjQuJlHL2aVhcNHBVMEJb7qb6gHWrbOitfcTbMo3f5
+         Lygw==
+X-Gm-Message-State: AFq9FYJEQmh2LnqeOLcuypDiVROgRLOwH55ZxNENH7AhpXhP4ztIAiXY
+	Q+gJwBTJn3PwKKtyyXOKSTKY6Lh6LwsoMqldge+YVN+1n+4D7PlT6zPC0/5Rcw==
+X-Gm-Gg: AYBFou2fbcM/BOmhnbU68rfJgvBpg17cpwJVHlfhUrlJrpt/b+1QdxOkb/E1pGAbDCL
+	PQ53150jf5JfVKRUPN+Tehnq8WBp7Y7iGHjnsmItROfK80FNe1xpSKlNp8vlB6pUdYer3pudYtV
+	2usfnxqfdyKGoufNcqLV31P0ToaL13WciWNH9JLVRWIFJ0ymUEXMwPw0di9QRyHf5e6pooUYxZd
+	kovq9NUxyCifGnbMUG4HjI4gJi5+6StUgobb69vp49xw5oiKviiTjiAPQYWlTCXtO0HawCC3wfz
+	RY8tquu3JUU5lej+UYceORnMzXqRSt0esNok3wAVnsScvgg2UbEt4TexSkVwWM3k+xO/xtuk2yd
+	T0ickH2o8vgA8bfTDuWGuMp/UN/RoVSOPqWaeSD8ET86HEyZy11LviDVWo809PmDo5XMVjYCd1F
+	MdcGAyO5qq3w+1Q1ID8Lj76NFLLbs0tkw3y+UORhehQzwLOeU1aM8lBnPdq2916KsvAr4gQfJ08
+	rBn8NM6gzFD6D1uCCuSYMlMNl9+QhHj1u1cNcPYgU+/xb2gVOt8kTxtmCXHL00ADXv0jmr57Hl2
+	9ZPTLrU+MjhvQK7UOj/tXYZ51PxJM8swGD/9Hfyoy/B6WIXGk5FIhBfcA4n4wTUyAzPKQMnLizV
+	JjfvHzGj2Fhwd6G5sJJSGMHVP9w46Qs6LiycIgk+6YLyuAhSPV+IL4YhqFTk859BM8oF6rUxr7H
+	41A88=
+X-Received: by 2002:a05:6102:5126:b0:7cc:22f0:830a with SMTP id ada2fe7eead31-7d07262fa72mr1936693137.8.1793395786294;
+        Fri, 30 Oct 2026 14:29:46 -0700 (PDT)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.44
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 14:29:44 -0700 (PDT)
+        Fri, 30 Oct 2026 14:29:45 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 02/10] tools/test-runner: Unbind virtio devices before powering off UML
-Date: Fri, 30 Oct 2026 17:29:31 -0400
-Message-ID: <20261030212940.753771-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 03/10] emulator: Answer the time of a guest with a skew
+Date: Fri, 30 Oct 2026 17:29:32 -0400
+Message-ID: <20261030212940.753771-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261030212940.753771-1-luiz.dentz@gmail.com>
 References: <20261030212940.753771-1-luiz.dentz@gmail.com>
@@ -101,77 +101,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-User Mode Linux unregisters its virtio driver when powering off, in
-atomic context, where removing devices that sleep, like virtio_bt in
-hci_unregister_dev(), triggers scheduling while atomic bugs and, with
-lock debugging enabled, an endless loop of warnings.
+With a skew, the current time of the calendar may be ahead of a guest,
+so answering it as the time of an interrupt moves the guest past the
+events it requested, which then run in its past and make it panic as
+time goes backwards.
 
-Unbind the virtio-uml devices before powering off, so they are removed
-in process context.
+Answer the time of the guest itself instead.
 
-Fixes: a7e9a42a791a ("tools/test-runner: Add User Mode Linux support")
+Fixes: d7ef45305b15 ("emulator: Add time travel calendar to btvirt")
 Assisted-by: Claude:claude-opus-5-5
 ---
- tools/test-runner.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+ emulator/timetravel.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index b4947f113607..0bca31a46351 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -232,6 +232,39 @@ static bool is_uml_guest(void)
- 	return uml;
- }
- 
-+#define VIRTIO_UML_DRIVER "/sys/bus/platform/drivers/virtio-uml"
-+
-+/* User Mode Linux unbinds its virtio devices when powering off, in atomic
-+ * context where their drivers cannot sleep, so unbind them before.
-+ */
-+static void uml_unbind_virtio(void)
-+{
-+	struct dirent *d;
-+	DIR *dir;
-+	int fd;
-+
-+	dir = opendir(VIRTIO_UML_DRIVER);
-+	if (!dir)
-+		return;
-+
-+	fd = open(VIRTIO_UML_DRIVER "/unbind", O_WRONLY | O_CLOEXEC);
-+	if (fd < 0) {
-+		closedir(dir);
-+		return;
-+	}
-+
-+	while ((d = readdir(dir))) {
-+		if (strncmp(d->d_name, "virtio-uml.", 11))
-+			continue;
-+
-+		if (write(fd, d->d_name, strlen(d->d_name)) < 0)
-+			perror("Failed to unbind virtio device");
-+	}
-+
-+	close(fd);
-+	closedir(dir);
-+}
-+
- static bool find_kernel(const char *root, char path[PATH_MAX])
- {
- 	struct stat st;
-@@ -2213,7 +2246,11 @@ int main(int argc, char *argv[])
- 
- 		sync();
- 		/* Rebooting User Mode Linux starts it again */
--		reboot(is_uml_guest() ? RB_POWER_OFF : RB_AUTOBOOT);
-+		if (is_uml_guest()) {
-+			uml_unbind_virtio();
-+			reboot(RB_POWER_OFF);
-+		} else
-+			reboot(RB_AUTOBOOT);
- 		return EXIT_SUCCESS;
- 	}
- 
+diff --git a/emulator/timetravel.c b/emulator/timetravel.c
+index c1938ed23bdc..be70acd3c10d 100644
+--- a/emulator/timetravel.c
++++ b/emulator/timetravel.c
+@@ -461,8 +461,14 @@ static void handle_msg(struct tt_client *client, struct tt_msg *msg)
+ 		break;
+ 	case TT_GET:
+ 		/* The guest takes it as the time of an interrupt: the current
+-		 * time, which no guest is ahead of.
++		 * time, which no guest is ahead of in lock-step. With a skew,
++		 * other guests may be ahead of this one, which must stay at
++		 * its own time to run the events it requested.
+ 		 */
++		if (tt.skew) {
++			send_msg(client, TT_ACK, msg->seq, client->time);
++			return;
++		}
+ 		client->time = MAX(client->time, tt.now);
+ 		send_msg(client, TT_ACK, msg->seq, client->time);
+ 		return;
 -- 
 2.56.0
 
