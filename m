@@ -1,85 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793346407;
-	b=2hjVRMX4AtQXR6bl433u8hetYxmR3JSLWF+7VqCrilwY3C7oB2e8rI2h8pmN5ZCsSghS
-	 URGyO1BovJHIaX7oFqsbvlNt7+6jZtcfATObalt1/sqoI4Nr8pyuO+pvsfTj8oYGi4/Cq
-	 TPlDiT9KfVJDDtKGE3xA9wZKtW/c3mMHJdfG61L0KXaBNVMWs/UQQJdLdQnGEFBOuNSHL
-	 ctfqOOHEhMDEZqftgO506EntuB68XV/CyV5jyg44qdfU2SUl8oCFh8cc0y/UdUUKXDlku
-	 OxufWcJOtHi60FJ4xFA4plEKjxOHmVc2qZDjWdwmAaCzO1LD3vvo4ZtwB9hvDj6jFUw==
+	t=1793351117;
+	b=KodvecEvyCEqPMl3p9zJs7rJFL+0/kLi2x1TTXgwH1PK6JPanKp31/VPZyqewrWOA+fj
+	 oGn32i0ODfkbxvJxmvVpBgZc82RW682lri7IJ8JxNxv6VEzR5xxQvgvxjvkpyX4MgMmOC
+	 EyqpLTyd6JGaOoqgV/KPCBmtELA4ZXu6qjrHGcytxN5suFnnUv6nii6YyYJy1LQ9KbA9I
+	 Scz5Yz6X+MHuR4EVFvqdCrsFE3EmU39R7+Z3PkH489x51rQDV5QxrVwQ83FWaoHqeeSr9
+	 HAt7MSnVZhsGSJE5ERQ42hqgO0LNuUWJzucLMzfkuwCTHb7KYRSz2irQSDa5grnPxew==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793346407;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793351117;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
-	b=q+/nooSEQQmyGCNh58n6nwUn5Ng61X8wX2XAY8lFHPAZrtwILzEoyA4BSP2Rz7Ifm3Oi
-	 f8D31zZ32AkOX6QWDaxnuBCVqiB/Uy/QH9Zvwm1tlstjL3SvkkG+AFq0XofVjWa9G+SsO
-	 TmRwnOsYKAzHl5+/dPQwHphWTI+ijLqlZJydPW/hHXOQUEp0WiTMDyv459ipwDAuS/Yqw
-	 sHenWGiphZ5bDAhhQN06Svzy2zYUjqmHf4ysvWX4tKWPVl+T3E96/ytObd8qIJvoJ7XmA
-	 hRYkuNjjae3o3iiAXFD8ON1J+MFsZ58FiXwAUNcUlYn/tT7PavtBk/QIwjME4n04exg==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=iLLJ7VSWkfT6blOLGIaUD9z0kVz6HbaoViZTdSH2puA=;
+	b=ujI3oRobLujtAIvIStgjDnEl+ICThnD+80fk7y62u+Hz8opasjzgy54y/Dc4jUxI3m0t
+	 F4mWr8rzDQLEZ0dg5Ki6dpBu4Sv4KaxNk8Qx8ehU+2AYeesKC35/4zEu5Xa2jF/Spic3E
+	 LsKBsS6sDnbuvFAFFS9OpNFQmmCVXYVS8VcKP6eaXrnlNaw8DXtoxERwToT6raAJxlt13
+	 SpnHJNjf3hmC3VeFyhLEiuhMdYqUtDVdL3Crtwo8hz3RVv2D/HC1ziqHtOSk3QULGshgT
+	 go5p84N4Q3HjgsBkqvaRnQMBshcE/6krenf4AG5rMaOrwAyADDwL2Q0OEvjOYEkWTQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nd1Gd4ss;
-	arc=none smtp.remote-ip=209.85.160.44
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+	dmarc=pass header.from=teenage.engineering;
+	spf=pass smtp.mailfrom=teenage.engineering;
+	dkim=pass header.d=teenage.engineering header.i=@teenage.engineering header.a=rsa-sha256 header.s=google header.b=VqXIuuj2;
+	arc=none smtp.remote-ip=209.85.208.54
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFE0606A31A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 07:46:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DFE0606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454A1606A31C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 09:05:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 454A1606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=teenage.engineering
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=teenage.engineering
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nd1Gd4ss
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-49e08af5fd4so187740fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 00:46:47 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=teenage.engineering header.i=@teenage.engineering header.a=rsa-sha256 header.s=google header.b=VqXIuuj2
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6b2237b596cso875741a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 02:05:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793346406; x=1793951206; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
-        b=nd1Gd4ssrxk2AepEg7+Wf3QpLA/IxlOf30Feg9tCwgdE491aJQjIxtSMPlMC63x0M/
-         gEb6iYBzs7z8/jJCtr4ed4xHclxY29W1VvJPluZABVaq/dfwxeQe/SFCGCYb/n99teDd
-         aM/DJlXSGOmLyizTf1oEllCdiVFBQnK91kXg6qOWaBo+FbqAiPhDWVHi3PJOcOBZVCLY
-         rkQAIyEsmSOgWPPoDV2TOpnoT41q6rOzLbaBGHc+Pc2n5rJytExJW+Is5B65sKSsWtRr
-         uR6prD951q8Q6nzB1vfvDXqWH7ZInCwA3okmiIEWZH6wuqB/TIqSCPEeeQMUEcfNYHdy
-         l+7Q==
+        d=teenage.engineering; s=google; t=1793351116; x=1793955916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iLLJ7VSWkfT6blOLGIaUD9z0kVz6HbaoViZTdSH2puA=;
+        b=VqXIuuj2P0mHXmynp602Gc/vtl4EJ9aY5JUC3/sOTrXpkRQoDjz4R+ObcwvTB6Urea
+         K9lKRG4elFjG8Qmj5+ttsy9lT6KvKpDAa4OALgZpe0xfCs1Hsob/2e2yIlvVk9Orh4vX
+         qlvf8thRqMLC/fkFyxzksA0vWQopWfv9HSr50=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793346406; x=1793951206;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
-        b=GCAlMaxMW/l73u6LE/2o6FoGNHS7q1VBEfB4vX/vCOKgL8f1I6CgEKoQvEOEK+V7QW
-         n+w4hhuKStU+go1ezlzGCtdoq8/ghPujYsfW7n61oXyNP6bVwOXVn/CsFe3d3YaF4fg5
-         eax/4iDxVJkZtZHE2TR9RtYtcH3K8eLTIrP60us4yWgr2rfgxaAneQD6W6fgbG2Ynyke
-         PB7bDSNT9ljW7K8eqxRZNI8aM2fGvrgp7P56mCNMksbkITTRhvVngtroxKoszybEPMlQ
-         NSaamRYgOV0VfNBUKYGZSkV3gv1P5ZhunBsQON/YSuPLd7R8r5VDk/c6j6rzZaKLT51T
-         qWYg==
-X-Gm-Message-State: AFq9FYIKOd1JufGWUpxVY9XOYjHJck+58pCLIA5vwHS70r43xabGOF7T
-	txtX91dpZg7HsITIP/wUcCmHSGvHs8cDYpGpR5A1/bZNC0XHCe+dAMMh1VmoAQ==
-X-Gm-Gg: AYBFou33Dl9PzObd9iTjG5PDtJf+WTgtCYrRFJLNJDjv0sRZ2mFT/84q/fVG+XSr4af
-	sYrOmTXzzE7nsNhUGrDepo4x+mST582vM5t5euUQypxWDfzcOTTWL9FN4RMXsI0hol0oCyXWJwT
-	3aX/lEo/AKEe123r6fMqPbQMBtMdX4K3j8r04KfOeEaQ3uap9iCqtdluQJzUwDHLmETzpVZlWcS
-	JLHGjAb66rLFXLSNgnPkjZRCbjTO+i0ZhdaWuVLSUF/WDYq4MGkomIrmFTADTQDVOkL25LBsHYn
-	bXAGLsde5Mzgqutkmzm3Yw+QDz4qLTMdZCDVvHy17W3xaf2hN4O+KsU56etGZnLCOqym/y019RC
-	fHsJ+v6qG82jvhJVAdctazhMy//xWP7EpcAX9CFqszWow0SMSO1k/zGTSuXkJxQ8wj8/4lU5yQj
-	G8xrNMUbgAclakw0TY4uD7j9coY5YujMHttruLNMWQNHODUYWt5hSQFEMFeFQNdjiI/CU3NbOld
-	1SHM+b8BLu4kZ0ZmfPVDDiabNN6J1u3wBL8G6lbxuDTkqLY5qSGI+sy/hCTWplA5Bi4P8gfhay5
-	PmhsX4sFMg==
-X-Received: by 2002:a05:6870:d3ca:b0:4a6:942c:7b05 with SMTP id 586e51a60fabf-4a9076f991amr942817fac.32.1793346406164;
-        Fri, 30 Oct 2026 00:46:46 -0700 (PDT)
-Received: from [172.17.0.2] ([52.165.250.243])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a90afa9d31sm1160932fac.16.2026.10.30.00.46.44
+        d=1e100.net; s=20260707; t=1793351116; x=1793955916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iLLJ7VSWkfT6blOLGIaUD9z0kVz6HbaoViZTdSH2puA=;
+        b=nUt+amaP0eyvBBFczom/yLXJfA2lmK4wZuTwbqNKz9e2Ku+XFoSOlGcV5pBlukaxN5
+         TxjfQEHEFO5c/9G80fTefLTq96fFOU8ELnzTb6p3htI8UbynsW2YYOOASGGaJznT5xCL
+         zX3oi7oGBcct1YqvUUxIUh3kSnyxMNW3gJWK2Nh74DEsH9dpQ60NC9MQVJuj1wUCqLE8
+         TdI7qy6qrSIABeChf+do+RGpZ5/BhkQ5CwvU+UJxQP3vuCAS7OquqHd+I6G/fk8/XvQi
+         enalcycaLH+4ngQihoXEcl3MHMXDR9EQ9NrEi5Rj1jxKeuajDzhSTjoaSnQwoKksihvw
+         i8ow==
+X-Gm-Message-State: AFq9FYKhdLVdaTM1sTk3bnUSG6dYlklgpKMvUp0B5k0xfngPEe+Z3b7B
+	ukg8C7zyY9W1Ql0lRwa7/SvaMadeUPPYIew83UYkls5W6P+HvMsjcz5mqRWSCYvBbiIeIcXFOow
+	A0iQNmg==
+X-Gm-Gg: AYBFou02zJ4GMl3De36vUSGnEWlw3eMvP56EK8QQfzD/JlP+R94bQcqWNNj+tyPdeGr
+	lDU7lbf+hd4UWeNfv9Himv1js8YL9QFnZPZapWenMVpEsztGDoHMxU6jg7OTrd/tSx7Arv/ipsG
+	/KO+4q10QXkeY7OU1Ufp9vDo1zli0aoyc/SyIvbeMvpBmWyYt0VLzSUFWRk8XsQTBymLsM0Rqo3
+	gZLG9qh3Dr3wi8PSs3vvecT/3sO5A621H4k9TcwrS/v4E7yPa/d4tenfAp9FggrQz+2Q1Zwe+Ba
+	QbZ3pGIKlBKpopSUgY2DBIZ2c93fv11eyrZbVY1HK3cJope/jLOwsjO0Hlp/v3S8wFTQw4SU4bo
+	pHU4OM0lxK0jPMW8Zb7mIU3mQVuwPIrwbnJzq/4WkCTubhJ5mNlxASp1FfEwztk76jafZgJsXM+
+	TLVGLk8UP6R2lx8D7YYImj+dDEmLthXdpl/YdrurFiBIPa6iL5NQn28BzQXTJfdxTOcebu5BE7u
+	iK0y5wsyjdfVkxO8qlanmiUklhOWSb0+U5wJX0Dlks5Tc7r1jx+YulCpnR+TYsnb2y80dV7suRE
+	dly33P/3QteHqOAXl8VGV7dm06sV0tm/Yl1RsamA3sGtxkqF5L2w4V3uoHaQVF/tQGAYADDzp8b
+	m2GcCxxLg0oXKFJBkn9qxBfyHXV+xqG8eJf1Rh+8=
+X-Received: by 2002:a05:6402:789:b0:6b1:8316:ba32 with SMTP id 4fb4d7f45d1cf-6b4d46754a6mr800229a12.17.1793351115745;
+        Fri, 30 Oct 2026 02:05:15 -0700 (PDT)
+Received: from jacob.localdomain (c90-143-204-146.bredband.tele2.se. [90.143.204.146])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b4d7a4eac5sm393459a12.5.2026.10.30.02.05.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 00:46:45 -0700 (PDT)
-Message-ID: <6ae44b65.99d0dbd8.1d1550.9a8c@mx.google.com>
-Date: Fri, 30 Oct 2026 00:46:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2591991551520612711=="
+        Fri, 30 Oct 2026 02:05:14 -0700 (PDT)
+From: Jacob Siverskog <jacob@teenage.engineering>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>,
+	Jacob Siverskog <jacob@teenage.engineering>
+Subject: [PATCH BlueZ] audio/media: Fix build with --disable-hfp
+Date: Fri, 30 Oct 2026 10:05:10 +0100
+Message-ID: <20261030090510.88867-1-jacob@teenage.engineering>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,39 +91,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [RFC] l2cap-tester: Check compatible interval preferences
-In-Reply-To: <20261015044221.55631-1-cochcoder@proton.me>
-References: <20261015044221.55631-1-cochcoder@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2591991551520612711==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The HFP MediaEndpoint support calls into hfp-hf.c, which is only built
+when HFP is enabled, so linking bluetoothd fails with --disable-hfp:
 
-This is an automated email and please do not reply to this email.
+  profiles/audio/media.c:242: undefined reference to `hfp_hf_sco_remove'
+  profiles/audio/media.c:1467: undefined reference to `hfp_hf_get_device'
 
-Dear Submitter,
+Guard the HFP code with HAVE_HFP, as is already done for the endpoint
+table entry and in transport.c.
 
-This series was picked up by the CI more than 2 weeks ago and the pull
-request created for it is still open, which means the series was never
-applied to the tree.
-
-   Series:       [RFC] l2cap-tester: Check compatible interval preferences
-   Pull Request: https://github.com/bluez/bluez/pull/2682
-   Created:      2026-10-15 06:39:11+00:00
-
-The pull request has been closed and no further action is taken on this
-series.
-
-If the change should still be considered, it must be resent to the Linux
-Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
-picked up again.
-
+Fixes: 89b91a4806fb ("audio/hfp-hf: Add MediaEndpoint for HFP codecs")
+Assisted-by: Claude:claude-opus-5-5
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/media.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
---===============2591991551520612711==--
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 34ff251c7..abd3cb992 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -238,10 +238,12 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
+ 		endpoint->pac = NULL;
+ 	}
+ 
++#ifdef HAVE_HFP
+ 	if (endpoint->sco) {
+ 		hfp_hf_sco_remove(endpoint->adapter->btd_adapter, endpoint);
+ 		endpoint->sco = false;
+ 	}
++#endif
+ 
+ 	g_dbus_remove_watch(btd_get_dbus_connection(), endpoint->watch);
+ 	g_free(endpoint->capabilities);
+@@ -1457,6 +1459,7 @@ static bool endpoint_init_asha(struct media_endpoint *endpoint,
+ 	return true;
+ }
+ 
++#ifdef HAVE_HFP
+ gboolean hfp_hf_set_configuration(struct media_endpoint *endpoint,
+ 					const char *ep_path,
+ 					media_endpoint_cb_t cb,
+@@ -1514,6 +1517,7 @@ static bool endpoint_init_sco(struct media_endpoint *endpoint,
+ 
+ 	return hfp_hf_sco_listen(endpoint->adapter->btd_adapter, endpoint);
+ }
++#endif /* HAVE_HFP */
+ 
+ static bool endpoint_properties_exists(const char *uuid,
+ 						struct btd_device *dev,
+-- 
+2.53.0
+
