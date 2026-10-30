@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793395795;
-	b=lFPkIXipt2pJ91u26ceV3TOEDt64uwkkS82RJo6MR6ctMx7BbzhJ5tN/fBHerKSXsdWq
-	 1blorBmDpJ7s94cDNU9p77XdC4uvvzB6PR3/2NPAh7SEWwytK//xBwdLDeEGa6/O94uru
-	 0wi4I7BfNq4wcgekQy+JNPuMcc8pdrDy8JD8H4IEysnj0b4TBHFjsAgtYIv/n45dkDQWE
-	 i66xZSJ52igl5dCY6nIBM0AIX9acKEftHr6Rb8PRC6KIvG18BjszCA6hFUq3RPFjjQmD8
-	 Duq8weXzS/1unQNSBkVFt6qJIOqWfNZrgaInfc3vxnaiDfFRmK3W71TmfVa7wNYoCQA==
+	t=1793395796;
+	b=3+Rk99qxxE9QHZva0suzr63kgwYEco2VFgpI5AyI5IUmL7LPbYBflchQyArCJpzC/sfj
+	 Si2elcy0oWvf+4PkqUaFnEUQHQ/fwsaNZQ20IK35J6VW56NIgdFN+S5OQ2bh//nO2BBNP
+	 UsRvX8nUDmD/YCahn2KLnP/xuXtGMcz3pNdsWSbNi16cJU1fRbEA3CoCnKLC4f8Uy2SMo
+	 37hPDlWaF8eRBEuEXkNq95t8XXqTgOAkB1KWDsDQcCPZ2YpsgBKGLdxRbBxsJq8NoEPkC
+	 m316+hJAMj7NTXW5yMFYuyIQ76E+1RnKnqJCiUc3IoRWGloiDph5cepxldzDciHYK2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793395795;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793395796;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
-	b=LVRPTnSTZQf+mLSjaNaKStq9whiCaBdoFLSQqV4hqUv6au5qHC6uaYX8s2RzoiKnho5Y
-	 riVf44TO64uQGzZqINBVGAPZx3ndlcvf89mnGTeoFfHS/+K7qzMFciX/Riv904otQmHnb
-	 9VT6m9Py2jLAD8tTM/4H1MqSdjhIiXWvX3K2nNJyHDWwSPvgVyIXXpouf2dLuiI7gPbVG
-	 zTuEibN6nHDsfHJZx8PUwTItcjUh5EYLsoFDr5sZT0P0PyARfNA9RDTbJMBcyRUGL8fJE
-	 LpGfHsgek+sowwukGj8QfUyThFeJAJHw6hyyqwO/r0ueqGY44kOr08A2kbzJOHZ4ARg==
+	bh=dJ2rtA3hu27ZwbilLN6OD7ndPd1ir8BnEoi4xiDtz+o=;
+	b=fDZ5znGqNO6lED+PLlYEdhCh9yosY8OUUI/s0Y6bcx6WZTmRBFi5vjwdzkU8nGeNhgyh
+	 fyOdM13/Top4SPxQVRbNe5pX3J2OJ8005nXsCD2WCaT9HPUQGikQuUGRzcv88GF+7GR+x
+	 dJXizabgPXmyfCsTi+7/5DRyj35dxLHN7bSJ1opmutN9c/JfRZt+yQnbVhS1WGogOfZL7
+	 R/7vofVf9Dn1F8WifV1V3Fk+5QByYHXxDbQ21FYjsIv2ne6xdVmH+rWlYVY6XlfOTbAUA
+	 nFdD2sC2Re7lftBTfAPdWcejCu5VTCShQRMMYX2+LN5qYdC3xH0lUDBAAuZr6XtarsA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j8CRlR4J;
-	arc=none smtp.remote-ip=209.85.221.175
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ffV3pvQm;
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59E0606A322
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C59E0606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648AD606A31E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 648AD606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j8CRlR4J
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5eac7220e9cso481275e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:54 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ffV3pvQm
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5eafb65e169so820513e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793395794; x=1794000594; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793395795; x=1794000595; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
-        b=j8CRlR4JRa/wbqB1LdwKqfzpk9EXeqnCurRf2NWTp3jcHkASYO/1GHBurRjfa9AyFs
-         xvaeZjkCg9u/j4xV80UEEWqhQMGVnolkD79kKF3WBstFUd0tS9THNRXyK5ic4Aa8Dp8R
-         ZV7aAWHOMgKXVSDqsTV/owtffZjgMcOzQazQaSNp6lww880NhzNFUIX7ZAX6xGxhWjTb
-         m3bv3ihsmJgqn7enHnqwEayXy5J75tdKk+aQofxSuIIdI8m57ipLctJU8syRcacuXhn/
-         EWTi/nbV/XJyntgraw/ry8miY7BjTBGOqwd7yScf+BP+fiJNBUByalC6gaXadV/Ody0H
-         nvyA==
+        bh=dJ2rtA3hu27ZwbilLN6OD7ndPd1ir8BnEoi4xiDtz+o=;
+        b=ffV3pvQm26llryNsmrYTNrM19H/uRXqXDlhyzwJwcAjk6rRu1qm/g8fuTZ1j8gG4s9
+         0FHnYypm1Tf7IwUleA3KSOVVvWe2AGMX+Nb0s8U6P66nQG7nyhPlKUARKZN7gSz75qrp
+         EtuDSEqlPSITX+hvzNjeSIj3Idgt2uFOZRu9B76oFlLnreaKMWaHWUAVMH9Bgtgh6vkl
+         8T1Aozvrdy2adWsT31KrWNaGq+gU1w4T/TcBklqqNE35VbABdYmz1fvzRcI5LmEmWfVJ
+         mCEOEUSrf0B6xsK0b8eMgOer6Qeugdew8QO9P6bua9YX96laXL8OnwX2lqfLyuBMEKjy
+         ccbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793395794; x=1794000594;
+        d=1e100.net; s=20260707; t=1793395795; x=1794000595;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
-        b=lynzIvu0gN2+9Jgdu3Bn1unUOFMZxdNCgATEsPLMtu2jdgj3gpZ24kPKyaDFzRFDO9
-         x8wMcHUZv3lAfcgfW3deXd20SB46RRb1zOhu82WO85acfPKm/zBn6xVZcmUV34zHKzFd
-         6AxdbFhV6uiacCUGTbTvTC7oY2PmNQpSHob8k1YoJb7NU0QBvRupq63nK4Wdr69GcYXn
-         9mShFGQ8rE4U4zOMad8yHyzXQivL8Mz//4DXCijIpar3yqr3jHA1uc0/HHpgdf8c5IU6
-         RPJtRi6cA4KP/wrjWcYnmqWdofakQvJSDLE8w4JLc/B/dnZkHbzFsHfuJeLTgPBE2hhD
-         AXEA==
-X-Gm-Message-State: AFq9FYJL1n4LGyxQjZzA/SnDYW/pchFq9kHtfzEgM/X8XJD904WJkMut
-	91LxFSR3zOoukJF9uDAMzv4PX8mQ5mEFk86TE6fweJCraFAm5FO+EfsvbcQUFg==
-X-Gm-Gg: AYBFou29HVVhw/GlzYkbijbA6eB7oXoi4LIC6ckOOWujRNUqPXN65uDQIbouK3JYa/f
-	CyYKXCLK2Kib9GkzUwe31doCG9aYZLk34eNnfnlwVBxMQ12khnfYARm2/kGYh4zY87Ui6wZAIPj
-	IdrgUqtBjgCd+SDNJZzTTY12d849MgA4waWWzB3jMX4CXR8CNs6n8oJ7YR3uvofqWsgfxMh4ScI
-	CxBrvXGs02GUDxdInnKmvhpnMxM7WAsyXqMS8F+B/GPvuhpbC2dQ46/q69EyxFrv27Kee6Uy4Ny
-	zSvlzO/6jaSj4neSQE1TtxjXGuwXWdOckMv4glWAcFSEZn4JklRhIPA4gxmFEYvvBeWJCbGomMw
-	U5fbPXpLbAdp4rj8dFiH6Dj9c6aecqWDEhU0oIYg08C+Zydch1QMmvbcuus++8gDMCq49N70p+t
-	tF8HszRlduzcAjcGMpfTOejmjNnmFlSRc7F++qE6D1cDnhbU1hYfBry7O+IX2UVYzFLo4E8sIFD
-	iK2O44gu5NE/5YSaSRf0UhJUf4PobOpgddlh1Ky37OpBQZXudrXgTjbOHbsvzT+K0Ot6deCMEFs
-	leyT0sCDTUfPewL8/5sVJ4irgsX3e+hBb+NFY6dKAmIo+w3PRzvXAgm8ilmLfxGU8GCV+JbSb3N
-	TF4A94Tln1CEJR9F+qkWL72g+U7mgJlnFuktHdLkSw3zKlLQXCJAVb+eZGeQjBXWJEa513z8lvy
-	CyVs8=
-X-Received: by 2002:a05:6122:512:b0:5c7:a9ee:dcfb with SMTP id 71dfb90a1353d-5ec68718ff2mr1871528e0c.5.1793395793860;
-        Fri, 30 Oct 2026 14:29:53 -0700 (PDT)
+        bh=dJ2rtA3hu27ZwbilLN6OD7ndPd1ir8BnEoi4xiDtz+o=;
+        b=lyqatzJKRpo8k0d50igvEyyKV/LCh+/r+0SdtEl6/OP0LnoitS6CL/BdLj1DETvJqp
+         Blb7UYhYceOHezvudADgb5YM2dU+ZFbSHn1K0FMuA7Ky8+2bB9xRo72X0lKhMZbnNQ6k
+         8lF+VrASeXbcRXH1AVXA+aTqpetiTbctSwfcnN/yw9D+9CTGON+oeUvxl8Bdu3lFd7Io
+         Eq7YGzizsC0CVwIxSV5bVF3QVaEBswafruG67foYbNII0kMssG5XbxJN9mwIwRI/QtBw
+         E6cxlOoTWJI6N04Sy0CN+7o/5Gh0MGySTGyiI73Yp/6nR5GF1K3U6iveFZGD/OKq4alV
+         LxZA==
+X-Gm-Message-State: AFq9FYIYLNZR6yNm95591rqcRsxip/EGkAB0sNfRMCzN5a9cUpHg+AGt
+	hELJxx1RXRt9ACvHj0DEN94UcSVG68W6jqstt8mDaU34d+JyOV+E1K1U+ZTI8w==
+X-Gm-Gg: AYBFou0CyVWDWEHY/5BxxFw77T840AHPw33lvVIiqAE1nk/wPJ9yiRSdBwUf9snviJt
+	6v1niKVZGZEkaYK7ddt79T1WKIpxKOGJj6f3RuIwRm+x5qjHS/51SCTUmHxe+hcvo7hX0r5n6dY
+	EeHSZG+teZcCKivJFyTPcGnKAzVlPCSwatKRPIQ1n5womDsg3k/PUQT/7qpO4rkduY/4HiXi/zi
+	PO6CTvkZVrJZUQ7TToEOLIAJf2Pxr4iKSxpwixc5VETP6AaEIUh9/kL8lxp3KHeKmx+mbmxt1GC
+	YAtXnD1nMUM4Msm1COVffU2ZvsxgoIgF8mSNL4O6xG+F51P+H9NQPY8DyKmqt6AMDYvYDwq/xq0
+	1eQpdlbRzR2xYkgUseSR2Z4CQIg35HsJjDi4COaGJn3zf7b03B+5uGlYqIwpD5HP5UneS40UaIZ
+	GZmI3JU7NT/k2a7AU1+V3v2s1gerQQVzEhEMj5dhPzRemRmTMjB12h0/uhx464Myojf1FCuocpS
+	KUPLeKTFAU18+LoobM0BkbaSk7SzKeod+G08qL15TRKwEb5pP2+2twZvMGj4QZ2reDrfnDkoYun
+	mj/KILm3zpNFEhiLm3nHnI4XCvkWutEuUbH+Q+xpUMUFJX2hC8bd1rrBxGtar93WAjPNiPUbjfT
+	5f/xRUsx7AThObBvmH2bgMKKvkLj+ub6HLUR4Uxtqr0uI64e5Y/bE9XatT6rVfhC3w4YiWptQhd
+	nDRKdk
+X-Received: by 2002:a05:6122:3284:b0:5ec:a9e:d80f with SMTP id 71dfb90a1353d-5ec6871c25fmr1967376e0c.8.1793395795452;
+        Fri, 30 Oct 2026 14:29:55 -0700 (PDT)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.52
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 14:29:53 -0700 (PDT)
+        Fri, 30 Oct 2026 14:29:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 08/10] a2dp: Fix refusing the AVDTP connection of a new link
-Date: Fri, 30 Oct 2026 17:29:37 -0400
-Message-ID: <20261030212940.753771-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 09/10] adapter: Don't cancel requests of a new link on stale disconnection
+Date: Fri, 30 Oct 2026 17:29:38 -0400
+Message-ID: <20261030212940.753771-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261030212940.753771-1-luiz.dentz@gmail.com>
 References: <20261030212940.753771-1-luiz.dentz@gmail.com>
@@ -102,93 +102,100 @@ Content-Transfer-Encoding: 8bit
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 When the remote reconnects before the disconnection of the previous
-link is processed, the A2DP channel of that link is still registered
-and an incoming AVDTP connection on the new link is taken as a
-transport channel of its session, and refused.
+link is processed, e.g. if bluetoothd was slow, processing it cancels
+the pending service authorizations and authentication of the device,
+which then belong to the new link, refusing e.g. its AVDTP connection.
 
-Process the disconnection of the signalling channel of the existing
-session first if it is pending, so the connection is handled as a new
-signalling channel.
+Check with the kernel whether a BR/EDR link to the device exists again,
+and if so don't cancel them.
 
+Fixes: 5b6ffe0381e8 ("adapter: Cancel the service authorization when remote is disconnected")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/a2dp.c  |  7 +++++++
- profiles/audio/avdtp.c | 24 ++++++++++++++++++++++++
- profiles/audio/avdtp.h |  1 +
- 3 files changed, 32 insertions(+)
+ src/adapter.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index cb1b3a9804e7..3b29ec204d00 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -2796,6 +2796,13 @@ static void confirm_cb(GIOChannel *io, gpointer data)
- 		goto drop;
- 
- 	chan = queue_find(server->channels, match_by_device, device);
-+
-+	/* The channel of a previous link, if its disconnection was not
-+	 * processed yet: this is not a transport channel of it.
-+	 */
-+	if (chan && chan->session && avdtp_check_disconnected(chan->session))
-+		chan = queue_find(server->channels, match_by_device, device);
-+
- 	if (chan) {
- 		struct a2dp_setup *setup;
- 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 56d27b973a17..30f80a0c2fd1 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -18,6 +18,7 @@
- #include <stdint.h>
- #include <stdbool.h>
- #include <errno.h>
-+#include <poll.h>
- #include <unistd.h>
- #include <assert.h>
- 
-@@ -1168,6 +1169,29 @@ static void connection_lost(struct avdtp *session, int err)
- 	avdtp_unref(session);
+diff --git a/src/adapter.c b/src/adapter.c
+index 3c0895d1e241..fd6746258f70 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7985,6 +7985,36 @@ struct agent *adapter_get_agent(struct btd_adapter *adapter)
+ 	return agent_get(NULL);
  }
  
-+/* Process a disconnection of the signalling channel not dispatched yet,
-+ * returning whether it is disconnected.
++/* Whether the kernel has a BR/EDR link to the device: its disconnection
++ * may be processed after the device connected again, e.g. when bluetoothd
++ * was slow to process events.
 + */
-+bool avdtp_check_disconnected(struct avdtp *session)
++static bool link_connected(struct btd_adapter *adapter,
++				struct btd_device *device, uint8_t bdaddr_type)
 +{
-+	struct pollfd pfd;
++	struct hci_conn_info_req *cr;
++	bool connected;
++	int dd;
 +
-+	if (!session->io)
++	if (bdaddr_type != BDADDR_BREDR)
 +		return false;
 +
-+	pfd.fd = g_io_channel_unix_get_fd(session->io);
-+	pfd.events = 0;
-+	pfd.revents = 0;
-+
-+	if (poll(&pfd, 1, 0) <= 0 ||
-+			!(pfd.revents & (POLLHUP | POLLERR | POLLNVAL)))
++	dd = hci_open_dev(adapter->dev_id);
++	if (dd < 0)
 +		return false;
 +
-+	connection_lost(session, ECONNRESET);
++	cr = g_malloc0(sizeof(*cr) + sizeof(struct hci_conn_info));
++	bacpy(&cr->bdaddr, device_get_address(device));
++	cr->type = ACL_LINK;
 +
-+	return true;
++	connected = !ioctl(dd, HCIGETCONNINFO, cr);
++
++	g_free(cr);
++	hci_close_dev(dd);
++
++	return connected;
 +}
 +
- static bool disconnect_timeout(gpointer user_data)
+ static void adapter_remove_connection(struct btd_adapter *adapter,
+ 						struct btd_device *device,
+ 						uint8_t bdaddr_type,
+@@ -8005,7 +8035,9 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
+ 
+ 	device_remove_connection(device, bdaddr_type, &remove_device, reason);
+ 
+-	device_cancel_authentication(device, TRUE);
++	/* Requests of a link that connected meanwhile are not cancelled */
++	if (!link_connected(adapter, device, bdaddr_type))
++		device_cancel_authentication(device, TRUE);
+ 
+ 	/* If another bearer is still connected */
+ 	if (btd_device_bearer_is_connected(device))
+@@ -9013,6 +9045,7 @@ static void dev_disconnected(struct btd_adapter *adapter,
+ 					uint8_t reason)
  {
- 	struct avdtp *session = user_data;
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 10c8f496b44e..ab5059b055ec 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -205,6 +205,7 @@ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
- 					struct avdtp_error *err, void *user_data);
+ 	struct btd_device *device;
++	bool reconnected = false;
+ 	char dst[18];
  
- void avdtp_unref(struct avdtp *session);
-+bool avdtp_check_disconnected(struct avdtp *session);
- struct avdtp *avdtp_ref(struct avdtp *session);
+ 	ba2str(&addr->bdaddr, dst);
+@@ -9023,6 +9056,11 @@ static void dev_disconnected(struct btd_adapter *adapter,
+ 	if (device) {
+ 		bool removed;
  
- struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
++		/* The device connected again before this was processed: its
++		 * pending requests belong to the new link.
++		 */
++		reconnected = link_connected(adapter, device, addr->type);
++
+ 		adapter_remove_connection(adapter, device, addr->type, reason,
+ 						&removed);
+ 		/* No need to continue if device was removed from the adapter,
+@@ -9036,7 +9074,7 @@ static void dev_disconnected(struct btd_adapter *adapter,
+ 	}
+ 
+ 	/* device could be still connected to different bearer */
+-	if (!device || !btd_device_is_connected(device))
++	if (!reconnected && (!device || !btd_device_is_connected(device)))
+ 		bonding_attempt_complete(adapter, &addr->bdaddr, addr->type,
+ 						MGMT_STATUS_DISCONNECTED);
+ }
 -- 
 2.56.0
 
