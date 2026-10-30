@@ -1,89 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793367869;
-	b=WgMaTpT2NtXljW2ITiKoPc3FWzmGfUVvb+0e5oxwhBOQkXqwhk/nOIrbfhFobV5OK42P
-	 jambSNnKv5Phc+7ALJ6s/T8w7wbTcckqGyYu6+XrikmfyB2n9+YvGWvzC44m7NpccBVhR
-	 ZHYECEDK+Vc0KklaCb7790+gcokkBVwJyYT7Yv0GNt1SSMVTXZszbPitB6/kV1dtMKQcJ
-	 eLxgFrWP/j0qYDJyFQZ9Qn+B80KsXcryOx1KJ0GZEU9zD9EjOPNJoZ7Q50SnkzrOwbgU5
-	 fA5QArSj3o1aZSrBmiLpwc0XRnBVt3VBljq5nDDoP9KNLX8Te86pMjJVEXta074c1Ng==
+	t=1793368808;
+	b=yFeviqOKhKcU5jy2ZfA/lvvIxGUKyP/ou03IQwfu74Jn7KGm2nO3H81VaFDonUHg1lJH
+	 P+tmIKS+b2W2BxFyi1hA1DdCcNxOxyrpDsJ9UhKMht9/vSwaj3Jh5+DxnWS/wPLjRpaFY
+	 4B1qxLvgkV09TrdzSkLF/yTr6WdRqVTAx0OSq+BRkrFjZS2l3tTZcx1wRcsMHycL6AhPc
+	 53vpw3fR64NFdFUUj8dkHCt/K4n1M11SJ5Cwak7Hn4wSTJsjGAgqyRDa8/kXmh7igw8+L
+	 nRpZFsesLW0T41GY/3xCbj2kqIwsVJfHtO2i4E/lAa9QC2BGnaQnbKkKMDZYDCZWOfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793367869;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=l5A4Rf9vYNsAC89purt1CgMvJ45V1kxpIPQzYh4toZQ=;
-	b=2t1GFJtgjqQNeiKU5zYtNX+9bp9gV49X/4A1Y9xg/RhB7DemEq5S4sppKd3Yt4u4B+ro
-	 d2YVED8JBt7dzibWrd/Gd8ImRAayg97/GgpBsIKBYUdXy4tdn2Dxv4bblgo3OusdTj2hi
-	 u0oz2CGtYkYKQnAYyoKOrjGKqzQijh7vmctritMnyGvBf4O/1IvSgtSzpDb21c+TL+RjU
-	 ZclAGNWhjEg9NUzOKJCcMgy9LQ8PrxErArtaraiEhkPPK2P3Ibj+cEb9gWKVZtWh6zxza
-	 3ATLDCPWWZ3b5OaGVpqgeabXJOzf50J34IWvslZb4buWAwv9eIR6wxmpZnXcz2fdBTA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793368808;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=W2xpSAbTLfSkk//6+2S09YfgmDNTg33ZJ0KqZmHBUGE=;
+	b=hicgzZPcuZSNzQXv6JbkLoRURsXMR5u7kqcH9DsWBFblUn/zceCyCTqSlp4JQmVB2UE7
+	 TTyqlnx9lbPz1SpUjyZZtI9RgPRYYBs16h/75fjrtO+EIy8fAHcWIsqyYHwZH3mtgeawj
+	 6chj6bjrRwkznuAmEf2dvmwmbQOpIIqWapDc4ilRlIjUprDivx+aa2qtew14OVKkne8FH
+	 nsaQA/DlKic5/XZT7nkxm54eLg5/Ign39435J55Ul0HnMUI4FcQyWvHjKNBG8g+3kAqVZ
+	 fcx0Wh+q/Ue+qYQ2n6x3bfp689pzA+3LcgkMsZDM9yYF8gO6lk3ZkWFBARzT+yBg9WA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VImjInxz;
-	arc=none smtp.remote-ip=209.85.221.172
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ATvCcXPc;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D800606A31F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 13:44:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D800606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC0D606A31F;
+	Fri, 30 Oct 2026 14:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VImjInxz
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5eaf169fe3dso216541e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 06:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793367868; x=1793972668; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=l5A4Rf9vYNsAC89purt1CgMvJ45V1kxpIPQzYh4toZQ=;
-        b=VImjInxz3HWpuX7TaS0WXBLhmM8JY4nsprd7Xoh+Jae8TKaYLRBDdI7vkBWLzvRcTL
-         rfmvVHBPBYGWj9CXqRhG9bSeBEgAxHBcqyKGxu0Pnm+4qQ7UXnGbJnxyh06O5T0hsnyk
-         Xx+dbOEaRVDHqnKhwg+m5zmiCduto7yO21C1Ntj7heagMalU/7HLfFXBRxSgx++fuNAe
-         DgoTnilgIoHMnXpRf+NgEDB3d2WpE4orH1DHSgii1UGM8dKc8wCKLu62cmU/4BfQVq3U
-         lqjKT8ElQBrtzhl36qWYCK+qay1QBbA5ANfsAzmKjdiqfA6r5no+3LXuSJmRZr99n1kQ
-         v52Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793367868; x=1793972668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=l5A4Rf9vYNsAC89purt1CgMvJ45V1kxpIPQzYh4toZQ=;
-        b=Yti9rXxxusUb4Wlak4gxP8Cm3QUWihROcuX0vpjBud2/JsONhqHnmdJ8yWKyCgGvWE
-         21o3tyKZA/HD+/w9mG6kU2T7K86ZYNI1ClKESpVl2fYUDSd11CMQpKDt1MdnAgZy2ghl
-         UEuzOxDKZA1L+b4lbIJzYHPufL/mJtrcAcN9yQFgc9QXfhgbQwgVZgENWZglzDWc3RJg
-         cO4ceP5DkeVdtzW02a4cMfSW5QGJOGIzZ8oQT69fGOPqxQSHR4ARmOTB8rjumP8bUO30
-         kcIp54lPstLN/CIuDsnpVbDlUUhBIQygBuql6nrFY7pOfNIyhaRet2HhF0dNrsR5j9Fr
-         MsMg==
-X-Gm-Message-State: AFq9FYJU+U9k9P4lolpeKxRC9z2qDUZf0ifeIQztQSQqx7rDqBGgduPF
-	+2KQgx2pDhKRjv3YUyql5cO7/m0x1V66wvK4UudcQ3uVzzjcz0TLz0L3SpDCjA==
-X-Gm-Gg: AYBFou25iFit20Pzwg+uYY+Z0EocibwrnAyNU4Jv5YE7hiEEQotnnBczJqrPJJ3IoEE
-	TpA5clSq1krTqy1ExHH2znL2YnuvEFawsPkYLLtjaSY9tEL1G1piXl5zK1Kg/Uib4ZViNmIuOct
-	rdtXHdZElQaVFFWa/7n+8IhL2IEh7zFMf+mJQG0fYnCMQSbAyAw/896bISOHRVvpWHLTfcqWxtA
-	jZQt5ckA5I3I7KaCXYkNO2KcffDyHH3MTztpUcRzZCnDn2wNNvCcyZfL1uFGOkRwjiTukz/O4ze
-	opecE8toKx9RghdNgzSHzeLZ9YnyblhEDrCkTGkhIv6/Ve2hz/XQEKfd2vA6X5j5HrSrl6hAtau
-	7tnopmhAnDlv45z5VxQxL1GJr9lOrk570vyiz78JTPwzWhxjvs+e8kli+h/SfWmr2YXv2icD1FA
-	7d5ArApkWHVWje/MhVkiWqoaSyY/hQg6/TgrxIOq8F9EsujGp0iXr5elAgYi1G7EMxmAbpI8xpa
-	m2Xz/JLBUx8y8YSNvuzYvxbjiX4GALMddMK3oKuqomo2D7NaMa3HJFeHgpfwZRPonbuu3nvyqjj
-	jl2VKO/lWcA5MsR3isRdmmn1aU9xeUD8wgLYvZjst/LMoX+8TJeXc7+W9oLtDu9/NvqhyTDpcsl
-	dpRzCb6U6OUbushE+/x538Pj4YLKRRf8rdK/New+q67GCYQNGMufaT74lkbUgdraWGOz1i+Uq7C
-	H1diw=
-X-Received: by 2002:a05:6122:1d46:b0:5bd:aba5:3830 with SMTP id 71dfb90a1353d-5ec68295940mr1255810e0c.0.1793367868117;
-        Fri, 30 Oct 2026 06:44:28 -0700 (PDT)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69bb872dsm2541474e0c.6.2026.10.30.06.44.27
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 06:44:27 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] shared/timeout: Fix use-after-free when a timeout removes itself
-Date: Fri, 30 Oct 2026 09:44:26 -0400
-Message-ID: <20261030134426.420979-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ATvCcXPc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 497591F000C1;
+	Fri, 30 Oct 2026 14:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793368807;
+	bh=W2xpSAbTLfSkk//6+2S09YfgmDNTg33ZJ0KqZmHBUGE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=ATvCcXPcQ+3Yns0KJJpVZ1WcGFCTMh0fm6/I5m5uYx9fRXZCUAuJTV08MWypuYANx
+	 hsSI6nH2euz/h89zLAyib8zrsbv4rMKpWreo64x03D//kql/DLIImPIeCLzaWsvyqb
+	 kofkgcp9YMc47K2dBhZ97oXenTVvuj6ZDxF7JlQrdxQqD2bRgov1Vri0MGXU1RS0Xh
+	 CwhRmkdfKR5lEHJ1Nl93xL8P7LVTMLdfmt9ZefBKOZu7kequTQ8wiA00+dD4FJG9U2
+	 UndP6CTNerMMAaXQsH4T7L45hiAbVeBWYcYeRUXirRjjZjf9of+uJiILFW+jyWCgBx
+	 sszi9aDeI7bqw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 402053800465;
+	Fri, 30 Oct 2026 14:00:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -94,133 +54,41 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: MGMT: Clear disabled connection parameters
+ when
+ loading none
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179336880606.1091505.1791997839483529343.git-patchwork-notify@kernel.org>
+Date: Fri, 30 Oct 2026 14:00:06 +0000
+References: <20261029202832.35354-1-kevin@simpleble.org>
+In-Reply-To: <20261029202832.35354-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-If the callback of a timeout_add() timer removes it, e.g. the tester
-test timeout restarting it for teardown, its data is freed before
-timeout_callback() reads the id, and the id may already be reused by a
-timeout added in the callback, which then gets removed instead.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Keep the data while the callback runs and free it afterwards if it was
-removed, and add a unit test for it.
+On Thu, 29 Oct 2026 13:28:32 -0700 you wrote:
+> Load Connection Parameters only clears the disabled connection
+> parameters when it loads more than one entry, so that loading a single
+> entry can update the parameters of one device without dropping the
+> others. Loading no entries does not clear them either, though, which is
+> what bluetoothd does when it starts without stored connection
+> parameters.
+> 
+> [...]
 
-Fixes: efe0efc925db ("shared/timeout: Add timeout_add_seconds abstraction")
-Assisted-by: OpenCode:claude-opus-5.5 valgrind
----
- src/shared/timeout-mainloop.c | 23 +++++++++++++++++++--
- unit/test-mainloop.c          | 38 +++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+), 2 deletions(-)
+Here is the summary with links:
+  - Bluetooth: MGMT: Clear disabled connection parameters when loading none
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b621473a7fff
 
-diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
-index e6f9c5e826b3..3dfcdee8143d 100644
---- a/src/shared/timeout-mainloop.c
-+++ b/src/shared/timeout-mainloop.c
-@@ -20,14 +20,28 @@ struct timeout_data {
- 	timeout_destroy_func_t destroy;
- 	unsigned int timeout;
- 	void *user_data;
-+	bool running;
-+	bool removed;
- };
- 
- static void timeout_callback(int id, void *user_data)
- {
- 	struct timeout_data *data = user_data;
-+	bool ret;
- 
--	if (data->func(data->user_data) &&
--			!mainloop_modify_timeout(data->id, data->timeout))
-+	data->running = true;
-+	ret = data->func(data->user_data);
-+	data->running = false;
-+
-+	/* The callback removed the timeout, so data was only kept around to
-+	 * be checked here and its id may already be reused.
-+	 */
-+	if (data->removed) {
-+		free(data);
-+		return;
-+	}
-+
-+	if (ret && !mainloop_modify_timeout(data->id, data->timeout))
- 		return;
- 
- 	mainloop_remove_timeout(data->id);
-@@ -40,6 +54,11 @@ static void timeout_destroy(void *user_data)
- 	if (data->destroy)
- 		data->destroy(data->user_data);
- 
-+	if (data->running) {
-+		data->removed = true;
-+		return;
-+	}
-+
- 	free(data);
- }
- 
-diff --git a/unit/test-mainloop.c b/unit/test-mainloop.c
-index 70ee03ee4283..b876e0285907 100644
---- a/unit/test-mainloop.c
-+++ b/unit/test-mainloop.c
-@@ -12,6 +12,7 @@
- #include <stdlib.h>
- 
- #include "src/shared/mainloop.h"
-+#include "src/shared/timeout.h"
- 
- 
- #define test_failed_msg(msg) \
-@@ -153,6 +154,42 @@ static void test_timeout(struct test_data *data)
- 	check(data->destroys == 1);
- }
- 
-+static unsigned int self_remove_id;
-+
-+static bool readded_callback(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->new_calls++;
-+	mainloop_quit();
-+
-+	return false;
-+}
-+
-+static bool self_remove_callback(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->old_calls++;
-+	timeout_remove(self_remove_id);
-+	check(data->destroys == 1);
-+	check(timeout_add(1, readded_callback, data, destroy) > 0);
-+
-+	return false;
-+}
-+
-+static void test_timeout_remove_self(struct test_data *data)
-+{
-+	mainloop_init();
-+
-+	self_remove_id = timeout_add(1, self_remove_callback, data, destroy);
-+	check(self_remove_id > 0);
-+	check(mainloop_run() == EXIT_SUCCESS);
-+	check(data->old_calls == 1);
-+	check(data->new_calls == 1);
-+	check(data->destroys == 2);
-+}
-+
- #define define_test(name, function)				\
- 	do {							\
- 		static struct test_data data = {};		\
-@@ -167,5 +204,6 @@ int main(int argc, char *argv[])
- 	define_test("Test Modify File Descriptor", test_modify_fd);
- 	define_test("Test Re-Add Other Callback", test_readd_other_callback);
- 	define_test("Test Timeout", test_timeout);
-+	define_test("Test Timeout Remove Self", test_timeout_remove_self);
- 	return 0;
- }
+You are awesome, thank you!
 -- 
-2.56.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
