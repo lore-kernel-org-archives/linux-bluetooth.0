@@ -1,76 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793342075;
-	b=jPsZYNAYG/nu3067dFVOKCftWkqGK99I4MoMYWc6etCkHpz1HOpTUo4RLhVyq0Jdoy+e
-	 gpXZVGA5krqHtADJE5tOZsa06LBneBThDaGCkh4Kh7cwZzxeG7wM8DEtVoNCkb5VxYEFD
-	 ivvQhEODRKAUG33/3Z+cF3fRDiEUYNHvSYbUYwq28kvuVNN5YdUaT6UmpQATpn8D9kTDq
-	 4MATR8PO8EqZQlbW3rfSp0ig0t8/Y1DudlqmJLQnAtGfnnHWjjhQ0L+xGKR9/CYSE2Zxn
-	 gf9ekHJWUa2xdMgazWU1TAT7O5CCBnaBliSWtHnANoWVI2JWvPsFyzTy23UEj8VdamQ==
+	t=1793346407;
+	b=2hjVRMX4AtQXR6bl433u8hetYxmR3JSLWF+7VqCrilwY3C7oB2e8rI2h8pmN5ZCsSghS
+	 URGyO1BovJHIaX7oFqsbvlNt7+6jZtcfATObalt1/sqoI4Nr8pyuO+pvsfTj8oYGi4/Cq
+	 TPlDiT9KfVJDDtKGE3xA9wZKtW/c3mMHJdfG61L0KXaBNVMWs/UQQJdLdQnGEFBOuNSHL
+	 ctfqOOHEhMDEZqftgO506EntuB68XV/CyV5jyg44qdfU2SUl8oCFh8cc0y/UdUUKXDlku
+	 OxufWcJOtHi60FJ4xFA4plEKjxOHmVc2qZDjWdwmAaCzO1LD3vvo4ZtwB9hvDj6jFUw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793342075;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:User-Agent;
-	bh=4cq7DC5qHtPKK2zJxY8VxDWBX5d4IPQHWqse1EYbGGA=;
-	b=4tHWIw3klEw7l0aAoSkTKpFtzuR43vbGBgHFOOIo7ny04vCHhO2YAbTPPvz/5rEDaj8n
-	 mH93mRPNrqhfu7ChENisFXLdJcLq5dqUTMguuoa0J7bhbuWbjAgrACxINGmgopfzyWboh
-	 IYmX7adc970vOp/Qt+gAqy+IquAufK64tlnavvDm5jqMUVwpS6LFJQmYQhM/27sHTjxph
-	 QFvOR2cb3kHaqDtYHnw20NCYgmcsgwuvoHvkVOYY6O7bXy72+VmdQ6xj8n3crSSHC4ALF
-	 KLJWZZf92ESiXajQ2gsLoOIRR7fMrghpNmNkQYgIFp5w/2rvnkr0dCm2uLnH+j53gyQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793346407;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
+	b=q+/nooSEQQmyGCNh58n6nwUn5Ng61X8wX2XAY8lFHPAZrtwILzEoyA4BSP2Rz7Ifm3Oi
+	 f8D31zZ32AkOX6QWDaxnuBCVqiB/Uy/QH9Zvwm1tlstjL3SvkkG+AFq0XofVjWa9G+SsO
+	 TmRwnOsYKAzHl5+/dPQwHphWTI+ijLqlZJydPW/hHXOQUEp0WiTMDyv459ipwDAuS/Yqw
+	 sHenWGiphZ5bDAhhQN06Svzy2zYUjqmHf4ysvWX4tKWPVl+T3E96/ytObd8qIJvoJ7XmA
+	 hRYkuNjjae3o3iiAXFD8ON1J+MFsZ58FiXwAUNcUlYn/tT7PavtBk/QIwjME4n04exg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=WEB02Ynz;
-	arc=none smtp.remote-ip=198.175.65.15
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nd1Gd4ss;
+	arc=none smtp.remote-ip=209.85.160.44
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30178606A31C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 06:34:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30178606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFE0606A31A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 07:46:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DFE0606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=WEB02Ynz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793342073; x=1824878073;
-  h=date:from:to:cc:subject:message-id;
-  bh=IlPVmKx0D9D9ns3VSjtIvuuZBKRL9GSpSb8HNgvMCW4=;
-  b=WEB02YnzvY2uzJsk7ko2dIERdhzWjsLG5Mz7xbDbN9EHPQKJB9db68tE
-   0zLMgpQgLKTbSGPAKdI10T8VCgcYjyNmFysj3Z6aV1qvHLwI6JTSFAFyU
-   HHg0W1+wqKtnMBDtTEA22ihv/Sx5Ar/CZB/yqUFQtlKEuRv1dA+2ukSao
-   19cM6A5KDtnNNkFeMqWrJBI73RIkasIcMGgWuHiUGFXberjmhlogvOstQ
-   hmYDPFQl5c81rIlrX5/ww+IPmqWR4qT8yYGNsbbB5UanyyRFCpWmu3MlF
-   bCkZzroUrSgt5IljJcWlB8gZeKonM+FivKDb0Ao4F3oXt55Yhs5//Ryji
-   g==;
-X-CSE-ConnectionGUID: AXrjWOlKRJy3zUCYKCzYvA==
-X-CSE-MsgGUID: dXMBRW2kTrGGfigNthoNdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11950"; a="2099585"
-X-IronPort-AV: E=Sophos;i="6.27,185,1787036400"; 
-   d="scan'208";a="2099585"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2026 23:34:32 -0700
-X-CSE-ConnectionGUID: JKop21OhQ5ytkO+KlZodcg==
-X-CSE-MsgGUID: pvD4dJqAQN2DkUQc1NBDUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,185,1787036400"; 
-   d="scan'208";a="5481440"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 29 Oct 2026 23:34:31 -0700
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xMgC4-00000000bOC-2mCl;
-	Fri, 30 Oct 2026 06:34:28 +0000
-Date: Fri, 30 Oct 2026 14:34:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9
-Message-ID: <202610301410.aj6aUGGA-lkp@intel.com>
-User-Agent: s-nail v14.9.25
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nd1Gd4ss
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-49e08af5fd4so187740fac.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 00:46:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793346406; x=1793951206; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
+        b=nd1Gd4ssrxk2AepEg7+Wf3QpLA/IxlOf30Feg9tCwgdE491aJQjIxtSMPlMC63x0M/
+         gEb6iYBzs7z8/jJCtr4ed4xHclxY29W1VvJPluZABVaq/dfwxeQe/SFCGCYb/n99teDd
+         aM/DJlXSGOmLyizTf1oEllCdiVFBQnK91kXg6qOWaBo+FbqAiPhDWVHi3PJOcOBZVCLY
+         rkQAIyEsmSOgWPPoDV2TOpnoT41q6rOzLbaBGHc+Pc2n5rJytExJW+Is5B65sKSsWtRr
+         uR6prD951q8Q6nzB1vfvDXqWH7ZInCwA3okmiIEWZH6wuqB/TIqSCPEeeQMUEcfNYHdy
+         l+7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793346406; x=1793951206;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=capiPQsUnJkJByX2YACWaLgkeymJ7zJPPUYdn1h0D1U=;
+        b=GCAlMaxMW/l73u6LE/2o6FoGNHS7q1VBEfB4vX/vCOKgL8f1I6CgEKoQvEOEK+V7QW
+         n+w4hhuKStU+go1ezlzGCtdoq8/ghPujYsfW7n61oXyNP6bVwOXVn/CsFe3d3YaF4fg5
+         eax/4iDxVJkZtZHE2TR9RtYtcH3K8eLTIrP60us4yWgr2rfgxaAneQD6W6fgbG2Ynyke
+         PB7bDSNT9ljW7K8eqxRZNI8aM2fGvrgp7P56mCNMksbkITTRhvVngtroxKoszybEPMlQ
+         NSaamRYgOV0VfNBUKYGZSkV3gv1P5ZhunBsQON/YSuPLd7R8r5VDk/c6j6rzZaKLT51T
+         qWYg==
+X-Gm-Message-State: AFq9FYIKOd1JufGWUpxVY9XOYjHJck+58pCLIA5vwHS70r43xabGOF7T
+	txtX91dpZg7HsITIP/wUcCmHSGvHs8cDYpGpR5A1/bZNC0XHCe+dAMMh1VmoAQ==
+X-Gm-Gg: AYBFou33Dl9PzObd9iTjG5PDtJf+WTgtCYrRFJLNJDjv0sRZ2mFT/84q/fVG+XSr4af
+	sYrOmTXzzE7nsNhUGrDepo4x+mST582vM5t5euUQypxWDfzcOTTWL9FN4RMXsI0hol0oCyXWJwT
+	3aX/lEo/AKEe123r6fMqPbQMBtMdX4K3j8r04KfOeEaQ3uap9iCqtdluQJzUwDHLmETzpVZlWcS
+	JLHGjAb66rLFXLSNgnPkjZRCbjTO+i0ZhdaWuVLSUF/WDYq4MGkomIrmFTADTQDVOkL25LBsHYn
+	bXAGLsde5Mzgqutkmzm3Yw+QDz4qLTMdZCDVvHy17W3xaf2hN4O+KsU56etGZnLCOqym/y019RC
+	fHsJ+v6qG82jvhJVAdctazhMy//xWP7EpcAX9CFqszWow0SMSO1k/zGTSuXkJxQ8wj8/4lU5yQj
+	G8xrNMUbgAclakw0TY4uD7j9coY5YujMHttruLNMWQNHODUYWt5hSQFEMFeFQNdjiI/CU3NbOld
+	1SHM+b8BLu4kZ0ZmfPVDDiabNN6J1u3wBL8G6lbxuDTkqLY5qSGI+sy/hCTWplA5Bi4P8gfhay5
+	PmhsX4sFMg==
+X-Received: by 2002:a05:6870:d3ca:b0:4a6:942c:7b05 with SMTP id 586e51a60fabf-4a9076f991amr942817fac.32.1793346406164;
+        Fri, 30 Oct 2026 00:46:46 -0700 (PDT)
+Received: from [172.17.0.2] ([52.165.250.243])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4a90afa9d31sm1160932fac.16.2026.10.30.00.46.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Oct 2026 00:46:45 -0700 (PDT)
+Message-ID: <6ae44b65.99d0dbd8.1d1550.9a8c@mx.google.com>
+Date: Fri, 30 Oct 2026 00:46:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2591991551520612711=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -79,70 +88,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
+Subject: RE: [RFC] l2cap-tester: Check compatible interval preferences
+In-Reply-To: <20261015044221.55631-1-cochcoder@proton.me>
+References: <20261015044221.55631-1-cochcoder@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1081a6ef8f1e0661fd52eb3f878691b0b96cdff9  Bluetooth: btintel: check FIPS status before firmware download
+--===============2591991551520612711==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-elapsed time: 1727m
+This is an automated email and please do not reply to this email.
 
-configs tested: 50
-configs skipped: 5
+Dear Submitter,
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-tested configs:
-alpha               allnoconfig    gcc-16.2.0
-alpha              allyesconfig    gcc-16.2.0
-arc                 allnoconfig    gcc-16.2.0
-arc                allyesconfig    gcc-16.2.0
-arm                 allnoconfig    clang-17
-arm64               allnoconfig    gcc-16.2.0
-csky               allmodconfig    gcc-16.2.0
-csky                allnoconfig    gcc-16.2.0
-hexagon            allmodconfig    clang-24
-hexagon             allnoconfig    clang-24
-i386                allnoconfig    gcc-14
-loongarch           allnoconfig    clang-20
-m68k               allmodconfig    gcc-16.2.0
-m68k                allnoconfig    gcc-16.2.0
-microblaze          allnoconfig    gcc-16.2.0
-microblaze         allyesconfig    gcc-16.2.0
-mips               allmodconfig    gcc-16.2.0
-mips                allnoconfig    gcc-16.2.0
-mips               allyesconfig    gcc-16.2.0
-nios2              allmodconfig    gcc-11.5.0
-nios2               allnoconfig    gcc-11.5.0
-openrisc           allmodconfig    gcc-16.2.0
-openrisc            allnoconfig    gcc-16.2.0
-parisc             allmodconfig    gcc-16.2.0
-parisc              allnoconfig    gcc-16.2.0
-parisc             allyesconfig    gcc-16.2.0
-powerpc            allmodconfig    gcc-16.2.0
-powerpc             allnoconfig    gcc-16.2.0
-riscv               allnoconfig    gcc-16.2.0
-s390               allmodconfig    clang-24
-s390                allnoconfig    clang-24
-s390               allyesconfig    gcc-16.2.0
-sh                 allmodconfig    gcc-16.2.0
-sh                  allnoconfig    gcc-16.2.0
-sh                 allyesconfig    gcc-16.2.0
-sparc               allnoconfig    gcc-16.2.0
-sparc64            allmodconfig    clang-20
-um                 allmodconfig    clang-17
-um                  allnoconfig    clang-17
-um                 allyesconfig    gcc-14
-x86_64              allnoconfig    clang-22
-x86_64                    kexec    clang-22
-x86_64                 rhel-9.4    clang-22
-x86_64             rhel-9.4-bpf    gcc-14
-x86_64            rhel-9.4-func    clang-22
-x86_64      rhel-9.4-kselftests    clang-22
-x86_64           rhel-9.4-kunit    gcc-14
-x86_64             rhel-9.4-ltp    gcc-14
-xtensa              allnoconfig    gcc-16.2.0
-xtensa             allyesconfig    gcc-16.2.0
+   Series:       [RFC] l2cap-tester: Check compatible interval preferences
+   Pull Request: https://github.com/bluez/bluez/pull/2682
+   Created:      2026-10-15 06:39:11+00:00
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The pull request has been closed and no further action is taken on this
+series.
+
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
+
+---
+Regards,
+Linux Bluetooth
+
+--===============2591991551520612711==--
