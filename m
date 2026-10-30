@@ -1,84 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.179
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793378767;
-	b=TX2V+V3mHtgckU2xjGVWdgQcnW8d9KUUTXVY87wKisG8M5zvsJoEqRTfDueBvrFSuTAx
-	 eeiBlanx6qoY8+/9Z1/e8mLTtEQGYZrJIJtE3n+Dly/ZiEaDmfU+clHcESBeRl8qbO+Ma
-	 iBbWTqp5igzHuQ7SreTBX/VuhMWN4/zV8Q5Lolv409+Peyk0WuNP/hKLdghomo+TiIcV3
-	 8qAPVIQ6bGByvVHaz9If95NLCzNpGgpBPgcvYk0PZdOpu6XsmRpw0TielVXI0sYegVW7g
-	 mSVCpLFkVCn1zTiVkEhJ1wpIn9qrz7t26RZ8bVfNve/htaIn9KRVruEumHIyhzOQILQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793378767;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=ORYwZ4RCkCjV3QeSBFinuNM34FlkQ3vyRqcwjXj4GKY=;
-	b=COteCGmXlzGX3m0rTRkIuul6+ZiD9xNMRx2zEgicACuQxbOZmAzDStEp8uvN+yKWysiM
-	 lyWwBIzXMmBkdvhC9SC9ZWhi1kUGUiiqx6Wm7OhQ4RxZb63xGQEIQEL/xdOQi1pY8SJs/
-	 0JaEzSkpMvmoBYv5UdKvqmyZCok6NCeCeArsvor7sne8Vuv7UWwUaUejcnVO6QtrEpQRA
-	 7zrUx5PAxZZaVm+3BeGRuPRLfswT5NP2y9y6fu+ePzbY0e4qQf7dMxFJ0t9zwHDlbb7lv
-	 L8+5PcBgQS6KoyRMr/sURKuzEKHgnKZ3ATP245bbWY4ChhDfrb37x/YLLzlCw+CH0jA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Faz9zD5c;
-	arc=none smtp.remote-ip=209.85.215.179
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793381484;
+	b=1EWzNflns8jSccSazyx+C0vnUvRX5vSa/m6hYNk3WT/K0cTeztxT10RbQsJGqe7ZcqXn
+	 Em+rxQ444mRyNmwtE+Wjek6BissCuS7Q0s2M2h6v0BJUiWny8fzC1BlU9HwQajbxqFHov
+	 ZZVd6KPZbWeFeLN06+fOjX6KpBNvwgCVgdiymzct+Q98I8FKslUK8h2XDsdsuoH+Rpin8
+	 Cqjv/dJU274Pyygdgd+zsYdfznJ4XiGVFlWJwL67pxDD8mVsFueOc1AMPqyx5Dsu3fAt+
+	 xJ3sbfAng1sBWA9vCMabV/F7z48yIJq63PCH2CHq9h+B+ZsXSHKYDbvi7R/xhaAMnzw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793381484;
+	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
+	b=R12ZjPwHomzJ36kHDJNV9OqZ6+tZA/dr6sJSa7snLBPM/XV7XBmcCwrG+fFrfDMrGlW4
+	 AC2DKqPM3I0H4vpwvXfXtNMPEHq1l99/eMcaJkgqqOctJBrCCH9IJ842W609gsa0SS6nE
+	 yAlqYVNT5ufGPBIKvhtfWdRUUir8bycpiIJDBoOODCGR1ffu7c4m29kHXruL7B5yp3y6c
+	 +R3zRI93Z8MnvSBBGk7tiRrBs8Dn97APL0cHj0gNtk3kAIpWyWZJ4AufJ5QrGwHKgYscu
+	 CCS6TikTxdr7+cDwc3is5d8Dyq0A2aq/b0Ndrg62JTEHI1MyJ4uLK23nRDhAsdjtKYg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=iki.fi;
+	spf=pass smtp.mailfrom=iki.fi;
+	dkim=pass header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=Yq+LszaH;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3E2606A31A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 16:46:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DB3E2606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE25E606A31A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 17:31:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE25E606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Faz9zD5c
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-cd6028ff33fso468247a12.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 09:46:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793378766; x=1793983566; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=ORYwZ4RCkCjV3QeSBFinuNM34FlkQ3vyRqcwjXj4GKY=;
-        b=Faz9zD5c8hq919Uks2yxOiahLXequwJ2HHwKUXP24oIYOEMbtIJv/jFSfFTg/NG22Q
-         /aM/QQQhFCFccY326yc1yYzsU9ZCDQdmlmBbX05E6YvpbZVzhToI7hz0m2RY99DyXCc4
-         pcL0Afpcu4LVNT8+HGH9s4dZoRq/Xm/bYz8GqQxjdI/G6JhmgsA0GekqK51wk95xXtuY
-         akrw+H0xA9CQMtRJQ+nx2tfRjCNqEzcOyZ0svxpi6BlUyeQkrGPorVsgk0MdMgpBZhSe
-         gyrQIro1qA7yiKDjnszOJ3ZT6W0AaBkAb/EAxAj9blymMFkO57GDXrLbr2YDL8+l4Tdt
-         jYQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793378766; x=1793983566;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ORYwZ4RCkCjV3QeSBFinuNM34FlkQ3vyRqcwjXj4GKY=;
-        b=MJ+nPPQLJZ22XZQf+cdXrZ5dCCcdOZMGRXyQYoJCE7Q0lchTqp18k6CWbdhI1OUvep
-         yW96UARRDPRbte4jckC374J4KzDR/3VHZtpQR+0XljhDbWaE4hifSYJP/7ytcB0nsaB7
-         l/xt0mX1XDyJezb9DKxM42oE44XorhJaLVUlL3U9wweHyuAR17IsKV8J0V55hQ+Wzwsy
-         OuJWTTNJ19pImJd0VsS71Ssz3hRUew/9opL2JXsBIeHqzeDv0oR4zeZ9rBZZ1Y26lX0u
-         dNo0uCBXQx4KG8mF0S4K2/9EawcjLjY2sAiSuhX73s+zZANlOZTNTJLdK1VNz/xxT61j
-         Sjag==
-X-Gm-Message-State: AFq9FYIYHqFn4YdGyV84Jf1K5tGOwUs0YNPE2fngYcDXRadctaM7VkuK
-	HRVs7Z4txnHA3uFKyX1Ua3yGqe6C+UI2PKSBAhq13fApVlyqCO02vQjeIoiMAQ==
-X-Gm-Gg: AYBFou27L5L+pqeM6k2amrP+j0HCUo//Tx3z/8z4s+nQ84pKnfmjpAEcWGZdpA8Kf5q
-	1z35rGruSFUGunS7Lduu1gRZRVKCnJGHl65+GkEirZABBLljxvLqIekG7/qWX+i/qb0InF7m3Pl
-	4y32GJgDt4Lg+o5+EDfjPep9+uk6hAj8jdVbU5AWWPvgPD1zMFHG7XcM+uwgTfj/hmoizrqJMEq
-	0118p56sLePQuGt8WRqhgZzDUwWsvY8pEGSLDglJZFji/BIFdeRUcLVOrqzmG5euFzRjRZ8yKoq
-	WjK8MERa2y7KNazkcoyv1jUpHENHuXxxiET3z2L8hFox80B35o8MfQxUVgvoNA1OsiJuX67yvOG
-	YRi1dt7selAJ8nSuAth7fLFH1cmDzqws6mfKy++kBR5yD7ZNfcr76UkImVj9ZQWjk2OuSl1/zbp
-	DGEfybsDEst7yvUokQBsEqX2kVQuJhwRUS9wUlaz7kRrJzdZCkRHm2s2JJYNwlAh0s95j8vkaMB
-	bc7P2lV1M4G6Rqms81+df7L9jY4MAbBVKr/xEd+mti4cusUHreif9GKI06OHi4=
-X-Received: by 2002:a17:903:3205:b0:2e9:5714:608b with SMTP id d9443c01a7336-2eb364b11ffmr31230215ad.34.1793378766155;
-        Fri, 30 Oct 2026 09:46:06 -0700 (PDT)
-Received: from [172.17.0.2] ([40.75.135.109])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2eb392ae011sm10019125ad.69.2026.10.30.09.46.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 09:46:05 -0700 (PDT)
-Message-ID: <6ae4c9cd.c45220f8.a8666.ccad@mx.google.com>
-Date: Fri, 30 Oct 2026 09:46:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6771819746964417049=="
+	dkim=pass (1024-bit key, unprotected) header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=Yq+LszaH
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4jGSnJ2zCFzyQC;
+	Fri, 30 Oct 2026 19:31:16 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1793381476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
+	b=Yq+LszaHzApyA6ECTTM2gAfxpEQWW7yj2MK6oCFSH2Mm+eBMgFmkZI2uVdzANasuIDFadj
+	xPUZhQWm7p5w3sC/sESpMC/FggiuZP3nR3KxBAiGNrkt3CTt+Zteqx+QIIfNfOwxrw8IiW
+	bWfHh7nTU4uLLxZdSAxo7ozUW7ZmJCU=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1793381476;
+	b=LEQtPnUs/7oASkkU02CvmDXucnRqxMR/tF2sZsdqdZzS14Ojd4G+xAiraHGhbIZvo2jDe0
+	W9uT0QcYfb0TpEQpOpOsmXx96O1J4PfMkiJsP2Resi2+8oOsAQCt5t839IqRvKHMsDXJYk
+	UyJXWtkx2TW5H8S0V8UeGYLf6ls3pgs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1793381476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
+	b=tsKXnxAkHIXcozjMUlAG/XiCshPAuqAEaumz2CML0/ow0sRYkENWNdLLr8XUbvxRluGQUh
+	jeoWbyT3c1XOND1yyJrJwK7fEttCpQKec38C/dQX9ODKRyMw9sDOM0Lkyo5XCNF3YBphGo
+	i0wl3b8HZBB/F5ZeCg9i74dSLAOUDIs=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH RESEND BlueZ] test: functional: retry pairable when Busy
+Date: Fri, 30 Oct 2026 19:31:12 +0200
+Message-ID: <45f6af417f7b09d62d76bf128c1d6d22189bb2f7.1793381304.git.pav@iki.fi>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,94 +80,105 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
-Subject: RE: Bluetooth: MGMT: Send Connection Subrate on LE connection and update
-In-Reply-To: <20261030144106.75414-1-kevin@simpleble.org>
-References: <20261030144106.75414-1-kevin@simpleble.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6771819746964417049==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+bluetoothctl registers an agent on connect, which toggles bondable.
+Before it completes, "pairable on" fails with org.bluez.Error.Busy.
 
-This is automated email and please do not reply to this email!
+Retry "pairable on" until accepted via a pairable_on() helper.
 
-Dear submitter,
+Fixes flaky test_bluetoothctl_pair_bredr / a2dp tests.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1197220/
+Log:
+src/agent.c:add_default_agent() Default agent set to :1.2 /org/bluez/agent
+src/adapter.c:set_mode() sending set mode command for index 0
+src/agent.c:agent_ref() 0x7c1fb6700110: ref=1
+src/agent.c:register_agent() agent :1.2
+[:1.2:method_return] < [#22]
+[:1.2:method_call] > org.freedesktop.DBus.Properties.Set [#31]
+[:1.2:error] < org.bluez.Error.Busy [#31]
+src/shared/mgmt.c:send_request() [0x0000] command 0x0009
+src/shared/mgmt.c:can_read_data() [0x0000] command 0x0009 complete: 0x00
+src/adapter.c:new_settings_callback() Settings: 0x03fc0ad1
+src/adapter.c:settings_changed() Changed settings: 0x00000010
+[bluetoothctl]> 	SupportedUUIDs: 0000110a-0000-1000-8000-00805f9b34fb
+[bluetoothctl]> 	SupportedUUIDs: 0000110b-0000-1000-8000-00805f9b34fb
+[bluetoothctl]> Agent registered
+[bluetoothctl]> Failed to set pairable on: org.bluez.Error.Busy
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      31.31 seconds
-CheckAllWarning               PASS      35.57 seconds
-CheckSparse                   WARNING   38.55 seconds
-BuildKernel32                 PASS      31.81 seconds
-CheckKernelLLVM               PASS      44.42 seconds
-TestRunnerSetup               PASS      748.20 seconds
-TestRunner_l2cap-tester       FAIL      10.81 seconds
-TestRunner_iso-tester         PASS      10.94 seconds
-TestRunner_bnep-tester        PASS      3.22 seconds
-TestRunner_mgmt-tester        PASS      88.64 seconds
-TestRunner_rfcomm-tester      PASS      5.16 seconds
-TestRunner_sco-tester         PASS      5.76 seconds
-TestRunner_ioctl-tester       PASS      4.71 seconds
-TestRunner_mesh-tester        PASS      5.57 seconds
-TestRunner_smp-tester         PASS      4.37 seconds
-TestRunner_userchan-tester    PASS      3.24 seconds
-TestRunner_6lowpan-tester     PASS      4.49 seconds
-IncrementalBuild              PASS      29.61 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Sanitizer errors:
-==35==ERROR: AddressSanitizer: heap-use-after-free on address 0x7b4eb88e33d0 at pc 0x561facb02e8e bp 0x7ffdc2595460 sp 0x7ffdc2595450
-READ of size 4 at 0x7b4eb88e33d0 thread T0
-    #0 0x561facb02e8d in timeout_callback src/shared/timeout-mainloop.c:33
-    #1 0x561facb03b75 in timeout_callback src/shared/mainloop.c:270
-    #2 0x561facb04aa6 in mainloop_run src/shared/mainloop.c:124
-    #3 0x561facb073fa in mainloop_run_with_signal src/shared/mainloop-notify.c:196
-    #4 0x561facb0c64b in tester_run src/shared/tester.c:1223
-    #5 0x561faca3617d in main tools/l2cap-tester.c:3918
-    #6 0x7f0eb98a8600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
-    #7 0x7f0eb98a8717 in __libc_start_main_impl ../csu/libc-start.c:360
-    #8 0x561faca3cc84 in _start (/home/runner/work/bluetooth-next/bluetooth-next/src/bluez/tools/l2cap-tester+0x16cc84) (BuildId: 91c9d49e9766c394468e27ffa29b05e7d348169f)
-
-0x7b4eb88e33d0 is located 0 bytes inside of 40-byte region [0x7b4eb88e33d0,0x7b4eb88e33f8)
-freed by thread T0 here:
-    #0 0x7f0eba1e63ff in free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:51
-    #1 0x561facb0336a in timeout_destroy src/shared/mainloop.c:251
-
-previously allocated by thread T0 here:
-    #0 0x7f0eba1e760f in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:67
-    #1 0x561facaed2d5 in util_malloc src/shared/util.c:46
-
-SUMMARY: AddressSanitizer: heap-use-after-free src/shared/timeout-mainloop.c:33 in timeout_callback
-No test result found
-
-
-https://github.com/bluez/bluetooth-next/pull/1032
-
+Link: https://lore.kernel.org/all/6ae4b5dc.60f493e6.387f6f.e5a9@mx.google.com/
+Assisted-by: opencode:qwen3.8-flash-next
 ---
-Regards,
-Linux Bluetooth
+ test/functional/test_a2dp.py         |  5 +++--
+ test/functional/test_bluetoothctl.py | 25 +++++++++++++++++++++++--
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
+diff --git a/test/functional/test_a2dp.py b/test/functional/test_a2dp.py
+index 12348ea05..4cf4eb296 100644
+--- a/test/functional/test_a2dp.py
++++ b/test/functional/test_a2dp.py
+@@ -9,6 +9,8 @@ import pytest
+ from pytest_bluezenv import Bluetoothd, Pexpect, find_exe, host_config
+ from pytest_bluezenv.utils import bluez_src_dir
+ 
++from .test_bluetoothctl import pairable_on
++
+ pytestmark = [pytest.mark.vm]
+ 
+ A2DP_SOURCE_UUID = "0000110a-0000-1000-8000-00805f9b34fb"
+@@ -50,8 +52,7 @@ def pair(host0, ctl0, host1, ctl1):
+     ctl0.send("scan on\n")
+     ctl0.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
+ 
+-    ctl1.send("pairable on\n")
+-    ctl1.expect("Changing pairable on succeeded")
++    pairable_on(ctl1)
+     ctl1.send("discoverable on\n")
+     ctl1.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
+ 
+diff --git a/test/functional/test_bluetoothctl.py b/test/functional/test_bluetoothctl.py
+index e8c813a7a..1486d9e99 100644
+--- a/test/functional/test_bluetoothctl.py
++++ b/test/functional/test_bluetoothctl.py
+@@ -20,6 +20,28 @@ from pytest_bluezenv import host_config, find_exe, run, Bluetoothd, Bluetoothctl
+ pytestmark = [pytest.mark.vm]
+ 
+ 
++def pairable_on(ctl):
++    """pairable on for given Bluetoothctl/Pexpect
++
++    Allow failure with org.bluez.Error.Busy, which can occur due to
++    bluetoothctl toggling bondable on startup. Retry until accepted.
++    """
++    while True:
++        ctl.send("pairable on\n")
++        idx, groups = ctl.expect(
++            [
++                "Changing pairable on succeeded",
++                r"Failed to set pairable on: (\S+)\r?\n",
++            ]
++        )
++        if idx == 0:
++            return
++
++        error = groups[0].decode()
++        if error != "org.bluez.Error.Busy":
++            raise AssertionError(f"Failed to set pairable on: {error}")
++
++
+ @pytest.fixture
+ def bluetoothctl():
+     try:
+@@ -41,8 +63,7 @@ def test_bluetoothctl_pair_bredr(hosts):
+     host0.bluetoothctl.send("scan on\n")
+     host0.bluetoothctl.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
+ 
+-    host1.bluetoothctl.send("pairable on\n")
+-    host1.bluetoothctl.expect("Changing pairable on succeeded")
++    pairable_on(host1.bluetoothctl)
+     host1.bluetoothctl.send("discoverable on\n")
+     host1.bluetoothctl.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
+ 
+-- 
+2.56.0
 
---===============6771819746964417049==--
