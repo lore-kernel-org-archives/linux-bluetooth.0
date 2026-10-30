@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793395789;
-	b=FTGXbcf9VzC/CsKMFFs1OisBsqdojQROVNaOFLjFm8VgnTMvUjccbJnPwcF589FZoBRa
-	 M/yFDa25PsD0pYOddfhqeexMQlZzJnhljQxjx0wRxCM7zcdpM5yX19TdOedMCcr2vMYSu
-	 RD176ESO3aPjtMXUGiR6UKyhRA7+cgbtckTsaO/XFvh1Yi/fb2R5lCCDP2LegiylkkQ3K
-	 G30OHf4ZRcctL3kOfPwkSoHu3IDi5zeiB/CntZDxmiuQkdlKMvhOh4LGTps5GpnWZVGK8
-	 AXaYtVDD/RHRrmHV2+fEUFkSCAPRK2WpqKbzB/zYDRS8mWKoHKJVUFwpEuEeDteq62Q==
+	t=1793395791;
+	b=oGcW5pN6QEHcAvZnuK/ZFKkNUheVtdoK9Bt7tCgKL/JtEKVSOrK/Aq5MiDZYc0DZ55oU
+	 Bysa0FBs07kod5pVhJ3r6vej8SkGaekulhXfVk+5hAJmB5fJI0j49FXSb1+Iphs91str2
+	 Qj7whskvVdFg15fa/dR+Se1DjC+6rzT74+6hnJwOetBsTbGZ4htAxRU5Y6JWTiQ7FC5Q3
+	 Ak4FfqseMEgBl6fh/9j8PwpgQ3WB3ttFNKniyzNCzkj3h+FFuJfK18DnsXw+gtIFVulPF
+	 Gx0vQ8Ac9OQklx0sjUeaT/G4Xw9uD/Ee3/AzW0Mc+btk68+g4DJ4exfc+jbNWDccomA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793395789;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793395791;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Gp/dAcngbK6/Hvnl/jQrviAJOPJ310rn6P0SaToTUFw=;
-	b=mXBWvDkWNpIX5VBLAmpPo+Qlhaqp5LmNoXTaXZhac2IgMNw0JVsY+5u5Kjy5JJZ9P0si
-	 BtkqdpD4aLCZnJCG9t4wcbVleGXQKtjQHiR66bqOmO8/FRyQalLS6SGWruEPCY7ZMCrRo
-	 18Fvl19zqVUmFPDmswGVZm1Qa3lRQhzaAd9oMzdkrV9XnqsNvIwkKD3I/8OcSMsAEsXRc
-	 RWKw4maq88H3BrG14ECkO2MisBnkBwuXVty4QUCFHtRZNwAg4vvHDn0stpATfycVm0bK9
-	 Bkp3JbzIYAv+Ln9li1ITMb/jZXzucbqlwqhEAbj6b05SWzF80eh+niGnPzsyF+Biq7Q==
+	bh=Q9qsRUv+pAKz8XBSBaIUzxMz5sZdB+AN13IJdxVfmt8=;
+	b=sBj3V4xu3G1fNbQVgfegV89qRaM7QIgaRn+E1HBmYK+E+KvGhRLNpO429zFE4WKx0dvW
+	 Q12IfFmPAC/65D05mhM5j6M6XpgSZ2Jh4bOH+bkxNCnjElOSc0L4yIwULS/7xEO1rsdUk
+	 pJJiyreeBxSdNcN2NO+BYPqIpo0jFixdRHKSap2wWOOPdPWi9HxX76GBXgtGNE6qOiOU3
+	 CKazl0UTtYqVLZLJbLyoah/dJRz5kEtZF3svm6lTs/+wq92aGD1vTQQaBGlWLXh1nFonZ
+	 6Mt11Hu/SMh8AjATtO7pYod1M2V2/4pBasEMMrKrTyjRuh2gRST0Rlw+TCF5suQIO7A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dfMKsu8u;
-	arc=none smtp.remote-ip=209.85.217.48
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Ix8/iNKk";
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E3D606A31F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84E3D606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308FB606A31E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 308FB606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dfMKsu8u
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-7d06ecaf709so603974137.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:49 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ix8/iNKk
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5c9e7731b34so975862e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793395788; x=1794000588; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793395790; x=1794000590; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Gp/dAcngbK6/Hvnl/jQrviAJOPJ310rn6P0SaToTUFw=;
-        b=dfMKsu8uctIacioj0GLXJn7einwQRNWrivSnX6exvJbhPb4OzASUjOJsuosPeIUcLf
-         VHvaMcEhKXKMQhEclNBrNIhyeB2UClV2xongD3079Q2a27fnVJUKGsNkjzWGZqjvvXo7
-         /2/ku+0O4fp8nnNzj+IR2jLL4Dn91GigbElsN6Rl3jTBslIqtz+Im81n34PFqmZlnmzf
-         3uK9ByCQlmrEBH068IQ+OMO2WOzzsftrmp4su8D7+9zEKuIrnlNgiSC1M0QuTXgp+2i7
-         YgowRvESQ9K8NmsYMxc3DdHQw5BAMDGVa0QLnHjMbEyxkkrjaSeHnPaVMhgKs2l2UP0w
-         NhnQ==
+        bh=Q9qsRUv+pAKz8XBSBaIUzxMz5sZdB+AN13IJdxVfmt8=;
+        b=Ix8/iNKkq6PfpWRyGnENjrobot7mMEwaFWOtlCJ/UOjiJrclSshZX6tQbRPDydIWyc
+         x8QA/z1t6zA/cbobKAekrSVNiaskicZHOdizvUVBBcZvvlH2doIEDjBO7kv3gzLD+a1A
+         +LIirj2nr7eGca/vTjrTDDydpm4GH/5a8Wzhb8TULrCYaNb8qhSCQvseDAxYzgGbxss3
+         7cmMEuzZ9bm2hF7H8qEF6c/uuWS9kStgtMXiSok00Gzp723PUzeBR+xVpiHjdVbaTGSv
+         m2MFkM1ks2iqFOfQHSRPfzGpPUYwRakC72UGfxczBStkgRiLfxN/DWO8InU7HO9B35nc
+         Sttg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793395788; x=1794000588;
+        d=1e100.net; s=20260707; t=1793395790; x=1794000590;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Gp/dAcngbK6/Hvnl/jQrviAJOPJ310rn6P0SaToTUFw=;
-        b=zT0JMog9ZM0ZnAqJUUWYZpL/3O6gAB9EMdolxDQXy9uVuYmzeZzZkJEy6m3OrjnJ6F
-         wITqzKezr3Hq5DNy+DuPyOGlCZ4/mbP9gBZnsenhV2FznJMq6shYqbemkEqVXTLRmOiV
-         e/apV+sh53MOdymEenQ3LWWS7BzgKm4L++Vct9QU5BtDBPXfXipc/3LbP+uUGpQ+WSdQ
-         vGZfeQFc0rVVR1z6p291ZEi9C2ivJ29f3TcFSnplJtsMQeti4grUENEg+sgzxo2pACKd
-         IAovQKCkt1y/6Y/jJF3XECZ732xMtzs9nAmSBfVNVdrOYzCTJg+meSPi/AcCemEnmeGM
-         0L2g==
-X-Gm-Message-State: AFq9FYKDLdQhetZ31Itb12Zt1A81mSI5MOeohCA+4qP2PXU76mFVFX8E
-	ukGB5vo2vTFXLunMft3igVeSpoFO6KBi9qYYk/mlBxO3KiXVELXL0ESNmMRAaw==
-X-Gm-Gg: AYBFou3kNsq8MqKVcgUDwsNZwnTyKmnqkSVKGWJinpQEeRwzufV4/y540EGyCq1l7Up
-	MX0psD78WK46E/FVMxv7MeQBwZli9Sl+UOTDO4CRZQa+NNOqhMp3WikgPT8SaWTu7aVlhytvpZS
-	dBgWxVse9ys+/RKIkh+q4H9CW6TWkDCzr2AtBhpQDNI/Zca0aqaRMSzKbdkpCyVUNgVUuQcN6SE
-	KQ3MQHOc0xAPN6do1cG6Gdc5tQjiy5CRnT7BAf/43JASKZxVzNk80VG/JbugbbRhrZAp3XaV2JC
-	9ZDuehPIUO4q5qLW/HlFI77XFWVw1+Fsz4kOthguN/FpfeuX2SNVH72pbzm+yXdbLi7iP3PZPEB
-	TiNpoxloF43fPQu4ND0Bu252a8wy+TQKlo0b2TG/ciHBYKI2BxYRKRrUG3RsnDF8NIFFoNoiOSe
-	GgbS9UTYSUvIX1WIN5WEc6/+m+QSkf2oatL9vKfc1qqPSOAJXywmM85jNTePhuf+cX5/glvyJu6
-	lO9n5k73m+A2sPna4JFAgnrLGRcgIrACpWkacZhvFPrGZyi0hbwLZp3Ggh5jlMocTFhe/+npSGg
-	AutccV2abGNGyjSciFgLMBp7s6MZMgzweeY83lsIxjig3QxYW6LSgs5x4lUYG4swJhuLR0oYOYp
-	fAjm8kbsWvMvno5VJHgTQvXL5RiIu51Ya5C4qEFoDX59DKdOUC6waP1XPEWhfvz9PRONGKienvg
-	bxBf2zH1brveDUzwEW2SP0YbYF
-X-Received: by 2002:a05:6102:c13:b0:7be:25d4:7ff0 with SMTP id ada2fe7eead31-7d072247a9cmr1781580137.4.1793395788372;
-        Fri, 30 Oct 2026 14:29:48 -0700 (PDT)
+        bh=Q9qsRUv+pAKz8XBSBaIUzxMz5sZdB+AN13IJdxVfmt8=;
+        b=0A2UEIbaNguvHrMkQi/RS095/HYpleQv4CTmNecpxLlD2Cc4GjBamgm/7gjOkNG4+1
+         t/am4lkv0Q85sSmhzRLFSQ8CWdb3TUJV/ri8FBmf8v9h6FKMRfnDaoYqFzAUpE94uZKW
+         IKxohcncdCnR+N+RfEAgmCz+sZ7tJv36hAwEqoyQ16LqgYt9DiGT9UIZkmSEDRgMXX6f
+         SnLp5Z315JS/QVrTm25Nx44U4xJ21UW29svJY25vl2Mqr5sZVV6pQdaK0opwNM+YZTqZ
+         kIeMG4sWJgwOXyoLyw/37tIn2q7h03ETLWsGMIAEXcTbLkdZoZaZmt2mkCLMTkURAi0F
+         bMEA==
+X-Gm-Message-State: AFq9FYIeMp8/lC6F32HmnFnFHMDdygVtJl4dE8UlrlFfjS9S5Ie8+Bd/
+	eUttvvlRhfPc7cgljgKd69KMxU7agpfcitmLF/nIsQyJ+zB0crdNmOLO13BG3A==
+X-Gm-Gg: AYBFou3CjEQ0Tyb/Nvf1LeIooWQQOg76g4e95oWBgeJJOCqDtdbpHRblgXjdxII0V08
+	MS6zwMZub6DOX5AmmcB/eLm1yreXvOJGPIHU/O5qBBofajAWPwpnMi9fTCUnKbCMctbWMNxzVMv
+	4UHJ/y6wRh4MzHKIKzOjuK9xpVSEO3sUswaTWgXcdnTM1l2w7vkv8UMMv5Kla9LCP+Z0Ow32cjx
+	PpcVMRycGXt6l/CcEzA+vRlsDByzXYcYuNDI5T45/foz7NlOY5txtgYBKfui0XTImyqJajBfKeJ
+	u34iL6+hGGQIxoHf/+ymv/ybJOGYT/FwqVWVDp/tkYYvqcuAnqgBNrCga4hlFdKkJPE8lxvagkI
+	532F/05KX7TYftRMd2klJPMgW8yZ//AoH6QdkN9jk69bAJnKg/v72FiIz6qAlSUcXTKjxOHGrJE
+	b5F6SNQRIkgNtLeS96RMBkGbnHcew0f5synmo/Sbn7Ib6K8x/PXiW/BylUzQzkUhaesBKQecjZf
+	y/UL9KWF6ZeAf3L4+qLHZ9mOBY0TK2LUk799V+Nw6KXClk5EqlrRf9y2FWKRWZ1hRW0affcMjPl
+	UV8Cr1+96W2IJcP71D63bp8coZgRyaH1brvu5/rs/rntmPmJU7M0MhcOpwSPdzEqLoWs/2ekpZO
+	VMjGyrr2tueht/UkiQa0LHadn8DHtlOAg2oDy2iEZbNDOdUiQEid716AP+SvU0GlgdRChgsuQqM
+	noKP7Z
+X-Received: by 2002:a05:6122:54c:b0:5ea:c37b:450 with SMTP id 71dfb90a1353d-5ec68980d64mr2035234e0c.20.1793395790136;
+        Fri, 30 Oct 2026 14:29:50 -0700 (PDT)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.47
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.48
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 14:29:47 -0700 (PDT)
+        Fri, 30 Oct 2026 14:29:48 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 05/10] test: functional: wait for BAP transports to be configured
-Date: Fri, 30 Oct 2026 17:29:34 -0400
-Message-ID: <20261030212940.753771-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 06/10] shared/mcp: Don't drop commands before supported opcodes are read
+Date: Fri, 30 Oct 2026 17:29:35 -0400
+Message-ID: <20261030212940.753771-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261030212940.753771-1-luiz.dentz@gmail.com>
 References: <20261030212940.753771-1-luiz.dentz@gmail.com>
@@ -101,93 +101,101 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bluetoothctl only selects or acquires a transport its local endpoint was
-configured with, which it learns from SetConfiguration, while the
-transport object may be reported before. The tests acting on transports
-could then fail with "transport endpoint not found" when the call came
-later, as happens under User Mode Linux.
+The remote player is created once the CCID of the service is read,
+before Media Control Point Opcodes Supported is, and until then every
+command was dropped. As the player returned the request id as error
+code, the D-Bus call succeeded anyway, so e.g. a Play right after the
+player appeared was silently lost.
 
-Wait for the transport reported under SetConfiguration in the tests
-selecting or acquiring it.
+Only refuse opcodes once the supported ones are known, letting the
+server reject them otherwise, and report commands that were not sent as
+errors.
 
+Fixes: 9027edc4604e ("shared/mcp, mcp: support multiple MCP, and add non-stub MCS server")
 Assisted-by: Claude:claude-opus-5-5
 ---
- test/functional/test_bap.py | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ profiles/audio/mcp.c | 10 +++++-----
+ src/shared/mcp.c     |  8 +++++++-
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-index 7cd9466bd5f7..221efd982071 100644
---- a/test/functional/test_bap.py
-+++ b/test/functional/test_bap.py
-@@ -37,6 +37,11 @@ ControllerMode = le
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index 314bce2439df..7522ca4e6ea3 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -253,35 +253,35 @@ static int remote_mp_play(struct media_player *mp, void *user_data)
+ {
+ 	struct remote_player *remote = user_data;
  
- TRANSPORT_RE = r"Transport (/org/bluez/\S+/fd\d+)"
+-	return bt_mcp_play(remote->mcp, remote->ccid);
++	return bt_mcp_play(remote->mcp, remote->ccid) ? 0 : -EIO;
+ }
  
-+# A transport is reported once created, and indented under the endpoint
-+# SetConfiguration call once its local endpoint is configured with it,
-+# which bluetoothctl requires to select or acquire it
-+CONFIGURED = "\t"
-+
+ static int remote_mp_pause(struct media_player *mp, void *user_data)
+ {
+ 	struct remote_player *remote = user_data;
  
- def dev_addr(host):
-     return host.bdaddr.upper().replace(":", "_")
-@@ -259,14 +264,15 @@ def unicast_hosts(hosts):
-     yield host0, host1, initiator, acceptor
+-	return bt_mcp_pause(remote->mcp, remote->ccid);
++	return bt_mcp_pause(remote->mcp, remote->ccid) ? 0 : -EIO;
+ }
  
+ static int remote_mp_stop(struct media_player *mp, void *user_data)
+ {
+ 	struct remote_player *remote = user_data;
  
--def expect_transports(ctl):
-+def expect_transports(ctl, configured=False):
-     """
-     The endpoint is configured for stereo, so one stream per location is
-     created, each with its own CIS in the same CIG.
-     """
--    _, m = ctl.expect(r"Transport (/org/bluez/\S+/fd0)")
-+    prefix = CONFIGURED if configured else ""
-+    _, m = ctl.expect(prefix + r"Transport (/org/bluez/\S+/fd0)")
-     left = m[0].decode("utf-8")
--    _, m = ctl.expect(r"Transport (/org/bluez/\S+/fd1)")
-+    _, m = ctl.expect(prefix + r"Transport (/org/bluez/\S+/fd1)")
-     right = m[0].decode("utf-8")
+-	return bt_mcp_stop(remote->mcp, remote->ccid);
++	return bt_mcp_stop(remote->mcp, remote->ccid) ? 0 : -EIO;
+ }
  
-     return left, right
-@@ -292,7 +298,7 @@ def test_bap_unicast_transport_created(unicast_hosts):
- def test_bap_unicast_transport_acquire(unicast_hosts):
-     host0, host1, initiator, acceptor = unicast_hosts
+ static int remote_mp_next(struct media_player *mp, void *user_data)
+ {
+ 	struct remote_player *remote = user_data;
  
--    left, right = expect_transports(initiator)
-+    left, right = expect_transports(initiator, configured=True)
+-	return bt_mcp_next_track(remote->mcp, remote->ccid);
++	return bt_mcp_next_track(remote->mcp, remote->ccid) ? 0 : -EIO;
+ }
  
-     # The CIS are only created once every CIS of the CIG is ready, so
-     # all the transports need to be acquired
-@@ -627,7 +633,7 @@ def test_bap_broadcast_transport_created(hosts, source_script):
- def test_bap_broadcast_transport_acquire(hosts, source_script):
-     source, sink = start_broadcast(hosts, source_script)
+ static int remote_mp_previous(struct media_player *mp, void *user_data)
+ {
+ 	struct remote_player *remote = user_data;
  
--    _, m = sink.expect(TRANSPORT_RE)
-+    _, m = sink.expect(CONFIGURED + TRANSPORT_RE)
-     transport = m[0].decode("utf-8")
+-	return bt_mcp_previous_track(remote->mcp, remote->ccid);
++	return bt_mcp_previous_track(remote->mcp, remote->ccid) ? 0 : -EIO;
+ }
  
-     # Selecting the transport syncs to the BIG and starts acquiring it
-@@ -682,7 +688,7 @@ def expect_bis_transport(ctl, host, bis):
-     Transport a side created for the BIS carrying its own channel,
-     checking it is the only one it has.
-     """
--    _, m = ctl.expect(BIS_TRANSPORT.format(bis))
-+    _, m = ctl.expect(CONFIGURED + BIS_TRANSPORT.format(bis))
-     transport = m[0].decode("utf-8")
+ static bool remote_mp_set_setting(struct media_player *mp, const char *key,
+diff --git a/src/shared/mcp.c b/src/shared/mcp.c
+index 4ee14d1567fe..8ddc072dacaa 100644
+--- a/src/shared/mcp.c
++++ b/src/shared/mcp.c
+@@ -108,6 +108,7 @@ struct bt_mcp_service {
+ 	struct bt_mcs_db rdb;
  
-     # Checked over D-Bus rather than with transport.list, as the
-@@ -942,8 +948,8 @@ def set_hosts(hosts, secure_connections):
-             "Pairing successful",
-             f"DeviceSet /org/bluez/hci0/{SET_PATH}",
-             f"Device {host2.bdaddr.upper()} Bonded: yes",
--            TRANSPORT.format(dev_addr(host1)),
--            TRANSPORT.format(dev_addr(host2)),
-+            CONFIGURED + TRANSPORT.format(dev_addr(host1)),
-+            CONFIGURED + TRANSPORT.format(dev_addr(host2)),
-         ],
-     )
+ 	bool ready;
++	bool op_supported_known;
  
+ 	unsigned int notify_id[MAX_ATTR];
+ 	unsigned int notify_id_count;
+@@ -1256,7 +1257,11 @@ static unsigned int mcp_command(struct bt_mcp *mcp, uint8_t ccid, uint8_t op,
+ 	if (!service || !cmd)
+ 		return 0;
+ 
+-	if (!(service->rdb.media_cp_op_supported_value & cmd->support))
++	/* The service is added once its CCID is read, so commands may come
++	 * before the supported opcodes are known: let the server reject them
++	 */
++	if (service->op_supported_known &&
++		!(service->rdb.media_cp_op_supported_value & cmd->support))
+ 		return 0;
+ 
+ 	DBG_SVC(service, "%s %d", cmd->name, arg);
+@@ -1686,6 +1691,7 @@ static void update_media_cp_op_supported(bool success, uint8_t att_ecode,
+ 	DBG_SVC(service, "Media CP Op Supported: %d", v);
+ 
+ 	service->rdb.media_cp_op_supported_value = v;
++	service->op_supported_known = true;
+ }
+ 
+ static void update_add_service(void *data, void *user_data)
 -- 
 2.56.0
 
