@@ -1,76 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793381484;
-	b=1EWzNflns8jSccSazyx+C0vnUvRX5vSa/m6hYNk3WT/K0cTeztxT10RbQsJGqe7ZcqXn
-	 Em+rxQ444mRyNmwtE+Wjek6BissCuS7Q0s2M2h6v0BJUiWny8fzC1BlU9HwQajbxqFHov
-	 ZZVd6KPZbWeFeLN06+fOjX6KpBNvwgCVgdiymzct+Q98I8FKslUK8h2XDsdsuoH+Rpin8
-	 Cqjv/dJU274Pyygdgd+zsYdfznJ4XiGVFlWJwL67pxDD8mVsFueOc1AMPqyx5Dsu3fAt+
-	 xJ3sbfAng1sBWA9vCMabV/F7z48yIJq63PCH2CHq9h+B+ZsXSHKYDbvi7R/xhaAMnzw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793381484;
-	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
-	b=R12ZjPwHomzJ36kHDJNV9OqZ6+tZA/dr6sJSa7snLBPM/XV7XBmcCwrG+fFrfDMrGlW4
-	 AC2DKqPM3I0H4vpwvXfXtNMPEHq1l99/eMcaJkgqqOctJBrCCH9IJ842W609gsa0SS6nE
-	 yAlqYVNT5ufGPBIKvhtfWdRUUir8bycpiIJDBoOODCGR1ffu7c4m29kHXruL7B5yp3y6c
-	 +R3zRI93Z8MnvSBBGk7tiRrBs8Dn97APL0cHj0gNtk3kAIpWyWZJ4AufJ5QrGwHKgYscu
-	 CCS6TikTxdr7+cDwc3is5d8Dyq0A2aq/b0Ndrg62JTEHI1MyJ4uLK23nRDhAsdjtKYg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=iki.fi;
-	spf=pass smtp.mailfrom=iki.fi;
-	dkim=pass header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=Yq+LszaH;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=141.14.17.11
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793385867;
+	b=UrCbWH86Bc4jWphKPtbf0G/ull1CKQF0XlX3oKPvq/iQ0TLhrliLBeTuq3/6I2VFshCi
+	 /IedWARfo0B3xKrYJTmZjzQ+/1R26Jf1fBGtswMqK8j7OlYsnb2S+tOJAECFn12hwlpSd
+	 6QL9IukK2WWRy0jvXEud2MrUGIk7Gm8uAPpYa7qn+QcPYNHmPq9PfOWRvYAIgB/h+ZbSE
+	 mxnVF7BGiBa3JVbYmWIlrlyEG2nYchSWPFlM9LlTGuK/9skHQ7r27P9nwJ54ylugSFD8u
+	 CAeGhjkHLRsSa0vY5CK0OIWCWKla075PrZd2cmsIrJj9TUvnwMlUJtaY9Q9lqCt9tSw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793385867;
+	h=DMARC-Filter:Received:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:DKIM-Signature;
+	bh=WqvK1oXV/PoqCN/uHmXaJj+eN8mJrD0A3RAa0dua+lo=;
+	b=wf9S+VLaC/7U8jR1shxtwDgfEF+mEBoKqVHymvGvjauBAQ3/0Qc1+4/Ng1fGPKDSMWSr
+	 r/PczIkxQR7C9c6wZeqKoQ725vs/TtIm5nIHA9xktkmzFMHU2wNSmWYzn0OmuXiWKzzoI
+	 ihtsu7Hf5dVZLl18xXwSTYPQqNla/Fsthr43nFzA3I6liVsUYOmUS9FkY6ORcmtkPOBtJ
+	 y/dR0daxnC4+qIL28G0nTZ6z7auMQ+aqgSs2nNKKk1xA9BwxUU2fVhnJbdgZwlKAo32tl
+	 fjuygsq4ysrRgrAQ8ArhbaBGMTZNo4fhO3gFlCpXDbL8X/PGDeuYxBO528Tbnv7WS9Q==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=molgen.mpg.de;
+	spf=pass smtp.mailfrom=molgen.mpg.de;
+	dkim=pass header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=ODlm5Bbb;
+	arc=none smtp.remote-ip=141.14.17.11
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE25E606A31A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 17:31:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE25E606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6843606A31A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 18:44:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6843606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=Yq+LszaH
-Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	dkim=pass (2048-bit key, unprotected) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=ODlm5Bbb
+Received: from [10.0.41.209] (unknown [62.214.191.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4jGSnJ2zCFzyQC;
-	Fri, 30 Oct 2026 19:31:16 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1793381476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
-	b=Yq+LszaHzApyA6ECTTM2gAfxpEQWW7yj2MK6oCFSH2Mm+eBMgFmkZI2uVdzANasuIDFadj
-	xPUZhQWm7p5w3sC/sESpMC/FggiuZP3nR3KxBAiGNrkt3CTt+Zteqx+QIIfNfOwxrw8IiW
-	bWfHh7nTU4uLLxZdSAxo7ozUW7ZmJCU=
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1793381476;
-	b=LEQtPnUs/7oASkkU02CvmDXucnRqxMR/tF2sZsdqdZzS14Ojd4G+xAiraHGhbIZvo2jDe0
-	W9uT0QcYfb0TpEQpOpOsmXx96O1J4PfMkiJsP2Resi2+8oOsAQCt5t839IqRvKHMsDXJYk
-	UyJXWtkx2TW5H8S0V8UeGYLf6ls3pgs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1793381476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7F0Sf8wPiQ5jV/xNnZHK0Gq3+iOyhEZ3KmpFQ07XjTE=;
-	b=tsKXnxAkHIXcozjMUlAG/XiCshPAuqAEaumz2CML0/ow0sRYkENWNdLLr8XUbvxRluGQUh
-	jeoWbyT3c1XOND1yyJrJwK7fEttCpQKec38C/dQX9ODKRyMw9sDOM0Lkyo5XCNF3YBphGo
-	i0wl3b8HZBB/F5ZeCg9i74dSLAOUDIs=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH RESEND BlueZ] test: functional: retry pairable when Busy
-Date: Fri, 30 Oct 2026 19:31:12 +0200
-Message-ID: <45f6af417f7b09d62d76bf128c1d6d22189bb2f7.1793381304.git.pav@iki.fi>
-X-Mailer: git-send-email 2.56.0
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 328514C442F982;
+	Fri, 30 Oct 2026 19:44:05 +0100 (CET)
+Message-ID: <d10df07d-03fe-446a-b462-0d956ced4e8a@molgen.mpg.de>
+Date: Fri, 30 Oct 2026 19:44:04 +0100
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -80,105 +51,131 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Set MAC_INIT in
+ get_mac_access()
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com
+References: <20261030142907.139369-1-kiran.k@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20261030142907.139369-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=molgen.mpg.de; s=20260906; 
+	t=1793385845; 
+	h=from:from:subject:date:message-id:mime-version:content-type:content-transfer-encoding; 
+	bh=WqvK1oXV/PoqCN/uHmXaJj+eN8mJrD0A3RAa0dua+lo=; 
+	b=ODlm5BbbzMYb3tMwge9IHY/D9XUu/M6aYbq+UJlVV0KDEKpMN+seRfepvVpoBRMbgmWQpXKAXadm
+	X39ihodiN22qr3bXv1hzaWQ0HIV/QylvjvPglb2YDssXwFwQHllSGAQ6S2/F4UdDDG33Koc/zto4rQ
+	vqEF5UGc9MpcG8x4B+K0sE08e9D+SA9P0CtzcasVazprJKC87xBRKkfe7dRTBv/2RC7HQ5bxW2I4oq
+	EUw7tMYUP1lLJVhqUVZoKyUMsUyV8MlboeMhDUsrr4VVCboATdEkkIB6m+SHBySsuj4DfbFwe1d/YB
+	+tE8AcyXcL8tCZ2744a3eLS2FuBVuKKA==
 
-bluetoothctl registers an agent on connect, which toggles bondable.
-Before it completes, "pairable on" fails with org.bluez.Error.Busy.
+Dear Kiran,
 
-Retry "pairable on" until accepted via a pairable_on() helper.
 
-Fixes flaky test_bluetoothctl_pair_bredr / a2dp tests.
+Thank you for your patch.
 
-Log:
-src/agent.c:add_default_agent() Default agent set to :1.2 /org/bluez/agent
-src/adapter.c:set_mode() sending set mode command for index 0
-src/agent.c:agent_ref() 0x7c1fb6700110: ref=1
-src/agent.c:register_agent() agent :1.2
-[:1.2:method_return] < [#22]
-[:1.2:method_call] > org.freedesktop.DBus.Properties.Set [#31]
-[:1.2:error] < org.bluez.Error.Busy [#31]
-src/shared/mgmt.c:send_request() [0x0000] command 0x0009
-src/shared/mgmt.c:can_read_data() [0x0000] command 0x0009 complete: 0x00
-src/adapter.c:new_settings_callback() Settings: 0x03fc0ad1
-src/adapter.c:settings_changed() Changed settings: 0x00000010
-[bluetoothctl]> 	SupportedUUIDs: 0000110a-0000-1000-8000-00805f9b34fb
-[bluetoothctl]> 	SupportedUUIDs: 0000110b-0000-1000-8000-00805f9b34fb
-[bluetoothctl]> Agent registered
-[bluetoothctl]> Failed to set pairable on: org.bluez.Error.Busy
+Am 30.10.26 um 15:29 schrieb Kiran K:
+> Every caller that read device memory had to call
+> btintel_pcie_mac_init() before btintel_pcie_get_mac_access().
 
-Link: https://lore.kernel.org/all/6ae4b5dc.60f493e6.387f6f.e5a9@mx.google.com/
-Assisted-by: opencode:qwen3.8-flash-next
----
- test/functional/test_a2dp.py         |  5 +++--
- test/functional/test_bluetoothctl.py | 25 +++++++++++++++++++++++--
- 2 files changed, 26 insertions(+), 4 deletions(-)
+I’d use present tense: Currently, every caller reading device memory has 
+to call …
 
-diff --git a/test/functional/test_a2dp.py b/test/functional/test_a2dp.py
-index 12348ea05..4cf4eb296 100644
---- a/test/functional/test_a2dp.py
-+++ b/test/functional/test_a2dp.py
-@@ -9,6 +9,8 @@ import pytest
- from pytest_bluezenv import Bluetoothd, Pexpect, find_exe, host_config
- from pytest_bluezenv.utils import bluez_src_dir
- 
-+from .test_bluetoothctl import pairable_on
-+
- pytestmark = [pytest.mark.vm]
- 
- A2DP_SOURCE_UUID = "0000110a-0000-1000-8000-00805f9b34fb"
-@@ -50,8 +52,7 @@ def pair(host0, ctl0, host1, ctl1):
-     ctl0.send("scan on\n")
-     ctl0.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
- 
--    ctl1.send("pairable on\n")
--    ctl1.expect("Changing pairable on succeeded")
-+    pairable_on(ctl1)
-     ctl1.send("discoverable on\n")
-     ctl1.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
- 
-diff --git a/test/functional/test_bluetoothctl.py b/test/functional/test_bluetoothctl.py
-index e8c813a7a..1486d9e99 100644
---- a/test/functional/test_bluetoothctl.py
-+++ b/test/functional/test_bluetoothctl.py
-@@ -20,6 +20,28 @@ from pytest_bluezenv import host_config, find_exe, run, Bluetoothd, Bluetoothctl
- pytestmark = [pytest.mark.vm]
- 
- 
-+def pairable_on(ctl):
-+    """pairable on for given Bluetoothctl/Pexpect
-+
-+    Allow failure with org.bluez.Error.Busy, which can occur due to
-+    bluetoothctl toggling bondable on startup. Retry until accepted.
-+    """
-+    while True:
-+        ctl.send("pairable on\n")
-+        idx, groups = ctl.expect(
-+            [
-+                "Changing pairable on succeeded",
-+                r"Failed to set pairable on: (\S+)\r?\n",
-+            ]
-+        )
-+        if idx == 0:
-+            return
-+
-+        error = groups[0].decode()
-+        if error != "org.bluez.Error.Busy":
-+            raise AssertionError(f"Failed to set pairable on: {error}")
-+
-+
- @pytest.fixture
- def bluetoothctl():
-     try:
-@@ -41,8 +63,7 @@ def test_bluetoothctl_pair_bredr(hosts):
-     host0.bluetoothctl.send("scan on\n")
-     host0.bluetoothctl.expect(f"Controller {host0.bdaddr.upper()} Discovering: yes")
- 
--    host1.bluetoothctl.send("pairable on\n")
--    host1.bluetoothctl.expect("Changing pairable on succeeded")
-+    pairable_on(host1.bluetoothctl)
-     host1.bluetoothctl.send("discoverable on\n")
-     host1.bluetoothctl.expect(f"Controller {host1.bdaddr.upper()} Discoverable: yes")
- 
--- 
-2.56.0
+> Fold the MAC_INIT handling into btintel_pcie_get_mac_access() and drop the
+> separate helper along with its three call sites.
 
+ From the diff, it’s not clear, why moving it to 
+`btintel_pcie_mac_init()` does not change behavior.
+
+> Unlike btintel_pcie_mac_init(), which also modified FUNC_ENA, FUNC_INIT,
+> BUS_MASTER_DISCON, and SW_RESET, leave those bits untouched as they are
+> not needed for MAC access. Set only MAC_INIT and MAC_ACCESS_REQ with a
+> single register write when either bit is not already set.
+
+I’d make it two commits.
+
+> Fixes: b9465e6670a2 ("Bluetooth: btintel_pcie: Read hardware exception data")
+> Assisted-by: Copilot:Gemini 4 Argon
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>   drivers/bluetooth/btintel_pcie.c | 31 ++++++-------------------------
+>   1 file changed, 6 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index 7d84c8106cf1..025c4c64d020 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -989,31 +989,18 @@ static int btintel_pcie_reset_bt(struct btintel_pcie_data *data)
+>   	return reg == 0 ? 0 : -ENODEV;
+>   }
+>   
+> -static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
+> -{
+> -	u32 reg;
+> -
+> -	/* Set MAC_INIT bit to start primary bootloader */
+> -	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+> -	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
+> -			BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON |
+> -			BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET);
+> -	reg |= (BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_ENA |
+> -			BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT);
+> -	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
+> -}
+> -
+>   static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
+>   {
+> -	u32 reg;
+> +	u32 reg, val;
+>   	int retry = 15;
+> +	const u32 req = BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT |
+> +			BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+>   
+>   	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+>   
+> -	if (!(reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ)) {
+> -		reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_ACCESS_REQ;
+> -		btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
+> -	}
+> +	val = reg | req;
+> +	if (val != reg)
+> +		btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, val);
+>   
+>   	do {
+>   		reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+> @@ -1951,8 +1938,6 @@ static int btintel_parse_mbox_tlv(struct btintel_pcie_data *data)
+>   	if (!buffer)
+>   		return -ENOMEM;
+>   
+> -	btintel_pcie_mac_init(data);
+> -
+>   	err = btintel_pcie_read_device_mem(data, buffer, tbl_addr,
+>   					   buffer_len);
+>   	if (err)
+> @@ -2643,8 +2628,6 @@ static void btintel_pcie_read_hwexp(struct btintel_pcie_data *data)
+>   	if (!buf)
+>   		goto exit_on_error;
+>   
+> -	btintel_pcie_mac_init(data);
+> -
+>   	err = btintel_pcie_read_device_mem(data, buf, addr, len);
+>   	if (err)
+>   		goto exit_on_error;
+> @@ -2732,8 +2715,6 @@ static int btintel_pcie_dump_fwtrigger_event(struct btintel_pcie_data *data)
+>   	if (!buf)
+>   		return -ENOMEM;
+>   
+> -	btintel_pcie_mac_init(data);
+> -
+>   	err = btintel_pcie_read_device_mem(data, buf, data->debug_evt_addr,
+>   					   len);
+>   	if (err)
+
+
+Kind regards,
+
+Paul
