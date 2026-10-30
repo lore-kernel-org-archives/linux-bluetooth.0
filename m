@@ -1,91 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793395794;
-	b=1DbpyrY3ylNidOEmwIbPXdInDQSk3UI1N/Mwi4MotSrX1Zcsz9cKgrDKSzn/dxsVbfXg
-	 aJ3EveTOoqmzceapqP9HqTKVrcy8KQKV6iIeN4CfhswSXWBPo8Wn1U47dn+PY5JYNAra7
-	 SvjdVLg+8cCW4TV5gvjqHVY5toYUtgUWGSDuHoGGPwWbCYs7A8X6Iva6qZpsAKGArdV5V
-	 i4k1COiP+Oty4J6MX6tmlVDRmHuYF7yEKIokF7PCzQ4Eh7xZVYhbKWrnD9OCgBTn9zRPt
-	 aSMnpGz5JncIph6+FMw0u7FXnkK7nOew+D78gZUJTiQB9iGMMGebQ+IDXdxrdOlaVag==
+	t=1793395795;
+	b=lFPkIXipt2pJ91u26ceV3TOEDt64uwkkS82RJo6MR6ctMx7BbzhJ5tN/fBHerKSXsdWq
+	 1blorBmDpJ7s94cDNU9p77XdC4uvvzB6PR3/2NPAh7SEWwytK//xBwdLDeEGa6/O94uru
+	 0wi4I7BfNq4wcgekQy+JNPuMcc8pdrDy8JD8H4IEysnj0b4TBHFjsAgtYIv/n45dkDQWE
+	 i66xZSJ52igl5dCY6nIBM0AIX9acKEftHr6Rb8PRC6KIvG18BjszCA6hFUq3RPFjjQmD8
+	 Duq8weXzS/1unQNSBkVFt6qJIOqWfNZrgaInfc3vxnaiDfFRmK3W71TmfVa7wNYoCQA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793395794;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793395795;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=LlEzGUAeQ+C9NAODFVnjP/8YdhsugoJk8PBpSWa/9iU=;
-	b=pvm6UfCJTKCDRZmTMmM6Ar7I4r+TFloWiiOmUMWK/geLyxnQ05VVU2IECdYSzOkCMHKh
-	 RfwZgmmfce9ypOll6SnZSvp6su7dW8bivhrfMm49QuojJQB7+Rs7+T4vnIHRyN3RrIJJ0
-	 GQonl5PISJ1E5Jng5024UxHjL/fYd2Dpj71/P2r0UJEEYGBGxEpBoiiQvcMWsPnNZbTab
-	 3hwGky6uWQrw2qgAXzAAfOYMAiWatgdnUaokIk97x/POJgnOpukaBe0sTt+M1F13S1ej0
-	 p4s+/Yhp2hEKI5OeIrqNEBnQvRWXQaeo2sv2x+9UttrRlgoIbBukfZa3nZxsFt/Zyvw==
+	bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
+	b=LVRPTnSTZQf+mLSjaNaKStq9whiCaBdoFLSQqV4hqUv6au5qHC6uaYX8s2RzoiKnho5Y
+	 riVf44TO64uQGzZqINBVGAPZx3ndlcvf89mnGTeoFfHS/+K7qzMFciX/Riv904otQmHnb
+	 9VT6m9Py2jLAD8tTM/4H1MqSdjhIiXWvX3K2nNJyHDWwSPvgVyIXXpouf2dLuiI7gPbVG
+	 zTuEibN6nHDsfHJZx8PUwTItcjUh5EYLsoFDr5sZT0P0PyARfNA9RDTbJMBcyRUGL8fJE
+	 LpGfHsgek+sowwukGj8QfUyThFeJAJHw6hyyqwO/r0ueqGY44kOr08A2kbzJOHZ4ARg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ufrWobLS;
-	arc=none smtp.remote-ip=209.85.217.43
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j8CRlR4J;
+	arc=none smtp.remote-ip=209.85.221.175
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A769C606A31D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A769C606A31D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59E0606A322
+	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 21:29:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C59E0606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ufrWobLS
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7cc53938a8fso730003137.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:53 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j8CRlR4J
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5eac7220e9cso481275e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Oct 2026 14:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793395792; x=1794000592; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=LlEzGUAeQ+C9NAODFVnjP/8YdhsugoJk8PBpSWa/9iU=;
-        b=ufrWobLS9wj2g44ZVamjEm5nKz4GwOS0FFGMfpSW7vvYPkz9AeeS7vKEDINAxFRVFE
-         EKalPkcouxBPE0LoiftoGt0GjkA+nAfBXk0MmR5O3VXj70z05qPRPhhNSlvlLR0JsDOW
-         016A5PFS7IP6Mi7DEGfj5JMtRQCNEXu2XWkrepqBpWp18G2XK9ZtYasTWvx/aLQTFKo8
-         30hvul7DfIoSrh2CT5AvZrPbiGmAFOFXkwVI29PLLlZnsskEnzP3SVQaszJO4jzKhrBR
-         LHeQz4hf8LFFXg/YvQfRAMiy0IKgYeLBLn6FJnU5cfwypUYUSGUAreidg7iEoxrhJ8N0
-         qxHA==
+        d=gmail.com; s=20260707; t=1793395794; x=1794000594; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
+        b=j8CRlR4JRa/wbqB1LdwKqfzpk9EXeqnCurRf2NWTp3jcHkASYO/1GHBurRjfa9AyFs
+         xvaeZjkCg9u/j4xV80UEEWqhQMGVnolkD79kKF3WBstFUd0tS9THNRXyK5ic4Aa8Dp8R
+         ZV7aAWHOMgKXVSDqsTV/owtffZjgMcOzQazQaSNp6lww880NhzNFUIX7ZAX6xGxhWjTb
+         m3bv3ihsmJgqn7enHnqwEayXy5J75tdKk+aQofxSuIIdI8m57ipLctJU8syRcacuXhn/
+         EWTi/nbV/XJyntgraw/ry8miY7BjTBGOqwd7yScf+BP+fiJNBUByalC6gaXadV/Ody0H
+         nvyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793395792; x=1794000592;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LlEzGUAeQ+C9NAODFVnjP/8YdhsugoJk8PBpSWa/9iU=;
-        b=ptQ4gPVT3EKoStuZhz/QelopzUY8JgxHkAtVyIXUFCx6Y0mdybtLM4tZyBiJOUDuFr
-         Rwi4YWyUfLyjSk6iykgsm03e70fIefl/JTh5uNHJrEolFdglvdRMEJTb3OZ8PXwypLOx
-         zHAOwHkc8ld0hshhNw5TFYT583h0kAkxRuqdi1kL5GD/cQnOaYLqRqtbiiQiDeq0Pj+Y
-         iioWK7lD2tLSRFHxiM87rHrufgFqrtIXo2ZkFVXzYS+PVgyqniQXqASWxCtCO333bXhn
-         zfdxug2f2bkjON5t0Atf3lymj+LYXZ/J4UO1Mhn6eoCmbQc6F3EmapgHonhjZDQ+ZXXa
-         Kj3Q==
-X-Gm-Message-State: AFq9FYJp99W1bP0vPbL7L39+EGvB+Z8jVgxHByZzCD1ExXP1WR22qyxy
-	wk/RcDFzeyiu2t2sWD8iRiXfybEgbiW2ivRVnuPYhOa8uaw85hLJMkunAG8LVQ==
-X-Gm-Gg: AYBFou3BH8al5XV0DzecG7S7aGGTDklXfqMeDt4xRLz9p9rUJcSbHzcr8bIddkaB7pz
-	dkzY5eRF7LHPiekbg/dStnvUM2Yg+NpO94m9RgDrGUPafjZx2N8gbgkUhFsvu4h4+t7DVGlkChS
-	zB9ZNe7TZznmbRv+m3Yed51XCT00NAH7h35SMeUYfJQeiGF5YmeKcKfdSEFLj9pOZC2unbZ9VJv
-	OjlwVGrgrRNRWmj5fTyCu84QAgIPwtlMKLya2hQ6kgoUWxjw6H+1annRZv4PjX3rNa9L+IFSseU
-	pUisay/G76BO0pzaINTXoLrkydu7KFqfKc5kTUCHNcP7qxGIUosd7htl5V3Ac319PaTjNq3DGDk
-	btqcq33nHdrYsGv2888QbMlIFyXD2luLhQBaa9YsyxHb0mHM3aT8+szjXKLv8++/EmNh10k9ua5
-	KyWFy//FffDi1qx3v+X9VwMJf68yKBGm4BWwPhWA3PQuyT0gvfTx/wjdaQpmHniIImEppx9bLZt
-	FaPqYcKW3ZrMknr2GEaWCQe635hnp+PfTl78jyPfSu/ANoxlD2Q4GkbRks+rJFqajSQohvY70z6
-	yoKi8NWUpaYZWxUJYbzVjklQR7eSEQNLRUNLTpgxz0a6FPznefseleZkXGvrM1GT0BdHZ67cPQv
-	d54AwzV2+N0kjsFzCDZQX78w6ua4mk0sFgbVZKrkhYF+0dMXnu/RyQqjsLwQg9fCC1iBJeO0O4i
-	zS5HY=
-X-Received: by 2002:a05:6102:5494:b0:7cb:bc5e:7d9f with SMTP id ada2fe7eead31-7d072bb3829mr1876769137.11.1793395792519;
-        Fri, 30 Oct 2026 14:29:52 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1793395794; x=1794000594;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=wo0EWkzugmC60UjkBz0RdKP0OScAfLWeN+J+4s5BfzE=;
+        b=lynzIvu0gN2+9Jgdu3Bn1unUOFMZxdNCgATEsPLMtu2jdgj3gpZ24kPKyaDFzRFDO9
+         x8wMcHUZv3lAfcgfW3deXd20SB46RRb1zOhu82WO85acfPKm/zBn6xVZcmUV34zHKzFd
+         6AxdbFhV6uiacCUGTbTvTC7oY2PmNQpSHob8k1YoJb7NU0QBvRupq63nK4Wdr69GcYXn
+         9mShFGQ8rE4U4zOMad8yHyzXQivL8Mz//4DXCijIpar3yqr3jHA1uc0/HHpgdf8c5IU6
+         RPJtRi6cA4KP/wrjWcYnmqWdofakQvJSDLE8w4JLc/B/dnZkHbzFsHfuJeLTgPBE2hhD
+         AXEA==
+X-Gm-Message-State: AFq9FYJL1n4LGyxQjZzA/SnDYW/pchFq9kHtfzEgM/X8XJD904WJkMut
+	91LxFSR3zOoukJF9uDAMzv4PX8mQ5mEFk86TE6fweJCraFAm5FO+EfsvbcQUFg==
+X-Gm-Gg: AYBFou29HVVhw/GlzYkbijbA6eB7oXoi4LIC6ckOOWujRNUqPXN65uDQIbouK3JYa/f
+	CyYKXCLK2Kib9GkzUwe31doCG9aYZLk34eNnfnlwVBxMQ12khnfYARm2/kGYh4zY87Ui6wZAIPj
+	IdrgUqtBjgCd+SDNJZzTTY12d849MgA4waWWzB3jMX4CXR8CNs6n8oJ7YR3uvofqWsgfxMh4ScI
+	CxBrvXGs02GUDxdInnKmvhpnMxM7WAsyXqMS8F+B/GPvuhpbC2dQ46/q69EyxFrv27Kee6Uy4Ny
+	zSvlzO/6jaSj4neSQE1TtxjXGuwXWdOckMv4glWAcFSEZn4JklRhIPA4gxmFEYvvBeWJCbGomMw
+	U5fbPXpLbAdp4rj8dFiH6Dj9c6aecqWDEhU0oIYg08C+Zydch1QMmvbcuus++8gDMCq49N70p+t
+	tF8HszRlduzcAjcGMpfTOejmjNnmFlSRc7F++qE6D1cDnhbU1hYfBry7O+IX2UVYzFLo4E8sIFD
+	iK2O44gu5NE/5YSaSRf0UhJUf4PobOpgddlh1Ky37OpBQZXudrXgTjbOHbsvzT+K0Ot6deCMEFs
+	leyT0sCDTUfPewL8/5sVJ4irgsX3e+hBb+NFY6dKAmIo+w3PRzvXAgm8ilmLfxGU8GCV+JbSb3N
+	TF4A94Tln1CEJR9F+qkWL72g+U7mgJlnFuktHdLkSw3zKlLQXCJAVb+eZGeQjBXWJEa513z8lvy
+	CyVs8=
+X-Received: by 2002:a05:6122:512:b0:5c7:a9ee:dcfb with SMTP id 71dfb90a1353d-5ec68718ff2mr1871528e0c.5.1793395793860;
+        Fri, 30 Oct 2026 14:29:53 -0700 (PDT)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.50
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69c9c554sm3696412e0c.14.2026.10.30.14.29.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Oct 2026 14:29:50 -0700 (PDT)
+        Fri, 30 Oct 2026 14:29:53 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 07/10] doc/test-functional: Document User Mode Linux VM hosts
-Date: Fri, 30 Oct 2026 17:29:36 -0400
-Message-ID: <20261030212940.753771-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 08/10] a2dp: Fix refusing the AVDTP connection of a new link
+Date: Fri, 30 Oct 2026 17:29:37 -0400
+Message-ID: <20261030212940.753771-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261030212940.753771-1-luiz.dentz@gmail.com>
 References: <20261030212940.753771-1-luiz.dentz@gmail.com>
@@ -98,144 +97,98 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Document running the VM hosts as User Mode Linux guests through
-test-runner, e.g. on machines without KVM support, with btvirt serving
-their controllers and channels over vhost-user, and the kernel
-configuration this needs.
+When the remote reconnects before the disconnection of the previous
+link is processed, the A2DP channel of that link is still registered
+and an incoming AVDTP connection on the new link is taken as a
+transport channel of its session, and refused.
 
-The hosts run on real time, as time travel makes these tests slower:
-document the measurements and why.
+Process the disconnection of the signalling channel of the existing
+session first if it is pending, so the connection is handled as a new
+signalling channel.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- doc/test-functional.rst | 74 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 70 insertions(+), 4 deletions(-)
+ profiles/audio/a2dp.c  |  7 +++++++
+ profiles/audio/avdtp.c | 24 ++++++++++++++++++++++++
+ profiles/audio/avdtp.h |  1 +
+ 3 files changed, 32 insertions(+)
 
-diff --git a/doc/test-functional.rst b/doc/test-functional.rst
-index e2fcf34138b3..a50cd441189c 100644
---- a/doc/test-functional.rst
-+++ b/doc/test-functional.rst
-@@ -90,8 +90,9 @@ The following additional options apply:
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index cb1b3a9804e7..3b29ec204d00 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2796,6 +2796,13 @@ static void confirm_cb(GIOChannel *io, gpointer data)
+ 		goto drop;
  
- ``--kernel=<image>``
-         Kernel image (or built Linux source tree root) to
--	use.  See **test-runner(1)** and `tester.config` for required
--	kernel config.
-+	use, either a QEMU ``bzImage`` or a User Mode Linux binary, see
-+	`User Mode Linux`_.  See **test-runner(1)** and `tester.config`
-+	for required kernel config.
+ 	chan = queue_find(server->channels, match_by_device, device);
++
++	/* The channel of a previous link, if its disconnection was not
++	 * processed yet: this is not a transport channel of it.
++	 */
++	if (chan && chan->session && avdtp_check_disconnected(chan->session))
++		chan = queue_find(server->channels, match_by_device, device);
++
+ 	if (chan) {
+ 		struct a2dp_setup *setup;
  
- 	If not provided, value from `FUNCTIONAL_TESTING_KERNEL`
- 	environment variable is used. If none, no image is used.
-@@ -167,7 +168,9 @@ A test run consists of the Pytest process (the *upper tester*, running on
- the developer machine) and one or more *VM hosts*.  Each VM host is a
- separate **test-runner(1)** instance, i.e. a QEMU virtual machine booting
- the given kernel image with the developer machine's root filesystem passed
--through read-only.  The VM hosts are wired together by a Bluetooth
-+through read-only.  With a User Mode Linux kernel the VM hosts are UML
-+processes instead, see `User Mode Linux`_.  The VM hosts are wired
-+together by a Bluetooth
- controller: either the emulated **btvirt(1)** controller, or a real USB
- controller passed through to the VM::
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 56d27b973a17..30f80a0c2fd1 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -18,6 +18,7 @@
+ #include <stdint.h>
+ #include <stdbool.h>
+ #include <errno.h>
++#include <poll.h>
+ #include <unistd.h>
+ #include <assert.h>
  
-@@ -249,6 +252,46 @@ Writing test code that runs in the VM, and the available VM-side
- facilities, are documented by `pytest-bluezenv
- <https://pypi.org/project/pytest-bluezenv/>`__.
+@@ -1168,6 +1169,29 @@ static void connection_lost(struct avdtp *session, int err)
+ 	avdtp_unref(session);
+ }
  
-+User Mode Linux
-+---------------
++/* Process a disconnection of the signalling channel not dispatched yet,
++ * returning whether it is disconnected.
++ */
++bool avdtp_check_disconnected(struct avdtp *session)
++{
++	struct pollfd pfd;
 +
-+When ``--kernel`` is a User Mode Linux (UML) binary, or a built kernel tree
-+with a ``linux`` binary and no ``bzImage``, **test-runner(1)** runs the VM
-+hosts as UML processes instead of QEMU, e.g. on machines without KVM
-+support, with the developer machine's root filesystem mounted read-only
-+through hostfs. The channels are passed to it with ``-o`` as kernel
-+parameters: a single ``btvirt`` process serves every device of the VM hosts
-+over vhost-user (see `virtio.rst <virtio.rst>`_), the controllers with
-+``-V``, and the control and log channels as virtio consoles with
-+``--console``::
++	if (!session->io)
++		return false;
 +
-+    VM host #0 (UML)            developer machine              VM host #1 (UML)
-+    ┌────────────┐            ┌─────────────────┐            ┌────────────┐
-+    │ virtio_bt  ├─ vhost ────┤     btvirt      ├──── vhost ─┤ virtio_bt  │
-+    │ hvc        ├─ vhost ────┤ controllers,    ├──── vhost ─┤ hvc        │
-+    └────────────┘            │ consoles        │            └────────────┘
-+                              └────────┬────────┘
-+                                       │ control, log
-+                                    pytest
++	pfd.fd = g_io_channel_unix_get_fd(session->io);
++	pfd.events = 0;
++	pfd.revents = 0;
 +
-+The shared directory is mounted with hostfs instead of 9p. There is no
-+``tty`` channel, so ``test/test-functional-attach`` is not available, and
-+controllers cannot be passed through, so ``--usb`` and ``--pcie`` need
-+QEMU.
++	if (poll(&pfd, 1, 0) <= 0 ||
++			!(pfd.revents & (POLLHUP | POLLERR | POLLNVAL)))
++		return false;
 +
-+The VM hosts run on real time, with test-runner ``-R``. Time travel, which
-+makes the kernel testers faster, makes the functional tests slower: they
-+exchange traffic between two or three guests, and in lock-step only one
-+guest runs at a time, each exchange taking a round trip to the calendar.
-+Wall clock time of ``make check-functional`` with 4 workers, same kernel
-+version and machine, UML with seccomp, cut off at 78 s, and of
-+``-k test_bluetoothctl``::
++	connection_lost(session, ECONNRESET);
 +
-+    VM hosts             check-functional        test_bluetoothctl
-+    KVM                  68 s, 49 tests run      20.1 s
-+    UML                  78 s, 41 tests run      20.4 s
-+    UML time travel      78 s, 12 tests run      25.8 s
++	return true;
++}
 +
+ static bool disconnect_timeout(gpointer user_data)
+ {
+ 	struct avdtp *session = user_data;
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 10c8f496b44e..ab5059b055ec 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -205,6 +205,7 @@ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
+ 					struct avdtp_error *err, void *user_data);
  
- REQUIREMENTS
- ============
-@@ -258,7 +301,7 @@ General
+ void avdtp_unref(struct avdtp *session);
++bool avdtp_check_disconnected(struct avdtp *session);
+ struct avdtp *avdtp_ref(struct avdtp *session);
  
- The following are needed:
- 
--- QEmu (x86_64)
-+- QEmu (x86_64), unless running User Mode Linux VM hosts
- - ``dbus-daemon`` available
- 
- Recommended:
-@@ -317,6 +360,22 @@ configuration enabled:
- 	CONFIG_PTP_1588_CLOCK_KVM=y
- 	CONFIG_PTP_1588_CLOCK_VMCLOCK=y
- 
-+A User Mode Linux kernel is built with ``ARCH=um`` from the same config,
-+and needs in addition:
-+
-+.. code-block::
-+
-+	CONFIG_HOSTFS=y
-+	CONFIG_VIRTIO_UML=y
-+
-+.. code-block::
-+
-+	make ARCH=um defconfig
-+	scripts/kconfig/merge_config.sh -m .config ../bluez/doc/tester.config
-+	make ARCH=um olddefconfig linux
-+
-+The KVM and PTP options above do not apply to User Mode Linux.
-+
- USB
- ---
- 
-@@ -348,6 +407,13 @@ Run all tests
- 
- Test output is logged in ``test-functional.log``.
- 
-+Run all tests under User Mode Linux
-+-----------------------------------
-+
-+.. code-block::
-+
-+	$ test/test-functional --kernel=/pathto/linux
-+
- Show output during run
- ----------------------
- 
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
 -- 
 2.56.0
 
