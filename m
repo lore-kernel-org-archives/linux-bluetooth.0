@@ -1,56 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793359980;
-	b=1kuflZg661Qso3KIhiNKXn28CYYYKdkQhw9LD4o2cAM0lk3bK2b9D4X/7pW6jYdk9dGf
-	 GPXb+3fp9tSo1ov4c/X+byCkBPCr6gy+ps+BdPXSgUpxr5miphKepvB13ZU6s1BlU2k+a
-	 jEi37JMaaEwudohie05cxTEub5IvcfH6X1IVzZ3Dd0RkcYqCFoTIP6HFZ6OAmrsthWqgU
-	 H7HgrF06pCJzNVXM0y/nyZWpHCf6TAkKOwjNbAginMGonQ+PN9SUcQJF0OX4yKw/1TpR3
-	 9oqIYAdI2gZcq6Eeb+YTlbU1iz9xucwb5OVeXBSy9dF21r95odYoT2aGrlw9BAG/upQ==
+	t=1793360455;
+	b=qvOUzKGy16OqtJpxcjGruavXbW3IAfudM0OhiXIrN5/pd4LydJqUEQrR8gFHLvKV8h+/
+	 6DKljqXo6+6OZ5RZ1RXz9//5vmEEWq+Z+ubI4JEOc8/L5WeSXjQl2XRHdYuN+TbL+o7fZ
+	 dpkZK2tazuOffXQ8POvmQwE69rn09t2MfLiV1KtMYQWydvHZc+m/MwwlWyc3j1CEUeDPv
+	 YIvnTY//Zh+5rj5p/BNkIE+RLtUSZ12DsDIINbKf5wmhsbkuTYF9yDLn6V2xl1x3imlyA
+	 XhpmjA22XoYPOEun0lMvyJ6NCDAPiUzKKQmj25o7LhUfOVa0tjCOaJ61rGwSrM45mFQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793359980;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793360455;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=tkMc0K2QRp4uZYMJTDc67OVOmAzKvQQMIGqhFsdpr1Y=;
-	b=5m4gt3NNsXxy0gHPGCYc3XTTh4SUc6F1XTH5+4q94yzCw6mu7XmkAsNP3RU+lTC1GuiE
-	 Po9tlxb8AR8DQ7nqANeNTCRbiZgklglusWMhsborytPk9E2k9QieZsq+lpJgf9hAW7Kbj
-	 hK6hl1xewxlvRLcI2x7OU0tOx9Kmja3xfNbGPF8jxoPN/gt5IK0eTmp0GZ9Z6cHr/+fyo
-	 lMtqkX+vD2r1r6XaeLuF9TwsXeAwjUaivtk3XBkCBWoIRUw+uvvwaAwHWM3snm+UJ/kzY
-	 DGH90crWEYep4A93f22UNeOGg4R1r2GmduSdTXey5QzCYA4LGY8mIW+UH3/JWPf90Ew==
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=1CrdMhtr9XtYi8Kjb68AsuSjBPC8FcvJG5QbjpiJl0o=;
+	b=qXVbJPQgMm8u8Y/Ohu7w/YuMMeM/l2dJkoaMi0Y3hU3EPiRA9neb8v/SZk+eoogCA4Xw
+	 lgQB00xqAgtV/pjwllHHir2EMlo9BG4YjmjNAlxDKEqVJxr++kJadyxzHJUKR9Ms8c2gF
+	 +J+wWpSymvRRlmyaVijWTbHoje0siYMPDMwxIAsTK2HSn5KpBPrnvZUgzrDBaSicdA/EL
+	 xIdwjRsVXml8T/ZGfZ9+tNghW23hvCnFv3Sv/CiNZCnopmts2E5dpuRXZxJ3kf4Fg2et5
+	 VhAJliZeG/S6Xo9vJ9rcmQDKuhkcwZ9AyLEfIKOT4cyTswmxt5cL19g0TomhVqOsW0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ITKHxZlY;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Fyw5Rl1w;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CE9606A31C;
-	Fri, 30 Oct 2026 11:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDCB606A31F;
+	Fri, 30 Oct 2026 11:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ITKHxZlY
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03061F000C1;
-	Fri, 30 Oct 2026 11:32:58 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Fyw5Rl1w
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34E561F0093A;
+	Fri, 30 Oct 2026 11:40:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793359980;
-	bh=tkMc0K2QRp4uZYMJTDc67OVOmAzKvQQMIGqhFsdpr1Y=;
+	s=k20260515; t=1793360455;
+	bh=1CrdMhtr9XtYi8Kjb68AsuSjBPC8FcvJG5QbjpiJl0o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ITKHxZlYyXgzi6LeGOmVcPfuw/80gGoQ5rXKEyGTSuZHSeHxUT7gkmwFdxdQ5ecga
-	 Wy3m1Zz/kj46yTAUFiZQHB41n5EGwD9TpglALL+GS58PFrwCILOIzV1tnj0Mixqvia
-	 32gwsbnHix4AUh/kCxdYqB7JeEed6K/3lje1fB3hqS5pViwAGNBFMSognBgwsK52MD
-	 7rZvm4pmY3zqrnU9UagWbYkEeANhwcQmjFjBpQtw9PQiW/wzIoKiOmxJ86TDETWU4E
-	 lnf7k881xCTIVD4UTx8xRikMIlLso4q/vzni+4UH+Cj+akUyXA8DKKfWPklnLeWYRr
-	 qOYKcuP9n0zJg==
-Date: Fri, 30 Oct 2026 12:32:55 +0100
+	b=Fyw5Rl1w5pJVTmbyrpVTQd58oKUZqEvR7qT2p21cWMF8DB6mDJfPmnblVTHq3bvrn
+	 qVu0gHCNmhdihjXKQ+/E5V1x0SksRhuBuaP5M6XjNeR2j59cqA98YorUAQaqQqt5RE
+	 Nq2GUjRkNvTzATqP2ufOIJdh2LAqncjv+JHlSm6LkzE+DEfuwags+M/FWrIULIcLFX
+	 sC7Y0PHq0tb+K9RSdgvCmrXxpEXAghZ4hEy+ihFgrYpiOSYEAQbibIJcRlLTCrKERx
+	 PuPAGsLtLFSm4FOfUwYp1JBIGFQWXV5lystWac0yplKccz49jS1BD7Zhka2DuQa+Vl
+	 vD5W+5rj6g/Rg==
+Date: Fri, 30 Oct 2026 12:40:51 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: christian.koever-draxl@student.uibk.ac.at
 Cc: yang.li@amlogic.com, marcel@holtmann.org, luiz.dentz@gmail.com, 
 	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
 	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Christian Stefan =?utf-8?B?S8O2dsOpci1EcmF4bA==?= <ckoever@outlook.de>
-Subject: Re: [PATCH 4/7] dt-bindings: net: bluetooth: amlogic,w155s2-bt:
- allow local-bd-address
-Message-ID: <20261030-translucent-angelic-myna-ef2700@quoll>
+Subject: Re: [PATCH 6/7] dt-bindings: net: bluetooth: amlogic,w155s2-bt: add
+ amlogic,shared-antenna
+Message-ID: <20261030-ambitious-muskox-of-jest-e4bd6c@quoll>
 References: <20261025192338.209574-1-christian.koever-draxl@student.uibk.ac.at>
- <20261025192338.209574-5-christian.koever-draxl@student.uibk.ac.at>
+ <20261025192338.209574-7-christian.koever-draxl@student.uibk.ac.at>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -62,17 +63,24 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261025192338.209574-5-christian.koever-draxl@student.uibk.ac.at>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20261025192338.209574-7-christian.koever-draxl@student.uibk.ac.at>
 
-On Sun, Oct 25, 2026 at 08:23:35PM +0100, christian.koever-draxl@student.uibk.ac.at wrote:
-> @@ -41,6 +44,8 @@ properties:
->      maxItems: 1
->      description: specify the path of firmware bin to load
->  
-> +  local-bd-address: true
+On Sun, Oct 25, 2026 at 08:23:37PM +0100, christian.koever-draxl@student.ui=
+bk.ac.at wrote:
+> From: Christian Stefan K=C3=B6v=C3=A9r-Draxl <ckoever@outlook.de>
+>=20
+> Some boards wire Bluetooth and Wi-Fi of the combo chip to a single
+> antenna. The Bluetooth RF has to be configured for that, which the
+> driver currently only does for the W265S2-class coexistence parts.
+> Add a property for boards to describe it.
+>=20
+> Signed-off-by: Christian Stefan K=C3=B6v=C3=A9r-Draxl <ckoever@outlook.de>
+> ---
+>  .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml           | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Drop and instead change additionalProperties -> unevaluatedProperties.
-
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
 Best regards,
 Krzysztof
