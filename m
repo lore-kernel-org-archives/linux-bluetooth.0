@@ -1,55 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793451467;
-	b=lJEikzvMH7mr2lr98gb8ZnX+dDGERDF2baalW51LIGCcZnSWuTSiuXDuhF/tQ9EnCviL
-	 XGv4sMtW1yIslkaS/1DR4UVd9a9xng4zWwjeqYT9BiBwyrk/BcvTsx3QJRmnHbdnv4sKc
-	 9J4iXkuMXvNaQMkmnezzTRhb/1+z7udu2m/TByGh0O/bsvCJ8napB7y1aa9OQ/7t19QM2
-	 19H8wu8B10jbQtF47gtduUh9J8C3ka3kKf2HsRjQK55eBXtqvwVH5bGpyOxmRUMM+aI1/
-	 Wj3gdet2g1EqQTtaOM4Qi4nr78kcDu849jej66bpo3EiZtT/UAoDyg4+qoO4963zsVw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793451467;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=ADpkKw8ZcHosCss31531pr6bot+Oa4C+WQwAZutcz0I=;
-	b=azzgb3xjTLXPRrwOo/YQVJHnJN3nG+37z9PmKMmkzXZorERmPJ03dE2BH0Y2sreHdj9q
-	 JLpNUwc4er8hvkaEPDqZa2dxuXABst2kkZtMUHET9+hAcB6S5elYRETOEjXzY+Yv2NOVm
-	 tcPdCv2u9qd8SWBM7ExJXmoi+1QkyAPbKtEjLf5XwUdKDxD4SQLYUI5U1duJzIt/FjWAV
-	 yBtO/VkSML3kjLMQNEB9FuSxQLgyzv8Y4ierIZkGSYO14jqwdTWfmyOxBN4a2mxad1pRE
-	 to07UO1IN16ZvZgFOXufSKGKALAAzalK7v7wKDb17MMSvuAtRJ++ltNvyPrKLRsOt9A==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b="jD7YJ/aP";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793456906;
+	b=pTgCDxRIldB45WVYCYDOf5INskwcs+lkqWnPfR/31dG5PRNqAXTgqUpVj7DeEh7VbQxj
+	 h6x5ktBUJVnkfr75FLRKrdINJwJSms5ovHpXkvLCct1py2TpxBmsmKnWAG4/ZYij40Oqr
+	 1aGs9qfoyaLV0+7j7Yaen8/NWWcu7Abdf3grjPlTtr+OXqOXGDDg5f04YbWznmUL7at7g
+	 WpK7cOZNZGLBVpvH1dIw+p9TIOEgO2usMB6XrN4Ey7jPmR4MuTaZqnzM9jTr9cXITmHK+
+	 oxzLO+ol+54VpJP6HapZ2z6q1JuOh4lluRip3xhQMethszqqDsMVc8YHRsV+/Ra7XHA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793456906;
+	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=NiI94rLhoPPkQw5dJDYF1uRfN/k4rxabin7im7CO0VY=;
+	b=TFEX9t+CE+uY80Gr4apYUoYDhYFhARYxvFcWT0LXV6jgQIXo7f/AcntPmFfM9g+5s7e5
+	 2mCnuJUndhXe4m8her4f1Wp3zo4gEuiecHGlBxNk79fnLWQvEUvQBylGtNn6CqGdzlUne
+	 GIClsUgB9Ea9i60yKHZoGmVLmmW5UMYGB195qQzogA2uESJpBVn/rzPr4NrwdWBkEIuLg
+	 /ml40tsLJVBWMnvR4puZaEb769rnLJZxTGPbA+7t8SG2Rt5yP0GXU6jnDtspB7glpYQad
+	 Ypz8JKQukMAYbsIDflU5pI08E7CC+bTqgTAyldMlvrSi9uAkd745q7Crxokxj5+vlNQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=iki.fi;
+	spf=pass smtp.mailfrom=iki.fi;
+	dkim=pass header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=N4g4uJDM;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=195.140.195.201
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC350606A31A;
-	Sat, 31 Oct 2026 12:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52134606A31D
+	for <linux-bluetooth@vger.kernel.org>; Sat, 31 Oct 2026 14:28:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52134606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=jD7YJ/aP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 685BF1F000C1;
-	Sat, 31 Oct 2026 12:57:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1793451466;
-	bh=ADpkKw8ZcHosCss31531pr6bot+Oa4C+WQwAZutcz0I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jD7YJ/aPzvWc8bhDb3Cu720stmkMJ7M7A1r6OUF5EjHHIePwWGqEgcPnRB2JRAQ8D
-	 uIwyeF1RZDDtg0kZWv6OxsQkoh+tiAaq1fAKHXC21E0DPkIp1wqWNCQ0LQE8eiZHud
-	 gmhV5aqOZPCyC3tRsRPpRL9We0FX7YDanOv38cz0=
-Date: Sat, 31 Oct 2026 13:29:47 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Radek Podgorny <radek@podgorny.cz>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: Re: 7.2.y took the on-air address fix without its companion
-Message-ID: <2026103137-purebred-puzzling-4f88@gregkh>
-References: <179097754519.501890.1801734138080126989@podgorny.cz>
- <2026100356-magnitude-esquire-89fc@gregkh>
- <179337661340.2790793.10493980332574129560@podgorny.cz>
- <2026103011-coeditor-debtless-2d94@gregkh>
- <179344898191.3643659.6660410741163325277@podgorny.cz>
+	dkim=pass (1024-bit key, unprotected) header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=meesny header.b=N4g4uJDM
+Received: from monolith.lan (unknown [IPv6:2a03:1b20:4:f011::999d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4jH0gc538pz10s6;
+	Sat, 31 Oct 2026 16:28:12 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1793456893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NiI94rLhoPPkQw5dJDYF1uRfN/k4rxabin7im7CO0VY=;
+	b=N4g4uJDMakJfE3RhI/8oiYL0L+k5yrzVqbI6GdRlrRuPb510JtrS9NrU9NqbgGYFkQKVLc
+	0EV19RkauwFvmWAMPBmhRcVUCJjZfPp+dSU/Qmwu8b9BG31ET2Jvc4wTmqKG4PMgM8clgx
+	KljaTUIAUltEqupGr5NLdixVVCUZPfs=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1793456893;
+	b=KaeGrqyPjzTw/gDoAF4TKk6BKe9K+ND0loSbhOkWAz1wjvo2un1kYDH0XeOLGHLUdL1tNu
+	JyjsbdnEDworVSZL4Nc/OZ4kivY5PQ+gutkS53C4GHetas0UFSeXHkTxdTCT4ortBOYEIr
+	gMrW9fz6F0zS/YuZngWvfkFw8UvyZ3k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1793456893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NiI94rLhoPPkQw5dJDYF1uRfN/k4rxabin7im7CO0VY=;
+	b=bymWSCfABz7tl/WLIn9z7+FRj8hEgeEhazt41OBz8j8UMtMKF6WHD54f178iu2hY/7Aaxa
+	c81JEf4An6y7zrF9KnHv1FmOxofzDJxrFOunaOG3zZmUMNxp7MXQXj1U8fNoOs/6judHCc
+	uECLE6EqTEpvzbqPHehX7VpTCKZqrQQ=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] monitor: Fix Conn Interval rsp group decode
+Date: Sat, 31 Oct 2026 16:28:09 +0200
+Message-ID: <3265e8c3d6e7628b82422ff9cad96eb0db9e7ef7.1793456788.git.pav@iki.fi>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -59,43 +80,31 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <179344898191.3643659.6660410741163325277@podgorny.cz>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 31, 2026 at 01:16:21PM +0100, Radek Podgorny wrote:
-> On Fri, Oct 30, 2026 at 11:32:40PM +0100, Greg Kroah-Hartman wrote:
-> > I have no context here, sorry, what is wrong?  If that's a bugfix, why
-> > is it not cc: stable?
-> 
-> Sorry, my last mail was too short.
-> 
-> It fixes a regression in stable. I sent two patches as a series:
-> 
->   3889a5fcd091 Bluetooth: forget a peer's RPA once it advertises its
->                identity address
->   4914c4998961 Bluetooth: put the peer's on-air address on air when we
->                cannot resolve
-> 
-> The second depends on the first, but AUTOSEL took only the second into
-> 7.2.8 (as a552b4bc058b). It also reached 7.3 ahead of the first.
-> 
-> So when a bonded peer turns privacy off and advertises its identity
-> address, the host keeps connecting to the old RPA, which the peer no
-> longer answers. That lasts until the adapter is powered off. 7.2.6
-> connected to the identity address and worked.
-> 
-> There is no cc: stable because I left the tags off on purpose. When I
-> posted the first patch, the kernel still hid the stale address, so the
-> patch fixed nothing live on its own. Taking the second patch alone
-> exposed the bug. In effect the first patch is:
-> 
->   Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
-> 
-> Please queue 3889a5fcd091 for 7.3.y and 7.2.y. It cherry-picks cleanly
-> onto 7.3.1 and 7.2.14. 6.18 and older don't have 4914c4998961 and don't
-> need it. I have run the two patches together since September.
+util_iov_pull() returns the advanced base, not the bytes pulled, so
+each connection interval group was decoded six bytes past its actual
+position. Use util_iov_pull_mem() instead.
 
-Thanks, that helps, now queued up.
+Fixes: 79cfd07224ff ("monitor: Add decoding for Short Connection Interval feature")
+Assisted-by: opencode:qwen3.8-flash-next
+---
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-greg k-h
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 8a0e49ff4..fdc02fe01 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -10289,7 +10289,7 @@ static void le_read_conn_interval_rsp(uint16_t index, const void *data,
+ 	for (i = 0; i < rsp->num_grps; i++) {
+ 		const struct bt_hci_le_conn_interval_group *grp;
+ 
+-		grp = util_iov_pull(&iov, sizeof(*grp));
++		grp = util_iov_pull_mem(&iov, sizeof(*grp));
+ 		if (!grp) {
+ 			print_text(COLOR_ERROR, "  invalid group");
+ 			break;
+-- 
+2.56.0
+
