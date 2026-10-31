@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1793448997;
-	b=ll4S3pyFnD+yWJXrDRkWiSeaqjZZ3AemXHwmu0qRS+LzOh6i1X5SjhXuP+BA4TPvVR3F
-	 NCuKNqgc1nE/JmR9zfEVw6JhO1/aVnHSFLkLoP4VKP0bdqgYhvvHfgEpyCmo7NNfvgE6l
-	 29+1+ZXpdS4k3OGq2L3RutdFjdflM/GQhkIsTQbDUINr5E+1vI+aAp+6Sw8NBRGFz6TJf
-	 29DNpka0N7y0hxSls3s9z6nYTZekDXdr9zIgY8aHamUfeRV59HEI/m3EpJVmCKanu2OK1
-	 edelU08a3N/AtZoFxqYxLr8o5i1rkr1Te+yZkT+9ag+EUStk8URMZ7CBHf2t8dgfjnw==
+	b=aPSLe90Oyib9/f3GnVkb6cP6KKdnYCaMKQ7nMM3uqf3am9lzMOSJSn/7gg8ibfwfNlAq
+	 ri8+NXMHCopRHjXLRtSLjOvIZxa6b7NugLjKY4m3Egvey8Jp4L0a/m0NQ4VkZAGN+8YG7
+	 84KTN1bdvBgtkT1x4pOhrKkByemKy3ft6Kso/lCE6P/GDpe5Tmj4St3OuGjrPw55y7j6e
+	 8VVbH5b3ynBaAICu7ORkBRLpRC6aR/ArIHnb60EWGUi/+NuCoOzbvgIfsLz63dKWWKekL
+	 s1DadlKFfg1aUE9L6ebUrzvzCoP9r5nETJ5rKih0Ws7kTvo2B5Gc5AvSwnRI5ATGKDA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793448997;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=SjqgroeEWEZSL3UEQsxo7sYbwKFnvRh6dO+iYjjDQ7E=;
-	b=MkAwqsS740b29N1iFhh9pK/uMsyDZhKIdcSA7V7aZ3/yZtJ2qkWL5MRqFCcZlPaHH9W3
-	 XahxaqpeyJkkhF9x+LbSofJ8UdXi149L8aQqKnG/D5dGI94Qz0W/b2r4/GPLB4iI4QNKN
-	 1mZWsOmbN+gSwu46dtinQ3y6apiZyWJtJv52cfCFx2n3SXlL+b8arcoCC73IkFkian5Vd
-	 W1AGawDFElfT2GCxBw6CNB8tC27YD3fgQiboHAEO08ffJU1B7Tx094LgmenP30mBDW62a
-	 /0UvBBFBPaSyyzVcTYV3RvUap+idBnw2eFcMDkI06zSCIJ6Sq7jdhY+anqm3nX/TQag==
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=he2Rfu8KETjYQmLhYbCWYK09Xpzsszq5xHpoav7qOTE=;
+	b=EXPeRE4Tqcl2J9BB4ScBaOf+hC37wzU+LiI9GIUmhUJlh2MCbwhz/f6MxSGuXBG7OrPT
+	 FoPftViIqB/gSWuyOOMODlOQigaop7SXF5YzFLRsQu1B3Z+GsX8F1bkO9V+eXRnpw7l/u
+	 f5xE0xlRoM28KUfX+uHmSIPJdjVA7UQJg7qMZkBr94Hb/wg/6e/L+80pgBeeLut0cLdr0
+	 0Gi80GqBP9JaZ1TqkCSzeco75fnYqjMUMV53YVSFLjtUl3VZ9vw+8dOhm7BNUpbUoBKxM
+	 5ACzy0E2HWMSGXOQKYAVfFTSGXVcsU2FEESsexremvemSkcCd8He207Gz5PPbfYBkVg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jvpe4JDf;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hApxP2Pe;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C9B606A32C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D240606A31A;
 	Sat, 31 Oct 2026 12:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jvpe4JDf
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hApxP2Pe
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
 	t=1793448997;
-	b=L88lRo4LnL5//0eQA5eW+myEz15ITj0/6Ykkfh7xDY+lX6FhRUDN8cvHyUY5t5xqIWQT
-	 kUF2lotjySuUg98rclqP/Io0X3SWFWL6SWxC94H5NX491y7ANDaCBOhK5jzz6EJrde+j8
-	 O+28w9989CkaPScXGznWPqp1oU1B5KlRo9+dgPMbEVOIdJT2RvnEkJuvjiTySSQO2qMhO
-	 SQSn8q1zgqWXCvpxDyaBx5BvZ2t5ceG2bkFC6l31er9QyhatsjbIR4eXAdAR7dYK5DW2s
-	 i1+YmVcMSWoHENrazql8JX3sBq4o77jJtYBbLWSq9uEc2PD2y+so8DN7SBkpGeCudZA==
+	b=OQClpE6GLk20TKFy8l55dAkphJD/hhSIWxBvVugGObPQlwMaPB+W83XcLKxmgtED/Syk
+	 F2PuutDKFpSK6X66qQQlsXyxvKtKb5l7d+lPfzQ90Mh3PeRHTglQe86ONtLaHcKpvp7Gb
+	 LtF83narSSDyu7Ms2HrhKAZpQ24qcrNkXe5lgD0SeKxx/RcJgY8ZzvCAya/8/LbENsmAN
+	 +Eurbe/SRlFLae6MHuOBWT+bd8pjS3cnsXD2AQxIoUFOhJo5zW8M/zq4RDk+Wo9WPB8MY
+	 kjLN08PUtBG+Wzm+eUkqpJTSnArw9sZ9nzBslhS266dRbgXDjs4tPoUTdyj5ZKVBp0A==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
 	c=relaxed/relaxed; t=1793448997;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=SjqgroeEWEZSL3UEQsxo7sYbwKFnvRh6dO+iYjjDQ7E=;
-	b=CokxASz+itq1kZs+pHJhM5HsPmd9gkEPPRf3XuOMDzXTQoUhsq1vPonwzBhbECJKaC1B
-	 SMuUOrVOcCqSd1wLiSyZ9LZSgmMG7EXnf+8B/pO8GKe9wZv8FqKbt4xA/WXQnsX51GXyw
-	 AVwyD1/8F8j8ZuHzqdKCLQClulb2NBK75zbTtgMcFmTreebUjZa82EYYw1kTHsS+mhycj
-	 51lR0ncIShFO+NEOwCIMQUM9d/mApWwbebJSxYth7Mm00uhE9wMUGufwtRwrdc0RRrs1U
-	 +3JdmpRbE6k2yXRR/b8OMhw41jACww+zd0QangMk2iZfqJ704cJWPMVMXVTnf5nsGeg==
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=he2Rfu8KETjYQmLhYbCWYK09Xpzsszq5xHpoav7qOTE=;
+	b=dAbDmh6ugNYXh5MZPrWl4ZEeltgxICKIDXx1fuYKpGJ8rgupJnwyQhyAZ/FOjJ4D2BsS
+	 Q1Sv+ttyTUwPseBinZEydd4Hd+l58BKZ+qD9YZthp8HBkdUKpiZNRTW9dvbERoV7UscYl
+	 lMbr2jrLSExvj6cmaGHtepffPZAXTdXYxvjb4XFlJ2BnCffVSvQUSPP+vii6xetKmGZWo
+	 R30k/9ukBwESDNi/FGCEL8wr8a6Z/g3pva8RV22h8eSax//sRSPeIUYNWCQaArLBG3cPI
+	 vKx+6VL7GLZoB5xDSg6RrVL2E/6xtJjolQCMf801k9kPi67cG+ZYSDMWNC5K9eeQWCQ==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id C27C51F000C1;
+	by smtp.kernel.org (Postfix) with ESMTPS id C35E01F0093A;
 	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793448997;
-	bh=SjqgroeEWEZSL3UEQsxo7sYbwKFnvRh6dO+iYjjDQ7E=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=jvpe4JDftDv2wCbbjdz2HTffnF6C+GovNUqUWt0dylMVRmQMk1ecv3v9pXSiH0zaI
-	 +rs0ygKbLSs80856ZA6PmoLxG176GM/Vhg+xkcVlRoUuB0mJrq1HlUx0jwTFYTXXDf
-	 3hrNKZGk2qs1fPdnd4ns3Ho3EBk8hh0BIKGvMXq6kLQwFb3L9wy+dvbnuHtwQDOS5e
-	 JW2+bIMtkMYChv/BTTyv10zq+vbU38oZidNvMy/UFP9RCMwGMxIG7DU0nVrkMKUD1S
-	 kjD91cUg2LMYCitwxIPzc4rCDMgTMjD3W4IbzC/GIoOy+67ug/Yha+zMWUD5XgsVln
-	 n8mbRRrVnf4WQ==
+	bh=he2Rfu8KETjYQmLhYbCWYK09Xpzsszq5xHpoav7qOTE=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=hApxP2PedjALElTRO5iFpDttxphp384/LvgjDMFvP63/6JK/4span6d+i/z27jJKm
+	 rPHEF4LwlIHBuvUyRTT34ZIPQrJZVZ78aKwvSdh7IX2WD3ATHyeDhTlnSkNA3dkjK4
+	 1GWkMkMlVhLlHNp0NqcCKtIH4zSXESl9VXxPwkEp/PMj+uYnMbcKadoKAsraZZ0y/Q
+	 6Da1a9cV2IDk1QEu/Cms2f/mR47LmXl71VHMieRFt8Qm31I7k9G0cUdieziTw5A6ZP
+	 lGhXoZ/gfG/1DVd+58veqPACXecCeUzmYs5PBPMXC1bcFkyJE3FwhUA/eY+I4/b3ZY
+	 uRcy5o+ThgQuw==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 234F245EC0;
+	by lkml.kernel.org (Postfix) with ESMTP id 360F845E62;
 	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
 From: Ernesto Salvetti via B4 Relay <devnull+ernesto.salvetti.tambosi.tn.it@kernel.org>
-Subject: [PATCH 0/3] Bluetooth: Fix LE on Barrot 33fa:0010 controllers
-Date: Sat, 31 Oct 2026 13:16:14 +0100
-Message-Id: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
+Date: Sat, 31 Oct 2026 13:16:15 +0100
+Subject: [PATCH 1/3] Bluetooth: hci_core: Don't use extended advertising
+ with broken ext scan
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,94 +84,108 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWMwQ6CMBBEf4Xs2Y20IIn+ivHQli2s0WJ2KzEh/
- LutHt/MvNlASZgULs0GQisrL6mAOTQQZpcmQh4Lg23tYNrOoHciS8YHYeQPKa4Gz6fB9jGOres
- 7KOJL6NcV73r7s779nUKuT3XhnRJ6cSnMNVqEJ07Hp9NMAvv+BZfbsLuWAAAA
-X-Change-ID: 20261031-barrot-le-fixes-v1-95624ffd0a43
+Message-Id: <20261031-barrot-le-fixes-v1-v1-1-30e2089882bf@tambosi.tn.it>
+References: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
+In-Reply-To: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
 To: Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793448994; l=3307;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793448994; l=3587;
  i=ernesto.salvetti@tambosi.tn.it; s=20261031; h=from:subject:message-id;
- bh=NkLdEkh7bgUMhoEF7i6a2/grihrcRLLsAyrSVjURO74=;
- b=wK3wUlz5FRjKma6NmX35el7rDepELpXhStFn1qiVneFSiKgL6kqYf5U7KioRaw0F5Ek6AqFNN
- KpV62SJyZhICUFPIA7EnpJxUFUMiq9LOfZ01Oc3xSIY9RphQlLZlmqY
+ bh=S7EzWsPZZdSgugiaMBXQ3KzQZLGqMEw7XwNS27NrlD4=;
+ b=al2oVKRlVrqvqfhDXOnL7HuOnmehyNkRhbKOm5rwBPFElOx9z5fp0hrlwCaXL1gva2cjAvvyR
+ AbR64GHNe3VB8JnEV8/lDJzhBn3orJfcrImxRcaFc+r778m5dLpg1TJ
 X-Developer-Key: i=ernesto.salvetti@tambosi.tn.it; a=ed25519;
  pk=OLNiuyRbYD4dcNYoAvM99nt/1KZTKeM316r91BCQDUs=
 X-Endpoint-Received: by B4 Relay for
  ernesto.salvetti@tambosi.tn.it/20261031 with auth_id=1370
 X-Original-From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 Reply-To: ernesto.salvetti@tambosi.tn.it
+Content-Transfer-Encoding: 7bit
 
-The UGREEN Bluetooth 5.4 USB dongle (33fa:0010, Barrot chip, bound to
-btusb via BTUSB_BARROT) works for BR/EDR, but LE is unusable: as soon as
-a scan is started the controller hangs on LE Set Extended Scan
-Parameters and btusb resets it in a loop. Once that is avoided, two more
-problems show up before an LE device can be used. This series fixes
-them one at a time:
+From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 
-1/3 Setting HCI_QUIRK_BROKEN_EXT_SCAN alone is not enough on a
-    controller that enforces the spec rule that legacy and extended
-    LE commands must not be mixed: the stack still uses extended
-    advertising (LE Read Number of Supported Advertising Sets is sent
-    during init), after which the legacy scan commands are rejected
-    with Command Disallowed. Don't use extended advertising when
-    extended scanning is marked broken. This also affects the other
-    users of the quirk (hci_bcm4377, Actions ATS2851 and Realtek
-    0bda:a728 in btusb), which will fall back to legacy advertising;
-    I could not test those.
+When HCI_QUIRK_BROKEN_EXT_SCAN is set the stack falls back to the legacy
+LE Set Scan Parameters/Enable commands, but it keeps using extended
+advertising if the controller reports the LE Extended Advertising
+feature. Already during init it then sends LE Read Number of Supported
+Advertising Sets, which is an extended advertising command.
 
-2/3 The controller answers LE Read Remote Used Features with
-    Controller Busy right after connecting, and the stack drops the
-    link. Continue without the remote features instead.
+Core Spec 5.3, Vol 4, Part E, 3.1.1 does not allow mixing the two
+command sets: once the Host has issued an extended advertising command,
+the Controller shall reject the legacy advertising, scanning and
+initiating commands with Command Disallowed until the next reset.
 
-3/3 Set HCI_QUIRK_BROKEN_EXT_SCAN and HCI_QUIRK_BROKEN_EXT_CREATE_CONN
-    for BTUSB_BARROT devices.
+A controller that enforces this, such as the Barrot one in the UGREEN
+Bluetooth 5.4 dongle (33fa:0010), then can't scan at all once the quirk
+is set:
 
-Testing: on bluetooth-next each patch builds (clang, W=1) without new
-warnings. The runtime tests were done on v7.2.11 (PikaOS kernel) with
-the series backported; patch 2 needed a context adjustment there, since
-hci_cs_le_read_remote_features() in v7.2.11 lacks the
-HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE handling. With a 33fa:0010
-(bcdDevice 88.91) and an Xbox Wireless Controller, checked with btmon:
+  < HCI Command: LE Read Number of Su.. (0x08|0x003b) plen 0
+  > HCI Event: Command Complete (0x0e) plen 5
+        LE Read Number of Supported Advertising Sets (0x08|0x003b) ncmd 1
+          Status: Success (0x00)
+          Num supported adv sets: 4
+  ...
+  < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+  > HCI Event: Command Complete (0x0e) plen 4
+        LE Set Scan Parameters (0x08|0x000b) ncmd 1
+          Status: Command Disallowed (0x0c)
 
- - without patch 1: Command Disallowed on every LE Set Scan Parameters
- - with the full series: scanning works, LE Secure Connections pairing
-   from scratch succeeds, reconnecting with the stored LTK works, and
-   the controller shows up as HID gamepad (hid-microsoft).
+  Bluetooth: hci0: Opcode 0x200b failed: -16
 
-Before that I used an earlier btusb-only workaround with the same
-effect for an afternoon of gaming without problems.
+Treat the controller as not capable of extended advertising whenever
+extended scanning is marked broken, so that only legacy commands are
+used.
 
-33fa:0012 shares the BTUSB_BARROT flag but I don't have one to test.
-
-Tool use: the investigation and the patches were done with the help of
-an AI coding assistant (Claude, Anthropic) in an interactive session.
-It analysed the btmon/dmesg logs, read the relevant core code, proposed
-and wrote the changes and the changelogs, and ran checkpatch. I ran all
-hardware tests, reviewed the changes and take responsibility for them.
-The patches carry an Assisted-by tag accordingly.
-
+Fixes: 392fca352c7a ("Bluetooth: Add quirk to disable extended scanning")
+Assisted-by: LLM
+Signed-off-by: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 ---
-Ernesto Salvetti (3):
-      Bluetooth: hci_core: Don't use extended advertising with broken ext scan
-      Bluetooth: hci_event: Don't drop LE link on busy remote features read
-      Bluetooth: btusb: Disable broken LE extended scan on Barrot controllers
-
- drivers/bluetooth/btusb_main.c   |  6 ++++++
- include/net/bluetooth/hci.h      |  5 ++++-
+ include/net/bluetooth/hci.h      |  4 +++-
  include/net/bluetooth/hci_core.h | 11 +++++++++--
- net/bluetooth/hci_event.c        | 11 +++++++++++
- 4 files changed, 30 insertions(+), 3 deletions(-)
----
-base-commit: 42b8c2d729268a65a2d98064e8dc59ff53646b14
-change-id: 20261031-barrot-le-fixes-v1-95624ffd0a43
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-Best regards,
---  
-Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1c992e87534d..74b96941ad11 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -274,7 +274,9 @@ enum {
+ 	/*
+ 	 * When this quirk is set, the HCI_OP_LE_SET_EXT_SCAN_ENABLE command is
+ 	 * disabled. This is required for some Broadcom controllers which
+-	 * erroneously claim to support extended scanning.
++	 * erroneously claim to support extended scanning. Extended
++	 * advertising is disabled as well, since legacy and extended
++	 * commands can't be mixed.
+ 	 *
+ 	 * This quirk can be set before hci_register_dev is called or
+ 	 * during the hdev->setup vendor callback.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 9d5d3ab4a075..d622cab32ca9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2095,8 +2095,15 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ /* Use ext create connection if command is supported */
+ #define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
+ 	!hci_test_quirk((dev), HCI_QUIRK_BROKEN_EXT_CREATE_CONN))
+-/* Extended advertising support */
+-#define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
++/* Extended advertising support
++ *
++ * Controllers shall reject legacy advertising, scanning and initiating
++ * commands with Command Disallowed once an extended advertising command
++ * has been issued (Core Spec 5.3, Vol 4, Part E, 3.1.1), so extended
++ * advertising can't be used when extended scanning is broken.
++ */
++#define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV) && \
++			      !hci_test_quirk((dev), HCI_QUIRK_BROKEN_EXT_SCAN))
+ 
+ /* Maximum advertising length */
+ #define max_adv_len(dev) \
+
+-- 
+2.53.0.697.g625c4fb2daa
 
 
