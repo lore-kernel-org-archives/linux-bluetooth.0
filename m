@@ -1,85 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.52
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793439884;
-	b=cWJo/MD08/TC76vzMo72qJ6JK3bldtDbHjdeIiJDDK0akYv9bFJgHPSZ45IOiYsuaJRk
-	 AXhPwvFFOD7/xkCzktpnemEqhTVe97101K8LQ0uBG6ypzDlMt7PYKQp4DQb1Qrpv9JWiB
-	 u5vjepQuh+GJ4csomeEIZBrNtgyB5KNYf0xnFVkLMty4zsuWI7M+meBNTYOdgLLmPBPII
-	 4mi8ug43QoakQj0YCM6SdTx7VVb217mi+pAg1buPl0jSVYmwN9rImCe2bOt8U5VPJlqFu
-	 vBRmncCWaWZbMOJBXfqG4Pvd1Q08nijEHnR6Iy0alFAKJW7Tr4K797Ds6AeYd4wTUjg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793439884;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=wah1C+AemO23rcWKtBPC9YlIp4pZRf/KFz0Z1VZ99I4=;
-	b=qQE9mIzB50AxLkZBkDabazgUWMumpWJtUj8Up7MUPPAUlMETCeKWj5IrVGkWj0Q3d3hO
-	 R00DObkUn/GTpO9rssqVu41f5LAfqci3srFS7k+ASOd2F1ANtVsVobne4btQSa0HrDWRW
-	 u5MLJsX3w2J6CO+C4ev5Zb+pdmw0VBkNiq+rgpr0+qwlZXlKAgOBEM70YPx0yrzDVoaQc
-	 Tdj0/oi+K+tPS26mixqGUv/16p9AJQV1De7IiZlf6N14XJponUWL4jcPvpiZBhRljX8Kd
-	 qLkwGOm43Ht1+8ecAh6M8HiGix81jph9YDJ6Jmh/YZeOIVQaEp++rBsk7U/iDqxPZXw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="PGx/zJaZ";
-	arc=none smtp.remote-ip=74.125.82.52
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793448997;
+	b=EZA2ss4llImTI/PI3jFYjEGYcE9yfF3ay6x7v9HFmBcPo1Tty8JwAhQk250gOjJsTgs/
+	 zfA/4a+VKSO1Ys8jl8tYXXLld+s3oReT76Il/BkzO7g5qDgofO3EmsWdB6HVMdvrCwMGb
+	 lCxD2fTztP4Sx3pPSzajc1+tRPdAUN2S442gD2ITVSPN4gY8ni11cGPeaFxisflndc5AA
+	 2c4kPoT/YxI8+NZlpflfkTyPJHOkqbhQup7i/i7XsqC3uNjqFGXxkPyed3XwLlI4gpDYa
+	 xxQ/Mpzf6jmhPuKR4NSSQmg561T8A8eBuncbjsbTU7Has/zLtkrlV4Jcgo/O3SBNyHg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793448997;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=uLV1w/mZ/bi98b2YU13ym/X0d8CvSInaPBvgVi0L4lU=;
+	b=rAZLYQtUx1egJMDOETKWYJ4ltxn4ZyQhWEgRi2ljJP55pqAKUol/mHO3qo+IWt0iII+/
+	 0pVcSNqHCxi72mCD1ZV5Z58frioQzds4xytQLYQuMHKc5WG21PSP5jvNEHafQS7nfxu5F
+	 ryQv0W/D9PZoWECOHdws46NWT0MtFgZPsuLLRZ9vgpjBh/Tyw8sGh06H1kVpHFmfLs2Y2
+	 B7dprjawDs+tf/L9LO1nSj2IRQRLWT0bFk5ADzcdHnCwA7/vDsOqbeRrzvhlNwq9cMuSk
+	 HkvSqiJ7rOtg8itZweAoqb+CP3yeNkIjzl/bL22gnL4q2WEVDFPcdMO71a68cXP8Zyw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dAxNuyzJ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE80E606A31E;
+	Sat, 31 Oct 2026 12:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dAxNuyzJ
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793448996;
+	b=mzdBfldj+WufwaDSPULVVDCqowxiy4d22dk1YiXNOFoAcaFRAebJb3Ol/+YFodJVZtlS
+	 nBGXppGHjKurZPUkQrPaXEQ5qeaX4oczKvuykR/FWF3IpPvJkrQfWsuEO9fydG2Gfn3S8
+	 LD05SA87rxs5k85jNJd+chvDQATSqxGfxd9CzLlAv/uhVeh7Xs/IX/XxEgUq4yF9nSMNI
+	 n8m1Ez/BB5rcBAxyA79VoRT36s9/lQCy7hsLrL5eduoBoAuWlr7hdN7u6KEz+Xc/aLCmU
+	 ogwxOnkxfVC01ZWxr+AnP+k9PhhEMgOQTqvQg9tdv2aOSnDziQMDo5URQ/BKR0dSzeg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793448996;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=uLV1w/mZ/bi98b2YU13ym/X0d8CvSInaPBvgVi0L4lU=;
+	b=eWtwkvPnjqlG+RF8ZdR6sWcme6C+YlzbY8e9iv1ACszVVI8LrBcvm0ZPucPTbbSTwB75
+	 X2uVErFBgnE571usvQEEcCmEtG3aLJMXWfqfsG4An3fu7ZiAy0LZU7TJ4xgblhFH1jFiT
+	 aa6t/4d2OdwiNryC2rXc2p3FlbWFushtWthKUcvk9KhXhcq00Y7Jj8liblOQUbNcmxGIF
+	 wWpVF8boEP8c/7F8uL4XWRH6jgqWRH6ltJQbk73j8Sk13SBBdw50VoOcCvO51n7mnDtcP
+	 Ylx1DYT3UqUWLlk7yvMkx+wOcvD2Kfijahk701dUJhIHmH+E2Ob7k+Gqu8EW5sZmtzA==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4912D606A31C
-	for <linux-bluetooth@vger.kernel.org>; Sat, 31 Oct 2026 09:44:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4912D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PGx/zJaZ
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-1a8cc11ac42so1311213c88.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 31 Oct 2026 02:44:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793439883; x=1794044683; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=wah1C+AemO23rcWKtBPC9YlIp4pZRf/KFz0Z1VZ99I4=;
-        b=PGx/zJaZTIncpv3j9e5vRDqo6wmScwXATlZmqorpxC7zls73IJPaAWxjCheuBGxpt/
-         EPAZKfc4Ou3QVnAZYVlQzlBL8i/yUmvfzpk+BEfQw+Hjy09Ma/hDMFHFgRWNnLfZYDjq
-         t2C30BI+rMxy5vNPC32IOrKnrMhBUk5AQ7prtJxhsJPq9jgytoG714xRtHE+51gZVsUr
-         VpZWGKA8FXWREVNqlvErRZ4f979+OcFQpuJLEzku4SBj53Rh9EZvyYpFVr+GQNzhi9AI
-         LGJlXIWoSwD6wy4hYRQo02ot9L9RL1izjtEVEzMSxphRgE0k1AxllG2uzl7e7TQNzeSm
-         Zo6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793439883; x=1794044683;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=wah1C+AemO23rcWKtBPC9YlIp4pZRf/KFz0Z1VZ99I4=;
-        b=ImGYe0S3/TXx2ec2Omtnhwc88VSF42fXOzYoMJxfHEIDe2DHy5CEc4lSkRswOaO+9z
-         DQtoYR9dZ2ms7tuRt277aJ0DVo9nV1J06ZDa5Uur0+iPtlNgsKicyCQepDODrg3xsyqy
-         6mLlHeIXz+YoV+SJmPnwexIG707zurq/Q3dtqvLaNVdrD/3EBJyDiD2ai44YH1+7Sdu0
-         qxEXlx3wHby+8FO2/fsQaDqe3ZZugRTuQJW7kBmeoKnMQJm0ECEmmEQBhj97u5odlzdT
-         XAVLOADXYOyEd61wZ62dlQJfuTlCWc4dtDVLq0eQtKSiAPCYm5/wuQUVvXek2WCAXD2h
-         nCrw==
-X-Gm-Message-State: AFq9FYJZ4TrMT45989mbuIuKSb0CdxhD5ydH8lrSPft5cJp4psnKNM24
-	O4fwlU8FYW7Bz0pOQLB/5m0hRbHY5Zf6ReaEJCTZvavZLR0CYhAWwh9HX+cy1g==
-X-Gm-Gg: AYBFou1NnomZ7o0CVeDb4KbfucvC39se1imeET2rJkTiaKfA+uhlkUO4SmQyF+gwhQv
-	lEAnrxpxC3l0P6jnexTTrvQ3fAxae7DkVGiMKuExF9i0CqYtf0RLuY25fvJ81C+DtSGbg3zxB9s
-	jQolxNE/j7HN0MM62xATiSOR8OCX9UWeXsmWQ6uSEIVA+epRJvUPwp9UzWuhZKmhmeyM2AeGm96
-	2MrILAqk3HxZtePSqeO/C68TaLCJhs4eAdG1oft1g73X8fsxURm85hrZ3Pm7f8uHu/fVA1EHt2v
-	EN1j0TEKaKDfg1/ZRrBb0RTVJF+P4qGbWMYh1pndo9z0X3tpbm+/9BQRNK+ILMch3NIlMdMGi2s
-	h2or8qpZWyv10yTmuvRDpy84giLnNDPIDpWQMSLRTfrq4XYbs1kRT+jCa12eHcK8gXSer9vanon
-	q7zzKUPoTSuYhgtST9MHCRhjdq6E4sru6KebjGb4FSc2wUx2DLIJQTQxKeYjR2aRbkFhnrfOaE9
-	3+pi8/szYRY73n1x87jKGULPjQ+EVQtKgBUyTJGHO06UHNmw6sBL6+8DH3vXRGzNF8uvOwx7P/p
-	at+s9CiLoA==
-X-Received: by 2002:a05:701b:454d:20b0:1ae:6a48:8458 with SMTP id a92af1059eb24-1ae6a488472mr3343136c88.22.1793439883287;
-        Sat, 31 Oct 2026 02:44:43 -0700 (PDT)
-Received: from [172.17.0.2] ([52.153.130.120])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1ac192c27cdsm24101843c88.10.2026.10.31.02.44.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Oct 2026 02:44:42 -0700 (PDT)
-Message-ID: <6ae5b88a.b97a138d.f69dd.b2e8@mx.google.com>
-Date: Sat, 31 Oct 2026 02:44:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5574508769284647142=="
+	by smtp.kernel.org (Postfix) with ESMTPS id C40AE1F00A02;
+	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793448996;
+	bh=uLV1w/mZ/bi98b2YU13ym/X0d8CvSInaPBvgVi0L4lU=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=dAxNuyzJU8ti58l7LAoP9dDFn8Th6zAejiJBOLuhxH9tlihId5HsYCs/kGRJhGrBK
+	 2J6bQvp8zcRoOnmegENGEQFaM6uShy7zNKnNv98LwwlYbDZ+YHTNXca0J6LPFc/fY4
+	 ZRf0BmmT7H9SFwg7XmiTkfGdMf6pjvBofw/OkjPluveU+DaM/z0URcCQrg9vC8k/Yf
+	 /KLnYYuB8wScmsqXFl8Tb1e4ebTkLfDDRuUwY0+nXbnTQw6j1t/aRdPDzj3AHWl7Cs
+	 mUahL1bD0PbdcfWegWl45AovzJZX+PcgUKPMsPTtq1I8ABnJqbyUZl1EwlXCbeH/jS
+	 2L2TfOITjpjMg==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 4080D45EC4;
+	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
+From: Ernesto Salvetti via B4 Relay <devnull+ernesto.salvetti.tambosi.tn.it@kernel.org>
+Date: Sat, 31 Oct 2026 13:16:16 +0100
+Subject: [PATCH 2/3] Bluetooth: hci_event: Don't drop LE link on busy
+ remote features read
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,89 +83,106 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, zzzccc427@gmail.com
-Subject: RE: Bluetooth: SMP: Serialize root channel updates
-In-Reply-To: <pm-bluetooth-objects-candidate-0184-v9-4094fa28af7bd56a283a-1@gmail.com>
-References: <pm-bluetooth-objects-candidate-0184-v9-4094fa28af7bd56a283a-1@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5574508769284647142==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261031-barrot-le-fixes-v1-v1-2-30e2089882bf@tambosi.tn.it>
+References: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
+In-Reply-To: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793448994; l=2905;
+ i=ernesto.salvetti@tambosi.tn.it; s=20261031; h=from:subject:message-id;
+ bh=6FdY8h7nVU+wFr+FiHP6cSyVDh7scpK0ylbnj6iZsko=;
+ b=tUJGdwui4lzAnNP7rki57kfX9oOJP+yIJAevYn7KjYyzMYMJDQdduIdo6Kp6evFa3q13RXsqa
+ sHxzsBFuYU7Ds/MvGo1PJukA93IVvNObJJDDMQD6z5x9rsR5nbQQrPV
+X-Developer-Key: i=ernesto.salvetti@tambosi.tn.it; a=ed25519;
+ pk=OLNiuyRbYD4dcNYoAvM99nt/1KZTKeM316r91BCQDUs=
+X-Endpoint-Received: by B4 Relay for
+ ernesto.salvetti@tambosi.tn.it/20261031 with auth_id=1370
+X-Original-From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
+Reply-To: ernesto.salvetti@tambosi.tn.it
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 
-Dear submitter,
+Right after an outgoing LE connection is established, the Barrot
+controller in the UGREEN Bluetooth 5.4 dongle (33fa:0010) rejects
+LE Read Remote Used Features with Controller Busy. The error is passed
+to hci_connect_cfm(), the pairing attempt fails and the link is torn
+down right away, so no LE device can be paired or connected:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1197650/
+  > HCI Event: LE Meta Event (0x3e) plen 19
+        LE Connection Complete (0x01)
+          Status: Success (0x00)
+          Handle: 65
+          Role: Central (0x00)
+  < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+          Handle: 65
+  > HCI Event: Command Status (0x0f) plen 4
+        LE Read Remote Used Features (0x08|0x0016) ncmd 1
+          Status: Controller Busy (0x3a)
+  @ MGMT Event: Command Complete (0x0001) plen 10
+        Pair Device (0x0019) plen 7
+          Status: Busy (0x0a)
+  < HCI Command: Disconnect (0x01|0x0006) plen 3
+          Reason: Remote User Terminated Connection (0x13)
 
----Test result---
+The controller does not send an LE Read Remote Features Complete event
+later on either.
 
-Test Summary:
-CheckPatch                    PASS      2.45 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.90 seconds
-SubjectPrefix                 PASS      0.29 seconds
-BuildKernel                   PASS      31.20 seconds
-CheckAllWarning               PASS      36.35 seconds
-CheckSparse                   PASS      39.24 seconds
-BuildKernel32                 PASS      31.90 seconds
-CheckKernelLLVM               PASS      34.91 seconds
-TestRunnerSetup               PASS      724.30 seconds
-TestRunner_l2cap-tester       FAIL      10.55 seconds
-TestRunner_iso-tester         PASS      10.79 seconds
-TestRunner_bnep-tester        PASS      3.16 seconds
-TestRunner_mgmt-tester        PASS      87.61 seconds
-TestRunner_rfcomm-tester      PASS      11.94 seconds
-TestRunner_sco-tester         PASS      5.60 seconds
-TestRunner_ioctl-tester       PASS      4.63 seconds
-TestRunner_mesh-tester        PASS      5.53 seconds
-TestRunner_smp-tester         PASS      10.36 seconds
-TestRunner_userchan-tester    PASS      3.21 seconds
-TestRunner_6lowpan-tester     PASS      4.44 seconds
-IncrementalBuild              PASS      35.53 seconds
+The remote features are not needed to use the connection; the stack
+already continues without them when a peripheral gets Unsupported
+Remote Feature. Do the same for Controller Busy and move the connection
+to the connected state.
 
-Details
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Sanitizer errors:
-==37==ERROR: AddressSanitizer: heap-use-after-free on address 0x7c21733e33d0 at pc 0x559ed80ece8e bp 0x7ffed3ea2520 sp 0x7ffed3ea2510
-READ of size 4 at 0x7c21733e33d0 thread T0
-    #0 0x559ed80ece8d in timeout_callback src/shared/timeout-mainloop.c:33
-    #1 0x559ed80edb75 in timeout_callback src/shared/mainloop.c:270
-    #2 0x559ed80eeaa6 in mainloop_run src/shared/mainloop.c:124
-    #3 0x559ed80f13fa in mainloop_run_with_signal src/shared/mainloop-notify.c:196
-    #4 0x559ed80f664b in tester_run src/shared/tester.c:1223
-    #5 0x559ed802017d in main tools/l2cap-tester.c:3918
-    #6 0x7fe17438b600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
-    #7 0x7fe17438b717 in __libc_start_main_impl ../csu/libc-start.c:360
-    #8 0x559ed8026c84 in _start (/home/runner/work/bluetooth-next/bluetooth-next/src/bluez/tools/l2cap-tester+0x16cc84) (BuildId: 91c9d49e9766c394468e27ffa29b05e7d348169f)
+With this an Xbox Wireless Controller pairs over LE Secure Connections
+and works as HID device.
 
-0x7c21733e33d0 is located 0 bytes inside of 40-byte region [0x7c21733e33d0,0x7c21733e33f8)
-freed by thread T0 here:
-    #0 0x7fe174cc93ff in free ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:51
-    #1 0x559ed80ed36a in timeout_destroy src/shared/mainloop.c:251
-
-previously allocated by thread T0 here:
-    #0 0x7fe174cca60f in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:67
-    #1 0x559ed80d72d5 in util_malloc src/shared/util.c:46
-
-SUMMARY: AddressSanitizer: heap-use-after-free src/shared/timeout-mainloop.c:33 in timeout_callback
-No test result found
-
-
-https://github.com/bluez/bluetooth-next/pull/1034
-
+Assisted-by: LLM
+Signed-off-by: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_event.c   | 11 +++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 74b96941ad11..7da40b84c198 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -726,6 +726,7 @@ enum {
+ #define HCI_ERROR_UNSUPPORTED_REMOTE_FEATURE	0x1a
+ #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
+ #define HCI_ERROR_UNSPECIFIED		0x1f
++#define HCI_ERROR_CONTROLLER_BUSY	0x3a
+ #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
+ #define HCI_ERROR_CANCELLED_BY_HOST	0x44
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d05934fef4d9..fcbd1807e2f3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3026,6 +3026,17 @@ static void hci_cs_le_read_remote_features(struct hci_dev *hdev, u8 status)
+ 			status = 0x00;
+ 		}
+ 
++		/* Some controllers reject the command with Controller Busy
++		 * right after the connection has been established. The
++		 * remote features are not required to use the connection,
++		 * so continue without them instead of dropping it.
++		 */
++		if (status == HCI_ERROR_CONTROLLER_BUSY) {
++			bt_dev_warn(hdev, "Remote features busy, continuing without them");
++			conn->state = BT_CONNECTED;
++			status = 0x00;
++		}
++
+ 		hci_connect_cfm(conn, status);
+ 	}
+ 
+
+-- 
+2.53.0.697.g625c4fb2daa
 
 
---===============5574508769284647142==--
