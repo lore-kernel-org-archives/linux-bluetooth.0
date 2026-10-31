@@ -1,79 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793448997;
-	b=nxfrzm13BgDsoarZ6Ep4JIP8YsJlLYmPrlmM6GlWx4tF0Ohh1Ixvd8mLZtsDECRrFa+b
-	 0Noz+zXzpBDhkm/oJ61RkJ68sWPmoAq7lHLS9tyK/F2yIYUbkpwwhJvBmchTiKoadDx7I
-	 PqPWE+fP073DfKWa/QbNY/rkygN98sBotI/3/k+IydW7swiZAz+lV2LksKpN9iL7e/QSn
-	 htc1dvXJrBemDnMKTEbHJs+kb0cu44KikC6nlylzeVQrHqlf20ON84GxGA94gilTz701K
-	 flv8Pdrr+TfdGAZl2T6tGq6yDPEuCZPNflx2nWpGkS0bKM+ONcbUg8mvmPZvieHk+tA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793448997;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=u85XSISWPysWcstcJvussxvAsuxTNwSFhcA4brqqkXU=;
-	b=UEp1Z3WVsgmPIal6oRlxrTYSxop6QCuu6xEQZNhrhSsMCpMgZr+mMmrydPtf4ejEkwbA
-	 EAmMoct5Hc1zZQSgD/z1PN1vK5X7cSNQ15/6HCP1OlufMzZaKrimeLPeSzh6sEDPST+Ok
-	 kk3rqwoY9sVpBs/D3xuQdtpB0gEBf+HUDhRpMeyLDG/wr7WZ1rslQvvVfcoJWL2IMhMYZ
-	 I60O5x5aFUpPMHkkm1cahx+5CFMNI2wHNjXccml4HG/CV/wAZIBRN4BcTqzef4UAFIfOp
-	 A50fjcVaHMU9LrX0FYbAc927ul9BFVwmi8JfO72gBC2wnEFG1l+huYHIL3fLNiUMNxw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bPy5znbd;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0D606A31F;
-	Sat, 31 Oct 2026 12:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bPy5znbd
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793448996;
-	b=y4EGAmfUCt/y/M0Tjm8NYyvaJAZPm2mIMdheeLE/TdZA4bBmeMXe1opNX8luL80EWiVd
-	 2bAMyN/vi/GwMSX9QShIaNpZpdC74lwPddKzj00U0NkR4zbCyy8FpeneqpM5mxOwj9RYm
-	 ys8yxTlV4KM0LmQGj284BTPpGZKQge+ui6bB5wzK3R4Es8ZL213cpqBjhYr0Alrchhg5T
-	 /jxIWtMMzRJ5W6Wpv9vB46qR8sPjwGrdVGR+5ftNCAlv06VouoUOugN1ebTJzFUM2y7nP
-	 dXaq9JSNb42zQP6wNI/enfH9xV5qIqdK+q6j0qbFBTYnSj+mOapRyN0k1D2qc1nyCvA==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793448996;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=u85XSISWPysWcstcJvussxvAsuxTNwSFhcA4brqqkXU=;
-	b=SCodzZUCvpmDbM3ZxyJFvKwYTjXweuqSCmA3v/DQwl41+0SleCujLVmGHIP1A9ceWIPG
-	 3k9RcR3ucz5C3+khiYnQLkWP4VClcSsClwsT2I/+ojfJc6r5bHLSezvkMoQ664nNY5fUQ
-	 mGMfvxODwolvGgzRYBHdhVrrVMjvRYlNQturi9ZmNb6LdgN0Q4nChlOSfxYL4gcK73D19
-	 ZpNHBm1gkZ591DdvSo62eMbhfwQsnB8OO6oCE7m5/d1vAIglWKdTzC6kgjMZqlDFL/ua+
-	 kYo6qcT7muHzZXfpVAO8N2zm1KHFFxEjEmdU5k9DPuVwrz7C527uL2+N64kCpu+yiqQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.76.89
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793449057;
+	b=qAYGP9xwKRpe+MV7EJ/VLg6VX+g0i59CWvo1liJi2gE6HGdxmVO+WErj6DC0MAlqeC1h
+	 aYNtugsjvJy2/+ZLsXuir6JRRjcdwhhSeRco00zgBEC0Z6+GgfZ5VvhvYyoBXQYyTF9kZ
+	 i2AEzQ0sTnmLwm4DOcFWcQj+tVoKy5wRW9GKIlprGODIpnGo+q8VrTfKV8qTm+xQ/RWTN
+	 7DQwRrMHBCFJlJyevdcqRlZQ23sb9W4jRTt8TVXOXdVFYdWUKcXw9eWe3VA+w3sMSKi2+
+	 BOWjzi5canWa6g/LfThOmdTxTndeRKcGXHGndCVDDFHbhEval/JjffZQBNZfBMfBkTw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793449057;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:To:Cc:Subject:
+	 In-Reply-To:References;
+	bh=DaFdbTzDElzVBBLXWgdEnO74GzOl9L3uSpC4rc309Jg=;
+	b=kAZsm/j8vJzL/xSt8ajb3qdlIukeXBlaFyalvfnrWNp0J9B83/MXv9flpFDbUDEXQuN7
+	 jT86Qslv9aBHarAyXFoqlPlJsDYUu6Go2qT4UHE7yVx8Ysz6oq/IgwGQ78uL8RLvNbmRi
+	 xs90g4ur/iarw20tIWXt21y8XB3h8kcvDQu57T2YFy58Pf24zvOtM7YQ7RUYZdyab/qSU
+	 216AgtqaRu/D6qcaow7QZVJGdXiyuMysgT5rqG9A7IWm2l+fFGSgRHpgLQwmP2H6AFoqT
+	 +dKttKSfTj8L2C1PUQJhiUFZQUD4VgXifp3Wljzn70MOmLRkTz60+jMG1A27VIPg1Ow==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=podgorny.cz;
+	spf=pass smtp.mailfrom=podgorny.cz;
+	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=UMclV2BU;
+	arc=none smtp.remote-ip=77.75.76.89
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id C29901F00919;
-	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793448996;
-	bh=u85XSISWPysWcstcJvussxvAsuxTNwSFhcA4brqqkXU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=bPy5znbdQbC8BhgRV0sB8gMzafx4gQTMLZtTFxtaPEj4wIx7dGcnVKi/bVLldrrwf
-	 s5myNjDOwHxNSPEfyxrSiNonxQY2xfYnpmbyROQzJyTVBj+PNAyTov1AeCVojHs6Zf
-	 aB2ga0LGJYMaAWNTxQVRfXIT1I2xy4dWAgNzygwHvagRtury9ars98Drg0IXLr4dGM
-	 wU0/ZN8B8s+u3PGc8PxLaIznIURUabFkAaKFJ0pSSQnoDPT1EjZxDExs/03z0rz6o1
-	 wK4Jnbj1qTPlBNwW95S29TWLfyuqZEKPYfeIg2WrlG7MCmGALn4VjdKiF1C4s2ayuA
-	 L4Y4xmsbTvTCQ==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 4C71445EC8;
-	Sat, 31 Oct 2026 12:16:35 +0000 (UTC)
-From: Ernesto Salvetti via B4 Relay <devnull+ernesto.salvetti.tambosi.tn.it@kernel.org>
-Date: Sat, 31 Oct 2026 13:16:17 +0100
-Subject: [PATCH 3/3] Bluetooth: btusb: Disable broken LE extended scan on
- Barrot controllers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BAB606A31A;
+	Sat, 31 Oct 2026 12:17:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88BAB606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=UMclV2BU
+Received: from email.seznam.cz
+	by smtpc-mxb-64995d6b58-wb7nk
+	(smtpc-mxb-64995d6b58-wb7nk [2a02:598:128:8a00::1000:929])
+	id 5b8e32daedb49fc35e012892;
+	Sat, 31 Oct 2026 13:17:16 +0100 (CET)
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
+	t=1793449036; bh=DaFdbTzDElzVBBLXWgdEnO74GzOl9L3uSpC4rc309Jg=;
+	h=From:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:To:Cc:Subject;
+	b=UMclV2BUw574PFpKBVOPEFNDDJ3RkA9OYsOiImT0kFKnnmuZiB4L/jSGX/hs0X3mo
+	 ECSSFwu/yOEFkBNBd3sdUOeJ4gbjEtnnI75GQ8XJ9xUyZywZpTyX14zyUXfNezrsqq
+	 GdRcub+RaTZ2ZnUBfUknIf5537fvyBs5x5zXJXeUvwQgwR3RWS7CO9oO4KaSIO6nFz
+	 ubtEkrlQf/YDeG0xagwmVZqawF5rRyaxqT9x+sgnotTnq8siRFuu49sAJIz6ZuzNR6
+	 Fa3WQ9FXk6DNJfgg5iec6tODxs0JY5Dq9VBPdMrP8DXe3jgN6ZqxYkiIqRD7MoYzDf
+	 Y8FzyCKQFw2kw==
+Received: from [192.168.31.81] ([2a01:9422:904:1ee:272:eeff:feab:4ab4])
+	by smtpd-relay-7df688cd44-5698r (szn-email-smtpd/2.0.89) with ESMTPA
+	id 64c474ca-2c92-4d19-bbb2-930bc8bb53bb;
+	Sat, 31 Oct 2026 13:16:23 +0100
+From: Radek Podgorny <radek@podgorny.cz>
+Date: Sat, 31 Oct 2026 13:16:21 +0100
+Message-ID: <179344898191.3643659.6660410741163325277@podgorny.cz>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,78 +65,52 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261031-barrot-le-fixes-v1-v1-3-30e2089882bf@tambosi.tn.it>
-References: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
-In-Reply-To: <20261031-barrot-le-fixes-v1-v1-0-30e2089882bf@tambosi.tn.it>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793448994; l=2029;
- i=ernesto.salvetti@tambosi.tn.it; s=20261031; h=from:subject:message-id;
- bh=Fo2F/LHMZlxUCU94fy+cZtcQarZ+SAzum0VbRoH027c=;
- b=veY8SItlpCgGAwnU3X9Ogf0M1oE2m3jCTQ/d76N/IcfE0CkaC2Q+LTNIJ9pn8kr3SBvuCxDxE
- yALEr2ZmKrWCfFmwG+yuPYbm7NJVTYf1SnU2rg3FJNgoDfc2hTLoqrL
-X-Developer-Key: i=ernesto.salvetti@tambosi.tn.it; a=ed25519;
- pk=OLNiuyRbYD4dcNYoAvM99nt/1KZTKeM316r91BCQDUs=
-X-Endpoint-Received: by B4 Relay for
- ernesto.salvetti@tambosi.tn.it/20261031 with auth_id=1370
-X-Original-From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
-Reply-To: ernesto.salvetti@tambosi.tn.it
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+    Marcel Holtmann <marcel@holtmann.org>,
+    linux-bluetooth@vger.kernel.org,
+    stable@vger.kernel.org,
+    Sasha Levin <sashal@kernel.org>,
+    Radek Podgorny <radek@podgorny.cz>
+Subject: Re: 7.2.y took the on-air address fix without its companion
+In-Reply-To: <2026103011-coeditor-debtless-2d94@gregkh>
+References: <179097754519.501890.1801734138080126989@podgorny.cz>
+ <2026100356-magnitude-esquire-89fc@gregkh>
+ <179337661340.2790793.10493980332574129560@podgorny.cz>
+ <2026103011-coeditor-debtless-2d94@gregkh>
 
-From: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
+On Fri, Oct 30, 2026 at 11:32:40PM +0100, Greg Kroah-Hartman wrote:
+> I have no context here, sorry, what is wrong?  If that's a bugfix, why
+> is it not cc: stable?
 
-The Barrot controller in the UGREEN Bluetooth 5.4 dongle (33fa:0010)
-reports support for LE Set Extended Scan Parameters/Enable and LE
-Extended Create Connection, but stops answering commands as soon as
-extended scanning is used. btusb then resets the device, it
-re-enumerates and the same thing happens again, in a loop every ~4
-seconds whenever a scan is started (e.g. to connect to an LE device):
+Sorry, my last mail was too short.
 
-  Bluetooth: hci0: Opcode 0x2041 failed: -110
-  Bluetooth: hci0: command 0x2041 tx timeout
-  usb 9-7: USB disconnect, device number 13
-  usb 9-7: new full-speed USB device number 14 using xhci_hcd
+It fixes a regression in stable. I sent two patches as a series:
 
-Set HCI_QUIRK_BROKEN_EXT_SCAN and HCI_QUIRK_BROKEN_EXT_CREATE_CONN so
-that only the legacy LE commands are used. Extended create connection
-has to go as well, since legacy and extended commands can't be mixed.
+  3889a5fcd091 Bluetooth: forget a peer's RPA once it advertises its
+               identity address
+  4914c4998961 Bluetooth: put the peer's on-air address on air when we
+               cannot resolve
 
-This depends on the previous two patches: without them scanning fails
-with Command Disallowed and LE connections are dropped right after
-they are established.
+The second depends on the first, but AUTOSEL took only the second into
+7.2.8 (as a552b4bc058b). It also reached 7.3 ahead of the first.
 
-Tested with 33fa:0010 (bcdDevice 88.91) and an Xbox Wireless
-Controller: scanning, LE Secure Connections pairing and HID input work.
-33fa:0012 shares the BTUSB_BARROT flag but was not tested.
+So when a bonded peer turns privacy off and advertises its identity
+address, the host keeps connecting to the old RPA, which the peer no
+longer answers. That lasts until the adapter is powered off. 7.2.6
+connected to the identity address and worked.
 
-Assisted-by: LLM
-Signed-off-by: Ernesto Salvetti <ernesto.salvetti@tambosi.tn.it>
----
- drivers/bluetooth/btusb_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+There is no cc: stable because I left the tags off on purpose. When I
+posted the first patch, the kernel still hid the stale address, so the
+patch fixed nothing live on its own. Taking the second patch alone
+exposed the bug. In effect the first patch is:
 
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index 92a78a7e6039..d5f18134ee3a 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -4735,6 +4735,12 @@ static int btusb_probe(struct usb_interface *intf,
- 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT);
- 	}
- 
-+	if (id->driver_info & BTUSB_BARROT) {
-+		/* Support is advertised, but the controller hangs on it */
-+		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_SCAN);
-+		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_EXT_CREATE_CONN);
-+	}
-+
- 	if (!reset)
- 		hci_set_quirk(hdev, HCI_QUIRK_RESET_ON_CLOSE);
- 
+  Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
 
--- 
-2.53.0.697.g625c4fb2daa
+Please queue 3889a5fcd091 for 7.3.y and 7.2.y. It cherry-picks cleanly
+onto 7.3.1 and 7.2.14. 6.18 and older don't have 4914c4998961 and don't
+need it. I have run the two patches together since September.
 
-
+Thanks,
+Radek
