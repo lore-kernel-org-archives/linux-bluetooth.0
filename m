@@ -1,84 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.77
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793546422;
-	b=vMlDY6c0yfGkHTaCiYwzGQ4UIz13I7bqE4DCQgaYoh2xWU/TSLsOJRsHtZCx2ZsUDmqt
-	 EEFUasb6PP3fUFjIxWPvsUjir2AI4KeRUcaEViKxljrwQJlsgjRDFXBEAZFM1SpwPIT++
-	 FMNV+GcpMKl0lziW9c0RZnby0ZgwCpCqsyu5FvtNYz2SUIYb44OVLoCPh8+I2bXH+T6/e
-	 QuG0fChd9Do2YkmHtwg0JXoV6c2PPsWyPcbkJmt+EUgBtSFPRiKs0a+bIPvCdbZbsP+xV
-	 0agN1S/9ztjpcpfoiO7qbc8eGynYyUSolweaclPeOF7Tv+MCzo9jbupNm1xURLJwpOg==
+	t=1793547751;
+	b=ukOokv+LC1iE06FL9SR8fC+6s/a626tOH4blwWrlc3dEcqvbxFQQ4HXInVaYKceKMsTi
+	 2ZuEA/jTyRVuo9IefCfp0Zk/fKXK6MqljwkvhhSGSyBdQYQdaomVPGpUBHQVbVHFxXy17
+	 MXSpWUHseHoyom/Y05W4ZAMhdBqpYVf6WNmXNtaqdT46hCkol50plTjGalgq8bIXf6bzC
+	 ed8YoYEQuwQYBZ2XotW6XYf74qf44vCaxmUmP3DfWJ4fQzZv8vWltzdPgnbK7awmsFs9l
+	 bXrm9BjV1Icwj9DIBqbgSl4OCao+pgN8bHJDTe/sbAG2dCMs6oB4vFERU/uASjF8XnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793546422;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=S2P8YnXno7u8KXa2ReVqkeGcIeRF8zHDT0PIGg9w/jA=;
-	b=JFIpej6eY6MbAr6j8PS0qpfU9NiE1Z1XBfay/8FvugQYfHnW7k0DkPwQ6wSzmiKfnTlm
-	 Rnww1nRJgFi6xXwIBOgpe3D3F3O9BDnmhmPffY8bHopK3BRYxi/90rqdXx5uh97a7lyDe
-	 pp4s94LSRUE3UheYU5Lqa7LxyHgaNW0t8iTsvrCuTojFFR9BeSs6QGORPFdttwNASqyl1
-	 t0NrkSBLwWNWRsXGtb9o3BVEXe4bx52bvX0BvjTpjM8HYX3im813gbw+kWMezzptFMW5D
-	 Q8Na2JPgusR8Yv6fPfXjYhA/5qjo/Dz12CcZ8XorRPRo32F0DHs/zl887ru64KRVR1w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793547751;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Content-Type:Content-Transfer-Encoding:
+	 From:Mime-Version:Subject:Date:Message-Id:References:Cc:In-Reply-To:
+	 To:X-Mailer;
+	bh=+hfJTfIE4c9lTY9KbtMmyOg2v8RzrvoME+4vIGZ/RDU=;
+	b=TDJQm5jDqaj4btfU9fQhfd7lnJb8OlLVsuz+WeUkXl0822Mvaiv4EomzemvDXscEUzn6
+	 5TLjcPbI6GPmOhfxByFaCHQPERgGW0AKzb62/FCgTspqkJmoMQasIMBPHL6X6MddwCNmH
+	 KF4F6ezUXO3Nr5VMPfWlQyz4BwRgb9u+GfHH6FvYKOcMPI+jq2V2XG+s5VZvaBEit3LQ7
+	 0PmZKghVHzVDGDYSn2GTUTsVS1cSJoGhDo2+IsZTdd+8cbBR3Zkkt8o2N9nz1VCXghxjV
+	 lOJtXNZHec6QoEURoEWpfHMFWPKA/BlmTDp/eHlgIfpmrSqEfPifzCc3swC8qURSX2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VRytou4S;
-	arc=none smtp.remote-ip=74.125.82.182
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=TPJPyTYA;
+	arc=none smtp.remote-ip=95.215.58.77
+Received: from mta1.migadu.com (out-77.mta1.migadu.com [95.215.58.77])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C647F606A324
-	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Nov 2026 15:20:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C647F606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38C0606A324
+	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Nov 2026 15:42:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C38C0606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VRytou4S
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-36661f953e4so3470476eec.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Nov 2026 07:20:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793546421; x=1794151221; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=S2P8YnXno7u8KXa2ReVqkeGcIeRF8zHDT0PIGg9w/jA=;
-        b=VRytou4Swbf1lj2eWfOmk0AEhQiMb2lRlrHZYaq5gJd4f73kQq90DOO1q34YYWWQe8
-         +//r4h2bNHS288RmtSStvsNDWc98wll7TFRkZ9JB2Ao+hqIrxpjGnp1M9JlM751Qnfc9
-         sw5+079P5AXBC8XvOiuBx11jtjvMDMzDVgWhLsiYp50bxOQh7r9jo42uDnu9+hoVYPaF
-         hB+V+UHWpbEch2ocJsTp9inDyADCtC7qnjAyQlXN6oplC64JzQfchxoofyQv78yvQGNr
-         YYE/zF+O+XZqTlblytyRlmf2guYiPCO79HcZwBVw1ZR5IH7wzoIfJS6zT5PNr1FZkxg+
-         epTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793546421; x=1794151221;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=S2P8YnXno7u8KXa2ReVqkeGcIeRF8zHDT0PIGg9w/jA=;
-        b=zxZt5u7oH9Opd9oT3AOz/+ljnxwJpZuVDLBbdu4/nHzvfmzAGuXgUl3YtpCt8KIox/
-         Pqor3yqfqX0rLVGuPJn6ZLnqhIeZwOxdWN5uW7G/1PZ9DwJuaDS+qWhGLHTVG1CpP6lT
-         rt96h8Vx46lS47me27kiPU1l1jmpiMNm6v5n8VsGSWGA3KxgZZEVIBcaqUD744WZRJv1
-         MaZpyXTUp8AePa9VyRbsT/2x+bkLz7P2zZi49EAo0yLrZ7YM0wR4zZ0CSQmPPCoaSMwk
-         Hg3cfhZm2BumSGLw3S6RhGdpt2jRUCzqwXz6BbspXVYU9SaYdHfU9O9P2b/MjL+VJdoS
-         q7Tw==
-X-Gm-Message-State: APuU4Z89U5FR+cP5Luot1MkKKFGJEWyBPbe/D6Jw53iljEgAOi4RZpqd
-	5GZ1F92WQaQwioQfY3Vu3sJY4TYNrB66BphaYn7unriQR4TNn4+xAPcCAuMsgg==
-X-Gm-Gg: AYBFou1odRKoLvh6lKlDQpIq48CeZQQYUnkG5JcEfsoxXSFYrV+EMI+Nj6xg4V3XfWW
-	F3KZLcAGCi5kjDBbKgtXsyNp0GUa2fVXiiwj//dVYnwP+00MfMgI+dvMS43/PRJj782cYSrofMG
-	35R97HIvaBsO+rmA2MuRHX6WI5pd2OYaAlZK4KDewHzn6A3MhZ2XCVwrjplJtKDi97cPnRXDv+k
-	SA1crWoJXXkZP27IDyFxgqwqHkYhEPbuPvtQvH2Mx9gKPVLa2MsH0LV+xKuwNf2tiG7o6dpigIk
-	sPD9sNERj70StNkQMwlcXbTtr/DAF5y7t6v2VE75A6Lbm+IXGgihO2SO6sfdYtsfDA34Czt290X
-	19cJ+msY5qDekw6x2pbJJDaHdnqUdoN7F77I+0vEGX8JKUPVO4D4XdmkRcspQQKZL/jnA3X7541
-	CocMTiTp+po3Uv6ARTiK7k0yAU99AlLzNM0XTGOoyxDHZmURKuVay0dNqX/qcsppdtYwVqsx+WS
-	KvEjpl35OnEVTG3M6TiEZRkQbhLoL5+URyXKL+TuoTjLPF2ySkwXMS1JzrBzJ7lag==
-X-Received: by 2002:a05:7300:f281:b0:369:f64e:7feb with SMTP id 5a478bee46e88-36a4220128dmr12215904eec.2.1793546420675;
-        Sun, 01 Nov 2026 07:20:20 -0800 (PST)
-Received: from [172.17.0.2] ([172.215.216.197])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a42935b4asm38610637eec.16.2026.11.01.07.20.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Nov 2026 07:20:20 -0800 (PST)
-Message-ID: <6ae758b4.be2e0958.1578de.f8eb@mx.google.com>
-Date: Sun, 01 Nov 2026 07:20:20 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5010258700336894388=="
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=TPJPyTYA
+X-Envelope-To: linux-bluetooth@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=JP5vsCwy4egMsces+lLZVoxETUXGeacn1AnVYveGSys=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793547747; v=1; x=1794152547;
+ b=TPJPyTYAsDuy/BFlcrmmiFv9z4gSPce/3JWAz9l9YupufSAgrnAYgnsxRd9xK1S8cf+J64+4
+ HCUXiKvR78SF+InoG9Tbj0ff4JfINpIMvfpxivMGDngg/6y+7sogyWLms9MbZVB/k8MfV4Gr7gS
+ SSKwIQTkYs/+0rbib/JrnHUw=
+X-Envelope-To: linux-bluetooth@vger.kernel.org
+Received: by mta12.migadu.com with ESMTPS id e2615d605fb60ce4;
+	Sun, 01 Nov 2026 15:42:27 +0000
+X-Mizu-Trace-ID: e2615d605fb60ce4
+X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Aditya Garg <aditya.garg@linux.dev>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -87,50 +58,84 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ingyujang25@korea.ac.kr
-Subject: RE: [RESEND] Bluetooth: btintel: Drop dead !skb check in btintel_read_version()
-In-Reply-To: <20261101135324.2192752-1-ingyujang25@korea.ac.kr>
-References: <20261101135324.2192752-1-ingyujang25@korea.ac.kr>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5010258700336894388==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1198111/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.63 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.09 seconds
-GitLint                       PASS      0.26 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      30.95 seconds
-CheckAllWarning               PASS      35.33 seconds
-CheckSparse                   PASS      38.44 seconds
-BuildKernel32                 PASS      31.77 seconds
-CheckKernelLLVM               PASS      33.42 seconds
-TestRunnerSetup               PASS      736.54 seconds
-IncrementalBuild              PASS      29.20 seconds
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH bluetooth-next] Bluetooth: hci_event: strip Broadcom vendor bits from legacy adv report type
+Date: Sun, 1 Nov 2026 21:12:06 +0530
+Message-Id: <F4853998-F2A8-4AFE-99EA-544657EAB0E8@linux.dev>
+References: <20261015114903.784731-1-66ton99@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ Jose Miguel Ochoa <josemiguelo.ochoa@gmail.com>,
+ Ton Sharp <66ton99@gmail.com>
+In-Reply-To: <20261015114903.784731-1-66ton99@gmail.com>
+To: Ton Sharp <66ton99@gmail.com>
+X-Mailer: iPad Mail (24B119)
 
 
 
-https://github.com/bluez/bluetooth-next/pull/1036
+> On 15 Oct 2026, at 5:20=E2=80=AFPM, Ton Sharp <66ton99@gmail.com> wrote:
+>=20
+> =EF=BB=BFBroadcom controllers running ROM firmware on Apple T2 Macs (where=
+ no
+> RAM patchram exists, e.g. BCM4364B3 on MacBookPro16,1) set vendor bits
+> 0x10/0x20/0x80 in the legacy LE Advertising Report Event_Type.
+>=20
+> As a result, directed advertisements (ADV_DIRECT_IND) arrive as
+> 0x81/0x91/0xa1 instead of 0x01. Because process_adv_report() drops any
+> legacy report with type > LE_ADV_SCAN_RSP (0x04) as an unknown advertising=
 
----
-Regards,
-Linux Bluetooth
+> packet type, bonded LE peripherals (such as Apple Magic Mouse/Keyboard)
+> and Chrome passkey proximity scans fail to discover or reliably reconnect
+> to the host.
+>=20
+> The valid legacy type is always located in the low nibble. Mask the type
+> field for Broadcom controllers (manufacturer 15) when it is out of range.
+> Valid legacy reports (0x00-0x04) remain untouched, low nibbles >=3D 5 rema=
+in
+> out of range and will continue to be dropped, and controllers from other
+> manufacturers are unaffected.
+>=20
+> The fix is based on the initial t2linux patch from Jose Miguel Ochoa.
 
+Late to the discussion but are you sure this applies to all Broadcom chips t=
+hat are not in T2 Macs?
 
---===============5010258700336894388==--
+We have a WIP patch that does the same thing only for chips seen in T2 Macs s=
+o I think that should be implemented?
+>=20
+> Link: https://lore.kernel.org/r/3352A23E-EA42-4366-BBAA-459CEAE6F51B@live.=
+com
+> Suggested-by: Jose Miguel Ochoa <josemiguelo.ochoa@gmail.com>
+> Signed-off-by: Ton Sharp <66ton99@gmail.com>
+> ---
+> net/bluetooth/hci_event.c | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
+>=20
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index c055d16cfb8e..a03a33bca095 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -6593,6 +6593,17 @@ static void hci_le_adv_report_evt(struct hci_dev *h=
+dev, void *data,
+>=20
+>        hci_store_wake_reason(hdev, &info->bdaddr, info->bdaddr_type);
+>=20
+> +        /* Broadcom ROM firmware (BCM4364B3 on Apple T2 Macs, no
+> +         * patchram) sets vendor bits in the legacy Event_Type.
+> +         */
+> +        if (hdev->manufacturer =3D=3D 15 && info->type > LE_ADV_SCAN_RSP)=
+ {
+> +            /* 0x0f masks out upper vendor bits (0x10, 0x20, 0x80),
+> +             * extracting the standard legacy advertising type
+> +             * (0x00-0x04) stored in the low nibble (bits 0-3).
+> +             */
+> +            info->type &=3D 0x0f;
+> +        }
+> +
+>        if (info->length <=3D max_adv_len(hdev)) {
+>            rssi =3D info->data[info->length];
+>            process_adv_report(hdev, info->type, &info->bdaddr,
+> --
+> 2.52.0
+>=20
