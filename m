@@ -1,93 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793656510;
-	b=HfXhYvm8OZ+qlNcrwXHratM0cyqHPJO6PO/RFp6JmaXpXHcxxVb3bMoa599XS4DLg8NM
-	 cyjrHhfWExRrde1xiMxZ3//BnYgvuQCRMCzzxnJJc0zOlHeA/m6Veja8uJ53BxjyK2oQO
-	 9hh+P3N+Wk9zGwp+jioZv9s1lh2UsF3vtA9bGNehzQ49Fpq4fnKOmVR1mfo01EZGFW+So
-	 OE6k+pcQ1iK+S3xAvL+W0kimr30+59SWtEVpTSUececa/xjyUGOOBHwjr4wcwt2pz1LqK
-	 rZqR1HQZX12Bt5OXr+OfA5/Y6MH1xLRe1ZMqWdwkusaOD+dXgXZL1NkxyPNt87OkW8Q==
+	t=1793657574;
+	b=LseqzVUfHkp+dLJkk+4gJa/ooR+e3sBq/PHtiLzVpRWyNGIHWoKLjHyu0JjOuqDK7vRb
+	 OLp9vI1afR1vzII4JJTCsM02irbtgsdp9LLF22GxWeb3q63F+wPiA7mm5OG7nLjuG/3u2
+	 cHT1NfMz9TJ+cMveDg+sBsg0SmzniiPQzYUZnUM6OFBK/8nNmLkH3uHoAfCucW8l9UHAg
+	 YLl/hOAKTnAckfHvbkY6erL4Pea/uOVBUtpZZv+WRsot+8wWshvtK/Jj84386h2Adk1Pf
+	 469tVbkJYGXtbCZpUZlUbo6CiBoccHqJPl9wpgXxpUVGLrAvZROn/ck5Xw4m5kUomgg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793656510;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793657574;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=iKChSJcCH8kDi8fprfSf3ufg9YgZMyeze+5SvKdpAEA=;
-	b=gdWUQzDyim66lh7qOgbqYHh2ooP/Q8JmF3ksqoePcOcHdsxJ5tjVHkCOU0F2nDjsmJew
-	 5MKlU9kd7cuEUjiYoW3e2uyxR4NBKbxL9N1+W1Ie75zuGRVzyaFnQtI1YX1IMTgiy1v/a
-	 DDGGc8boL/i3JQqrbxeu5bhsG2fj7z96B+Rd6jS+7dO4w5XKjcK9VBlthNYkctnUoJqiE
-	 iohwAhcQUoQIgtSb13XTHU4DzstRvDuvwn6MQ9AEbBc77+2FXkS7sfTDtCzWcT/Y3YGK5
-	 mWR66IuBQiCNcI0PVVsU3dpI8x2EcaNOsESs/CJ/AV/5+Xm2E75zuDXS3aPm4AIlOqA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
+	b=rVD7XGrryiSbWt7sHmNiEx1R+x+zy373NCAXcag50ZtZcUe4MT48eKyHP2PzcvrWfPVb
+	 /nK9dipxUVILTuDlr5V/t9QzOY5MECbz0tVdpVPwVugb1XICRABmLvVVSqLYkuRKVL38Y
+	 LMgswmlz6SYdsb9vsSk7etNNZ/6zNkeSDb27ORWIMVRgslgRddRYCQaALcjvce00BQ7M+
+	 Z/qboP/dIWEHNhI+bpT3StOmRGYmlxX+bqlgnvWW9fBE2B2lqSr6AP/43fqOs5E45Qc6e
+	 kT81fcSG0xFEAZHyID5PhGt+lgom0p+AO/igYl7QFEx4aBzXhFiOFfB5Df2YymUCn4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ix2vDa+V;
-	arc=none smtp.remote-ip=209.85.217.54
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sBTZQeEd;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B16606A32D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 21:55:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70B16606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B07B606A32C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 22:12:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B07B606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ix2vDa+V
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-78fb1fb9508so65042137.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 13:55:10 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sBTZQeEd
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so26897955e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 14:12:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793656509; x=1794261309; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=iKChSJcCH8kDi8fprfSf3ufg9YgZMyeze+5SvKdpAEA=;
-        b=Ix2vDa+Vj1rV8u3y5/xx0DAm2jTfPL3f8MbgRocLDXw3PUwgrCp3YdvGtqNt2KNR22
-         l59kraCV+Mzyn7pwF8Rn8syIbqSEgCtKkdRdqjByJtAGyAIpwEpmCj9unhcp+lK5ty4Y
-         Z4+n7wFeEdrZ+48gu/nmhMkLJLgXbyQgOXjEk1vPLXlgjV4RphSh+z0WPEWyOk124Mbn
-         4pkgH00M1wsEb0AN401FzHdQJXlLhZrbFoKp/lbdRDg5MlEMnMBTYxe3tABCUGwzh4Sr
-         KqWN2/UUkHbY1wyF0+TjwwsLuZ8cnJ2KUe4sjzIJx7TBa9+nRoMw9v0R0CuLM12eBBVa
-         ouYA==
+        d=gmail.com; s=20260707; t=1793657573; x=1794262373; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
+        b=sBTZQeEdVCQYcD0H90mku0dXYpq6JpHezGiIzOoJWFMrhqfxzUHmQp6Lj2n46HbAtn
+         msTmmeCPAg2Matb6VWz7qh+dp8SMGKXCZQ0KJHOiJ1P8NmlBlsCcU927ti+hF4FxIGQG
+         +EoYNKhAAwrQMD61EZjeCtWqkjRveTA4Bx36EZxb/IVeeo2bGXx4ElXeE7EBZdTjex9d
+         9b5d11rgtW084vfc+KkfyBYnvsh7nSD7d6tENXtI/S0IdXuU/FvxyF1tw4WxdTFeeFd9
+         HbCtiqUr5lm0Pj+upg2nbPaeDWSN6fS7X+Gyc37IXukiSaXe5PqH6cDWGt60nwridUHT
+         utVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793656509; x=1794261309;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=iKChSJcCH8kDi8fprfSf3ufg9YgZMyeze+5SvKdpAEA=;
-        b=hFWOqR/DPeGZgOM7ZanviJJbBdQUlvnD309fv9itAhDlO5X/sGI+GoVJK7PYAR9wvW
-         lfteCQoEZkQKOP2+2pOoOBOg52BuC/RmIvYHPzLF7jzEeTNZ6nF4Q5yXD8FQZq/CPlUC
-         OLWRfTBYTwcNdOODFdRBEja51JKYTB8agd68nx1u7Fl6lRLwkVVCNC+bpM+39eNn360+
-         DFmAse7PeoYl/zpH1PcRAJnMTZrjjKcf89HU4PIo+g+73FDJyp+GtGdS7eWtlYzp4BQW
-         KYSaMWFctx+GC9fPgdx69ajS+XPBW8DFUSp5LjFDY42+sYYIA3EZ3Mp42bjao0Lt74Hs
-         HPvg==
-X-Gm-Message-State: APuU4Z/4Q6UjPO3ITSWY/JFNi3rl3vKOL/ohaV4LuR6Uu/O1nLz1e2g7
-	HugCmc/P5jDCqSPaVd3nu+p8a7aIoZ75wr8evPwpHsdWYmvYkCXaLbg8EQ6xqj23
-X-Gm-Gg: AYBFou1+id4Hf3acWYUxvv5KyDdCdBqzwq6f2yn6KzMRC4HbGBHMI9ePP9ivMX5gvOX
-	Zi4wH2O4IOgCt49SaM5AKdLuY3IddvA9XFWmrmGeDr15ZBgG9QKCbM9AUawaDO/doKAwR1LQ62P
-	SQG87XH6rV2+/GNrEpCBp9CUJynk+akwjGNfVjARuxER42Jo7oItZHxbDmSMvFjywDA1VNCNYC8
-	lU90zciIafW3XimCmoZKsx1Jx6g9wxgEuZvA7mX0mGb4LJaIkkucrnW7quf20RGLTmI/8fsTBWD
-	9JgvCwSAtzjqYStFGsMaR1VNIw6HKxulmi5MlSFJZMztuMaxlj9TAvFncYIBqhUBhkh1I2ipWGU
-	vKPPBopBMP67jv8fKJM4RPJ2J1hLoZVUxvJgY9EeXCYc5N/e9fxPkPxUdkWgqJKrTHfFwa7JTqh
-	sx2oW2z481fdh9EREOL3IxX9o87ZDZ9jiq7ujSZkvEwtKyo5+XaGg9IRrn4xdht0JWuPhj39qfB
-	LaaXCT5Owc0jIOWfDe83V0aLjJ4JdqwT8sH4y3wBRhsvWusF6zSC7Q2poQBtDGQJFUQr/MKCBWi
-	SLiWTCqhY1QAlhzSE/HSZUFVgSQhvLfYJ4wBKBqFVnqhtPvF66/aVs2PdlYWrpLTcDqmI0/x9f1
-	p0kC8bFf2jSIQ258EJhKXmEFbfYdsdZQHQKMVUUjiGTs8olTNtjqYDGDyc1dCc2Lpfd14Me0Ngv
-	AwWY4=
-X-Received: by 2002:a05:6102:5128:b0:7cb:6954:109a with SMTP id ada2fe7eead31-7d054180f14mr4487071137.12.1793656509470;
-        Mon, 02 Nov 2026 13:55:09 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d07738ebf2sm11066184137.1.2026.11.02.13.55.08
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20260707; t=1793657573; x=1794262373;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
+        b=LuDoQ/Ypk6/Jroa+VCEEIaVvVDfknhtY4/i1QvHShBU56FjHXLRcxqrW0vU7IjPuqc
+         U2OEzTN3al4HaPEypvRs3nC2VTadbGJm/3M/VAeRt2qIkwgGT5w5iSj2ZvdslTwntHVo
+         cK6fIMB1JHPM75oIyYZKFCy5PxZWKukFnHerQ0snI8B22Bf3tAgFRhja1GdCQRzmeR3X
+         NorC8NItSyHCpe570E/7ndi6WxvpMIIRvjepzxpBl+1ZRb8ckRL2J7PpWMaO85ukzzup
+         95qbzINe4m8xUlAerNALRzAw+XZ5+d9Vamkdc4IVWZzuU6kQXSZstkSPsR/qJGEd2Nrd
+         4NFA==
+X-Gm-Message-State: AFq9FYKhr8AMl/AMysarBP2RiHfgjJLamcbfj4XQ3zNgMfvKwHp5mWZh
+	gNaUkhinSUHo19IdFAopHBWjVsGXHpeqocNkkH1drj4etu+iGEAeo1DLah8d/QQ7BFI=
+X-Gm-Gg: AYBFou272Lhqy3SQteUFoYybBf9Z0gydj1j+aMye+V8jtaNs1p/QsFPddO2FFDfwj0/
+	pF2MYUzwbUUuSclru6OEJC2Bepbyec9fYVHlHYbAX0AwE5qSljz632/LypSshcCCFmrJYhnsWeX
+	iH7Gja5wfuT76X9AtHqHtipmB2KpXFdl5fYGsDut56daKMt0Sro0nPQBQQ8LfgbqSpHQ8BPNXDm
+	O9HMOZwLyUkeDdilda7XGjWXiy2VJF4j2MWSLJ2/8ujB665CYojYce97/VlglHN/bRTkOi1Fvsq
+	ulD9pREufHTObk130m0XMlduhSQLLi30c+X08KfALmcW33c/0MHNbYOpYzit9vWKl338Ppxj6f/
+	nHFV7Q0kSBF9UHf4zyLadNy/JLnFECDyi2jn89KalfLF4PMBNJ3xTnrhlkHtdd7eV5QacRtxWGn
+	q6v3bYIQcVnYklWsHtOmDCksquXcPRpGcIgLjdSNjI/eCOadLResbSG1l3jb4g3hrYNnnjjqFWs
+	7/vSJ44egKOWBoqr8DTcYr1O1cGA8wGofJyvSBSx1AeHZoGMSy56AXfwFz9Z1JO8r5Q/FtGzUb5
+	gaKtgjlIKsj2qGlTwnVSPoztDRMcwDB1Irgn/fvWk+Isjf7Qwd8ztijFWLQtlBspVRLQPfVr0lZ
+	dH41Ud/Iv/u5LZ661m7mWF5unTulWFhlsE3BU73MtnYqb/Xm/CA==
+X-Received: by 2002:a05:600c:34d1:b0:4a0:b6:4619 with SMTP id 5b1f17b1804b1-4ac12475a61mr263779945e9.0.1793657572711;
+        Mon, 02 Nov 2026 14:12:52 -0800 (PST)
+Received: from pop-os.. ([2a02:810d:478b:2e00:d078:1466:9ea1:3ace])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ac09ad5ff8sm207894205e9.4.2026.11.02.14.12.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 13:55:08 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Mon, 02 Nov 2026 14:12:52 -0800 (PST)
+From: RasmusML <rasmusml0501@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 6/6] transport: Don't disable desynchronized links on release
-Date: Mon,  2 Nov 2026 16:54:57 -0500
-Message-ID: <20261102215457.2553416-7-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261102215457.2553416-1-luiz.dentz@gmail.com>
-References: <20261102215457.2553416-1-luiz.dentz@gmail.com>
+Cc: RasmusML <rasmusml@hotmail.dk>
+Subject: [PATCH BlueZ 1/2] profiles/midi: Fix running status across channels
+Date: Mon,  2 Nov 2026 23:12:22 +0100
+Message-ID: <20261102221223.16079-1-rasmusml0501@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,39 +94,114 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: RasmusML <rasmusml@hotmail.dk>
 
-Releasing a desynchronized transport also disabled its links, which
-are acquired and released on their own, so the other direction of a
-CIS stopped while still acquired.
+When two MIDI messages of the same type but on different channels end
+up in the same BLE-MIDI packet, read_ev_others() writes the second
+status byte without the timestampLow byte that must precede every
+status byte. A receiver then reads that status byte as the timestamp
+and applies the following data bytes to the previous message's channel
+through running status, e.g.:
 
-Only disable the links along with the stream when they are
-synchronized, as is done when enabling them.
+  sent:    ch1 NoteOff 60, ch2 NoteOff 64, ch3 CC123, ch4 CC123
+  packet:  B5 94 81 3C 00 82 40 00 94 B3 7B 00 B4 7B 00
+  decoded: ch1 NoteOff 60, ch1 NoteOff 64, ch3 CC123, ch3 CC123
 
-Fixes: 1db06505df5a ("audio: Add ability to desynchronized linked transport")
+This happens because rstatus holds the ALSA event type, which carries
+no channel, so the writer assumes running status while
+snd_midi_event_decode() correctly emits a new status byte.
+
+Fix this by decoding each message into a local buffer first and
+appending timestampLow whenever the decoder actually wrote a status
+byte. If the message does not fit, flush the packet and, if it relied
+on running status, decode it again with a reset decoder so the new
+packet starts with a full status byte. This replaces the -ENOMEM retry
+path.
+
+Closes: https://github.com/bluez/bluez/issues/2630
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/transport.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ profiles/midi/libmidi.c | 59 +++++++++++++++++++++++------------------
+ 1 file changed, 33 insertions(+), 26 deletions(-)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index c6b675f0b6ec..285db0d37554 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2277,10 +2277,10 @@ static guint transport_bap_suspend(struct media_transport *transport,
+diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
+index ef33f7dfd..349f5f7b2 100644
+--- a/profiles/midi/libmidi.c
++++ b/profiles/midi/libmidi.c
+@@ -191,40 +191,47 @@ static void read_ev_sysex(struct midi_write_parser *parser, const snd_seq_event_
+ static void read_ev_others(struct midi_write_parser *parser, const snd_seq_event_t *ev,
+                            midi_read_ev_cb write_cb, void *user_data)
+ {
+-	int length;
++	uint8_t msg[MIDI_MSG_MAX_SIZE];
++	long length;
++	bool status;
  
- 	bap_update_links(transport);
+-	/* check for running status */
+-	if (parser->rstatus != ev->type) {
++	/* running status only ever continues the same event type */
++	if (parser->rstatus != ev->type)
+ 		snd_midi_event_reset_decode(parser->midi_ev);
+-		append_timestamp_low(parser);
+-	}
  
--	/* Don't disable links acquired on their own, they are disabled
--	 * when they are released.
-+	/* Don't disable links that are desynchronized or acquired on their
-+	 * own, they are disabled when they are released.
- 	 */
--	disable_links = bap->linked &&
-+	disable_links = bap->linked && !bap->desync &&
- 			!queue_find(links, match_link_independent, owner);
+-	/* each midi message has timestampLow byte to follow */
+-	length = snd_midi_event_decode(parser->midi_ev,
+-	                               parser->midi_stream.data +
+-	                               parser->midi_stream.len,
+-	                               parser_get_available_size(parser),
+-	                               ev);
+-
+-	if (length == -ENOMEM) {
+-		/* remove previously added timestampLow */
+-		if (parser->rstatus != ev->type)
+-			parser->midi_stream.len--;
++	length = snd_midi_event_decode(parser->midi_ev, msg, sizeof(msg), ev);
++	if (length <= 0)
++		return;
++
++	/*
++	 * The decoder leaves the status byte out only when it repeats the
++	 * previous one, channel included, and every status byte it does write
++	 * needs a timestampLow before it. Decide that from the decoded message,
++	 * not from the event type: two note-ons on different channels share a
++	 * type but not a status byte.
++	 */
++	status = msg[0] & 0x80;
++
++	if (parser_get_available_size(parser) < (size_t) length + status) {
+ 		write_cb(parser, user_data);
+-		/* cleanup state for next packet */
+-		snd_midi_event_reset_decode(parser->midi_ev);
+ 		midi_write_reset(parser);
+ 		append_timestamp_high_maybe(parser);
+-		append_timestamp_low(parser);
+-		length = snd_midi_event_decode(parser->midi_ev,
+-		                               parser->midi_stream.data +
+-		                               parser->midi_stream.len,
+-		                               parser_get_available_size(parser),
+-		                               ev);
++
++		/* a new packet cannot continue running status */
++		if (!status) {
++			snd_midi_event_reset_decode(parser->midi_ev);
++			length = snd_midi_event_decode(parser->midi_ev, msg,
++							sizeof(msg), ev);
++			if (length <= 0)
++				return;
++			status = true;
++		}
+ 	}
  
- 	id = bt_bap_stream_disable(bap->stream, disable_links, func, owner);
+-	if (length > 0)
+-		parser->midi_stream.len += length;
++	if (status)
++		append_timestamp_low(parser);
++
++	buffer_append_data(&parser->midi_stream, msg, length);
+ }
+ 
+ void midi_read_ev(struct midi_write_parser *parser, const snd_seq_event_t *ev,
 -- 
-2.56.0
+2.43.0
 
