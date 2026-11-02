@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793658017;
-	b=rGZYG4lkJoSbOM7ja+nEsBalWuRvF1uUqTw06xZFhLv9YuAwaBew63FnAjOKElIrDA9w
-	 rn2grHGl+ms4nNn4tDtQwYNJKgGsqwB2lxXkXLMk4IPTtlRR2xVlgBu1Msy4yfUqzvDlE
-	 Tfat3+i0CYSmJ57qE9M0HorQlaoBIQ2ltEFSu5iDT6CxxFWzGN1tlyyBykk8pWhIb2V4S
-	 of1bsrqRSWaxFG3TFZm+Jer1sGFfuTihn4ybr2N6zaMHmyfL3Uctf6QPKPnPk/VBee+f/
-	 yOuJW5b18mZ3UPT3YxCut+O4csex9nwJGB50IV5jxVslziRY6KKWjVQJRjbv3c6RX3g==
+	t=1793658021;
+	b=nvSVO6IH+Upy2YgwZ1axz7MI0PpQnCFgy72pfdgj+3w13jg86rwQhY38t79z1hKXF31e
+	 9tZEDGec5TTEtkMrt50cAn9KR0hX7iq0lONvmi7/g3WYeU4x700JQws+0J6yJbFetyXF1
+	 dEhZu8FwwyBJhQqUjXbI7xqFGGpzy7HPbtOUgJWZGZAopM8uZ1wXML+HAnMewOsicUGGq
+	 iowtdAzfghNX/7dBcL4coago/+HBXISTRAwNcF4N6Ftz5RUpxRZrPYBMObfMaBRh0T0L6
+	 mhoLwQWH6ZbRE4FgM/Z1moZ9CsSd7w1UEhmaR5ZgMuho4EIZWGDL93uqWbZpbKRFkNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793658017;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793658021;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=x2TEtBHnD88O2fic8L/tUUMf9f9U9t/ddgJN1D41BIY=;
-	b=XOom+4PALhCQV/Kd9kL8V0iK83rMEKZEeMrQGF6Rp8QLxvHG0xIhUO3QadNlPTa1Myyl
-	 Q7B9Dx7hTiWmZ32dfHJMHbeFk+z2NYDzIgqlCOJOxZRf82axrW6fjC7CJ3ynDBn91ajML
-	 XRws5/9Tkie/swGCETcJiZLg0Lqk+Xz5CWRHQwT9pQj8unjjKj6cSmzJvzCOUgbidV2dZ
-	 GchqOlSbe7xO1eEdTVTTdJ5OpNwINoEnSnUKwVBX04/NZY7iyP6J5suSXZ+rgTXZoFqOr
-	 QCgSWlSzqIRktlFELMmoV8fqpFzdpHYMZ7KJeyzEOL2l3nQUY1Pt9Dh0EThyj13T76Q==
+	bh=lfQC5oONn1O12zujNbswi2n52JTnkv8/ImyjnFp/67M=;
+	b=rv8QgNO2itKDm/6Sy0mBqDPRqmDcmxH5OwOXAtkfVQDzDIXygyK3rMYju2vp6AcNYwEZ
+	 1S96aYe9667GjbbefqwFOmtvnp+053E+VGx6nAh2lsCVHSvJV0ThvF0R+WhMGwN2qFvQU
+	 cMW0Y7wcxdoP2iBsS2aygdqtKY4ChcYahcRnonKOIlg305wZCis2Q5Nlgaq5SIpMuCiuH
+	 ktWHvzxR3FDkv8qKIM59ZYNu1k4aJrjoCCDlvgvcHJJW+qrnk7x7FkjkRSMoTYrizA/kt
+	 iFOjh1rAXIEzDeaHHkKKAuuLi9wgFlo1jqZOR9EC99wvIAiMLQy9z3IrBt8GKz7CBWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYqG1Abl;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=I8N5lI5M;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA057606A326;
-	Mon,  2 Nov 2026 22:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F97606A336;
+	Mon,  2 Nov 2026 22:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYqG1Abl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876271F00A16;
-	Mon,  2 Nov 2026 22:20:16 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=I8N5lI5M
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C52B1F00A1D;
+	Mon,  2 Nov 2026 22:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793658016;
-	bh=x2TEtBHnD88O2fic8L/tUUMf9f9U9t/ddgJN1D41BIY=;
+	s=k20260515; t=1793658021;
+	bh=lfQC5oONn1O12zujNbswi2n52JTnkv8/ImyjnFp/67M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=LYqG1AblMkRp8mEv2PbVEpPP/EMaq+C3/RZUoVJh/cd/PxWlxjRGpAmO3AWnOVyMQ
-	 Rfn+osHM3gunove+/hwZFTDrC+NW1hZX4yAYE8FH7Nd0NhtB+PApxoaUoSTqB0EcQj
-	 XwattIKSr7He56UbOxgmt59PYtbh15k5YmyZfZxtFMShEFQDzKxZE5KwlNbQAj6x+i
-	 kpK/5NlMBXcloJpzG3mBM0bfHzQu3GjCeeytjyo47LiVa4S6uxgUxQ8Vvr3nMkK7Lz
-	 wrOTL3kRfQwFnTKDRsTWaYfFZFNZrHGfpNRDmNf+Ht4LIkUOCR+AaAhhi/nnhNZ9NW
-	 T/pAQHJk7HHdw==
+	b=I8N5lI5M3M6VvHMGXvMRJGWp5e4+Zx0bl5I4lkshfU54o/j6HSDNDaNbq6Tx8WZr2
+	 VslkIqdn84ju6AfQ8ElryZJoUznP/ALsmPx5XnaHjJ+wsLcQONuuUBXjWN2sYw0A2Q
+	 4w2iTqTwyLKsevd8SBtNiQZDkVbOY5mx/w1WZ8+AZwt5dC6e8lMvbhJxDqbEFhAmQ0
+	 xVp1XamzGYQa7TNbenSCzc1+h191ETO3QWP65ExccLnFbyRKiWsbyY2UmD9PfpV3/X
+	 OgSqkfvE2Eini37VJ80R30cxHiz13n3pOcLk4w3m3MHMUpODqxwLW9u2FyScfutrTE
+	 VPBINxNOo+Gzw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D375380821F;
-	Mon,  2 Nov 2026 22:20:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02FF2380821F;
+	Mon,  2 Nov 2026 22:20:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,38 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: validate retained LE ISO command lengths
+Subject: Re: [PATCH v2] Bluetooth: MGMT: Send Connection Subrate on LE
+ connection
+ and update
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179365801530.694758.3065073336478186790.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Nov 2026 22:20:15 +0000
-References: <179362071770.29269.15160948500453012976@stu.pku.edu.cn>
-In-Reply-To: <179362071770.29269.15160948500453012976@stu.pku.edu.cn>
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, pav@iki.fi, linux-kernel@vger.kernel.org
+ <179365801954.694758.1964574440994296679.git-patchwork-notify@kernel.org>
+Date: Mon, 02 Nov 2026 22:20:19 +0000
+References: <20261102170008.62788-1-kevin@simpleble.org>
+In-Reply-To: <20261102170008.62788-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 02 Nov 2026 19:58:37 +0800 you wrote:
-> Two LE ISO event handlers use flexible-array data from the retained command
-> skb without checking how much command data is present.  A malformed command
-> can therefore make either handler read beyond the skb when the controller
-> returns its status or completion event.
-> 
-> Add a saved-command helper that also returns the parameter length, then
-> use it to validate LE Create CIS and LE Set CIG Parameters commands before
-> their CIS arrays are accessed.
+On Mon,  2 Nov 2026 09:00:08 -0800 you wrote:
+> Userspace is not told the parameters of LE connections: the Connection
+> Subrate event is only sent for LE Connection Rate Change, which needs
+> the Shorter Connection Interval feature, and nothing is sent when a
+> connection is established or updated with LE Connection Update
+> Complete. Applications that need the connection interval, e.g. to
+> estimate throughput or latency, have to read it from HCI traffic
+> instead.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] Bluetooth: validate retained LE Create CIS command length
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1eb52f35fc8f
-  - [2/2] Bluetooth: validate retained LE Set CIG Parameters command length
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ed4d302af778
+  - [v2] Bluetooth: MGMT: Send Connection Subrate on LE connection and update
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0c0c3d785643
 
 You are awesome, thank you!
 -- 
