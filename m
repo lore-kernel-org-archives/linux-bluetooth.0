@@ -1,98 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793623684;
-	b=lCgU+VDUAPxmO5tpgK1NF7m+pAiYdble+0+TXAA2HkY4HskYdnPL6ojn5UU/EZO+NpyY
-	 /gbA4PnmKeGMUZx6j5KLXeA6IPxYkeGDC7ldQWZFvyX4LhxpnYOyRuOXECL8cHl3QV/nF
-	 TTgVE5hc5kt3ijhoME4z0E+RnNBMgrTGpVnpTOOyvRzdNJvH+jCeXPQ0XLImkrR2JQUcv
-	 4RAuFXVCxTJ5smOjCVmOudGmFNsfDagOU8pypsa84GRp+CS8Q4Z1NXk6JA0FnEESRm/oQ
-	 Ya0XpooCweuj7gTaB+802rBbuy3PyEq5PYr2rgZWJmkj6nYhYXZTbf73eUippGoIB9A==
+	t=1793627511;
+	b=HUAKeheGd7Ll06mblge/cTTcYUlJHeTVuzLxfXmesRwBX0Ru7nftPxg3+hPNwn5wAosB
+	 i+R+R7rf0XYoXWeKTCX8q+JzlEBPvpKHE2VunpK5PvqgGunuHva4HNHNwnZAhMxmcs1AY
+	 Z4pcIaNa2GwFa9pgyBl3VQI2utXw5hrNm+MkG1B4kcnsejoQrfrgT9taF05YDd+IsV5wb
+	 +h1j+EgYnAhr1bPNwT36H93AoVpUFSewVv6/61gvS8GiEea/IDE3AMWHElfDlV94x/zpY
+	 MCifY3cLaz/qm7crPkiAXJGL7jmQZdb3dC1p2PWvUQ4qc/MapUOf/V94OgtjGTose8A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793623684;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=UQh3Hhv6qjNy92jmqlHZeQDSexdAkfgjQwGaT5rQ7nk=;
-	b=vnUGYKUPWijGaczYqJdKjTqaPknVpftxQ/e7aFMWF0nL/NXRWFZE2HDPhAdrvgvCuxG2
-	 80S9+txXrL/ANr1zoexxNNv9J64bSBAQ0Wsd4FGLTlnfseedoTebAy0VnbR28FwFNyXE7
-	 Y/Ufi7+EwAIp1vCXElWhXK9aV8d6N/xLFB58XFmYbqSnQZnze1+Bg/iE1SjtprEKgQxnh
-	 ADXJfArooRlLEwcoLd8tl+BP6LYNK+dJWznPG+kbgb82eQngubeYfIljX3CBzE7AwyQ6X
-	 E56zksjIi6bcONqh26OzYQLDO8LpQLlgRm/B+o1USTuVyes/Nk/qVYDJdPuOH510EVg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793627511;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=6ZBrZJd1zfaQqH9bIbJsxriKxcef7wYa/kY6sxkJupw=;
+	b=0LEhDJME327W7ND5dyvxW9Eu3MocCfMxLwYezFJtvDSQt8lFnmbtmeB0jiIUCpbyjK9Z
+	 9HU2PPCD190F8v+5BPHHTsiGBbZDFb06dfvRskhmdt8x5FzgjLM9228gHPXymLcVz/pA1
+	 FdDYSEvKoGSaDayMWFhDnYtdpi6u0WWFpeHNY/SnX9k5JyXUR/b26OTuoA/DZr7E1ZoRq
+	 D0Yq9kkRAtwbbuULuIXcUmURDJP5TrRelSLZw8xIaxnKBvNrqnSH3jjhgJJiKV3XDyMAW
+	 XFNqbyjRHUIF6HQBbF8KZUJdQprTXJ69wRhuWEAgkAZoLHZWub8EfB8hOHqbxbOyPfA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=llkcERm3;
-	arc=none smtp.remote-ip=209.85.210.175
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=NUH7mB2H;
+	arc=none smtp.remote-ip=192.198.163.16
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805CD606A331
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 12:48:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 805CD606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DC9606A335
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 13:51:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0DC9606A335
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=llkcERm3
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-89d6bd67045so1386721b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 04:48:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793623684; x=1794228484; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=UQh3Hhv6qjNy92jmqlHZeQDSexdAkfgjQwGaT5rQ7nk=;
-        b=llkcERm3dY9S+MXVNxFUy6yIL5WHeYI2OEQd0kAGizxhHB5Zp+hfiHvATonAfBupC0
-         dxlrdTgAaKlcqgPcb0pfmgsLo/Wy45Gp5sXLvMANUXNILOXNXD9lGaxJV9nAA+ytouyE
-         W0NbnNAECzZqxpXysgc4TZB8qw3qSNfp0VXNxyirQyAGPoffSs5l0c79D5vA1R9WTrB/
-         rQhyjZvDVwJhzBC3l7cUqKavl8QvVs8rtkOvxMPHLo5DNp5zhM/XDJcqz3gGiw81WfK5
-         GhkcFNe7gE4xX5/4uHm9pw1L2V4rLARGb05Xap/3EFUlmC80QTcAuBVWtDzH1E67MPG5
-         1JxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793623684; x=1794228484;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UQh3Hhv6qjNy92jmqlHZeQDSexdAkfgjQwGaT5rQ7nk=;
-        b=AOsnRF1RwqeuHrtf7yS6dMHKcGX/4IflD6dOB33g5rrndXzifEaO6inE1ylAP6CINq
-         HS3KLlMagrIuzLnyLuNF4YWzULV8My7lq75VNSL1XeTG0EBeV/lNXsqC3YvjHVrgiFqD
-         AoJU0feCjP8GO61gQd8ZdDl6G/34xGd8EpSL27JP2/1kyq4Q/RopTOgmqnBXPNPhCTE8
-         w75ke5CuzB740xCcYhZ1C1tsjm/xNmmjRREUB0/ivkVULM3reoBtBqPhn3G3c28bweXO
-         dE/esvX7nWN1LP6jeEq0gyDOHzfaXV9Qb0J1jLKYiKqHcg6RGgfYoaejVEgoJ+zmXNHC
-         6Idg==
-X-Forwarded-Encrypted: i=1; AKwUvBxinPjjdnZJTvxM6BVqM8yJG3StCqc1lvbyJb9OZnseSc6tYdorQ/ePD69/tpcY9bjFbSctT7xwj4O1OcGB0ZY=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+O7jPZmd9hx5el3Km6yixDZxdjvkXykqW64pHn4DAss2c+SsnG
-	Ueu0FA0DU2zcy57C08/aONpsWdnNd+8YwG1vn1jxaUIbHXFba66GBRaZ
-X-Gm-Gg: AYBFou2wPgbWfDMz+GNMmSkrwhZd4+ezYVLfbu90yuCIQrDPc4cx7Nr5JG5TZDlLFPT
-	RpxY2BFzYEzYvx6a0y4Qao2+SSaCKDsNgWTsP0ov04/bNJCcMZvqWSx5N2j2CkVDQAhTuPGn66h
-	UHjBBoLL8ra7d+4TFX0k30EYt1z8GhXxEvvlYm/6t7yP9/r2dWA2H/A/QOMF+Gv/36NShKFFuMw
-	7NyB3Fi/E8XFbjm7X7vVT4DOoBiE7Iy9T2IE5HNaSo5H5Z++LvnawePHOCYjP0ORY6c3zVJ6saj
-	OeTIyWooakW6xrEBCn4I9JfxUeSNU6vBW85XRe4hUUHmcoi4xHtqM+Q3peuOxLuTxORqrQ8uH0i
-	W2v1H43z2U+2DxdR/YN0d1q6CpnbppWD7btE1cV1gY+LAjZmpoRjz73dLNJin2mG1XSim+KWK3p
-	pgM4pnnuVwYtD77iDVyhSIACrd93LQVQBAtjEnVK5eXtA7cHstSCQylDGPKQe9+zIe2vtXpWmzY
-	MY5utMbR4ZllyD3Qhd3tzd6IfpGOrbL2ktUQiXeazPtL9fry5LTqTShFa4v9YApWzW6cULQ7qY7
-	irMwUUxtIgF4x0pPJQ4w25Nc7dqebahAzhZ9e/Au4cDNW1U6Vfnf0BL9LHwkrXUEPS1a4kuBMhw
-	CdoDTcYAd98/yEw==
-X-Received: by 2002:a05:6a00:1382:b0:8a0:31e5:8cc3 with SMTP id d2e1a72fcca58-8a8317dd858mr7535283b3a.10.1793623683085;
-        Mon, 02 Nov 2026 04:48:03 -0800 (PST)
-Received: from KRHW1CJW23.bytedance.net ([139.177.225.227])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8aad77fda1asm1908357b3a.6.2026.11.02.04.47.58
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 02 Nov 2026 04:48:01 -0800 (PST)
-From: Zhao Li <enderaoelyther@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Johan Hedberg <johan.hedberg@intel.com>,
-	security@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: L2CAP: Only accept LE responses to outstanding requests
-Date: Mon,  2 Nov 2026 20:47:34 +0800
-Message-ID: <20261102124735.23199-2-enderaoelyther@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261102124735.23199-1-enderaoelyther@gmail.com>
-References: <20261102124735.23199-1-enderaoelyther@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=NUH7mB2H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793627510; x=1825163510;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9nNPRq0OZrlmBCrUWBSYr7p55rbrszlOhHHoPdDOgoM=;
+  b=NUH7mB2HrKcGCw62/3VAjgmgRPyYUCM4qtnG/awHfbK9ZkTslCgj/Mr0
+   /Uhwo9gztcaLpLWoYkkxCNbixjsU3Wh3+p8w122LHUqQVZ8UJLvilT36O
+   7cC1Xp+ACjCVAb++8bDRDdyhHRRaCxGdf1itAEilsMCiuxO3SaFrJzRYw
+   pv99OFrelA3bW9px22d4jrat4lQvnVGXKjHenJESOqu/lerscfHt80NVp
+   jHvq2582Pxkj5Y3pMGccRGkAwYU4xYqAUzruDsODa5XlB5Wc2VCA0yZaU
+   oqQCNBoaAamrosU/W2hAd1kH9nOCfO0NxnK3/bhDpEWAr8al3hd/c1syF
+   Q==;
+X-CSE-ConnectionGUID: 5dFfyH0zQa+DUzhtIKbZ9w==
+X-CSE-MsgGUID: CrLlXWroT4eXxPgZ1lR85g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2330014"
+X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
+   d="scan'208";a="2330014"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2026 05:51:49 -0800
+X-CSE-ConnectionGUID: 6Lt0n3osTny2EZ4bahbx+g==
+X-CSE-MsgGUID: LQzgrsSrRSe+R1DxI9SWZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
+   d="scan'208";a="6450145"
+Received: from weba0534.iind.intel.com ([10.66.226.131])
+  by fmviesa009.fm.intel.com with ESMTP; 02 Nov 2026 05:51:48 -0800
+From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: kiran.k@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel_pcie: DBGC flush doorbell and dump rate-limit
+Date: Mon,  2 Nov 2026 19:13:19 +0530
+Message-ID: <20261102134319.2280200-1-aluvala.sai.teja@intel.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,234 +80,469 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The LE and ECRED response handlers match channels by identifier without
-checking whether they sent the request. An incoming channel stores the
-identifier chosen by the peer, so an unsolicited response can bypass
-deferred setup, delete an established channel, or leave an unaccepted
-socket and channel allocated after l2cap_chan_del().
+DBGC data in SMEM may not be up to date when a dump is collected. Make
+btintel_pcie_coredump() arm USER_TRIGGERED_DUMP and ring the
+IPC_CONTROL.COLLECT_DUMP_REQ doorbell first, so the firmware flushes
+the SMEM contents to DRAM and the dump holds valid data. The resulting
+fwTriggerDump interrupt queues the coredump with
+TRIGGER_REASON_USER_TRIGGER and skips the firmware trigger event, as
+there is none for a host-initiated flush. Firmware-initiated triggers
+still emit the diagnostic frame with TRIGGER_REASON_FW_ASSERT.
 
-Extend the BR/EDR lookup from commit a518b9a9ef6e ("Bluetooth: L2CAP:
-Only accept connection responses to outstanding requests") to LE.
-Require the matching connect-request flag and add a reconfigure-request
-flag. Check reconfigure identifiers under the channel lock, since
-BT_RCVMTU can replace a request without the connection lock. Match all
-members of a rejected ECRED request, which share one identifier.
+The doorbell only concerns Bluetooth DBGC. When traces are routed to
+the WiFi DBGC there is no host buffer to flush into, so skip the
+request. When the core is halted the firmware cannot answer, so queue
+the dump directly. If the firmware does not answer within 1 second,
+treat the doorbell as missed and collect the dump directly.
 
-A reconfigure request can outlive close(). Complete it even in
-BT_DISCONN, and call the close callback after deletion to release an
-orphaned socket. Otherwise deletion cancels the timer and removes the
-channel before the disconnect response or the channel timeout can close
-it.
+Quiesce the doorbell path before entering D3: mask the firmware trigger
+interrupt, drop a pending request, and wait for an in-flight timeout or
+dump to finish. Unmask it again on resume or if suspend fails.
 
-AI assistance was used.
+Allow one collection per second, measured from the end of the last
+dump, and reject concurrent dumps. A rate-limited firmware trigger
+still emits the diagnostic frame; only the dump is skipped.
 
-Fixes: f1496dee9cbd ("Bluetooth: Add initial code for LE L2CAP Connect Request")
-Fixes: 71fb419724fa ("Bluetooth: Fix handling of L2CAP Command Reject over LE")
-Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-Cc: <stable@vger.kernel.org> # 5.7.x: a518b9a9ef6e: Bluetooth: L2CAP: Only accept connection responses to outstanding requests
-Cc: <stable@vger.kernel.org> # 5.7.x
-Signed-off-by: Zhao Li <enderaoelyther@gmail.com>
+Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 ---
-Built in patch order at W=1 with GCC 12.2 (x86_64 module, x86_64
-built-in and i386 module) and Clang 19.1.7 (x86_64 module). The x86_64
-module builds with both compilers also linked vmlinux and modules.
-Sparse checked l2cap_core.c with C=2 after each patch without
-diagnostics. Smatch reported the same pre-existing l2cap_chan_connect()
-diagnostic as the base; no cross-function database was used.
+v2: quiesce the doorbell path in suspend_late: mask the firmware trigger
+    interrupt, flush pending dump work, and unmask it on resume or if
+    suspend fails (Sashiko review of v1)
 
-Coccinelle 1.3's use_after_iter rule found nothing in the changed
-functions. All changed functions were processed; five unchanged parser
-gaps also occur in the base. Hardware validation has not been run.
-This diff does not apply to stable branches as is; adapted backports
-compiled at W=1 on the seven supported lines and, with patch 2's
-backport applied, linked as modules. Their behaviour was not tested.
+ drivers/bluetooth/btintel_pcie.c | 239 +++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel_pcie.h |  12 ++
+ 2 files changed, 243 insertions(+), 8 deletions(-)
 
-QEMU/vhci testing with patch 1 alone kept all 445 established channels
-alive. In 40-pair close-before runs, failed reconfigure responses and
-Command Rejects each reached 44 l2cap_sock_destruct calls with the fix
-and four base boot-noise calls; success reached 43 on both. A 1200-pair
-base run retained 1984 kB of gross Slab memory at listener close while
-the fixed arms released memory. Kmemleak reported nothing even on the
-leaking base, so it was not used for the leak verdict. A KCSAN kernel
-with both patches, built without KASAN, ran the same close-before
-workloads without data-race reports.
-
-The stable request covers 5.7 and newer with the declared BR/EDR lookup
-prerequisite or an equivalent backport. Older LE-only trees need an
-adapted patch without ECRED hunks. The diff exceeds the stable guideline
-of 100 lines including context.
-
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 82 +++++++++++++++++------------------
- 2 files changed, 42 insertions(+), 41 deletions(-)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 54eddcdd341f..2a05bda8ab43 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -756,6 +756,7 @@ enum {
- 	FLAG_DEFER_SETUP,
- 	FLAG_LE_CONN_REQ_SENT,
- 	FLAG_ECRED_CONN_REQ_SENT,
-+	FLAG_ECRED_RECONF_REQ_SENT,
- 	FLAG_PENDING_SECURITY,
- 	FLAG_HOLD_HCI_CONN,
- 	FLAG_DEL,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4dd56e0074fd..a21b2d70ad8a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -144,24 +144,12 @@ static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
- 	return c;
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 7d84c8106cf1..adb2bc44abbe 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2788,25 +2788,87 @@ static bool btintel_pcie_queue_coredump(struct btintel_pcie_data *data,
+ 	return false;
  }
  
--static struct l2cap_chan *__l2cap_get_chan_by_ident(struct l2cap_conn *conn,
--						    u8 ident)
--	__must_hold(&conn->lock)
--{
--	struct l2cap_chan *c;
--
--	list_for_each_entry(c, &conn->chan_l, list) {
--		if (c->ident == ident)
--			return c;
--	}
--	return NULL;
--}
--
- /* Our connection request has been sent and is still outstanding */
- static bool l2cap_chan_connect_pending(struct l2cap_chan *chan)
- {
- 	return chan->state == BT_CONNECT &&
--	       test_bit(CONF_CONNECT_PEND, &chan->conf_state);
-+	       (test_bit(CONF_CONNECT_PEND, &chan->conf_state) ||
-+		test_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags));
- }
- 
- /* Other channels may hold the same ident for a response they still have
-@@ -174,7 +162,7 @@ static struct l2cap_chan *__l2cap_get_connect_chan_by_ident(struct l2cap_conn *c
- 	struct l2cap_chan *c;
- 
- 	list_for_each_entry(c, &conn->chan_l, list) {
--		if (c->ident == ident && l2cap_chan_connect_pending(c))
-+		if (l2cap_chan_connect_pending(c) && c->ident == ident)
- 			return c;
- 	}
- 	return NULL;
-@@ -5073,7 +5061,7 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
- 	BT_DBG("dcid 0x%4.4x mtu %u mps %u credits %u result 0x%2.2x",
- 	       dcid, mtu, mps, credits, result);
- 
--	chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
-+	chan = __l2cap_get_connect_chan_by_ident(conn, cmd->ident);
- 	if (!chan)
- 		return -EBADSLT;
- 
-@@ -5621,9 +5609,10 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
- 		struct l2cap_chan *orig;
- 		u16 dcid;
- 
--		if (chan->ident != cmd->ident ||
-+		if (chan->state != BT_CONNECT ||
- 		    chan->mode != L2CAP_MODE_EXT_FLOWCTL ||
--		    chan->state == BT_CONNECTED)
-+		    !test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags) ||
-+		    chan->ident != cmd->ident)
- 			continue;
- 
- 		l2cap_chan_hold(chan);
-@@ -5842,16 +5831,9 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
- 
- 	BT_DBG("result 0x%4.4x", result);
- 
--	if (!result) {
--		list_for_each_entry(chan, &conn->chan_l, list) {
--			if (chan->ident == cmd->ident)
--				chan->ident = 0;
--		}
--		return 0;
--	}
--
- 	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
--		if (chan->ident != cmd->ident)
-+		/* Reconfiguration updates ident with only chan->lock held. */
-+		if (data_race(READ_ONCE(chan->ident)) != cmd->ident)
- 			continue;
- 
- 		if (!l2cap_chan_hold_unless_zero(chan))
-@@ -5860,7 +5842,15 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
- 
- 		lockdep_assert_held(&chan->conn->lock);
- 
--		l2cap_chan_del(chan, ECONNRESET);
-+		if (chan->ident == cmd->ident &&
-+		    test_and_clear_bit(FLAG_ECRED_RECONF_REQ_SENT, &chan->flags)) {
-+			if (result) {
-+				l2cap_chan_del(chan, ECONNRESET);
-+				chan->ops->close(chan);
-+			} else {
-+				chan->ident = 0;
-+			}
-+		}
- 
- 		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
-@@ -5875,26 +5865,35 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
- 	__must_hold(&conn->lock)
- {
- 	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *) data;
--	struct l2cap_chan *chan;
-+	struct l2cap_chan *chan, *tmp;
- 
- 	if (cmd_len < sizeof(*rej))
- 		return -EPROTO;
- 
--	chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
--	if (!chan)
--		goto done;
-+	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
-+		/* Reconfiguration updates ident with only chan->lock held. */
-+		if (data_race(READ_ONCE(chan->ident)) != cmd->ident)
-+			continue;
- 
--	chan = l2cap_chan_hold_unless_zero(chan);
--	if (!chan)
--		goto done;
-+		if (!l2cap_chan_hold_unless_zero(chan))
-+			continue;
- 
--	l2cap_chan_lock(chan);
--	lockdep_assert_held(&chan->conn->lock);
--	l2cap_chan_del(chan, ECONNREFUSED);
--	l2cap_chan_unlock(chan);
--	l2cap_chan_put(chan);
-+		l2cap_chan_lock(chan);
-+		lockdep_assert_held(&chan->conn->lock);
++static bool btintel_pcie_dump_rate_limited(struct btintel_pcie_data *data)
++{
++	unsigned long last = READ_ONCE(data->last_dump_jiffies);
 +
-+		if (chan->ident == cmd->ident &&
-+		    ((chan->state == BT_CONNECT &&
-+		      (test_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags) ||
-+		       test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))) ||
-+		     test_bit(FLAG_ECRED_RECONF_REQ_SENT, &chan->flags))) {
-+			l2cap_chan_del(chan, ECONNREFUSED);
-+			chan->ops->close(chan);
++	return last && time_before(jiffies, last +
++			secs_to_jiffies(BTINTEL_PCIE_DBG_DUMP_COLLECT_MIN_INTERVAL_SEC));
++}
++
++/* Consume the user-trigger flag and disarm the doorbell timeout. Returns
++ * true when the interrupt answers a pending user-triggered doorbell.
++ */
++static bool btintel_pcie_consume_user_dump(struct btintel_pcie_data *data)
++{
++	if (!test_and_clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags))
++		return false;
++
++	cancel_delayed_work(&data->user_dump_work);
++	return true;
++}
++
+ static void btintel_pcie_msix_fw_trigger_handler(struct btintel_pcie_data *data)
+ {
+ 	bt_dev_dbg(data->hdev, "Received firmware smart trigger cause");
+ 
++	/* A reply to a pending doorbell during a running dump is dropped; a
++	 * real firmware trigger still continues to emit its event.
++	 */
++	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags) &&
++	    btintel_pcie_consume_user_dump(data)) {
++		bt_dev_warn(data->hdev,
++			    "user-triggered dump dropped: dump already in progress");
++		return;
++	}
++
+ 	/* Per-work guard: deduplicate concurrent FW-trigger interrupts.
+-	 * Cleared at the tail of btintel_pcie_fwtrigger_worker().
++	 * Cleared at the tail of btintel_pcie_fwtrigger_worker() on the
++	 * FW-initiated path, or inline on the user-triggered path.
+ 	 */
+ 	if (test_and_set_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
+-			     &data->flags))
++			     &data->flags)) {
++		if (btintel_pcie_consume_user_dump(data))
++			bt_dev_warn(data->hdev,
++				    "user-triggered dump dropped: dump already in progress");
++		return;
++	}
++
++	if (btintel_pcie_dump_rate_limited(data)) {
++		if (btintel_pcie_consume_user_dump(data)) {
++			bt_dev_warn(data->hdev,
++				    "user-triggered dump rate-limited (< 1 sec since last dump)");
++			clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
++				  &data->flags);
++			return;
 +		}
 +
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
++		/* Only the dump is limited; still report the FW event */
++		bt_dev_warn(data->hdev,
++			    "fwTriggerDump dump skipped: rate-limited (< 1 sec since last dump)");
++		if (!queue_work(data->dump_workqueue, &data->fwtrigger_work))
++			clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
++				  &data->flags);
++		return;
++	}
++
++	/* A doorbell-initiated flush has no firmware event to read, so skip
++	 * fwtrigger_work and release the guard here.
++	 */
++	if (btintel_pcie_consume_user_dump(data)) {
++		if (!btintel_pcie_queue_coredump(data,
++						 BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER))
++			bt_dev_warn(data->hdev,
++				    "user-triggered dump dropped: coredump not queued");
++		clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags);
+ 		return;
 +	}
  
--done:
- 	return 0;
+ 	if (!queue_work(data->dump_workqueue, &data->fwtrigger_work)) {
+ 		clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags);
+ 		return;
+ 	}
+ 
+-	/* Queue coredump after the fwtrigger event reader so dmp_hdr.event_*
+-	 * is populated before dump_traces consumes it.
+-	 */
+ 	btintel_pcie_queue_coredump(data, BTINTEL_PCIE_TRIGGER_REASON_FW_ASSERT);
  }
  
-@@ -7757,6 +7756,7 @@ static void l2cap_ecred_reconfigure(struct l2cap_chan *chan)
- 	pdu->scid[0] = cpu_to_le16(chan->scid);
+@@ -2814,6 +2876,9 @@ static void btintel_pcie_msix_hw_exp_handler(struct btintel_pcie_data *data)
+ {
+ 	bt_dev_err(data->hdev, "Received hw exception interrupt");
  
- 	chan->ident = l2cap_get_ident(conn);
-+	set_bit(FLAG_ECRED_RECONF_REQ_SENT, &chan->flags);
++	/* A halted core cannot answer a pending doorbell */
++	btintel_pcie_consume_user_dump(data);
++
+ 	/* CORE_HALTED is the single-writer guard for this handler. It is
+ 	 * set once on first HW exception and cleared only by re-probe
+ 	 * (data is reallocated), so it also serializes hwexp_work
+@@ -2852,6 +2917,8 @@ static void btintel_pcie_coredump_worker(struct work_struct *work)
+ 	}
  
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_RECONF_REQ,
- 		       struct_size(pdu, scid, 1), pdu);
+ 	btintel_pcie_dump_traces(data->hdev);
++	/* 0 means no dump yet, so never store it */
++	WRITE_ONCE(data->last_dump_jiffies, jiffies ?: 1);
+ out:
+ 	/* Release guard last so a new trigger can run only after this
+ 	 * pass has fully completed (including dev_coredumpv()).
+@@ -2897,6 +2964,39 @@ static void btintel_pcie_fwtrigger_worker(struct work_struct *work)
+ 	clear_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags);
+ }
+ 
++/* FW did not answer the DBGC flush doorbell in time; collect directly. The
++ * coredump guard is taken before the flag is cleared, so a late fwTriggerDump
++ * interrupt is dropped rather than treated as a firmware-initiated trigger.
++ *
++ * Known, accepted limitations: a doorbell reply arriving after this worker
++ * has finished is indistinguishable from a firmware trigger, and the worker
++ * and the interrupt handler may both try to claim one pending request. The
++ * COREDUMP_INPROGRESS guard still ensures a single dump; the worst case is
++ * an extra diagnostic frame or a misleading warning.
++ */
++static void btintel_pcie_user_dump_worker(struct work_struct *work)
++{
++	struct btintel_pcie_data *data = container_of(to_delayed_work(work),
++					struct btintel_pcie_data, user_dump_work);
++
++	if (!data->hdev ||
++	    !test_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags))
++		return;
++
++	if (btintel_pcie_dump_rate_limited(data) ||
++	    !btintel_pcie_queue_coredump(data,
++					 BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER)) {
++		clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
++		bt_dev_warn(data->hdev,
++			    "DBGC flush doorbell timed out, dump dropped: busy or rate-limited");
++		return;
++	}
++
++	clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
++	bt_dev_warn(data->hdev,
++		    "DBGC flush doorbell timed out, collecting dump directly");
++}
++
+ static void btintel_pcie_mbox_worker(struct work_struct *work)
+ {
+ 	struct btintel_pcie_data *data = container_of(work,
+@@ -3208,7 +3308,9 @@ static irqreturn_t btintel_pcie_irq_msix_handler(int irq, void *dev_id)
+ 			btintel_pcie_msix_tx_handle(data);
+ 	}
+ 
+-	if (intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG)
++	/* A masked cause still latches; ignore it once masked (suspend). */
++	if ((intr_hw & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG) &&
++	    !(hw_mask & BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG))
+ 		btintel_pcie_msix_fw_trigger_handler(data);
+ 
+ 	/* A masked cause still latches; ignore it once masked. */
+@@ -3855,6 +3957,27 @@ static void btintel_pcie_unmask_hw_rfkill(struct btintel_pcie_data *data)
+ 	spin_unlock(&data->irq_lock);
+ }
+ 
++static void btintel_pcie_mask_fwtrig(struct btintel_pcie_data *data)
++{
++	spin_lock(&data->irq_lock);
++	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
++				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG);
++	spin_unlock(&data->irq_lock);
++}
++
++static void btintel_pcie_unmask_fwtrig(struct btintel_pcie_data *data)
++{
++	spin_lock(&data->irq_lock);
++	/* Drop a reply latched while masked so it is not taken as a
++	 * firmware trigger.
++	 */
++	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
++			      BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG);
++	btintel_pcie_clr_reg_bits(data, BTINTEL_PCIE_CSR_MSIX_HW_INT_MASK,
++				  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_FWTRIG);
++	spin_unlock(&data->irq_lock);
++}
++
+ static void btintel_pcie_enable_interrupts(struct btintel_pcie_data *data)
+ {
+ 	spin_lock(&data->irq_lock);
+@@ -3880,6 +4003,7 @@ static void btintel_pcie_probe_cleanup(struct btintel_pcie_data *data)
+ 	disable_work_sync(&data->hwexp_work);
+ 	disable_work_sync(&data->fwtrigger_work);
+ 	disable_work_sync(&data->mbox_work);
++	disable_delayed_work_sync(&data->user_dump_work);
+ 	disable_delayed_work_sync(&data->hw_rfkill_work);
+ 
+ 	flush_work(&data->rx_work);
+@@ -4099,6 +4223,7 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 	if (!err) {
+ 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
+ 		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
++		btintel_pcie_unmask_fwtrig(data);
+ 		btintel_pcie_unmask_hw_rfkill(data);
+ 		btintel_delayed_hw_rfkill(data, true);
+ 	}
+@@ -4351,6 +4476,8 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 	disable_work_sync(&data->hwexp_work);
+ 	disable_work_sync(&data->fwtrigger_work);
+ 	disable_work_sync(&data->mbox_work);
++	disable_delayed_work_sync(&data->user_dump_work);
++	clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
+ 	bt_dev_dbg(data->hdev, "Release bluetooth interface");
+ 
+ 	/* Both reset paths follow the same contract: on success they
+@@ -4375,6 +4502,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
+ 		enable_work(&data->hwexp_work);
+ 		enable_work(&data->fwtrigger_work);
+ 		enable_work(&data->mbox_work);
++		enable_delayed_work(&data->user_dump_work);
+ 		enable_delayed_work(&data->hw_rfkill_work);
+ 	}
+ 
+@@ -4684,6 +4812,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	INIT_WORK(&data->hwexp_work, btintel_pcie_hwexp_worker);
+ 	INIT_WORK(&data->fwtrigger_work, btintel_pcie_fwtrigger_worker);
+ 	INIT_WORK(&data->mbox_work, btintel_pcie_mbox_worker);
++	INIT_DELAYED_WORK(&data->user_dump_work, btintel_pcie_user_dump_worker);
+ 
+ 	data->boot_stage_cache = 0x00;
+ 	data->img_resp_cache = 0x00;
+@@ -4778,6 +4907,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ 	disable_work_sync(&data->hwexp_work);
+ 	disable_work_sync(&data->fwtrigger_work);
+ 	disable_work_sync(&data->mbox_work);
++	disable_delayed_work_sync(&data->user_dump_work);
+ 
+ 	/* Cancel pending reset work. Skip only when remove() is called from
+ 	 * within the reset work itself (PLDR device_reprobe path) to avoid
+@@ -4822,6 +4952,32 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+ }
+ 
+ #ifdef CONFIG_DEV_COREDUMP
++static u32 btintel_pcie_ipc_ctrl_toggle(struct btintel_pcie_data *data, u32 bits)
++{
++	unsigned long flags;
++	u32 reg;
++
++	spin_lock_irqsave(&data->ipc_lock, flags);
++	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG);
++	reg ^= bits;
++	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_IPC_CONTROL_REG, reg);
++	spin_unlock_irqrestore(&data->ipc_lock, flags);
++	return reg;
++}
++
++/* FW treats any transition of COLLECT_DUMP_REQ as a request, so the bit is
++ * toggled rather than set and never needs to be cleared by the host.
++ */
++static void btintel_pcie_trigger_fw_dump_collect(struct btintel_pcie_data *data)
++{
++	u32 reg;
++
++	reg = btintel_pcie_ipc_ctrl_toggle(data,
++					   BTINTEL_PCIE_CSR_IPC_CONTROL_COLLECT_DUMP_REQ);
++	bt_dev_info(data->hdev,
++		    "IPC doorbell sent to FW for DBGC flush (IPC_CTRL=0x%08x)", reg);
++}
++
+ static void btintel_pcie_coredump(struct device *dev)
+ {
+ 	struct  pci_dev *pdev = to_pci_dev(dev);
+@@ -4830,8 +4986,59 @@ static void btintel_pcie_coredump(struct device *dev)
+ 	if (!data)
+ 		return;
+ 
+-	btintel_pcie_queue_coredump(data,
+-				    BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER);
++	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags) ||
++	    test_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags)) {
++		bt_dev_warn(data->hdev,
++			    "coredump rejected: collection already in progress");
++		return;
++	}
++
++	if (btintel_pcie_dump_rate_limited(data)) {
++		bt_dev_warn(data->hdev,
++			    "coredump rejected: rate-limited (< 1 sec since last dump)");
++		return;
++	}
++
++	/* No host DBGC buffer exists to flush into when traces go to WiFi */
++	if (btintel_pcie_dbg_to_wifi(data)) {
++		bt_dev_info(data->hdev,
++			    "coredump skipped: debug traces routed to WiFi DBGC");
++		return;
++	}
++
++	/* Only a halted core cannot answer the doorbell. FW services it
++	 * regardless of host setup or recovery state, so no other state
++	 * needs to be excluded; collect directly here.
++	 */
++	if (test_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags)) {
++		btintel_pcie_queue_coredump(data,
++					    BTINTEL_PCIE_TRIGGER_REASON_USER_TRIGGER);
++		return;
++	}
++
++	if (test_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags)) {
++		bt_dev_warn(data->hdev,
++			    "coredump rejected: user-triggered dump already pending");
++		return;
++	}
++
++	/* Arm the timeout before the flag so an interrupt cannot cancel a
++	 * timer that is not queued yet.
++	 *
++	 * The arm/flag/doorbell sequence is not atomic against the interrupt
++	 * handler or reset. A firmware trigger in this window may take the
++	 * user-dump reason, and a reset in it may leave the flag set until
++	 * the next reset. Both are rare and do not affect the dump contents.
++	 */
++	if (!queue_delayed_work(data->dump_workqueue, &data->user_dump_work,
++				secs_to_jiffies(BTINTEL_PCIE_USER_DUMP_TIMEOUT_SEC))) {
++		bt_dev_warn(data->hdev,
++			    "coredump rejected: dump workqueue is disabled");
++		return;
++	}
++
++	set_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
++	btintel_pcie_trigger_fw_dump_collect(data);
+ }
+ #endif
+ 
+@@ -4936,9 +5143,19 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 	data = pci_get_drvdata(pdev);
+ 
+ 	btintel_pcie_mask_hw_rfkill(data);
++	btintel_pcie_mask_fwtrig(data);
+ 	btintel_pcie_synchronize_irqs(data);
+ 	cancel_delayed_work_sync(&data->hw_rfkill_work);
+ 
++	/* No new firmware trigger can arrive now. Drop a pending doorbell
++	 * request, then let an in-flight timeout worker and any queued dump
++	 * finish so that nothing touches the device while it enters D3.
++	 */
++	clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
++	cancel_delayed_work_sync(&data->user_dump_work);
++	flush_work(&data->fwtrigger_work);
++	flush_work(&data->coredump_work);
++
+ 	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
+ 	if (mesg.event == PM_EVENT_SUSPEND &&
+ 	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
+@@ -4958,6 +5175,7 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+ 	if (err) {
++		btintel_pcie_unmask_fwtrig(data);
+ 		btintel_pcie_unmask_hw_rfkill(data);
+ 		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
+ 		btintel_delayed_hw_rfkill(data, true);
+@@ -5023,6 +5241,11 @@ static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, BTINTEL_PCIE_STATE_D0);
+ 
++	/* Restore the firmware trigger interrupt even if D0 entry failed, so
++	 * a later recovery does not leave it masked.
++	 */
++	btintel_pcie_unmask_fwtrig(data);
++
+ 	if (err) {
+ 		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
+ 	} else {
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index f04dfb0b30fa..2db674a3eb9d 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -44,6 +44,7 @@
+ #define BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET		(BIT(31))
+ 
+ /* BTINTEL PCIE CSR IPC Control Register */
++#define BTINTEL_PCIE_CSR_IPC_CONTROL_COLLECT_DUMP_REQ	(BIT(6))
+ #define BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL		(BIT(7))
+ 
+ /* BTINTEL PCIE CSR IPC Status Register */
+@@ -166,6 +167,7 @@ enum {
+ 	BTINTEL_PCIE_CORE_HALTED,
+ 	BTINTEL_PCIE_COREDUMP_INPROGRESS,
+ 	BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS,
++	BTINTEL_PCIE_USER_TRIGGERED_DUMP,
+ 	BTINTEL_PCIE_RECOVERY_IN_PROGRESS,
+ 	BTINTEL_PCIE_HWRFKILL_ON,
+ 	BTINTEL_PCIE_HW_RFKILL_STATE_CHECK,
+@@ -223,6 +225,14 @@ enum btintel_pcie_mbox_msg {
+ /* Default poll time for MAC access during init */
+ #define BTINTEL_DEFAULT_MAC_ACCESS_TIMEOUT_US	200000
+ 
++/* Minimum interval (in seconds) between debug dump collections */
++#define BTINTEL_PCIE_DBG_DUMP_COLLECT_MIN_INTERVAL_SEC	1
++
++/* Time (in seconds) to wait for FW to answer a DBGC flush doorbell; an
++ * unanswered doorbell is treated as missed and the dump is collected directly.
++ */
++#define BTINTEL_PCIE_USER_DUMP_TIMEOUT_SEC		1
++
+ /* Default interrupt timeout in msec */
+ #define BTINTEL_DEFAULT_INTR_TIMEOUT_MS	3000
+ #define BTINTEL_PCIE_MBOX_INTR_TIMEOUT_MS	500
+@@ -803,6 +813,7 @@ struct btintel_pcie_data {
+ 	struct work_struct	hwexp_work;
+ 	struct work_struct	fwtrigger_work;
+ 	struct work_struct	mbox_work;
++	struct delayed_work	user_dump_work;
+ 
+ 	struct dma_pool	*dma_pool;
+ 	dma_addr_t	dma_p_addr;
+@@ -824,6 +835,7 @@ struct btintel_pcie_data {
+ 	u32	debug_table_size;
+ 	struct btintel_pcie_dump_mem_info	dump_info;
+ 	struct btintel_pcie_mbox	mbox;
++	unsigned long	last_dump_jiffies;
+ 
+ 	/* Wait queue for mbox_worker to wait for GP0 alive interrupt */
+ 	wait_queue_head_t	mbox_parse_wait_q;
 -- 
-2.56.0
+2.53.0
 
