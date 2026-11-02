@@ -1,97 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793622874;
-	b=rzLtpUHAjOiJgYOwtZZ8c+SPSHTU0Pr9hs6ozbYSq/gVRcdz2GgLdfwdt7psGv4Z+WX7
-	 xeEF38h1tuvFHn54ioMewGXowfQYRj8vjXhowZy3xYLuM4Zrp8oa+VPM67r/G9zAypZ8w
-	 ZTXkOvG/+zyjIPsA/4WfU3gdCfihXmnRv8SPSQZE/NDnTTN2vIqfdp2mcOwgk/J2IDyVW
-	 P1AmXtayvWzDJfNYzacDeZx73TxGpKcNYKg5BGfVAQ/84CZLzJHkzUulZHGc1EZD8/24P
-	 +GkFJpTmOxJujc+LFJRgZdIH6L4EzmwkPH1q/ps9l33ryWJOgPyJcK1XlEON3Rgz97A==
+	t=1793623679;
+	b=K6PcbO78cG7o9MPTvEmmwhqSSQc+RA6WLLjj6UHbZqqxQXxhWepWw3RwhfFcg898FUb3
+	 9Zu7MjtPELnE2WxdTMNE5zJ1euUkBuX/XLwH4gMaA5djPmSw75lG8JOHJlLbOtwJPlL/M
+	 S/L0QB3Hc70D5KTL/zKCU7tgDvt/UKsNx2b0OIStKhgvxM+gpIgAnLRnDNrRqK9RDOAwk
+	 Xfv3o1e4s8aNvZCbvX30hR15gpnNds94Wf8Kld+sWYhMHAeusC74r4tvDRTgyXEownxqF
+	 5Yd7jk70QgV/Nt29jfVVsNx+KLCVxvTDNLrW+8U8I9fQP41Igq5LUDgHI5abyaIl8zw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793622874;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793623679;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=8WgZokOso5GKBkB6b1tRUojAeIrmq+wx4vK3BoCOZdA=;
-	b=ctfOyJl+dDyJ8ikwJ+D+KbHcyGgbKptexs8qAugCGS66p4nAjZbD0CJP7A6k8PGnqmlM
-	 w+X12cgbOY5bWYvp2lVqxCufwclugOp+jbCZHqexKT1A5frbNbnBQKJgWX+d0EYmJ6e1T
-	 8Wp2IBrezhTS8eeBnU2cUL7sMakhHGAaZXPDbEhqs30OeWl5PEq7Jukuo3S0nsV+rGiPa
-	 s46+c5mXz6VLP7JqUoh2rddxLX6BSHaLrRgUTtOw790j0CzMEePi26kyS6FXxWRSA0w0H
-	 UDJusEi+Dl2Nd5UGS7+6bRatChkqNCYdmdG50wP/CnyTefSKWk9OZNhAZ43lToaALGg==
+	bh=zqoWqaP8cnZQxZpPL5UVASrgtfs6Kly9E6CJOTM41tU=;
+	b=t0SgvsshcmKofmf1iGPsTMKH/kt+c4JVHmh0cY8YoicDcc0fQWlikaDR80PsrMr3ZlOB
+	 8xmvADq4LSghcEoWdmf3icve+L8WiGxmKt/+T2wNP8o/hjPavjRuZllL9ZYrSkJoSoDv0
+	 XTx9Tq0KhKnPOMRSlNxxe5OEyXbwdU4q53Y49LqLe3g7hUkglF0LKzDTxNv4L+g8/fd6F
+	 Ou6x7WhRf8IrTIfrDSvBr2qIS12l16eubHlF5+WLV2aF/emmBuaFAevS3GxINqDG6tRto
+	 0Asy/CFnH3/DbKfGEUBBYmhmiwkuBKJAjHadet9x1cm3Xj3aI4jUKOW5wR8A7hWTcQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cloudlinux.com;
-	spf=pass smtp.mailfrom=cloudlinux.com;
-	dkim=pass header.d=cloudlinux.com header.i=@cloudlinux.com header.a=rsa-sha256 header.s=google header.b=Mgit0CiU;
-	arc=none smtp.remote-ip=209.85.218.45
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rw0n5fK4;
+	arc=none smtp.remote-ip=209.85.210.178
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA106606A32E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 12:34:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BA106606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cloudlinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudlinux.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE3D606A338
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 12:47:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6AE3D606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=cloudlinux.com header.i=@cloudlinux.com header.a=rsa-sha256 header.s=google header.b=Mgit0CiU
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c3f04e0e65fso430288066b.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 04:34:33 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rw0n5fK4
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8a05effaf8dso1640260b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 04:47:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudlinux.com; s=google; t=1793622872; x=1794227672; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793623678; x=1794228478; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8WgZokOso5GKBkB6b1tRUojAeIrmq+wx4vK3BoCOZdA=;
-        b=Mgit0CiUXJF476mkGjG/UtMwaxX5JUjdiFfVeAGAOLUguFT72B03MvLcGth7CIhu60
-         V4Gn27EVgzsiGSRLwcwuLr1xO05TwrG2o987Da+SFncL2BQDYpeZGNQVgeNR1PYu7zb7
-         xmyAE1d2jGl9WxYLW1E8o/ueQpm9/V2tbgo7/DgQYrhqs/rZBM938LeGunPsi9MW+3We
-         avvT78CrOOo5XxKUKkTOm9FZdaRutToVtKMLD1rwLue/8dh6peQYMz6HKDbS9PkyKCL+
-         6iZbJNoPvr8JVnMWPUPn4X2cx8DuGaqWqtmObQdVTsPeHz5l2eNZukYD1bDpIhKmrSLR
-         oB3A==
+        bh=zqoWqaP8cnZQxZpPL5UVASrgtfs6Kly9E6CJOTM41tU=;
+        b=rw0n5fK4MnaD3IQJIzm+vgfsJelHJJy6+EQ1mLdsTyeE7nAx35qWOOW/mWoj6tYKjs
+         +8yF4uneyKymfwNOiZDic3km4qFPavWLlhB9ZyBa+Y2qjQ4fttIyZPm6nW6mOIVQjd1g
+         KyvI3W220e2TeBv9Jt0ZKs9KW8psJhnbvUhlbsbIt8dyCiYfUZMxlHsoVvBNxV8Z2Ihk
+         YXms1PI6KfpFETKzXDT3JONi4ocbKLoZLl59qNggXiCn4NO6Qax6NWQuoteytEqRSI77
+         X4kD5MVZ+mK9jHTkczscbYPnvxfck5NX9BbdmyHR0KnYFnkZkuVx2IHPK4voN0KGy6Jw
+         n6Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793622872; x=1794227672;
+        d=1e100.net; s=20260707; t=1793623678; x=1794228478;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=8WgZokOso5GKBkB6b1tRUojAeIrmq+wx4vK3BoCOZdA=;
-        b=sehWEBYmgYbGcyk9a2JrQIOWFyuguo41UMxhl8dX2dUZsXaoJbeIEycSjC4a4GRQD4
-         bmQqgIBCmzAwwFkN8CMEkEkTTV54g5L6bcpCEqXmbelSaklBCTAOPLqWAxSSvnFY1StL
-         TbZYTBg/NqQXVqpSZ/ElZXHqWPfbk8l4G6y1KK/0ZBqFAt4NgqUblMRWJ1yosWBhQQb+
-         lGvZq24eLcHVZ1vipcbuXF7rHlDh/0NmH3eeoQA+30vWa3bSza/CtAEwrXi8AMwvkF60
-         v3/R6Z7cQ2XpOswB1Us17/CW5b3GiywWQR8oukT+mKvyTTnxWklrx2t57W3+uSpbgPOE
-         0KkQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwAsl+gbgVDoNvHUuT9Z6DYdjWnh0eeoJ0WLt5yuj5XNJdfQzhozxaQPxB0MvlNf7mia+sNVzVYLwUM57svl9U=@vger.kernel.org
-X-Gm-Message-State: AFq9FYI7Ggu45arnTjteHK6ijpBJikGuVkcKUY5luPu7ihm+NLb4Akt7
-	AEh5aFTI8QgxWaQ22mYFzT+C5Xlap86yCiI+m3SBs0sT48kLIFOiD/aU9aWqzPs4flI=
-X-Gm-Gg: AYBFou2xAp4Rguph3xP9AZX2ZGu4D6iwky9b5wa4NABG3qzId+63SKZTXOK/OmrJHjh
-	Ae0kmi+1HBk2iPN+7/8neUZUYi37Igdi7IpMewrD88sNBXQHibsF48dFFIdNH5jP7Htz7kHTq3a
-	Ib8LC+arkC9G45VWcH5HYgXxuBNSNddLda83lXOUuPGSsPFYzUSo4Ow9NFiKdIjMzqAESdQX5Eb
-	GRRnMJp9P4npaaL9h/lfd1RQrqV+qtNRUy140LiOvMaHwo/rG85bf6a8SwyPajSP3Ykm0wuf5De
-	23W9vSGB2J4Kq2+laBeqH0XsW5L18TtnkSaUvOEvvV1Bpd74y/V6ZeMz/kDJsZD/XO8uu2D5xj+
-	iBr0xJNm4BXVXKlJPeU44WbBJ7FJ4Xz/x5i+uXFLipHfC0bofPyjvnKhG5Zuzz9Jy3Tlg0OMT1x
-	dujK5IpH2felD1k9VVutA6RJC/In9PfjBJMyTWZ/6gQIBPE/oO2MR5uGIy2HoZexQFncyO13Flf
-	f8tGURn9NFVqTQpnZ6POkPRrxQVcQoPKeXmmM7+NJXYX9WwFwAYWwW9tiAo0SMrBnjaeGkB1puH
-	B/TXpCywhw==
-X-Received: by 2002:a17:907:868a:b0:c2e:2baa:a642 with SMTP id a640c23a62f3a-c4ca7a820acmr832014066b.30.1793622872158;
-        Mon, 02 Nov 2026 04:34:32 -0800 (PST)
-Received: from dev1.kernelcare.com ([2a01:4f8:172:1c85::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4cabe4aa07sm396884866b.63.2026.11.02.04.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 04:34:30 -0800 (PST)
-From: Andrey Misiurov <amisiurov@cloudlinux.com>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
+        bh=zqoWqaP8cnZQxZpPL5UVASrgtfs6Kly9E6CJOTM41tU=;
+        b=l9otWFb1nJhydkNkHDU/DcBBnWN99XqeY82WnC60zekG8eJjW1n0vlcdjGItPSG4Hj
+         cqQy0aHg1qNrPqAeaPob5SNIcsPgovyr4Ud6hi1S/vvdXuHBLAl6DLMq/Zl/ALxhDY7V
+         E8y//Es6fbNKSOz7o4sJRyg01GTTq/na+wq47ymByR+yJnIx3MfJFIbq7/dLOnyY+iNk
+         VM5uatvyIS5FkX796YPv4ylBZfrh3SuvvcysE5sHJoPKbTizIxPl18P8fXqj340M+YRa
+         kzvMzDtLdf5HPZjlh6zd/I2NzXB1uEvjUSixlpXaB+hUT6CS8ys+qvrUynHAVOLIESJd
+         RepA==
+X-Forwarded-Encrypted: i=1; AKwUvBzIFoOrK/J0MiFcJj1eEuO3axFjyG/PTdJbWnwiSf98UYhRlgUrI7jmox45lgeoJ80noy5k8l1w1kEjPl80C2s=@vger.kernel.org
+X-Gm-Message-State: AFq9FYIrwjhTu82H4sKg7ypU8OWkrj0Kr+H5c134h9vTJAW1J8WlZP2O
+	m9rH3D44LpGQG6bmER5g3BgyO90ede9fnHpkgDUKS2aFHtm3PVZbV30+
+X-Gm-Gg: AYBFou26LE48/DUpj830/7c1e/xM9deykArQ6wrOZwk1/CxuXMieOO2IdiLHPg6whrv
+	2HQ855B6zYwlXBilxMJSDOSCVpTaLlYooPBT3YpEpyExuybETTQ4dbW1tm9V4TB3i1rtrASEgyM
+	DsLIZv8JO3qGN6y4CzPV4GUfrItQ0WwIvkN4Hgd/7aEygSfHsC71BcoqzSAjv8yacZPkALj5QAx
+	kEtcjdWrb3maCdbZl6Be5vkZKyag9Kxy99ejBoIVzDJGoWi0dxy+GUwZt5Tk8OE0NkAEQAOaaCy
+	ToSE/+qbhBgTZPbWL8MCX+ndrZvumItcucoz/Ysh5lQY7UBGdWYumz2Z4WfwylNlhkMNlRHSC4/
+	iml/KatVf7THr3yTibtz817Nca0eVHeNAvbca3wOlUXEQCJiMI7WkvYa8iTqIyR309rHXLdxQ0I
+	4JKneOXvBuDGa4581WAe/gj4uihZ7RYWI8EhCBnzqu/1BZ4JqpOUa33MwAImBFcWbe3Fpqu2V6/
+	Zd2HaCy0TlVe2Bp6txybYznC6VU1FsNX9xzuHHGiOx3kWHGTHUPLLgzsi2zpzL104xDgeX83mMA
+	J7JCDFCSypdaYhO24x4CfDQ04o1en3/xt0IQm7+NxyhgLlXf9Q1NjsPNq0Wuyq3k2Nqm
+X-Received: by 2002:a05:6a20:a126:b0:3e1:c1a4:91f6 with SMTP id adf61e73a8af0-3e928c5c937mr9229349637.13.1793623677157;
+        Mon, 02 Nov 2026 04:47:57 -0800 (PST)
+Received: from KRHW1CJW23.bytedance.net ([139.177.225.227])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8aad77fda1asm1908357b3a.6.2026.11.02.04.47.52
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 02 Nov 2026 04:47:56 -0800 (PST)
+From: Zhao Li <enderaoelyther@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+	security@kernel.org,
 	linux-bluetooth@vger.kernel.org,
-	2122295973@qq.com,
-	Andrey Misiurov <amisiurov@cloudlinux.com>
-Subject: [PATCH 6.1.y] Bluetooth: ISO: drop unbalanced sock_put() in iso_conn_ready()
-Date: Mon,  2 Nov 2026 13:34:18 +0100
-Message-ID: <20261102123418.363320-1-amisiurov@cloudlinux.com>
-X-Mailer: git-send-email 2.43.7
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] Bluetooth: L2CAP: Match LE responses to outstanding requests
+Date: Mon,  2 Nov 2026 20:47:33 +0800
+Message-ID: <20261102124735.23199-1-enderaoelyther@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -103,48 +99,61 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 1702f12cf59a ("Bluetooth: ISO: fix use-after-free of listener
-socket in iso_conn_ready"), the 6.1.y backport of upstream 560bef609fa5,
-puts the listener when it is no longer listening. Upstream that put
-balances the reference taken by iso_get_sock(). On 6.1.y
-iso_get_sock_listen() takes no reference (it got one only in v6.8 with
-fa224d0c094a), and no other exit of iso_conn_ready() puts the parent.
+An LE peer that can reach a local L2CAP listener can use unsolicited
+responses or Command Rejects to bypass deferred setup, remove an
+established channel, or leak an unaccepted socket and channel.
+Authentication requirements depend on the listener's security setting;
+whether a default configuration exposes such a listener has not been
+checked.
 
-No race is needed to hit it: shutdown() of a bound socket sets
-SOCK_ZAPPED and keeps BT_BOUND, so listen() still succeeds and the
-listener stays BT_LISTEN with SOCK_ZAPPED. Every incoming connection
-then takes the new branch, and the second one frees the listener while
-it is still on iso_sk_list and attached to its file.
+Patch 1 requires an outstanding request of the matching kind before a
+response or reject can change a channel. It also completes socket
+cleanup when a reconfigure failure or reject arrives after local close.
+Patch 2 clears incoming identifiers once their responses have been
+sent, so a later ECRED request that reuses one no longer matches the old
+channel. Patch 1 is the security fix; patch 2 is separable.
 
-Drop the put.
+Patch 1 extends the BR/EDR lookup from commit a518b9a9ef6e ("Bluetooth:
+L2CAP: Only accept connection responses to outstanding requests"). Its
+stable tags request 5.7 and newer with that prerequisite or an equivalent
+backport. Older LE-only trees need an adapted backport without the ECRED
+hunks.
 
-Found while reviewing a backport of this fix; not reproduced at
-runtime.
+AI assistance was used.
 
-Fixes: 1702f12cf59a ("Bluetooth: ISO: fix use-after-free of listener socket in iso_conn_ready")
-Signed-off-by: Andrey Misiurov <amisiurov@cloudlinux.com>
----
-6.1.y only: 6.6.y and later have the reference-taking lookup.
+GCC 12.2 and Clang 19.1.7 builds passed at W=1, including full x86_64
+module linking after each patch. GCC also compiled the Bluetooth code
+built-in on x86_64 and as modules on i386. Sparse reported no diagnostic;
+Smatch retained its one pre-existing diagnostic. Coccinelle 1.3's
+use_after_iter rule found nothing in the changed functions; five
+unchanged parser gaps also occur in the base.
 
-The closed-listener race that 560bef609fa5 fixes does not free the
-listener on 6.1.y: iso_sock_release() calls sock_orphan() before
-iso_sock_kill(), which then returns early on SOCK_DEAD, so a released
-ISO socket is never freed (fixed upstream by ce57442a3792 "Bluetooth:
-ISO: fix leaking sk after socket release", not in 6.1.y). If that
-commit is backported, iso_get_sock_listen() needs to take a reference
-as upstream does.
+QEMU/vhci testing with patch 1 alone kept all 445 established channels
+alive. In 40-pair close-before runs, failed reconfigure responses and
+Command Rejects each destroyed about 40 sockets with the fix and only
+boot-noise sockets on the base. The success path destroyed the same
+number on both. A 1200-pair base run retained gross Slab memory after
+listener close while the fixed arms released it.
 
- net/bluetooth/iso.c | 1 -
- 1 file changed, 1 deletion(-)
+With patch 2, new ECRED requests that reused the identifier of a
+closing LE channel completed instead of being refused; partially
+accepted groups were not tested. A KCSAN kernel with both patches
+reported no data races in the close-before runs.
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1536,7 +1536,6 @@ static void iso_conn_ready(struct iso_conn *conn)
- 		if (parent->sk_state != BT_LISTEN ||
- 		    sock_flag(parent, SOCK_ZAPPED)) {
- 			release_sock(parent);
--			sock_put(parent);
- 			return;
- 		}
+Hardware validation has not been run. Patch 1 does not apply to stable
+branches as is; adapted backports of both patches compiled at W=1 and
+linked as modules on the seven supported lines, and were not tested.
+
+Zhao Li (2):
+  Bluetooth: L2CAP: Only accept LE responses to outstanding requests
+  Bluetooth: L2CAP: Clear request identifiers on incoming LE connections
+
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 87 ++++++++++++++++++-----------------
+ 2 files changed, 45 insertions(+), 43 deletions(-)
+
+
+base-commit: 6b4b543fa18757297ac756a6fe6e64f506b7844a
+-- 
+2.56.0
 
