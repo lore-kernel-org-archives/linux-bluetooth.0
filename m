@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793638806;
-	b=MwpSO1ZAPZcNQzPB6k6skHi+pehKyQLLMpbSdd/TJ3NET/+EpTDaiSCcBXPWciUBZGEX
-	 8w/2wSa5MUB3fCCpnCE1Tg9PJK99QYyKLWoIQSN0Hllibf4cS5zqP5W81ZB0ybCNujIzG
-	 HAY9zxBpqzwZD2eE1s5/WujELRdG47NR7DyyizGZ/rYtpVGmBAiDs2iTCSvrdW7y0WvXp
-	 THpyV3qyI6GWF/y0V2XecUiC92OI0w0snCQGnxChGGde0JnYwTRz+SXtx9aUnOe6m6xlb
-	 rUnQDnHTFtVfoHueC8l+Gxof6Whte9jqD0SFmVt2aap+/SJ+Yx43UJQJSsQ4IRi/Q+A==
+	t=1793638815;
+	b=Kb4cbZ/FlOL84mhGIOPBkQqVQcdiZ7cs/GK2gR/whddmuMQQ0fFdK7+bR7JhTMjdXRcM
+	 AD8LmTC5jvgzV4uv88vU0/xhyngklW+jugRxM5mp/sCp5rZ/epDU1kz/8BP6b8Diq1QsV
+	 xWEATvLwGkF6KkAzQ2vtZmaV7xkPcWhCCZF8BF8aInjqVOMI/md2vwdTUwqQdFmqhFi2P
+	 OpXAvqJ5tFElI48XTkEDQIuTUIOR65GZV93sEyfgcxxu1oaS5Q1YFjAwp+vf+Xgbo0QEI
+	 grNwHua2BqkhBHlnxkeUHcBgZWqBNfXlDqgAoAPVL91FYSNOP/hGc++1VIJzVDFcWVw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793638806;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793638815;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=wPJslWzgV/qmgQrkFiDa1p1u44fnWzbYAs/o+wLjkr8=;
-	b=HUanKHENvW1Krs1xVQ9R+Skh68HxWCP1HlMa1aa0o76YA1V1oVuwyk8Nmdi8CEoUShVy
-	 OdFww1hzUB75FizMGNWGAJI7mO2LALhJsvXG89qS5nc2TtOefv/iVPreAy7NaGNmCAzZ3
-	 mM3A/m/4peLGisFo6NWEf73Z0Rjm+Qab7WAloZZ1LumRZ/fxVmYX7y459DLLbR67z4T4f
-	 61eRdP+9QspXi8F3Nve8T/4C2C9f8eOy863jmHaAbsFsi67lkGyhgPlnGUe0AiYZGVsON
-	 DXPgcESSbroJ96ewLlVff9FTtdOKXm6rMilbNTMh3zfmGOsrThg1wq/3AtmoKfhZeFg==
+	bh=Gj+cEnUX//I8NTeCN+X3F8KLHoyCJOOVE92EzAIsAdg=;
+	b=Rw6FYvCdi1De7ttwLEC+a2cGTkonLPDRyuvA9ty9t3CpsVyTxK02UsrGdSuPwlo7KKFy
+	 zEK5M+6LMKnNsLqcaxz2+F+syV1MyXWd/pA+luGAJwSEJ9QLbh1DJNWWf3KO2/MVQv299
+	 duubx3Txjv0rFLZAExprJYRAQ2mjpFmjzO1IbXuCjQ6NrdsiFZxofQMqXfhiI5RlvUviC
+	 m2xaDgbB5cc9oGr65DBtdGBLwhb8Yj2ulNRv//9Nd0yPApyGZKRUs+gEwGla9t8itzGUt
+	 LUKL7gfmCHs1e995A2Vq8iYcIxb8RBSh1YjuyuDpBdxisuhYL9dlJb/gFe1vgGhW7Hw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b="gqM/FvLl";
-	arc=none smtp.remote-ip=74.125.82.47
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=lXQGkVQZ;
+	arc=none smtp.remote-ip=74.125.82.46
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CF660752A8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 17:00:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11CF660752A8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDD5606E02F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 17:00:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BDDD5606E02F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=gqM/FvLl
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1438d9363fbso2523454c88.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 09:00:05 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=lXQGkVQZ
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1aefd1bf74aso2040930c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 09:00:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1793638805; x=1794243605; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1793638814; x=1794243614; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=wPJslWzgV/qmgQrkFiDa1p1u44fnWzbYAs/o+wLjkr8=;
-        b=gqM/FvLl18Yd0YilZ+++KmUtIF//9SIjokWGRAaIJXrH7grYfg0sPFLjfGRcLwj8Vc
-         xJQDuUuDvUoMo0Ut27i7iNNjgkq0rqVd61t2uHapoI1t64xjkucAdhU2LNb5plDyNmHk
-         aaENUKFYcLWucZcgaRaloRRVXvW/7TVyeUpLqALW3kx8jolM1G3ElalvZr4j00EY4coj
-         gUf28r2/VKnJDg3taKzyk9HFaKlvyjD8k3nFBzJeLDkfa0mkrHUv8Z+q9uhje1tUelOj
-         5ZD6Jhn5QUW5cCO12TsxtFwXmEcaeSVhu9jddgkRn5HPrmky2CIJggSnfLpMvO5eHERJ
-         OJCg==
+        bh=Gj+cEnUX//I8NTeCN+X3F8KLHoyCJOOVE92EzAIsAdg=;
+        b=lXQGkVQZDqQD70UuI+r6mqvyH2Roh67io4mSjOU6eBRIP4qTLqJylEtWlj35kB64H5
+         EZfB9tVXpuN5qaKHFUqUYyO8YJezGhAYpLzniDHEDy6V2IKCeMy9+rqVY+bccvu6/7Et
+         eEQXzdjSavrJDIZEWouHb3htYjXUUz8tI6FeblePdx6tvmPjE+Dbus8REeahqXQDKz8H
+         2xloDTiSYGa5V9eM2/UKrYIIeHKdCUUBuNYec+9MKwZPY0jqRReYaRKIFwdFYui8k5v7
+         1OQroqp3Qtruar5VDPDPjuVgfDWy4j5KmTfXDpzaCm8505njDYFuSfNTN09BzoNz52p8
+         a9Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793638805; x=1794243605;
+        d=1e100.net; s=20260707; t=1793638814; x=1794243614;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=wPJslWzgV/qmgQrkFiDa1p1u44fnWzbYAs/o+wLjkr8=;
-        b=y2ibVDu0iAxJb5tKXseRUOB/P56XVyNSSPSPfs8BRewxeJpWH7QEfWxKqV8orgeLjn
-         YMhEVEwj6zPEUPURGu2HvJNELyKChWo0+i7tbWbR8EfQ+hxVIeZg7TZz0NDP8yOsVOyZ
-         feobIso8FIFECZZYjbviVRRGRivOb9347y5X9wfZlSxUqRu96SQlh6KOP1wuQLBpzgJQ
-         +pbQQk6JmH8UFVAQOcY9BLBEwB99kFpJ3hMim6cP4lFeRo/6dwtwxnAby4jl5CiVJ1ml
-         WQbEHSsfAVlfgDcn1zs5M1XTUiI+xfZ2nibBcrlErteN8yppR3+xx/FggnTZgg2p7GMx
-         P13A==
-X-Gm-Message-State: AFq9FYIdGWfe7qaIJgmtt7/6xWZf2lbSWOHjo2mL9GU0jQBkOnC166UR
-	B54ZIBh2Eql7pqPSoHrcqWs5cFZERSpuOI1nKfScV0TKUSVRmUGJUaMyzERwNqxPnUw9Ifuf1d4
-	EqzXI/0M=
-X-Gm-Gg: AYBFou2bHo+956ziSFkv7ovM3Btn8OQUhAyAx+o9Wjt3AIMSpScN7JpFJypWQYuxK47
-	FWUv+qUv9kIFTh1vKabBW4BxBxcYDhslc0qXJGC8PygUJujh5wvArC0hblSlXP4Cy5//qKAbY17
-	wKGkSPn8VKvO/an4cTkJoNoXaWoVAjDVt9vpRBOQqJv6IXHnm7BRsS/PRhsSmJptfKGO/5sP0MM
-	RwbjbivWhKKphrv4S8Wuj4RyyS4vMV+2s1x41rqwnUcehI6wWmWq4gF9+IA9Y17wz2JxZo85eYf
-	Wciudoak5MKUptsAwSGlioRDiXHSqLMaXjopYRpp9CBRpes+OkQWg1zzNRbrmHBVAZSgKbOSlZI
-	5uKCaX0NM7jy2glhaEPY1Zr2ielLaKJxMti7dzIo/9Vx8GT04Te7gGz6hmxCT6oEi+2RthUAP/1
-	pCmI9VbSiSsfZzXnFIa0Cn4I6+pqBwD+tuDtooGp3PIwJX5tdvrJZ+NeuqWgDk6s9Tj5NNOQwSj
-	KhnpvpnwA7ROCK0E+7hwbJpb24XthsNRAGBp3gQIeh5i0nbSdTQbpRgqW0qRinaZnZOpfS49w8B
-	PWDcG7c4CAFIVBrxJZjxlD9ChtkbKZ3Qo0Puu1noujqEyv0NRoasAOKzTbGt7BtU+9DlfRsSTfy
-	/lSCBi4FamCEqSKOc+24GY2EPhmDnKCCWkF5SjBZUTpZjm87NqWbFp5A7za/s9JFAbAMXEG8=
-X-Received: by 2002:a05:701b:4586:20b0:1ab:9742:e028 with SMTP id a92af1059eb24-1ac55960b4bmr14590265c88.3.1793638804745;
-        Mon, 02 Nov 2026 09:00:04 -0800 (PST)
+        bh=Gj+cEnUX//I8NTeCN+X3F8KLHoyCJOOVE92EzAIsAdg=;
+        b=xMz4kAWUmeDYNWt0Xi2Y41eJCtQOHb0Mu6fJFVtneRreABwQNwpIW+AUiDgwwCKJDz
+         9fW5oN1eIqzTOeMs+wASKOWLuOjLRLbDER8/ljLR0nPeJVp/hNBMiKnYYCpetZ9YsBVm
+         XFHXGYaFEfHSBRLIBRo8Zgn6778Ix5vJDitPdt1k4Hv6+GY23QWWW13RO2Lqc3HkvOZu
+         DpMmpUN6obvjkkY0RMPa+gBzlTNuJ8PxcLcs+CPXhZUFiypBsNSSZSpep900lfVB5q6k
+         SL33m5ISR1lrFDCR2VWsVfxf67j3ouaVvYfJuYlMjV0GZ9s8wqPY6hL8awg8P29OMgFW
+         fOlg==
+X-Gm-Message-State: AFq9FYKPYI1a2vlSnYLTS7UfdkS9UuoKFNPCkjrk9Yk74GUqHT6yGHXt
+	tixff9IHm7T2glE0c+T+fNZeyo82mByAVe1H9LmcvlY/lZH5JCZcd10eWKFC+EBO13PKL0cKxKa
+	0puRXZ7w=
+X-Gm-Gg: AYBFou3ZuK33eJ6/4BTwYEXWZDRWGfp+uXYc9RlviMlnb5wxbLfSnE/K4bu5ZmWX/L8
+	1SToFbmrCRc+jgP4F6bg8mx7gxSIUZ9Lk0HQvhoMlnYlyNylr7420G9vJ9Iulz7Y3Vcr3SdRtGj
+	xiPVAA/fYZ1zqSAu5XshgTprBIKdjofGhym54SUUJZHbrhau6h1FeTMW1VR7459XymCScO3azJS
+	GXh5NheoYMUNaOZbjTPYGotXqMy1oDB6tzcacciQX+uKBLtYCXdtA0p1/RxNjTm/EJ9TgP/SauW
+	LsXQvpQ1apBQgVKM/OvbOK6bnZQdiBhpAlPmB/MMok8nZiuKueQa+1vcAqVCtpPcP49JAbK4b3T
+	lTP1JOx9te/Rvsxa+W6ssGBKlzNnaZ85W0a/wmyGWgDTSlw5upMzuSZLar/X5GxEUcJG+SYdNw7
+	EXtFo2UVUZJxWgAvC3wKJIDgOCM1vMl51nPwRhG18ewA1RFNiltSgVFMRbxhTXvjskX5nVyUNSP
+	+Ng8YgYzFgeQrc9XIU2ydyNuV8JPcHgcqAgn8OWL8FHMSUEpmSQ2W5IVNNLcHnMTigQ6SASy6Fp
+	YDytSYIt/cCBDAYXrniPj7r/LdNk0rYik1Z1maZRGbZXf7pS0Ur2eJb5t4oj9kpTWEhEMTcrlwm
+	IxhjuSgd//t12Byhh7mZ1Dc/G5R6+0Ai9aQgIytGr3dljw5He3IA7WZCdnvNp3OYnebPyZYybM3
+	ws0hifzjzXa1O6Q+0r
+X-Received: by 2002:a05:7022:b889:b0:195:8fa1:b447 with SMTP id a92af1059eb24-1a9494d8f22mr19453283c88.12.1793638813082;
+        Mon, 02 Nov 2026 09:00:13 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1ac13ef1932sm35224345c88.2.2026.11.02.09.00.03
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1ac1abcf67csm35506402c88.21.2026.11.02.09.00.11
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 02 Nov 2026 09:00:04 -0800 (PST)
+        Mon, 02 Nov 2026 09:00:12 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH v5] Bluetooth: MGMT: Fix discovery stuck after a failed Stop Discovery
-Date: Mon,  2 Nov 2026 09:00:00 -0800
-Message-ID: <20261102170000.62469-1-kevin@simpleble.org>
+Subject: [PATCH v2] Bluetooth: MGMT: Send Connection Subrate on LE connection and update
+Date: Mon,  2 Nov 2026 09:00:08 -0800
+Message-ID: <20261102170008.62788-1-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -98,242 +99,108 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Stop Discovery moves the discovery to DISCOVERY_STOPPING, and
-stop_discovery_complete() only moves it on to DISCOVERY_STOPPED when
-stopping succeeded. When it fails, for example because LE Set Scan
-Enable times out, nothing moves the discovery out of
-DISCOVERY_STOPPING: Stop Discovery is rejected, as the discovery is not
-active anymore, and the LE scan timeout was cancelled before the scan
-was disabled. Until the controller is powered off, every Start
-Discovery then fails with Busy, and hci_update_passive_scan_sync()
-skips background scanning, so devices set to auto-connect are not
-connected anymore.
+Userspace is not told the parameters of LE connections: the Connection
+Subrate event is only sent for LE Connection Rate Change, which needs
+the Shorter Connection Interval feature, and nothing is sent when a
+connection is established or updated with LE Connection Update
+Complete. Applications that need the connection interval, e.g. to
+estimate throughput or latency, have to read it from HCI traffic
+instead.
 
-Move the discovery back to DISCOVERY_FINDING when stopping it failed
-while its inquiry or active LE scan is still running, so that it can be
-stopped again. Only change the state while the discovery is still
-stopping, as Inquiry Cancel may already have stopped it, for example
-when only the passive scan could not be disabled, and a new Start
-Discovery may have followed. Do this under hci_dev_lock(), like the
-command completions that change these flags, and before replying, so
-that a client acting on the reply sees the new state. Only cancel the
-LE scan timeout once the scan is disabled, so that the discovery still
-ends on its own, except when suspending, where it is still cancelled
-first.
+Keep the connection rate parameters, which the event reports, in sync
+when an LE connection is established and after each LE Connection
+Update, with the interval converted to units of 0.125 ms, and send the
+event then. As these do not report subrating, keep the subrate factor
+and continuation number of the last connection rate change, or 1 and 0
+if there was none. Load Connection Subrate then also compares new
+parameters against the current ones rather than those of the last
+connection rate change, and a failed connection rate change reports
+the current parameters.
 
-A timed out LE Set Scan Enable can still complete afterwards, which
-cancels the timeout as well, so also stop the discovery when its scan
-is disabled while the timeout is pending, or while the timeout work
-waits for the lock.
-
-Fixes: 0e05bba6f6f8 ("Bluetooth: Update stop_discovery to use HCI request")
 Assisted-by: Claude:claude-opus-5.5
 Signed-off-by: Kevin Dewald <kevin@simpleble.org>
 ---
-Changes in v5:
-- Only change the state while the discovery is still stopping, so that
-  a failed stop does not overwrite a new Start Discovery (Sashiko).
-- Change the state before replying, so that a client acting on the
-  reply sees it (Sashiko).
-- Keep cancelling the LE scan timeout first when suspending, so that it
-  does not run while suspended (Sashiko).
+Changes in v2:
+- Keep the connection rate parameters in sync and send the event with
+  mgmt_conn_subrate_notify() instead of a new function (Sashiko).
 - Rebase on bluetooth-next 42b8c2d729.
-- v4: https://lore.kernel.org/linux-bluetooth/20261030042437.42733-1-kevin@simpleble.org/
+- v1: https://lore.kernel.org/linux-bluetooth/20261030144106.75414-1-kevin@simpleble.org/
 
-Changes in v4:
-- Only go back to DISCOVERY_FINDING while the discovery is still
-  stopping, and not for the passive scan (Sashiko).
-- Check the flags and change the state under hci_dev_lock() (Sashiko).
-- Also stop the discovery in le_scan_disable() when the scan was
-  disabled while it waited for the lock (Sashiko).
-- Rebase on bluetooth-next 1081a6ef8f.
-- v3: https://lore.kernel.org/linux-bluetooth/20261027210057.44347-1-kevin@simpleble.org/
+bluetoothd already registers the Connection Subrate event, and only logs
+it for now. Once this is merged, I'll send the BlueZ side: it exposes
+the parameters as properties of org.bluez.Bearer.LE1 (Interval, Latency,
+SupervisionTimeout and Subrate), and documents the new cases of the
+event in doc/mgmt-protocol.rst.
 
-Changes in v3:
-- Go back to DISCOVERY_FINDING instead of DISCOVERY_STOPPED when
-  stopping failed while the inquiry or the LE scan is still running.
-- Keep the LE scan timeout until the scan is disabled, so that the
-  discovery still ends on its own.
-- Stop the discovery when a timed out LE Set Scan Enable completes
-  afterwards, as that cancels the timeout too.
-- v2: https://lore.kernel.org/linux-bluetooth/20261027172730.86568-1-kevin@simpleble.org/
+I reused the Connection Subrate event since it already carries the
+interval, latency and supervision timeout. If you would rather keep it
+for the connection rate procedure, I can add a separate event instead.
 
-I did not find an error status that shows by itself that the scan
-already stopped: the kernel only disables the scan while HCI_LE_SCAN is
-set, and hci_cc_inquiry_cancel() already turns Command Disallowed after
-the inquiry completed into success. So this checks HCI_INQUIRY and
-HCI_LE_SCAN instead, which are only cleared once the controller
-confirms. Going back to DISCOVERY_FINDING sends Discovering (enabled)
-again.
+As the rate parameters now follow the connection, Load Connection
+Subrate no longer requests a connection rate change for a connected
+device whose current parameters already match the new ones. Before, it
+did so until the first connection rate change.
 
-Changing the state before replying also sends Discovering (disabled)
-before the reply when stopping succeeds. bluetoothd already gets that
-order when Inquiry Cancel stops a BR/EDR discovery, and its tests pass
-as before.
+Tested in test-runner with the functional tests of those BlueZ changes:
+with this patch both hosts report the parameters once connected and
+after a connection update, and without it neither does. The kernel
+testers and the HoG tests, which also use Load Connection Subrate and
+watch this event, pass as before. Only tested with the emulator.
 
-Reproduced in test-runner with a new mgmt-tester case, "Stop Discovery -
-Scan Disable Failed 1", in which the emulator answers the first LE Set
-Scan Enable (disable) with Unspecified Error: without this patch a
-second Stop Discovery is rejected and Start Discovery fails with Busy;
-with it the second Stop Discovery succeeds, and so does Start Discovery
-(3 of 3 runs). Without the second Stop Discovery, the discovery ends at
-the LE scan timeout.
+The PHY in use could be reported the same way, but the kernel does not
+know which PHY a connection starts on, so that would also need LE Read
+PHY after connecting. I left it out for now.
 
-The v3 and v4 regressions reproduce with a BR/EDR discovery while
-passive scanning for an auto-connect device, where only disabling the
-passive scan fails. With v3 the discovery is enabled again and Start
-Discovery fails with Busy (2 of 2 runs). With v4, when another socket
-starts a discovery after Inquiry Cancel and before the failure, a
-second Start Discovery right after the failed stop is accepted (3 of
-3). With this version the discovery stays stopped in the first case,
-and the second Start Discovery fails with Busy in the other (3 of 3
-each).
-
-Freezing the emulated controller while bluetoothd stops discovering
-makes LE Set Scan Enable time out and then complete just after: the
-discovery is stopped when it completes, and Start Discovery succeeds
-(3 of 3). The other kernel testers pass as before. The lock orderings,
-the reply ordering and the suspend path are only checked in the code,
-not reproduced. Only tested with the emulator, not with real
-controllers. I can send the mgmt-tester case to BlueZ if you want it.
-
-Not changed: hci_pause_discovery_sync() can still leave the discovery
-in DISCOVERY_STOPPING on suspend when stopping fails, which I have not
-reproduced. A simultaneous discovery that is stopped while it resolves
-names also goes back to DISCOVERY_FINDING rather than
-DISCOVERY_RESOLVING, so its remaining names are not resolved and the LE
-scan timeout ends it.
-
- net/bluetooth/hci_event.c | 12 +++++++++++-
- net/bluetooth/hci_sync.c  | 26 +++++++++++++++++++++++---
- net/bluetooth/mgmt.c      | 23 ++++++++++++++++++++---
- 3 files changed, 54 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_event.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d05934fef4..80679f1881 100644
+index d05934fef4..6330f2da99 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1819,6 +1819,8 @@ static void store_pending_adv_report(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 
- static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
- {
-+	bool timeout_pending;
-+
- 	hci_dev_lock(hdev);
- 
- 	switch (enable) {
-@@ -1848,10 +1850,18 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
- 		/* Cancel this timer so that we don't try to disable scanning
- 		 * when it's already disabled.
- 		 */
--		cancel_delayed_work(&hdev->le_scan_disable);
-+		timeout_pending = cancel_delayed_work(&hdev->le_scan_disable);
- 
- 		hci_dev_clear_flag(hdev, HCI_LE_SCAN);
- 
-+		/* The scan of a discovery was disabled before its timeout,
-+		 * for example by a Stop Discovery that timed out and still
-+		 * completed, so nothing else would end the discovery.
-+		 */
-+		if (timeout_pending &&
-+		    hdev->discovery.state == DISCOVERY_FINDING)
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
- 		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
- 		    hci_test_quirk(hdev, HCI_QUIRK_SIMULTANEOUS_DISCOVERY) &&
- 		    !test_bit(HCI_INQUIRY, &hdev->flags) &&
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9d829c20c3..9213e3ef9f 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -376,8 +376,18 @@ static void le_scan_disable(struct work_struct *work)
- 	bt_dev_dbg(hdev, "");
- 	hci_dev_lock(hdev);
- 
--	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
-+	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+		/* The scan of a discovery can be disabled while this work
-+		 * waits for the lock, for example by a Stop Discovery that
-+		 * timed out and still completed, so end the discovery as
-+		 * le_set_scan_enable_complete() does when it cancels this
-+		 * work.
-+		 */
-+		if (hdev->discovery.state == DISCOVERY_FINDING)
-+			goto discov_stopped;
-+
- 		goto _return;
-+	}
- 
- 	status = hci_cmd_sync_queue(hdev, scan_disable_sync, NULL, NULL);
- 	if (status) {
-@@ -5920,11 +5930,15 @@ int hci_stop_discovery_sync(struct hci_dev *hdev)
- 		}
- 
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
--			cancel_delayed_work(&hdev->le_scan_disable);
--
- 			err = hci_scan_disable_sync(hdev);
- 			if (err)
- 				return err;
-+
-+			/* Only cancel the LE scan timeout once the scan is
-+			 * disabled, so that the discovery still ends if
-+			 * stopping it failed.
-+			 */
-+			cancel_delayed_work(&hdev->le_scan_disable);
- 		}
- 
- 	} else {
-@@ -6559,6 +6573,12 @@ static int hci_pause_discovery_sync(struct hci_dev *hdev)
- 		return 0;
- 
- 	hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-+
-+	/* Cancel the LE scan timeout first, so that it does not run while
-+	 * suspended if the scan cannot be disabled.
-+	 */
-+	cancel_delayed_work(&hdev->le_scan_disable);
-+
- 	err = hci_stop_discovery_sync(hdev);
- 	if (err)
- 		return err;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index cf5256f4a8..260ef2a457 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6318,12 +6318,29 @@ static void stop_discovery_complete(struct hci_dev *hdev, void *data, int err)
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	hci_dev_lock(hdev);
-+
-+	/* Change the state before replying, so that a client acting on the
-+	 * reply sees it, and only while the discovery is still stopping, as
-+	 * Inquiry Cancel may already have stopped it and a new Start Discovery
-+	 * may have followed. Go back to DISCOVERY_FINDING when stopping failed
-+	 * while the inquiry or the active LE scan of the discovery is still
-+	 * running, so that it can be stopped again.
-+	 */
-+	if (hdev->discovery.state == DISCOVERY_STOPPING) {
-+		if (err && (test_bit(HCI_INQUIRY, &hdev->flags) ||
-+			    (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
-+			     hdev->le_scan_type == LE_SCAN_ACTIVE)))
-+			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-+		else
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
- 	mgmt_cmd_complete(cmd->sk, cmd->hdev->id, cmd->opcode, mgmt_status(err),
- 			  cmd->param, 1);
- 	mgmt_pending_free(cmd);
--
--	if (!err)
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+@@ -5886,6 +5886,26 @@ static void le_conn_update_addr(struct hci_conn *conn, bdaddr_t *bdaddr,
+ 	}
  }
  
- static int stop_discovery_sync(struct hci_dev *hdev, void *data)
++/* Keep the connection rate parameters, which the Connection Subrate event
++ * reports, in sync with the connection parameters and send the event. LE
++ * Connection Complete and LE Connection Update Complete don't report
++ * subrating, so keep the subrate factor and continuation number of the last
++ * connection rate change, if any.
++ */
++static void le_conn_update_rate(struct hci_dev *hdev, struct hci_conn *conn)
++{
++	/* The connection interval is in units of 1.25 ms and the connection
++	 * rate interval in units of 0.125 ms.
++	 */
++	conn->le_rate_interval = conn->le_conn_interval * 10;
++	conn->le_rate_latency = conn->le_conn_latency;
++	conn->le_rate_supv_timeout = conn->le_supv_timeout;
++	if (!conn->le_subrate)
++		conn->le_subrate = 1;
++
++	mgmt_conn_subrate_notify(hdev, conn, 0x00);
++}
++
+ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 				 bdaddr_t *bdaddr, u8 bdaddr_type,
+ 				 bdaddr_t *local_rpa, u8 role, u16 handle,
+@@ -6032,6 +6052,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 	conn->le_conn_interval = interval;
+ 	conn->le_conn_latency = latency;
+ 	conn->le_supv_timeout = supervision_timeout;
++	le_conn_update_rate(hdev, conn);
+ 
+ 	hci_debugfs_create_conn(conn);
+ 	hci_conn_add_sysfs(conn);
+@@ -6296,6 +6317,7 @@ static void hci_le_conn_update_complete_evt(struct hci_dev *hdev, void *data,
+ 		conn->le_conn_interval = le16_to_cpu(ev->interval);
+ 		conn->le_conn_latency = le16_to_cpu(ev->latency);
+ 		conn->le_supv_timeout = le16_to_cpu(ev->supervision_timeout);
++		le_conn_update_rate(hdev, conn);
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
 
 base-commit: 42b8c2d729268a65a2d98064e8dc59ff53646b14
 -- 
