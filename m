@@ -1,74 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793637889;
-	b=XiTsApL4LdVUK6KuFzenSYWNMvFDHIC3QOV3pN6DnKU9HSSgHsSWPOpcxLD9r+boISNx
-	 Z5RKGnlgYT3XZDR+quIkNTsaNPXVL30tfiYZqwxPtyY4AQbhVoXQ4jHfZnUWZglJNt2Mo
-	 2GMCB+hlx4Bi1F04+3KLaLFmhbqJJ68DP+9q5WeveVa7Tbd4FQGnxVbRxYID6r1c+L0bp
-	 xg7woHTuDrjwHnuM7u2awMBs+PzG1qLi84oR/Ix5C7SGyOyRQMxPsRZgaIvynFc/oBZf2
-	 kyHvd3MU+zQokTQQllTFodtu3x/hwBcZTRaPQrH15IUkzKaeB5hMCMHHSyr4LtCxCLw==
+	t=1793637890;
+	b=YFrEfqK03Btt0DYaaI6Ka3QXubkV+fxAJdgCVJrT3j3zHVKAVx5gCWP7hKRZ7+ZkNLaP
+	 re6ogOGDMqqmHgC9gG6kTzkOI7smo60+X/Qyk3M98jTnmtgsh95/m4wvQpWOl9BkpRPbH
+	 Uv5tmZ5yKTyLrpSU+uCIT+6BCq8Ky3KsmIzajj3gZL7o5DtbROnUi77gExCPes9iuZWda
+	 ad26gO9qBU+FN6HAR6woEst8glSv8LgxDq/1oX5EuODuqtJBSQjAaHsFKQkMsBpZ/PPYa
+	 +7VkurlRS6eLdroFBMHXzXXchN+xJRPoKjH3LJfUcOo4zD1UzSn2Zs4zMkRlEGTZ31Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793637889;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793637890;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=lh48TWHcmEyeTfNRmkhhDPQTDd2qCcS37CrY5kwVtNg=;
-	b=tnW9ypMhX0xedAoB11mTNrmFqw11kt7OnznRJO8qndITV29ePfAAS2TDBGIwhDEbCd4l
-	 ofv/z44zhlVrvI31SxBIAU82TZj8ypfRCN9CQ7uCIpveZgP51KKhuHsGfcg1WzQezqXVp
-	 WrIgo3QptZ+msYWmBX6Cqu5FUSJEb8PeGV/mcW19N9lBdtKmHcPxi8eBf51Fm1qvxJXCX
-	 hr190m7N53hV9iXPn42EjaWvhAATC9JsoURGzheqoaNNcQ9IJITPiIwahp/azjYLTyInc
-	 zNELcJ2i4lLihPGYMLOCzHXgPSYqCvemph8Rs07Jzr8ggai8BILqpd0OKAgpX+YOk8g==
+	bh=CNlv/37orV34xZY606mud5ZlXbiKaqVPM6whW9QrYw8=;
+	b=t1LcgTGz1Dz5u/70pWrAJ2togS6h2bGoPBKzKS4ktFtQwHEPdAEjV5euSMB0Clxyemw0
+	 H4ItbLhxLvlyhapwghbpJ7BmcpD2xpGdDqK//IGS/Y+2L+t/VMWoRPMi0r0HbKtEE/kLZ
+	 MLET9JOhCDYEsOoXBoBf8PAWhpQfQxF3IOZuz7h7TKdDFtls4nXyYuKxcA7GOE9a6B6sF
+	 nI9mqPv9lZV4lfYzST/lbQ7LcXOq+UhdBVcueP99vDTB1iXmAjk3qg+6vybHXYM+Ao6Ah
+	 oJikW+jrO0ABSC0sz4oZYHU3o6hZediS6n1AbcyAeU5QdVQTYucZNf7U22YX26hlr2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=RzkNSdB2;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="jMt/dnLF";
 	arc=none smtp.remote-ip=198.175.65.14
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE363606B1D3
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 16:44:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE363606B1D3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DA5606BA56
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 16:44:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76DA5606BA56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=RzkNSdB2
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jMt/dnLF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793637887; x=1825173887;
+  t=1793637888; x=1825173888;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qYBP+CXP9vlm8sYBbCcbgmlfciE4nASBuq+N0A4Esbs=;
-  b=RzkNSdB2AiSAdA6/4B3+P/TwG8mfVmWJHRG6xtVu2V5UHohePKrlj+Kc
-   kG1tM7KPPBnqGDmt9RO8w02GtJJFiKZel8qWCgq8ec4T/V0L9zLzu9OtS
-   MWXrdspmbT4fIRuvLzrBEyk7mW68Y688gN6ZIsIYY2FqTrzciVamZaHuM
-   vcH4PKWGtnHv6pl0bu6HJHJ4XC5X8yB+np2g1/o4WnAQMnmU8jDkmNesu
-   LzZ0PG7Uy4IRB/+cHHqyTsw5DmzZLDZvaiI6BfyhQl8zIi8ZhuANNGiUO
-   ZbuChNOTcutXtYM/Dno3weuf88paHESc3QFxuv3d7azOzkSIvDvOKTTm1
-   w==;
-X-CSE-ConnectionGUID: W1jj1ZMTSh6AjnPfM/RkfQ==
-X-CSE-MsgGUID: nOVN6YS8RKKs3xBxgjcu8g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2221964"
+  bh=eiYhQP+CZztRwOkFRGFl9NjLauF1A/HY/Pn/ISm1h0s=;
+  b=jMt/dnLFlx8VtGDu1kZHbIpFgFnP+nC0DBLj8G7hfhQVrjE127VUk9km
+   oiTMETqIRSFazGWiQV7Agx5D3lzLV99mUarzjcYXqEr4KWxxTtsW0JKte
+   zH/OXnYKmewMj8nvtyTy8u5tEP4cE1UvYpL1bxPVW+Hp+kqroTo9uPclm
+   0qLl3KyE4VAxpJTy3TKhCi5Nlotbv9CTE6RhEEix65b4yft524Mbg8buZ
+   ueKXcIYkmOSHfnLO37VhbQTojFz5NrJ9aYBfzuyIaGLpdAXx3aEFnNXuH
+   T/Kv86TkNw6TWKLKpqm7uQXp/5OP/kgZUBZHsMgeL0cVXAxHoYjTbOqj9
+   Q==;
+X-CSE-ConnectionGUID: yTyLYHvbTs2aMGD8jrU1Bg==
+X-CSE-MsgGUID: h43mVnjkS8WcYRdCqvg6wQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2221969"
 X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
-   d="scan'208";a="2221964"
+   d="scan'208";a="2221969"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2026 08:44:46 -0800
-X-CSE-ConnectionGUID: NK1BKZu1R1ylvvooEuewfQ==
-X-CSE-MsgGUID: sEX6NHHfRMCUNZ5I7qUZCg==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2026 08:44:48 -0800
+X-CSE-ConnectionGUID: jPHKI67mQRKjwcZOLXyK7w==
+X-CSE-MsgGUID: PGNZOn8DRCObZUiIUD+o/g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,191,1787036400"; 
-   d="scan'208";a="6329062"
+   d="scan'208";a="6329071"
 Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa002.fm.intel.com with ESMTP; 02 Nov 2026 08:44:44 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 02 Nov 2026 08:44:46 -0800
 From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: kiran.k@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v2 1/2] Bluetooth: btintel_pcie: Move debug INI parsing to debug file
-Date: Mon,  2 Nov 2026 22:06:12 +0530
-Message-ID: <20261102163613.2524534-2-aluvala.sai.teja@intel.com>
+Subject: [PATCH v2 2/2] Bluetooth: btintel_pcie: Add fatal error injection test mode
+Date: Mon,  2 Nov 2026 22:06:13 +0530
+Message-ID: <20261102163613.2524534-3-aluvala.sai.teja@intel.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261102163613.2524534-1-aluvala.sai.teja@intel.com>
 References: <20261102163613.2524534-1-aluvala.sai.teja@intel.com>
@@ -83,347 +83,374 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the debug INI parser from btintel_pcie.c to
-btintel_pcie_debug.c so that all debug INI handling lives in one
-file. DBG_PATH, ENABLE_INI and LOG_MASK behave as before.
+Add the FATAL_ERR_TESTMODE debug INI option to inject a firmware
+exception for testing. The INI value selects the exception type and the
+injection context (thread, IRQ or rfkill). Whether an injected
+exception is expected to trigger recovery depends on its type.
+
+The test mode is disabled when the OPFW API lock is set, unless the
+unlocker firmware was loaded.
 
 Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
 ---
- drivers/bluetooth/btintel_pcie.c       | 122 ---------------------
- drivers/bluetooth/btintel_pcie_debug.c | 142 ++++++++++++++++++++++++-
- drivers/bluetooth/btintel_pcie_debug.h |   8 +-
- 3 files changed, 146 insertions(+), 126 deletions(-)
+ drivers/bluetooth/btintel.c            |   5 +-
+ drivers/bluetooth/btintel.h            |   1 +
+ drivers/bluetooth/btintel_pcie.c       |  30 +++++
+ drivers/bluetooth/btintel_pcie.h       |   5 +-
+ drivers/bluetooth/btintel_pcie_debug.c | 149 ++++++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie_debug.h |  25 +++++
+ 6 files changed, 212 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 7d84c8106cf1..8b991ad2a107 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -274,128 +274,6 @@ static inline bool btintel_pcie_dbg_to_wifi(struct btintel_pcie_data *data)
- 	return data->dbg_path_cache != BTINTEL_PCIE_DRAM;
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index b9bb6980bada..a0aa110f4cdd 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -3579,8 +3579,11 @@ static int btintel_try_load_unlocker(struct hci_dev *hdev,
+ 	if (err) {
+ 		bt_dev_err(hdev, "Failed to load intel/unlocker.sfi (%d)", err);
+ 		data->unlocker = false;
++		return err;
+ 	}
+-	return err;
++
++	btintel_set_flag(hdev, INTEL_UNLOCKER_LOADED);
++	return 0;
  }
  
--/* Name of the optional INI file used to override the default dbg_path
-- * (data->dbg_path_cache), yoyo ini settings and runtime log_mask.
-- */
--#define BTINTEL_PCIE_DBG_INI_FILE "ibt_bt_dbg_cfg.ini"
--
--/* Loads optional "DBG_PATH=<value>", "ENABLE_INI=<value>" and "LOG_MASK=<value>"
-- * overrides from BTINTEL_PCIE_DBG_INI_FILE
-- * and applies them to data->dbg_path_cache, data->enable_ini and data->log_mask.
-- *
-- * DBG_PATH accepts BTINTEL_PCIE_WIFI_DBGC (0x06, default) and
-- * BTINTEL_PCIE_DRAM (0x01, legacy); an invalid or missing entry leaves
-- * the cached value set by the caller unchanged.
-- *
-- * ENABLE_INI accepts 1 (enabled) or 0 (disabled); an invalid or missing
-- * entry leaves data->enable_ini unchanged.
-- *
-- * LOG_MASK accepts any u32 bitmask (see BTINTEL_PCIE_DUMP_TX and friends).
-- * The default enables alive interrupt and Sx logging; an invalid or missing
-- * entry leaves data->log_mask unchanged.
-- */
--static void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
--{
--	const struct firmware *fw;
--	const char *ini_file = BTINTEL_PCIE_DBG_INI_FILE;
--	char *buf, *cursor, *line;
--	bool dbg_path_applied = false;
--	bool log_mask_applied = false;
--	int err;
--
--	err = request_firmware_direct(&fw, ini_file, &data->pdev->dev);
--	if (err < 0) {
--		BT_DBG("%s not found (%d), using dbg_path=0x%02x log_mask=0x%08x",
--		       ini_file, err, data->dbg_path_cache, data->log_mask);
--		if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
--			data->enable_ini = false;
--		return;
--	}
--
--	buf = kmemdup_nul(fw->data, fw->size, GFP_KERNEL);
--	release_firmware(fw);
--	if (!buf)
--		return;
--
--	cursor = buf;
--	while ((line = strsep(&cursor, "\n"))) {
--		char *eq;
--		char *val;
--		uint parsed;
--
--		line = strim(line);
--		if (!line[0] || line[0] == '#' || line[0] == ';')
--			continue;
--
--		eq = strchr(line, '=');
--		if (!eq)
--			continue;
--
--		*eq = '\0';
--		line = strim(line);
--		val = strim(eq + 1);
--
--		/* Keys are case-insensitive. */
--		if (!strcasecmp(line, "DBG_PATH")) {
--			BT_INFO("Read DBG_PATH from %s: '%s'", ini_file, val);
--
--			/* base 0 lets kstrtouint accept "0x06", "6", etc. */
--			if (kstrtouint(val, 0, &parsed) == 0 &&
--			    (parsed == BTINTEL_PCIE_DRAM ||
--			     parsed == BTINTEL_PCIE_WIFI_DBGC)) {
--				data->dbg_path_cache = parsed;
--				dbg_path_applied = true;
--				BT_INFO("WRT dbg_path accepted: 0x%02x",
--					data->dbg_path_cache);
--			} else {
--				BT_WARN("Invalid DBG_PATH='%s' in %s, using dbg_path=0x%02x",
--					val, ini_file, data->dbg_path_cache);
--			}
--		} else if (!strcasecmp(line, "LOG_MASK")) {
--			BT_INFO("Read LOG_MASK from %s: '%s'", ini_file, val);
--
--			if (kstrtouint(val, 0, &parsed) == 0) {
--				data->log_mask = parsed;
--				log_mask_applied = true;
--				BT_INFO("WRT log_mask accepted: 0x%08x",
--					data->log_mask);
--			} else {
--				BT_WARN("Invalid LOG_MASK='%s' in %s, using log_mask=0x%08x",
--					val, ini_file, data->log_mask);
--			}
--		} else if (!strcasecmp(line, "ENABLE_INI")) {
--			BT_INFO("Read ENABLE_INI from %s: '%s'", ini_file, val);
--
--			if (kstrtouint(val, 0, &parsed) == 0 &&
--			    (parsed == 0 || parsed == 1)) {
--				data->enable_ini = !!parsed;
--				BT_INFO("WRT enable_ini accepted: %u",
--					data->enable_ini);
--			} else {
--				BT_WARN("Invalid ENABLE_INI='%s' in %s, using enable_ini=%u",
--					val, ini_file, data->enable_ini);
--			}
--		}
--	}
--
--	if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
--		data->enable_ini = false;
--
--	if (dbg_path_applied)
--		BT_DBG("Loaded dbg_path=0x%02x from %s", data->dbg_path_cache, ini_file);
--	else
--		BT_WARN("No valid DBG_PATH in %s, dbg_path=0x%02x", ini_file, data->dbg_path_cache);
--
--	BT_DBG("ENABLE_INI effective state: %u", data->enable_ini);
--
--	if (log_mask_applied)
--		BT_DBG("Loaded log_mask=0x%08x from %s", data->log_mask, ini_file);
--	else
--		BT_DBG("No valid LOG_MASK in %s, log_mask=0x%08x", ini_file, data->log_mask);
--
--	kfree(buf);
--}
--
- /* Helper function to allocate and setup a debug buffer group
-  * @data: driver data structure
-  * @buf: pointer to data_buf array pointer
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index d5e125ec5168..372c6d7d8cbe 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -259,6 +259,7 @@ enum {
+ 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 	INTEL_ACPI_RESET_ACTIVE,
+ 	INTEL_WAIT_FOR_D0,
++	INTEL_UNLOCKER_LOADED,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 8b991ad2a107..23635b27bcec 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2954,6 +2954,14 @@ static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
+ 	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
+ 		return;
+ 
++	/* Intentional: with the fatal error test mode enabled, the post-setup
++	 * injection consumes this rfkill pass, so the initial rfkill check is
++	 * skipped. This avoids a second, back-to-back injection while the
++	 * recovery caused by the first one is running.
++	 */
++	if (btintel_pcie_fatal_err_post_setup_pending(data))
++		return;
++
+ 	/* Do not report an initial clear when rfkill was never asserted.
+ 	 * After resume, however, a previously asserted rfkill must be
+ 	 * cleared and reported to the HCI stack.
+@@ -2968,10 +2976,17 @@ static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
+ 		     !(ipc_ctrl & BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL);
+ 	if (set_rfkill) {
+ 		bt_dev_dbg(data->hdev, "hw rfkill on");
++		/* Fatal error test mode: inject on every rfkill assertion seen
++		 * here, including after resume, not only on a transition.
++		 */
++		if (btintel_pcie_fatal_err_handle_rfkill(data, true))
++			return;
+ 		set_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
+ 		hci_rfkill_set_hw_state(data->hdev, true);
+ 	} else {
+ 		bt_dev_dbg(data->hdev, "hw rfkill off");
++		if (btintel_pcie_fatal_err_handle_rfkill(data, false))
++			return;
+ 		/* Nothing changed at the initial post-setup check, so there
+ 		 * is no transition to report.
+ 		 */
+@@ -3921,6 +3936,12 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev,
+ 		goto exit_error;
+ 	}
+ 
++	/* ver_tlv holds the operational firmware version after setup. A
++	 * locked platform with the unlocker loaded can run the test mode.
++	 */
++	btintel_pcie_fatal_err_check_api_lock(data, ver_tlv.api_lock &&
++					      !btintel_test_flag(hdev, INTEL_UNLOCKER_LOADED));
++
+ 	data->dmp_hdr.cnvi_top = ver_tlv.cnvi_top;
+ 	data->dmp_hdr.cnvr_top = ver_tlv.cnvr_top;
+ 	data->dmp_hdr.fw_timestamp = ver_tlv.timestamp;
+@@ -3947,6 +3968,8 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
+ 	bool fips_crc_failed;
+ 
++	btintel_pcie_fatal_err_load(data);
++
+ 	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
+ 	       fw_dl_retry++ < 1) {
+ 		if (fips_crc_failed)
+@@ -3975,6 +3998,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 	}
+ 
+ 	if (!err) {
++		/* Fatal error test mode: arm the post-setup notification before
++		 * SETUP_DONE so the rfkill work cannot inject a fault ahead of
++		 * it.
++		 */
++		if (btintel_pcie_fatal_err_testmode_active(data))
++			set_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
+ 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
+ 		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
+ 		btintel_pcie_unmask_hw_rfkill(data);
+@@ -4567,6 +4596,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
+ 	data->img_resp_cache = 0x00;
+ 	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
+ 	data->log_mask = BTINTEL_PCIE_LOG_ALIVE_INTR | BTINTEL_PCIE_LOG_SX;
++	btintel_pcie_fatal_err_init(data);
+ 	data->pcie_alloc_init = false;
+ 	data->enable_ini = false;
+ 	btintel_pcie_yoyo_init(&data->yoyo);
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index f04dfb0b30fa..4bffd95b6ec6 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -172,7 +172,8 @@ enum {
+ 	BTINTEL_PCIE_SETUP_DONE,
+ 	BTINTEL_PCIE_MAIL_BOX_INTR,
+ 	BTINTEL_PCIE_MBOX_PARSE_PENDING,
+-	BTINTEL_PCIE_MBOX_PARSE_READY
++	BTINTEL_PCIE_MBOX_PARSE_READY,
++	BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING,
+ };
+ 
+ enum btintel_pcie_tlv_type {
+@@ -719,6 +720,7 @@ struct btintel_pcie_ini_dump_info {
+  * @dbg_path_cache: cached debug output routing mode (BT DRAM or WiFi DBGC)
+  * @log_mask: runtime diagnostic logging mask loaded from LOG_MASK in the
+  *	debug INI file (alive interrupt and Sx logging are enabled by default)
++ * @fatal_err: fatal-error injection testmode state
+  * @cnvi: CNVi register value
+  * @cnvr: CNVr register value
+  * @gp0_received: condition for gp0 interrupt
+@@ -775,6 +777,7 @@ struct btintel_pcie_data {
+ 	u32	dbg_path_cache;
+ 	u32	log_mask;
+ 	bool	enable_ini;
++	struct btintel_pcie_fatal_err_cfg fatal_err;
+ 	struct btintel_pcie_yoyo_ctx yoyo;
+ 
+ 	u32	cnvi;
 diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
-index 9f2d3f32bd99..f3350fc9b08a 100644
+index f3350fc9b08a..18f20b5ded1f 100644
 --- a/drivers/bluetooth/btintel_pcie_debug.c
 +++ b/drivers/bluetooth/btintel_pcie_debug.c
-@@ -1,22 +1,158 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-- * Intel Bluetooth YoYo Debug Framework
-+ * Intel Bluetooth PCIe Debug Framework
-  *
-  * Copyright (C) 2026 Intel Corporation
-  *
+@@ -7,7 +7,7 @@
   * Runtime-configurable TLV-based debug collection framework for loading and
   * parsing the optional YoYo firmware configuration used to enable debug
-- * regions, triggers, HCI commands, and configuration sets.
-+ * regions, triggers, HCI commands, and configuration sets. Also provides
-+ * debug INI configuration.
+  * regions, triggers, HCI commands, and configuration sets. Also provides
+- * debug INI configuration.
++ * debug INI configuration and fatal-error injection testmode.
   */
  
  #include <linux/errno.h>
- #include <linux/module.h>
-+#include <linux/pci.h>
-+#include <linux/slab.h>
- #include <linux/stddef.h>
+@@ -18,6 +18,7 @@
  #include <linux/string.h>
  #include <linux/unaligned.h>
  #include <net/bluetooth/bluetooth.h>
-+#include "btintel_pcie.h"
++#include <net/bluetooth/hci_core.h>
+ #include "btintel_pcie.h"
  #include "btintel_pcie_debug.h"
  
-+static char *btintel_pcie_read_debug_ini(struct btintel_pcie_data *data)
+@@ -153,6 +154,152 @@ void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
+ }
+ EXPORT_SYMBOL_GPL(btintel_pcie_load_dbg_path_from_ini);
+ 
++void btintel_pcie_fatal_err_init(struct btintel_pcie_data *data)
 +{
-+	const struct firmware *fw;
-+	char *buf;
-+	int err;
-+
-+	err = request_firmware_direct(&fw, BTINTEL_PCIE_DBG_INI_FILE,
-+				      &data->pdev->dev);
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	buf = kmemdup_nul(fw->data, fw->size, GFP_KERNEL);
-+	release_firmware(fw);
-+	if (!buf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	return buf;
++	data->fatal_err.testmode_enabled = false;
++	data->fatal_err.context = BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_THREAD;
++	data->fatal_err.type = BTINTEL_PCIE_DEBUG_EXCEPTION_FAILURE_TYPE_DEFAULT;
++	data->fatal_err.api_lock_enabled = false;
 +}
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_init);
 +
-+static char *btintel_pcie_ini_next(char **cursor, char **key)
++void btintel_pcie_fatal_err_load(struct btintel_pcie_data *data)
 +{
-+	char *line, *eq;
-+
-+	while ((line = strsep(cursor, "\n"))) {
-+		line = strim(line);
-+		if (!line[0] || line[0] == '#' || line[0] == ';')
-+			continue;
-+
-+		eq = strchr(line, '=');
-+		if (!eq)
-+			continue;
-+
-+		*eq = '\0';
-+		*key = strim(line);
-+		return strim(eq + 1);
-+	}
-+
-+	return NULL;
-+}
-+
-+/* Loads optional "DBG_PATH=<value>", "ENABLE_INI=<value>" and
-+ * "LOG_MASK=<value>" overrides from BTINTEL_PCIE_DBG_INI_FILE and applies
-+ * them to data->dbg_path_cache, data->enable_ini and data->log_mask.
-+ *
-+ * DBG_PATH accepts BTINTEL_PCIE_WIFI_DBGC (0x06, default) and
-+ * BTINTEL_PCIE_DRAM (0x01, legacy); an invalid or missing entry leaves
-+ * the cached value set by the caller unchanged.
-+ *
-+ * ENABLE_INI accepts 1 (enabled) or 0 (disabled); an invalid or missing
-+ * entry leaves data->enable_ini unchanged.
-+ *
-+ * LOG_MASK accepts any u32 bitmask (see BTINTEL_PCIE_DUMP_TX and friends).
-+ * The default enables alive interrupt and Sx logging; an invalid or missing
-+ * entry leaves data->log_mask unchanged.
-+ */
-+void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
-+{
-+	const char *ini_file = BTINTEL_PCIE_DBG_INI_FILE;
 +	char *buf, *cursor, *key, *val;
-+	bool dbg_path_applied = false;
-+	bool log_mask_applied = false;
++	u32 parsed;
 +
++	WRITE_ONCE(data->fatal_err.testmode_enabled, false);
++	clear_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
 +	buf = btintel_pcie_read_debug_ini(data);
 +	if (IS_ERR(buf)) {
-+		BT_DBG("%s not found (%ld), using dbg_path=0x%02x log_mask=0x%08x",
-+		       ini_file, PTR_ERR(buf), data->dbg_path_cache,
-+		       data->log_mask);
-+		if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
-+			data->enable_ini = false;
++		BT_DBG("%s unavailable (%ld); fatal-error testmode disabled",
++		       BTINTEL_PCIE_DBG_INI_FILE, PTR_ERR(buf));
 +		return;
 +	}
 +
 +	cursor = buf;
 +	while ((val = btintel_pcie_ini_next(&cursor, &key))) {
-+		unsigned int parsed;
++		if (strcasecmp(key, "FATAL_ERR_TESTMODE"))
++			continue;
 +
-+		if (!strcasecmp(key, "DBG_PATH")) {
-+			BT_INFO("Read DBG_PATH from %s: '%s'", ini_file, val);
-+			if (!kstrtouint(val, 0, &parsed) &&
-+			    (parsed == BTINTEL_PCIE_DRAM ||
-+			     parsed == BTINTEL_PCIE_WIFI_DBGC)) {
-+				data->dbg_path_cache = parsed;
-+				dbg_path_applied = true;
-+				BT_INFO("WRT dbg_path accepted: 0x%02x",
-+					data->dbg_path_cache);
-+			} else {
-+				BT_WARN("Invalid DBG_PATH='%s' in %s, using dbg_path=0x%02x",
-+					val, ini_file, data->dbg_path_cache);
-+			}
-+		} else if (!strcasecmp(key, "LOG_MASK")) {
-+			BT_INFO("Read LOG_MASK from %s: '%s'", ini_file, val);
-+			if (!kstrtouint(val, 0, &parsed)) {
-+				data->log_mask = parsed;
-+				log_mask_applied = true;
-+				BT_INFO("WRT log_mask accepted: 0x%08x",
-+					data->log_mask);
-+			} else {
-+				BT_WARN("Invalid LOG_MASK='%s' in %s, using log_mask=0x%08x",
-+					val, ini_file, data->log_mask);
-+			}
-+		} else if (!strcasecmp(key, "ENABLE_INI")) {
-+			BT_INFO("Read ENABLE_INI from %s: '%s'", ini_file, val);
-+			if (!kstrtouint(val, 0, &parsed) && parsed <= 1) {
-+				data->enable_ini = !!parsed;
-+				BT_INFO("WRT enable_ini accepted: %u",
-+					data->enable_ini);
-+			} else {
-+				BT_WARN("Invalid ENABLE_INI='%s' in %s, using enable_ini=%u",
-+					val, ini_file, data->enable_ini);
-+			}
++		if (kstrtou32(val, 0, &parsed) ||
++		    BTINTEL_PCIE_FATAL_ERR_ENABLE(parsed) > 1 ||
++		    BTINTEL_PCIE_FATAL_ERR_CONTEXT(parsed) >
++				BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL ||
++		    parsed >> 24) {
++			BT_ERR("Invalid FATAL_ERR_TESTMODE='%s' in %s; testmode disabled",
++			       val, BTINTEL_PCIE_DBG_INI_FILE);
++			break;
 +		}
++
++		data->fatal_err.context = BTINTEL_PCIE_FATAL_ERR_CONTEXT(parsed);
++		data->fatal_err.type = BTINTEL_PCIE_FATAL_ERR_TYPE(parsed);
++		WRITE_ONCE(data->fatal_err.testmode_enabled,
++			   BTINTEL_PCIE_FATAL_ERR_ENABLE(parsed));
++		BT_INFO("FATAL_ERR_TESTMODE accepted: 0x%08x", parsed);
++		break;
 +	}
-+
-+	if (data->dbg_path_cache != BTINTEL_PCIE_DRAM)
-+		data->enable_ini = false;
-+
-+	if (dbg_path_applied)
-+		BT_DBG("Loaded dbg_path=0x%02x from %s", data->dbg_path_cache, ini_file);
-+	else
-+		BT_WARN("No valid DBG_PATH in %s, dbg_path=0x%02x", ini_file, data->dbg_path_cache);
-+
-+	BT_DBG("ENABLE_INI effective state: %u", data->enable_ini);
-+
-+	if (log_mask_applied)
-+		BT_DBG("Loaded log_mask=0x%08x from %s", data->log_mask, ini_file);
-+	else
-+		BT_DBG("No valid LOG_MASK in %s, log_mask=0x%08x", ini_file, data->log_mask);
 +
 +	kfree(buf);
 +}
-+EXPORT_SYMBOL_GPL(btintel_pcie_load_dbg_path_from_ini);
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_load);
++
++void btintel_pcie_fatal_err_check_api_lock(struct btintel_pcie_data *data,
++					   bool api_lock)
++{
++	data->fatal_err.api_lock_enabled = api_lock;
++	if (api_lock) {
++		if (READ_ONCE(data->fatal_err.testmode_enabled))
++			bt_dev_info(data->hdev,
++				    "OPFW API lock enabled; disabling fatal-error testmode");
++		WRITE_ONCE(data->fatal_err.testmode_enabled, false);
++	} else if (READ_ONCE(data->fatal_err.testmode_enabled)) {
++		bt_dev_info(data->hdev, "fatal-error testmode active: ctx=0x%02x type=0x%02x",
++			    data->fatal_err.context, data->fatal_err.type);
++	}
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_check_api_lock);
++
++static int btintel_pcie_inject_fatal_err(struct btintel_pcie_data *data,
++					 u8 context)
++{
++	struct hci_dev *hdev = data->hdev;
++	struct sk_buff *skb;
++	u8 param[2];
++	int err = 0;
++
++	/* Setup and the rest of HCI initialization hold req_lock. Wait for
++	 * them before testing HCI_UP; a delayed worker alone is not enough.
++	 */
++	hci_req_sync_lock(hdev);
++	if (!test_bit(HCI_UP, &hdev->flags) ||
++	    hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
++		err = -ENETDOWN;
++		goto unlock;
++	}
++
++	if (!READ_ONCE(data->fatal_err.testmode_enabled))
++		goto unlock;
++
++	param[0] = data->fatal_err.type;
++	param[1] = context;
++	skb = __hci_cmd_sync(hdev, 0xfc4d, sizeof(param), param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		goto unlock;
++	}
++
++	kfree_skb(skb);
++unlock:
++	hci_req_sync_unlock(hdev);
++	if (err)
++		bt_dev_err(hdev, "fatal-error inject failed (ctx=0x%02x err=%d)",
++			   context, err);
++	return err;
++}
++
++bool btintel_pcie_fatal_err_handle_rfkill(struct btintel_pcie_data *data,
++					  bool rfkill_on)
++{
++	if (!READ_ONCE(data->fatal_err.testmode_enabled))
++		return false;
++
++	if (rfkill_on)
++		btintel_pcie_inject_fatal_err(data, data->fatal_err.context);
++	else
++		bt_dev_info(data->hdev, "fatal-error testmode active: ignoring RF-KILL OFF");
++
++	return true;
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_handle_rfkill);
++
++bool btintel_pcie_fatal_err_post_setup_pending(struct btintel_pcie_data *data)
++{
++	int err;
++
++	if (!test_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags))
++		return false;
++
++	/* Intentional: RFKILL context tells the controller testmode is enabled */
++	err = btintel_pcie_inject_fatal_err(data,
++					    BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL);
++	/* HCI is down: keep the notification pending for a later pass and let
++	 * the normal rfkill handling run.
++	 */
++	if (err == -ENETDOWN)
++		return false;
++
++	clear_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
++	return true;
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_post_setup_pending);
++
++bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data)
++{
++	return READ_ONCE(data->fatal_err.testmode_enabled);
++}
++EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_testmode_active);
 +
  /* TLV-specific parser DEBUG_INFO TLV type */
  static int btintel_pcie_yoyo_parse_dbg_info(struct btintel_pcie_yoyo_ctx *ctx,
  					    const struct btintel_pcie_tlv_dbg_info *info,
-@@ -327,5 +463,5 @@ btintel_pcie_yoyo_get_buf_alloc(struct btintel_pcie_yoyo_ctx *ctx, u32 alloc_id)
- }
- EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_get_buf_alloc);
- 
--MODULE_DESCRIPTION("Intel Bluetooth yoyo debug framework");
-+MODULE_DESCRIPTION("Intel Bluetooth PCIe Debug Framework");
- MODULE_LICENSE("GPL");
 diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
-index 5ed368fb13d1..04cfcef6f65b 100644
+index 04cfcef6f65b..97f514533449 100644
 --- a/drivers/bluetooth/btintel_pcie_debug.h
 +++ b/drivers/bluetooth/btintel_pcie_debug.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
- /*
-- * Intel Bluetooth YoYo Debug Framework
-+ * Intel Bluetooth PCIe Debug Framework
-  *
-  * Copyright (C) 2026 Intel Corporation
-  *
-@@ -14,6 +14,12 @@
- #include <linux/device.h>
- #include <linux/firmware.h>
+@@ -18,7 +18,32 @@ struct btintel_pcie_data;
  
-+struct btintel_pcie_data;
+ #define BTINTEL_PCIE_DBG_INI_FILE	"ibt_bt_dbg_cfg.ini"
+ 
++/* FATAL_ERR_TESTMODE: B0 enable, B1 context, B2 type, B3 reserved. */
++#define BTINTEL_PCIE_FATAL_ERR_ENABLE(v)	((u8)((v) & 0xff))
++#define BTINTEL_PCIE_FATAL_ERR_CONTEXT(v)	((u8)(((v) >> 8) & 0xff))
++#define BTINTEL_PCIE_FATAL_ERR_TYPE(v)	((u8)(((v) >> 16) & 0xff))
 +
-+#define BTINTEL_PCIE_DBG_INI_FILE	"ibt_bt_dbg_cfg.ini"
++#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_THREAD	0x00
++#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_IRQ		0x01
++#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL	0x02
++#define BTINTEL_PCIE_DEBUG_EXCEPTION_FAILURE_TYPE_DEFAULT	0x00
 +
-+void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data);
++struct btintel_pcie_fatal_err_cfg {
++	bool	testmode_enabled;
++	u8	context;
++	u8	type;
++	bool	api_lock_enabled;
++};
 +
+ void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data);
++void btintel_pcie_fatal_err_init(struct btintel_pcie_data *data);
++void btintel_pcie_fatal_err_load(struct btintel_pcie_data *data);
++void btintel_pcie_fatal_err_check_api_lock(struct btintel_pcie_data *data,
++					   bool api_lock);
++bool btintel_pcie_fatal_err_handle_rfkill(struct btintel_pcie_data *data,
++					  bool rfkill_on);
++bool btintel_pcie_fatal_err_post_setup_pending(struct btintel_pcie_data *data);
++bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data);
+ 
  /* External YoYo binary file */
  #define BTINTEL_PCIE_YOYO_FW_NAME	"intel/ibt_debug_yoyo.bin"
- 
 -- 
 2.53.0
 
