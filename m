@@ -1,89 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793656501;
-	b=Q5uxoE5YSNJAREX9AJoGXu4FQDQlTOP3Lsw8xSHL6rTEawj1BGrk+LbU3EaZDrpQ4cbp
-	 UK0npPzYFVha9zVvC/qX7Ji0fQPD89j84LstNBsLWG95uW6xyKSVSxNwuTbE2x6CV/LW7
-	 62/L3XS/vQ1v6FWBVZq5cJHUuBOZUmhqW9mgIgZ7YDncDJjO+VdE4JcF1b9F/Ez6b7url
-	 L0pm0aFcdGhbVbyqnU/YTuX27/3mdsxsdEsA/h4oohYrDWwe9l7B/ox8wXi2G24L2AVov
-	 wRKpHribqNSXr8GyNJyV8WPOXxOMYQ04C/PLjhrboomHniYOJ0OA/xP4M207UN1+3rw==
+	t=1793656502;
+	b=G+Q3QZnw3sOuGFjdQdhUvoZrBcuUiNf9q65uQ8P/XzYWblfLU55pNmq3jV2eg0b9CTVP
+	 lOAwE7Ejooi/2WI0UdtMaookzEMf16KoC3AnnaJq4Kaho3WFWPZYadHlITg/sIg25K/4l
+	 aK9a2wsr6asGradM76MGdLs3d7IaNA6mbOYAIFbtgvr2fH2qBCOz2HdX3MdC8hOdngu6b
+	 5WM4Evd1YnD2BSSqo+krWf+CO65LsQwYyXxuHkQUfA8j43aJz1g3ghM3kfAlHnj4pVI42
+	 JMtSDDBeHD4RpcUXsIu8Qngx20QGQzACKaDiB8oh/rS3+tSZO9HXz5nYOYT2kVqXrtA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793656501;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793656502;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=g+UsAn/ald9LdimUJXag7AX4efSpc/9TAbioHt+NEho=;
-	b=QGWQsWEvfaewtg1ThiQ6f1QrORSzkPV0gcozgiVRFqolMoYmfNGfj2+8j9AOT93i7Wn1
-	 oi5ALF4Hgcwcx0aoHlnkbvYUm2BzDnS/BjOOcNNuGJe3N5X3jJWy297xsjBRCSB9NOo0i
-	 CPrfBIP1JxcpvkKLnTQFcf4Z2Y6sz6ScFEVHW8IiciOwN5bw+59my+Sl0KuqMLA/2PmeC
-	 S3ztJ9cZdXRW71EAMVIhrPvQlnXzzCh2kj151O2n8L6UZ8nJA2YohFseu5Ic+aYWGyF7c
-	 wMTpostZ6yvYQ+/BIos0Mrtj6UsDRU/VJvBMwiqIhXIuTsZn1GIZ1fEsl8u74nskErQ==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=O6pHjPpZY/l835OWAdG1AgRWZfTphM41zQrpHIxuEAk=;
+	b=YKVloiu6X75F22iGqmMFTSZFN0CEXBcpvacZ/01RlTC8F0if7qqBKVazL8Zj6Sza0d3Q
+	 HaiwvJ07s37SPK1SkdR5TXokwJZc37BTtLzDKKJfB8E8k8Cwuc64GVm3Kr/I6F3UGRE3t
+	 97zWXznnIbnwRFYpY4/GrNblmdHhqTlBKsDt3Py39xb8ZQ+DJu8bz+AiHiPBACuILZLw7
+	 bYB0q/PDJeIxUv+LSFIQLvSa3fl5C6EHeiBDNexQRF7CfYQqR6AxJ9k0EWQPowAIuHCiG
+	 xZmUAhMVv4Ser3v4xjZgVNUvao72p01vIUGEGL3E6c20LEGnc0/zGej5cTUqde8Ftzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rXs6z+qa;
-	arc=none smtp.remote-ip=209.85.217.54
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nTuDfxRA;
+	arc=none smtp.remote-ip=209.85.222.43
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ECE606A324
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 21:55:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39ECE606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63703606A32E
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 21:55:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63703606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rXs6z+qa
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-7ccb2ffe333so2159201137.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 13:55:01 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nTuDfxRA
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-9906a5410f5so83796241.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 13:55:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793656500; x=1794261300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=g+UsAn/ald9LdimUJXag7AX4efSpc/9TAbioHt+NEho=;
-        b=rXs6z+qaaR6ltWn+f9UvNfdQyniRiD4GcEyT52y1j6KnjdA+vUnwiRJqzh2yGweeZN
-         vUZxmrFyyjBXw6WiTUH98aBJp5ADmuFY49dTnTi5f2ThRRpPV0HxIEKwk8y2CAFhUjWt
-         vLvpuI5UODTrQoOtedTp1O6SDYr6n0cC6vyy1cwiFnmPZ56aHDKZv2Ps1XN0QP5pE+Hz
-         eUv0ruagpPPz2KtRIwqvPkJRlpmahtwzI5V0mnPZBT7lszUduQ0nyv0vaLZLPUTfv9pH
-         DLdgFiHii4P5AsDNNX9aHh6ubPEeAOWJGj1RkKiQuTqy4n2Tzzn/wAgXPSQpPfWaVklb
-         K4Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793656500; x=1794261300;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20260707; t=1793656501; x=1794261301; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=g+UsAn/ald9LdimUJXag7AX4efSpc/9TAbioHt+NEho=;
-        b=Bo80h8nEjW9hQKndaJOkwAc9a0BPYOK9NwKFPBkhGTTOVKeXgD9+Xb+0EenQPYg1Me
-         HV5ZOAS42LWlZGw4wuh8sSMgtXH88hZAPmDchM9BLODb+MhHujxb7Bbe2PCVUo5MvdGx
-         C6hgA/prp2ViqFKE3Q4ILCaZqIuzgclB7KWFkuGm032q/cCbXTziDTws0cSyKpO576ns
-         Z2sssjubcJa6E98VMejGcabHlvzDtlG0I4xM34mgezFB5/Lcv0vCulbNczTHl/mzzXJ9
-         tA1K5kYFPv0aVEZYlXHtuM2LPCzqE42CQl14NrvTJithafVrK1Mr5OQpluTXlJ0db7OM
-         gcDA==
-X-Gm-Message-State: APuU4Z9LZHPkRh2MLZrEWhEP1UPjyTzBgr00C24F/ArgZ75ILG8MR3fN
-	Bqd721D7cbt6E805pta5J8jTQBAFuSCLCDUKQ0agrKxGwxFwJxhM3uA9aCZVo/zV
-X-Gm-Gg: AYBFou3ssO72Q9kVnnzcvN2J4e51ao1Fal8M1pnL3S7UBc+de98+7z0fiju4W6H2qY+
-	pg1vO4yGoFTcnJBQJC/TGpsoXb/zhKPc5VC8vZN8AGdkaMwWJQxUalLcUrXjcSDErKBXPNtJC/3
-	AagswjwD3xEaAfhjc9RbVSy05JJx4SRsHwYPnCgpY2oW9MSHfuzhrGD/c8Moa0+Tv3BuqKkKRap
-	oN2NJO2Eq8aUFSbo6RELb0LZyjmFnBwLGTca1HEDrYqZ69xJ3vuFS8BsqEaiGl9yag5suJUr278
-	/BIe22JaJH8ilIRRt2Hz4J5D/KcpGvKkEoBk0oWaGBEJ8URN3ikFjCluzBFuZcCkK979ZQfL89K
-	lzmWwpStia1KQVN2fGp/aldhO1FsELInYRCq1V1V+d0gVjy+tYZtjRBRNb2xOZ+gS1Jn2P52h3n
-	asMromV4+n0LGTKZk0Xlg5tSWM9+I3nsux00Htw6vgMscve5IbZ6CbL9L4a/ygKGdrQKop9gI18
-	P44rOH6520t5RxYjskmkU5h4gJxqnyuhM2kpF6t3KYSiezg//g8GPH14KwLwcB+8pcOuQmKIvNV
-	Y6+cfNPGelcwaqGbkMa0YUDLoUDIx9r8EnDxBEt7u/PZPSWlY7BKWWAs5QU3YI80ubLIzPKHUvK
-	iKZHQAe0pBG6VTplgT6B6NiKB0FoZKczXgTROXcsv7n6CssWZak20zLN7mCHXxDqUUCSoffSqhP
-	xjm8Q+uDwnmJqfCNHuf3bTQXp0
-X-Received: by 2002:a05:6102:a4f:b0:7cc:94e0:ad23 with SMTP id ada2fe7eead31-7d072d4a990mr4993602137.31.1793656500132;
-        Mon, 02 Nov 2026 13:55:00 -0800 (PST)
+        bh=O6pHjPpZY/l835OWAdG1AgRWZfTphM41zQrpHIxuEAk=;
+        b=nTuDfxRAU9Ru8pDeZFdAj1PcQLokU7V/iT331VXo3ZHteVzMVPvP0LRUNWAeAfktce
+         ztNOdGmIAdqqzWqVaMLxn94XUJuFykJYjhdUn/MuGOwhyN/o5D/pFrrGVB+sExGEMgBh
+         F+i/cWLBFhfN9dIcNRS5zl7dEsacRQc4N+O3B7tQIbwVu+4N2pYjGyfPN422GmWvlPHx
+         gus5/gaMQo7OUV0OziKF1SLibtqRcBQb8a2QBIw0ZNDONYrPtkjZAy3Wi2BnhSe1zX3G
+         WS0s2cH3VdBcQhvOYhlTKnkfIm7KadwgzGPU7zmI2h/W1VBn3aeOrgT58BVoyLGtJVTV
+         TFAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793656501; x=1794261301;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=O6pHjPpZY/l835OWAdG1AgRWZfTphM41zQrpHIxuEAk=;
+        b=GlnVcrquvW7KfWyaxeWDnCVIg6WMsv2IPJdRWMqN6LkoZekR9pzz+lIDL43GEn4icD
+         BzVo/LXXxALnWrWtSaJItqRv+jVb/whHDG5tG1gnPmFvlbtH3ZOPECM9rMHQLZlyWlrP
+         l8xz2xF9GUJMhidP0SE/DzEEsjMGKHbonvwSOTAKaWmyVrWTn0A3oT4PE+jjk87JGQc7
+         JP5iRRGk1lXMHdCBcU7tnp3uMr+UG2gq/vH/IuBRh/5rtF1YhKGhSVzYqlE3oIA4vBAG
+         2Vii+SahVwVYTi/gr26VcMO586iJZd70XHk8epXz0MYAXS96AlWfErcQ1wdGLz0Mgw/c
+         EIMQ==
+X-Gm-Message-State: APuU4Z/y5P7r57PE09XNrysDtSyoby8pXxIOyH5hTO0jJgdZqhmc0I2Q
+	pPtMi0OAY/ND8MAaBaYEm1fUpaWaujCn8TZnQwrv1cyB7nzMGhFuvFaDa3gJdCTV
+X-Gm-Gg: AYBFou26G9HbNClfKePzstmrMlpp1dy9g4DcPyBO1ewZ+lK4OjR33m51RK2eKxhWrEj
+	Ta6GWv3WqCJi2xTxVPUI8WloFJTFGt3Jo6OZBZpCZFcwqTEAJJ6riDqf8/IQm9v5yDvrm3QZ9xf
+	qR9bf3BCAssax/59JLB8T0uKqioZllNDR6WUp762uxfx+l7/er7z5IfwYXDSW0FCwPVx2dRFlJG
+	KM2VmUjb7dl0TCouOj41aMJmRI8z7XJNtzKouIHQnL6STDz5zKU7od5cPffwQrC/JkWUUiKDcKu
+	lUvjyLHyfJYjMRK27CClSmvZU2AwZjZu09h2GHw9FUssp9c5prvbeV0uzSQvvLbPI7dDWHVLdL3
+	F1HXr4FRBCXsBEMMfkrxlLF8p2vnuk4W1G3dXlK7EoGvNYZ2J162qOz8BUmj2ygnID2VMhKQQHh
+	sG6APZ07YQFAP1BuacXjErI3G5gpScwBzfHOBWVrhowd0o5wJCNHBe0LB7SiEqy1ZmomFRSIg5I
+	2sxczU5W5QAMpzOwj4lHYdbE2eYh6Y+qRjekus0ZmHtPOI92JrbaIGZ/BEx5rvGzdVqidE/epvZ
+	Q/0XENMq6i3AJhUxdmcgyS044JlDd6zCQXm/sSe1Ov2fUzI7nGCmhPMMKI7WPNX9kUzDpImNqwJ
+	lby8wTePLm3IKdymKzJQ9JY644TK+TAQDQV4IOVp22dwim+k4Mbr8XSLX96bqbSHj8CT2wlpvfC
+	PGDq8=
+X-Received: by 2002:a05:6102:5106:b0:7c1:e804:3c91 with SMTP id ada2fe7eead31-7d072c398bdmr2629661137.8.1793656501262;
+        Mon, 02 Nov 2026 13:55:01 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d07738ebf2sm11066184137.1.2026.11.02.13.54.58
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d07738ebf2sm11066184137.1.2026.11.02.13.55.00
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 13:54:58 -0800 (PST)
+        Mon, 02 Nov 2026 13:55:00 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 0/6] Fix linked transports of an ASE not enabled yet
-Date: Mon,  2 Nov 2026 16:54:51 -0500
-Message-ID: <20261102215457.2553416-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 1/6] client/scripts: Add bap-duplex-lc3.bt
+Date: Mon,  2 Nov 2026 16:54:52 -0500
+Message-ID: <20261102215457.2553416-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261102215457.2553416-1-luiz.dentz@gmail.com>
+References: <20261102215457.2553416-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,59 +101,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When acting as an acceptor, a remote initiator may enable only one ASE of
-a bidirectional CIS first, e.g. a phone in a voice call enabling the
-Source ASE of a headset before its Sink ASE. Once the CIS is established,
-the transport of the Sink ASE, still in QoS Configured, was set pending
-along with its link, so an audio server would acquire it and either get
-NotAuthorized, failing the working link as well, or have it made active
-through the link while its ASE is not enabled.
+Register a PAC Sink and a PAC Source endpoint with LC3, both for Front
+Left only, so a single CIS carries both directions, e.g. for a voice
+call to a headset with a microphone, and describe how to enable and
+disable each direction on its own.
 
-Likewise, once both ASEs were acquired on their own, disabling one of
-them set the transport of the other idle and disabled its ASE as well,
-stopping the other direction.
-
-The first patches add a functional test reproducing this, using the
-Desynchronized property of an initiator in testing mode to enable and
-disable each ASE separately, and the last ones fix it by only updating
-the state and owner of a link once its ASE is enabled when acting as a
-server, and by leaving links acquired on their own, or desynchronized,
-alone when a transport is released.
-
-This depends on "test: functional: wait for BAP transports to be
-configured", which bluetoothctl needs before it can acquire the
-transports of the test.
-
-Changes in v2:
- - test: functional: Cover enabling one ASE of a bidirectional CIS:
-   drive the tests through bluetoothctl (transport.desync, acquire,
-   release and show) rather than calling the D-Bus methods directly,
-   so the sequence can be reproduced by hand with the same script.
-   This also fixes the tests failing on setup with a NameError, as v1
-   used a test helper without declaring the dependency above.
- - client/scripts: Add bap-duplex-lc3.bt: describe how to enable and
-   disable each direction on its own with bluetoothctl.
- - doc/functional-bap: Document the duplex unicast test cases: list the
-   bluetoothctl commands in the steps.
- - No changes to the other patches.
-
-Luiz Augusto von Dentz (6):
-  client/scripts: Add bap-duplex-lc3.bt
-  doc/functional-bap: Document the duplex unicast test cases
-  test: functional: Cover enabling one ASE of a bidirectional CIS
-  shared/bap: Add bt_bap_stream_is_client
-  transport: Don't set linked transports pending before they are enabled
-  transport: Don't disable desynchronized links on release
-
- client/scripts/bap-duplex-lc3.bt |  53 +++++++++++
- doc/functional-bap.rst           | 112 +++++++++++++++++++++++
- profiles/audio/transport.c       |  95 +++++++++++++++++++-
- src/shared/bap.c                 |   8 ++
- src/shared/bap.h                 |   2 +
- test/functional/test_bap.py      | 147 +++++++++++++++++++++++++++++++
- 6 files changed, 414 insertions(+), 3 deletions(-)
+Assisted-by: Claude:claude-opus-5-5
+---
+ client/scripts/bap-duplex-lc3.bt | 53 ++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
  create mode 100644 client/scripts/bap-duplex-lc3.bt
 
+diff --git a/client/scripts/bap-duplex-lc3.bt b/client/scripts/bap-duplex-lc3.bt
+new file mode 100644
+index 000000000000..af82658b5df3
+--- /dev/null
++++ b/client/scripts/bap-duplex-lc3.bt
+@@ -0,0 +1,53 @@
++power on
++#
++#
++# Register a PAC Sink and a PAC Source endpoint with LC3, both for Front
++# Left only, e.g. a headset with a microphone in a voice call. Run on
++# both sides: the device that pairs is the initiator.
++#
++endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
++# Auto Accept: accept the configuration chosen by the peer
++y
++# Max Transports: no limit
++a
++# Locations: Front Left
++1
++# Supported Context: same as the contexts bluetoothctl registers with
++0x0fff
++# Context
++0x0fff
++# CIG: assigned automatically
++a
++# CIS: assigned automatically
++a
++endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06
++# Auto Accept: accept the configuration chosen by the peer
++y
++# Max Transports: no limit
++a
++# Locations: Front Left
++1
++# Supported Context: same as the contexts bluetoothctl registers with
++0x000f
++# Context
++0x000f
++# CIG: assigned automatically
++a
++# CIS: assigned automatically
++a
++#
++#
++# With a single location, the stream of each direction uses the same
++# CIS, so the two transports are linked.
++#
++# To enable each direction on its own, as a phone may do in a voice
++# call, run bluetoothd with Testing = true on the initiator and, after
++# pairing, desynchronize the transports and acquire them one at a time:
++#
++# transport.desync /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx/pac_sink0/fd0 on
++# transport.acquire /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx/pac_source0/fd1
++# transport.acquire /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx/pac_sink0/fd0
++#
++# bluetoothctl on the acceptor acquires each transport once it is
++# pending, i.e. once its ASE is enabled, and transport.release on the
++# initiator disables the ASE of a transport alone.
 -- 
 2.56.0
 
