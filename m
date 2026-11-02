@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793643181;
-	b=MDUtYGgt28GBGO+L8qOdbjsQ2zuPN3/FHisYJtlBlhdm9zNTWPBuxf2w5JW9KPkJCKk9
-	 A5sPKV4xBk00s1xRJcFSLl7aFwgh7JSqxdd5YvezSyOHVRL8mjwafPUXiqL2bluysBW2C
-	 VYkpziZiYVyHZ1QM1oAlXNxmM3W+3OwReKOE6NGrs3AekjbS74Yc1P/Td24y1IAKTMhLK
-	 4Jde/IfvvN0FYzDtqcoEEGqbSCCt3FQVNYu1g0xj/3dGY7jsuYYae8+YtDoF9TtiCU1E7
-	 cvNvBlQD8n14eoPIpFdR9Qw42kTVpjV2Mh0ep/1BqmaQRrmqEm2SqJAwzmDNt44MxAQ==
+	b=ajkZlzoPsdXqSiRuiZGIn3FVGVzNSKyIjcIOt8ywNI/vEhMaVNBo9V0tgr/aIFM8Sx/G
+	 btvkNhX2L0MQ4aunhsX3L8WtSuM790v5J48kmtLTyqXwZA0VE8ontm6OazAwMFf5IJEuA
+	 QEyE+hjVrSeqQWvuGnU2RC/oW03W33u9TR7t89dBkUyXX8+XcL69/I/2MSK/wZwgJPZ2u
+	 qm22XboT4wjSP/pd5pwG9rpfOhmlLx/Z+k6iH+f+U97Auk1iAgv1JOzR0CzUASljzdrhV
+	 gy/CSelWxx7dzmMWh+G+h8q9CePbWOC6jUrblXirWPhOreOShPp3b7PB5bLRErCbKLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793643181;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=kCjmpEGkiwLV0Bv+udGETEPV+bZgSwE1N1nolVtmd6A=;
-	b=AICqIlzgm4QXPHJYh5OnBTDTRhvgF9/DZeJAENnkhmm1Uxq8ugNzwF+hGyZp1kGBB2X8
-	 i0klrFJqSOJo9oXY1z+7khqCeai9oQuR3KKgiPi8BEA0uEJsysWBE4gjl6scQ3cXoSIT/
-	 xYpdR2Qlj4cwXd/to02GO+067FdfWHk/ij6FUxIuoKOFgWZJneTTcYoequD34ypeqIHiU
-	 9P2C/1rOADa3JdCuKDy/JKOUQwHRGrZ6u5shI0APayaBhOn+XLgDfopwQ1OBX2F7CN2gs
-	 IpoeIE1seG39HNJq/hwLegKhntj4lNG6/lLBp2xutro8851IyDuSiQibfGrojwXMiTw==
+	bh=rySAoxJ+1WNd8li5PbRdtmNYRQx4OzM2QNVTPoECwbo=;
+	b=CEXKtkjemCD7fxNPl1y+/HkG1pWsxVTCS+cbQjjOQCOcyRZJzGKG00RrsCBjxbMvNSNc
+	 66MACTv5VY1lyZ1NLqRPaNHY/O4As5vIq8U+u59uH/0ufW6NTfcZdib4h9feTR6kAVOU6
+	 q7ypuA/gaOiy6TMf4eCj9g/7NhZ3J480uUtNk8YLGT1rN5cenPlHJYQbHCRNeYrVK0JAt
+	 aNzNt1VsKugIyeR+UCdjhRQ0+YGlfpNgePqqtim0E9U7oGKbAjnp7bVTLLvZNJWtGQrdE
+	 vNA/kHVNOZKJ37J2e0Y14q+vg5UgiC0tB+tYnYTlNxeedMmCWnRczjGLynAF2q+7bHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=g61hdvyh;
-	arc=none smtp.remote-ip=209.85.221.177
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XHw6Eyob;
+	arc=none smtp.remote-ip=209.85.221.171
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2308606A32F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 18:13:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2308606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BE9606A327
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 18:13:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62BE9606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=g61hdvyh
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5eadadf23e5so2462269e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 10:13:00 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XHw6Eyob
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5eab93a9862so548474e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 10:13:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1793643180; x=1794247980; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=kCjmpEGkiwLV0Bv+udGETEPV+bZgSwE1N1nolVtmd6A=;
-        b=g61hdvyhqIzap9eFPeAh4YTWPvVI8iDHmogq2u4rkdKOkt88E/1zvzr0m+nW5K4/VI
-         0SWBS+xtk+IivM8iSopaF7B5Wo8QV8oo+Y/7onIVh1XX7Y63iaUn4E8gu3TfFwtOQOOF
-         LHMM62TtIJCb5O/695jEApTJDhUcv/sYHW6CLoAuwLYiKoRkRanGfH7OmNLXQbd40FAT
-         juSyJInIXi8DqT5w2kPnIn0ue5HCmo/0x5n1EkLh9SFm9bjTEsxCjAlXPqfQ6eH6oVhS
-         +XubV0ItvpsSgn7z+rV6I/vazWN0gPBsbNMVZHJQPYO3XAFb42hsQ3xKEtq625jFsU5v
-         0Clw==
+        bh=rySAoxJ+1WNd8li5PbRdtmNYRQx4OzM2QNVTPoECwbo=;
+        b=XHw6EyoboY9xWP4DZ3LYn7QsWwLH+HJ7R2hCEJZuK8emF78v9v+cGaot+Z2mqaPdid
+         p2dvgCUcotxEpLiTQwJjIUfCu6fXXG5B5Agw7r5VPx6a9Z/H48a36rlKpaJMvnQ7O5ci
+         NycRd0mfDutKqJpTh99becpzqgQyw6g13ExzEKP5WAP4gG+w9mLfsDk2qPv7E0ruwlnR
+         cgpf8IlwAQLMgxCkN8p/gov72jhIWNxRpM1XhRTzEyf7CiwTvawLAqcM7MHLJTgYmr6k
+         NKG/eq9Xn9bt3TM9zmtn+VsOfFjLTd/L8at6W3xTDkHIZRN9V0Eq1z5lMR1APigeM/90
+         LWRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1793643180; x=1794247980;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=kCjmpEGkiwLV0Bv+udGETEPV+bZgSwE1N1nolVtmd6A=;
-        b=BVir8k8QD+eVPugaYVVdHN3k5ZR9+PXIAcNt8t9NdCfN/kL8606I7nAl0BwVRW9nZN
-         VnovYDcPRIlGIe0yqwAJg0fCzuaS5sJmReaKKc7WnOoC1PV6r8VKFfhGg7ZQlB2Hobp/
-         uF/BzMkYCxGjk9p5STHVo3jqlTBwr7ZQ6HOP0N3nAjGVAt1mnm5ra7bDc639BYMh2cB3
-         ingMlqRpXFvlYf3PtrOgProVO/gawd8466fxPfH3RNBdUMNn9qco7iiec5h+OF4S44sw
-         15HomOKlEnfCnw+99fk68YHsD3L9id2qgEyQqGNuYs3LGICmERyrGQv0VAnX27ZDTGrP
-         2NbA==
-X-Gm-Message-State: APuU4Z/bXE+FerW7IgpbeisBnw032yTNuS3BftbQVPeN/1VJxHKZhkQs
-	qf8knDMRmCkCEN//MJEMbJ+YFsJJxG+jVERRTTCa+tJ1tzdpz8dKHKAKLEu4XcR1
-X-Gm-Gg: AYBFou07+ZJ6J9UVMwyKFLCX1zYd5+7ngJ15Pd3YPUXHM4prXSt2XHM7O9hEZrjTLTz
-	6wiR6uLgIRutA8/GOW2PvhokGzZEzu9cmLLul6PnDA2jRs6rB0EwngSY2rLM1JdKywfpnbePqTa
-	3pFj9eYpB82Kz1uxlpk+f2AJMMBxKeTDjDze4RF/4mte5VkREN7ae3OrEI3oi/WAFlgvcHLycKu
-	p2YgDxeGbNCcPDMemVoIHbHyr+K0eaA1agDM88Zr/yw3VFUn/fSVH2jqYj7/CmsvXLpSOEdlRn7
-	XlBUF+CNbsC2NkWu3fiqOMSiJpTjxlxxGb/3Zz/KTROeaazMvNsPlPDnjl++2n9inVfg/vch6Yw
-	EO697M6txGjh3H19DCe+bEOJ1ssrU2ybq7VVsntK0U9sI+JXaw0rWh2v5GiCU+gc5rRRkFouSPQ
-	9xnQLenUvn3/RnLUFJsZQgKrqSa3Scpf6qen++1H3RtmLtr4M53p6ZOYu1eU4hiqFPXmGTLCXHt
-	+uxZKFUxLYq+6xLpiCgspHIDCmJEMU3rCp0Lc8BbbRiy8af1B6xVeo/uw+NYW7WJyMh1xjdKw12
-	z8L1NHKggGQ7OVRAkDtLkj0HCrR9BvhOYyWdVMLZm8AVugadRc+1IKsH7IgZ1THrpHhyze7Njph
-	qnrNhlc/eZqOAnkirP7Du+RRoteTlRzEJ8v2UxoDz+aH7ok1t3nAQRJYuOW+ZI2bixDml9mkEdF
-	cXnsL0
-X-Received: by 2002:a05:6122:d1d:b0:5ec:3e18:a8fa with SMTP id 71dfb90a1353d-5ec689cf4a3mr4691213e0c.20.1793643179333;
-        Mon, 02 Nov 2026 10:12:59 -0800 (PST)
+        bh=rySAoxJ+1WNd8li5PbRdtmNYRQx4OzM2QNVTPoECwbo=;
+        b=1id2L8wB1fHwIxaDm8Ruja8IPxNxTVwvhniB1xrkyh+LYSJCdeSfxJEs0KgqpVQBOQ
+         R4fgxJDo/dM7B7zFzvDutb1wzVuWHLQ1/DFTuaEK1fKhaEJH7fmqSKuhrNDEN8qNdFBb
+         39FxHtmlo0D/CE8tlJfH/d5GMV5k0I4wjzQEayA2TScNCcti08Cr2RsQAOtr2afb+8bC
+         HzNVzu97oByvyqXtjBHEd86cbfbRCbGXfsd2MK8uZNrzvGPG7z2zS5p3dNlkEdZvLqeO
+         cuzEa5yeNmhEZhpEAQIBn4Li8vDN7b6csbT6oVOyGDJeMjSF3SUAbcToWIeWc5BmWfp3
+         dwjA==
+X-Gm-Message-State: APuU4Z//1IizJZFmLGxx5aXaloxIEDPwQjvz4tPsTmY9wxwWdpLQBNOu
+	cccjYg5rRdnIspluhtTkKt4uPmW9DTXOscU2SFDwUR1LZvvzRAwjqIzzClKInCt5
+X-Gm-Gg: AYBFou0mzhI05Tc8nNdLzwdXvgsHvAPTQNsJnUzD0zHYHHD07c/kXBZ+v4/Ep/pvcPM
+	LI+4+YQx4x5frhr0La2koTJHJx6/qPFJKGdl10cgzzRRbUqs5Dz1PbrCmEIcWrIehJsxWeEESYA
+	zCgy044T7YVjRRxv8zLtPc00hB2y51/NsLGWqY+WFyZxxLS89YylXYHxrUQduy8EjewnD5anOb5
+	OgDG6GCOCg8msDXalHUh85Q/20kEarSmEQ2kkWkyDyTMzfRBIhku71UhWwrwOD0di0iVMAsO7Bb
+	Wbf5da89XDH7m3kko/Eoj7M/FXTjPvibs0fWu1lIyvxVQH3BVv5UqNId5vOCYRMNspfF3i48nuY
+	DHPRrGRJvRttvCYlY0/EwBInzNq/BwqA91K3xGxIEDhzFLt4uzjpN/qnsHDXbL7bxWeqE2ixnc7
+	skJaPiAth1s/cXaYHOp6DLpZgVl8l/zg/UyYds4hLUJMOPkyl22bga/jN4IZ9nuCahhw4QClMjr
+	iggWIh4Kbplv7l2vdh86GMFZzqLe3o+A+l2ryyBcRwCMahamUG9d0WSly3FpA06Mi/IKwNGfWOh
+	P3oCA8oMk4IhWXv7XCA1CgT7xQc77nmnnk/6Vc31qpv5hzI6Sig5V5NS2oQK2B/Hg2DAaGB5fJl
+	DwDANS8AKQeE+FItQ1bZ5tDrxMtiAlsZuyFY0y06tI9H9PhuofYUvu6xwWnME0tlpUFniTIwPzT
+	vDk7FDxtE6RXNOdULjd6d032bP1A==
+X-Received: by 2002:a05:6122:3a0c:b0:5ea:ef43:b03d with SMTP id 71dfb90a1353d-5ec6870c951mr4362552e0c.7.1793643180223;
+        Mon, 02 Nov 2026 10:13:00 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69bf220esm10300208e0c.7.2026.11.02.10.12.58
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec69bf220esm10300208e0c.7.2026.11.02.10.12.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 02 Nov 2026 10:12:59 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/6] client/scripts: Add bap-duplex-lc3.bt
-Date: Mon,  2 Nov 2026 13:12:51 -0500
-Message-ID: <20261102181256.2321329-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/6] doc/functional-bap: Document the duplex unicast test cases
+Date: Mon,  2 Nov 2026 13:12:52 -0500
+Message-ID: <20261102181256.2321329-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261102181256.2321329-1-luiz.dentz@gmail.com>
 References: <20261102181256.2321329-1-luiz.dentz@gmail.com>
@@ -101,63 +101,132 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Register a PAC Sink and a PAC Source endpoint with LC3, both for Front
-Left only, so a single CIS carries both directions, e.g. for a voice
-call to a headset with a microphone.
+Describe the topology with a stream for each direction over the same
+CIS, the test of the Desynchronized property used to enable each
+direction separately, and the test of the acceptor when only one of
+its ASEs is enabled.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- client/scripts/bap-duplex-lc3.bt | 41 ++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
- create mode 100644 client/scripts/bap-duplex-lc3.bt
+ doc/functional-bap.rst | 105 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
-diff --git a/client/scripts/bap-duplex-lc3.bt b/client/scripts/bap-duplex-lc3.bt
-new file mode 100644
-index 000000000000..f1f20fc44e02
---- /dev/null
-+++ b/client/scripts/bap-duplex-lc3.bt
-@@ -0,0 +1,41 @@
-+power on
-+#
-+#
-+# Register a PAC Sink and a PAC Source endpoint with LC3, both for Front
-+# Left only, e.g. a headset with a microphone in a voice call. Run on
-+# both sides: the device that pairs is the initiator.
-+#
-+endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
-+# Auto Accept: accept the configuration chosen by the peer
-+y
-+# Max Transports: no limit
-+a
-+# Locations: Front Left
-+1
-+# Supported Context: same as the contexts bluetoothctl registers with
-+0x0fff
-+# Context
-+0x0fff
-+# CIG: assigned automatically
-+a
-+# CIS: assigned automatically
-+a
-+endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06
-+# Auto Accept: accept the configuration chosen by the peer
-+y
-+# Max Transports: no limit
-+a
-+# Locations: Front Left
-+1
-+# Supported Context: same as the contexts bluetoothctl registers with
-+0x000f
-+# Context
-+0x000f
-+# CIG: assigned automatically
-+a
-+# CIS: assigned automatically
-+a
-+#
-+#
-+# With a single location, the stream of each direction uses the same
-+# CIS, so the two transports are linked.
+diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
+index 42fa7fda8006..ea0054ecff5c 100644
+--- a/doc/functional-bap.rst
++++ b/doc/functional-bap.rst
+@@ -157,6 +157,111 @@ test_bap_unicast_reconfigure_metadata[empty|media]
+ 	streams; it does not exercise microphone streams or simultaneous
+ 	playback and capture.
+ 
++DUPLEX UNICAST
++==============
++
++Two hosts, connected over LE, with a stream for each direction sharing
++a single CIS, e.g. a voice call to a headset with a microphone:
++
++.. code-block::
++
++	+------------------------+                 +------------------------+
++	| host0                  |      LE ACL     | host1                  |
++	| initiator (central)    | --------------> | acceptor (peripheral)  |
++	| bluetoothd, testing    |                 | bluetoothctl -a auto   |
++	| bluetoothctl -a auto   |                 | bap-duplex-lc3.bt      |
++	| bap-duplex-lc3.bt      |  CIS 0x00 (LC3) | PAC Sink, Front Left   |
++	| PAC Source, Front Left | ==============> |                        |
++	| PAC Sink, Front Left   | <============== | PAC Source, Front Left |
++	+------------------------+                 +------------------------+
++
++	one CIG holding one bidirectional CIS: the Sink ASE and the Source
++	ASE of the acceptor use the same CIS, so the transports of each
++	host are linked
++
++	--> connection is initiated by      ==> audio flows towards
++
++The initiator runs `bluetoothd` in testing mode:
++
++.. code-block::
++
++	[General]
++	Testing = true
++
++which makes the ``Desynchronized`` property of
++**org.bluez.MediaTransport(5)** writable, so each direction can be
++acquired, and so its ASE enabled, on its own. The acceptor does not run
++in testing mode.
++
++``client/scripts/bap-duplex-lc3.bt`` on both hosts
++	Registers a PAC Sink endpoint
++	(``00002bc9-0000-1000-8000-00805f9b34fb``) and a PAC Source endpoint
++	(``00002bcb-0000-1000-8000-00805f9b34fb``) with LC3, both with
++	Front Left as their only location, so a single CIS carries both
++	directions. The host that pairs is the initiator.
++
++test_bap_unicast_desync
++-----------------------
++
++:Setup: As above, with both transports created and linked.
++
++:Steps:
++	1. Initiator: set ``Desynchronized`` on the transport of the remote
++	   Sink ASE.
++	2. Initiator: ``Acquire`` the transport of the remote Source ASE.
++	3. Initiator: ``Acquire`` the transport of the remote Sink ASE.
++
++:Expected:
++	1. ``Desynchronized`` is set on both transports, as it applies to
++	   the links of a transport as well.
++	2. The acquired transport moves to ``State: active``, while its link
++	   stays in ``State: idle``.
++	3. The link is acquired on its own and moves to ``State: active``.
++
++:Notes: Checks the mechanism the next test relies on to enable a
++	single ASE of a CIS, so a failure of that one can be told apart
++	from a failure of the initiator to enable the ASEs separately.
++
++test_bap_unicast_duplex_enable_one
++----------------------------------
++
++:Setup: As above, with both transports created and linked, and
++	``Desynchronized`` set on the initiator.
++
++:Steps:
++	1. Initiator: ``Acquire`` the transport of the remote Source ASE
++	   only, so the acceptor's Source ASE is enabled and the CIS is
++	   established, while its Sink ASE stays in the QoS Configured
++	   state.
++	2. Acceptor: check the state of the transport of its Sink ASE.
++	3. Initiator: ``Acquire`` the transport of the remote Sink ASE.
++	4. Initiator: ``Release`` the transport of the remote Sink ASE.
++
++:Expected:
++	1. The acceptor's Source ASE transport moves to ``State: pending``,
++	   and is then acquired by `bluetoothctl`.
++	2. The Sink ASE transport stays in ``State: idle``: its ASE has not
++	   been enabled, so it is neither pending nor acquired along with
++	   its link.
++	3. The Sink ASE transport moves to ``State: active``, acquired on
++	   its own once the initiator enables its ASE.
++	4. The Sink ASE transport moves back to ``State: idle`` while the
++	   Source ASE transport stays in ``State: active``, on both hosts:
++	   transports acquired on their own are released on their own.
++
++:Notes: Reproduces a remote initiator, e.g. a phone in a voice call,
++	enabling the Source ASE of a headset before its Sink ASE. As an
++	acceptor cannot enable an ASE itself, acquiring a transport whose
++	ASE is still in QoS is rejected with ``NotAuthorized``. An audio
++	server acquiring every pending transport then fails, and with it
++	the linked transport that was working.
++
++	`bluetoothctl` with ``-a auto`` acquires a transport as soon as it
++	is pending, as an audio server would. Depending on which transport
++	it acquires first, the Sink ASE transport is either rejected or
++	made active through its link, so the test checks the state of the
++	transport rather than the result of the acquisition.
++
+ BROADCAST
+ =========
+ 
 -- 
 2.56.0
 
