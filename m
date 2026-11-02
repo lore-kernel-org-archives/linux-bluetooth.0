@@ -1,88 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793657574;
-	b=LseqzVUfHkp+dLJkk+4gJa/ooR+e3sBq/PHtiLzVpRWyNGIHWoKLjHyu0JjOuqDK7vRb
-	 OLp9vI1afR1vzII4JJTCsM02irbtgsdp9LLF22GxWeb3q63F+wPiA7mm5OG7nLjuG/3u2
-	 cHT1NfMz9TJ+cMveDg+sBsg0SmzniiPQzYUZnUM6OFBK/8nNmLkH3uHoAfCucW8l9UHAg
-	 YLl/hOAKTnAckfHvbkY6erL4Pea/uOVBUtpZZv+WRsot+8wWshvtK/Jj84386h2Adk1Pf
-	 469tVbkJYGXtbCZpUZlUbo6CiBoccHqJPl9wpgXxpUVGLrAvZROn/ck5Xw4m5kUomgg==
+	t=1793657596;
+	b=CvA8etdqJAP78dYalJOAGlG89hcYhda1M4dQlwLZo7+s782FMMAcLjvNWGH6WQ5agtmG
+	 HB+ItRsmQm2hMwam2B55Qn5aOOnF1Bmj8GLUyPK92Lz5MBVKnT5sNxEwpozlPMUXVmjYM
+	 2KWqwC5fl1XQawPmkI3YyGx+LsjmuJrSgaioJNNTCm6+cYxSUKzg8SVSCxctLZrH0ZFjj
+	 jlkQDQRB0Myk7y3bJcC6enrjHSwTiWR3ebyuPgY/eMEEhmRYSSJLnpVerzSVsA5Qy4YaB
+	 /Amr3YcikDjSGqkJ/YbBYDdNXEQU4WQ2EMCNKioU5GchIV1fnrYf4AZJadWVkdW4QUg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793657574;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793657596;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
-	b=rVD7XGrryiSbWt7sHmNiEx1R+x+zy373NCAXcag50ZtZcUe4MT48eKyHP2PzcvrWfPVb
-	 /nK9dipxUVILTuDlr5V/t9QzOY5MECbz0tVdpVPwVugb1XICRABmLvVVSqLYkuRKVL38Y
-	 LMgswmlz6SYdsb9vsSk7etNNZ/6zNkeSDb27ORWIMVRgslgRddRYCQaALcjvce00BQ7M+
-	 Z/qboP/dIWEHNhI+bpT3StOmRGYmlxX+bqlgnvWW9fBE2B2lqSr6AP/43fqOs5E45Qc6e
-	 kT81fcSG0xFEAZHyID5PhGt+lgom0p+AO/igYl7QFEx4aBzXhFiOFfB5Df2YymUCn4Q==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=smWY0rwFNPwgx/jGhdDbJOXQyoaMMjm51SWzV+xWcKA=;
+	b=oEjOTFOYMCq0bZg+DbJagSe2hMvJHFPQRaTCHdQeK9Vm7t2EXLN1Y4oU4h77rEHE1hdT
+	 PpxP6L6CVR6zKXBORrjvbhERJ6mZMBP8uaKO8D7HGTzDaryzX44vDKSrnD1v8M15vm/MX
+	 M4kJmnJiqWJKsdunHGSLUHre6YKSPctZqPuzes0J0rRZ4ZtXoFvftMZMDbVyso0nCAvUK
+	 Mv+73Lk+BFN4COhrv9vsPh0ciM9E1ig5/FIQtdSdX6sj/K+d1Fq7B19xnQHxvuveiCfIa
+	 DVSsdb+Eaw3J+l0ji37lRwjdFHSjVsMYn9FLNMXRO8V02awZIMaiI53coxj0todcFDg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sBTZQeEd;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FPjIKOov;
+	arc=none smtp.remote-ip=209.85.221.51
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B07B606A32C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 22:12:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B07B606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C458606A32D
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 22:13:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3C458606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sBTZQeEd
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so26897955e9.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 14:12:54 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FPjIKOov
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-48af4d4e61fso2167786f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 14:13:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793657573; x=1794262373; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
-        b=sBTZQeEdVCQYcD0H90mku0dXYpq6JpHezGiIzOoJWFMrhqfxzUHmQp6Lj2n46HbAtn
-         msTmmeCPAg2Matb6VWz7qh+dp8SMGKXCZQ0KJHOiJ1P8NmlBlsCcU927ti+hF4FxIGQG
-         +EoYNKhAAwrQMD61EZjeCtWqkjRveTA4Bx36EZxb/IVeeo2bGXx4ElXeE7EBZdTjex9d
-         9b5d11rgtW084vfc+KkfyBYnvsh7nSD7d6tENXtI/S0IdXuU/FvxyF1tw4WxdTFeeFd9
-         HbCtiqUr5lm0Pj+upg2nbPaeDWSN6fS7X+Gyc37IXukiSaXe5PqH6cDWGt60nwridUHT
-         utVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793657573; x=1794262373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1793657594; x=1794262394; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=v3rM3cfccMZ2aie5BUH39pXwz2HmJ/pubiH7nn5cWWw=;
-        b=LuDoQ/Ypk6/Jroa+VCEEIaVvVDfknhtY4/i1QvHShBU56FjHXLRcxqrW0vU7IjPuqc
-         U2OEzTN3al4HaPEypvRs3nC2VTadbGJm/3M/VAeRt2qIkwgGT5w5iSj2ZvdslTwntHVo
-         cK6fIMB1JHPM75oIyYZKFCy5PxZWKukFnHerQ0snI8B22Bf3tAgFRhja1GdCQRzmeR3X
-         NorC8NItSyHCpe570E/7ndi6WxvpMIIRvjepzxpBl+1ZRb8ckRL2J7PpWMaO85ukzzup
-         95qbzINe4m8xUlAerNALRzAw+XZ5+d9Vamkdc4IVWZzuU6kQXSZstkSPsR/qJGEd2Nrd
-         4NFA==
-X-Gm-Message-State: AFq9FYKhr8AMl/AMysarBP2RiHfgjJLamcbfj4XQ3zNgMfvKwHp5mWZh
-	gNaUkhinSUHo19IdFAopHBWjVsGXHpeqocNkkH1drj4etu+iGEAeo1DLah8d/QQ7BFI=
-X-Gm-Gg: AYBFou272Lhqy3SQteUFoYybBf9Z0gydj1j+aMye+V8jtaNs1p/QsFPddO2FFDfwj0/
-	pF2MYUzwbUUuSclru6OEJC2Bepbyec9fYVHlHYbAX0AwE5qSljz632/LypSshcCCFmrJYhnsWeX
-	iH7Gja5wfuT76X9AtHqHtipmB2KpXFdl5fYGsDut56daKMt0Sro0nPQBQQ8LfgbqSpHQ8BPNXDm
-	O9HMOZwLyUkeDdilda7XGjWXiy2VJF4j2MWSLJ2/8ujB665CYojYce97/VlglHN/bRTkOi1Fvsq
-	ulD9pREufHTObk130m0XMlduhSQLLi30c+X08KfALmcW33c/0MHNbYOpYzit9vWKl338Ppxj6f/
-	nHFV7Q0kSBF9UHf4zyLadNy/JLnFECDyi2jn89KalfLF4PMBNJ3xTnrhlkHtdd7eV5QacRtxWGn
-	q6v3bYIQcVnYklWsHtOmDCksquXcPRpGcIgLjdSNjI/eCOadLResbSG1l3jb4g3hrYNnnjjqFWs
-	7/vSJ44egKOWBoqr8DTcYr1O1cGA8wGofJyvSBSx1AeHZoGMSy56AXfwFz9Z1JO8r5Q/FtGzUb5
-	gaKtgjlIKsj2qGlTwnVSPoztDRMcwDB1Irgn/fvWk+Isjf7Qwd8ztijFWLQtlBspVRLQPfVr0lZ
-	dH41Ud/Iv/u5LZ661m7mWF5unTulWFhlsE3BU73MtnYqb/Xm/CA==
-X-Received: by 2002:a05:600c:34d1:b0:4a0:b6:4619 with SMTP id 5b1f17b1804b1-4ac12475a61mr263779945e9.0.1793657572711;
-        Mon, 02 Nov 2026 14:12:52 -0800 (PST)
+        bh=smWY0rwFNPwgx/jGhdDbJOXQyoaMMjm51SWzV+xWcKA=;
+        b=FPjIKOovbDFCZvlX2Aj1Yh5SAT82evrSzEQ1WeOHiw9pIY+d6owhgZc/XF4SzXn7Eg
+         lnqYxuUwXK0Lcg8WGcpNaIbBthCrL0woQTA98sBAbL1OCC04VamqfN1g1jMwCt/tsuqH
+         TqP5L+zqby+9bX0M5z7VeCjAsRlYB/WUmpu/z5vhEdpiu1CX7XS9YiBEvaUekuxRuHNU
+         gXJxpEEey5r6xp5/Q29PxjjIu9J7SB2Djva/yaP1pZIA+eGOGI0L9TJPOkfL9VzQSlSq
+         yYSVYQWeC5YQr7WM1YGKbk/J6M490LXxFyPLkEklOtd0ltTX5A5pnTGbsnaMACaXbU+0
+         4rLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793657594; x=1794262394;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=smWY0rwFNPwgx/jGhdDbJOXQyoaMMjm51SWzV+xWcKA=;
+        b=TmMWvFjGviewAN8oTqGYqsRv5UBvDNw53J7fLkgV1kU2K4+TL7R/TeGLsxLz84tCOV
+         20DpBCNr3Fk21raD1X8tTyj3PxyGBOUvBLxrM0EYUuCXD4QwuNBY5U3Oe2GDMu5DWugY
+         pjdyEXbjbacntidAWzKOXQiwIHmHlsFaXpZ+YoZapBPQ8hYHqu4CJulwXe0t57mRDzC3
+         skwCQJTlgWyeGUa9Fkcan02U4H7xofmwrhmVj/N1FMob4ZY+8iyiH8ayd5fy2e5txO35
+         CAkcOttMUzl0689iaOqlGOUn7q6Y2YVIOz7zxcQvwkWiBFzigRT43fLNWWgEKNEWUFsb
+         3Muw==
+X-Gm-Message-State: AFq9FYJsqv9BNEofN9l7vFY9twLiakwsCBg4neJmL3piAyCMb97Jq0KS
+	rinEvdGV5GIhDv6Ae49W+RF80safllbugUOZG9epyjO2S+oEGOMUKsRhvg37XqWesN0=
+X-Gm-Gg: AYBFou09DmwexeiVXCLAMFohQUsCFpoHbFN5HRpIksLWRyBIVxVYk8VJfAZqmPFMFDH
+	AGypLSLKqYE8M5Xga10MUcdyfj2BA+iIa65uEtnY4PGkZ4UBIHJOMHjhm03UNHdsmbrnNuKfMEz
+	dScpMMilcvzTekjBddrFaHrfJY44XrPNP7JXw1DKuof3hwZhXXdXSC7JQZicsO6jNkSe6/aSFKW
+	cJEmQMljfsPkSyF+kvu6eZmC05Elfq4iqSY3KKBmK6E9w6j7IsiFzjzQAdawIUPGQHF8JU6zAkC
+	RBE2FuDlcUqlx593bYiv3iUMmlaImzPrPwNBxR9dnOX3u87C/lfreI4I0oZoMOrlzgaTaY8Hi8J
+	zrMP7Azq7PV9pc4Fx8f50vH7l5hLs71ag3w6i2lYIKcsZR9kHtQvs6T6OKyBPrDr+DqiJF2DlcU
+	qibsPitgIJJSQAfuFSmz9bAtjO+P/ybAQilFwYJESpNW13bph0mk1/ObO4NHSIIkwsQSxMe3Fm0
+	hDYZNkDW2uJrquHNdS3YnIqYGR4i2VIa4CBhNwtHWfL9IrfYfR0S9MOToPZvYAoa2nWN/RT2ME9
+	ZonZdE7V9jjOWvLUY2i6I+y99J5/7u1HMobYFBiJltwUsMzwylfxdHUqmPkOgD2irm1Tl0KIOCP
+	XG/gSCV3RzlXrSAxfnf1iM+/ah3xPX9jWXP9mvUlbrVz5USUDKA==
+X-Received: by 2002:a05:600c:a4c:b0:4a2:967:dfb8 with SMTP id 5b1f17b1804b1-4ac1765d7d7mr261754655e9.20.1793657594572;
+        Mon, 02 Nov 2026 14:13:14 -0800 (PST)
 Received: from pop-os.. ([2a02:810d:478b:2e00:d078:1466:9ea1:3ace])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ac09ad5ff8sm207894205e9.4.2026.11.02.14.12.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ac09ad5ff8sm207894205e9.4.2026.11.02.14.13.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 14:12:52 -0800 (PST)
+        Mon, 02 Nov 2026 14:13:14 -0800 (PST)
 From: RasmusML <rasmusml0501@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: RasmusML <rasmusml@hotmail.dk>
-Subject: [PATCH BlueZ 1/2] profiles/midi: Fix running status across channels
-Date: Mon,  2 Nov 2026 23:12:22 +0100
-Message-ID: <20261102221223.16079-1-rasmusml0501@gmail.com>
+Subject: [PATCH BlueZ 2/2] unit/test-midi: Add multi-channel writer test
+Date: Mon,  2 Nov 2026 23:12:23 +0100
+Message-ID: <20261102221223.16079-2-rasmusml0501@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261102221223.16079-1-rasmusml0501@gmail.com>
+References: <20261102221223.16079-1-rasmusml0501@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,112 +100,57 @@ Content-Transfer-Encoding: 8bit
 
 From: RasmusML <rasmusml@hotmail.dk>
 
-When two MIDI messages of the same type but on different channels end
-up in the same BLE-MIDI packet, read_ev_others() writes the second
-status byte without the timestampLow byte that must precede every
-status byte. A receiver then reads that status byte as the timestamp
-and applies the following data bytes to the previous message's channel
-through running status, e.g.:
+Add a writer test with messages of the same type on different channels
+for Note On, Note Off, Control Change and Pitch Bend. Each of these
+needs its own status byte preceded by timestampLow, and running status
+must only be used when the channel matches too.
 
-  sent:    ch1 NoteOff 60, ch2 NoteOff 64, ch3 CC123, ch4 CC123
-  packet:  B5 94 81 3C 00 82 40 00 94 B3 7B 00 B4 7B 00
-  decoded: ch1 NoteOff 60, ch1 NoteOff 64, ch3 CC123, ch3 CC123
+The existing writer tests use a single channel for every event, which
+is why the missing timestampLow was not caught before.
 
-This happens because rstatus holds the ALSA event type, which carries
-no channel, so the writer assumes running status while
-snd_midi_event_decode() correctly emits a new status byte.
-
-Fix this by decoding each message into a local buffer first and
-appending timestampLow whenever the decoder actually wrote a status
-byte. If the message does not fit, flush the packet and, if it relied
-on running status, decode it again with a reset decoder so the new
-packet starts with a full status byte. This replaces the -ENOMEM retry
-path.
-
-Closes: https://github.com/bluez/bluez/issues/2630
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/midi/libmidi.c | 59 +++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 26 deletions(-)
+ unit/test-midi.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/profiles/midi/libmidi.c b/profiles/midi/libmidi.c
-index ef33f7dfd..349f5f7b2 100644
---- a/profiles/midi/libmidi.c
-+++ b/profiles/midi/libmidi.c
-@@ -191,40 +191,47 @@ static void read_ev_sysex(struct midi_write_parser *parser, const snd_seq_event_
- static void read_ev_others(struct midi_write_parser *parser, const snd_seq_event_t *ev,
-                            midi_read_ev_cb write_cb, void *user_data)
- {
--	int length;
-+	uint8_t msg[MIDI_MSG_MAX_SIZE];
-+	long length;
-+	bool status;
+diff --git a/unit/test-midi.c b/unit/test-midi.c
+index 702133e59..79cb03123 100644
+--- a/unit/test-midi.c
++++ b/unit/test-midi.c
+@@ -525,6 +525,24 @@ static const snd_seq_event_t event5_expect[] = {
  
--	/* check for running status */
--	if (parser->rstatus != ev->type) {
-+	/* running status only ever continues the same event type */
-+	if (parser->rstatus != ev->type)
- 		snd_midi_event_reset_decode(parser->midi_ev);
--		append_timestamp_low(parser);
--	}
+ static const struct midi_write_test midi5 = BLE_WRITE_TEST_INIT(event5, event5_expect);
  
--	/* each midi message has timestampLow byte to follow */
--	length = snd_midi_event_decode(parser->midi_ev,
--	                               parser->midi_stream.data +
--	                               parser->midi_stream.len,
--	                               parser_get_available_size(parser),
--	                               ev);
--
--	if (length == -ENOMEM) {
--		/* remove previously added timestampLow */
--		if (parser->rstatus != ev->type)
--			parser->midi_stream.len--;
-+	length = snd_midi_event_decode(parser->midi_ev, msg, sizeof(msg), ev);
-+	if (length <= 0)
-+		return;
++/*
++ * Same event type on different channels: each needs its own status byte and
++ * timestampLow, so running status must not carry over between them.
++ */
++static const snd_seq_event_t event6[] = {
++	NOTE_EVENT(NOTEON, 0, 60, 100),       /* Note On */
++	NOTE_EVENT(NOTEON, 1, 64, 100),       /* Note On, other channel */
++	NOTE_EVENT(NOTEON, 1, 67, 100),       /* Note On, running status */
++	NOTE_EVENT(NOTEOFF, 0, 60, 0),        /* Note Off */
++	NOTE_EVENT(NOTEOFF, 1, 64, 0),        /* Note Off, other channel */
++	CONTROL_EVENT(CONTROLLER, 2, 0, 123), /* All Notes Off */
++	CONTROL_EVENT(CONTROLLER, 3, 0, 123), /* All Notes Off, other channel */
++	CONTROL_EVENT(PITCHBEND, 4, 0, 0),    /* Pitch Bend */
++	CONTROL_EVENT(PITCHBEND, 5, 0, 0),    /* Pitch Bend, other channel */
++};
 +
-+	/*
-+	 * The decoder leaves the status byte out only when it repeats the
-+	 * previous one, channel included, and every status byte it does write
-+	 * needs a timestampLow before it. Decide that from the decoded message,
-+	 * not from the event type: two note-ons on different channels share a
-+	 * type but not a status byte.
-+	 */
-+	status = msg[0] & 0x80;
++static const struct midi_write_test midi6 = BLE_WRITE_TEST_INIT_BASIC(event6);
 +
-+	if (parser_get_available_size(parser) < (size_t) length + status) {
- 		write_cb(parser, user_data);
--		/* cleanup state for next packet */
--		snd_midi_event_reset_decode(parser->midi_ev);
- 		midi_write_reset(parser);
- 		append_timestamp_high_maybe(parser);
--		append_timestamp_low(parser);
--		length = snd_midi_event_decode(parser->midi_ev,
--		                               parser->midi_stream.data +
--		                               parser->midi_stream.len,
--		                               parser_get_available_size(parser),
--		                               ev);
-+
-+		/* a new packet cannot continue running status */
-+		if (!status) {
-+			snd_midi_event_reset_decode(parser->midi_ev);
-+			length = snd_midi_event_decode(parser->midi_ev, msg,
-+							sizeof(msg), ev);
-+			if (length <= 0)
-+				return;
-+			status = true;
-+		}
- 	}
+ struct midi_data {
+ 	size_t events_tested;
+ 	const struct midi_write_test *midi_test;
+@@ -618,6 +636,8 @@ int main(int argc, char *argv[])
+ 	           &midi4, NULL, test_midi_writer, NULL);
+ 	tester_add("Split ALSA SysEx events to raw BLE packets",
+ 	           &midi5, NULL, test_midi_writer, NULL);
++	tester_add("ALSA Seq events on several channels to Raw BLE packets",
++			&midi6, NULL, test_midi_writer, NULL);
  
--	if (length > 0)
--		parser->midi_stream.len += length;
-+	if (status)
-+		append_timestamp_low(parser);
-+
-+	buffer_append_data(&parser->midi_stream, msg, length);
+ 	return tester_run();
  }
- 
- void midi_read_ev(struct midi_write_parser *parser, const snd_seq_event_t *ev,
 -- 
 2.43.0
 
