@@ -1,84 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793610486;
-	b=Kbi2D44D0MsNDIHjzJf3RmPINFnLD/ZUpoN86VPfjjW2tgMPsDbZvy9dkIB06TMfeA36
-	 eILle8Ocw1nMhDMadfHmk181pz306Jz1iAns3VQnhuvf1DcoX8UsrKfXt62f69uwYiiN5
-	 1Py1A61tiU7DLb53GSl6UCZ1UrlZ7uessRBV5w4fgf+q7nC14fEJigVlaZxwqwJDl3Nzl
-	 OfQXqBNAbxeP3m+4lH8nAz2lJPnZSQL0F5tcylVFh03t1b3YNZWhAlLLhnkmYiDd9S1kW
-	 nAmp9XJ59IbzqIZltot5FdHDnAsuJ7hN9G35yA8VeZ1UT4dZCtuLYDZMneOzsAhz5EA==
+	t=1793612894;
+	b=FULZDp6A3kdM3AWirJ1njFGLz450llJG5yg8fm8GZ8+d2vEBIOS5ycAttnZvoowNcubM
+	 vap5TLT5MpvYMPYzFFLz7mCwELykDzOujbISJ9K6h/P9piL5t+TDM4HPlq2eOXszMjacF
+	 K5LMPTjDg/ghMoSK9LdY9TBbnxlU2YNsm7ElES92CGl/jeYgcn7T9lSDwgbB5GUyIevu6
+	 E7ilj06qGyFp/lxX08DQlPRPwNgv7O4izE0n0sUjYqQ7DiLIlVDjk9RBewC+gWmjRO678
+	 If7w3CAPzuwlimEAmR5p4UK+tlBiXmNw1f1juRjZRb/jihsPRN/AEgvqRDGtL0ytmZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793610486;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=sprFlcXfVCyoRFyVc0i5CR6tTtfxq5e1dCiCfIw2NEA=;
-	b=LjErM5OpFFwyFmfw36/7trhEg3UB7mU/++imwWjpdeETgbDvE1+7sf9t6UuQinyrtU5b
-	 oW2EiP3PBbRtoBJkWKoIsuGypvjOKYchKDGKvrZ4x9PjBUVNeoY6vQLSiCgtpYOxDiOHE
-	 kUOd34sXP/eeQFbQ27DMfrvGtcMGXINXNPaRpUfIayHU6viDX0zcYYne9G6na40o6qgfF
-	 NOs3ic3pRxBHLYOO52cp6meKo/JGrF9l/XzZlbAsUskyjuBvS8ysHoU3oTYElotVDZExp
-	 RGERDceXpz2ocv+O7cA+PG1oyTX2xqlrE8tsUZ21liaABaQNusN86zmme8vDKd//lbg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793612894;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-Proofpoint-Reinject:X-QCInternal:
+	 X-QCInternal:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=y99IFQU1Z/zGZnStXTf6TTTZ1kfP+dHEP9lO3wSWaEw=;
+	b=VnmcJTYHINdbTMeNO6idw8jLgPSgvucs45fMFiuD5hfuAM8g+E8VY7db0d0M9Wyv4F+N
+	 v1ZPSlWigRKLDi7cK6TYvtVEoOKi6/Vvj4AkZ2VGMoRr8Av/vbkVV6UeAb9PHjwBONxxg
+	 sXSMHAXSuSDR2jUOqCJyoahhMUH0+TQgOkjGWb4x5xnNo6m+QcA9rySJwsbEmkpiLvrUu
+	 KmgXdZeHbsjUNd3UAVPiIGtrbJoYWUOovY9GG8MA4jFC51aKqzHCXeXz41t2WmBzo/nQZ
+	 akKwIvQQuD1oyN4AUYNfgLQi0Bc75Rjbds2I+jjOlslLOb90bcCGX/1YVgwnCxrnIrQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vmOlSfGf;
-	arc=none smtp.remote-ip=209.85.210.49
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=CXIH8Kzk;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE53F606A324
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 09:08:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE53F606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCE2606A327;
+	Mon,  2 Nov 2026 09:48:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CCCE2606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vmOlSfGf
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-85c1135c286so1766745a34.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 01:08:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793610485; x=1794215285; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=sprFlcXfVCyoRFyVc0i5CR6tTtfxq5e1dCiCfIw2NEA=;
-        b=vmOlSfGfEwpDAXlBbnSzYcHqmtV8TAzZluvsvspZGKWlNH3Ruo/vofWND7LirIYXy4
-         ThC8JTzcpbm0gnzU05rvUIIoMG5mPt2D37EAVA558uWBUuinb3C3x76FAuul2/bcSpZB
-         ECfVx89xSgyfT6auMvhM9f+voy6+ukMXcm7+LC0qfJ39tHTfNuUAj9C3+xiU4KOijr11
-         yrQvrNYNM5WmCOTucMxRXyyXOfGIGMr4KBOWuIJGE0356q0Wp3rD3xdRvNgNag+qFUjC
-         ZYv08qg4tjzhFe3ddhpOXQY34hMM45L5gRQxK/UOTjSymYT+2pGgtuQc7MgPxOqqg4jR
-         VNLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793610485; x=1794215285;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=sprFlcXfVCyoRFyVc0i5CR6tTtfxq5e1dCiCfIw2NEA=;
-        b=pk2ikqqCmYMzbnSMcWCq4s2tieaeLpVrVnQhyX6t0IbPwJwN0mnv+vJq9IyotOGcTN
-         m8CXr2i2y+/Vy4zv0Mj4F/jH9Nt8sbWbP5WPM8jUjoBN0/4Hd9nOwJ92JqyF9BHnZEa0
-         j4ve9oMdaxSgJY53xyOwNgvwfaXDP+ElHGd8XFb9mx85tYshbj5rXLGYe83SQvYAvuOH
-         1fwUNTS2zPJSCctS5/tVagSYMN1cZp4xuoQ+Hc7paWKQ4V0C+pcSItFEK+9CIr9LYnRQ
-         KNyJ1vqWzVc7ZA8TyEQR5/nk33rIxkzzCNU/Vx2MKY0D00Yb7llIH70Q1dsHR3QTtERz
-         BXXQ==
-X-Gm-Message-State: AFq9FYLyJ1qSO+LOj9T/w3WI7R/tgyqm3fvis/VFVwGDN9LVkwvdKgK0
-	4fhmiejzavIDr0zVdLzYDSGQ66FUivNjDgVQeNershb/BzK5qF3/NlPs6XJXlQ==
-X-Gm-Gg: AYBFou2nYjyNMAm5XM++3gRajwYP8OmRCkQELsFcZho040h1emsLrfVzOTseTx+KCIu
-	LBIX5E8LqHcu6OqhaznP9LzH9fAqK827KIjWXC8ZPaq/GHyqCypPK2LsbX1KEGSY1Qqtz5IuRBD
-	+DZKWMumL+xotnxQE/qAqF+gd6T4jdWtwvVCA28cRZavzbQhDzcAF2imqRRQ4Bnx3qgRIX7xeVi
-	ZyxBD71/6/Dr19Dq/bVX+/oO+wvNFTUYZBgevt0+47v6GX5T6DKV64K33NXReZOH46C7JTQRXUh
-	+Mxz5+siZzTa2QRAWzag2YeeYTEQwBf04XYKoJ5/s7a0+wh+omBIbpogXdYqyT3u8QeBimQ3iLH
-	W34faxz6CNm9hIf0oSuX45POEozx5x5toFL1fLBB03iNIBI/kQZe6IZLu40szxxo4WzFZv/toXr
-	aV2tKyP2KAwgk4mXqzuPMnGlt8F6RJs4OBamUbMXXeBNQxKWNPkHQtFNtjqg1mxQAWAkgOCYumV
-	W8p4ghLBPFA69YPGUyCXjHnwKz9ArPsDGyvTeFEKV3ZLEleLiLqPKugvGY8HNnp
-X-Received: by 2002:a05:6830:2709:b0:844:ec25:c7e9 with SMTP id 46e09a7af769-85d362fc927mr7828297a34.3.1793610484828;
-        Mon, 02 Nov 2026 01:08:04 -0800 (PST)
-Received: from [172.17.0.2] ([52.183.221.246])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85d355295fbsm8829452a34.25.2026.11.02.01.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 01:08:04 -0800 (PST)
-Message-ID: <6ae852f4.d643d4e7.f723c.a651@mx.google.com>
-Date: Mon, 02 Nov 2026 01:08:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8551121075342478611=="
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=CXIH8Kzk
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A29AQmo3086616;
+	Mon, 2 Nov 2026 09:48:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=y99IFQU1Z/zGZnStXTf6TTTZ1kfP+dHEP9l
+	O3wSWaEw=; b=CXIH8KzkTO1VRrOHwyBIFcHrrPAixqmzWMcOUITuTuNeyyewWzn
+	VtAed7E5UyxIejohHkZ7T/qYY/BeR4r5hPa/evH/9jUXG0I1e7jdFHVcn7XfaoE3
+	jIU9zCeJyxUtx985ybJVZg+bINo/YwU2g+ztALIuuR6E5DM+RYv22zPIciCIJOp7
+	OOWTRhUHTe1YCSuv0nbSWCYfXkIn/45g9k8ZZgNziRtqA0Xd3GEdDZJUK5Il4Gvy
+	/oHTI74PYfMBPZMOwVRMk7MY9PpcNphF0fgnDoGoGVfAjk6593KxjXYGWLN9vwLc
+	8+1zb0v6t6Ra1rgko2mXbPLdejPzcHqATCw==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hpka616eg-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 02 Nov 2026 09:48:11 +0000 (GMT)
+Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A29m8gx3436119;
+	Mon, 2 Nov 2026 09:48:08 GMT
+Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6A29m8I43436112
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 02 Nov 2026 09:48:08 +0000 (GMT)
+Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
+	id 8A282671; Mon,  2 Nov 2026 17:48:07 +0800 (CST)
+From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        chejiang@qti.qualcomm.com, quic_chezhou@quicinc.com,
+        wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        mengshi.wu@oss.qualcomm.com, stable@vger.kernel.org,
+        Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
+        Cheng Jiang <cheng.jiang@oss.qualcomm.com>
+Subject: [PATCH v1] power: sequencing: qcom-wcn: increase WCN7850 power-up delay
+Date: Mon,  2 Nov 2026 17:48:00 +0800
+Message-Id: <20261102094800.3225454-1-shuai.zhang@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,63 +83,79 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com
-Subject: RE: Channel Sounding and RAP fixes
-In-Reply-To: <20261102081913.1623864-2-cheng.jiang@oss.qualcomm.com>
-References: <20261102081913.1623864-2-cheng.jiang@oss.qualcomm.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-ORIG-GUID: 6iWzyB_znUzkD8RYYlCAUl3ORHK0DJU1
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTAyMDAzOCBTYWx0ZWRfX+D0J6sTAJ9hP
+ km9cQ69FH6eGLxsWDKDT90Cg5YSwkXBFmSdTRRNVP5/erdydrQeHFAPSJDfzxoXhTXRJ8aRb2RC
+ 5x0vFEgnewKIBdNBVvkaIreuEE4tx4Q=
+X-Authority-Analysis: v=2.4 cv=ZbyIpcVA c=1 sm=1 tr=0 ts=6ae85c5b cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=ZpdpYltYx_vBUK5n70dp:22 a=EUspDBNiAAAA:8 a=v_2pxYgQTzMkBfL8lxYA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTAyMDAzOCBTYWx0ZWRfX4o43CnkcceWv
+ QqMvCtLaW+kqqk7ZGdJ/UNPnZxsmH/h2nDSuMfd3351YGW9rK9uugOrYxQMcwfmfuJnuF88LUsd
+ 8YNYXC2GE779n4yiDBxMFCVvY1UfJ3uxTK5sjElglQUtN4OlwS6Ds9QhXKMWXJXdYLfRkl8voED
+ 5GhsqNwE/OsNrEsm0MqQUhvf/k6HQ2gAXToW0pLYC6HxGwzyrEloIIzHXvAjqxFlPHntpCgd2X4
+ zhpXMyeEt1exnoM0LkBEXhjCZNESws1+DN8i5lKPzHSMkGCmDuU7lI0jnVSx2lcESyLz4yWaKJd
+ 5sVYYG9Bw8TMTi+NQ7m4nNRE+68y0ppc4kyy2COZPmbpKo/LQuritxWZXREofiSkXz1cyqC7Bvw
+ Uo3gRUNV0sEhEOijA0NbawlxXlR0O5mkM67x3eh+Jk14/312fLhVvdicJPe0tw6gKd5WbxTI1Ln
+ JMQStDfzFjkbRWzzeOQ==
+X-Proofpoint-GUID: 6iWzyB_znUzkD8RYYlCAUl3ORHK0DJU1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-02_03,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ phishscore=0 adultscore=0 clxscore=1011 bulkscore=0 impostorscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2610300000
+ definitions=main-2611020038
 
---===============8551121075342478611==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When the WCN7850 is powered up from the Bluetooth side first, i.e.
+BT_EN is asserted while WLAN_EN is still low, the chip starts from a
+cold state and is not ready to accept the first HCI command 50 ms after
+BT_EN goes high. The first command (0xfc00, read QCA version) is lost,
+hci_qca does not resend it and fails after the 2 s command timeout:
 
-This is automated email and please do not reply to this email!
+  Bluetooth: hci0: Reading QCA version information failed (-110)
 
-Dear submitter,
+When WLAN is powered first, 50 ms is sufficient, so the failure only
+shows up in the BT-first ordering. Measured on the affected board by
+which enable pin rose first:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1198568/
+  pwup_delay_ms   BT-first boots   with -110
+  50              9                9
+  75              23               0
+  100             21               0
+  300             20               0
 
----Test result---
+Raise the power-up delay of WCN7850 to 100 ms. The delay is shared by
+the Bluetooth and WLAN targets, so WLAN power-up also waits 50 ms
+longer.
 
-Test Summary:
-CheckPatch                    PASS      7.35 seconds
-GitLint                       FAIL      4.51 seconds
-BuildEll                      PASS      13.67 seconds
-BluezMake                     PASS      179.90 seconds
-MakeCheck                     PASS      13.01 seconds
-MakeDistcheck                 PASS      99.32 seconds
-CheckValgrind                 PASS      157.65 seconds
-CheckSmatch                   PASS      179.66 seconds
-bluezmakeextell               PASS      63.53 seconds
-TestFunctional                PASS      845.97 seconds
-IncrementalBuild              PASS      317.45 seconds
-ScanBuild                     PASS      637.91 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,08/15] profiles/ranging: Let StartMeasurement() pick the Initiator for Both
-
-1: T1 Title exceeds max length (82>80): "[BlueZ,08/15] profiles/ranging: Let StartMeasurement() pick the Initiator for Both"
-[BlueZ,12/15] profiles/ranging: Defer CS Security Enable until the link is encrypted
-
-1: T1 Title exceeds max length (84>80): "[BlueZ,12/15] profiles/ranging: Defer CS Security Enable until the link is encrypted"
-[BlueZ,13/15] profiles/ranging: Choose the CS antenna configuration from both ends
-
-1: T1 Title exceeds max length (82>80): "[BlueZ,13/15] profiles/ranging: Choose the CS antenna configuration from both ends"
-
-
-https://github.com/bluez/bluez/pull/2747
-
+Fixes: 2f1630f437df ("power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets")
+Signed-off-by: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
+Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/power/sequencing/pwrseq-qcom-wcn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/power/sequencing/pwrseq-qcom-wcn.c b/drivers/power/sequencing/pwrseq-qcom-wcn.c
+index 636dd7e63..05ee1785e 100644
+--- a/drivers/power/sequencing/pwrseq-qcom-wcn.c
++++ b/drivers/power/sequencing/pwrseq-qcom-wcn.c
+@@ -427,7 +427,7 @@ static const char *const pwrseq_wcn7850_vregs[] = {
+ static const struct pwrseq_qcom_wcn_pdata pwrseq_wcn7850_of_data = {
+ 	.vregs = pwrseq_wcn7850_vregs,
+ 	.num_vregs = ARRAY_SIZE(pwrseq_wcn7850_vregs),
+-	.pwup_delay_ms = 50,
++	.pwup_delay_ms = 100,
+ 	.targets = pwrseq_qcom_wcn_targets,
+ };
+ 
+-- 
+2.34.1
 
---===============8551121075342478611==--
