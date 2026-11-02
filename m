@@ -1,54 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793619430;
-	b=arGZrg6GP3aPwV8rCkSyAtfK6lBb9J6YgUaJAZVgXziz8P0MEKWCXLPsfAt2D268qvYf
-	 6IYyBmsYUg9x8u4VaQUZ8K/ae4xef1X4OjCsYo07x2O+s8rgL/e/jcEmzp5OIWvu9Y7AJ
-	 jhI/AlNVvG2iXtp2TGM/YQx9TAx5pAak+ZZYm7eLc5RlheUjLEbUdjGhQ0u5Q57bKMufS
-	 eKV3yNAo8lknj/W7T5snPYK27vZt93yIMz/x1OHEZ4XLjxkRzHx6Lx+0VxaYOqJArgNPt
-	 5ifkXX5dQsIkREFFMG8n60BzV8hMiq+kO9SnP2/tBil3n06DR0/fKEVqcn9X5QSP1DQ==
+	t=1793620724;
+	b=2QuAs6GPczno6VvCmCH3w95PdOZSAE/U3jcdobuzxZHNbYLwJP7wX+YkPt6F6ChC8ZB9
+	 cn3OkPN9j0y9cmSkQqgkyDx8Re+2Li+4IdEc5iimYEQbrCXPelAHm+bx0cpNZNKwONMGN
+	 YtP3sXKR7fKBT6Yik3sj2U2MDX6Wk0QX08dib9z0cdXFPIJb0kFjxG22+O1Eprpe01AZs
+	 fVyhIb/lctd1af/Agiz/YFe6QBF2RzgJkoZIEomnPStM1DM011coIpUmOkWWWl15a4LD9
+	 HfcTsGdCz7rqdvT2Dxh0FC91EHd3g998xSlmuHR2QocAwHnh7LVDXSmfvyJ0MTEN3+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793619430;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=bytB1fyy1wX/WQ59LZvnIJkEOWibnESqXNvK/GAnXzw=;
-	b=sI+knYPohQNeidfkTX2bzzxEMwUSWlmdF3k0WQmXmbV7JK0xRkU2k8vL1s7sqLrpmrk3
-	 paUFkIIJBAdQGGKhvLXrZ0MEQUQM32mrKWeHjLNwgrDux6bx0QH6rqZPYXdOMJjKFZF1t
-	 jXXqBTIC+ZrYCrM+JaGtCj9AznsiWYk/RyykjxrWzYC3ZjyvHEkcvMVawtST+GxrnWkby
-	 aFQezXZifA+6l57kJTuE8mHHaYI45d7M7Virog3y4CTXG65XTx/mcl+WsxgDO22L1pfKe
-	 yD7Lz3Pf1BIIiwSgdnSY9YyH5klclYOTTEE3UeRsM5FtNY78gz7MehRL15XEvhskCuQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793620724;
+	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version:X-HM-Tid:
+	 X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
+	bh=QA8QHK3ZtUn9TzFs8P37lxt4nTIOC/0mWQHKcLfADpA=;
+	b=L9EtcJkMJX4sUQsWPU1ogwkPeN2B5MJ/ufsKqPYnqpEoQ+5axZeTvLnOd1hrvixJI93T
+	 WL4+3hnEh0YcREri11P+HiUmWfRzKtWjIXJfsKKhOwpO5mJcB3wf+ocuWtdfDQVMmMnPJ
+	 6BV3rwuS6ErIhiU3nBt5AL6lPmNz2vLpwKWx3kga6XAWDQHPoik01MPf4tE4lIJ2fvH9k
+	 S4iNeSX05Xu7RPNxtW/kcrA/kmG54XG/Cp1zrWFLDCLgKzwF4PkzMzPeFdTsc+inmREXM
+	 ZuX8ddH8ZWMs+kK8QQV7I/2utvVkXHv/xa2BLrFIC7kaMzgA2Gg0Qh/Bg5K96fhsnGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=stu.xidian.edu.cn;
-	spf=pass smtp.mailfrom=stu.xidian.edu.cn;
-	arc=none smtp.remote-ip=162.243.164.118
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD77606A324;
-	Mon,  2 Nov 2026 11:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CD77606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=bytB1fyy1w
-	X/WQ59LZvnIJkEOWibnESqXNvK/GAnXzw=; b=skrzj08kxkryWvIEUi8iQj1zku
-	JiokPaJ7DZ1bnWmQqEvm/w3XutwSNF1onLlAUF2kqPazWo5RfoRfBjk2auaQTI4A
-	9YFxAY4xxcDEITce4fwSm26t2+hJXcEBf8iQAy+etVl9cmdLzAbHEsgmqk4n7kXt
-	lyxku5QYguxdh+Fhc=
-Received: from user-virtual-machine.localdomain (unknown [113.200.174.101])
-	by hzbj-edu-front-3.icoremail.net (Coremail) with UTF8SMTPA id BbQMCkDm6v3XdehqXgsZAQ--.24966S2;
-	Mon, 02 Nov 2026 19:36:55 +0800 (CST)
-From: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
+	dmarc=pass header.from=stu.pku.edu.cn;
+	spf=pass smtp.mailfrom=stu.pku.edu.cn;
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=L7Rgw8mC;
+	arc=none smtp.remote-ip=45.254.49.197
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069E5606A327;
+	Mon,  2 Nov 2026 11:58:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 069E5606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=L7Rgw8mC
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [1.202.162.49])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 5330b2347;
+	Mon, 2 Nov 2026 19:58:38 +0800 (GMT+08:00)
+From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Bin Yu <byu@xidian.edu.cn>,
-	Cheng Wen <wencheng@xidian.edu.cn>
-Subject: [PATCH v2] Bluetooth: btusb: fix use-after-free in force_poll_sync
-Date: Mon,  2 Nov 2026 19:36:54 +0800
-Message-Id: <20261102113654.8724-1-25031212351@stu.xidian.edu.cn>
-X-Mailer: git-send-email 2.34.1
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>, linux-kernel@vger.kernel.org
+Date: Mon, 02 Nov 2026 19:58:37 +0800
+Message-ID: <179362071770.29269.15160948500453012976@stu.pku.edu.cn>
+Subject: [PATCH 0/2] Bluetooth: validate retained LE ISO command lengths
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,96 +55,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BbQMCkDm6v3XdehqXgsZAQ--.24966S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr43Ary3uF18urWkWr1fCrg_yoW5GFykpF
-	WDCa4YkrWUtr4DCrn8Aa1xAasYv397X34UCa429345Wr9xW348AFyxt3yYgr97urWUAw12
-	yFn8KFy3u3W5CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib7Iv0xC_Zr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28I
-	cVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx
-	0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY
-	1x0262kKe7AKxVWUAVWUtwCY02Avz4vE14v_Gw4l42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUcXdjDUUUU
-X-CM-SenderInfo: ysvqjiysrsjkur6v33wo0lvxldqovvfxof0/1tbiAQUFD2rnVdSm9wABsS
+X-HM-Tid: 0aa19c2032fe03a2kunmab045f0fe84cf
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlDTBpPVktKHh0fQ0hOSUNPT1YeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlKVUlLSVVKTUlVT0JZV1kWGg8SFR0UWUFZT0tIVUpLSEpMTU
+	NVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=L7Rgw8mCoM6vbX7F72lzI/m16not6uVxNwd85cmUTgvpdwc0sK0m+oqR9Dv2IRV77dPDE/PsCoPl2/t9iGhrWWupmsUDPXkgxihjSZiLiEYIdC8YxQ5052NXGaLhecvSkil9FYwFsqpjsEdwj6ziDUaGznI5/xpJ45dC/PRfsKQ=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
+	bh=QA8QHK3ZtUn9TzFs8P37lxt4nTIOC/0mWQHKcLfADpA=;
+	h=date:mime-version:subject:message-id:from;
 
-The force_poll_sync debugfs file uses the driver's struct btusb_data as
-its private data. The file is created under hdev->debugfs and is removed
-only when the HCI device is released, while btusb_disconnect() frees
-btusb_data unconditionally. The HCI device can outlive the driver data,
-for example when an HCI socket still references it, so reading or
-writing the already opened file then dereferences freed memory:
+Two LE ISO event handlers use flexible-array data from the retained command
+skb without checking how much command data is present.  A malformed command
+can therefore make either handler read beyond the skb when the controller
+returns its status or completion event.
 
-  BUG: KASAN: slab-use-after-free in force_poll_sync_read+0x129/0x140
-  Read of size 1 at addr ffff88800cfb7038
-  ...
-  Freed by task ...:
-   kfree
-   btusb_disconnect
+Add a saved-command helper that also returns the parameter length, then
+use it to validate LE Create CIS and LE Set CIG Parameters commands before
+their CIS arrays are accessed.
 
-Remove the debugfs file before the private data is freed.
-debugfs_remove() waits for callers that are already inside the file
-operations, and any later access fails with -EIO instead of reaching the
-driver, so btusb_data can no longer be dereferenced after it is gone.
+Yifan Zhang (2):
+  Bluetooth: validate retained LE Create CIS command length
+  Bluetooth: validate retained LE Set CIG Parameters command length
 
-Fixes: 800fe5ec302e ("Bluetooth: btusb: Add support for queuing during polling interval")
-Cc: stable@vger.kernel.org
-Co-developed-by: Bin Yu <byu@xidian.edu.cn>
-Signed-off-by: Bin Yu <byu@xidian.edu.cn>
-Co-developed-by: Cheng Wen <wencheng@xidian.edu.cn>
-Signed-off-by: Cheng Wen <wencheng@xidian.edu.cn>
-Signed-off-by: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
----
-Changes in v2:
-  - Rebase onto v7.4-rc1; btusb was split into btusb_main.c and
-    btusb_qcom.c, so the fix now touches btusb_main.c.
-  - No functional change.
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 18 ++++++++++++++----
+ net/bluetooth/hci_event.c        | 14 +++++++++++---
+ 3 files changed, 27 insertions(+), 7 deletions(-)
 
- drivers/bluetooth/btusb_main.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index 92a78a7e6039..95398e2ca098 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -1088,6 +1088,8 @@ struct btusb_data {
- 	int (*disconnect)(struct hci_dev *hdev);
- 
- 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-+
-+	struct dentry *force_poll_sync_dentry;
- };
- 
- static void btusb_reset(struct hci_dev *hdev)
-@@ -4820,8 +4822,9 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	usb_set_intfdata(intf, data);
- 
--	debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
--			    &force_poll_sync_fops);
-+	data->force_poll_sync_dentry =
-+		debugfs_create_file("force_poll_sync", 0644, hdev->debugfs,
-+				    data, &force_poll_sync_fops);
- 
- 	return 0;
- 
-@@ -4862,6 +4865,9 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	if (!data)
- 		return;
- 
-+	debugfs_remove(data->force_poll_sync_dentry);
-+	data->force_poll_sync_dentry = NULL;
-+
- 	hdev = data->hdev;
- 	usb_set_intfdata(data->intf, NULL);
- 
 -- 
-2.34.1
-
+2.39.5 (Apple Git-154)
