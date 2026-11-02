@@ -1,73 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793607566;
-	b=JpRLylprJX5fmnilja9PAZYGqdY9EMBBavCK6rb4ZxWp7j0VBBAYIVh5l8TCFtxKR0+U
-	 fSC/xRzYN1W+VWSPLNJrpvXQQmg/d/GZJOv6SjLg/7sPosxGCL2TGGwE6XzxBnZ4OD51P
-	 dvAMiF2QzEv3Hk5hm4tk3xayuq736eRIVn9FjcIR+zTN2DzS7/suhrNzOgbYzkGP+RJhP
-	 UeiQPHHLBQxzxPp0BZ/z5DVFVzk45oOzQAdsUxbBptgwQoeznzgbEvCbZRX7aXEONRar+
-	 iI7YA8Ifljk815W+k73IGYRNy1eBLg2KXof5kMGvKgSAB/eMKV9ruNwVwGzJAmoIFjA==
+	t=1793607567;
+	b=rpTNqSIgEH4U5Vh50/ThI56FumXMs0bm3oL6lh2TR/4Zzel7k1dC102E9U0m42ymYqFP
+	 4D9h8gjcBpLIUmLMIRPR7CwmiL6B3WqZiD4whoeEqxXaD15/f6RnuohNv9xV6eBC0dmPJ
+	 tW75Pk3elii80U5H7M+P6OPhtvEzxlakPoujT9xh2EptBI4acJS/Cuw1IpfC6fvxcFlfS
+	 zogqzCt1fDQWWWvBSDgaLuBjmeZik6q7xnxybvRJW3emK8PoHBSkMUZS4B7R6tKHkioBj
+	 UyiOVU0tYKsjMQJeI+GDM8amhVsp59xRGs8vLl4kJ0XAnezVoA2Z/Zn6dq8GLVcp0RA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793607566;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793607567;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:From:
 	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
+	 MIME-Version:Content-Transfer-Encoding:X-Proofpoint-Reinject:
+	 X-QCInternal:X-QCInternal:X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
 	 X-Proofpoint-Spam-Details;
-	bh=xCsJmIdnOHUeWnjcDmdIFDrnRy8gq0JIH0CkfW1kBqg=;
-	b=slDT6ThRy3wbO8yhs17uqxmoT5a49wK2nb8dh8FLCeJOv+GwNkGXJ9U+iy5yF+VHybRD
-	 lhPVTVMbVgam95CN3ycLHlsEQ3hbB7D7VQtnJucVMG7stK4O4t+lzInpm66amZimgsh2o
-	 uJm80G+Dacglo3BzxUvzbJk0p/lCBC0rYv7t8fe7urflpGiQAOAH0oTiSecutr0aE8ZOl
-	 Il0UZLfzR5BHlUhoK3F35WHPCsm9jOCHY81vWZrBOJDNqLOZIddTWQeS0WUjr9h6cVa7w
-	 xZ7oJBuRsu6QJ+WVCUsPhtze9is3CssEqMDPeRG7tiOYKuOnlK64rrmxoA1U9ZOyPfA==
+	bh=ag8LYmBeEHG/OQCSSIAlL9n8t1Xl1ONpPaDoB+SqM7I=;
+	b=tzMv/3dkCrXDCZvtNqZQPZGav9FfgR6rcIobco5X65dJbSxjyv5NUeLChMkV8iBlaZb3
+	 p+HJThulvNNX7WWOpl9KlRl10stZNrInCo+fhS3uh2K2xuqnOI2LiDiK0Hf/yL8MYPody
+	 WexwMG4nDDXNdNeL1ADnn+euTwrtEVgfSPCrqw+6E7UXCIS0/A8CScCu908oaBE7H6PVo
+	 fficPorh8ayUbGdonycoUTYYNFox/rWH9UD6tMDAmn0adzG0fXv9MPQcQTYrfwEBAFd8q
+	 vn5S4gd9+Or0zbDqlt/seGrO9kMnZKAAJ3YzqmXV8o+XbkXmoPSiOUpGffJtilp6WDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=M32wB4pt;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lbvQsOJM;
 	arc=none smtp.remote-ip=205.220.168.131
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31154606A338
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 08:19:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 31154606A338
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F51606A337
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 08:19:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73F51606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=M32wB4pt
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A27nNaw3220287
-	for <linux-bluetooth@vger.kernel.org>; Mon, 2 Nov 2026 08:19:25 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lbvQsOJM
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A25VsiF3924178
+	for <linux-bluetooth@vger.kernel.org>; Mon, 2 Nov 2026 08:19:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	xCsJmIdnOHUeWnjcDmdIFDrnRy8gq0JIH0CkfW1kBqg=; b=M32wB4ptIE5XzdI+
-	N/VEOkneXLJga5MdLQZW67DzDFYuP9la46eaRgpaJI6fk5r1vVhImEOv4oCOKnTV
-	Ay7+JjE3/PPez9z4SyuS/oiy0bdOOVqshLoawqRA6PjuCQfeoFlT0xXN3OGE6FV4
-	MVbRS7OysjaS/LO9gIP4bI2E9bTjHBKcf5MTIvNDJymH5cyn0ICPkPhJ5RhcFvu4
-	rLD5OygA5ZoBDf7NaP/8NxzF+K2c+xZvyry/NxOEl73waOSzcj5rkTzPTQzpCrJm
-	tRApcLxnpm0W/RCqYrDLWYYN7XHMRfsVcWz+mjL3vkBBSDyv0jzM3+JjasEZNS/F
-	HB7h4Q==
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=ag8LYmBeEHG
+	/OQCSSIAlL9n8t1Xl1ONpPaDoB+SqM7I=; b=lbvQsOJMWuZ/U4meY6WLx9j2iWK
+	wFEp475VWoeBT6FYpjJ93WwQPQk5Y9UccNO7JtOhqzhaM+Gt0QZoLsdNIwWsL9S1
+	6/ZH8Tt500NI74w2coI2RAz4k4XG5Y+CKfqGYjNbENgSTUh83UYID4BgQMjdj27G
+	RJp5nKihFGCQoV0ZkgrI/yE+LXc4eU4MigEkBplbvi8XB7y1MXIM7Ezwh0Xb9+iB
+	K3lorGWpUzrCA+Ztmm2tWdMo7nNc2qdGtl9qNlWQ0ZXWTY6LVqh4kMjgFCiQvLH8
+	4iiCRy+S05zisdJ5uj+kFBw0dtnyeHgAukTmm0XAClzcuvNbtso7hKJXKqQ==
 Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hppfe83wv-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hpmf1rjyd-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 08:19:25 +0000 (GMT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 08:19:26 +0000 (GMT)
 Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A28JNj63331183;
-	Mon, 2 Nov 2026 08:19:23 GMT
+	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A28JKm53331060
+	for <linux-bluetooth@vger.kernel.org>; Mon, 2 Nov 2026 08:19:24 GMT
 Received: from bt-iot-sh04-lnx.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTP id 6A28JJg33331043;
-	Mon, 02 Nov 2026 08:19:23 +0000 (GMT)
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTP id 6A28JJg53331043;
+	Mon, 02 Nov 2026 08:19:24 +0000 (GMT)
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: jinwang.li@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
         Cheng Jiang <cheng.jiang@oss.qualcomm.com>
-Subject: [PATCH BlueZ 08/15] profiles/ranging: Let StartMeasurement() pick the Initiator for Both
-Date: Mon,  2 Nov 2026 16:19:05 +0800
-Message-ID: <20261102081913.1623864-9-cheng.jiang@oss.qualcomm.com>
+Subject: [PATCH BlueZ 10/15] profiles/ranging: Act on a CS configuration created by the peer
+Date: Mon,  2 Nov 2026 16:19:07 +0800
+Message-ID: <20261102081913.1623864-11-cheng.jiang@oss.qualcomm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261102081913.1623864-1-cheng.jiang@oss.qualcomm.com>
 References: <20261102081913.1623864-1-cheng.jiang@oss.qualcomm.com>
@@ -80,169 +79,130 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Authority-Analysis: v=2.4 cv=SeZi5fRu c=1 sm=1 tr=0 ts=6ae8478d cx=c_pps
+X-Proofpoint-ORIG-GUID: EE3HRTzStrjcHZJETNQcgHq9qm4xJ_Ms
+X-Authority-Analysis: v=2.4 cv=bNaDs/+Z c=1 sm=1 tr=0 ts=6ae8478e cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=71qAId39zc2m8ACVpswA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTAyMDAzMiBTYWx0ZWRfX3byyHevCCjf1
- ycn19tf2DoKF0Tjabpy2uKDHYescHsRawJSMOAZMZ1EOX1oM9LMLUkg+p9X0uqhGMnvB70buMkP
- /+wXENQzePdmdHj5d+tOVslEmT6nxukawnYWR0ZyRXOPxC478zEMM+Y/w1chplcph/4R10oELU2
- kHe1vV/wHcbUd2sYMCyWb1fnJNynJIewI/GyPfHEk5RA90XVLf3pZioIo27nHIU8Tz+wICuppkd
- YtpT3r2LhENh+VAXD3RFq2ulKGW2lawZFMPtsYOTMFvO9g1Qr1vuKFLhnP+/IL16T+GY4HV4o/L
- Bs1ribzeKZJb10AYKmszmfLbTNs1DD9eooqHWPbKEtxQZK1OK9cgiqHUiSITU2gs6Z521jxEMes
- SAIMQppk579SIkJvdTG6Jy/ZGIqTZpqcdZkyVH+18kiFcsKDpU5QCZDkjlLQYrCfwa97aEBIUi7
- iSz8MDl/+I0UYVQtEWw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTAyMDAzMiBTYWx0ZWRfX6/UqwWvxacmg
- 6nnH9CAA82nwv/NrqpPZ/+XRZXKBz+D1Xe/AfLUP7t3+seQD2JpKOpBDoeczURKtnzhV/qJHLJG
- Rpmqfl4UWfgjIL3JhbY8SX3vAsA8lao=
-X-Proofpoint-ORIG-GUID: wSmaoeqPQoRaqvurPQYJXo31enXcQIRt
-X-Proofpoint-GUID: wSmaoeqPQoRaqvurPQYJXo31enXcQIRt
+ a=MzT2TaW_STTz_qO-:21 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22 a=uc-NRWdrDaRFPdozmDoA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTAyMDAzMiBTYWx0ZWRfX6Qy06IxeFUK8
+ vLGb83/Y3Gowdx+AvnJ4g3wxPL9jcAHMgQ/gvPXRFPh5/h0kHSe2Y235V+Dq39JK3JSjAQhEMhi
+ EoCweTxN6wUExjrNjU+cn1vhsRD861WXLeYP5Ie++Iy5ZPmgE106s+Cchz580fT3b6jMc4nSjOS
+ HPsaW0PTwaQUT2G5FLmT8i6ZWHzbCh+LiK0EyExgZQAKyE8JTLNbBQceHMjGtqIbYBksoXDAUk4
+ vYVGzWk1/K6IMW9dkIKuOaNrG58tctkQu5S9c8f9oiu7Nscrg6iY1QiDG2hy+hew1/gEc4QXhlF
+ 0B2Hntj3Z0RwnGnjIRpP+Kf6DV9GEdj8p8gDYNyK5qKAVmWfUXCEfvno1KQLsoFdUXVMEpM/4gl
+ KkiTmFUA6XeTapa+koB1TSqKtGC4PG5YowPvvYEdnTO6V9y3IjQO8EvGGZIfP6lfgsRsrBu/Tn9
+ a33jszdR/v7DqQSPyiQ==
+X-Proofpoint-GUID: EE3HRTzStrjcHZJETNQcgHq9qm4xJ_Ms
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTAyMDAzMiBTYWx0ZWRfX5IJ9QPkPS7zb
+ MI9l0XwOpgObCkFtFZCaTD4doZxs1OqiIRCktB6bGCRZ+E2lfEP34fg7osFup3MwuiB5OFuKhRK
+ bSTd2oA2f+WdBx59JW5OeU4S4OBj8dQ=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-02_02,2026-10-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 priorityscore=1501 clxscore=1015 phishscore=0 malwarescore=0
+ impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 clxscore=1015 malwarescore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611020032
 
-Role_Enable is a bitmask of the CS roles the Host permits, and the CS
-roles are independent of the GAP roles. When Role_Enable permitted both
-roles, the setup code let the GAP role decide, so a Peripheral that
-called StartMeasurement() still waited as Reflector and took the
-Initiator role only when Role_Enable permitted nothing else.
+LE CS Config Complete is also generated when the local Controller has
+responded to a configuration request from the remote one (Core v6.2
+Vol 4 Part E 7.7.65.42). The handler required CS_STATE_WAIT_CONFIG_CMPLT
+before parsing the event, which is only reached between the Set Default
+Settings response and Config Complete of a StartMeasurement(). A remote
+Initiator does not wait for that: it can create the configuration as
+soon as the link is up, before the local setup phase has run, or again
+after an earlier procedure. The event was then dropped along with the
+role it carries, Security Enable Complete and Procedure Enable Complete
+failed their own state checks, and no ranging data was produced.
 
-The setup phase only runs from StartMeasurement(), so the local Host is
-always the one asking to measure: take the Initiator role whenever
-Role_Enable permits it.
+Parse Config Complete in any state. Every state machine on the adapter
+receives the CS events of all links, which the state check used to
+hide, so ignore Config Complete and Security Enable Complete events
+whose handle is not mapped to this state machine, so that they cannot
+overwrite this link's role or advance its state.
 
-Both sides may now ask for a configuration at the same time. The
-collision rules let the Central's request complete and reject the
-Peripheral's with LL Procedure Collision (Core v6.2 Vol 6 Part B 5.1.25
-and 5.3). Ignore that rejection instead of removing the config ID, which
-could remove the configuration the Central has just created.
-
-The Config Complete role check compared Role_Enable with the two
-removed helpers. Check the reported role against the Role_Enable bits
-instead, which accepts the same roles for every valid Role_Enable.
+A successful removal (action 0x00) leaves the remaining parameters
+undefined, yet it went on to the role check and, if the undefined role
+happened to be permitted, to Security Enable. Ignore it whatever the
+state.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/ranging/rap_hci.c | 59 +++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 23 deletions(-)
+ profiles/ranging/rap_hci.c | 42 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 7 deletions(-)
 
 diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 0eea018cc..f23e89cfe 100644
+index ef01e60c5..39b167ba8 100644
 --- a/profiles/ranging/rap_hci.c
 +++ b/profiles/ranging/rap_hci.c
-@@ -348,17 +348,30 @@ static enum cs_state cs_get_current_state(struct cs_state_machine *sm)
- 	return sm ? sm->current_state : CS_STATE_UNSPECIFIED;
- }
+@@ -882,13 +882,6 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
  
--static bool is_initiator_role(const struct cs_state_machine *sm)
-+/* Role_Enable is a bitmask of the CS roles the Host permits for this link
-+ * (Core v6.2 Vol 4 Part E 7.8.134), not a selector for one of them.
-+ */
-+#define CS_ROLE_ENABLE_INITIATOR	0x01
-+#define CS_ROLE_ENABLE_REFLECTOR	0x02
-+
-+/* Whether Role_Enable permits the CS role (CS_INITIATOR or CS_REFLECTOR)
-+ * that LE CS Config Complete reports for the local Controller.
-+ */
-+static bool cs_role_permitted(const struct cs_state_machine *sm, uint8_t role)
- {
--	return sm->role_enable == 0x01;
-+	if (role == CS_INITIATOR)
-+		return sm->role_enable & CS_ROLE_ENABLE_INITIATOR;
-+
-+	return sm->role_enable & CS_ROLE_ENABLE_REFLECTOR;
- }
+ 	DBG("size=0x%02X", size);
  
--/* For role_enable=0x03 (Both), Central acts as Initiator and Peripheral as
-- * Reflector — the link layer topology determines the CS role assignment.
-+/* The setup phase only runs from StartMeasurement(), that is when the local
-+ * Host asked to measure this peer, so take the Initiator role whenever
-+ * Role_Enable permits it. The CS roles are independent of the GAP roles.
-  */
--static bool is_both_role(const struct cs_state_machine *sm)
-+static bool cs_local_is_initiator(const struct cs_state_machine *sm)
- {
--	return sm->role_enable == 0x03;
-+	return sm->role_enable & CS_ROLE_ENABLE_INITIATOR;
- }
- 
- /* Helper function to send read remote capabilities for all connections */
-@@ -503,7 +516,6 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
- {
- 	const struct bt_hci_rsp_le_cs_set_def_settings *rp;
- 	struct cs_state_machine *sm = user_data;
--	struct rap_conn_mapping *m;
- 
- 	if (!sm || !data || size < sizeof(*rp))
- 		return;
-@@ -521,22 +533,13 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
- 	if (rp->status == 0) {
- 		cs_set_state(sm, CS_STATE_WAIT_CONFIG_CMPLT);
- 
--		/* Send CS Create Config if we are (or will act as) Initiator.
--		 * For role_enable=Both, Central acts as Initiator.
-+		/* Only the Initiator creates the config; the Reflector waits
-+		 * for its own CS Config Complete.
- 		 */
--		if (is_initiator_role(sm)) {
-+		if (cs_local_is_initiator(sm))
- 			rap_send_hci_cs_create_config_command(sm, rp->handle);
--		} else if (is_both_role(sm)) {
--			m = find_mapping_by_handle(sm, rp->handle);
+-	/* State Check */
+-	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT) {
+-		DBG("Event received in Wrong State!! ");
+-		DBG("Expected : CS_STATE_WAIT_CONFIG_CMPLT");
+-		return;
+-	}
 -
--			if (m && m->is_central)
--				rap_send_hci_cs_create_config_command(sm,
--								rp->handle);
--			else
--				DBG("Both role: Wait for CS Config Cmpl");
--		} else {
-+		else
- 			DBG("Reflector role: Waiting for CS Config Completed");
--		}
- 	} else {
- 		/* Error - transition to hold */
- 		error("CS Set default setting failed with status 0x%02X",
-@@ -889,6 +892,18 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 	/* Pull the entire structure at once */
+ 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
+ 	if (!evt) {
+@@ -898,6 +891,35 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
  
  	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
  
-+	/* Both sides asked for a configuration at the same time. The Central
-+	 * rejects the Peripheral's request with LL Procedure Collision (0x23)
-+	 * and completes its own, which the Peripheral handles instead (Core
-+	 * v6.2 Vol 6 Part B 5.3). That configuration arrives in an event of
-+	 * its own, so there is nothing to undo here: removing the config ID
-+	 * could remove the one the Central has just created.
++	/* Every state machine on this adapter sees every CS event, so ignore
++	 * the ones for other links: acting on them would overwrite this
++	 * link's negotiated role and advance its state.
 +	 */
-+	if (evt->status == 0x23) {
-+		DBG("Config collided with the peer's, using the peer's");
++	if (!find_mapping_by_handle(sm, evt->handle)) {
++		DBG("Not for this link, ignoring");
 +		return;
 +	}
 +
- 	/* Check status */
- 	if (evt->status != 0) {
- 		if (evt->action != 0x00) {
-@@ -934,9 +949,7 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 	 * (CS_INITIATOR=0x00, CS_REFLECTOR=0x01)
- 	 * which is different from the role_enable value sent in HCI command
- 	 */
--	if ((is_initiator_role(sm) && rap_ev.role != CS_INITIATOR) ||
--	    (!is_initiator_role(sm) && !is_both_role(sm) &&
--	     rap_ev.role != CS_REFLECTOR)) {
-+	if (!cs_role_permitted(sm, rap_ev.role)) {
- 		error("CS Config role 0x%02X doesn't match role enable 0x%02X",
- 			rap_ev.role, sm->role_enable);
- 		cs_set_state(sm, CS_STATE_HOLD);
++	/* Action 0x00 reports that the configuration was removed, and leaves
++	 * the remaining parameters undefined (Core v6.2 Vol 4 Part E
++	 * 7.7.65.42), so there is no role or configuration to act on.
++	 */
++	if (evt->status == 0 && evt->action == 0x00) {
++		DBG("Config %u removed", evt->config_id);
++		return;
++	}
++
++	/* This event is also generated when the local Controller responded to a
++	 * configuration request from the remote one, which is how a Reflector
++	 * learns a procedure is being set up for it. The peer can do that
++	 * before the setup phase has run here, or after an earlier procedure,
++	 * so do not require WAIT_CONFIG_CMPLT, which only the local setup
++	 * phase reaches.
++	 */
++	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT)
++		DBG("Config created by the peer while in %s",
++			state_names[cs_get_current_state(sm)]);
++
+ 	/* Both sides asked for a configuration at the same time. The Central
+ 	 * rejects the Peripheral's request with LL Procedure Collision (0x23)
+ 	 * and completes its own, which the Peripheral handles instead (Core
+@@ -1044,6 +1066,12 @@ static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
+ 	DBG("status=0x%02X, handle=0x%04X",
+ 		rap_ev.status, handle);
+ 
++	/* Shared HCI channel: drop events belonging to another link. */
++	if (!find_mapping_by_handle(sm, handle)) {
++		DBG("Not for this link, ignoring");
++		return;
++	}
++
+ 	if (rap_ev.status == 0) {
+ 		/* Success - proceed to configuration */
+ 		cs_set_state(sm, CS_STATE_WAIT_PROC_CMPLT);
 -- 
 2.43.0
 
