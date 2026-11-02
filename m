@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793656504;
-	b=iYgvsemE7QJOtiM3xsqDYi3aHWQZ5BOYSF3f+6Wwhp905CCvWq7M/HdsbWnHUbk0U2Df
-	 ZA6kt3T+A9ojbLxzrtvzYYxBOIDVFp36FTW1URl5jRTZ/i0+AFSK3kbLJqak1MqGDn/vP
-	 xtoSsX5LgOq824e/4JWx6dlJmmzLYgar0NOgcy4A8X16ufeBdIPpkhFE8ns+p+R60u5cp
-	 O4M3FyMI29aArKM8dMUv9a/g/WgPI6+R36otCqDMLrW28N3F2A3XIod6aR2IsScXwKz6u
-	 6NyAZwS6V7JaS875Cbg/YG4v3Q6XB6Wzq2LZJf9Az+3KipsSRrhulJg9XtXmdb2lr3g==
+	t=1793656506;
+	b=OdJHhQ65FA/RllGT5/J6rH+TCAHIVIdZG8dBhJxBK1CGxDutL4YhIMZL4UmTWci6OLkt
+	 9znVacRaoC3e+MgpCNsifbuKr90rVWm2AYB7VNFTExkSuAZeHs3O58V4jJl5kI4UUVtHs
+	 aa779wKex2Qs0R6CnNcCSDX9bG81iqV96UfBf5IoGfBNPczyPVl1OPtPKMfYmcWaC7DY3
+	 TiEfkGi/Ilz8gUdSIAnQceHMfT7MH4DIg4j316K5ixQjAYFJ3wvf7z27+NoMY+8ndG3f1
+	 tcRNLmnGT2EpjmZbOYslE3opQ/L6uqYB5/NSQReS57ou7rc2JnOPkWvNcXtE6orlKyg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793656504;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793656506;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=GMRcYyDynoqGRkVE2BEYwHQ2SYNW7Eu/4032ACRLg7o=;
-	b=FjTqt4dfl6W8BlbgvGFAFaMsceco4NNvJOG9ruZO3pnc2cG6TZdBpQFIiV2LqTEyu7tX
-	 5y6vTV6Y2NFbgsNBNeaEE1ojyr++RSiYKJMia8iGWe1Y8jvSHqJDGp/Q/eyWmVDB7T8DK
-	 TKOtcSw6rsYqIX9ltYjka+yI/aOAisslLrO37gsfVm7X9AbIBg6rIG6uOfCRB5HGg/3xV
-	 SCZ/sYuu8Oo0+pfv8xc4x+hWCzrzEHlrOZPcnpMIILzN55J2yp2hxnbN1foRU0iMIiZfj
-	 zEQBwjx1SL8Mz4zOWK+pytd4UNJGxwBa7c7/RGB/W2rlyaGej75a45B3GE24fdlynvA==
+	bh=mhQIeRuo/lS7pkbq+6yasVvd9lG4uqLlIpKAbMY14Ug=;
+	b=sD37h9DA5oLT4maDtt5HLvwxBZLev/S0ehtYzwmTgdUeuMcESvirAY+dHwaGHcaziAc9
+	 WM9v6blGmOzn1M8Bfdl5vhVUl0GsVUnD0oti9+ZePQctd7yQDEC6LKWzSHaIBJJjrok56
+	 GWL93tmwhsKTBi4QiiRh/e2gxdOjjk4SwBBw4XYUg6tpZp2aEjkRPKd8//ueM0etrR/Um
+	 jYO7hSx6xvkc+lz8liDMM4M6fyTO+qk6PaDfj7Nqz2WAQiV3y70J3ETuEhdZy65WpjaXA
+	 6LV9CN4SVV9nup6dyNvt+SgBThQ34CjQeE2h3J4V39JQTWgMra2s3ovo8Uv6HeMIQGQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=msOkUiLW;
-	arc=none smtp.remote-ip=209.85.217.46
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MLZ0p2lH;
+	arc=none smtp.remote-ip=209.85.217.48
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AAC606A329
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 21:55:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77AAC606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52392606A326
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Nov 2026 21:55:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52392606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=msOkUiLW
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7d06763335aso1145286137.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 13:55:04 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MLZ0p2lH
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-7c3cecbda48so724176137.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 13:55:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793656503; x=1794261303; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793656505; x=1794261305; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=GMRcYyDynoqGRkVE2BEYwHQ2SYNW7Eu/4032ACRLg7o=;
-        b=msOkUiLWPPpwLKVShL2J80q1qTjl1MwK++Z/MN2PODqiPM8WMcinxkIGrUALgpx8nh
-         W030sZ2IsgN/mOIjaoeOh0IFqpDOwvtszJXHKaz9YkloQWj/nabyWFozAkr45+4rkAvz
-         vkEu1J9ndozEKzaavS/tB0k9px/WrqLzd5lB/MyIyD5KooGVmqXn6adTKshRJQrFakMI
-         dT0vubXUi/3TKvZzgHAb/7JaqmddGqh8JdtWZ4CLikGSQLSUzaTm7AYmgd+9H0GQzs3N
-         HGvk5VSvKTv80G7SgTRI3qw9BC0o84tDIZQWIaSGymhTsx3R8UF/mUbGe9S9BFCrnRXn
-         DE5g==
+        bh=mhQIeRuo/lS7pkbq+6yasVvd9lG4uqLlIpKAbMY14Ug=;
+        b=MLZ0p2lHIllpjKZo2CjWWDCSLidemMIA/C7KX3Kl9F1sUQmvysB+ouO+iVnvBTEAFg
+         n0uybQC/3IGHo59qfYrpu136+07PBIK8TXnvTbdzD2d/d8y6GywTYJ+PT3ZBu/YJjRkf
+         teMj3vR7pi1jV5djFRmg1UgMYDo9R8vmq3Jt5RvVKbkFecqWa+j6bL5YePSJ8SD5h5jR
+         nl2s7fhGnmujq/8DCmCJWfWhfvf+M2CoyXj13yVBU1TkTWzC3407xxT+ERVJ5BBm9347
+         Z2UI+pqG0LnM/6k2mXoST1sSTr6BW6NRvLGKAP9u3SPcx/T1xuYoPHyLTbenOOfX9gvt
+         vMxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793656503; x=1794261303;
+        d=1e100.net; s=20260707; t=1793656505; x=1794261305;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=GMRcYyDynoqGRkVE2BEYwHQ2SYNW7Eu/4032ACRLg7o=;
-        b=xC+DPIzgT0NzxFOcu/LylEOTgSS6khd7Y+oTj48y+ZQ3ddOVSB//ytx6RchVJHlCMS
-         e6rzLif4Rc/gZrm+YV/9uZltzbU0zfxgACBXK+gnwDVC1/8Taqa3gNYN2UerpqMm++0l
-         /TnaEev7NgLePO0GZgH4ZVpaSaXKeS9PanrcKz2Q+/+kBtQUkFFVUZVnfLqPnbWTeqg5
-         H+aPwOmudjPDFpkBxDzbOUWv5Lm0uwu/sIc1OMNPGCcO+Bi9dvjyGncNxJKLp5WwHFew
-         2YelzxhL4IEWEsdl9CW1TifY20vn/5qdhCW+wqYAy/UjqZxfNrDhgnC9nkboYZi+PdWx
-         qYJw==
-X-Gm-Message-State: APuU4Z/pUWC4rG3iMMNYeN/undrT2AFrBkUJ8Br9DD0lQfYS7FM5CGDF
-	eb/0EB9vaJ9tqpJsoUQctSAgVRRk3MrzyDHDnCjMe2J5+70S3OMglGmoz4l8luVq
-X-Gm-Gg: AYBFou02I45/ID0IwafL3aCVGGBzKmMuS+VZGeijm7ayACvkCv46x/iB+qzFkdpCCcC
-	qIGAcK8Rl3jM4n+XVVaJo/yQCebO/6EuRSCS+ogQwn6hgfy14Sknpfb/2kXjEwhRfHrTqHYTSM9
-	IfRsyftxoDl//LSngr0D3LjqcGxrjHgURi3HA8T6ASKb3iI206/pe32yBpSRz7+QWAN+5d4w8cw
-	b0wCAChjnv61Ds2075vmSh2PheGCkPgl3RWhkoHuTeVDIzf8dceD0cYjyJQcLZsvllBvyd3nN87
-	nBdHJjBB125nKsjZ5MFn72KQvAXJaIvQjZbof6Wi2mWDma6ROiz2pIqMe2eD2lGO9nfhKkppxw3
-	jAQrLfxDlYCWw/7GeD8tgdzrFXFL7leLU1SdesrjggSvora5wAMo++WZJ/NhVZ58IKxOzS91EYl
-	ClljYHsOrxH8B94isckWP3XhmtG0CbgObu3j3+xQfvH/+ySjwvKeQlG3IjZ6APLA6+WuTR7whCl
-	k1iC27aneHeFhMzrdW/FY1DDl8oqeRuhRZvirfU37tTrUDQ1khRRYzZvKqnrbNa03EY2iQRLD/c
-	ZWk3ytLdvoKOkogZBEoPdIJSG8k8DQT3GZrCRFcFQ5+EXm0VUv++jIwZeeU55tIVpZ1OCcxs5hO
-	Em5hYoew4otGpwJ2OWKze7cEZW0EJoDj6nklzcLt3EUkyKl3S1xbbH5Xx9yZ6o4zuXzCJkCzczn
-	i/zwG18VJpDqJQYffy9LvbB8BU
-X-Received: by 2002:a05:6102:148c:b0:7c1:bc57:c7f5 with SMTP id ada2fe7eead31-7d072bb320cmr4454772137.12.1793656503435;
-        Mon, 02 Nov 2026 13:55:03 -0800 (PST)
+        bh=mhQIeRuo/lS7pkbq+6yasVvd9lG4uqLlIpKAbMY14Ug=;
+        b=vU7wGa1ZXfeUrhTcuFxAghtO5VF+0JFD1PThauLumjAzB5hoQ3AkFGpv5o9TWFuPwb
+         rPdNJo/Di0R/xDYEYINI5kXEdKscn+YBfAbZ93vjoU9+RkrrHvJks2FwD5mQkMuzzVNd
+         eVk7+0f2/7ddTOLbrdjPEiMg+RutTKI3O8MDYYSjmJUhPWxybOk7wtLdInj0ibxpWhWw
+         pXTYsLo6+PCeYgjGUB+KxM2Vvx0AG174i1P4/ieIrlwIKdj25sUUIhsmM6MYhbzAksYp
+         gvdzDUzLbuX9X7KMWrQ6HfVzSNjojw4sEzJCX/FAHxihN2hDTtdS7w1SzkgHkEBdQGvC
+         LmAg==
+X-Gm-Message-State: APuU4Z8Ox+COVeOPTYwS1FtsTM+D8CNOevFF5g36hW3SPZ1hLacs7LwB
+	XGSBpDUTWXQnv/PgwWYPLjF30hrn64F1OBg1gx/eIu5QzlCllMhZCVdeFX0MQfC4
+X-Gm-Gg: AYBFou0EBSgo499rI6atyM/+JBXH4pTwh5aKIGnQjdJB7rooSL51F2kPw6JaPlatBr0
+	WnMTHKAoBHAp/06opLIxJghCQ9Qc+Iv0O4oAHTxZ93fLv8N1Uh8+Ch1WQ87dQX7m87eAIeKrN+O
+	F7DgP9fLcdyooEp2DEELuqGEmXfm+SAlctq+Xsn76XzH0BwGVpFn5+xnkhwwqC/4iJazvg21BSi
+	LJfDiM+eXW65z07bfAyiOe7BLJUQZc3EXiu0dXQfWr0jUEKT4BMefC5wS2LdsXHFJcywnYZ2aab
+	jHlT6AGiwZMgoMMbMht70IC/K7PE8qcud3FE76b58k/A6ApZPNuKvzMDG0sZTwQ/Q13aJCUHmMF
+	Y3I8v9sweDlp+a5EhBFQerPbAHwAW1uCkNJPosgujYQMHdgxks6oD4zdgv/UaXJflcTouJwBRhy
+	/p574e9F5ss9OTE75LHYmUZvRSUFCkOOmL5I+Wqb1FhLQI0wdK3F1QF4NJD7PkgyyFU+sSYZRFN
+	ziCA5HNAvqlsExMMvBPyRkWKKPKLDPpGDjAE3MG8xm3pb3ZmWsD9LV001RtYBFbFYk7nzrmm+yu
+	clc0/ZCYTPo6Pslly0WSJk+Yi/XAUXAcvKYuD4FrMebsXDFdxU/71vwy7FBzJVfHYgp/8T6qVLp
+	lgWiyVMWBz9VQpFz5iDOGENSdPaJeq/bjdKbkQhSfL1quByG731FgwoZhRW68PQSl4/mfowl1Uh
+	Mvqns=
+X-Received: by 2002:a05:6102:358d:b0:7a7:198a:c2bc with SMTP id ada2fe7eead31-7d072d5e4a4mr5598057137.36.1793656505168;
+        Mon, 02 Nov 2026 13:55:05 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d07738ebf2sm11066184137.1.2026.11.02.13.55.01
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d07738ebf2sm11066184137.1.2026.11.02.13.55.03
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 13:55:02 -0800 (PST)
+        Mon, 02 Nov 2026 13:55:04 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/6] doc/functional-bap: Document the duplex unicast test cases
-Date: Mon,  2 Nov 2026 16:54:53 -0500
-Message-ID: <20261102215457.2553416-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/6] test: functional: Cover enabling one ASE of a bidirectional CIS
+Date: Mon,  2 Nov 2026 16:54:54 -0500
+Message-ID: <20261102215457.2553416-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261102215457.2553416-1-luiz.dentz@gmail.com>
 References: <20261102215457.2553416-1-luiz.dentz@gmail.com>
@@ -101,139 +101,182 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Describe the topology with a stream for each direction over the same
-CIS, the test of the Desynchronized property used to enable each
-direction separately, and the test of the acceptor when only one of
-its ASEs is enabled.
+Have the initiator, in testing mode, desynchronize its linked
+transports and enable the Source ASE of the acceptor alone, as a phone
+may do in a voice call, then check that the transport of the Sink ASE,
+still in QoS Configured, is neither pending nor acquired along with its
+link. Once both are acquired, release the Sink ASE alone and check that
+the Source ASE keeps streaming on both sides.
+
+Also check desynchronizing the transports on its own, so a failure to
+enable the ASEs separately can be told apart.
+
+Everything is driven through bluetoothctl, so the sequence can be
+reproduced by hand with client/scripts/bap-duplex-lc3.bt.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- doc/functional-bap.rst | 112 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
+ test/functional/test_bap.py | 147 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 147 insertions(+)
 
-diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-index 42fa7fda8006..fc367e0f9181 100644
---- a/doc/functional-bap.rst
-+++ b/doc/functional-bap.rst
-@@ -157,6 +157,118 @@ test_bap_unicast_reconfigure_metadata[empty|media]
- 	streams; it does not exercise microphone streams or simultaneous
- 	playback and capture.
+diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
+index 221efd982071..5a96cdba6294 100644
+--- a/test/functional/test_bap.py
++++ b/test/functional/test_bap.py
+@@ -583,6 +583,153 @@ def test_bap_unicast_reconfigure_metadata(unicast_hosts, metadata):
+     )
  
-+DUPLEX UNICAST
-+==============
-+
-+Two hosts, connected over LE, with a stream for each direction sharing
-+a single CIS, e.g. a voice call to a headset with a microphone:
-+
-+.. code-block::
-+
-+	+------------------------+                 +------------------------+
-+	| host0                  |      LE ACL     | host1                  |
-+	| initiator (central)    | --------------> | acceptor (peripheral)  |
-+	| bluetoothd, testing    |                 | bluetoothctl -a auto   |
-+	| bluetoothctl -a auto   |                 | bap-duplex-lc3.bt      |
-+	| bap-duplex-lc3.bt      |  CIS 0x00 (LC3) | PAC Sink, Front Left   |
-+	| PAC Source, Front Left | ==============> |                        |
-+	| PAC Sink, Front Left   | <============== | PAC Source, Front Left |
-+	+------------------------+                 +------------------------+
-+
-+	one CIG holding one bidirectional CIS: the Sink ASE and the Source
-+	ASE of the acceptor use the same CIS, so the transports of each
-+	host are linked
-+
-+	--> connection is initiated by      ==> audio flows towards
-+
-+The initiator runs `bluetoothd` in testing mode:
-+
-+.. code-block::
-+
-+	[General]
-+	Testing = true
-+
-+which makes the ``Desynchronized`` property of
-+**org.bluez.MediaTransport(5)** writable, through ``transport.desync``,
-+so each direction can be acquired, and so its ASE enabled, on its own.
-+The acceptor does not run in testing mode.
-+
-+Everything is driven through `bluetoothctl`, see
-+**bluetoothctl-transport(1)**, so the sequence can be reproduced by hand
-+with the same script. On the initiator, the transport of the remote Sink
-+ASE is the one under ``pac_sink``, and the one of the remote Source ASE
-+under ``pac_source``. On the acceptor, ``transport.show`` reports the
-+UUID of the local PAC of the ASE of each transport.
-+
-+``client/scripts/bap-duplex-lc3.bt`` on both hosts
-+	Registers a PAC Sink endpoint
-+	(``00002bc9-0000-1000-8000-00805f9b34fb``) and a PAC Source endpoint
-+	(``00002bcb-0000-1000-8000-00805f9b34fb``) with LC3, both with
-+	Front Left as their only location, so a single CIS carries both
-+	directions. The host that pairs is the initiator.
-+
-+test_bap_unicast_desync
-+-----------------------
-+
-+:Setup: As above, with both transports created and linked.
-+
-+:Steps:
-+	1. Initiator: ``transport.desync <sink transport> on``.
-+	2. Initiator: ``transport.acquire <source transport>``.
-+	3. Initiator: ``transport.acquire <sink transport>``.
-+
-+:Expected:
-+	1. ``Desynchronize succeeded``, and ``transport.show`` reports
-+	   ``Desynchronized: yes`` for both transports, as it applies to the
-+	   links of a transport as well.
-+	2. ``Acquire successful: fd <fd> MTU <read>:<write>`` and the
-+	   transport moves to ``State: active``, while its link stays in
-+	   ``State: idle``.
-+	3. The link is acquired on its own and moves to ``State: active``.
-+
-+:Notes: Checks the mechanism the next test relies on to enable a
-+	single ASE of a CIS, so a failure of that one can be told apart
-+	from a failure of the initiator to enable the ASEs separately.
-+
-+test_bap_unicast_duplex_enable_one
-+----------------------------------
-+
-+:Setup: As above, with both transports created and linked, and
-+	desynchronized on the initiator.
-+
-+:Steps:
-+	1. Initiator: ``transport.acquire <source transport>`` only, so the
-+	   acceptor's Source ASE is enabled and the CIS is established,
-+	   while its Sink ASE stays in the QoS Configured state.
-+	2. Acceptor: ``transport.show <sink transport>``.
-+	3. Initiator: ``transport.acquire <sink transport>``.
-+	4. Initiator: ``transport.release <sink transport>``.
-+
-+:Expected:
-+	1. The acceptor's Source ASE transport is acquired by
-+	   `bluetoothctl` and moves to ``State: active``.
-+	2. The Sink ASE transport stays in ``State: idle``: its ASE has not
-+	   been enabled, so it is neither pending nor acquired along with
-+	   its link.
-+	3. The Sink ASE transport moves to ``State: active``, acquired on
-+	   its own once the initiator enables its ASE.
-+	4. The Sink ASE transport moves back to ``State: idle`` while the
-+	   Source ASE transport stays in ``State: active``, on both hosts:
-+	   transports acquired on their own are released on their own.
-+
-+:Notes: Reproduces a remote initiator, e.g. a phone in a voice call,
-+	enabling the Source ASE of a headset before its Sink ASE. As an
-+	acceptor cannot enable an ASE itself, acquiring a transport whose
-+	ASE is still in QoS is rejected with ``NotAuthorized``. An audio
-+	server acquiring every pending transport then fails, and with it
-+	the linked transport that was working.
-+
-+	`bluetoothctl` acquires a transport of its endpoints as soon as it
-+	is pending, as an audio server would. Depending on which transport
-+	it acquires first, the Sink ASE transport is either rejected or
-+	made active through its link, so the test checks the state of the
-+	transport rather than the result of the acquisition.
-+
- BROADCAST
- =========
  
++# The initiator runs in testing mode, so its transports can be
++# desynchronized and each direction enabled on its own
++duplex_host_config = host_config(
++    [
++        Bluetoothd(conf=BAP_CONF.replace("[General]\n", "[General]\nTesting = true\n")),
++        Pexpect(),
++    ],
++    [Bluetoothd(conf=BAP_CONF), Pexpect()],
++)
++
++def show_transport(ctl, path):
++    """
++    Properties transport.show reports for the given transport.
++
++    They are indented, unlike the [CHG] lines of other transports that
++    may be printed in between, and a command with a known output is
++    issued after it to tell when everything has been listed.
++    """
++    ctl.send(f"transport.show {path}\nversion\n")
++    ctl.expect(f"Transport {path}", timeout=REPLY_TIMEOUT)
++
++    # Up to the end of the line, or a line still being printed would
++    # match only in part
++    props = {}
++    while True:
++        idx, m = ctl.expect(
++            [r"Version \d", r"\t(UUID|State|Desynchronized): ([^\r\n]*)\r?\n"],
++            timeout=REPLY_TIMEOUT,
++        )
++        if idx == 0:
++            return props
++
++        props[m[0].decode("utf-8")] = m[1].decode("utf-8")
++
++
++def show_state(ctl, path):
++    return show_transport(ctl, path)["State"]
++
++
++@pytest.fixture
++def duplex_hosts(hosts):
++    """
++    Initiator (host0) and acceptor (host1) each with a local PAC Sink and
++    PAC Source endpoint for a single location, paired over LE, with a
++    stream configured for each direction over the same CIS.
++
++    On the initiator, the transport of the remote Sink ASE is under its
++    pac_sink endpoint and the one of the remote Source ASE under its
++    pac_source endpoint. On the acceptor, each transport carries the UUID
++    of the local PAC of its ASE.
++    """
++    host0, host1 = hosts
++
++    initiator = start_bluetoothctl(host0, "bap-duplex-lc3.bt")
++    acceptor = start_bluetoothctl(host1, "bap-duplex-lc3.bt")
++
++    pair_le(host0, initiator, host1, acceptor)
++
++    # bluetoothctl only acquires a transport its local endpoint was
++    # configured with
++    paths = [
++        m[0].decode("utf-8")
++        for m in expect_all(initiator, [CONFIGURED + TRANSPORT_RE] * 2)
++    ]
++    to_sink = next(path for path in paths if "/pac_sink" in path)
++    from_source = next(path for path in paths if "/pac_source" in path)
++
++    # Each transport is reported when created and again under the
++    # SetConfiguration call of its endpoint
++    paths = []
++    while len(paths) < 2:
++        path = expect_all(acceptor, [TRANSPORT_RE])[0][0].decode("utf-8")
++        if path not in paths:
++            paths.append(path)
++    uuids = {path: show_transport(acceptor, path)["UUID"] for path in paths}
++    by_uuid = {
++        uuid: path for path in paths for uuid in (PAC_SINK_UUID, PAC_SOURCE_UUID)
++        if uuid in uuids[path]
++    }
++    assert len(by_uuid) == 2, f"acceptor transports: {uuids}"
++    sink = by_uuid[PAC_SINK_UUID]
++    source = by_uuid[PAC_SOURCE_UUID]
++
++    yield initiator, acceptor, to_sink, from_source, sink, source
++
++
++def desync(initiator, to_sink, from_source):
++    """Desynchronizing a transport desynchronizes its links as well."""
++    initiator.send(f"transport.desync {to_sink} on\n")
++    expect_all(initiator, ["Desynchronize succeeded"])
++
++    for path in (to_sink, from_source):
++        desync = show_transport(initiator, path)["Desynchronized"]
++        assert desync == "yes", f"{path} Desynchronized: {desync}"
++
++
++@duplex_host_config
++def test_bap_unicast_desync(duplex_hosts):
++    initiator, acceptor, to_sink, from_source, sink, source = duplex_hosts
++
++    desync(initiator, to_sink, from_source)
++
++    # Acquiring one transport leaves its link alone
++    initiator.send(f"transport.acquire {from_source}\n")
++    expect_all(initiator, [ACQUIRED, f"Transport {from_source} State: active"])
++    assert show_state(initiator, to_sink) == "idle"
++
++    # The link is acquired on its own, over the CIS already established
++    initiator.send(f"transport.acquire {to_sink}\n")
++    expect_all(initiator, [ACQUIRED, f"Transport {to_sink} State: active"])
++
++
++@duplex_host_config
++def test_bap_unicast_duplex_enable_one(duplex_hosts):
++    initiator, acceptor, to_sink, from_source, sink, source = duplex_hosts
++
++    desync(initiator, to_sink, from_source)
++
++    # Enable the remote Source ASE only, leaving its Sink ASE in QoS,
++    # while the CIS they share is established. bluetoothctl on the
++    # acceptor acquires a transport as soon as it is pending, as an
++    # audio server would.
++    initiator.send(f"transport.acquire {from_source}\n")
++    expect_all(initiator, [ACQUIRED, f"Transport {from_source} State: active"])
++    expect_all(acceptor, [ACQUIRED, f"Transport {source} State: active"])
++
++    # The Sink ASE has not been enabled, so its transport must not be
++    # reported as pending, nor acquired along with the Source one
++    state = show_state(acceptor, sink)
++    assert state == "idle", f"{sink} {state} while in QoS"
++
++    # Once the initiator enables it, it is acquired on its own
++    initiator.send(f"transport.acquire {to_sink}\n")
++    expect_all(initiator, [ACQUIRED, f"Transport {to_sink} State: active"])
++    expect_all(acceptor, [ACQUIRED, f"Transport {sink} State: active"])
++
++    # Disabling the Sink ASE alone leaves the Source one streaming
++    initiator.send(f"transport.release {to_sink}\n")
++    expect_all(initiator, ["Release successful", f"Transport {to_sink} State: idle"])
++    expect_all(acceptor, [f"Transport {sink} State: idle"])
++    time.sleep(1)
++
++    for ctl, path in ((initiator, from_source), (acceptor, source)):
++        state = show_state(ctl, path)
++        assert state == "active", f"{path} {state} once the Sink ASE released"
++
++
+ # Broadcast code used by the broadcast scripts, see BCAST_CODE in
+ # client/player.c
+ BCAST_CODE = (
 -- 
 2.56.0
 
