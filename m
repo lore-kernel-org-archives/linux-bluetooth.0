@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793717541;
-	b=Ou+1bNJ6uur+pOOZ2DBw9tedTi02WnUcmEvGcFrfe65CxJf9npsIvEoxxE6I8IE8iV/e
-	 oqwGQWKTCAJk1zCc/I/6IKbq5J6dPfEjATb8PPqf+exOZf/j4FbhR/fF9lJ9Mn/yjkmOi
-	 jwo4PKxg2GdvpqGh4frmTIpiIwKTmIsgXBgr39Zkn5H6fhIacBqNz8UIHxOQuCKoRWQZ9
-	 sS6bUmgjUUQA8juGUCgEL9eJmmFksHH7g9B4AkKSAhDrlmp/NT5zWx5gM5KpMnfkjRTAU
-	 IhFqzxW4ptWmUygiyzMWAeN0cc+G2X6i+TyRjW71rzZ1WexVMPvZqokGiqjok5h2cNg==
+	t=1793717543;
+	b=HarV9i71gD1EOBhksVC17rYrE2PbmXZiGyf8GV3LvZtsUlV8MbNk7EcLYX6pVxD7UbXb
+	 ccJz0TBlJu0kac5UwQ1sDEz4ScS2xAuL/AoMgnnzxEcYYs9fCkQPKJarBqnkGSp1h0vfa
+	 U6uBv0oZt3m0u2fXZuGU15zrr4LqOGiZiwws2R1y2HISt253mMVl5o3yPMvAb0OLe0/0K
+	 gWqBfiot0HeLOPlTATs7+LgzjGUhRfcvkRIXEy912F3A/E5yAdozmr4YZgXzCiqWZKT8D
+	 XCoRibLM3gZj3496Iyahtyyh/VJVYR257KiLiiI1rZAswjvta+5R6GNSlVaMZqaq4iw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793717541;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793717543;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=q1RwUUB2SGzRM/xlK6bFv1Cor0DulNlU980YLEG+TAE=;
-	b=5XmbzpIG57UzRtQqO9SVyHT9RFc4e/qp8rCWMh+o0AIvBQUSP+W396NoHUpwXBMTXijf
-	 wOYH1lCoPoQ6nbkNGBbkwwpbk6qOa/SXpvLdyNqIGlAT5T2c9UmUv2EyY2bdNqU3bKkQK
-	 PC3tTr9LXRbLH/dkmlkPpxw6P8lfVINLLkmmTngEv5iZLdMjDiTsaNfvbUF/iPLuh/fgR
-	 FxLkZn0f8CxRvI5GlEPDjwbuXz29VrlrvSGEza+gXqtCfqLW6gZmeBoCu3DeHxCD0gP1L
-	 +3bztvsbsryD+LDAGQXzej+65YaVcmQ7Y/AD9wyyQ7BgqzHsc9XGq1H6zvWpLHdbh1w==
+	bh=BTQhXryiFz6WNhtO/2cBLI/E9BKh5fzSCgT17OC2isQ=;
+	b=svBHdNlchtg5WsVbdtmavTVYCUZx6/W/6oRdCEWRsyKeoYcH3u2nUQ3qgG0sUU3mQ0iw
+	 Z/S7fQzfburmVk++YvZvJL0kcmCJGWxDBzckPUH2owRNtYL5hG/xqstJ+WC6cbDBsI200
+	 2/SQfYmLCSsafCxdbsfl91qGSyQIf24d4ey4xwpoyOvjCm6fjG+GCnBpRQ5Ux5mAwKSwI
+	 VajnsgsjM2S6eYBAvhYCCpM+iQp4+LdtMf2aw2TpFlStBazQ7NRDfYoaojEJIJlbyyQvL
+	 qbs4nNccRKKbWsHe1BU6DruxCQaR26wJl1Xd3vcU1VGZGluDGc3A7GTKA2I7yo7UePg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QrHKGYCN;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YULUcOln;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843BC60A2619;
-	Tue,  3 Nov 2026 14:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D5260A2624;
+	Tue,  3 Nov 2026 14:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QrHKGYCN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109DD1F00A15;
-	Tue,  3 Nov 2026 14:52:19 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YULUcOln
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C1B1F00919;
+	Tue,  3 Nov 2026 14:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793717541;
-	bh=q1RwUUB2SGzRM/xlK6bFv1Cor0DulNlU980YLEG+TAE=;
+	s=k20260515; t=1793717543;
+	bh=BTQhXryiFz6WNhtO/2cBLI/E9BKh5fzSCgT17OC2isQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QrHKGYCNgqCSncLN4i2WXs3uJxSVn+qIiCKZHCT2QCisFV5DIoHEkkvmbFQPyYitL
-	 UsELGDV96+izMumxGBdhMH0aYqOfaet7hs9Wnikknwye6cKY8buyzfo6fySQN7PNIS
-	 cmH3M1/Iu09CsR5K84dNuT9TyPskp+xCd/Qj5sJw4vSPODnOaF6QL7UgYUKH7Vsj4M
-	 R7mGJo8FA/RreBRw7UptLSMzLt+15XNfoVLNwDQyKFCY08QumfP5fRXUd/Qu+XMqDY
-	 L497hLplKdiTwBsrj0ZsQhWxVTgVpq41FXssa8xDKXlLdJPu2rhu/iD8QzP3VoCJCv
-	 eXE5uLYIsPLrg==
+	b=YULUcOlnU5estLQZ4jpKMFl1ZUufGXrceg4QR9QBHrz+KUXwTw5DarbaN4Sc24PtL
+	 HD4NcxARddyrligJZ3EJ9NEpKUS/qyW2S+PZHSAOX4Nj0gQWUkELPABhufTZYCoj8m
+	 L2n7AsCkjpMqXUjts2F/rlD6YbdxhC101ijSm/Y6yHsCIi6PaSX0JZJdBVG8zKsZ8H
+	 4pVXOP/I7bY9uvJbjewxTMmgVsRJKwUb2BMiiIBBdMUltfAZ5yf3Dn/MoixNUj+KaI
+	 9ReJ+RcCaxrkT1vR1SGJtOYZ9ldi3aC9jBpq38EDwdiEwELgjmCQCOubApelLUfMQP
+	 58erdJ+VLWzSA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
@@ -54,12 +54,12 @@ Cc: Sasha Levin <sashal@kernel.org>,
 	regressions@lists.linux.dev,
 	1149377@bugs.debian.org,
 	Christoph Zwerschke <cito@online.de>
-Subject: Re: [PATCH 6.18 1/2] Revert "Bluetooth: btusb: Add ASUS USB-BT600 for Realtek 8761CU"
-Date: Tue,  3 Nov 2026 09:51:56 -0500
-Message-ID: <2026-11-03-1-daily-reply-0008-re-revert-asus-bt-rtl8761cu-6-18@kernel.org>
+Subject: Re: [PATCH 6.12 1/2] Revert "Bluetooth: btusb: Add ASUS USB-BT600 for Realtek 8761CU"
+Date: Tue,  3 Nov 2026 09:51:57 -0500
+Message-ID: <2026-11-03-1-daily-reply-0009-re-revert-asus-bt-rtl8761cu-6-12@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261102153241.373878-1-cito@online.de>
-References: <20261102153241.373878-1-cito@online.de>
+In-Reply-To: <20261102153243.373899-1-cito@online.de>
+References: <20261102153243.373899-1-cito@online.de>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -74,10 +74,10 @@ Content-Transfer-Encoding: 8bit
 
 > This reverts the ASUS USB-BT540/BT600 Realtek 8761CU ID backport.
 >
-> Mainline keeps the ID entry, so this revert is for 6.18.y only, as agreed
+> Mainline keeps the ID entry, so this revert is for 6.12.y only, as agreed
 > in the regression thread.
 
-Queued the series for 6.18, thanks.
+Queued the series for 6.12, thanks.
 
 -- 
 Thanks,
