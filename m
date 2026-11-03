@@ -1,48 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=46.54.226.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793719071;
-	b=3IepNdJBVHz4pHc5TEB3cq4ThPo7X9r4QCnMIcycsQNe+w3HLLwGNIb0t6NK6rHHpxEn
-	 1dmQC7M4TBY4CD8wxw1NdOimztZK2X9KszDxoiaYtXyYC4rT0Jv0nfZ1KJFDK4hVX3wSV
-	 Q9P+LFe1kvIkO5XpizN7Je8fvMfmZh715IgVFWCu8a5J72S2ZT3A6YZP1iVXDmII47xQK
-	 8oA3KISugT3kjKVUVYBju6t2hMU0S1hiI8cqJCsAs9og1Ab2aQiuHLKiT0J/JVDJJDmWm
-	 yAxZwKUEYiRHrgdUV5f6n3E4PfnIoQpRbO8oEYQ21FnnSI6ez1RKzKjmsQsKiMpSVfw==
+	t=1793723410;
+	b=NdKpo+3S1p0Nof4O3GWwMWBa/N3dcP2cKsD5vSCXkMQdsJz5QPq/+Lexx4QoqYftVCP2
+	 DqKIliOPBQ5DwDRWjVsvdd1flGKQojN0t6fXFA07QZx0FA5fxl/tm7Uo0536HkPsTg7c9
+	 fh96Q42R/uOypLZVZi5gBCK2HXla3g4vxNr82H+P/NJ3T64RDspvYZcRsHnc66ytV59ol
+	 gjJdDd/w/z58ZJvN9oLLWEzekrYQZ9KaqnqoS3CjRkyBbBpL7oEnzIwxI0WTtKR5aIj/O
+	 GviRrWBRptp5lSLSXze+3EroSC3fI43rZzsEDL74MIVvOJ6efKoNk7MuPeV63ArlJRw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793719071;
-	h=DMARC-Filter:Received:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=5L+ml8/iia9nZGNt1ztEQS4idka4W4lDUtD1CW4S93Q=;
-	b=d9fYF53Y+xuX5qJzJ8ps/nSF+kDh6JqAOjsoY2pa45xWu4Sh43Wek8Rx1gYTz/mjTiTG
-	 W7sOo7FTEX63mVNWER/KHVPCuT1n61w9gDzSZnD2nar3Gl2evgvFgIYZmadzKiDFvfh8a
-	 VOa/wcwKhIoCNHA0fWeujJSeEO3zpQKze+0RSuaRhnEaq7jHl0IXskYjEtd1I/o9CWiCa
-	 BK0mzzteNaoPbiygtON6Ljbf7iDKQV2/ytLzk7JBcF4Pjw1I3iN11qZcDivO5KRPD0WeH
-	 7OnkKlRVJIMSx1EtSmfUcjnlsnqxxONftM2nStmCZIcaQ0HfiXNCOFiig7iPZSi7Jcg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793723410;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=hivnJUqdr2xdqW8CKeTQAf4qqlWgnHzfCDn0xmpYfwM=;
+	b=dhBYXCgjMKfbAS/B3sL04TQyISAF16HdYzdJIKXyOGkp/HkD1emz6TcGcqo5BLf29Jkf
+	 WVJX2cf9y4uLgNa9FfhGQwGj7wEH7PZwWBeF9VXDKhOqxvSy0x7zEQJJd1NNPSqhACjtT
+	 zDQoFoyyIpZVSsaO+wuT+fZAVZDPo0rY/dH7NLTlCdfiZwABTVsRXOOR4f2ikwSueu4NE
+	 GJMEKERBPL991db0rz9AzT+c6Z1YMg7v4c9zW6aK6rpgH+azQGYqv73XorRjzN/h2+spd
+	 Bl3G9dESNc3lBqx8SJSLyJqj6QX2v/oe60ljod78Jk6Ty3YjIsftrvkNNmA6AKUJ9Zg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=tnode.com;
-	spf=pass smtp.mailfrom=tnode.com;
-	arc=none smtp.remote-ip=46.54.226.45
-Received: from mail.tnode.com (mail.tnode.com [46.54.226.45])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LEYq8GcY;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36267606A331
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 15:17:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36267606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tnode.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tnode.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.tnode.com (Postfix) with ESMTP id 6B3DB1260034;
-	Tue,  3 Nov 2026 16:17:42 +0100 (CET)
-Received: from mail.tnode.com ([127.0.0.1])
-	by localhost (mail.tnode.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JTgaWoqttzqI; Tue,  3 Nov 2026 16:17:41 +0100 (CET)
-Received: (nullmailer pid 598668 invoked by uid 1000);
-	Tue, 03 Nov 2026 15:17:40 -0000
-From: Mitar <mitar.git@tnode.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mitar <mitar.git@tnode.com>
-Subject: [PATCH BlueZ] mpris-proxy: Stop and start together with dbus.service
-Date: Tue,  3 Nov 2026 16:17:24 +0100
-Message-ID: <20261103151724.598627-1-mitar.git@tnode.com>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BD8606D80C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 16:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LEYq8GcY
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE511F00A18;
+	Tue,  3 Nov 2026 16:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793723410;
+	bh=hivnJUqdr2xdqW8CKeTQAf4qqlWgnHzfCDn0xmpYfwM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=LEYq8GcY4TCzuLU96a17Sqw0F9q4bCWm8kA/HNg4SGb/sC+fkbB9FMQPvjk6W8dzR
+	 04vRe0bAW25EDFEWuBHzYRHidAvciDhuqnpizy3V3NhJoCrM0wf5wng28NDg94YdZj
+	 0Y1OfJmPWi+wNh0UvsmI+QKQoiWFkqqLFv4Npq5I9HL4XygHWeRwlK/rZ97pL494Id
+	 3sVaR5aZjkElwc31so8m/JUoPxN5791uhRQ/cQpYb8mR4hsUy01lHbBTC4mKAAx7AN
+	 iBE1KKFT10bScwfWly1Bu9gsDFoGwhvyuzfIXyVi5Kg2J86o/k303EOtK6F/ygs4pS
+	 /KcyMSZJrHT0A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 03239391AFF6;
+	Tue,  3 Nov 2026 16:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -53,41 +54,56 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 00/10] Run test-functional under User Mode Linux
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179372340880.1736455.17491384995793060538.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Nov 2026 16:30:08 +0000
+References: <20261030212940.753771-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261030212940.753771-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-GNOME stops dbus.service when a session ends, with
-gnome-session-restart-dbus.service, and the bus is started again through
-dbus.socket once a client connects to it. mpris-proxy is not stopped
-with the bus: libdbus ends it with exit status 1 when the bus closes its
-connection, so the unit fails, and nothing starts it again as long as
-the user's service manager keeps running, for example when the user logs
-in again within logind's UserStopDelaySec=. The media players of the
-next session are then not registered with BlueZ.
+Hello:
 
-Make the unit part of dbus.service, so that stopping the bus stops
-mpris-proxy first, and have dbus.service want it, so that it is started
-again together with the bus.
----
- tools/mpris-proxy.service.in | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/tools/mpris-proxy.service.in b/tools/mpris-proxy.service.in
-index 6ae56c6..2b8a4d5 100644
---- a/tools/mpris-proxy.service.in
-+++ b/tools/mpris-proxy.service.in
-@@ -4,6 +4,7 @@ Documentation=man:mpris-proxy(1)
- 
- Wants=dbus.socket
- After=dbus.socket dbus.service
-+PartOf=dbus.service
- ConditionUser=!@system
- 
- [Service]
-@@ -11,4 +12,4 @@ Type=simple
- ExecStart=@PKGBINDIR@/mpris-proxy
- 
- [Install]
--WantedBy=default.target
-+WantedBy=default.target dbus.service
+On Fri, 30 Oct 2026 17:29:29 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This allows running test-functional with User Mode Linux (UML) VM hosts,
+> e.g. on machines without KVM support, together with pytest-bluezenv:
+> 
+> https://github.com/bluez/pytest-bluezenv/pull/8
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,v1,01/10] tools/test-runner: Default to time travel with User Mode Linux
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=82da11007efa
+  - [BlueZ,v1,02/10] tools/test-runner: Unbind virtio devices before powering off UML
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9edc135192a9
+  - [BlueZ,v1,03/10] emulator: Answer the time of a guest with a skew
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=92515ade2f98
+  - [BlueZ,v1,04/10] adapter: Don't return Busy when a pending change sets the same value
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a994cab0ec45
+  - [BlueZ,v1,05/10] test: functional: wait for BAP transports to be configured
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=48cff70088e2
+  - [BlueZ,v1,06/10] shared/mcp: Don't drop commands before supported opcodes are read
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=084df6bd3dca
+  - [BlueZ,v1,07/10] doc/test-functional: Document User Mode Linux VM hosts
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2500322374e9
+  - [BlueZ,v1,08/10] a2dp: Fix refusing the AVDTP connection of a new link
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=efabf8db4c22
+  - [BlueZ,v1,09/10] adapter: Don't cancel requests of a new link on stale disconnection
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9d498bc8f241
+  - [BlueZ,v1,10/10] test: Cover A2DP reconnection with a pending disconnection
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2ee9c3a504ac
+
+You are awesome, thank you!
 -- 
-2.53.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
