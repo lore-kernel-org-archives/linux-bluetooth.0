@@ -1,77 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793687831;
-	b=Jl5dSXVoT5S/W2nB/E6d/VaqQoBiL5sauDyOWm0JGByZjORsRJ36D/J8RqYBs1iFl/T5
-	 0/qzn126Bjp0h+iConu5xmVpByOhUki9c1E/PhBZxBEZulzRkBSeeOTo6YOeiturbSC2y
-	 HAzIBjTbzC52g9lCUJDlm2b2JHeTpiTQfvcK8rMpKiJhNuugx7tWpKwFOlOROj8WSx+a6
-	 KC6QAUL009NpxViMQhQIZVx5Q176e4EvClvpIMNEwQ7wJ1Tt3PrQaZjLmhWHy20DgIFz3
-	 S8ToQDBlI7OOAHd7c2tk4mmAlACZN/u5ZtPDUoe4B9xWbA5/ctn1ln1oSeoq+7fmOUA==
+	t=1793688932;
+	b=DF3lxb6TKCriuuT5NJXrJTQANxq4k8DJuFWPYM+OVm/aJS4LNNzQPzGs75PQaxSGgBys
+	 jfeLg6BmwIeON7HYSIKZsR7BGneN5ekkE8924RR+YP3y4xoYkCzkwOTPknWef7qWwN4BQ
+	 XF339a2RaA08E5lxAApKCyKWmUI2Z15T7UEGuOPMSKgHfUoSCHvr168yPMa1+/dDK4Ifx
+	 xQ3UseHltW9njNwkHSFQsiqRh2b7y8Yqvqi4wGkqgSZhFKve+6rKKzkbk57H7uasRKj4R
+	 J20zl4xbcEf8QbEKFeSrUFVQtk+JrpJlbBK3IqJU8KYtnADwaU2Z/ozylJBbVidTDiw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793687831;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=+FYOaaFQIOobAnpj/XVWp5zrANA/RarcvshDkt9MaaY=;
-	b=31c8KnrCJ2u+aJJhOXoMa9KpBkWtO9zUdflEsRuVwcvuIkSovqULNvNLobplGmLTd5wk
-	 pkFHmOGGsTz4NvcRfG1jVDAwUbP2kdcqq6QnoGWHZVEqENLSCoSYP7HGYSdH/mxA3DhQI
-	 TiEYAQ4rIaAe87MzOfIkpv285BImTwQ79UuDtU0WjpkUJA7OWLBBHmoh/9xQuwUpuYeV8
-	 2qQpM0BdRGFT9/4FT02RlNfx603PD4Bj8vfKRCwX5prC9SIUYfk5JBzdwVe05Kq0wO+Zl
-	 ol4Bw9j687qmSdWp6VIFRX0XYoISpEyvB7G/dpecgLhOhG0ipwwpY+4jJWp/uutgUJg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793688932;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:
+	 Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-GUID:X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=u3h1/X3+r8JGIu4ype+pHKZpociXhTpLMqQc+auwIMs=;
+	b=feMD5dwqRZRPWMf7lVWJu/OeAz0g2lx5AiitbtvRhf/NWEnIN8wt/PXSdqQ2UbeYzJSw
+	 bmPY4kmAiFR+ED73i2IpvKBhk+AujlCQCXdcQzWfR7T/4qNXB+NJe4myW5HzsTa6trFDk
+	 6VB+y5mdsb/TBlPs9HoyKvIBueYlC2Tern/AYZS9OUUf7au/Jmae/+po95msRtquubFvx
+	 V4WiDZXl/TUFFmzTSXLyGSqOQ3bh3BIX1ARJ9R1hnB6YFyNuUDWu1DV/UzB47TPXADa9A
+	 VaZEJjR75pho43teFo5V84QdUiYN9Ylpp+LT55XTXfyzg+wdIBtufv1wP5lThWXbUNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fHgnAOr1;
-	arc=none smtp.remote-ip=192.198.163.17
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=cNqnkf3s;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=f7oMpQxo;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACA7606A333
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 06:37:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1ACA7606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1153606A324
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 06:55:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1153606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fHgnAOr1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793687830; x=1825223830;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UGOU5TyRzlLkIB1evv7st0YafkjdYOb3+BxNoxdSdPU=;
-  b=fHgnAOr1V/XjL0/4shKD+Ak5spucFGtO3TGVv2c/abTBM6ZMuR9qNsUJ
-   WzpgGe07r4c7M4GpKtJ89rP6J/kmNUQi9ERkBluQeyOOqqk2Y+KQe1ubj
-   cuuDYnPiXQEi0CO3qWrp3MHLMo+McIhaT9Z5D103uWOfsoYcyhr4dGHWP
-   8WxEBC2bC7Hfh2HbHkN0uF+roRgkf6aDILIIYOpu1flcZRr7U+gQucyOv
-   HerfEcAfWfmU+eLlIDfXluAM73OSwbcUsBI0XjpxOkwMSu/yJRCrn6MkV
-   r5gmi1BBAuWCRYLrlJwa/uzg2e1ILHuU8Yi/Ax5fNb3Hzirt7Y/3AWfo8
-   A==;
-X-CSE-ConnectionGUID: sVpBurWsSrKkcjyS7vTn5Q==
-X-CSE-MsgGUID: 2X7ttxbxQCCyEcFck6wWXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2411556"
-X-IronPort-AV: E=Sophos;i="6.27,192,1787036400"; 
-   d="scan'208";a="2411556"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2026 22:37:09 -0800
-X-CSE-ConnectionGUID: bzcWygRiRXGBY3UekmuzZw==
-X-CSE-MsgGUID: JsBaU/I9RrqlK1/XJbimFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,192,1787036400"; 
-   d="scan'208";a="6720558"
-Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa007.fm.intel.com with ESMTP; 02 Nov 2026 22:37:08 -0800
-From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v4 2/2] Bluetooth: btintel_pcie: Add fatal error injection test mode
-Date: Tue,  3 Nov 2026 11:58:32 +0530
-Message-ID: <20261103062832.3083624-3-aluvala.sai.teja@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261103062832.3083624-1-aluvala.sai.teja@intel.com>
-References: <20261103062832.3083624-1-aluvala.sai.teja@intel.com>
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=cNqnkf3s;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=f7oMpQxo
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A31eo2b4002807
+	for <linux-bluetooth@vger.kernel.org>; Tue, 3 Nov 2026 06:55:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=u3h1/X3+r8JGIu4ype+pHK
+	ZpociXhTpLMqQc+auwIMs=; b=cNqnkf3saiq9E+SxtnmOxnu7Vj+sf+oeug6lg2
+	7Kg1diOPs1x4DvAhFRS7dTTKoCRnQFQkvtUaS7kKVOwjBXOu+v3T03KzbjyrAvOA
+	gvnD4qJxLKxds6sOZVNXDLZmJd7PcE/ZVXDAIzIHNLL5zOOUjRBDDErDKPrrx5bT
+	y9P9nhzZUtonEi2ybWTz/S0hrGT/ulhwXFXPvWkdK+S6+6n0w3WznJvJg3Yq7Q5V
+	Ibmn4I/eNETAbmtZJebvb4fWThVIq802STpR5bPnZU8AEYV3Gk6k1bRhndjiQm3/
+	yEA8YZKEYaOYM9Pk/hbK8lC2NYtUblLq/UfN6aoNXDTdrQKg==
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hq07ejcns-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 06:55:30 +0000 (GMT)
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-540e2737afaso1273044b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 22:55:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1793688930; x=1794293730; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=u3h1/X3+r8JGIu4ype+pHKZpociXhTpLMqQc+auwIMs=;
+        b=f7oMpQxoDoTnc1yQzIiNfLG089InWguVfl+vZUJg0V25Zr7z+li1DGaUEIfnXnRlob
+         A7Ywdj0+Px2zAyfgCTka/96WSl1WGZXiP0bfviP5VR3x6w7z7/7Py/jDerh8PGtr0xJX
+         gHvMwHUT5V9KT+Va69vWeh+4aGdhnvH+TiA3c9DXLFmgR8d9cVGSYyCgCsAR6ZMyxVlu
+         DQSWzmDALqOmEr6PNRDCDzWSwumA6rTUUjYFw+9ZfYsHJv/J4tifYralJZQuEq6C9DX8
+         yOUdhKW3qCdhK5GA6vAOPwDKhnER9OnmSJ/AcOTyeN6yhvPsFPaDhhPjZwHAmkAsHobe
+         8woA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793688930; x=1794293730;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=u3h1/X3+r8JGIu4ype+pHKZpociXhTpLMqQc+auwIMs=;
+        b=I0Nna6vaclCG3pt6yjsfeXs+spjN7MtulRxgiP/q6PIEH2HLfe15x6JV8MzU0+5YAZ
+         QMue75B7kwCadFJXqJt1WYlzpFHIhmmlqqc3alkgFVztQ6V57w/6GHaJ3biqfWV3ypu2
+         G8bVBX3+WDtTxtUdeCqy3UvYBbbGQgguPqKadDqx2nfNm1FcTKK1O+76qGQ4k3i17e2H
+         dk6LR3HXVvSq5hSHyacgMy8yhxNtiuLhweCgI7XlDyitTMsKD8onPg3ALV/4U9nb0QpJ
+         13dRwNek6ugPcsdaT9P82E0ngz/0u2xzen/RTloIEKcG6ToEaoHlrJ0F4K2JOTKp/fcZ
+         y5vA==
+X-Forwarded-Encrypted: i=1; AKwUvBx4mKpYNGK0hHqvch1p7ME5BatnePWAnO9e/K5bALrJbDsyNKWcsUqa2PqgE5nhrIoXuLGS5hlUiwSReaU6tuk=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJuFHG8um76ppFwgKKfZO8NV70Iv7T9ifAlRShSNK6t6L4ywhtd
+	FTe6abLiILHBteVcTjXDfVYos0sE9IwaOYnb+n6vLg/V0tGbKLN/pBMrrmABUpftek7TcwK/Bs5
+	lwXDYhR7+trlsTBM5xzB+il9Uc4+OXebRC8c2y7MXmtYrQR2McZ/bEBrG96skeMd/sKw/GGI=
+X-Gm-Gg: AYBFou03vRVN2+vxSJQyBO7PWf76y44LHwmMuPOywkC29U/jB5Sxczpnr7KwvdY28HT
+	m0jX4EpmeXk0dL/Nc0KBboQRn2mNXUwWa+GdepMbzcv7dFO86dGC2Du2gw66uEnBYWkY3G4Olos
+	5THTO0Qhv5omN+UozXw9njns7m7eE67mKG6w6PeFEevNrj3TU5Ig8SICEGFox/aqAr+y4UiAq2C
+	YvCeEOBPFa5zGwrFWPFVxKdKkjWAh5edlETdq9h448p4A5+C8LfFHR6c9zB/D4XSd0RTMtqZ0tf
+	Km1KE/RDW7Ckq9ssKH/IuLrLBLbz75xJg3nXQLLrx7SsPCRWOZLggG9K66oQiLnx2dVXG/cG9um
+	2ZFaGeJBIMLyx/l34OJE891uyr6fxzTYL/DQx6wAUVj/FedBTuoT4JCYJ5ASA46fsi08W/LK6Gl
+	qO/pkGRBdpxLzhjO5INc0=
+X-Received: by 2002:a05:6808:308d:b0:4c0:c8ee:adb0 with SMTP id 5614622812f47-5640d654132mr14322797b6e.0.1793688929958;
+        Mon, 02 Nov 2026 22:55:29 -0800 (PST)
+X-Received: by 2002:a05:6808:308d:b0:4c0:c8ee:adb0 with SMTP id 5614622812f47-5640d654132mr14322789b6e.0.1793688929539;
+        Mon, 02 Nov 2026 22:55:29 -0800 (PST)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-5640fe423fasm10305974b6e.16.2026.11.02.22.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 22:55:28 -0800 (PST)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Subject: [PATCH v2 0/2] Bluetooth: Fix Transport_Unit_Size and remove
+ redundant NVMEM dependency
+Date: Mon, 02 Nov 2026 22:55:19 -0800
+Message-Id: <20261102-fix_kconf-v2-0-b4bd28de37b5@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -81,402 +115,73 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFeF6WoC/22NQQ6CMBBFr0JmbQmtBAZX3MMQA2WQqlDtANGQ3
+ t2CWzeTvPyXNyswOUMMp2gFR4thY8cA6hCB7uvxSsK0gUElKpOJQtGZ9+Wu7diJtEXCPMWmKTo
+ I/tNRGPfWufoxz82N9LQFNqM3PFn32Z8tcvP+dRcppMhUmiMWSh4zLC1z/Jrrh7bDEIcDlff+C
+ wr5DiS7AAAA
+X-Change-ID: 20261028-fix_kconf-4d8e8748bb9f
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>,
+        Kiran K <kiran.k@intel.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zijun Hu <zijun.hu@oss.qualcomm.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTAzMDAyNyBTYWx0ZWRfXxjZufBj2P78x
+ f37ghGcWwRpcdDKx8DPse3yn0XR6DWt/yDc6l2REih+vqeFFTtOHvGc4bKNDKmwINE4JeNw43eh
+ Iu6SZ8cUtVckUc1F7pP3qkBItL5+xWM+ktFYPOAGEHL6gzLjlYpje1shKwg/F2nqXRuldMak4Hq
+ pAimqdqa1mD6mhSTQOGCAe/Emeouiy3uoUiagmCYSgyTiEspHrb0xLq/U6C25/3ewHtnvLDXzpr
+ Mz1oDpANbMxMC+79JVynj1bf9ii38ODPiL8aI49XQwQmdSTjfT6FeKaRdQtTjrfzMWEW5eA/yEn
+ ud7w8Ue5BJ75j/K0690gOcaHDTAgreROZ4Wlwtd9Pd6mmlLxPQ77WtM95Vb6CvZUrBavrrDxuxg
+ 5QipGZ2B5zBRTeiv9unGjrBmI+ahDpKd3U51vXZqybboxrM4jRNhTTlUI0Bokh6OjKC6MVKPXDS
+ tGDZc0D5deWTJiAxcsg==
+X-Proofpoint-ORIG-GUID: w8QRq5fPefEmWFikl-v_GJm9DZjsMSmr
+X-Proofpoint-GUID: w8QRq5fPefEmWFikl-v_GJm9DZjsMSmr
+X-Authority-Analysis: v=2.4 cv=B/wsQ+tM c=1 sm=1 tr=0 ts=6ae98562 cx=c_pps
+ a=AKZTfHrQPB8q3CcvmcIuDA==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=1nq5aM8V5XYSDQTivPwA:9 a=QEXdDO2ut3YA:10
+ a=pF_qn-MSjDawc0seGVz6:22 a=FO4_E8m0qiDe52t0p3_H:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTAzMDAyNyBTYWx0ZWRfX3k1vexbgGomo
+ AZkkGsPDEeKSOiAsvXeHIv5jElfnQAiJamC/s8XEqhgX44m2DJ5tPqG78aaSAQpYb0ChDJL6mAn
+ Lji7LOMxJMYIrmYJZw5tQUiewrAUqeQ=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-03_01,2026-11-02_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611030027
 
-Add the FATAL_ERR_TESTMODE debug INI option to inject a firmware
-exception for testing. The INI value selects the exception type and the
-injection context (thread, IRQ or rfkill). Whether an injected
-exception is expected to trigger recovery depends on its type.
+This series contains a very simple bug fix and a trivial cleanup.
 
-The test mode is disabled when the OPFW API lock is set, unless the
-unlocker firmware was loaded.
-
-Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Signed-off-by: Zijun Hu <zijun.hu@oss.qualcomm.com>
 ---
- drivers/bluetooth/btintel.c            |   5 +-
- drivers/bluetooth/btintel.h            |   1 +
- drivers/bluetooth/btintel_pcie.c       |  39 ++++++
- drivers/bluetooth/btintel_pcie.h       |   5 +-
- drivers/bluetooth/btintel_pcie_debug.c | 157 ++++++++++++++++++++++++-
- drivers/bluetooth/btintel_pcie_debug.h |  25 ++++
- 6 files changed, 229 insertions(+), 3 deletions(-)
+Changes in v2:
+- Add patch 1 to fix Transport_Unit_Size for HCI data path
+- Patch 2: Reword commit message
+- Link to v1: https://patch.msgid.link/20261028-fix_kconf-v1-1-624788921368@oss.qualcomm.com
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index b9bb6980bada..a0aa110f4cdd 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3579,8 +3579,11 @@ static int btintel_try_load_unlocker(struct hci_dev *hdev,
- 	if (err) {
- 		bt_dev_err(hdev, "Failed to load intel/unlocker.sfi (%d)", err);
- 		data->unlocker = false;
-+		return err;
- 	}
--	return err;
-+
-+	btintel_set_flag(hdev, INTEL_UNLOCKER_LOADED);
-+	return 0;
- }
- 
- int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index d5e125ec5168..372c6d7d8cbe 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -259,6 +259,7 @@ enum {
- 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
- 	INTEL_ACPI_RESET_ACTIVE,
- 	INTEL_WAIT_FOR_D0,
-+	INTEL_UNLOCKER_LOADED,
- 
- 	__INTEL_NUM_FLAGS,
- };
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 8b991ad2a107..2ae682af13e9 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2954,6 +2954,14 @@ static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
- 	if (!test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags))
- 		return;
- 
-+	/* Intentional: with the fatal error test mode enabled, the post-setup
-+	 * injection consumes this rfkill pass, so the initial rfkill check is
-+	 * skipped. This avoids a second, back-to-back injection while the
-+	 * recovery caused by the first one is running.
-+	 */
-+	if (btintel_pcie_fatal_err_post_setup_pending(data))
-+		return;
-+
- 	/* Do not report an initial clear when rfkill was never asserted.
- 	 * After resume, however, a previously asserted rfkill must be
- 	 * cleared and reported to the HCI stack.
-@@ -2968,10 +2976,18 @@ static void btintel_pcie_hw_rfkill_delay_work(struct work_struct *wk)
- 		     !(ipc_ctrl & BTINTEL_PCIE_CSR_IPC_CONTROL_HW_RFKILL);
- 	if (set_rfkill) {
- 		bt_dev_dbg(data->hdev, "hw rfkill on");
-+		/* Fatal error test mode: inject on every rfkill assertion seen
-+		 * here, not only on a transition. A work run queued behind the
-+		 * post-setup injection may inject once more.
-+		 */
-+		if (btintel_pcie_fatal_err_handle_rfkill(data, true))
-+			return;
- 		set_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags);
- 		hci_rfkill_set_hw_state(data->hdev, true);
- 	} else {
- 		bt_dev_dbg(data->hdev, "hw rfkill off");
-+		if (btintel_pcie_fatal_err_handle_rfkill(data, false))
-+			return;
- 		/* Nothing changed at the initial post-setup check, so there
- 		 * is no transition to report.
- 		 */
-@@ -3550,8 +3566,16 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 
- static int btintel_pcie_open(struct hci_dev *hdev)
- {
-+	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
-+
- 	bt_dev_dbg(hdev, "");
- 
-+	/* Fatal error test mode: send the post-setup notification that was
-+	 * deferred because HCI was down.
-+	 */
-+	if (test_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags))
-+		btintel_delayed_hw_rfkill(data, true);
-+
- 	return 0;
- }
- 
-@@ -3921,6 +3945,12 @@ static int btintel_pcie_setup_internal(struct hci_dev *hdev,
- 		goto exit_error;
- 	}
- 
-+	/* ver_tlv holds the operational firmware version after setup. A
-+	 * locked platform with the unlocker loaded can run the test mode.
-+	 */
-+	btintel_pcie_fatal_err_check_api_lock(data, ver_tlv.api_lock &&
-+					      !btintel_test_flag(hdev, INTEL_UNLOCKER_LOADED));
-+
- 	data->dmp_hdr.cnvi_top = ver_tlv.cnvi_top;
- 	data->dmp_hdr.cnvr_top = ver_tlv.cnvr_top;
- 	data->dmp_hdr.fw_timestamp = ver_tlv.timestamp;
-@@ -3947,6 +3977,8 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 	bool fips_crc_failed;
- 
-+	btintel_pcie_fatal_err_load(data);
-+
- 	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
- 	       fw_dl_retry++ < 1) {
- 		if (fips_crc_failed)
-@@ -3975,6 +4007,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 	}
- 
- 	if (!err) {
-+		/* Fatal error test mode: arm the post-setup notification before
-+		 * SETUP_DONE so the rfkill work cannot inject a fault ahead of
-+		 * it.
-+		 */
-+		if (btintel_pcie_fatal_err_testmode_active(data))
-+			set_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
- 		set_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags);
- 		set_bit(BTINTEL_PCIE_HW_RFKILL_STATE_CHECK, &data->flags);
- 		btintel_pcie_unmask_hw_rfkill(data);
-@@ -4567,6 +4605,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	data->img_resp_cache = 0x00;
- 	data->dbg_path_cache = BTINTEL_PCIE_WIFI_DBGC;
- 	data->log_mask = BTINTEL_PCIE_LOG_ALIVE_INTR | BTINTEL_PCIE_LOG_SX;
-+	btintel_pcie_fatal_err_init(data);
- 	data->pcie_alloc_init = false;
- 	data->enable_ini = false;
- 	btintel_pcie_yoyo_init(&data->yoyo);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index f04dfb0b30fa..4bffd95b6ec6 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -172,7 +172,8 @@ enum {
- 	BTINTEL_PCIE_SETUP_DONE,
- 	BTINTEL_PCIE_MAIL_BOX_INTR,
- 	BTINTEL_PCIE_MBOX_PARSE_PENDING,
--	BTINTEL_PCIE_MBOX_PARSE_READY
-+	BTINTEL_PCIE_MBOX_PARSE_READY,
-+	BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING,
- };
- 
- enum btintel_pcie_tlv_type {
-@@ -719,6 +720,7 @@ struct btintel_pcie_ini_dump_info {
-  * @dbg_path_cache: cached debug output routing mode (BT DRAM or WiFi DBGC)
-  * @log_mask: runtime diagnostic logging mask loaded from LOG_MASK in the
-  *	debug INI file (alive interrupt and Sx logging are enabled by default)
-+ * @fatal_err: fatal-error injection testmode state
-  * @cnvi: CNVi register value
-  * @cnvr: CNVr register value
-  * @gp0_received: condition for gp0 interrupt
-@@ -775,6 +777,7 @@ struct btintel_pcie_data {
- 	u32	dbg_path_cache;
- 	u32	log_mask;
- 	bool	enable_ini;
-+	struct btintel_pcie_fatal_err_cfg fatal_err;
- 	struct btintel_pcie_yoyo_ctx yoyo;
- 
- 	u32	cnvi;
-diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
-index f3350fc9b08a..8f5d4c830e24 100644
---- a/drivers/bluetooth/btintel_pcie_debug.c
-+++ b/drivers/bluetooth/btintel_pcie_debug.c
-@@ -7,7 +7,7 @@
-  * Runtime-configurable TLV-based debug collection framework for loading and
-  * parsing the optional YoYo firmware configuration used to enable debug
-  * regions, triggers, HCI commands, and configuration sets. Also provides
-- * debug INI configuration.
-+ * debug INI configuration and fatal-error injection testmode.
-  */
- 
- #include <linux/errno.h>
-@@ -18,6 +18,7 @@
- #include <linux/string.h>
- #include <linux/unaligned.h>
- #include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
- #include "btintel_pcie.h"
- #include "btintel_pcie_debug.h"
- 
-@@ -153,6 +154,160 @@ void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data)
- }
- EXPORT_SYMBOL_GPL(btintel_pcie_load_dbg_path_from_ini);
- 
-+void btintel_pcie_fatal_err_init(struct btintel_pcie_data *data)
-+{
-+	data->fatal_err.testmode_enabled = false;
-+	data->fatal_err.context = BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_THREAD;
-+	data->fatal_err.type = BTINTEL_PCIE_DEBUG_EXCEPTION_FAILURE_TYPE_DEFAULT;
-+	data->fatal_err.api_lock_enabled = false;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_init);
-+
-+void btintel_pcie_fatal_err_load(struct btintel_pcie_data *data)
-+{
-+	char *buf, *cursor, *key, *val;
-+	u32 parsed;
-+
-+	WRITE_ONCE(data->fatal_err.testmode_enabled, false);
-+	clear_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
-+	buf = btintel_pcie_read_debug_ini(data);
-+	if (IS_ERR(buf)) {
-+		BT_DBG("%s unavailable (%ld); fatal-error testmode disabled",
-+		       BTINTEL_PCIE_DBG_INI_FILE, PTR_ERR(buf));
-+		return;
-+	}
-+
-+	cursor = buf;
-+	while ((val = btintel_pcie_ini_next(&cursor, &key))) {
-+		if (strcasecmp(key, "FATAL_ERR_TESTMODE"))
-+			continue;
-+
-+		if (kstrtou32(val, 0, &parsed) ||
-+		    BTINTEL_PCIE_FATAL_ERR_ENABLE(parsed) > 1 ||
-+		    BTINTEL_PCIE_FATAL_ERR_CONTEXT(parsed) >
-+				BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL ||
-+		    parsed >> 24) {
-+			BT_ERR("Invalid FATAL_ERR_TESTMODE='%s' in %s; testmode disabled",
-+			       val, BTINTEL_PCIE_DBG_INI_FILE);
-+			break;
-+		}
-+
-+		data->fatal_err.context = BTINTEL_PCIE_FATAL_ERR_CONTEXT(parsed);
-+		data->fatal_err.type = BTINTEL_PCIE_FATAL_ERR_TYPE(parsed);
-+		WRITE_ONCE(data->fatal_err.testmode_enabled,
-+			   BTINTEL_PCIE_FATAL_ERR_ENABLE(parsed));
-+		BT_INFO("FATAL_ERR_TESTMODE accepted: 0x%08x", parsed);
-+		break;
-+	}
-+
-+	kfree(buf);
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_load);
-+
-+void btintel_pcie_fatal_err_check_api_lock(struct btintel_pcie_data *data,
-+					   bool api_lock)
-+{
-+	data->fatal_err.api_lock_enabled = api_lock;
-+	if (api_lock) {
-+		if (READ_ONCE(data->fatal_err.testmode_enabled))
-+			bt_dev_info(data->hdev,
-+				    "OPFW API lock enabled; disabling fatal-error testmode");
-+		WRITE_ONCE(data->fatal_err.testmode_enabled, false);
-+	} else if (READ_ONCE(data->fatal_err.testmode_enabled)) {
-+		bt_dev_info(data->hdev, "fatal-error testmode active: ctx=0x%02x type=0x%02x",
-+			    data->fatal_err.context, data->fatal_err.type);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_check_api_lock);
-+
-+static int btintel_pcie_inject_fatal_err(struct btintel_pcie_data *data,
-+					 u8 context)
-+{
-+	struct hci_dev *hdev = data->hdev;
-+	struct sk_buff *skb;
-+	u8 param[2];
-+	int err = 0;
-+
-+	/* Setup and the rest of HCI initialization hold req_lock. Wait for
-+	 * them before testing HCI_UP; a delayed worker alone is not enough.
-+	 */
-+	hci_req_sync_lock(hdev);
-+	if (!test_bit(HCI_UP, &hdev->flags) ||
-+	    hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-+		err = -ENETDOWN;
-+		goto unlock;
-+	}
-+
-+	if (!READ_ONCE(data->fatal_err.testmode_enabled))
-+		goto unlock;
-+
-+	param[0] = data->fatal_err.type;
-+	param[1] = context;
-+	skb = __hci_cmd_sync(hdev, 0xfc4d, sizeof(param), param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		goto unlock;
-+	}
-+
-+	kfree_skb(skb);
-+unlock:
-+	hci_req_sync_unlock(hdev);
-+	if (err)
-+		bt_dev_err(hdev, "fatal-error inject failed (ctx=0x%02x err=%d)",
-+			   context, err);
-+	return err;
-+}
-+
-+bool btintel_pcie_fatal_err_handle_rfkill(struct btintel_pcie_data *data,
-+					  bool rfkill_on)
-+{
-+	if (!READ_ONCE(data->fatal_err.testmode_enabled))
-+		return false;
-+
-+	if (rfkill_on) {
-+		/* HCI down: nothing to inject, use the normal handling */
-+		if (btintel_pcie_inject_fatal_err(data, data->fatal_err.context) ==
-+		    -ENETDOWN)
-+			return false;
-+		return true;
-+	}
-+
-+	/* Release of an assertion handled by the normal path: let it through */
-+	if (test_bit(BTINTEL_PCIE_HWRFKILL_ON, &data->flags))
-+		return false;
-+
-+	bt_dev_dbg(data->hdev, "fatal-error testmode active: ignoring RF-KILL OFF");
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_handle_rfkill);
-+
-+bool btintel_pcie_fatal_err_post_setup_pending(struct btintel_pcie_data *data)
-+{
-+	int err;
-+
-+	if (!test_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags))
-+		return false;
-+
-+	/* Intentional: RFKILL context tells the controller testmode is enabled */
-+	err = btintel_pcie_inject_fatal_err(data,
-+					    BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL);
-+	/* HCI is down: keep the notification pending for a later pass and let
-+	 * the normal rfkill handling run.
-+	 */
-+	if (err == -ENETDOWN)
-+		return false;
-+
-+	clear_bit(BTINTEL_PCIE_FATAL_ERR_POST_SETUP_PENDING, &data->flags);
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_post_setup_pending);
-+
-+bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data)
-+{
-+	return READ_ONCE(data->fatal_err.testmode_enabled);
-+}
-+EXPORT_SYMBOL_GPL(btintel_pcie_fatal_err_testmode_active);
-+
- /* TLV-specific parser DEBUG_INFO TLV type */
- static int btintel_pcie_yoyo_parse_dbg_info(struct btintel_pcie_yoyo_ctx *ctx,
- 					    const struct btintel_pcie_tlv_dbg_info *info,
-diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
-index 04cfcef6f65b..97f514533449 100644
---- a/drivers/bluetooth/btintel_pcie_debug.h
-+++ b/drivers/bluetooth/btintel_pcie_debug.h
-@@ -18,7 +18,32 @@ struct btintel_pcie_data;
- 
- #define BTINTEL_PCIE_DBG_INI_FILE	"ibt_bt_dbg_cfg.ini"
- 
-+/* FATAL_ERR_TESTMODE: B0 enable, B1 context, B2 type, B3 reserved. */
-+#define BTINTEL_PCIE_FATAL_ERR_ENABLE(v)	((u8)((v) & 0xff))
-+#define BTINTEL_PCIE_FATAL_ERR_CONTEXT(v)	((u8)(((v) >> 8) & 0xff))
-+#define BTINTEL_PCIE_FATAL_ERR_TYPE(v)	((u8)(((v) >> 16) & 0xff))
-+
-+#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_THREAD	0x00
-+#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_IRQ		0x01
-+#define BTINTEL_PCIE_DEBUG_EXCEPTION_CONTEXT_RFKILL	0x02
-+#define BTINTEL_PCIE_DEBUG_EXCEPTION_FAILURE_TYPE_DEFAULT	0x00
-+
-+struct btintel_pcie_fatal_err_cfg {
-+	bool	testmode_enabled;
-+	u8	context;
-+	u8	type;
-+	bool	api_lock_enabled;
-+};
-+
- void btintel_pcie_load_dbg_path_from_ini(struct btintel_pcie_data *data);
-+void btintel_pcie_fatal_err_init(struct btintel_pcie_data *data);
-+void btintel_pcie_fatal_err_load(struct btintel_pcie_data *data);
-+void btintel_pcie_fatal_err_check_api_lock(struct btintel_pcie_data *data,
-+					   bool api_lock);
-+bool btintel_pcie_fatal_err_handle_rfkill(struct btintel_pcie_data *data,
-+					  bool rfkill_on);
-+bool btintel_pcie_fatal_err_post_setup_pending(struct btintel_pcie_data *data);
-+bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data);
- 
- /* External YoYo binary file */
- #define BTINTEL_PCIE_YOYO_FW_NAME	"intel/ibt_debug_yoyo.bin"
--- 
-2.53.0
+---
+Zijun Hu (2):
+      Bluetooth: hci_conn: Fix SCO/eSCO Transport_Unit_Size for HCI data path
+      Bluetooth: hci_uart: Remove redundant NVMEM dependency
+
+ drivers/bluetooth/Kconfig |  1 -
+ net/bluetooth/hci_conn.c  | 18 ++++++++++++------
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+---
+base-commit: 3f425f95ba3923d605f6a8b382e8fcdc59d479db
+change-id: 20261028-fix_kconf-4d8e8748bb9f
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
