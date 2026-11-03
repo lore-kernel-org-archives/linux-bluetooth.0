@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793737843;
-	b=BQrQ86uMjmtRI5LbE+WAWECiMhVVMsbgJOvL876+ikonyfsDDJHMsDOCdzsCLATp5oUA
-	 7sDkDepEgfZfZitqVYK5eZ4WKp1aE8tiBLbNxvIzvUrswC7qBCdCm6r1tPYaigaUldVyF
-	 sQRc+90gTIJDLUJWBBfw06kcphtUD8H2o26FE+4HY/jyn+EMLflW+uMOIP/mAWc8Uqcj3
-	 zF5cYyDGEdsmpebvfKcch/J+rvOrpSXLrpjMROkoeUvUYzFNqOvycXVVQA+PvGkEIIAW9
-	 ajZnGT6VzbiXFnfAE3opWbg+DFrRHnO4NVJuWXxjrgVggcwEscUvpVbzLh+85ccrVOw==
+	t=1793737844;
+	b=I7TZDj/zE5QAg+XVIbrKnWraiBuMzKtWOHZPdaCKlayrtcCOFd5z8/48jl2uxBOlr0jE
+	 J0+lT2mYOkzsx9pExnfQlxmaHHhB4siUbTxFi9ptxykC74NnFiVrJbJA8My652Sqq9lpR
+	 UoFDn73cjjwT35/qCBHlUZ3mKPHlcUJCOBlHWa7S29Zq95NrLmTRmJDvk8ALdnsLnkTB4
+	 8joOhWKcjYpLfmDQYqTftLsCzEExueMoKpA+LEfdBe+nmv+2L0bUzZKgDy9TukxggCbMb
+	 5dQBJf+7QjrBy/NvkJDBIFpLhudQNalo01hwI6aX0GDTt7qTuWXYdGttap2a0ZtBaQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793737843;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793737844;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=rCFw/wHJd/u2CTxo3A7lkSztzsNUxKo6MOK5Efevu84=;
-	b=kgCOGgB0Zq0ytF6dE7unqC8l3US066Vx30xngZ4vbvgZPCLv9SfPLwT+SngM6YKaapGL
-	 Fb5tjnO6XF46QUb2emROZBE9yGAYwRapyh0V1ogFeHDaOCWfVfopeX55rYP4Foiutu4iI
-	 Myby/iH/IiH8OaU5fmlAzzSun/cs+DtQU9ReJuphIJYeHUFhXRmt55AvmKc9RfwyzdPNY
-	 eUE0ResP96/B+nnZ5Cdv/eQdUjHBwuukvx2JQMEiDXfJQQ+GHv25bSQlJc9R+KE9W+MrR
-	 kfaQVtPS8TuOGSe7I9Kcm5o99d6HmQG3amiGGkTKL4WvxJUfvyLhGXzxktWnDnoPTKg==
+	bh=Qh65e8JDZKas9KySMyRDgyNPSYBfocWoO0D8i26UmMA=;
+	b=JTCfbCoBsLa0J6WrIMRg9TXvZvDliPKofqXbl6SSSiqfVy/cebOgEe0J03Z5UcvfAvNM
+	 dUdv7Jjq29Qglc5o1uCApPTI0QNQee2ZIYzTnMs9envmvZX9wEkRXxMI44TjaTVHa2bgb
+	 faT2C5Wmt8jtWB6TOUYchI70md0WJH7YDX3MYrnKmJD5ffQD4xc9ZIs3nOhv/SlS6g3HM
+	 OltBNDzacUIIlyOS2ozCSMY6axN9jLGMyaYPNQtxaY2nQVTUba5tiMJ0+1MFT/AsC/4bN
+	 bVSGEsichN7A8179kSy8EoONQWJs6HwQgehBJyC94OeOqXrfIsbzdu8jndiTu5gMYbQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dVFmv5zY;
-	arc=none smtp.remote-ip=209.85.217.41
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PVpixYcA;
+	arc=none smtp.remote-ip=209.85.222.45
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D2C606A31B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 20:30:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8D2C606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E155606A31B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 20:30:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0E155606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dVFmv5zY
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-7cc0892f92cso1528441137.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 12:30:42 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PVpixYcA
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-980c4258105so1750241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 12:30:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793737842; x=1794342642; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793737843; x=1794342643; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=rCFw/wHJd/u2CTxo3A7lkSztzsNUxKo6MOK5Efevu84=;
-        b=dVFmv5zYrv9/I7Y+dXiGS+N2G8PMBiQSycp6RpFzyI378a9SWOEnyCurMVferB/R52
-         mCwzHrwxED1XMM1sofysAHIwNI6gwKUeV9GnIn42TrawXFNvgVo0MEU31KzcGmGZPsGU
-         4uT0kuZQuBhKIVEm6VjnZ0dD+oEOE6s/ILskudx7XHXBTPcGRbU2jYPVpkEqURo5W4+t
-         4K9BbMtQMGOMXlrrlAod6N9D7lVPAetMPvjGC7ICi37xDKGzBr+7Wwy2v3Zmgz9ERp9U
-         fM7eZwWMOTdmLHRD5JRpY3g7mlxUlXEWyYOthWLPK5upd6DkVgrP6ozPIvr1L99cWb81
-         Z/1Q==
+        bh=Qh65e8JDZKas9KySMyRDgyNPSYBfocWoO0D8i26UmMA=;
+        b=PVpixYcAuV0KGlvGevYsCHG9wmsdg3EAYskRII7lQ2rvtvsL4lAXGKOWM84oyFMdI4
+         sWMzqc4EH9iCXPgHJa/sRE2X3/u1egNwsZsDT1K3qbh0mO/n1kUzo1c26wGvzuQQoSwN
+         rrVIXD5NjmxIDX9Ie3kGSGuqA2YB1bHAC2fYvietV5EqG9cCxpFIWL7kwsFmCAxkj4pR
+         VYkrNIJb+VHF/pbSWyLxV3gr/y6pvUuqGIOY6KmaIdsSOaCodIT652aRuMFvEe7KTa7C
+         0v8XQALQ4t7UHPUXUG2d1PgpYBm9pnJlr4N6Sn4LIelKKTspWg3vfG5JkeudBxonFHqs
+         z/mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793737842; x=1794342642;
+        d=1e100.net; s=20260707; t=1793737843; x=1794342643;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=rCFw/wHJd/u2CTxo3A7lkSztzsNUxKo6MOK5Efevu84=;
-        b=wFUOKHbrbezWuWX/H20V1By+TrQzK+VY8xWRa/ebmEbmqG06SLHMQPuryaQrMdF8p7
-         FT4U3J26lnngGKgwZvOA6r5ca1UH2nY0lS9PMGDl3jTwASco/CKYxfqGv2LfA8AWt8B0
-         Dz4bMJq/FPdRB709ty05MIW+isV/W/o8pVtV+1PhUN/myBF5Iy7EvoDr4mzfMWSrjMHM
-         4MZm8BGfTYR0lHsoejNEKMl31p1UDWwmSrSsc4BAln/AtdSP8bq+rR/CJ92sucM/Lydk
-         KaDiez5Dur9ew8ns0YzHJdFA+pmfTYhpIyC8Xw8sE9alB3UyaASdu6JhWXV8kSCAoGHB
-         m9kA==
-X-Gm-Message-State: APuU4Z/78z2K2FsALwefASzwGWQYoE8R9DGLCXFWG6G1MJUyv1LHq0Hm
-	tnObvwf+O+EgJTHC1E/ItHLwlth/E0SmKUgrjvvvsH0HjSSAW00uGkCAF69lWw==
-X-Gm-Gg: AYBFou0S9osw8cZgf6uNmrJNcl5aRfKLVIbSNgaXwWP+dEalHdjhF5vIXRXDTA1cBk9
-	kmNtQWsHKbn3j3TpitmqkBPuKeOoTdg2YEox6zSp5/yGZntV4YhaG7ulZVwJYn8IFlqRZti4J+i
-	92NCyV55P57wMe95JOm4U8M2PKfwCbdHf6rdos7HDLe4G7Tpfw9SVvSRs5pSXl18frau9bOIfzz
-	Ch7LWsg/KsA2dnVbfjkrtD6GKp7O2hVPCBqENI+bqECSipxvN9OHM3MlZUc9f4Uc7ulw44xGzL0
-	XEMzn0aTWpU5/j/l9W+aXlOLj5Iz/62x+fWuG+E+WQF1cnVTrUh9YdcXabGYS27wNg7iPECTW81
-	uEMZ+l2rvOSqdhqr1cbESFTSJPi+i1ZpZed/0AP4zKGATm31OQd+MvscpnIFS9Qwp7lTbzkCdQ/
-	IWMIRsVkeEcmnI1f3H2sjQpV6QwDv1w8xj5NrFoJ0bqlsvef0IOHbgUB61mlEXks1vu+sYtKoBr
-	sEOoIuFboiNc9UhRwbSO9YmUiNKJwEdG9m7JysGmBmhZNc7VjaF8n8mia1PbxmqlrqfEcpWz0Aw
-	Nj6McqJWSffyTZ8DnY+jTqG1RndeAZbhu75wEd4m24prQtmgd9aTN83p8A4y5SCDL7oeYPhNMql
-	Hsq6JmVdSuAQWRxtZkWIlQKgG9IEozTouTzq+WzJyhopWfTg8RlrfD1ddb4CfyuRbDxrYX5GReW
-	pBUi/g
-X-Received: by 2002:a05:6102:3711:b0:7c8:1fd5:82b5 with SMTP id ada2fe7eead31-7d072695e4emr4857884137.14.1793737841702;
-        Tue, 03 Nov 2026 12:30:41 -0800 (PST)
+        bh=Qh65e8JDZKas9KySMyRDgyNPSYBfocWoO0D8i26UmMA=;
+        b=K+fDfn4z6Mx5HmafDJDAm9WJjR6p6f3BddPZXtAONnyocm0IXVMdytXicF6N0oy7dI
+         udPK28j6ZrYE9LdVBfP+nxQLFV7oE5d4KOxgP88qWprTahwskqmareq0fG+ltlAsUdqc
+         8+lOyv1ywn62352fCptvNXmQHkk5TEFgpIP0ANXgC+iZBBzHWM//julM48/qFym/LC5L
+         JO2slvpZnw6TGKgXuVKaO8JsT0q9IUn9SuKaKZdbCgFkwQSMsI+1+buTNDnfHiG9IAGa
+         GO85FCjmBXQSEWnhG9Q11EX+AKyAk7ZykSkWEnwgsezQu5XeIVwQfhdLHrK5hFKgYuE1
+         Nfpw==
+X-Gm-Message-State: APuU4Z9wzB3bz6vROQAPLVYiuHJc1iiN/+kAVov8NV4jAml2Fe1EJ8Sd
+	6YzVMG7uCNli/XiWnIlWxO5EOynXW/thEtMfp2tAZLXACAmsin8dQ9bW/MxfaQ==
+X-Gm-Gg: AYBFou3Qrxkma5Ttt4RO+A729AYFQJM0F6e03jJROhYFf2trWLqTqZY/Uw3DTWIqGg+
+	odIdbFLmuBIIRIISud4eiuVA0ovrXdD+BBctF/0maay2IEk4PoMxXip8sCzENAVQVONdxqMhr/I
+	MOoskIGOv73BxVk65PxW9xn+E+oeN7RhCgK9gHCOq8TSBErJMy+XYqI2R2g0zdh2PxlT+TiiwlZ
+	2ogKD7g2gAU8/qSfeCvZ2jo+irOIc7KrbtbR2X/pwz+Y96z+T60+IEQJrnLxKIv4gJ8obiYtjBH
+	r9sNsm7kOj2x5VL9mutdlTksQBrUA4aSS+HYopw3sH7QZK29qshh+nsO9Rcd5xXFDDRWc3nG/ag
+	1wbBo5GDVXPRZKh7maDy+F3VSmhjripBMJJSxvyUVG5NIjazsBqHLNXQx9rxaDHGTxkbtA6so5Q
+	6EVCjrN8aGskbVOFDe9lfg5PuASDfM8oiQP82A7D6AtjkIV+vcemmm8Y+Fxc4sGXxlAY6bIlo1O
+	T0IAuMTall/jmnkjTSlEWMe7yU/AXU3XtscloI2E8v/mqxu96jNSI4XWlNkqvNtxjyjvsl72Q3r
+	UdiB1emIKyBio7CZocmrC5RGxDHR0FiEt0tcyHau0Ua74cqOqhJuoNhGTzzxhoK8OcEiaR45Pha
+	7fe6pF3jnAJnWKzfoHzXyNeeCzoUbgKHfGEq4GDeZ1f8CeEgSLYp67gPZjZFTPwFxxAz/6AqpAN
+	nYLGZs
+X-Received: by 2002:a05:6102:54a2:b0:7c0:4d52:8cc9 with SMTP id ada2fe7eead31-7d072c4161fmr6334342137.14.1793737843037;
+        Tue, 03 Nov 2026 12:30:43 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d69af021sm167865241.1.2026.11.03.12.30.40
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d69af021sm167865241.1.2026.11.03.12.30.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 12:30:40 -0800 (PST)
+        Tue, 03 Nov 2026 12:30:42 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/5] unit/test-gatt: Add Notify Multiple server tests
-Date: Tue,  3 Nov 2026 15:30:33 -0500
-Message-ID: <20261103203034.3904499-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 5/5] main.conf: Add NotifyMultiple option to GATT section
+Date: Tue,  3 Nov 2026 15:30:34 -0500
+Message-ID: <20261103203034.3904499-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103203034.3904499-1-luiz.dentz@gmail.com>
 References: <20261103203034.3904499-1-luiz.dentz@gmail.com>
@@ -101,130 +101,131 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds server tests for sending Notify Multiple with the default and
-a positive timeout, disabling it while a notification is pending, and
-sending with it disabled.
----
- unit/test-gatt.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 99 insertions(+)
+This adds NotifyMultiple option which can be used to control the use
+of GATT Notify Multiple:
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 535baafc6f70..6d6d0c73ed40 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -2336,6 +2336,70 @@ static const struct test_step test_notification_server_1 = {
- 	.length = 0x03,
- };
+ false: Disable Notify Multiple, always send regular notifications.
+ true: Enable Notify Multiple with 0 ms timeout (default).
+ <ms>: Enable Notify Multiple with the given timeout in milliseconds.
+---
+ src/btd.h     |  1 +
+ src/device.c  |  2 ++
+ src/main.c    | 32 ++++++++++++++++++++++++++++++++
+ src/main.conf | 12 ++++++++++++
+ 4 files changed, 47 insertions(+)
+
+diff --git a/src/btd.h b/src/btd.h
+index d70276b1dca0..b059ab872764 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -165,6 +165,7 @@ struct btd_opts {
+ 	uint16_t	gatt_mtu;
+ 	uint8_t		gatt_channels;
+ 	bool		gatt_client;
++	int		gatt_mnotify;
+ 	enum bt_gatt_export_t gatt_export;
+ 	bool		gatt_seclevel;
+ 	enum mps_mode_t	mps;
+diff --git a/src/device.c b/src/device.c
+index 137970637777..6d1e78b0ead2 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6547,6 +6547,8 @@ static void gatt_server_init(struct btd_device *device,
+ 		bt_gatt_server_set_permissions(device->server, false);
  
-+static void test_server_mnotify(struct context *context)
-+{
-+	const struct test_step *step = context->data->step;
-+
-+	bt_gatt_server_send_notification(context->server, step->handle,
-+					step->value, step->length, true);
-+	bt_gatt_server_send_notification(context->server, step->handle,
-+					step->value, step->length, true);
-+}
-+
-+static const struct test_step test_mnotify_server_1 = {
-+	.handle = 0x0003,
-+	.func = test_server_mnotify,
-+	.value = read_data_1,
-+	.length = 0x03,
-+};
-+
-+static void test_server_mnotify_timeout(struct context *context)
-+{
-+	bt_gatt_server_set_mnotify_timeout(context->server, 1);
-+	test_server_mnotify(context);
-+}
-+
-+static const struct test_step test_mnotify_server_2 = {
-+	.handle = 0x0003,
-+	.func = test_server_mnotify_timeout,
-+	.value = read_data_1,
-+	.length = 0x03,
-+};
-+
-+static void test_server_mnotify_flush(struct context *context)
-+{
-+	const struct test_step *step = context->data->step;
-+
-+	bt_gatt_server_send_notification(context->server, step->handle,
-+					step->value, step->length, true);
-+
-+	/* Disabling sends the pending notification right away */
-+	bt_gatt_server_set_mnotify_timeout(context->server, -1);
-+}
-+
-+static const struct test_step test_mnotify_server_3 = {
-+	.handle = 0x0003,
-+	.func = test_server_mnotify_flush,
-+	.value = read_data_1,
-+	.length = 0x03,
-+};
-+
-+static void test_server_mnotify_disabled(struct context *context)
-+{
-+	const struct test_step *step = context->data->step;
-+
-+	bt_gatt_server_set_mnotify_timeout(context->server, -1);
-+	bt_gatt_server_send_notification(context->server, step->handle,
-+					step->value, step->length, true);
-+}
-+
-+static const struct test_step test_mnotify_server_4 = {
-+	.handle = 0x0003,
-+	.func = test_server_mnotify_disabled,
-+	.value = read_data_1,
-+	.length = 0x03,
-+};
-+
- static uint8_t indication_received;
+ 	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
++	bt_gatt_server_set_mnotify_timeout(device->server,
++						btd_opts.gatt_mnotify);
  
- static void test_indication_cb(void *user_data)
-@@ -3337,6 +3401,41 @@ int main(int argc, char *argv[])
- 			raw_pdu(),
- 			raw_pdu(0x1B, 0x03, 0x00, 0x01, 0x02, 0x03));
+ 	btd_gatt_database_server_connected(database, device->server);
+ }
+diff --git a/src/main.c b/src/main.c
+index c7a55d30f61b..8e58b6b58ae2 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -151,6 +151,7 @@ static const char *gatt_options[] = {
+ 	"ExchangeMTU",
+ 	"Channels",
+ 	"Client",
++	"NotifyMultiple",
+ 	"ExportClaimedServices",
+ 	"Security",
+ 	NULL
+@@ -1190,6 +1191,35 @@ static void parse_gatt_seclevel(GKeyFile *config)
+ 	g_free(str);
+ }
  
-+	define_test_server("/robustness/mnotify", test_server, ts_small_db,
-+			&test_mnotify_server_1,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
-+			raw_pdu(0x13),
-+			raw_pdu(),
-+			raw_pdu(0x23, 0x03, 0x00, 0x03, 0x00, 0x01, 0x02, 0x03,
-+				0x03, 0x00, 0x03, 0x00, 0x01, 0x02, 0x03));
++static void parse_gatt_mnotify(GKeyFile *config)
++{
++	char *str = NULL;
++	char *endptr = NULL;
++	long val;
 +
-+	define_test_server("/robustness/mnotify-timeout", test_server,
-+			ts_small_db, &test_mnotify_server_2,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
-+			raw_pdu(0x13),
-+			raw_pdu(),
-+			raw_pdu(0x23, 0x03, 0x00, 0x03, 0x00, 0x01, 0x02, 0x03,
-+				0x03, 0x00, 0x03, 0x00, 0x01, 0x02, 0x03));
++	parse_config_string(config, "GATT", "NotifyMultiple", &str);
++	if (!str)
++		return;
 +
-+	define_test_server("/robustness/mnotify-flush", test_server,
-+			ts_small_db, &test_mnotify_server_3,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
-+			raw_pdu(0x13),
-+			raw_pdu(),
-+			raw_pdu(0x23, 0x03, 0x00, 0x03, 0x00, 0x01, 0x02,
-+				0x03));
++	if (!strcmp(str, "false") || !strcmp(str, "no") ||
++				!strcmp(str, "off")) {
++		btd_opts.gatt_mnotify = -1;
++	} else if (!strcmp(str, "true") || !strcmp(str, "yes") ||
++				!strcmp(str, "on")) {
++		btd_opts.gatt_mnotify = 0;
++	} else {
++		val = strtol(str, &endptr, 0);
++		if (!endptr || *endptr != '\0' || val < 0 || val > INT_MAX)
++			error("Invalid value for NotifyMultiple=%s", str);
++		else
++			btd_opts.gatt_mnotify = val;
++	}
 +
-+	define_test_server("/robustness/mnotify-disabled", test_server,
-+			ts_small_db, &test_mnotify_server_4,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
-+			raw_pdu(0x13),
-+			raw_pdu(),
-+			raw_pdu(0x1B, 0x03, 0x00, 0x01, 0x02, 0x03));
++	DBG("NotifyMultiple=%d", btd_opts.gatt_mnotify);
 +
- 	define_test_server("/TP/GAI/SR/BV-01-C", test_server, ts_small_db,
- 			&test_indication_server_1,
- 			raw_pdu(0x03, 0x00, 0x02),
++	g_free(str);
++}
++
+ static void parse_gatt(GKeyFile *config)
+ {
+ 	parse_gatt_cache(config);
+@@ -1199,6 +1229,7 @@ static void parse_gatt(GKeyFile *config)
+ 	parse_config_u8(config, "GATT", "Channels", &btd_opts.gatt_channels,
+ 				1, 6);
+ 	parse_config_bool(config, "GATT", "Client", &btd_opts.gatt_client);
++	parse_gatt_mnotify(config);
+ 	parse_gatt_export(config);
+ 	parse_gatt_seclevel(config);
+ }
+@@ -1425,6 +1456,7 @@ static void init_defaults(void)
+ 	btd_opts.gatt_mtu = BT_ATT_MAX_LE_MTU;
+ 	btd_opts.gatt_channels = 1;
+ 	btd_opts.gatt_client = true;
++	btd_opts.gatt_mnotify = 0;
+ 	btd_opts.gatt_export = BT_GATT_EXPORT_READ_ONLY;
+ 	btd_opts.gatt_seclevel = BT_ATT_SECURITY_AUTO;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index 1d8e97dc6f1a..12028e162c1d 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -270,6 +270,18 @@
+ # Defaults to 'true'.
+ #Client = true
+ 
++# Controls the use of GATT Notify Multiple when acting as a server and the
++# remote client supports it. Multiple notifications are buffered for up to
++# the given timeout so they can be sent in a single PDU, this improves
++# throughput but adds latency which may be undesirable for e.g. HID.
++# Possible values:
++# false: Disable Notify Multiple, always send regular notifications.
++# true: Enable Notify Multiple with 0 ms timeout (only notifications queued
++#       in the same mainloop iteration are aggregated).
++# <ms>: Enable Notify Multiple with the given timeout in milliseconds.
++# Defaults to true
++#NotifyMultiple = true
++
+ # Minimum required Encryption Key Size for accessing secured characteristics.
+ # Possible values: 0 and 7-16. 0 means don't care.
+ # Defaults to 0
 -- 
 2.56.0
 
