@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793690878;
-	b=34uAge1p9QjPgTSk55+LoGbddatE6ow5mRX71ip/GO/Z4YlzpfD8mpjj/llTfnT5ZBRg
-	 aVXi2sYm2XbWZYJ8m1VW3eKrwEPDA4agGJJSrG1m/0JJ/HAfQkFcvhSKBbwNH1EXwJm62
-	 iXRCDQzOBU4tQZPJUGU9CsLpIz047WJp1Xytu44+wKpaidHFO2sBHYcDoRLengTQi4NMj
-	 PciAm1EmDO0ZGdSK/6fuYzCOHPBpQ9fn/ABCNsZYLpP7QMr/Oo5mQiX3HGAbC0lpm3KSo
-	 fQF/YxJuSG7Omv93E53xH1xAGdizEXK7nOmkwOb8V4zIOnMav5KqgcqMhYhnDYUwvxg==
+	t=1793690879;
+	b=jZTW31Nkj+SDEKHhstBoFaja5z/p/mkU1w2FEGf3g71ZyfpRmdomskFELJz4aep0YSuu
+	 l0HWEHvNZ2ZwfqU2GfwOtMBbf/tfZqUPrNDST+E/UOySdcGAcTxd5Z4giajDkRVG+JUKB
+	 oAseHX3fumlDeY10kHjzoEJgLHF3bQJD+jYU/UCL1H2kLI6qQS/cAXHojHQHXo9uVmwri
+	 hxP77K509WrrsH2PAxvLhPwfXtn8m13cIrWfoURwmjkSrIe8zCU5O+zLTjpGxnTRZlx7T
+	 YauaDaVgpru0jURzd+u6EauZsqrwCHxb6MLzxLb/8Rm1Obkljrn19h+W1gHbtXwKvOQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793690878;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793690879;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=ge3acH+yi7jj/2VZ8oPBGEaqzVMx6RDgsI+gwHw3LnU=;
-	b=RAwMG7NE9lYTvfnNXhV9m9NJrUk+O2eYW17P5x7Khjj/4Jvq4msdXmvxtLuHRAGb8aLh
-	 yfIFg+tVN6z0M1bROfa566i+eSZQYB/v4eJXR+0UKqXpMheVDSJu5FZPqVOxQeu1rGABc
-	 PCUKRv9UPxVaX5QEwJau84b4jt/L4wvQCL/46774OOvcNpox9tlxSRu2GdYRmUVTNNYzB
-	 PVyn5QCroOXwwxXg4zFjjwnGHqJfg5+iF/nNMCnpP62DH+5APLv5bcah6/PKzj3Cffkth
-	 ptwmJPQaQ7OhWJpr4Qx0TES1rCzL/7VVbG7apguuiawStpmR+awvFyCHnVjRW9S2Q8g==
+	bh=X615zU9ORSEAQUv8Nz+s0hDCGEZaTV9qWtlk0faDhI0=;
+	b=XgKl+30eBMojY8kSm22cYthfEx/aQxIW88ExUEGQDpdUvkYHHx70XdnrpxOQnn5ttR8s
+	 eZ6362mQvZj33NC4XH0hICP43zmLlDpwrI/ZeBOoj1otU3zApz7E5xPP+daY+zrk4GVaU
+	 WTftY4LrlpSeEtZ3v3vQg6DpLWyHNjbfsaKgo9l2Pkcpn7vyHIPpiXPPHAacT+iYuyyxa
+	 DKrfTm1swUbWZ+YsMFlDJa3nr0z669xP8zlB3Ay6KgjtEkB/SWUoPzAMzy/AnPCWlbP2f
+	 xspyzgi/PV6KCj6WaC9A4cY9k3pncZDZMmqFY8VGUn2qdcnKqC5MO7nS96XtpczGeNQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b="Mnrm/0me";
-	arc=none smtp.remote-ip=74.125.82.169
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b="lRpboS/b";
+	arc=none smtp.remote-ip=74.125.82.170
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A35606A32E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 07:27:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F1A35606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB66606A32F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 07:27:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CEB66606A32F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=Mnrm/0me
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-369f33df08eso7468081eec.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 23:27:57 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=lRpboS/b
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-3514b90bb89so7993272eec.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 23:27:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1793690877; x=1794295677; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1793690878; x=1794295678; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ge3acH+yi7jj/2VZ8oPBGEaqzVMx6RDgsI+gwHw3LnU=;
-        b=Mnrm/0mexulM7WC1uybFKIZN5sTkhTA/B+84pbImMgpvazA5yEK9F0VjKDsJPJOIk6
-         wE9fyWmKN84bo0nNaZGo1Az4Xkhs+kX5su2Biy3r/A7N7oN0kSe8LqPCX1OlMQKWTBMl
-         EJbkbrR2TNfbI+B/VU4v7Wh9MFIvPyX36iLQ6We2tyo1nFay9CWvu5G9+69HKo+MTxJk
-         CJNMUqxBp1yJsH1ZxkRqqpIywAMsbSEv1oIVAQu56l0p3GbPLEXiHTD5Uxe72BpSy7zD
-         LR6Hclf0M4V3HIio41jdAGYctLw68C2rdTbh0SkXGW6grQ6n18c+Q3hdj7juG/NSoVDJ
-         5jnQ==
+        bh=X615zU9ORSEAQUv8Nz+s0hDCGEZaTV9qWtlk0faDhI0=;
+        b=lRpboS/b5QjN8qiWwTaZRiNVFKF910Y5CR9kapChUZJPKuEX/yxii6EcepsdC6Ym0O
+         y0NPXP3dErnz+lmA5gq8eV99l2FPyKx1qstT9WTe0w79BmF+H2p/GtvXdwZSI3NuNIdG
+         Oqcu+XKWCX3KvFSXiJmKDmqEmn0aYJQ14wcgRtntB3cEy91TFZ79KntDWfbJF3SkppAT
+         D6iZqs4k9URNwq26TQT58p6vi3DOOLq5qLKzEyUV2KDxGdLUOHw3GhC7/UPvZU6rEfSd
+         aELn2tM2y1LKZ8BOUo6tHnO+8RAseEFaWIVh4pk0xSAERG8EHei4JdWqylJ2fkjh0573
+         U+/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793690877; x=1794295677;
+        d=1e100.net; s=20260707; t=1793690878; x=1794295678;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ge3acH+yi7jj/2VZ8oPBGEaqzVMx6RDgsI+gwHw3LnU=;
-        b=YQEWILAQKqvDiufr8JIW7tryJLtpURPiw/dWgU7D8a1gl2o0GJlbPOAkuFbLFL4+A2
-         IcKCa9NtN+gv6QpfniCMYiqdxcLPM/QNYjEyuOIbqDJ7V517dCBJ0HK2slPU6OwkRhDO
-         k2ShnPJUf6f7iUJ6fO33e66S8TC/DX6FXwVxzGUY0/OLFhGGnYqy0kZnW2bJ3lflfVha
-         VEo65ZMg5TYJqybc2r5sX7ElNAnIoLuVulGTySy/uuEO+1ZdSP8ccf+UnCdhjkb5deHt
-         gpGwgBT1sFgOu3RIYdEIy9tHYWjVhGCNKrjLQK2Iia6qP7WrpTOqz1r4E4JS46tMSx+t
-         1s8Q==
-X-Gm-Message-State: APuU4Z8g5OlAhd7A7m9i+JTZ8oTH99PbuLGZyH/8YNLDrnPe5VvO7lRc
-	Jr2SlbQxzdq5S6SGP3K5rQLyuBSP2uif58r+4m/6fQ9Cg62MiJsLJHbaupqtAfyZkPO4KRUYnPx
-	ryfY+ODc=
-X-Gm-Gg: AYBFou0caxiQ19HWGVh4/yLkjAjez7NWU6jEJXIE/rShuO8lcpaoL9UXlf1LCqWoCUX
-	/Nqnlqn2AAv4y7T76CcWGVBOzAzuc3BmvheJX6+Fnv/QnbaUQ/ClLhi9QHbjiIQ72Op+iKIS26e
-	5OzIc5PNZSHFq2gPycqFqklk0SmCs0ZatmDwlkevcexSiAKFVlHVBvi32UKtInUy9pfj+KsfFZQ
-	uxqdfuvXZs2Y6XGAmO8cQsu26azQftEH8aFLP2ulZp4+BzQuX3ii058Q0njlnu/l7pQL3QX05EU
-	Cq8Ds/ZUXfbHBlpJRpZll4yZUUh2rwfAOZE0E87LSz6Bnw+gMLmn/Tq+VsWbwrWNanuGMvMy/r/
-	h1aDsUb8ROeF+xwHz0IOFKJF4WezfkXUIMZ10DzjTCn9NMN+9ZMWfbzQ+0ZhqYabCDJ8hVZfV4r
-	6hVfjtAXHWpma5oFxumexXM9phFnDBSusElraYGpQWgstE7DXDMcwGIKDWOQkN/w5tRsAYzIEgh
-	5LLH7acJo6tqBMnQvOQPTC9lbOn/a4N4CgxHE8Gb/b1l9SZRUyF8575sLCUqhrHhripGXd9TRNM
-	Cv6Q5G/mIf+2HJzIGB2hBdbGVDRB6rTylpVBMMaiI8yN8d+3ol5kPUoVkiF7EIygzt6uSa7mRwc
-	ith4ti4+nMhdt5Wxl1LOb/WEg8uiAnZ/FLJEMeflWvwYrhhC6xRH/GnGa/PtAbcCpKmgqAqo=
-X-Received: by 2002:a05:701b:455a:10b0:1b2:42e3:e5f0 with SMTP id a92af1059eb24-1b242e3e78bmr141160c88.12.1793690877017;
+        bh=X615zU9ORSEAQUv8Nz+s0hDCGEZaTV9qWtlk0faDhI0=;
+        b=alLA5c/N85XwYmT0K7g4ldIzNd+g5SsY+8tehOF6gv1vf7qCnRqxrbLD4GPwMOrWzF
+         s79TutkvjIY8cyO8s0oCSz/l9ZA593BXkd2bn9X/XD96zMlABl8ySOaXpjqi0Pr6mVU5
+         OVzNDMvP/OKHShAoEs/S580qkNn1yWvVX3aLyg4C/hdDmNbtokpaft3fzBlKrxlD8osa
+         6+E5agPq0OwyB7uXqPLVO96aDnZ7gK3vD33PPNgWM4TdvaigEcphAEZJ9npRIk9DLuhg
+         ukvINQfy8Z/LPC5ii4B8BLZDyJBdbARTAond3aVJk3tR/4K7C4oZucTBkZHHIH2KV87Q
+         VaBg==
+X-Gm-Message-State: APuU4Z935WZAiIFl045zu6DXUvCHPqdlAObaw6Z5ESgtjdpIbN4NOZgC
+	cJ4CzIqS4oQFpnarEHb056aqvZNOJCOUDc33WdaYHm9ks/lYeeOlyx5DFySwkiUOnwkCZMPB8yA
+	gOn9sc5A=
+X-Gm-Gg: AYBFou1mKG7J7OwpDRG5HG4JxCVV8CLLvBd2dpvxTGAub0RbN5IRT0pkz6TwIzpDaeD
+	u8CS1gnsQILloyaprNoEH4j6mN6htmF1SZmltnUw1C89tddyJrva6UPgcdegY1eLOxUXy0aVQ4O
+	ODdd/KGMvgkSQqSunjJT0U2nbvdd3KIYux4b1hazhDyVDyYPSVu1Y4dvzRSvW9Ti9tk3GbKJel7
+	mQUeGLBkpr2/FWHgf6O/SYsGwnkAJVN9zkfeII13J3F2xG+ztsmLrR+PyH0LRjLKT9j9lPLvnCf
+	uOyqfMGdyrCrqBoS7659IBEugqLjiQ9/Pqyiwc9Y20DulHTlgqSrFi7k7kKQJF5XM0bV6xQGDYR
+	rKjqgTPD35NyzwN8y9+oVeMGRyNbxO4WmXAqnDOoIjS3yuFnsdZhBCPHyszkDTekGdHQ8PXHnmH
+	JhA6Sbad7AaI9agrunHcPB9Cf+l/5gDLKaf3MS+PtMAcvFcmrgo4l97TkGd3IP30J5NDoxMQHsw
+	mQKwqQAsTeFoAsZXVkjHT68KtIk1R8W/N2LIsQfV2fgJ+ONJ1qqgYms7TJYnz4tHOHwCYSQsvyr
+	hECZD7WSgTac6lqyBu1c9aJVJ1OXDCjHUOjAv3IErDu+4FsDhLcoNh7h63IFmXC33H4svFPGZLP
+	/E6kfYybpbWb3cMzjCa8PqQhU7fdof07+DPxq76ns+zVlfmw9MntafqhT98O6iNizCwsXj4AlHu
+	lK7GUyqjksVzcgkQN8VQ==
+X-Received: by 2002:a05:7022:b059:20b0:1ad:3402:733f with SMTP id a92af1059eb24-1ad3420f9a1mr18071081c88.44.1793690877655;
         Mon, 02 Nov 2026 23:27:57 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1aed79b3dfcsm42437988c88.12.2026.11.02.23.27.56
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1aed79b3dfcsm42437988c88.12.2026.11.02.23.27.57
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 02 Nov 2026 23:27:56 -0800 (PST)
+        Mon, 02 Nov 2026 23:27:57 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ 3/5] bearer: Add connection parameter properties
-Date: Mon,  2 Nov 2026 23:27:47 -0800
-Message-ID: <20261103072749.50979-4-kevin@simpleble.org>
+Subject: [PATCH BlueZ 4/5] client: Print LE connection parameters in info
+Date: Mon,  2 Nov 2026 23:27:48 -0800
+Message-ID: <20261103072749.50979-5-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261103072749.50979-1-kevin@simpleble.org>
 References: <20261103072749.50979-1-kevin@simpleble.org>
@@ -100,257 +101,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This implements the Interval, Latency, SupervisionTimeout and Subrate
-properties of org.bluez.Bearer.LE1 with the values of the MGMT
-Connection Subrate event, which the kernel sends when an LE connection
-is established and whenever its parameters change.
+This prints the connection parameter properties of the LE bearer with
+the likes of info command:
+
+bluetoothctl> info <addr>
+...
+        LE.Role: central
+        LE.Interval: 0x00007530 (30000)
+        LE.Latency: 0x0000 (0)
+        LE.SupervisionTimeout: 0x07d0 (2000)
+        LE.Subrate: 0x0001 (1)
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- src/adapter.c |  12 +++++
- src/bearer.c  | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++
- src/bearer.h  |   3 ++
- src/device.c  |   8 ++++
- src/device.h  |   3 ++
- 5 files changed, 148 insertions(+)
+ client/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index edd2fdaf4..5ecb3c784 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -9506,6 +9506,7 @@ static void conn_subrate_evt(uint16_t index, uint16_t length,
- 	const struct mgmt_ev_conn_subrate *ev = param;
- 	struct btd_adapter *adapter = user_data;
- 	uint16_t interval, subrate, latency, cont_num, supv_timeout;
-+	struct btd_device *device;
- 	char dst[18];
+diff --git a/client/main.c b/client/main.c
+index 01ed00073..1131c2ae3 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2098,6 +2098,11 @@ static void cmd_info(int argc, char *argv[])
+ 		print_property_with_label(bearer, "Connectable",
+ 							"LE.Connectable");
+ 		print_property_with_label(bearer, "Role", "LE.Role");
++		print_property_with_label(bearer, "Interval", "LE.Interval");
++		print_property_with_label(bearer, "Latency", "LE.Latency");
++		print_property_with_label(bearer, "SupervisionTimeout",
++						"LE.SupervisionTimeout");
++		print_property_with_label(bearer, "Subrate", "LE.Subrate");
+ 	}
  
- 	if (length < sizeof(*ev)) {
-@@ -9532,6 +9533,17 @@ static void conn_subrate_evt(uint16_t index, uint16_t length,
- 		"cont_num 0x%04x timeout 0x%04x", adapter->dev_id, dst,
- 		ev->addr.type, interval, subrate, latency, cont_num,
- 		supv_timeout);
-+
-+	device = btd_adapter_find_device(adapter, &ev->addr.bdaddr,
-+							ev->addr.type);
-+	if (!device)
-+		return;
-+
-+	/* The interval is in units of 0.125 ms and the supervision timeout
-+	 * in units of 10 ms.
-+	 */
-+	device_set_le_conn_params(device, interval * 125, latency,
-+					supv_timeout * 10, subrate);
- }
- 
- int adapter_set_io_capability(struct btd_adapter *adapter,
-diff --git a/src/bearer.c b/src/bearer.c
-index 51dd789f1..5285e0274 100644
---- a/src/bearer.c
-+++ b/src/bearer.c
-@@ -56,6 +56,13 @@ struct btd_bearer {
- 	 * additional connect messages.
- 	 */
- 	DBusMessage *connect; /* connect message */
-+
-+	/* LE connection parameters, only valid while connected */
-+	bool conn_params;
-+	uint32_t interval; /* in microseconds */
-+	uint16_t latency;
-+	uint16_t supv_timeout; /* in milliseconds */
-+	uint16_t subrate;
- };
- 
- static void bearer_free_dbus_message(void *data)
-@@ -304,6 +311,58 @@ static gboolean bearer_role_exists(const GDBusPropertyTable *property,
- 	return btd_device_bdaddr_type_connected(bearer->device, bearer->type);
- }
- 
-+static gboolean bearer_get_interval(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_bearer *bearer = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
-+							&bearer->interval);
-+
-+	return TRUE;
-+}
-+
-+static gboolean bearer_get_latency(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_bearer *bearer = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&bearer->latency);
-+
-+	return TRUE;
-+}
-+
-+static gboolean bearer_get_supv_timeout(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_bearer *bearer = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&bearer->supv_timeout);
-+
-+	return TRUE;
-+}
-+
-+static gboolean bearer_get_subrate(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_bearer *bearer = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&bearer->subrate);
-+
-+	return TRUE;
-+}
-+
-+static gboolean bearer_conn_params_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct btd_bearer *bearer = data;
-+
-+	return bearer->conn_params;
-+}
-+
- static const GDBusSignalTable bearer_signals[] = {
- 	{ GDBUS_SIGNAL("Disconnected",
- 			GDBUS_ARGS({ "name", "s" }, { "message", "s" })) },
-@@ -318,6 +377,14 @@ static const GDBusPropertyTable bearer_properties[] = {
- 	{ "Connectable", "b", bearer_get_connectable, NULL,
- 					bearer_connectable_exists },
- 	{ "Role", "s", bearer_get_role, NULL, bearer_role_exists },
-+	{ "Interval", "u", bearer_get_interval, NULL,
-+					bearer_conn_params_exists },
-+	{ "Latency", "q", bearer_get_latency, NULL,
-+					bearer_conn_params_exists },
-+	{ "SupervisionTimeout", "q", bearer_get_supv_timeout, NULL,
-+					bearer_conn_params_exists },
-+	{ "Subrate", "q", bearer_get_subrate, NULL,
-+					bearer_conn_params_exists },
- 	{}
- };
- 
-@@ -418,6 +485,59 @@ void btd_bearer_connectable(struct btd_bearer *bearer)
- 					"Connectable");
- }
- 
-+static void bearer_conn_param_changed(struct btd_bearer *bearer,
-+							const char *name)
-+{
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), bearer->path,
-+					bearer_interface(bearer->type), name);
-+}
-+
-+void btd_bearer_conn_params(struct btd_bearer *bearer, uint32_t interval,
-+				uint16_t latency, uint16_t supv_timeout,
-+				uint16_t subrate)
-+{
-+	bool added;
-+
-+	if (!bearer || !bearer->path)
-+		return;
-+
-+	added = !bearer->conn_params;
-+	bearer->conn_params = true;
-+
-+	if (added || bearer->interval != interval) {
-+		bearer->interval = interval;
-+		bearer_conn_param_changed(bearer, "Interval");
-+	}
-+
-+	if (added || bearer->latency != latency) {
-+		bearer->latency = latency;
-+		bearer_conn_param_changed(bearer, "Latency");
-+	}
-+
-+	if (added || bearer->supv_timeout != supv_timeout) {
-+		bearer->supv_timeout = supv_timeout;
-+		bearer_conn_param_changed(bearer, "SupervisionTimeout");
-+	}
-+
-+	if (added || bearer->subrate != subrate) {
-+		bearer->subrate = subrate;
-+		bearer_conn_param_changed(bearer, "Subrate");
-+	}
-+}
-+
-+static void bearer_clear_conn_params(struct btd_bearer *bearer)
-+{
-+	if (!bearer->conn_params)
-+		return;
-+
-+	bearer->conn_params = false;
-+
-+	bearer_conn_param_changed(bearer, "Interval");
-+	bearer_conn_param_changed(bearer, "Latency");
-+	bearer_conn_param_changed(bearer, "SupervisionTimeout");
-+	bearer_conn_param_changed(bearer, "Subrate");
-+}
-+
- void btd_bearer_connected(struct btd_bearer *bearer, int err)
- {
- 	DBusMessage *reply;
-@@ -488,6 +608,8 @@ void btd_bearer_disconnected(struct btd_bearer *bearer, uint8_t reason)
- 					bearer_interface(bearer->type),
- 					"Role");
- 
-+	bearer_clear_conn_params(bearer);
-+
- 	switch (reason) {
- 	case MGMT_DEV_DISCONN_UNKNOWN:
- 		name = "org.bluez.Reason.Unknown";
-diff --git a/src/bearer.h b/src/bearer.h
-index 238d0a17c..26530c11a 100644
---- a/src/bearer.h
-+++ b/src/bearer.h
-@@ -19,5 +19,8 @@ void btd_bearer_destroy(struct btd_bearer *bearer);
- void btd_bearer_paired(struct btd_bearer *bearer);
- void btd_bearer_bonded(struct btd_bearer *bearer);
- void btd_bearer_connectable(struct btd_bearer *bearer);
-+void btd_bearer_conn_params(struct btd_bearer *bearer, uint32_t interval,
-+				uint16_t latency, uint16_t supv_timeout,
-+				uint16_t subrate);
- void btd_bearer_connected(struct btd_bearer *bearer, int err);
- void btd_bearer_disconnected(struct btd_bearer *bearer, uint8_t reason);
-diff --git a/src/device.c b/src/device.c
-index 4567188d6..137970637 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -8523,6 +8523,14 @@ void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
- 					timeout);
- }
- 
-+void device_set_le_conn_params(struct btd_device *device, uint32_t interval,
-+				uint16_t latency, uint16_t supv_timeout,
-+				uint16_t subrate)
-+{
-+	btd_bearer_conn_params(device->le, interval, latency, supv_timeout,
-+								subrate);
-+}
-+
- void btd_device_foreach_service_data(struct btd_device *dev, bt_ad_func_t func,
- 							void *data)
- {
-diff --git a/src/device.h b/src/device.h
-index 5ead73958..6756cb3ab 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -249,6 +249,9 @@ void btd_device_foreach_ad(struct btd_device *dev, bt_device_ad_func_t func,
- void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
- 					uint16_t max_interval, uint16_t latency,
- 					uint16_t timeout);
-+void device_set_le_conn_params(struct btd_device *device, uint32_t interval,
-+				uint16_t latency, uint16_t supv_timeout,
-+				uint16_t subrate);
- void btd_device_foreach_service_data(struct btd_device *dev,
- 					bt_device_ad_func_t func,
- 					void *data);
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 -- 
 2.54.0 (Apple Git-157)
 
