@@ -1,91 +1,91 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793690877;
-	b=W9xLbe2wb6a5tx8S0G5zNKxYa1+ClF0/7QnMHj0mCSrycP/9e4ggYUuLs/7I2Qx515SD
-	 G7lfqOkw/qBSDc4fJPma5Xc1p3jRdqBEyJSK6PqotceiK0knC++IBqOcoSiRcz90d2WlS
-	 iwomCxOmnrG/0GQYpFnqrNAQj+EUVfLTlxFFKGQaZJbqYVjZ9TE/ZItVPWVZcyARjR+IN
-	 sfvJLaqw+pDjJFG8I2B7XnZdUcNIXo21KwMxnXDMcQz7ZcPH4TrueA1A3Q9sBvrAe9u9d
-	 CeUJzhBlIJ1hK7rCRYN1VxCJK9gi2ZAew3a6tudXthdiPoing/A6Im117AM7LVuyf+w==
+	b=pTRgfPc6vAy6DrVPf9Za1Bg9tmy16bb9KYRHRs8LHmj8HW+WTHMrQuIIj/cGl1Jzbjg0
+	 lOnfFMCupOifHdjhRmQejOqYMEVqYtL0c05ggNPkUpox74ihHPpyFQSpcCZhLbxBROvfx
+	 CJuvgWJV1A4O5msCwgdWxyhL2dEeox2hbzs+PMa83pS3ckAXEqmJeVhKp+lVfP0O89M/u
+	 kNjvo7vMk2/tJKMaQASSQAia0SbMqRefgPU5rqUUAlk3O/sujOgfsiVGUJvfYWeFHf0K9
+	 usbo+Dfda3EYE/WfzlU54a1O8NjBv5Eh3wJkN2Hr02vqn0PdDEwsffrdwZaPJCNefJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793690877;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=BCRmxDZQNqIR+WtaN5FIifpkR+PeT7HFZUck4px6r7E=;
-	b=CKUqEzyzVexOqwrHpwospW2DSWV+ceGqUR2h0sBX0sBuF1pziO/EPN33bgX+5vt1uXls
-	 4MnZ6ffszoyKj93ohN8qf6Zq7QtbFwJSDBFQ9F35rMRQOLvCwu29n2KR8W4vGcV5/hx1u
-	 8YK7412kzPQojXAHkFspF3dGF/yAPfc+xEunXOKsNvVPbn04XJU9dmAbIbJOqoyiy+pEU
-	 VUHMtNg1Kb0CZHHGmgXDaoxjzwQSQEwDLFCUOKHGixg/iIWHV9bpV23BGgIzMaLKKPXke
-	 4dNU9RLqcE3qZdyPMjTKP4+ljF0n1cMutJb1fud8RZYSAKZYh+AiEfhMrVx3ThJjpQQ==
+	bh=cRuGeDelLBQ3zT5yR4lgJxot3pYSuYtADZ6kC/XGsKY=;
+	b=05DbdmQ4gljE9+XV5Bz5zgy/4rxnqnNTEcjqo23GWL8eSiy/+Br+CTs7IAvAEpe5Sq1A
+	 DRersl8676SVm5RooZlbAI76xIzHNR4XZV19Qbg7MjO4/qeEWuFxlolXfvsmmT59qG1JT
+	 HoMr2SvO79JCCxsaAAzLa4QQwYpcZICA2VWR0mw5IEz32upxxRcC5P4k5h2+QEEEhHlWQ
+	 2NC6zlSuRR8jfWmCnBq4GgudZ+B3kvf50XEk41SbpSiAyLjHsPZh7JEP3kdHWJY0T8RDN
+	 pEwKJyeKIZ9i4VmUZlnBRuU78STpdkdkcuxz3mDPbJT45/lN6z3eRBeB/bfrzMPux4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=eu+kyKUz;
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=F3OxpdY3;
 	arc=none smtp.remote-ip=74.125.82.45
 Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12BC606A32F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 07:27:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D12BC606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7896E606A332
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 07:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7896E606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=eu+kyKUz
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-170135e43c7so2037152c88.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 23:27:56 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=F3OxpdY3
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1ae18eb9ad0so3872509c88.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Nov 2026 23:27:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=simpleble.org; s=google; t=1793690876; x=1794295676; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=BCRmxDZQNqIR+WtaN5FIifpkR+PeT7HFZUck4px6r7E=;
-        b=eu+kyKUz9JqSHrzFnaRdO6zBwdb28eMokmrslHlHdX8WUR/qZFkQAsUIhruOJ6JIDi
-         2bxbzTagniTq7QSBeesNJ2y1MpPLTQkvs/voio6aMlxEs47iUbMUldRiYBddlfACK+Cm
-         oNXsji8BHjzRMMraX7sEc03eJL25i5WJGR4Iz/txf9zOXAwOvgERoIVR5++VqfWiea0y
-         eHTTXCHrGpiIM7TDnLHYS7ZqyUWeBNi39J23lW/aSimfghiLBTepgG/DenSyFZhI3vS1
-         cUCRpsN5NCLGAcGPvP+Cv7FjQY5bKyJmDZW1vg2FQY+hY3LGMbdR4FCKHg4XaGPhTgOv
-         GfMQ==
+        bh=cRuGeDelLBQ3zT5yR4lgJxot3pYSuYtADZ6kC/XGsKY=;
+        b=F3OxpdY36X/EQGVpNh2Uui1ARhWhrbIQJrMpmRiMyV1SVvFIA2hfBhHaVErO/y+p4h
+         PlnfLa6iYcz0ze5Oj3VdcjG1GaApEh4TUW63zcC5+MuiCukoySOgqraPuKK/e1zqr00e
+         HgCzVUZJZv/8Rj1YHsjg9FYysPkjpeOwos1hQUM8M49ob2kL8MkuJXM4M+Af6aEkIaGk
+         Q8jmhkj5wYrVLsAIQXroYm1nPoG7NeKl1xRlaGkWELTCf1vYmg4LuH7/VpsLFH1w4tSw
+         uSmfq8k7ZaKbw1vm0a1YsHYeYDO4yuUWBjt5CByLg0N1KpAx4l54TnQ8ddclWRuA00ol
+         sWWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1793690876; x=1794295676;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=BCRmxDZQNqIR+WtaN5FIifpkR+PeT7HFZUck4px6r7E=;
-        b=clCbpyN/kO2L+VOsSdm2RZD2nuZiEdg6RlZ9v98Ly3yYEDnO2JbQW5vjB2EKwIDjgS
-         jUp0SkpjLOfn1VL8Slu9Mj6RpcGdYv9MFuVi2xtgSp0aem4Zpjs+PMrGVXhyEEOaQMBa
-         HYCXuwptDdbQmG33T+R9Wv0jFgIOP5Os73OGXYi/N9ZDZtSG4HhkznWqwGQCb5CO0B7A
-         HSy5Rb3O1Xsr9hkceOrTQSTiUT9ZrgkvdSuV9JQpmN2LdfHR/U0ros7/PwBKGhDawbOF
-         EX3dtCM1Kf/cXRBcLbOH9cXR6XrkWQKOnFDq2qOYTLnMhkWhQrb2kFGVImfKn5/eB/p4
-         cJ1g==
-X-Gm-Message-State: APuU4Z+cs1f/r60Kn2VKVVu7LrpOeLKOexirNxAe57SqIEEdF9XmMVcG
-	m6hvOxyrteLvhfIEXPuQQ8tFw+3AU0CQ83ZRukttfQYGm2e5JQGQ/sG85X9eMaj6YcpzM1Rb5/f
-	MvODnqkk=
-X-Gm-Gg: AYBFou1ZAXH8sYzap8P3WOcpG4qEaVHwkvDyXQSjqDa/Q22BL5ReG5YNG//vr/nlUcW
-	VdQg4f3/fiqAVmcKd1nbi4PsFBOpd88strJj38vtvvIbuHobHRqPk6HicLtYCxxnwmzDRjzYk5h
-	ocJl+lluvCODwuIdrQ+cFHyCBW0AavH/SDXPIzzf07OpF9wYAAG2sqs6b2I2Y2Ww2Oveyt+uiQe
-	hcMWS4JwPNn2MCVnmJedQnmVB1T3vsrmhK5FncITjrRAGfxpfcYfsxXccJmD7px9nEBbckyiNOh
-	VDzfwB0KQsIO5LBawgEbz4PJ1jng0qcUDm0gBLsOoWV8qSkInjkADMJLyiy/6q74uz/OasXr2u+
-	Im3pDKUaBLSWcbtXcmj4GyAywC4BaRQb/USO2UTAVnjzitq4I52H1TX21qI3sKXdG8JhpNzMg2S
-	Z7fusfrxBNb7sDj1C/AJ0GjrLqf1PfIRAjenJkpm2y9uKqlg+7u2ytH0v5pvr7UHguZooyVl1MG
-	5xF4D9/9JbYL85SIlrtFZdq4bvQi0xZL0A9TP0i4m5GPpFKdsne/0FhIGSaNSzp8IDSC1giZu+h
-	XNfDOc3bb13P3mBqFWLR0/itAR5z816jmGh4tr4HBCahCpVWdNND8GD6/yesF4LvsNEkrULO8Km
-	5aD6++jAe9GRXBWMfQZF8b3ujCp3LciXeRfziTdz9m+HmICFjgWNVXIrYb7TcJzFwz4yMbDk=
-X-Received: by 2002:a05:701b:418d:10b0:192:e5a8:6bae with SMTP id a92af1059eb24-1ac5e6f5eaemr19022260c88.40.1793690875553;
-        Mon, 02 Nov 2026 23:27:55 -0800 (PST)
+        bh=cRuGeDelLBQ3zT5yR4lgJxot3pYSuYtADZ6kC/XGsKY=;
+        b=uyGcksjl9MqCqjE3N+Pe3lJIH/K7/Cpo2qyQ25jNO+XBCBaTex5plDRa/yv84W3iTE
+         cIF79Q+zGzoMBQIVxk1p8JU6qrYAsfoqU1p7As81+arBdswnXNXOj+FYCaEdknNZ9ZTT
+         +d03Dix3rzUkfZRwr72ETDtwmF+gPei7XjrZ7KbQADRH2nfxhPOyFCHAGGmfDOk2CnZA
+         CcMSIeLlKbFzcupDLBsxHsbZZ4vZlgGhzE8wTHhRKU8PDRAQdu/EYntQ1e5AX9SMXJZY
+         weFsQBT3g6n9aPyxptuqAu+yzA+bNBSL1ZmLEUUtt/gDivk6yc+tBo5XW9gvmesHIAZ9
+         7MZw==
+X-Gm-Message-State: APuU4Z/WGjIpoJuH9P8hSs6q8UZ6SqjYz4r1XdJknuWdluT9Z9N8cTxF
+	6KhQkWdrBMo23/tDrGjTYanhA8Eklm1YJl1u9lSGvlSvBzLaEEzb4BrswYm57nQqiTnK2tAqw40
+	K3C3aq5o=
+X-Gm-Gg: AYBFou212XFtIAB0IBQSyN+cOnGgKQkfKI/loJ6PwMjzkld2zgjHWlStGApT0zgLwYH
+	t6OWCAsKZjB+qq9dJDxOFKe/uO4CoDRK8dqh1Q0RqE7KQcFimtIrQp0mC3ZAhuXdt3SUDJxpuFV
+	KDiItUsLllYAHZzNDTK4T33l6kKSIOxFH8ZEw78FUPY9uz5GNq8zfF6P3x+pXWm6BNNK74c9IGH
+	y73S5QTHj0YOJhuihloYJfiXlvExUxkmN+HeVlel3oh1XMS2w8WGg50RtEh0sH5yH6p7zFE6RI9
+	PQsYFAZI74JKTEdmMNcCJ/rHC6bXQKfFGye2tebbuWqwa2piGXsz0OKwVXY3O4McjDoDm2rk884
+	y3OsAJC1QfjWT72EXIMGCZ/kRrxKFkr0Wqsz9Gc12Udu5IoAt+ylFe0Lthb+Qk7CZHkt6r6+89R
+	215Rv8ALUPGw2xJ/NfZMbCmbet09maMpiFiTGphen6Trq/oGnaYS/UfHQ12qv/aSPvcixDoaTPD
+	QnfQa18PgNyPSj5Vmj7UEdULc+wXKHZ6r5EBFlFpPw6E0coJMUqM/cK1JNlWh3/N0zTKmzU1OS7
+	6xWLBDN6KWLRAMHDeJsE0vwaIBdTPSsc6+y7GnyHUFwEjsouDNnMI7IY07mkoJPvwk1YNPpt3xD
+	YF2MZDfJ9RPmtMghcpUWm6yodfZEPlWh6ooR6796hic/FCijwNlTAFsQ9MI88jDJb9pX3V5Y=
+X-Received: by 2002:a05:7023:90b:b0:14c:8461:b3ef with SMTP id a92af1059eb24-1ac5e6f5132mr23605084c88.24.1793690876324;
+        Mon, 02 Nov 2026 23:27:56 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1aed79b3dfcsm42437988c88.12.2026.11.02.23.27.54
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1aed79b3dfcsm42437988c88.12.2026.11.02.23.27.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
         Mon, 02 Nov 2026 23:27:55 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ 1/5] doc/mgmt: Document Connection Subrate for LE connections and updates
-Date: Mon,  2 Nov 2026 23:27:45 -0800
-Message-ID: <20261103072749.50979-2-kevin@simpleble.org>
+Subject: [PATCH BlueZ 2/5] org.bluez.Bearer: Add connection parameter properties
+Date: Mon,  2 Nov 2026 23:27:46 -0800
+Message-ID: <20261103072749.50979-3-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261103072749.50979-1-kevin@simpleble.org>
 References: <20261103072749.50979-1-kevin@simpleble.org>
@@ -100,46 +100,62 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With "Bluetooth: MGMT: Send Connection Subrate on LE connection and
-update", now in bluetooth-next, the kernel also sends the Connection
-Subrate event when an LE connection is established and after each LE
-Connection Update, so the connection parameters are known on
-controllers without the Shorter Connection Interval feature, and a
-failed connection rate change reports the current parameters. Document
-this, and the Subrate and Continuation_Number values these events
-carry.
+This adds Interval, Latency, SupervisionTimeout and Subrate properties
+to org.bluez.Bearer.LE1 with the parameters of the current LE
+connection, so applications can see the connection parameters in use,
+e.g. to estimate throughput and latency, without reading HCI traffic.
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- doc/mgmt-protocol.rst | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ doc/org.bluez.Bearer.LE.rst | 38 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
-index ed2bd3349..bf6a3b200 100644
---- a/doc/mgmt-protocol.rst
-+++ b/doc/mgmt-protocol.rst
-@@ -5520,6 +5520,11 @@ This event indicates that the connection rate has changed for a device. This
- can be a result of a successful LE Connection Rate Request or a change
- initiated by the remote device.
+diff --git a/doc/org.bluez.Bearer.LE.rst b/doc/org.bluez.Bearer.LE.rst
+index 6d3df3fcf..3db5237b4 100644
+--- a/doc/org.bluez.Bearer.LE.rst
++++ b/doc/org.bluez.Bearer.LE.rst
+@@ -177,3 +177,41 @@ Possible values:
+ 	peripheral.
  
-+It is also sent when an LE connection is established and after each LE
-+Connection Update, which do not report subrating: the Subrate and
-+Continuation_Number parameters then keep the values of the last connection
-+rate change, or 1 and 0 if there was none.
+ A PropertiesChanged signal indicate changes to this status.
 +
- Possible values for the Address_Type parameter:
- 
- .. csv-table::
-@@ -5529,7 +5534,8 @@ Possible values for the Address_Type parameter:
- 	0x01, LE Public
- 	0x02, LE Random
- 
--The Status indicates whether the connection rate change was successful.
-+The Status indicates whether the connection rate change was successful. When it
-+was not, the other parameters are the current ones of the connection.
- 
- The Interval parameter specifies the new connection interval in units of
- 0.125 ms.
++uint32 Interval [readonly, optional]
++````````````````````````````````````
++
++Indicates the connection interval of the current connection on LE bearer, in
++microseconds. It is only present while the remote device is connected over LE
++bearer.
++
++A PropertiesChanged signal indicate changes to this status.
++
++uint16 Latency [readonly, optional]
++```````````````````````````````````
++
++Indicates the peripheral latency of the current connection on LE bearer, the
++number of consecutive connection events the peripheral may skip. When the
++connection is subrated, it counts subrated connection events. It is only present
++while the remote device is connected over LE bearer.
++
++A PropertiesChanged signal indicate changes to this status.
++
++uint16 SupervisionTimeout [readonly, optional]
++``````````````````````````````````````````````
++
++Indicates the supervision timeout of the current connection on LE bearer, in
++milliseconds. It is only present while the remote device is connected over LE
++bearer.
++
++A PropertiesChanged signal indicate changes to this status.
++
++uint16 Subrate [readonly, optional]
++```````````````````````````````````
++
++Indicates the subrate factor of the current connection on LE bearer: only one of
++every Subrate connection events is used. It is 1 when the connection is not
++subrated. It is only present while the remote device is connected over LE
++bearer.
++
++A PropertiesChanged signal indicate changes to this status.
 -- 
 2.54.0 (Apple Git-157)
 
