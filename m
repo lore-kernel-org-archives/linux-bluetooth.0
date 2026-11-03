@@ -1,91 +1,90 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793737819;
-	b=gDM4dVeLyz+UVZUnfKnRXCTrRdsnghb5l3LUrnG6hJ4IJG5DEMmRpv8lEM/K1aUluIK5
-	 A344J+yFXusdM/Hky0u5ZxYe7CrUJ8l+4FM+bolyw4P7MxGRlOv9XjO2W6MNTPZ2QHJtT
-	 v5x6NXlb5RkpDovlQLGsarJqITYOEuocdCmkNqYFjnbmXyXM/VSiyvzZR8kX0Ew1evW1+
-	 hscfveSFn8r9t5RG0cnCxE/HDZc8+toMJvvXZZp5kR42cRO9IKbsl/rdyLsQlyMjom9vJ
-	 YnocSOf5ZfHCOHrRouocABiobZCT4Xi1EuRysR5Jbws9My6eKQKDm3Ovat79GYuzckg==
+	t=1793737820;
+	b=SyBWG/fsOo6/Mn+v9u9EhWNopOapooHomiXE1CKSZ2lJd7Y+nQHDLYvOzywTgIFxEuld
+	 XdHYT4oMujdbW+xeJKzEZog86vxNbhNoa4xSo//Y/N5lJ9TX214CfMNPn1eetJNziy2S/
+	 vj/9YmzPX/aQV9limG6nlvRI0Y0KxleMGPgNMYJiIVdeCq0wVVVCY0nwPjfpeOcCFmP19
+	 uhdwwoircXFxOqp/jKUk8s6+EfvOY2lH+qiFRblrf0nvfRdaCPgqe1cB4+IAooa8dP8vr
+	 E1rqhE6si78YtqNOCPMM+mKpMnP+NrPyiuABpCgykxlo/k2Fo7jiGEjXbaolC8H7YEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793737819;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793737820;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=itM7zsiVdI5UXLe8RTBovMbkspc+Nb6u5NIlO7xWjf8=;
-	b=gDQ/ez5TEASKtNGsilwo8viTVLKFh7OYg/SUirkW1lk7lP7cDGS8+CKOXnnUmlZwjRum
-	 lHD+797TPU07Bttv9cjnaxqwYtdbCEDqbIhv+S0EPIsYo2G1CW+o1Ne3hdGYr7MUkVONN
-	 rajtvD2CVByXlKqrNCRLvvA0QzqAsBJZjk12tRmy5t5uPyhpgdsE2p9WzDWxtAgKgS7Ov
-	 WYRU9sS3yE/igJpqF8vlaQxZRQDNRAs2rhH1hrBFIgkjnU/ooA1sJw1qUoqj0yzm0XqRX
-	 D0wUISEbX9kwzBBvuubYvIqdx/uE/kQ7xIWFnke09CUidly4lQTIJOtAH4ee+/hJeqg==
+	bh=0fEbVpzAYZ1geT4KPz+slnD3AQTSaGYACgL7oQWmOCA=;
+	b=q7SxtFQrplecFCQK6fveCCIYLoxI5wgdpFLp6KXaSiwj3Le3UQspuSL9JXYA58Qj624h
+	 YJN8tmbPS84/KdznVWF90EOJNOX2QAanXdUPOsjbdL9dpSe4zZDsmpSOIJpuFBJH8u2xt
+	 dVo3VvU40ZrTONqZAHeZXZ7SHiifol8WCj80CkGGXtJj9bKICLqqHwKcLyqf4h0VNy/aE
+	 K2AsM33FJuc0tBS896zbMJeDtpdGaeNWsrOV7bs+LHAeXUZzgzWfgt1Ox6pi9tsICjkeM
+	 ZpRU2X80D4mZeQ+ajXuDoii/XWDL0CcWCC2uKCac4167Tiy2ksSUS4kOllOZPpKwb7g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WdEQPvbB;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=CeHD4VBx;
 	arc=none smtp.remote-ip=209.85.221.169
 Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F068606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7527606A331
 	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 20:30:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3F068606A330
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E7527606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WdEQPvbB
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5eac319a6c2so3577925e0c.0
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=CeHD4VBx
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5eadf48fb2dso1650062e0c.1
         for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 12:30:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793737818; x=1794342618; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=itM7zsiVdI5UXLe8RTBovMbkspc+Nb6u5NIlO7xWjf8=;
-        b=WdEQPvbB33DovRyA7QvIeSKjmir8oIDxbySmL8LJT2B9MjD3ISp1KGx7fz+JkC3iVQ
-         NF5bIgJR+pFc7jou4RGqvi4gK+NjOZLUUcFBbGo881IFPQhV24b86o6noBT8db6gKy4D
-         2nHkKM6lLMjE/IHa/yOUxBLjALA3L6jlAI4yupr2TwRuODRvQTa+4cgEPzLGzYiomb0w
-         GsmIgiS2LzlXYLIy3OgWCSwDVNGSCZg3c0P5DMnGnKQwkryj3Vvs6SdWtBwzf1tmr0lu
-         ujD6hTSmHE4ONmpnlSbz4DZCvIwQMyVdXRCjni/ZICx3W9waFig+vX4dHmKTWChy5dK7
-         MlNQ==
+        d=gmail.com; s=20260707; t=1793737819; x=1794342619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=0fEbVpzAYZ1geT4KPz+slnD3AQTSaGYACgL7oQWmOCA=;
+        b=CeHD4VBxiCyp6sEoxuLl1fotBRlmbVloa+AXi8q6Zk6SWkTJjCii4sJnsrufhoSpDg
+         xZ6otGNHaSGBAqlkUulJZnc9xi9dU3evboCYp6UbUNch/zzqpjpntCkHq49/5xeE0Pdn
+         FOa+yWOoXds2T5uUj0QRuuqsUQA4cWiCE7N0PwcTJ4Do2strp9KPtobfCB+D/br3aMqG
+         1MNLzMvzy+HhwhIqS2J6/sxkVKgxK6UqcIXdU+NkZVYvlrlG3aFDPX513f5guk3giVJo
+         yW12HAvEaHObdONJB8TgISe+fTIRsq57OZLWDSL6wvWNHwGg/ZL/AAHtAs0EaY5UGiEG
+         Qcjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793737818; x=1794342618;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=itM7zsiVdI5UXLe8RTBovMbkspc+Nb6u5NIlO7xWjf8=;
-        b=ictnQqP+9Wyb7hswIEehdL+03i0ooV+qHG+9GUOP9Vs/0Y3W/DRzln/J96yizJS1xv
-         Sb3+1IdIw8ZEtLV8d9YqxIFVWsnS1r1y+O5iR8TzCvmavlRV9yQz+/2KK0Y2UHBDLCec
-         dd7euQ5G6C9K1zL6KLr7IhG1pFOIqlCnOVXFjjni1aeYayfKjYy6zmhnWATplsVCYbAj
-         pu9WOFZBezvxrjBXc/9Druqow0Pl2eCnNHOFUH91PZl4g6Xg1qQ1T/csRedwN7dEJxm8
-         XR9sqPv/MSlyFdHsqX7nRt4OlUlRZIwyFqtr33jjzQlIy1INQhVNjTNOrfK/Q0R0zT24
-         0btw==
-X-Gm-Message-State: APuU4Z/mIia3cn9S22WobJm97lA4emuZqE/ET1XSlrgUO/rbqT76xAYC
-	cFnFZ/LQr042k/YDYnOwljoSLIf+ZI+1FeiQ58TIIIeStC++++P+GCJAkYya2g==
-X-Gm-Gg: AYBFou3nJF7Z1Yj8JJo+I59LALA0wRZ0T633nK7ORIWFHozaWOMGfQ4poJw3A+cHpqK
-	xrCgw7/yuJgcb5S9YUb+SSlWha8H1sh7qoIug487EG8cT+NPzuxq3/c3jTDCBadaniQrVqHP/5k
-	iL82H8V2S2DD4knnw5sZEoPoWoLvjjBWJp6sIHa/LR1JsZSfdFIXwFAXETFTC4NFlUy/iumDiIx
-	QmYnuSJQ+19RIMJfntCo9aqIjvN+QvydRN/Xb+lCVQtbZgnd3plD/k1GT8pwvZlfycHjWnV0jux
-	NB/Lq+Rci8260VlsugXb5b5iWb3zgBHjWm6ii6Juxj26kjtGhY61VDMaT9CyXklSr728+KUhd+R
-	mMiFzWrEC2mozY5eM11lINHhrjpK9mC0IiVOLW+Mha+z9+VFyODwkbbp/5o9INj7QWbH4z/wtNT
-	FSz94Dnl2BAqsYMZoZ2r+uDAMkrKadQ2KCICltuG9UhnW3JI8SO8Zmg8r+ESOpyxh2ySD8WJ+e7
-	OK8S0Nt3eCpYO/45JTet2gGJdbD9/oJNB8zSuwGd8vFfSpJAYOqOCtVN3P06t+NSYWaNGDjmS+R
-	P7sNPhqECdjJPCffRyzc2XL2YCQZRuM+QutldM7swhQ0+7Mdgj/LLIS4eFwVBwlIuN03wK0PXoY
-	JssG0FjyAu4Tp2rX3jglVTix56+VNmof9stps3tBPWBM1qcfGd5iGLUD9pCZfxM7o4fH/nr9D3q
-	JMGSk=
-X-Received: by 2002:a67:e111:0:b0:78e:1e0f:ea42 with SMTP id ada2fe7eead31-7d07223fbb2mr5371016137.2.1793737818092;
+        d=1e100.net; s=20260707; t=1793737819; x=1794342619;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=0fEbVpzAYZ1geT4KPz+slnD3AQTSaGYACgL7oQWmOCA=;
+        b=w9QXd0iUiabai1GXgoZntjix5203eh7rGVeAMTyyJUAkYLIfHWn8FwBAbNwzCkz1Bl
+         HCO3XFs8zqwpH/2qasgm9jCiQZSD0TPR4HQaUYVN9OKh91q9d8hsgizyVs1oA58HMWVf
+         k9gpyCWLEGt5B5k9MbaF6cOcseZCrmffGRTg5hiV7g6cILC4ofa1I/xQZrXna7FnTdoQ
+         dJj+XaNFS9AGhbIlVomwa8tvJgYxp2Kx7nvNwFtRx1TDoic8YcrGzGchusKnBPrJxHyl
+         ucguwUohlZgFESHMiHw5WQqJz3oMGL6xP36aHvpuz3B/42cMjTNNAy1NH1580ncxX8xu
+         iW9w==
+X-Gm-Message-State: APuU4Z8ZCTVzXxsJRddkrYp/sd64hS1ohTvyNOO4IrIRLQWEbWFCRZ1p
+	j0V3/QsTt3lldq1FXEJ7jyLLHR+o4H84zmYgsM9BykcykyVIyYjIuvrjsBWpUQ==
+X-Gm-Gg: AYBFou17TL4nz79msbAIbAqpqh/lvhV073cLt2dIwld/84MZ3RqN1N27aQpAhY827ws
+	2BoYWhDRfpwqWk0mvJS8FU+sCnlsHtsY0F0AsaXbdlWeRuivyLLvAc6JQLKkcBHIwMbLj3CCJtx
+	YFOtTBs9cgIpN+m50t9UNEeXNgjgxsEKiVWe9Fa3Ul2qfcI9AJr7YZ697/URYF0u6LnR8zTr+/H
+	F5efj7BNXA6dumfIKGyh20GsFNodQEyHp2rp9D7VHOLaLuyoF5zxj3af6Xz1NKjJdetDYAzAHop
+	o0rFFCR+iCEsvEZyXMdZjCcWXKolTkv2jQ7rnJKQKqX7HFjjHoh+Fc9bq/tWY8ht4A/gfFsiag0
+	BF9fyjfpUA9XE/gZCt3mdyxY8rFuT8rOe/WCPwcsH9niJVxSstEaHamlAYW91b4utoaXXwclAL3
+	UyHM+j2NP5+r7oERrtIiSjbPZcYra4yoeBxtmYL4LuAHTBLAsQterUM77DiagyFzHv+XWN3cccN
+	X52pD+RbxITYSNuK60pU2u1vFZZQIQ/KR1QVHOQCo3awKaVomaUU87aGvIJUWjfTpty+C/PzBzc
+	COQQiGwmmib9GiWfps0VWnKUCOx1H42zcpPLXJFFafePzr3m1fB1/EYD4s8aOeZK6iS/X8fzNkE
+	tzoKHO4lxp4Iylv8jtqtH7NUd7qSj4vVlfn7zuv+P/ptyp5EIYRzZjuVIoQ+5Afeeswz9mRC0+y
+	B3nGT5AzGZxMBYvE1tXIkoIOiI
+X-Received: by 2002:a05:6102:148c:b0:7c3:9464:efaa with SMTP id ada2fe7eead31-7d07223f482mr6132529137.2.1793737818936;
         Tue, 03 Nov 2026 12:30:18 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d91d2a3asm139916241.8.2026.11.03.12.30.17
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d91d2a3asm139916241.8.2026.11.03.12.30.18
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 12:30:17 -0800 (PST)
+        Tue, 03 Nov 2026 12:30:18 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/7] unit/test-bap: Add Notify Multiple test
-Date: Tue,  3 Nov 2026 15:30:06 -0500
-Message-ID: <20261103203011.3904290-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 5/7] shared/tester: Add support for alternative PDUs
+Date: Tue,  3 Nov 2026 15:30:07 -0500
+Message-ID: <20261103203011.3904290-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103203011.3904290-1-luiz.dentz@gmail.com>
 References: <20261103203011.3904290-1-luiz.dentz@gmail.com>
@@ -98,82 +97,160 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds a server test with Notify Multiple enabled which checks that
-the ASE Control Point notification and the ASE state notification are
-sent in the same Notify Multiple PDU.
+This adds IOV_ALT, IOV_ALT_OR and IOV_ALT_END markers which can be used
+to express PDUs that can be exchanged in alternative ways, e.g. when
+an optional feature is used, along with tester_io_set_alt which selects
+the alternative to be used by the test.
 ---
- unit/test-bap.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ src/shared/tester.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/tester.h | 13 ++++++++
+ 2 files changed, 87 insertions(+)
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index 8f081d92b936..1b1a51b03e51 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -73,6 +73,7 @@ struct test_config {
- 	const struct iovec *setup_data;
- 	size_t setup_data_len;
- 	uint8_t cancel;
-+	bool mnotify;
- };
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 72b280a1f3d5..5207b6aa7cf8 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -85,6 +85,7 @@ struct test_case {
+ 	const void *test_data;
+ 	const struct iovec *iov;
+ 	size_t iovcnt;
++	struct iovec *alt_iov;
+ 	tester_data_func_t pre_setup_func;
+ 	tester_data_func_t setup_func;
+ 	tester_data_func_t test_func;
+@@ -145,6 +146,8 @@ static void test_destroy(void *data)
+ {
+ 	struct test_case *test = data;
  
- struct test_data {
-@@ -668,7 +669,8 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
- 	}
++	free(test->alt_iov);
++
+ 	if (test->timeout_id > 0)
+ 		timeout_remove(test->timeout_id);
  
- 	if (!bt_gatt_server_send_notification(data->server,
--			handle, value, len, false))
-+			handle, value, len,
-+			data->cfg ? data->cfg->mnotify : false))
- 		tester_debug("%s: Failed to send notification", __func__);
+@@ -528,6 +531,8 @@ static void next_test_case(void)
+ {
+ 	struct test_case *test;
+ 
++	tester_io_set_alt(0);
++
+ 	if (test_current)
+ 		test_current = test_current->next;
+ 	else
+@@ -1170,6 +1175,73 @@ static void setup_io(void)
+ 	io_set_read_handler(ios[1], test_io_recv, NULL, NULL);
  }
  
-@@ -2067,6 +2069,30 @@ static void test_ucl_scc_cc_lc3(void)
- 
- 
- /* 4.9 Unicast Server Configuration */
-+static struct test_config cfg_snk_8_1_mnotify = {
-+	.cc = LC3_CONFIG_8_1,
-+	.qos = QOS_UCAST,
-+	.snk = true,
-+	.mnotify = true,
-+};
++const uint8_t tester_iov_markers[3];
 +
-+/* The CP notification and the ASE state notification are expected to be
-+ * sent in the same Notify Multiple PDU.
++static unsigned int io_alt;
++
++static bool iov_is_marker(const struct iovec *iov, unsigned int idx)
++{
++	return iov->iov_base == &tester_iov_markers[idx];
++}
++
++/* Only keep the selected alternative of the PDUs in between IOV_ALT and
++ * IOV_ALT_END.
 + */
-+#define SCC_SNK_8_1_MNOTIFY \
-+	DISC_SRC_ASE_LC3, \
-+	IOV_DATA(SCC_PDU(1), SCC_PDU_ASE(SNK_ID(0), LC3_CODEC_ID_DATA, \
-+			0x0a, 0x02, 0x01, 0x01, 0x02, 0x02, 0x00, 0x03, 0x04, \
-+			0x1a, 0x00)), \
-+	IOV_DATA(0x23, CP_HND, 0x05, 0x00, 0x01, 0x01, SNK_ID(0), 0x00, \
-+			0x00, \
-+			SNK_HND(0), 0x23, 0x00, SNK_ID(0), 0x01, \
-+			0x00, 0x02, 0x01, 0x0a, 0x00, \
-+			0x20, 0x4e, 0x00, 0x40, 0x9c, 0x00, 0x20, 0x4e, 0x00, \
-+			0x40, 0x9c, 0x00, LC3_CODEC_ID_DATA, \
-+			0x0a, 0x02, 0x01, 0x01, 0x02, 0x02, 0x00, 0x03, 0x04, \
-+			0x1a, 0x00)
++static int test_setup_alt(struct test_case *test, const struct iovec **iov,
++								int iovcnt)
++{
++	unsigned int alt = 0;
++	bool in_alt = false;
++	int i, cnt = 0;
 +
- static void test_usr_scc_cc_lc3(void)
++	for (i = 0; i < iovcnt; i++) {
++		if (iov_is_marker(&(*iov)[i], 0))
++			break;
++	}
++
++	if (i == iovcnt)
++		return iovcnt;
++
++	free(test->alt_iov);
++	test->alt_iov = calloc(iovcnt, sizeof(*test->alt_iov));
++	if (!test->alt_iov)
++		abort();
++
++	for (i = 0; i < iovcnt; i++) {
++		const struct iovec *v = &(*iov)[i];
++
++		if (iov_is_marker(v, 0)) {
++			in_alt = true;
++			alt = 0;
++			continue;
++		}
++
++		if (iov_is_marker(v, 1)) {
++			alt++;
++			continue;
++		}
++
++		if (iov_is_marker(v, 2)) {
++			in_alt = false;
++			continue;
++		}
++
++		if (in_alt && alt != io_alt)
++			continue;
++
++		test->alt_iov[cnt++] = *v;
++	}
++
++	*iov = test->alt_iov;
++
++	return cnt;
++}
++
++void tester_io_set_alt(unsigned int alt)
++{
++	io_alt = alt;
++}
++
+ struct io *tester_setup_io(const struct iovec *iov, int iovcnt)
  {
- 	/* 4.9.1 Unicast Server as Audio Sink Performs Config Codec – LC3
-@@ -2100,6 +2126,10 @@ static void test_usr_scc_cc_lc3(void)
- 	define_test("BAP/USR/SCC/BV-001-C [USR SNK Config Codec, LC3 8_1]",
- 			test_setup_server, test_server, &cfg_snk_8_1,
- 			SCC_SNK_8_1);
-+	define_test("BAP/USR/SCC/BLUEZ-1 [USR SNK Config Codec, LC3 8_1, "
-+			"Notify Multiple]",
-+			test_setup_server, test_server, &cfg_snk_8_1_mnotify,
-+			SCC_SNK_8_1_MNOTIFY);
- 	define_test("BAP/USR/SCC/BV-002-C [USR SNK Config Codec, LC3 8_2]",
- 			test_setup_server, test_server, &cfg_snk_8_2,
- 			SCC_SNK_8_2);
+ 	struct test_case *test = tester_get_test();
+@@ -1182,6 +1254,8 @@ struct io *tester_setup_io(const struct iovec *iov, int iovcnt)
+ 		}
+ 	}
+ 
++	iovcnt = test_setup_alt(test, &iov, iovcnt);
++
+ 	test->iov = iov;
+ 	test->iovcnt = iovcnt;
+ 
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index dfc1ca3a8ebe..b22e8b38ea2a 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -23,6 +23,18 @@
+ 
+ #define IOV_NULL {}
+ 
++/* Markers for PDUs that can be exchanged in alternative ways:
++ *
++ *   IOV_ALT, <alternative 0>, IOV_ALT_OR, <alternative 1>, ..., IOV_ALT_END
++ *
++ * Only the alternative selected with tester_io_set_alt() is used.
++ */
++extern const uint8_t tester_iov_markers[3];
++
++#define IOV_ALT		{ .iov_base = (void *) &tester_iov_markers[0] }
++#define IOV_ALT_OR	{ .iov_base = (void *) &tester_iov_markers[1] }
++#define IOV_ALT_END	{ .iov_base = (void *) &tester_iov_markers[2] }
++
+ void tester_init(int *argc, char ***argv);
+ int tester_run(void);
+ 
+@@ -84,3 +96,4 @@ struct io *tester_setup_io(const struct iovec *iov, int iovcnt);
+ void tester_shutdown_io(void);
+ void tester_io_send(void);
+ void tester_io_set_complete_func(tester_data_func_t func);
++void tester_io_set_alt(unsigned int alt);
 -- 
 2.56.0
 
