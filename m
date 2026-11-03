@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793737840;
-	b=kFJ1OTAGKs0h2GOdSGt3wFmzAxtKqeTRsywa6rD3a5carQTcsU68km399IRW5aznolQi
-	 c3aKSeyjIhPqaniUiPrqLKUIYi3SeGfcpLMbCM6jpws3wSP8C+hxGTjqEI/3PiwH9BfKk
-	 EFsvbssq8Sv/IOPPxqcN1Xp4BV31DZeYWXUXfkUjMgV1l6OU9dwgOx/ybehytE6w75iaY
-	 oVz3dTds1nlOSQTGbC9Y+Hvn+87bQX+5cO8aY70vCues/r26k8MPbLL6dfxyCFGVBC9Wo
-	 mMMdBmNb4DUpHkTEoP0GEFNDJSeO5QlKtcX9tdyfmKydU1bsohcq8mcK6ZHYZaccQAQ==
+	t=1793737841;
+	b=WU/fDUv6jD+46yLMfbZ3Yto1oy7eIIQ6fnTTff3SIAFBfaDbUHvcsEghU1aip9qPnYLv
+	 lBgEaKtoXxUdDIphLK1EkkZCHBPs/rPsoYBkiIwZxYhpFWZnMTcNwTI/UYlr63kYNgaDc
+	 RWxvwvVj2GM5YpBNANcmUgGEmvfml6V6avErT/gPT+PD75JNw1gKnFvl0GjXRMFaeLJBD
+	 ah26qUFJc3NwsONUTgGkIPM4F+Bs8EjBgL8+EcMJDnsMu8khgnjIb1u0aOtw7BsA7I1oC
+	 bjXFyHw2Cx/D9iF7XpX00K4aA0N8pxB+EgoanICQkhG631OjxbSNRGAMDf+IOlPOlTQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793737840;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793737841;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=q0zJcegewNsF8yxAs0IuKZW5hBYRafjWd/7Gdg0Y8kI=;
-	b=5G9DGzjFvWqdIX/xHSmqpzpGfkVM8dmLs5VHBaoTYyVVeyZ0EeadLSrFPfCnP11dh/b4
-	 kgV35DTXuQvZ6Bu38i+WL+RkliZUNl07ZXnHihIEMQfiW080VMQx+Q014LEto/i/qaf87
-	 h3cX3dhBex80Me0qWNrF+JkHBWA4+6OxVq0jbJnOdVOsGk2TPGNh2sxx1t9ATEmL2Eu78
-	 pB7/HZLGVt38mYhx1nRq+AmPFbwidV4dfl10KOf3KsgrYJN1umUJO0/A5v25rqPAbQmaI
-	 AG0iS+0eHQW1hjwNqFSBc+p955jTU8WMK6kyXSPFVgBgSsNbd46oxrw7Z60foDA9O0w==
+	bh=fZ+B3O7MhOD3TlVcYktBa/Tvb6Ay5D11vBT6PONzzj4=;
+	b=sjHgDuji9MK9LzLw2p1UBivujnQ9LThjWYCZOItxZf1JKd77N+2ELZCHGfHJGjzJiFNm
+	 IiQ4lIXU3sxS0YWbVtYsh/gHyQhiugDYJsy8YENneTZPFmZwZtZ9nMjiHquBF/0QxP0p5
+	 tUwYgS2qBhitvCEoBDdFjSRuGSGjDViZaJm/tEZ1sInkR71xfH4aj+96xapja0RXiiO8Y
+	 f7YXRQ7zyxIh7hls1w0ZkOJ1FBkUOVUs7wpE4nFL8j9g6urYX5YcFieeQ7u1vVBprZfeg
+	 3tm3PWH5CQqZ7rfePShrlwIzEmw7OZEcognWOymTWYjGuOF5A+IQPcgbGQV44ZpYZug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EmUPcNxB;
-	arc=none smtp.remote-ip=209.85.217.50
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PtCYIAAo;
+	arc=none smtp.remote-ip=209.85.222.43
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B04606A329
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 20:30:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12B04606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72981606A31B
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 20:30:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72981606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EmUPcNxB
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-7ce78f9d6baso769871137.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 12:30:39 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PtCYIAAo
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-998318396ecso5718241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 12:30:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793737839; x=1794342639; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793737840; x=1794342640; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=q0zJcegewNsF8yxAs0IuKZW5hBYRafjWd/7Gdg0Y8kI=;
-        b=EmUPcNxBa4LnevOMKRNwDWlR6o0ovqnxnrlNVGvzvMflR8VIdZs3GKodu/yn1ND3lh
-         bpkpOUT8ujlRkLP1tlgFa9X/lVt5fSv5TGAARlPbIahb6eHXuMWp/iidGv/tJaZMxGTc
-         d9VsjAlmM0p20mhcmnY8USXMWvP3C5hgtPnAcNK8F6fldNxUGVvjSOQT4QTtkxH2f9H3
-         kZKRA2L9+gxkvgrqgOpeBe2a354miZfPLC5skdnEZB8hxAZTPRwqNF3Q2mQruzr5dBFK
-         pIfLO9vtOZz9nyR8aco7bQ6CjaG3C95LIvJ0L7e57k8XYUTMpAJxUi8F+6TtqjbvIUAn
-         /tKw==
+        bh=fZ+B3O7MhOD3TlVcYktBa/Tvb6Ay5D11vBT6PONzzj4=;
+        b=PtCYIAAomJPPcmPyx+GVJnsr+up5jPJl9m23CIJ7Pze1o9UCbr1gvl8njkCsALKRTE
+         1pBPvu/CucORHD8bbvHqo+GuboZwsnz3gbeSMkyAqB9FxFj6mesROqY53fzREwT7S30P
+         Y/8BpSsh1GuXbxv/EpZuoMC9KPqqB/7fyirJzdp6cVftKmaeGPPN7CVUXZ/dh37wO5uQ
+         o8/aNPYENtHs2ekaONhx2YWVdld03JU3QyZbJ7O4Eh5rCeoxwZzU2TqO2tP3sjmhrmGv
+         Mg7vzp1zW60j8xzwikHkt2+zYyn1IvBti6csVScpjbJouESaemqrF6wmizId8fxKQwqm
+         WznQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793737839; x=1794342639;
+        d=1e100.net; s=20260707; t=1793737840; x=1794342640;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=q0zJcegewNsF8yxAs0IuKZW5hBYRafjWd/7Gdg0Y8kI=;
-        b=p9vRbCBvxKOb8KXZlQwxb4uJlD9zgfIE7VzPQdb5fFBCz4UMWcmqxwD2Je+GecRlnP
-         UinjLeOsGKbXbDg4/GHYMW14ujOIAX1rjlpJ4cwDuJXC0qJ6bDAqY9x2K9UD0bf879LR
-         37BIpPtoBYuSCLQIZGTvFBZn9yOgSyEFU3Go1zNtgp9sDP8DG9wchhKj5EoW9qSNV8f3
-         GSYfTg2NcVe1C4vcGLVvhixGBBnSLFYFtifboU6Lwfs5vsNaLdu8KJpqTtANYu5yCnTn
-         hunE28PMPhtTA5CsUReVu78hwEn1Q/O8tTmXOstDWxN//529dhyqtXHlf681OW6B1EPN
-         NSPw==
-X-Gm-Message-State: APuU4Z9a9viIXT+2Ti7mA6Hd1Ozy9dmRQLJpyQgLxGy67Yso6vdzN10s
-	vjxFGJO79ersoPl0E6fa+isN3ClkEZlahXJcmz5mpozkEd4RLvK8eqiWPgTgFA==
-X-Gm-Gg: AYBFou1WZ2162U7pQB/3YXLVHkne0aWrJGWYjoEtif3/SKbjFBUoPppb28mYadLePWV
-	BVUsdgvJIlUeZm5WgZDvU90KO4dF4ynWZai25bGQbYtmGvhi9HFW7V2x/1+B0kIRllXGJwFjYnk
-	JnrSzPKZCCPMvQbMSzEmsPwqjC7II0f/2sEP9OUcCvTKzA1tyKML0GPV4vsAqcYKF6VSYWJwXjG
-	6isRkORFFLLQMtzH43VqbmajJ+fp3u5APhZ7bv4rX8hBoVc7ypLr1MxOYbUHT1EAjSjcT9nXM1L
-	YZYqkYRCV71t/Os2nu3luIZtosRbYFEcp8EXMzS+gLNN+48a4OrSbwTiiYSdeq43YX3FRuTPogs
-	MYJE/jm1hsM8oupqhcblrwKN+bzrqeapNaH1EyT9YLAGGDUlI8N6gQbxS7axxIpl0yyBTk5Pn3N
-	mN9bFeLFr1zUajP3sqhiiZzMbs/FVqSiZY+oB5hs/nxYjzrr9vuozco9xdX8R3py0GKtwq/ITVI
-	BLT7UNL9RVEHC3ebCrcQJ6XjF9rtTj9Q1HJVxpD0NKTQ4DjsIWTLIwA+IgJuQqNHHf3mmePkv/K
-	SxHqDYM9l4FjleyDedoIuRLw3p3AaaOEhi/hItAlYvtB6sLJC7y9TT7chn2dt/C623oi2XckT3L
-	sGl+O+wYMcTXffoZNC/0+mccDVVYMeoN3rbhPe+hXSst7RpeQJ49hitGGTk8aAbBWzlfgGnD9jD
-	sxwZr6
-X-Received: by 2002:a05:6102:160e:b0:7aa:d0a9:c5aa with SMTP id ada2fe7eead31-7d054215e44mr5192505137.18.1793737838991;
-        Tue, 03 Nov 2026 12:30:38 -0800 (PST)
+        bh=fZ+B3O7MhOD3TlVcYktBa/Tvb6Ay5D11vBT6PONzzj4=;
+        b=0vGFyPruqyEHSX5XOuVua6kpsYLzn8e+xFUtTS7wM+XX9EcsTRHwzkMDWNKwdFkVlI
+         v+2EzJh35GBkbqGbXK/WQ5s+NrfcSenFQ2Wpw4ejsepCu1vhpXUz6Eq8to6h4z9PXdVE
+         F3J2/s5OItWxaT8Z1NqtncrIVyBSZDYsNIv4c4m/8KuaXZPK7J0JMpvmX3kmVLC2mNhk
+         3UTCs2AyrqcL6ch7s6fqewWgZNnnY2dFhdAnyAlKE8+wKvQg46t8oDYuMsMVbqJXAJq+
+         fLhuJ0x4EUOcYxStcb2HghCppKuQAei0l/AD5yK9BFkWz4F2rKRjegeW182j8VnLrsMj
+         PLAQ==
+X-Gm-Message-State: APuU4Z/WdnDynrCDHRMcvoYHvfM8XLREKjGtXpWgXm+yjcJD/aYmuyVN
+	uXqMAhu092MkOgMyEg35tbNdmi5Yc+nkrKxcBLEx/cWCmpIvja6To3/ekSaRCg==
+X-Gm-Gg: AYBFou0uYndY6YX7nYBtzuw/DXLbfIkFPlEvn9O9K/WrAurgdMdfm8HfrzfbQQQ4Txk
+	RMTMXfOCEATsBkWVSFDp2JzXSSHVgROT/btpgbCw1Zb7XkHzsQXmd+TI//Yv1yVpPXw3CWeNzJY
+	mBsLRVa7EUoHXCNHvseFRXJTbsTq09BGSI57eHFAl06DucQWfyBbWvGIQyVXKYGmJZiQdWnvyh+
+	98FXpGVOf7nUt7qoPRKmBX/d+2KGyGrJm+vTxjaFmQ4DHc2JMLeL5Q0nKrohzq2jwwmv5TpQ7Dr
+	RhNPOZd1Bha9QdI0ByYkCfh+7gJ8CKGpAMWRbwWNLQ8WFfp9IC0hrJaFWaBJF7RvgJRvrZifG3U
+	a9prXjaWXtcH9edMIlA3yAwE2xQ4PejiQ435Ce5yxYG8lc98/amwH6hw/mY+ntIPkfrEAqTH/SV
+	hBMGPqneDMsZjc3DU0sej2i1Nj99/XIse90ar+DiFKXJsNer2m7JRKTr+LJJZH4cst6Tyo9GqpI
+	FL3vgqzTiDECYkxpx/cj34gEf0am4Lw3GmfDKzsUEC8rpnLuayC3j1orc16btgvEh0T0z6CqdLZ
+	PJ6jd1zhZtnOHycWncuQu4CEoQMceuhDV+tbP0mo3F3ZfYGE/VjntNAm4DoY1r/JT1iXHLuNley
+	IsLpCT2VL/K4/AZxo5RFizI5Sv5Zo0h6MGnJmhhFfv0d/hgPWx15JahXtmWZd4znKgKdshWPbj+
+	sMyQ1M
+X-Received: by 2002:a05:6102:6449:b0:7a2:7ccd:280d with SMTP id ada2fe7eead31-7d072bb31cbmr4921466137.8.1793737840224;
+        Tue, 03 Nov 2026 12:30:40 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d69af021sm167865241.1.2026.11.03.12.30.38
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998d69af021sm167865241.1.2026.11.03.12.30.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 12:30:38 -0800 (PST)
+        Tue, 03 Nov 2026 12:30:39 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/5] shared/mainloop: Fix idle ID overflow
-Date: Tue,  3 Nov 2026 15:30:31 -0500
-Message-ID: <20261103203034.3904499-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/5] shared/gatt-server: Add bt_gatt_server_set_mnotify_timeout
+Date: Tue,  3 Nov 2026 15:30:32 -0500
+Message-ID: <20261103203034.3904499-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103203034.3904499-1-luiz.dentz@gmail.com>
 References: <20261103203034.3904499-1-luiz.dentz@gmail.com>
@@ -101,95 +101,220 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Idle IDs were allocated from a signed counter that was never recycled,
-so it would eventually overflow and wrap negative, after which
-run_idles() would skip the pending idles, since it used the IDs to tell
-the ones added during the pass, and timeout_add() would reject the new
-IDs.
+This adds bt_gatt_server_set_mnotify_timeout which can be used to
+control the timeout used to aggregate notifications into a Notify
+Multiple PDU, a negative value disables Notify Multiple so regular
+notifications are always used.
 
-Fix this by recycling the IDs within the idle range and marking the
-idles to be run at the start of each pass instead.
+The default timeout is changed from 10 ms to 0 so only notifications
+queued in the same mainloop cycle are aggregated, since the former adds
+latency which may be undesirable for e.g. HID.
+
+While at it, rename the nfy_mult/notify_multiple identifiers to mnotify.
 ---
- src/shared/mainloop.c | 34 ++++++++++++++++++++++++++++++----
- 1 file changed, 30 insertions(+), 4 deletions(-)
+ src/shared/gatt-server.c | 87 +++++++++++++++++++++++++---------------
+ src/shared/gatt-server.h |  3 ++
+ 2 files changed, 58 insertions(+), 32 deletions(-)
 
-diff --git a/src/shared/mainloop.c b/src/shared/mainloop.c
-index 27de2b02ae09..c3db4932c7df 100644
---- a/src/shared/mainloop.c
-+++ b/src/shared/mainloop.c
-@@ -21,6 +21,7 @@
- #include <stddef.h>
- #include <stdbool.h>
- #include <string.h>
-+#include <limits.h>
- #include <signal.h>
- #include <sys/signalfd.h>
- #include <sys/timerfd.h>
-@@ -335,6 +336,7 @@ struct idle_data {
- 	int id;
- 	bool deferred;
- 	bool armed;
-+	bool ready;
- 	bool removed;
- 	mainloop_timeout_func callback;
- 	mainloop_destroy_func destroy;
-@@ -357,6 +359,18 @@ static struct idle_data *find_idle(int id)
- 	return NULL;
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index fde791aae867..15944bd1478f 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -32,7 +32,7 @@
+  */
+ #define DEFAULT_MAX_PREP_QUEUE_LEN 30
+ 
+-#define NFY_MULT_TIMEOUT 10
++#define MNOTIFY_TIMEOUT 0
+ 
+ #define DBG(_server, _format, arg...) \
+ 	gatt_log(_server, "%s:%s() " _format, __FILE__, __func__, ## arg)
+@@ -73,7 +73,7 @@ static void prep_write_data_destroy(void *user_data)
+ 	free(data);
  }
  
-+static bool idle_in_use(int id)
+-struct nfy_mult_data {
++struct mnotify_data {
+ 	unsigned int id;
+ 	uint8_t *pdu;
+ 	uint16_t offset;
+@@ -114,20 +114,21 @@ struct bt_gatt_server {
+ 	bt_gatt_server_authorize_cb_t authorize;
+ 	void *authorize_data;
+ 
+-	struct nfy_mult_data *nfy_mult;
++	struct mnotify_data *mnotify;
++	int mnotify_timeout;
+ };
+ 
+-static void notify_multiple_free(struct bt_gatt_server *server)
++static void mnotify_free(struct bt_gatt_server *server)
+ {
+-	if (!server->nfy_mult)
++	if (!server->mnotify)
+ 		return;
+ 
+-	if (server->nfy_mult->id)
+-		timeout_remove(server->nfy_mult->id);
++	if (server->mnotify->id)
++		timeout_remove(server->mnotify->id);
+ 
+-	free(server->nfy_mult->pdu);
+-	free(server->nfy_mult);
+-	server->nfy_mult = NULL;
++	free(server->mnotify->pdu);
++	free(server->mnotify);
++	server->mnotify = NULL;
+ }
+ 
+ static void bt_gatt_server_free(struct bt_gatt_server *server)
+@@ -135,7 +136,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+ 	if (server->debug_destroy)
+ 		server->debug_destroy(server->debug_data);
+ 
+-	notify_multiple_free(server);
++	mnotify_free(server);
+ 
+ 	bt_att_unregister(server->att, server->mtu_id);
+ 	bt_att_unregister(server->att, server->read_by_grp_type_id);
+@@ -1681,6 +1682,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+ 	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+ 	server->prep_queue = queue_new();
+ 	server->min_enc_size = min_enc_size;
++	server->mnotify_timeout = MNOTIFY_TIMEOUT;
+ 
+ 	if (!gatt_server_register_att_handlers(server)) {
+ 		bt_gatt_server_free(server);
+@@ -1753,31 +1755,48 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+ 	return true;
+ }
+ 
+-static void notify_multiple_timeout_remove(struct bt_gatt_server *server)
++static void mnotify_timeout_remove(struct bt_gatt_server *server)
+ {
+-	if (!server->nfy_mult->id)
++	if (!server->mnotify->id)
+ 		return;
+ 
+-	timeout_remove(server->nfy_mult->id);
+-	server->nfy_mult->id = 0;
++	timeout_remove(server->mnotify->id);
++	server->mnotify->id = 0;
+ }
+ 
+-static bool notify_multiple(void *user_data)
++static bool mnotify_send(void *user_data)
+ {
+ 	struct bt_gatt_server *server = user_data;
+ 
+-	server->nfy_mult->id = 0;
++	server->mnotify->id = 0;
+ 
+ 	bt_att_send(server->att, BT_ATT_OP_HANDLE_NFY_MULT,
+-			server->nfy_mult->pdu, server->nfy_mult->offset, NULL,
++			server->mnotify->pdu, server->mnotify->offset, NULL,
+ 			NULL, NULL);
+ 
+-	notify_multiple_free(server);
++	mnotify_free(server);
+ 
+ 	return false;
+ }
+ 
+-static bool notify_append_le16(struct nfy_mult_data *data, uint16_t value)
++bool bt_gatt_server_set_mnotify_timeout(struct bt_gatt_server *server,
++							int timeout)
 +{
-+	struct idle_data *idle;
++	if (!server)
++		return false;
 +
-+	for (idle = idle_list; idle; idle = idle->next) {
-+		if (idle->id == id)
-+			return true;
++	server->mnotify_timeout = timeout;
++
++	/* Flush any pending data if Notify Multiple is being disabled */
++	if (timeout < 0 && server->mnotify) {
++		mnotify_timeout_remove(server);
++		mnotify_send(server);
 +	}
 +
-+	return false;
++	return true;
 +}
 +
- static bool idle_pending(void)
++static bool notify_append_le16(struct mnotify_data *data, uint16_t value)
  {
- 	struct idle_data *idle;
-@@ -407,13 +421,19 @@ static void remove_all_idles(void)
- static void run_idles(bool deferred)
+ 	if (data->offset + sizeof(value) > data->len)
+ 		return false;
+@@ -1792,27 +1811,31 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+ 					uint16_t length, bool multiple)
  {
- 	struct idle_data *idle;
--	int last = idle_next_id;
+-	struct nfy_mult_data *data = NULL;
++	struct mnotify_data *data = NULL;
+ 	bool result;
+ 
+ 	if (!server || (length && !value))
+ 		return false;
+ 
++	/* Notify Multiple disabled, send as regular notification */
++	if (server->mnotify_timeout < 0)
++		multiple = false;
 +
-+	/* Mark the ones armed before this pass, so the ones added or armed by
-+	 * the callbacks only run on the next pass.
-+	 */
-+	for (idle = idle_list; idle; idle = idle->next)
-+		idle->ready = idle->armed && !idle->removed &&
-+						idle->deferred == deferred;
+ 	if (multiple) {
+-		data = server->nfy_mult;
++		data = server->mnotify;
  
- 	for (idle = idle_list; idle; idle = idle->next) {
--		if (idle->removed || !idle->armed || idle->id >= last ||
--						idle->deferred != deferred)
-+		if (!idle->ready || idle->removed)
- 			continue;
- 
-+		idle->ready = false;
- 		idle->armed = false;
- 		idle->callback(idle->id, idle->user_data);
+ 		/* flush buffered data if this request hits buffer size limit */
+ 		if (data && data->offset > 0 &&
+ 				data->len - data->offset < 4 + length) {
+-			notify_multiple_timeout_remove(server);
+-			notify_multiple(server);
+-			/* data has been freed by notify_multiple */
++			mnotify_timeout_remove(server);
++			mnotify_send(server);
++			/* data has been freed by mnotify_send */
+ 			data = NULL;
+ 		}
  	}
-@@ -434,7 +454,13 @@ static int add_idle(bool deferred, mainloop_timeout_func callback,
- 		return -ENOMEM;
  
- 	memset(idle, 0, sizeof(*idle));
--	idle->id = idle_next_id++;
+ 	if (!data) {
+-		data = new0(struct nfy_mult_data, 1);
++		data = new0(struct mnotify_data, 1);
+ 		data->len = bt_att_get_mtu(server->att) - 1;
+ 		data->pdu = malloc(data->len);
+ 	}
+@@ -1834,13 +1857,13 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 	data->offset += length;
+ 
+ 	if (multiple) {
+-		if (!server->nfy_mult)
+-			server->nfy_mult = data;
++		if (!server->mnotify)
++			server->mnotify = data;
+ 
+-		if (!server->nfy_mult->id)
+-			server->nfy_mult->id = timeout_add(NFY_MULT_TIMEOUT,
+-						   notify_multiple, server,
+-						   NULL);
++		if (!server->mnotify->id)
++			server->mnotify->id = timeout_add(
++						server->mnotify_timeout,
++						mnotify_send, server, NULL);
+ 
+ 		return true;
+ 	}
+diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+index ea49f2960d71..b024258cd186 100644
+--- a/src/shared/gatt-server.h
++++ b/src/shared/gatt-server.h
+@@ -43,6 +43,9 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+ 					uint16_t length, bool multiple);
+ 
++bool bt_gatt_server_set_mnotify_timeout(struct bt_gatt_server *server,
++							int timeout);
 +
-+	/* Recycle the IDs within the idle range, skipping the ones in use */
-+	do {
-+		idle->id = idle_next_id;
-+		idle_next_id = idle_next_id < INT_MAX ? idle_next_id + 1 :
-+								IDLE_ID_BASE;
-+	} while (idle_in_use(idle->id));
- 	idle->deferred = deferred;
- 	idle->armed = true;
- 	idle->callback = callback;
+ bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+ 					uint16_t length,
 -- 
 2.56.0
 
