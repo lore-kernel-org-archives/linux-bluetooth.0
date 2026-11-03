@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793723413;
-	b=4J2Oo2OUwIFUC7JrjN+YxwTkCButgHDZuGbnjQmWckXaavXW6i0IwvY0PzyxZOG6dvSq
-	 Skm9TuvjNY7ZUbVgnTGpQAkGkHCYheLJqGijAo9MN7NpvfTkoOJjfUtMqgNs8VzikoYmm
-	 ejFWWYsW9SkJZzTXq50nFpnOjA27Os+M7Of70PUqNWp6+D8IGAFkOJ80MsTtjLirrcnZk
-	 YpZa6xnyzURWpUE4klYGsFQ9OuoW7tzfSxhAOHRS2yzLxcAcAmrUV9E/OD94d60gWg1kk
-	 Ra7ttoAr8R9fEYSuDaxi2IwSJ4ytGVYmPaBKcp4UEw0FmzXEnmxq2xlZr6ZN6G+AGDg==
+	t=1793723415;
+	b=JBIEXPL/hqlZb6LPPi2MxBhG1rEk3hDnu83f2UYEklLxxAoPvWMw2gVfR6VGTrik5nRr
+	 i8OQkaeUexNxJcGORgKmCOzflo6JRGdgTj/80EW43XHu9EBUuRonzbH17GFBsz2Y0K1RU
+	 fvsE3gRnAqQPRLMKXK6ujacKEZtGrKpw+Jsm9eAcXUcCSFuSvMAuS1IED5ylLPXlHKN2s
+	 EE/OPCsirOZJeNqfkQv6daQNFZJi2fDmk1zVivYb6mVi+R18+SZ+SvKMHze2N6cnsJwGl
+	 woEcQyE5WvpDKObFwVPS92DImF2EgIQ6A0Lkx/qJVXEyH1+H/gv4RXcITspLLCxpZGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793723413;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793723415;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=JOT/vkpDhR/gaeMLIXKgQDTblPLIPhe5QlfCpFFsGSc=;
-	b=yMZXe3VXzg75pZkeSI0nSXXCEkYNmiVVWe6tCc1853eZHKq3dXejX+qQ/k9T0oshtGie
-	 VzmeeBTe0KdTz+rmGOywwmtc6djPg+n7dFoZcJCOyUzIwl1LqPgPOb+DSsdz7TcIjKyTh
-	 DcmR6Sy3MLPkq1AVWE7cx2LJKicZBTnhsah2CweLa2qVmTcXlXow07nxznwWxfuHGEOp/
-	 DdGUPuOMefwP0dF6kcOKFRR4zPNC/8up0mD5zeZaSPkjOeHYitERUyq4LM0svGIx5feLY
-	 9d5wR3deeNH3JVA5JC1yzBZ57XZ+KBMc0346lEukZkM9dkD2swa9fwKBBUOwAMfjW5Q==
+	bh=i+1YFgGeIU0fBFYY7xLgg0jArnhMLsiEmW/k+VX7ZAo=;
+	b=LZTT+5yOmzJKps0iCjSYpXQm26GArLtVTRL543vglJOF5dNrt65cYiOqvEAS+JnYLTb0
+	 /TXIIVI3AU17GGFpsw08Es9FK4LvkBN1MYQ9EoYNdGa+8E1x+uWDc27fltUeAgIdjXLyi
+	 39abRltqjjDi9CviHDHjGgUDPUzxPqWn3kne/h6yKwpyMaXa/v9ksKO2v3JWsmlDqq0Zk
+	 atvMViv9Y+T16HjYrOqsHz4rP0HMDl7oKViq8F86DxLd3KLwv4iF8/x2pqiKsxEAQh8NA
+	 OnPm5s/KTHU3ZZszrx+jHpQMWmOFz+GzYnlnx+zOcdctavxVYDACL3Fo5kksbbMs7wg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m6kaZvpo;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gDiuCDRc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E638606D82C
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 16:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F74606A338
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Nov 2026 16:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m6kaZvpo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B7521F00A15;
-	Tue,  3 Nov 2026 16:30:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gDiuCDRc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86C1D1F00A1B;
+	Tue,  3 Nov 2026 16:30:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793723413;
-	bh=JOT/vkpDhR/gaeMLIXKgQDTblPLIPhe5QlfCpFFsGSc=;
+	s=k20260515; t=1793723414;
+	bh=i+1YFgGeIU0fBFYY7xLgg0jArnhMLsiEmW/k+VX7ZAo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=m6kaZvpoTN1bINlIs0wApg2czZ/np6U7T0mmfOZcLVN8dqmVOU7KY54nDNu2DWq0n
-	 cAyuY+txU9sBlndJwae7LFfNc1diOP8FkM5SRh/vZJtS/bh5sB/Qh984d2/duwcvqg
-	 cwZb0p3R7xVeW0MtawkBBlf34EEQTagMw/vjxkfaaiBen7xaGOmIqF7T0ZDVXsYsnL
-	 2XadU6uqB/3MNHJsUExIv6MCYNDwgQvLf3ShWYeoJT3I8xlDKK77k+cjN58oOLOxOH
-	 DjSIpz6hVDveizroIYjPX/2c6Msg8mM9HvSpHCntTX4IziaEfXBJdiLCalHbQFWwuz
-	 DMTRDi69TAWmw==
+	b=gDiuCDRc1AOWBJumB1PkI7Wr7Ea1dZrIo0TpXzzNg1Mh1PEtWdtnYwwlGGDqgdJ7f
+	 PMVNncVUhdYrg0waeqNq08CnWm7Yv7zl5p7WazHW/v/IVYE5bIUMneZMALZjCJ22zw
+	 kcbOgKQ9wKop0tlILB3FGMB4GFpbEkqxCztIBcHqRUGOzsaTEaEzPujN51DaPeKFnd
+	 53EdRmB1owMmniPv8Z0XI7lxR2OWMKA9HX41XPD6vnroxupzgCIClYpzfgFu7Q75kG
+	 uK3ptOSrRv0wC64/57W+y6v6DtuyOgvc7/cSF3GdufVGflYax0kqyavOTPjaz8Sr3t
+	 nMsryBkOmfe/g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0322B391AFF6;
-	Tue,  3 Nov 2026 16:30:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D281391AFF6;
+	Tue,  3 Nov 2026 16:30:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,36 +54,49 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] monitor: Fix Conn Interval rsp group decode
+Subject: Re: [PATCH BlueZ 0/5] Add LE connection parameters to
+ org.bluez.Bearer.LE1
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179372341154.1736455.322872408424969861.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Nov 2026 16:30:11 +0000
-References: 
- <3265e8c3d6e7628b82422ff9cad96eb0db9e7ef7.1793456788.git.pav@iki.fi>
-In-Reply-To: 
- <3265e8c3d6e7628b82422ff9cad96eb0db9e7ef7.1793456788.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+ <179372341304.1736455.11988052173742240524.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Nov 2026 16:30:13 +0000
+References: <20261103072749.50979-1-kevin@simpleble.org>
+In-Reply-To: <20261103072749.50979-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 31 Oct 2026 16:28:09 +0200 you wrote:
-> util_iov_pull() returns the advanced base, not the bytes pulled, so
-> each connection interval group was decoded six bytes past its actual
-> position. Use util_iov_pull_mem() instead.
+On Mon,  2 Nov 2026 23:27:44 -0800 you wrote:
+> Applications have no way to know the parameters of an LE connection:
+> the interval, peripheral latency and supervision timeout. They decide
+> how fast data can move and how quickly a lost link is noticed, so
+> applications that need them end up reading them from HCI traffic.
 > 
-> Fixes: 79cfd07224ff ("monitor: Add decoding for Short Connection Interval feature")
-> Assisted-by: opencode:qwen3.8-flash-next
+> This adds Interval, Latency, SupervisionTimeout and Subrate properties
+> to org.bluez.Bearer.LE1, filled from the MGMT Connection Subrate event,
+> which bluetoothd already registers but only logs. With "Bluetooth: MGMT:
+> Send Connection Subrate on LE connection and update", now in
+> bluetooth-next, the kernel sends that event when an LE connection is
+> established and after each LE Connection Update, not only on LE
+> Connection Rate Change.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] monitor: Fix Conn Interval rsp group decode
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7a713dc0c1b7
+  - [BlueZ,1/5] doc/mgmt: Document Connection Subrate for LE connections and updates
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4382352a3214
+  - [BlueZ,2/5] org.bluez.Bearer: Add connection parameter properties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=65cfa00be28b
+  - [BlueZ,3/5] bearer: Add connection parameter properties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cbac1283b7d9
+  - [BlueZ,4/5] client: Print LE connection parameters in info
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8e89e98a4b76
+  - [BlueZ,5/5] test: functional: add bearer connection parameter tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aaf8f96f42d1
 
 You are awesome, thank you!
 -- 
