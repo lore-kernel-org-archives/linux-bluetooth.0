@@ -1,84 +1,46 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.226.251.21
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793759644;
-	b=xWdoaPm22jeqyYT6AaFqRtW/Fbbx8j1XgyzeqMeFmv0ofYAbSV8gWqrB/Bjx5zrlEkI7
-	 hgu/Q4rMwh4SVZn31aOQM8kFyoa/5TDbS+Qi1yCZQ9iPK53bdVXd4wdokrK/sZ5457CEh
-	 mCqZUdCRE8c9GOrYkN2cin4T5+djaV0RdwbingPhPga1oS1XzgJ7RNGRosTxt6YzbNSB7
-	 9ZkMuwuOIPm6MsLaedxKIXPTj1WCK56kqGrn+sM4hz5qcRmSml3EnDG7lePypntPLqIBX
-	 HnbD2Xce7SvcyCuY4dhkFH7Pu3+tUV7Z9cEc+niGmlhig1JLkbyu0ByCaEs3C3btZTA==
+	t=1793760810;
+	b=0O/k/z1tYYWJFxwGO8fKaW2nlbtjNk0pS726zZbmEjqrjE8LdiuzcqwfQbczF3EpfYQ0
+	 8ZRC+idjT5Skl77YNqPYdrDpnzDcfGVTYgTA3oCgUu7GH0NmuBzWsvMAriNdwpKBWVMIm
+	 SW3BiyN/qvc237CG3Z97Ky4lnBBXRutwBQLurJYS36dfuHa3TP7sRpRWWCDAeycTtstk4
+	 mpqC5pGV5Uj1qVlmZ6TQ/YlNSwJfZzKJHEQ5BsG9ep4I+HUg7yFAQGFO3dbi8WdJetsiS
+	 PTuugS2LNDH1r9KWzGAWckGBhk79URPJGrDdt8hO0yI6naa54wN4y9uGEj8A1kA9ZGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793759644;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=ukPSQKIQpl3L2cLAn/s5lssfgBcAwuRwH3+fL78zY/M=;
-	b=0Os2CanR/9JgWLuK0K+Mbw6fFPhUUcZd+DFOV4JWUsK+aABtYzxzDncI/RkiVui2GI+w
-	 Gqi4fIl72YQsqXRKZRok2/FQSIMyT27MfhWchlbc6H4y/ovsw/wlcfaCM7ucQNxs1+DS5
-	 LNWacTdP0Z486ELh63kZiUA2DfdEZsJu1MvzqBWd+4PfF9i/qViq+YzKGbcgTfMrOwubK
-	 NJiimvpBH2bE3hvVWLG8ag11M/hVWKZUfq3UDVOZffkmu0OKd89noZ+kkZZQwG5HdSjBj
-	 FNyOenQkr/ggy+Pa4aRVYw0apqMJRjY/xDZnJvrWnavxYiAPW0vd9XfskTHcxr7f4GA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793760810;
+	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding:X-CM-TRANSID:
+	 X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
+	bh=gN6ju4CfNYfxfvlLO00Bo4eK2Bc9VTRWjB8sRdxp4rs=;
+	b=PJMdexkcBhsJOGsHAEmhjIUZkEeMg2hcfqtUYMS2wTpZZFmx0yHqoFU//007s2UF6GRr
+	 9pv0dKXMfKeyL+mLNlLn6pKezDIRVWMyn82mQN2n7GSaKO+h8tXUqVFS/LWVYgK+smOIn
+	 954+HMv95nxgZHAFEq3HzboRfMH5HXGx5CAB8rachTyUHjfr8FQrH2awl6EF4lRzZCos1
+	 ZKSAtF5vs4lVDjboC5Z7Gcl2PlHV6JIC9k/ikq/hqwTP9uN3WuaxebByQeVpmHwxfFmk7
+	 ePaSsmE5JRByhC1tw8mMmGbmrRl8a3lxnWhQVI/L6bdnq8Mb3Mgv4uYkh0VgBTjqMNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lSLUcxIe;
-	arc=none smtp.remote-ip=209.85.160.177
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=none header.from=iscas.ac.cn;
+	spf=pass smtp.mailfrom=iscas.ac.cn;
+	arc=none smtp.remote-ip=159.226.251.21
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2F6606EEB9
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 02:34:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BA2F6606EEB9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lSLUcxIe
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-53644b28706so2389371cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Nov 2026 18:34:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793759643; x=1794364443; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=ukPSQKIQpl3L2cLAn/s5lssfgBcAwuRwH3+fL78zY/M=;
-        b=lSLUcxIekrDOaaWNp+/aBgo4mJUfrIfNmFsEJRHqP07czXzVtML0TKUYqR9Gz+gHBW
-         k5LB1bG8Bae4cFrrAtFmoMIN140NbTHvq1Yv3uRFnWixvGpxxnCfVR+T9bd5cuje1WfX
-         TWzSK/T4TLe4Iie97/DGdgcz+xvLa82pFJALm4Q+eHVTq/6YN9KIij42RmNQp7AJ7Kfy
-         cr7P4d1JWTZ08H8SUDNC6Iz7iwlyfHMfLwbfsSr6tSocqEGDrI/5GfDiCF5IV/8r+hEe
-         JaQYNA33XJ9naQQVePtbRdX+VSvDsRzZ4e9PEwPUZKWD5oMCJKDXJl7EEZWe3VV093Q2
-         woAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793759643; x=1794364443;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ukPSQKIQpl3L2cLAn/s5lssfgBcAwuRwH3+fL78zY/M=;
-        b=nz/GIoFofTbfoiA0X3D/BCpx5hoQFXRBkS3S2SDwblY3Y/ZjjSQ00QI0tku2pkxarX
-         3dKm/j7VUKlXPPRPeG/rO3sQUR03TZ5oNx8QLvQ/rHcaIQU5MvVsfbIK8lGygxcqD4Dh
-         enedOknvt/ujsDLlfNSIgaNj2U9hN4GRsKlpaMGcFQ/gwI+i1zWDTQCsPnPG5WH9w+M7
-         bDrFQmsUPC40umjQbCGjZOJsaa819kP3GDjFzE0BhwAit+5of5E68NLxWUpYq+Eey2WP
-         9qUGEg6Rs1a8kq58aDxIXwpGgIlouuZGH0ZHdQlIZGWhS/UO7pml1WwweB/giM5kK467
-         K18w==
-X-Gm-Message-State: APuU4Z+AqnIflrlLNNCrf+62UCs/sPx4AQdcYXJSoilbYcLG3BqVY/zK
-	D4spXWvE1H4z/z8Y3aMN67faJZ7V1+wn4VkZGs7BBcS3Tq4zm7s0U0FC3SdHsA==
-X-Gm-Gg: AYBFou13kGFPsQjY5ObYbBNz1fyQm8ke0wffyyDXORAZmsrx4ksMa7hoJ4fXLCam8dH
-	AqQi7bbKjaBWm6Lpuc74sva04jqN37ShBNkHFR3vvecWgfAxYoneoh3XVdTnqF68FzPDTMTddER
-	wOBIjF//aXH5pOm4m7ikyIe+e4eJQA/NzPDETVdq1cl5KH6C1pCJzCuZFJmFtDKcpJaMrvFkY93
-	1GLZOrSHL4Stx4HKuOAxkniQytuE/2Qv5CLX0pKaWdWqjvsEEXBq4r/nhnXn4D3BqNQ/YkU6cqw
-	TC7dca0gA6QcQdzsBgpU0MD1HAk4DRfqmlqEGh10V1Kcurh42fwj8DP6+Bsm3gLJElXJspYUZJ8
-	GLqOTgTT7/HQmF8UjoXOwjlDOa0q0SMDJZsjpbt2ZbweohiCPF3AJdan2rzPcTs2uCDyxqE2nHJ
-	av0Efni++60R5QX+/l0KjluXzELmxNJdMGHBxsSvj4JXuO7oU8ey2RcsZj5JkXwAfaQ5woaFPaU
-	d5dcjwVYI5usm9pamdPTAh5jY30E40iiOFYrV4EJNdQ5pYTevZjycuuqKU8VKQ=
-X-Received: by 2002:ac8:5d8d:0:b0:535:a5f7:d589 with SMTP id d75a77b69052e-542b7ef72bbmr260272221cf.67.1793759642505;
-        Tue, 03 Nov 2026 18:34:02 -0800 (PST)
-Received: from [172.17.0.2] ([172.174.191.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91e7e7b1e92sm6462086d6.45.2026.11.03.18.34.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 18:34:01 -0800 (PST)
-Message-ID: <6aea9999.8b0b0488.416aa.9d09@mx.google.com>
-Date: Tue, 03 Nov 2026 18:34:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2123786697767441103=="
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DA7606A31B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 02:53:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0DA7606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
+	by APP-01 (Coremail) with SMTP id qwCowABXf_knnupqrOQ+AA--.27798S2;
+	Wed, 04 Nov 2026 10:53:27 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: free the ECDH tfm when a sample fails
+Date: Wed,  4 Nov 2026 02:53:36 +0000
+Message-Id: <20261104025336.1527270-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,394 +50,83 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Add support for HDT and EKS
-In-Reply-To: <20261103221944.4072041-2-luiz.dentz@gmail.com>
-References: <20261103221944.4072041-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2123786697767441103==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1200958/
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      7.31 seconds
-GitLint                       PASS      3.27 seconds
-BuildEll                      PASS      16.30 seconds
-BluezMake                     PASS      233.73 seconds
-MakeCheck                     PASS      15.58 seconds
-MakeDistcheck                 PASS      118.58 seconds
-CheckValgrind                 PASS      188.91 seconds
-CheckSmatch                   WARNING   230.71 seconds
-bluezmakeextell               PASS      75.18 seconds
-TestFunctional                PASS      987.86 seconds
-IncrementalBuild              PASS      447.01 seconds
-ScanBuild                     PASS      845.36 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v1,2/9] monitor: Add HCI decoding for HDT
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#162: FILE: monitor/bt.h:260:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#167: FILE: monitor/bt.h:265:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#172: FILE: monitor/bt.h:270:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#180: FILE: monitor/bt.h:278:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#188: FILE: monitor/bt.h:286:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#198: FILE: monitor/bt.h:296:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#206: FILE: monitor/bt.h:304:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#213: FILE: monitor/bt.h:311:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#220: FILE: monitor/bt.h:318:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#225: FILE: monitor/bt.h:323:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#253: FILE: monitor/bt.h:351:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#269: FILE: monitor/bt.h:3354:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#275: FILE: monitor/bt.h:3360:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#281: FILE: monitor/bt.h:3366:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#292: FILE: monitor/bt.h:3377:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#298: FILE: monitor/bt.h:3383:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#309: FILE: monitor/bt.h:3394:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#318: FILE: monitor/bt.h:3403:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#323: FILE: monitor/bt.h:3408:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#341: FILE: monitor/bt.h:3426:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#354: FILE: monitor/bt.h:3439:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#361: FILE: monitor/bt.h:3446:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#384: FILE: monitor/bt.h:3469:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#398: FILE: monitor/bt.h:3483:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#416: FILE: monitor/bt.h:3501:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#423: FILE: monitor/bt.h:3508:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#446: FILE: monitor/bt.h:3531:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#453: FILE: monitor/bt.h:3538:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#461: FILE: monitor/bt.h:3546:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#471: FILE: monitor/bt.h:3556:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#476: FILE: monitor/bt.h:3561:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#483: FILE: monitor/bt.h:3568:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#489: FILE: monitor/bt.h:3574:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#508: FILE: monitor/bt.h:4563:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#518: FILE: monitor/bt.h:4573:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#529: FILE: monitor/bt.h:4584:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#562: FILE: monitor/bt.h:4617:
-+} __attribute__ ((packed));
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#583: FILE: monitor/bt.h:4638:
-+} __attribute__ ((packed));
-
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#1192: FILE: monitor/packet.c:10541:
-+		uint16_t mask = print_bitfield(2, rates, fields);
-+		if (mask)
-
-WARNING:SPACING: Unnecessary space before function pointer arguments
-#1512: FILE: monitor/packet.c:10861:
-+	void (*cmd_func) (uint16_t index, const void *data, uint8_t size);
-
-WARNING:SPACING: Unnecessary space before function pointer arguments
-#1515: FILE: monitor/packet.c:10864:
-+	void (*rsp_func) (uint16_t index, const void *data, uint8_t size);
-
-WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-#1636: FILE: monitor/packet.c:10985:
-+				enhanced_accept_sync_conn_request_cmd, 63, true },
-
-/home/runner/work/bluez/bluez/src/patch/14942033.patch total: 0 errors, 42 warnings, 1890 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942033.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,3/9] monitor: Add LL decoding for HDT
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#184: FILE: monitor/ll.c:801:
-+		uint16_t mask = print_bitfield(2, rates, fields);
-+		if (mask)
-
-/home/runner/work/bluez/bluez/src/patch/14942032.patch total: 0 errors, 1 warnings, 355 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942032.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,4/9] emulator: Add HDT support to btdev
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#802: FILE: emulator/btdev.c:8419:
-+	} __attribute__ ((packed)) rsp;
-
-/home/runner/work/bluez/bluez/src/patch/14942034.patch total: 0 errors, 1 warnings, 1140 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942034.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,6/9] shared/gatt: Add MIC length permission checks
-WARNING:LONG_LINE: line length of 85 exceeds 80 columns
-#548: FILE: unit/test-gatt.c:4735:
-+	define_test_server("/robustness/mic-len/read-multiple-variable", test_server,
-
-WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-#569: FILE: unit/test-gatt.c:4756:
-+	define_test_server("/robustness/mic-len/read-by-group-type", test_server,
-
-/home/runner/work/bluez/bluez/src/patch/14942036.patch total: 0 errors, 2 warnings, 356 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942036.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,7/9] main.conf: Add HDT configuration
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#213: FILE: src/main.c:193:
-+static const char *hdt_options[] = {
-
-/home/runner/work/bluez/bluez/src/patch/14942037.patch total: 0 errors, 1 warnings, 152 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942037.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,8/9] l2cap-tester, iso-tester, mgmt-tester: Add HDT tests
-WARNING:MACRO_ARG_UNUSED: Argument 'name' is not used in function-like macro
-#362: FILE: tools/iso-tester.c:909:
-+#define test_iso_full(name, type, data, setup, func, num, reason) \
- 	do { \
- 		struct test_data *user; \
- 		user = new0(struct test_data, 1); \
- 		if (!user) \
- 			break; \
-+		user->hciemu_type = type; \
- 		user->test_data = data; \
- 		user->client_num = num; \
- 		user->accept_reason = reason; \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'setup' is not used in function-like macro
-#362: FILE: tools/iso-tester.c:909:
-+#define test_iso_full(name, type, data, setup, func, num, reason) \
- 	do { \
- 		struct test_data *user; \
- 		user = new0(struct test_data, 1); \
- 		if (!user) \
- 			break; \
-+		user->hciemu_type = type; \
- 		user->test_data = data; \
- 		user->client_num = num; \
- 		user->accept_reason = reason; \
-
-WARNING:MACRO_ARG_UNUSED: Argument 'func' is not used in function-like macro
-#362: FILE: tools/iso-tester.c:909:
-+#define test_iso_full(name, type, data, setup, func, num, reason) \
- 	do { \
- 		struct test_data *user; \
- 		user = new0(struct test_data, 1); \
- 		if (!user) \
- 			break; \
-+		user->hciemu_type = type; \
- 		user->test_data = data; \
- 		user->client_num = num; \
- 		user->accept_reason = reason; \
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#2819: FILE: tools/mgmt-tester.c:14370:
-+	} __attribute__((packed)) *cmd = param;
-
-/home/runner/work/bluez/bluez/src/patch/14942039.patch total: 0 errors, 4 warnings, 2685 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942039.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,9/9] l2test: Add HDT options
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#204: FILE: tools/l2test.c:127:
-+static int mic_len = 0;
-
-/home/runner/work/bluez/bluez/src/patch/14942038.patch total: 1 errors, 0 warnings, 285 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14942038.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c:2290:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4251:52: warning: array of flexible structuresmonitor/bt.h:4239:40: warning: array of flexible structuresemulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2756
-
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABXf_knnupqrOQ+AA--.27798S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw1ktFWxCFWUCFWrtFy7KFg_yoW8WF1rpr
+	4agFna9FWkXr1ak3WUJa109Fn8Ca1DuF17G39Yv3ZxZ34Y9rW0qr4I9FWUJrWDCrZ2qF4a
+	ka9Fyry3Gw1DWFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkqb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
+	AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+	6r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14
+	v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
+	McIj6xIIjxv20xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv
+	6cx26r48ZrWUJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
+	4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUXVWUAwCIc40Y0x0EwIxG
+	rwCI42IY6xIIjxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr
+	1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAI
+	cVC2z280aVCY1x0267AKxVWxJr0_GcJvcSsGvfC2KfnxnUUI43ZEXa7IU5Sg4DUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAABA2rqY+TkJwAAsK
+
+test_ecdh() allocates a KPP transform, then runs three samples. If a
+sample fails, the function jumps to the done label, which only fills the
+debugfs buffer. The transform is freed only on the success path, so any
+sample failure leaks it.
+
+Add a label that frees the transform and use it from the three sample
+failure paths.
+
+Fixes: 47eb2ac80918 ("Bluetooth: move ecdh allocation outside of ecdh_helper")
+Cc: stable@vger.kernel.org
+Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/selftest.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index cdfc40e0016b..b91f7559d8fd 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -214,31 +214,32 @@ static int __init test_ecdh(void)
+ 			       dhkey_1);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 1 failed");
+-		goto done;
++		goto free_tfm;
+ 	}
+ 
+ 	err = test_ecdh_sample(tfm, priv_a_2, priv_b_2, pub_a_2, pub_b_2,
+ 			       dhkey_2);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 2 failed");
+-		goto done;
++		goto free_tfm;
+ 	}
+ 
+ 	err = test_ecdh_sample(tfm, priv_a_3, priv_a_3, pub_a_3, pub_a_3,
+ 			       dhkey_3);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 3 failed");
+-		goto done;
++		goto free_tfm;
+ 	}
+ 
+-	crypto_free_kpp(tfm);
+-
+ 	rettime = ktime_get();
+ 	delta = ktime_sub(rettime, calltime);
+ 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+ 
+ 	BT_INFO("ECDH test passed in %llu usecs", duration);
+ 
++free_tfm:
++	crypto_free_kpp(tfm);
++
+ done:
+ 	if (!err)
+ 		snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
+-- 
+2.34.1
 
---===============2123786697767441103==--
