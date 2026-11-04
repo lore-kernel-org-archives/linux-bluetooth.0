@@ -1,52 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793776335;
-	b=zUmoIt3nAf6Ta6vvf6mwu2RtIbzfF54/L5D33TCo+SnvhP/OPWB0BwOuHsVjWLdftaIa
-	 BRTTSMvv+81Atgm13jaLj6gRsCQksRb8eCrGZlfXEI+pxEu/bOS5BdxG001UmQ7OWZRYi
-	 2AHZ+OLZxtTGD38TllypmLwGD9Aq5g+MuQbzZyn/sjh3gGhYLIYWVMhZhJIofG3JrGiYx
-	 3BEh4IKB+CFYnjDiGpq2t0CsIPPQQSKkHouNh12kuzXseSJ2Y4pVTzjHfQj5c3TB2qBvM
-	 RclsQOFYEF6aIsmqK61r0CUrNQnYMRLyNqNMLUchC6Rp8rS2S2xr5lE7nM5wMI0VQVg==
+	t=1793776339;
+	b=lESZpDwv5KNroPMS93FY2qnQ50f4rjxaqplwq6b4zboglWsP0YB3galCNTZ6CSw40h7O
+	 KdWu+5QIiFhaSjOhVL51plmDqlk7X9VxBbKlBgvBaRpl3VBpvJVa5wzqsY5g9bsHQ4aBo
+	 2904Y+oG434sP0ws3v4Q9JnPC9aqEHkGPXE0hNXZFLK84mkyJyUvm0B4p+/MWobgGqw2J
+	 gqSbrl0oqXTVBjHMSy+NuZBe384zweXb7VAeN/S4oUsIlC00QinzMIh/SFwm0mgT4msvK
+	 zBx1F/3bN+7Fv5COB1jsspC9ihXCmf7LhWbueaVpLmMPLyjYz4XR1VsakSm8WrXBZzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793776335;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793776339;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=3GAM+K1BQRgD0LHnnWnhJwsHi1QWVfuoKa6RWb0EbWg=;
-	b=Sj9jQEI1w4jxp8DQecKQP6xSDyvxguWISR+MfuR0uvmzIl0AU1fsNRFG76+MgPJ+sVBa
-	 j2qdVlJCPpoiAiLUnh8yZOpCQrfNVoyY+2qofM3yq7m+WWsCLx5aJjdE/X7zc7/2o2SYd
-	 r/53fcSv7VdUwCP3aeQyFoPOCmWN/GOQEI5Ulceqiqcits532t2AFUPowyO0OKoYvg0pP
-	 vpYnDxHJzG2z8EovCnwgJRqQalueqyfcUl+DzL0Ub+e37IugWdH3EzKl1z9H9KCoYWpxd
-	 UBuJj+2lyoCfRWxGPEpMyXQ7AFCBmr+qywgRn4ddDBglboioBeZqNokpAbWT6m5qeDQ==
+	bh=j7lXt8iYfSfAZOuLlE51MN3xuJbzCiGNyydVLHN9mgk=;
+	b=uBsdNe2lzpLJtBzX3Z2jelUhs3uN2AeHOlENIf3kmtvkiviXhw2jwdYjNu1mjIKoJ+ef
+	 Xk/StNkhYbdqLx8korf5Nq0QCFb/qTeqVUL8NLdsv715Qj2HqIgft9NFK/EOQ3/Wz9Xxz
+	 gc5RMDFw/EDytLnI/GBKYCr4AjoyQ46zd/R2mv04roWqK+47peSAlY+92y1f5DxYVpY3A
+	 IypeIXi/FlQXGz64AMIQtjYpghl96yYdCP2lQQGDWVKcpdPuqmOOdGkrnGRI8UTym1H1x
+	 jZDQ1XUsPeofKLy3Jp8VGArVTkObU0W3YkIGfhUcH+pmmkA3eXpk29ws+wsoBlu0a7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d3foo9qM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z4hplF9a;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD4606A32E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78DB606A31B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d3foo9qM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B5A1F000C1;
-	Wed,  4 Nov 2026 07:12:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z4hplF9a
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E2811F000C1;
+	Wed,  4 Nov 2026 07:12:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793776334;
-	bh=3GAM+K1BQRgD0LHnnWnhJwsHi1QWVfuoKa6RWb0EbWg=;
+	s=k20260515; t=1793776338;
+	bh=j7lXt8iYfSfAZOuLlE51MN3xuJbzCiGNyydVLHN9mgk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=d3foo9qMHxgdhDlZw1USDCHRK6bRf4bIt8p/xQrVzDCLftqkMMcmAOX9pVJYPYeV2
-	 F5V+P2lveLMsgLG5DgwLwtwEB2cQFHGI1AqaGAo5DO6716H/ndhghh0tE0/+wTo+tP
-	 Xh/5ZhRmFWbZtaf/flwprwyse/ILmXHRMZvUm9GoJaECJmjeRMyCxQ1WD+dZ5H6F+Z
-	 lRMhGbop9xbYc3DxzR/WHPuDgG0fciiBzfnth77CM7LYAxckO65/9kxYNlQh/petGd
-	 Bmyi7hGA1omLsWNwzCaY/veQrklMCWVbxcozhFrOyVRvznZFwSnhWEOs/MZFII3wKj
-	 1MCeI4oBpwGWQ==
-Date: Wed, 4 Nov 2026 08:12:11 +0100
+	b=Z4hplF9asjn2usTkRiWDIP9qlJaI3ZzXs+WfPVARk5Lfc9zV1TkDE/RlBstymtRNf
+	 oJlJFkoNJMzXgOF3/xdpWDDfgTGuxOHnEEw4VISQsF9+UWvrN2wd+2hXTtvnEsbjn+
+	 HYalGZuZtB9RsT+I9tyfgnJD5S9vUlIMBjJr9RrOkGSvTyvRgER4GLO45XRmGsU6/F
+	 yNu15xdo9kIAOF/MzpZ4rZPV3UUgdcdadqPju/e7PWY2B8Go0FBFBT626Pz8mIUG1Z
+	 qq/1pIXop6jV/sA7HngFAgccdERotSRMq74lzEaLDRMwi22PkSo9K3NgwK8U1FCLco
+	 MtagOYittO7hw==
+Date: Wed, 4 Nov 2026 08:12:15 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: delete the new SCO link if linking it fails
-Message-ID: <20261104-tangible-chocolate-badger-d10c90@quoll>
-References: <20261104022807.1484114-1-vulab@iscas.ac.cn>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: drop the pending command if the adv monitor
+ queue fails
+Message-ID: <20261104-polite-markhor-of-protection-8556ef@quoll>
+References: <20261104022808.1484131-1-vulab@iscas.ac.cn>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,30 +59,29 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261104022807.1484114-1-vulab@iscas.ac.cn>
+In-Reply-To: <20261104022808.1484131-1-vulab@iscas.ac.cn>
 
 
-On Wed, 04 Nov 2026 02:28:07 +0000, Wentao Liang wrote:
-> hci_connect_sco() adds a fresh SCO/eSCO connection with
-> hci_conn_add_unset(), which leaves its hold counter at zero and takes a
-> reference on the controller. If hci_conn_link() then fails, for example
-> because the link cannot be allocated, the error path calls
-> hci_conn_drop() on a connection nobody holds. The counter goes below
-> zero, the delayed deletion work is never armed, and the connection stays
-> in the hash with its controller reference until the controller is
-> unregistered.
+On Wed, 04 Nov 2026 02:28:08 +0000, Wentao Liang wrote:
+> __add_adv_patterns_monitor() links the command into hdev->mgmt_pending,
+> which takes a reference on the socket, and then queues the sync work.
+> When hci_cmd_sync_queue() fails, for example because the controller is
+> not running or is being unregistered, the work never runs and the
+> completion callback that would free the command is never invoked. The
+> command therefore stays on the pending list and keeps the socket
+> reference until the controller is unregistered, and it also keeps
+> MGMT_OP_ADD_ADV_PATTERNS_MONITOR busy for other requests.
 > 
-> Use hci_conn_del() for a connection created here, as the other
-> hci_conn_add_unset() error paths do, and keep the drop for a connection
-> that was found in the hash.
+> Remove the pending command on the queue failure path, matching what the
+> other management commands do when their queueing fails.
 > 
-> Fixes: 06149746e720 ("Bluetooth: hci_conn: Add support for linking multiple hcon")
+> Fixes: b747a83690c8 ("Bluetooth: hci_sync: Refactor add Adv Monitor")
 > Cc: stable@vger.kernel.org
 > Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
 > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 > ---
->  net/bluetooth/hci_conn.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+>  net/bluetooth/mgmt.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
 
 Multiple things here:
