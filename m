@@ -1,100 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.46
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793780688;
-	b=Gp6qugcBif1MJLVg5qFhqQZaT+3Lfy1/bA+b2iQo42OV4ZvYMor+DRyV6yMwB+idh67c
-	 cBnLo0b83ojW2UtUUO16tP2qqSgSRexgZuc62CCLletJFQdiQpF1Mda++DMa69MUfPCbV
-	 fhIfecC3d9CcaxgsS5p8d5vo5hnLPHuiBEdcL3Aehkyvyp1Ht53oV1eU865ale84O2Lp8
-	 jNUKWbSd0EvmCHhUDXnomm0cZmInsSVzp0vzuvI/VgSSa0Rty7KaxObzccEae2sPs1cbh
-	 iz1SJaXficPKRQvBHybU07Vk7t0QlURO0bYCvZEafaI46vdHEkwWwxugzi7lGcNFu0A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793780688;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=+GDlXWJUsYv47EeExLeI8zNRHRArPEHoLs9WQdDARCo=;
-	b=EdmlrPqLmFt1+gCVEDGfTuoB0FU3mb15luiyJgfoOKkbvE93DNj5fygo5H3nFh7zpF5j
-	 mjFxDkKYIE2JJ1tFJ+lYZ/f1z9cVhJlmihAwIO2SNQm1CPjH1KVlIU0+buQr5iwuXzxuA
-	 EPdWS81elsRMDdO6jvFcXm2IlGxmz3O3jAQnmnZ22I4zkjHCe31qpLVo/8tj5ArswzAcL
-	 N1tnCXE16HvK0lqbDjsbbGWX+cW+VjrLTm65+2hgoA3YUgtZRTK2me3kwsDBDGBJ4sFly
-	 ZwZwQuuVsqtb8Vz7Z3VmLOQ9oNuMvnJ5jtalmZXzACARPjYMcrLqGWZ4ikRZQSqO2NA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dRWBnV3N;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.46
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793781278;
+	b=2pDfxw4JC4trVRw5K5K0oe0daTeqITgaHbtDv9dfUKOY5lsUf349INoJkn0HOReEKsqs
+	 4nxKLlZfcPWc61f7eY4I9Sr2vFmyum0l7N8a6MW8mog7vT8CBOv18zWORF9BhXlEerHKt
+	 u/vRubKRi6aVduuYbYS/RVk52pyGyyZI4vV4NyYzF0N4OcRa3LCt/ErldxdxY50QFCcc0
+	 iFwzGJSqfyfHMIsHzVugrsNM8Eidw6Tv58uWOakRAIpGcq9d/udKHBP1qckPwBQXeKaYs
+	 toARhQsjhsVhrfWd/hCDxC0quLQiP4dum3TY3QsHmMIexxFavddOppjcpsbXUl5/OzA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793781278;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding:
+	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
+	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=60YbiL8YjKNSy3ZuLIi0mpklF2WzebRBqzE7QPAh7pA=;
+	b=CXtHlJJJJoM76AceyMcMMstgVUGg5gF3lvKFR+bhpENZ8cYh1pKTYhran6cWEPPtCblZ
+	 UcJEaGCGTV1lpuBIy3VVtdHR/ZEvq/XHpBfTFp1YI8c7SVLWSYP98H4Ch7AVwBQUngqWw
+	 4ysLVkfFHfFLJxxQmvjhL95a8OrL3udowzlZ3HRVZ4sno817ttMiGWb11JWNcaV8Yl9NK
+	 Z1Cv2RaPqWhrkdqgjoh2sPGsBtUaRAj/9DVo0K8PiL9oNKRDtS6UjLUvyqn+inz+2KIO8
+	 JaiesOFhNQa6UvejeLslMcGpXvtcB9NiwMLJOXFV+DocMK5ma+ai5vwV9uAND6EwrYw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KwcE55sq;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6F7606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 08:24:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE6F7606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E73F606A333
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 08:34:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E73F606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dRWBnV3N
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c347be93d54so7267966b.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 00:24:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793780686; cv=none;
-        d=google.com; s=arc-20260327;
-        b=oaaDGuiiktf2prvaLp2KjzuqHjVjdLlJWpUvuJcKvCQwjZ6MI5s9qXq9qWBhApN0XC
-         IdBld9305MvwG+Jgp915rcqVzkmsGSG5WMxPilyp6qnwVu/WisTWOda/R7n3BV1uETJu
-         RZa8es6UsgfgtosNLNvAmZ4FxsTCkuHej57dKQaKP2APUgseOn+YeVAqWKkM1hf+srLa
-         uj9GZt/X60jvSZ2uif2iF+4g4H1nSz3QiLWmBzjBhuVO9vlfZRee8zOrl1F6fP9zWmBi
-         ppvjz447QHsEGSCRGeBr9PbI+iPDJAyaKoySJgKFoih1wfI15bT0bzZTpioWR666bURT
-         i65A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+GDlXWJUsYv47EeExLeI8zNRHRArPEHoLs9WQdDARCo=;
-        fh=npLmsmpQrvfY2L2s9Y29xuqh0TY3SlTBkcxu9XePD5w=;
-        b=VBVXNaoJeJj8x66PekZ8pDO8HZmGbdp1L9G3WS1kbuPhM5pAz20gJnjm1tpqDcAF4L
-         0YVJqulNqvhWeFzyCZgP2tdQhi4ygiMUvRIJ+sRkqVpu/LKz3zIGfUOJ6g5W1Td0OeMT
-         6xw6K7M8SSJ5doKnurs9q3aKlbTEl+rqDAeq29c846r5gk28fOxQlmP1wy5Zcq+ege8Q
-         RpdcGY7ZpRuRH1jy7Jp4tW/DQBo+Z0SWU0AUrzA2Yuqy4R5NvJttMumn3YADh3OXGRxh
-         bnpO/LBEXO/5yCVyhpr8OfC86MfYyxU4IE5hjHLz3zg3MRagXHJgxkd5J5c+37DiLTN3
-         Gdww==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793780686; x=1794385486; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+GDlXWJUsYv47EeExLeI8zNRHRArPEHoLs9WQdDARCo=;
-        b=dRWBnV3Nh4PROZw+QpcipQd8jacvXRo2SiAcx9F0GSEdnpef5TLxpdLLHcOI+znKWY
-         BwxU4N5boHG0FVdrA5NGjzperhdOTlthNJYkBKDPeJjJJlK/Xy3MsYjYvou4iiQn/Muy
-         BvW7x+H+H5MtnI3bE5tIcddZ57QmqBsBD+2NLCVJzKJ6QDMyux2+CrZGTOvgnnPATyZd
-         Nyu+PUiRFhobHG+SXMjcb+LWhkhwkxu+zzxw9+wcf9uupVgnMei476FWifQaR6mIKnl+
-         0jZxMPv6CFYG9Zw9OhpWuoGgdqlzXr3zpktswjfN83Ng2hNmXg7+6bcQF6ZJfHo350I6
-         UILA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793780686; x=1794385486;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+GDlXWJUsYv47EeExLeI8zNRHRArPEHoLs9WQdDARCo=;
-        b=VU5YwQPubNHWSthZ9kgxWIKDoCyyoEBCnK+KlZfBGYBzsgF/Yog2JjAAaYjleJtKNG
-         XB1JrClJbjHJF2cGlqOlxLv0GWNlLSJPXo1gI4crDD/+IjyEru0SAeJVqm1KmVw3S1V5
-         qWtFho9dTSAO3sR9GKJJjxlEeDIuAxtBcJtz7Nf48HN3gB5Snnn/+gzuSJ6J4twMSWIi
-         0l0rhkLN3GtJMms9gcNlc9hHbk/wXyJ37Eo7zwBT8OwOE03cKcy3pJh0aqp5CZXZ0OHa
-         2fgnRaaYBfZPP1SBtYDajEorlSpZQswyjRyodxhNiQixs9Zxs6wbOYy4DZwgnhEKyS/5
-         tm3Q==
-X-Forwarded-Encrypted: i=1; AKwUvBzkq5FHxUXW/EvgFxsHPql0jiEkErrTHPRv4qpqUmoCcke2DbXkI9kEXosWUJ/7QVpTJPb+vXlNLJXmKpYbPXM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9EIL/H0kbw8Hfr0KjcPnD59GLrhNlrzxLmudhCMnxSE9o81DMs
-	XcSC45g6GZ0Drx85UzY2tLhbhBd40X2jAm+17vfIfFSf8li/CkDnJDXyrImQ8CiEdl+09BPeX3+
-	J0y5ryZdlCQZtOl6kUeTIEi2m0dD9lCY=
-X-Gm-Gg: AYBFou1GWtC1NkGaOXeVt68su/pa0Lvem8mvvXuyaM+k7YmAmqRrXrRyYIy/vkAHxgX
-	PlTytPfmEETiE2KLezQOpuPG75EJDxPMP3nm+lnmIC4BtHToQt80MbCf7+6fbdNp2Za/+rIlZ3U
-	HloRYxEvmK03wCDy1yGMv1/vuWcXJmhDoZzrUnCtgfBMCo5pAcF33NoYMksX1Hi8QV3vnarTVPr
-	w9YEr6eCq7336rhd2lI6EoS2PdjzLhxo6WVtdT7lkFo5fRtlCa4ZEkJCUzDxEbiQf0U5HWEf5nE
-	6pbamlKWKORphIR4nP1ovanvJmePbDycAHjErF69x8VdN0nDQQpfHFwQpVEYaUSLgSFp2eae+y3
-	hAC6Ck7LJTdqVeTDsU+rw2x+lHzgH+sB91VoRRNXPrQMPMl+2Mg/IAn0kFo9rP1+6c6c=
-X-Received: by 2002:a17:906:6411:b0:c42:e6c8:e45a with SMTP id
- a640c23a62f3a-c4ca7a4c8b9mr1386970366b.3.1793780685708; Wed, 04 Nov 2026
- 00:24:45 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KwcE55sq
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48KWWm3875516
+	for <linux-bluetooth@vger.kernel.org>; Wed, 4 Nov 2026 08:34:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=qcppdkim1; bh=60YbiL8YjKN
+	Sy3ZuLIi0mpklF2WzebRBqzE7QPAh7pA=; b=KwcE55sqksa8LD7wXlfLHo9TYrY
+	AK4m6pIIMK07Sstc6wF38gKLdDckw1E9DRX7wn1tnijPtX61hJ+KV1iPYWZgyxX8
+	u7MYBDqDn6HfiwGfbL0TFKTT5qy5ZhWIsqG2jl7cPkt7D9O7Pz342zbYH6wt0lGH
+	er5/65o9qkuwIJBDpa6AS7cktevAS2kRF/irik8pzQKCUGuAsRffHhoqCQNni9bT
+	6uAxcmomtwiudDIn0hTK51UBE87CUAWpZToOAESeylKFMMAHwgx6/cr9CH4Jkaxp
+	m53+Nc9hczNW2SRiGjZ8LNIXgsjUMVHsTPXqV4FKNRRvGe/b+uF07fOCSRw==
+Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqwb091y8-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 08:34:37 +0000 (GMT)
+Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48YZSH2686402;
+	Wed, 4 Nov 2026 08:34:35 GMT
+Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6A48YZtQ2686390
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 04 Nov 2026 08:34:35 +0000 (GMT)
+Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
+	id 50861279B3; Wed,  4 Nov 2026 16:34:34 +0800 (CST)
+From: Jinwang Li <jinwang.li@oss.qualcomm.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
+        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
+        mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
+        xiuzhuo.shang@oss.qualcomm.com
+Subject: [PATCH v1 01/18] obexd/pbap: Fix crash counting vCards in dummy backend
+Date: Wed,  4 Nov 2026 16:34:12 +0800
+Message-Id: <20261104083429.4111632-2-jinwang.li@oss.qualcomm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
+References: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,70 +83,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <179376960391.50454.8822263457423416137@gmail.com>
-In-Reply-To: <179376960391.50454.8822263457423416137@gmail.com>
-From: Chengfeng Ye <nicoyip.dev@gmail.com>
-Date: Wed, 4 Nov 2026 16:24:33 +0800
-X-Gm-Features: AclHuK-R2OdQr1K9gGtBoNEjfvIOvN0HOzedAfw3-hfWuJgFyYUBaWV7yfFSPt0
-Message-ID: <CAAo+4rXReQNa8q1_zkHn87thQeSLQHyPhioCrDbT_1K8L=rQSw@mail.gmail.com>
-Subject: Re: [PATCH v6] Bluetooth: hci_conn: hold a reference for LE
- connection timeout
-To: Yaohan Li <shunsheng1218@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX4TJ7ElanLdr6
+ CR1aNz3juDbzYJzJg8MGMBNbsw5RZ/cSHXIKd2XlXI1SQlPXBpmkPE7rBpDtxWzLsCL9gY1+ZOP
+ oQcafXWw6gUO2BZzmrnFpBbaS0dDuYs=
+X-Authority-Analysis: v=2.4 cv=OfINnRTY c=1 sm=1 tr=0 ts=6aeaee1d cx=c_pps
+ a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=DJpcGTmdVt4CTyJn9g5Z:22 a=VAP3BKsw3AH9pjT3LMIA:9
+X-Proofpoint-GUID: XPx9innh6x6dt1fYBgsJElAEPxF2phV5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX+V7XOVEj21eO
+ jvDQwU0bQdqEdet3rnxmI5ySmi1UGc4y08qTRX4pnLegLzuTdSq6ywF6Ykt43LfqejNvtxnSq2J
+ fHkVHiqgX4A/+WL7qzdfWK8w1cFPmfB61iJQSCAaICE1s5EkeJ7ca2LYC2cBaTJ13P+hOKxDVMV
+ n59hcTvw7LlE02PHuYTcuAsurzavvZM+Ccbe7MLMwwXZo2wh/w4ao0ObpqWt0NDOWPLT5lfxI+a
+ 8Zt7KJDhBYOWNNFzVjTfY/mN2jBMcelNrlGb5bm31MvKHBzxXpCiseO2AEbJ98lCygGhtpmw6ft
+ RWWnL1F1TKs0n/wlFIRRQVuuNKj1m+9BKOmn1WGCH+dtFC3ROLBrO6hJl6kVbK2WYzA9cb/Yrbs
+ kBydrKSq9k/z+W4BbeGDZFblHNalPQLw6jMCV9KtoEQzWpTbslF2THFofalpXRJyvK4thETvtYg
+ 1+2CjaAkNc+MEf+eAiQ==
+X-Proofpoint-ORIG-GUID: XPx9innh6x6dt1fYBgsJElAEPxF2phV5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-04_02,2026-11-03_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040033
 
-Hi Yaohan,
+Skip the vCard callback when none is given. Counting the vCards of the
+missed calls folder passes none and crashed.
 
-On Wed, Nov 4, 2026 at 1:20=E2=80=AFPM Yaohan Li <shunsheng1218@gmail.com> =
-wrote:
->
-> Hello Chengfeng,
->
-> We independently reproduced the LE connection timeout use-after-free
-> and tested your [PATCH v6] ("Bluetooth: hci_conn: hold a reference
-> for LE connection timeout") on a clean Linux v7.4-rc1 tree
-> (6628e7d4c6b2).
->
-> Test setup:
->   - QEMU/KVM, KASAN-enabled kernel, /dev/vhci virtual controller
->   - Management SET_ADVERTISING and L2CAP LE connection
->   - Kprobe-assisted timing injection at le_conn_timeout() entry,
->     50 ms park, with mgmt disconnect at discms=3D2015
->
-> Results:
->   - Unpatched v7.4-rc1: 42 slab-use-after-free reports,
->     with the first relevant frame in hci_conn_failed()
->   - Your v6 patch applied to the clean tree: 0 KASAN reports,
->     with 200 confirmed probe hits under the same timing setup
->   - Control run without injection: 0 KASAN reports
->
-> This is a test of your posted v6 reference-counting patch, not
-> merely our independently developed fix. The result supports the
-> lifetime fix under the tested interleaving; it does not establish
-> coverage of every Bluetooth shutdown path.
->
-> I also confirmed your analysis that a naive
-> cancel_delayed_work_sync() replacement is NOT safe: the mgmt
-> disconnect path holds hdev->lock while calling hci_conn_del,
-> which would deadlock against le_conn_timeout's hci_dev_lock
-> acquisition. Your reference-counting approach is the correct
-> solution.
->
-> Tested-by: Yaohan Li <shunsheng1218@gmail.com>
+Fixes: f34bc5d924ec ("obexd: Add PBAP PullPhoneBook function for dummy back-end")
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ obexd/plugins/phonebook-dummy.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thank you for reproducing the issue and testing the v6 patch, the
-detailed results and your confirmation of the locking issue are
-helpful. I also appreciate your Tested-by tag.
+diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
+index 0a0ae24ff..14075b502 100644
+--- a/obexd/plugins/phonebook-dummy.c
++++ b/obexd/plugins/phonebook-dummy.c
+@@ -175,7 +175,9 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
+ 
+ 		v = Parse_MIME_FromFile(fp);
+ 		if (v != NULL) {
+-			func(filename, v, user_data);
++			if (func)
++				func(filename, v, user_data);
++
+ 			deleteVObject(v);
+ 			n++;
+ 		}
+-- 
+2.34.1
 
-> We can provide the full console logs, build configuration, and
-> reproducer details privately if useful. The investigation was
-> AI-assisted, and the patch application and test results were
-> reviewed by the human tester.
->
-> Best regards,
-> Yaohan Li
-
-Best regards,
-Chengfeng
