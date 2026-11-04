@@ -1,76 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793781278;
-	b=2pDfxw4JC4trVRw5K5K0oe0daTeqITgaHbtDv9dfUKOY5lsUf349INoJkn0HOReEKsqs
-	 4nxKLlZfcPWc61f7eY4I9Sr2vFmyum0l7N8a6MW8mog7vT8CBOv18zWORF9BhXlEerHKt
-	 u/vRubKRi6aVduuYbYS/RVk52pyGyyZI4vV4NyYzF0N4OcRa3LCt/ErldxdxY50QFCcc0
-	 iFwzGJSqfyfHMIsHzVugrsNM8Eidw6Tv58uWOakRAIpGcq9d/udKHBP1qckPwBQXeKaYs
-	 toARhQsjhsVhrfWd/hCDxC0quLQiP4dum3TY3QsHmMIexxFavddOppjcpsbXUl5/OzA==
+	t=1793781279;
+	b=ndXbX3cVddiFA/5lqdQvFK4yNs93hA3g9ZdoQgvgWMPnnaOauBAZ2b4AeXdr7HHYceYD
+	 /Xlm7SxWT/LBjL/uccP47fExA/U4PYwWTAyKXE5FI7Ag+GKCWmQNByXmagXa2st/lyRB+
+	 pPELj5TKjD5JEAEktEAuIa0Ri38kSXrDIUZVXx0rGvJMEjAXaXtillQOQOlQjmLyZ9FYW
+	 6CswlDS2cOWW04W3C6RLCQQHI7/pcOxI7oedQrM1ophS1Cbff2wMEvLJIvDK0KCcpsn5B
+	 0cOuaKkNcUXcMdI5dV5kb+lYlP5NyMh0ld0IWmyHjeqjGsiDXwmFjRrI+HuoWIKkOkw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793781278;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793781279;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:
-	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
-	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:X-Authority-Analysis:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=60YbiL8YjKNSy3ZuLIi0mpklF2WzebRBqzE7QPAh7pA=;
-	b=CXtHlJJJJoM76AceyMcMMstgVUGg5gF3lvKFR+bhpENZ8cYh1pKTYhran6cWEPPtCblZ
-	 UcJEaGCGTV1lpuBIy3VVtdHR/ZEvq/XHpBfTFp1YI8c7SVLWSYP98H4Ch7AVwBQUngqWw
-	 4ysLVkfFHfFLJxxQmvjhL95a8OrL3udowzlZ3HRVZ4sno817ttMiGWb11JWNcaV8Yl9NK
-	 Z1Cv2RaPqWhrkdqgjoh2sPGsBtUaRAj/9DVo0K8PiL9oNKRDtS6UjLUvyqn+inz+2KIO8
-	 JaiesOFhNQa6UvejeLslMcGpXvtcB9NiwMLJOXFV+DocMK5ma+ai5vwV9uAND6EwrYw==
+	bh=wqp8/eH2TgHBG574tI4yg0fKJ3ptLqR4+grMk1//fg8=;
+	b=bZc+1TsLFcD0gifbZfz3kyy0HL55tqfJimxOnjXzloNJrQBS+8KUcQxKWTx5XPKnlN2l
+	 AUKCoUefvTz4EflJBPHkWw+oRNovVjuvS5yWt6O19GGF3l+0kQgQOp85/6O9QD+jAJBCt
+	 Fsa7DcWvHzLwpYjwM0VO2C9ELuwvkiW3zOEe3eAyHK/jWc5grGh5KpB4qsGH9P256zKBG
+	 8y3QN67dWQMiF5L+PvVfRh0ty7xYpuHnfgj1eaVRT5Rot/LZx34iorz70mEs8h9krs1Ir
+	 rOcargLxVD8UyOkix6HLmvV6QlVVxIGrhWXPQi9kyfYEegkwCCzBLtwWl/fL+RqMRtA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KwcE55sq;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lvB5qISm;
 	arc=none smtp.remote-ip=205.220.168.131
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E73F606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EF8606A336
 	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 08:34:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E73F606A333
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5EF8606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KwcE55sq
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48KWWm3875516
-	for <linux-bluetooth@vger.kernel.org>; Wed, 4 Nov 2026 08:34:37 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lvB5qISm
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48KNGl2290379
+	for <linux-bluetooth@vger.kernel.org>; Wed, 4 Nov 2026 08:34:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=60YbiL8YjKN
-	Sy3ZuLIi0mpklF2WzebRBqzE7QPAh7pA=; b=KwcE55sqksa8LD7wXlfLHo9TYrY
-	AK4m6pIIMK07Sstc6wF38gKLdDckw1E9DRX7wn1tnijPtX61hJ+KV1iPYWZgyxX8
-	u7MYBDqDn6HfiwGfbL0TFKTT5qy5ZhWIsqG2jl7cPkt7D9O7Pz342zbYH6wt0lGH
-	er5/65o9qkuwIJBDpa6AS7cktevAS2kRF/irik8pzQKCUGuAsRffHhoqCQNni9bT
-	6uAxcmomtwiudDIn0hTK51UBE87CUAWpZToOAESeylKFMMAHwgx6/cr9CH4Jkaxp
-	m53+Nc9hczNW2SRiGjZ8LNIXgsjUMVHsTPXqV4FKNRRvGe/b+uF07fOCSRw==
-Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqwb091y8-1
+	:mime-version:references:subject:to; s=qcppdkim1; bh=wqp8/eH2TgH
+	BG574tI4yg0fKJ3ptLqR4+grMk1//fg8=; b=lvB5qISmm0tVUfzD4lhfw4skD6G
+	ZPgND0E3SkEESyLjTEV8RvfPsKMgL9QEAymDWxyyIkE46DEE4kZSeFUnJozoa/ou
+	2iRex9yAzKle8DJyuixukYem+ezOugF8HiQYFnzJNUeRqkoTBk0sHAp60phVKfpi
+	1oU4ewCCiHX3HEM77sVimNfZxitcQd/q/F1b2MgbLvoaAcy32iFixtdzfx/NAx6R
+	p45kkWXp6irS4hhHt88wjJWZgLkmEoAO99k8++U7dCpyf/mgPPeDpUXPYQIEgAY5
+	mFFa2uCpVJcatEelsPh/i2oCKeoW1UpLBEAeugOutk164ht1PGGpWrNRyiQ==
+Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqpuvadqq-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 08:34:37 +0000 (GMT)
-Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48YZSH2686402;
+	for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 08:34:38 +0000 (GMT)
+Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
+	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48YZQf2687993;
 	Wed, 4 Nov 2026 08:34:35 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6A48YZtQ2686390
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6A48YZGV2687985
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Wed, 04 Nov 2026 08:34:35 +0000 (GMT)
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 50861279B3; Wed,  4 Nov 2026 16:34:34 +0800 (CST)
+	id 5E38E279B6; Wed,  4 Nov 2026 16:34:34 +0800 (CST)
 From: Jinwang Li <jinwang.li@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
         wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
         mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v1 01/18] obexd/pbap: Fix crash counting vCards in dummy backend
-Date: Wed,  4 Nov 2026 16:34:12 +0800
-Message-Id: <20261104083429.4111632-2-jinwang.li@oss.qualcomm.com>
+Subject: [PATCH v1 04/18] obexd/pbap: Reject PullvCardListing without Name in telecom folder
+Date: Wed,  4 Nov 2026 16:34:15 +0800
+Message-Id: <20261104083429.4111632-5-jinwang.li@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
 References: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
@@ -87,56 +87,56 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX4TJ7ElanLdr6
- CR1aNz3juDbzYJzJg8MGMBNbsw5RZ/cSHXIKd2XlXI1SQlPXBpmkPE7rBpDtxWzLsCL9gY1+ZOP
- oQcafXWw6gUO2BZzmrnFpBbaS0dDuYs=
-X-Authority-Analysis: v=2.4 cv=OfINnRTY c=1 sm=1 tr=0 ts=6aeaee1d cx=c_pps
+X-Authority-Analysis: v=2.4 cv=O6SsLx9W c=1 sm=1 tr=0 ts=6aeaee1e cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=DJpcGTmdVt4CTyJn9g5Z:22 a=VAP3BKsw3AH9pjT3LMIA:9
-X-Proofpoint-GUID: XPx9innh6x6dt1fYBgsJElAEPxF2phV5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX+V7XOVEj21eO
- jvDQwU0bQdqEdet3rnxmI5ySmi1UGc4y08qTRX4pnLegLzuTdSq6ywF6Ykt43LfqejNvtxnSq2J
- fHkVHiqgX4A/+WL7qzdfWK8w1cFPmfB61iJQSCAaICE1s5EkeJ7ca2LYC2cBaTJ13P+hOKxDVMV
- n59hcTvw7LlE02PHuYTcuAsurzavvZM+Ccbe7MLMwwXZo2wh/w4ao0ObpqWt0NDOWPLT5lfxI+a
- 8Zt7KJDhBYOWNNFzVjTfY/mN2jBMcelNrlGb5bm31MvKHBzxXpCiseO2AEbJ98lCygGhtpmw6ft
- RWWnL1F1TKs0n/wlFIRRQVuuNKj1m+9BKOmn1WGCH+dtFC3ROLBrO6hJl6kVbK2WYzA9cb/Yrbs
- kBydrKSq9k/z+W4BbeGDZFblHNalPQLw6jMCV9KtoEQzWpTbslF2THFofalpXRJyvK4thETvtYg
- 1+2CjaAkNc+MEf+eAiQ==
-X-Proofpoint-ORIG-GUID: XPx9innh6x6dt1fYBgsJElAEPxF2phV5
+ a=Um2Pa8k9VHT-vaBCBUpS:22 a=tXj-jVEF51iBFPFnddoA:9
+X-Proofpoint-ORIG-GUID: 1ys6a-3l5ExDhOPW7jTvh70GTIfi3yee
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzNCBTYWx0ZWRfX3zP/RuWrJxta
+ QtBDQx2IHcf6+/YBP8mU30pexSnYJtKzS9+JefAtfj1K+vtGE0GyYiI1P/tFCwg1RMYU8B+hyrm
+ HKGukc7jtgT6YoafiASialf/tamgoFc=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzNCBTYWx0ZWRfX3w1Ip89SRv42
+ 4qMNaiBxABaZj0Dwpt18xajTnRLz47AAb7g3yN7iIOB16xHrYzUWmhzFGQGBtpjBGeDvwjsmcyF
+ xxDm3TI/VYQz3NfdH23pQPcpgVBXA2J2Js/WdEv1elvoG+I/HsaXoFzJ6tgfChNPdtIeqzYKJSt
+ eejE7oILCoiLTIGBDHRZH7D8xHd6HOER1EqwohhnJBXYBiTvrkDeeLar5A86wX7DXPnjZSYqvOW
+ AEvmxheBP9LBSZE/dqRA+L0GeOZiWt7PQag0CLGTWScYUsTFmMIxS+RRPBt9RhV88DubW9qroDh
+ b16JIKyRevLh7G/xPN6D+Eyg67om/Nx5+CpMGRv+pgCKdDdrtwUr+7/boIyx/M2+YEnEcKfTs8x
+ G56fhIjkXV+Q9XiIInc+d0H+PsrqlLgGVvIIZnN0JIWw27Q4B5KgjrI/n4ViPin+hnLf84JMPcC
+ b/vO7jqSJipiRJSwFIA==
+X-Proofpoint-GUID: 1ys6a-3l5ExDhOPW7jTvh70GTIfi3yee
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-04_02,2026-11-03_04,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- phishscore=0 impostorscore=0 priorityscore=1501 bulkscore=0 suspectscore=0
+ malwarescore=0 impostorscore=0 clxscore=1015 spamscore=0 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040033
+ reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040034
 
-Skip the vCard callback when none is given. Counting the vCards of the
-missed calls folder passes none and crashed.
+Return an error for a PullvCardListing request with an empty Name when
+the current folder is telecom, which has no vCard listing.
 
-Fixes: f34bc5d924ec ("obexd: Add PBAP PullPhoneBook function for dummy back-end")
+Fixes: 2e2c48dfc234 ("obexd: Initial support for mimetype drivers on PBAP")
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- obexd/plugins/phonebook-dummy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ obexd/plugins/pbap.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-index 0a0ae24ff..14075b502 100644
---- a/obexd/plugins/phonebook-dummy.c
-+++ b/obexd/plugins/phonebook-dummy.c
-@@ -175,7 +175,9 @@ static int foreach_vcard(DIR *dp, vcard_func_t func, uint16_t offset,
- 
- 		v = Parse_MIME_FromFile(fp);
- 		if (v != NULL) {
--			func(filename, v, user_data);
-+			if (func)
-+				func(filename, v, user_data);
+diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+index 3ee54f1fe..436981a4c 100644
+--- a/obexd/plugins/pbap.c
++++ b/obexd/plugins/pbap.c
+@@ -544,6 +544,10 @@ static int pbap_get(struct obex_session *os, void *user_data)
+ 	} else if (g_ascii_strcasecmp(type, VCARDLISTING_TYPE) == 0) {
+ 		/* Always relative */
+ 		if (!name || strlen(name) == 0) {
++			/* telecom has no vCard listing. */
++			if (g_strcmp0(pbap->folder, PB_TELECOM_FOLDER) == 0)
++				return -ENOENT;
 +
- 			deleteVObject(v);
- 			n++;
- 		}
+ 			/* Current folder */
+ 			path = g_strdup(pbap->folder);
+ 		} else {
 -- 
 2.34.1
 
