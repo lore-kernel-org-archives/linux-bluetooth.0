@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793776288;
-	b=mF8cITlnpCn+zEQUd1z511k9FThZHWeH7P3KwXntaK85bSlHBs/j6/zOXSXE3TlqjqVK
-	 259dG8EHrDZ9tqdlOnadMWQtbSAV+3FexVo7xfkg2Mr4nSVKm3fLtf+YqM6tcTQZwW6jL
-	 O7XQc563jQY2UYOeHIlQ+Ozf+y2aE1VnVmR9Fi2ONvt+i23EJw6AfSlb2CCzkEemcKIxt
-	 AsQpGWs4GkncfRdm/SMG6aLQv98gyOkVSDRSxFmjxPLtZKie/9XsilJafU/fbq66sGeUT
-	 7Kjs9OlL/OdqtX34SijGD0vRTJLW2RfDLQuLxvz9UOp5aKVF0RLqsse4ogLgauVIsvw==
+	t=1793776331;
+	b=ODJ7erorj8PJL3tErz8PACB/VzE4txv3XZR7Enjpf2NsS/Bh2Gvw4sQhQQnK9YV7bJW9
+	 AyjTTTeQlIZWd/LyONEoZxoSLGqmAcAr4Tf1k8+PzA2G6uVetCoHAAz8q3sueXgNcm906
+	 5GSW7MfXCdvkHnYD3EDrbinKUcZCLMcUFLO8xo8e48JcG4N6CcYXltT6o7KoLWLiSnMSK
+	 xCYm71Dptnay7b6huKJ4a1F4IVLDDi/kKkhZaG3AkVVlbu7359wofq3MN1Re+rUo3i0Ej
+	 /7sbkjkJyEPRgGpC41asQnOQzfKki3T5cRVWEcx0D7YRLHhR0oWTImwY11EONlXPyyA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793776288;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793776331;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=I2QKA06qbNWU/juOXN+Ld9vwR0Jj+1ZyOmt/eyj32No=;
-	b=lZQcrWskueJjmwPIBiRc4upnWeW91/ZkOKHDZ7x5JkQGXgLSdTEdDY1XBQCvN+DPpS6e
-	 ng9Px4oIH7pb2OpiZV57z15fxz9jIIxabBcnz9rx8tZVA38HeyVYFdbW7F0ewv8Etx76f
-	 L3ftdPCSosPYVWSYg63GRvsO1XqTqXzDG6JWSA3sTw0cs1+n+xOXFQtI7WRM7jlxsLpni
-	 YsJFtPLnRj0ja7BywHF0VyL1Yi22PACR3pso4E22GrFtCPXXGGSRymGpMpT4a27EFr4D4
-	 FiyUueOf/FwKPL4T0lhnfOPNZLYYYskIHSsxowdExwLHFSyp+jWF5VJzURcayachCVg==
+	bh=RNN4mg4H2dAj5sJ94GXGDPeY4sTTj6BuYZ2rkjfsCWk=;
+	b=zFR+PBm7pwpwcIdjQmBN9o8ABEp/+6A6B9oplqFFDaVcllSzvuF3UXRW9wlHBGwWNDJb
+	 YN/v6wYOqhklDsdEJsAnwS0QDq7YtXOvYw4H+3miCYR+AksuKjG8G6WrH1DnCYKDremdn
+	 MNAaHozr1dHJObp4JvhcxxaoESlzWzLQZ1Mv+k6Hz2TCYHVqHb0yNW3stYKvwTXQmq/ju
+	 oLR1IWwQeCcYZnVtHivWXLH3gQ92i8Kn7I1cqt+hkXlChTPWbcX8w/0/wDGPwRiyVOATL
+	 aWEgvSs9XriW1NletoygvZHH82zTecbxePlXp1qDuRen0LHfyNJzXxZiAacmZn9y8Qg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hsqko0W8;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cshOMqAV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6A3606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0902F606A31B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hsqko0W8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BEF71F000C1;
-	Wed,  4 Nov 2026 07:11:26 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cshOMqAV
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A311F000C1;
+	Wed,  4 Nov 2026 07:12:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793776287;
-	bh=I2QKA06qbNWU/juOXN+Ld9vwR0Jj+1ZyOmt/eyj32No=;
+	s=k20260515; t=1793776330;
+	bh=RNN4mg4H2dAj5sJ94GXGDPeY4sTTj6BuYZ2rkjfsCWk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hsqko0W8hEjO8O/TmcOt9faJKQQrlTcUzeoTm+EOdMbnDem/a+HhD/m7KsP4eVvMs
-	 HLySwxRsGmbl/nwy3OrrXqpFgjHzwN6EFGAEkkUIBiazt/utP06feRSPZZyV0ENmjP
-	 /k55HGCTQhOMdwkB8hQNR4vKDnKJEKEQmV+a89sPr1tB8J2ABua55g4t0RV9pvWRm5
-	 FIeBV0eZdYQZ8VuEcxkALOje1cj3CC5+ZmradTs9MikcmdovBdw6xpZSqgB1VkmMkv
-	 6Ss+VOKe/XxfrJVKCY0DbF0kyGajYzrMJ3bEf2vGoJ6MjHwEXMSOR47640DFEDe8Qs
-	 6JVdpV9SJnLfg==
-Date: Wed, 4 Nov 2026 08:11:24 +0100
+	b=cshOMqAVym3Cfvj7t5iN/KIkCojn3mpcAbVfXJfE7wLtM9Ai4ULcDK+zy0i4fsuEr
+	 hJDgfOYAuIERN6IarSEyZ6lbCTAP7X1QsfDVg0FWSufkocoj/d/w88CsXqYQMYh6sx
+	 osDtY/tKN3uyZ1lR29g12blT1ZrGsR2yqP6MdAdcN62opi7jF+F5FuUGgJvNnLASTy
+	 3j9n/71g/CarnyKXXoZE9eJCxjfhl6bZ526bUTXy6C1MT5LEWVjP0Qnh0PjzkP05sB
+	 mnwycYtv5eM4qn9/iTb2mTXZBsfbtWALsPVN6Rfke0vEms90rAnsLqPesCRUNsBnRY
+	 ViLr7z9JK+uzQ==
+Date: Wed, 4 Nov 2026 08:12:08 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH] Bluetooth: free the ECDH tfm when a sample fails
-Message-ID: <20261104-quirky-spicy-okapi-99e60e@quoll>
-References: <20261104025336.1527270-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH] Bluetooth: free the mesh tx if queueing the send fails
+Message-ID: <20261104-arboreal-fresh-bettong-e53f50@quoll>
+References: <20261104022809.1484148-1-vulab@iscas.ac.cn>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,25 +58,29 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261104025336.1527270-1-vulab@iscas.ac.cn>
+In-Reply-To: <20261104022809.1484148-1-vulab@iscas.ac.cn>
 
 
-On Wed, 04 Nov 2026 02:53:36 +0000, Wentao Liang wrote:
-> test_ecdh() allocates a KPP transform, then runs three samples. If a
-> sample fails, the function jumps to the done label, which only fills the
-> debugfs buffer. The transform is freed only on the success path, so any
-> sample failure leaks it.
+On Wed, 04 Nov 2026 02:28:09 +0000, Wentao Liang wrote:
+> mesh_send() puts the new mesh_tx on hdev->mesh_pending through
+> mgmt_mesh_add(), which takes a socket reference, and only then queues
+> mesh_send_sync(). The cleanup on the failure path is guarded by
+> "sending", but that flag is set from HCI_MESH_SENDING before the queueing
+> and err is only ever set when it is clear: when sending is set no queueing
+> happens and no error is recorded. The guard is therefore never true on the
+> error path, so a failure of hci_cmd_sync_queue() leaves the mesh_tx on the
+> list with its socket reference held and no worker to consume it.
 > 
-> Add a label that frees the transform and use it from the three sample
-> failure paths.
+> Drop the stale guard and always release the mesh_tx when the request
+> cannot be queued.
 > 
-> Fixes: 47eb2ac80918 ("Bluetooth: move ecdh allocation outside of ecdh_helper")
+> Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
 > Cc: stable@vger.kernel.org
 > Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
 > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 > ---
->  net/bluetooth/selftest.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+>  net/bluetooth/mgmt.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
 
 Multiple things here:
