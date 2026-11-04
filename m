@@ -1,44 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=176.98.248.254
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793793707;
-	b=JwkVmdylnltBomOG8aLU719w7IHv+mohWeUT7edBg22uEc3jlTDcDSbqs05xgdveiXEE
-	 f7CbSWpmNV6p3f00bPG9hnqCzR4NJQDkPbiEJzTrsmDjh6IbXE7WH/JC/96fqH4AJskZx
-	 i4YF+uFvUE/stp1UpXtP/en5KG3deEWWN2yUPTaN2R5FGn5+2ri3iC5RIn9hsTSsfEEum
-	 5lCobalwCoSYUcpihlJG94o5MEYPZsSCYUhXAFJ6ETu01YcDXoFSCTgFic527X08YCoav
-	 3k0Oo1VUHRL4jq3gm4KMR845iRuQejavBbGpDToh7lX+V3xbbP/4Yccy8dNVtmpO2Lg==
+	t=1793795621;
+	b=MXm/5xkjFCBVjNpLhA322uYvlWawYvFiFF7wC3rsmVekh8HiIJ768yBqw6yXh3Ovj3Ok
+	 vejvkNCQx8MAGm0rSNx5tdnM8tKS8h0KAqrfxe7EaTRW+iTt8Js2jIOHvE52kHEXPnb2+
+	 A9EcjPXh3pgpcvbeRHGOkCslpyBROI+wjfKuQs0mGOIi2EHwFHv6kM2q+qPXT9nHeDYKD
+	 wfGOU8DzpbO94nXs3aU8OulSEYkIXPoz1SluxOzVX2a2KBpu42gjmx0nLDAi/c1NKMxpS
+	 7aUi6b1KLBz5RHpzUV3eKa0GKD7fPUmCznIoG0MfgP85KSjqPwvMa2qtjTUdFGugVmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793793707;
-	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=YY3r/TXTbSQv2f/8wCPyyqFfjDJfFUaHECdMjCQ3O58=;
-	b=zKvENKv2iQM3isB89mwtfT40nbSVx4cUIUstqjHw1rbBiCRDw1NBM+ZZORUX3AObNozW
-	 itU+4C1+7xe9kA979nfcfmgQMdIxqw+FlPzssXAoFSrgbwrt49F8NrwMwxm6Dsee4wvgW
-	 NedJ1di4l/lZjboD8rkXQ0DBOCG60IbgGHCdiOBOExfLn6g/0ilDwDv1wtJCF0dMAxF/k
-	 0WMC/ap4M64BYbinDt35+j2Ni16A2u+51BYOheR6OaJXZZu7ufbdnetaE0+6ME+hZdkeJ
-	 HVtgYcq27aOLHMGvsIZ2xEhkAe2e26v8cX09SUwrh37PkkLzdviapRK7x+5epnx2ZQA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793795621;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=JVlpWWl/wEpU3RfMlox4oL+34KJXaKjbR5gK3QH5u5E=;
+	b=rANOz8l6wch3gjzlely2ypnB75KS0PaPcTOmECLdjYJ3/IVE+C4JhnWedVPW+29QBwfs
+	 mRIajl5hYGB1L/CPU8hrgXFXrXuMzapvMvJSk4kwMFNBqTiVaLDtU0VOh7276zXz19ip5
+	 p4hWNrWKYjyZ63MWVOJTgyafOrKLSWGsat6gN8rpraBoCIPNf/biXGVZwDXqL6MqEVksN
+	 GuZAOWlO5IcLjQC+oI73xcJHnRJlSpNvg0yp2K8Xp/E+Uqf2WS64/ggxDKSvA2S8y+fGc
+	 DY/dDxepBVxBtYegUmFmlu7d9sIrAIcXU0NUbpj8yVO3X7zkPGcb96iQHPi3mcv8I6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=podgorny.cz;
-	spf=fail smtp.mailfrom=podgorny.cz;
-	arc=none smtp.remote-ip=176.98.248.254
-Received: from ruprt.localdomain (unknown [176.98.248.254])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751A6606A326;
-	Wed,  4 Nov 2026 12:01:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 751A6606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=podgorny.cz
-Received: by ruprt.localdomain (Postfix, from userid 1000)
-	id 362DF186A9A4; Wed, 04 Nov 2026 13:01:38 +0100 (CET)
-From: Radek Podgorny <radek@podgorny.cz>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Radek Podgorny <radek@podgorny.cz>
-Subject: [PATCH v2] Bluetooth: find an RPA peer's connection parameters by its identity
-Date: Wed,  4 Nov 2026 13:01:38 +0100
-Message-ID: <20261104120138.1165715-1-radek@podgorny.cz>
-X-Mailer: git-send-email 2.56.0
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=GuItm+E5;
+	arc=none smtp.remote-ip=198.175.65.12
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600E0606A31B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 12:33:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 600E0606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=GuItm+E5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793795619; x=1825331619;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ju92Y05dS3FXSTw+BmzEmkxTuR0EXp8FcA+9bDb07N4=;
+  b=GuItm+E5evlErZYpbIh1MD8wzYcBHJiqy7yZr+Y50ASP2bp9A+fL9QqM
+   fX663EJ54CPdntLdHLdj6faj5mogIhSheWTCI7x1PSAAr/WE5lwynr6oA
+   GHrjlhZgfYVnR+UWS4641fNJtU5LOXREsZuZH4KtGh5QR/IstY9YavDXb
+   o5ciyPZXg8jKaMDHYzM+VgWpO1qClO1wuGJ3FvoZacdzYBeROTnlqAHPk
+   aOuUYeoRe7z/QUSugxNHRhIK9EiqhCN/8aBB0EhcL7StKlWxXM17sBmGx
+   GQd5K+APlFNhqLO93YD0MjZB8HE0aiZvBJupePmgQuL114B83NZ39HDyb
+   Q==;
+X-CSE-ConnectionGUID: F/P0j7bDRSSnV8qW8VqWeg==
+X-CSE-MsgGUID: FUV0Ah5zQhCVBb7NwOWf0g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11955"; a="2422487"
+X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
+   d="scan'208";a="2422487"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 04:33:38 -0800
+X-CSE-ConnectionGUID: eG7XfCmNRTCcdO6VKPC60A==
+X-CSE-MsgGUID: PBcM0j1eTpWA5ZUpNDc8jg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
+   d="scan'208";a="7099780"
+Received: from weba0534.iind.intel.com ([10.66.226.131])
+  by fmviesa007.fm.intel.com with ESMTP; 04 Nov 2026 04:33:37 -0800
+From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: kiran.k@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+Subject: [PATCH v5 0/2] Bluetooth: btintel_pcie: debug INI rework and fatal error injection
+Date: Wed,  4 Nov 2026 17:55:06 +0530
+Message-ID: <20261104122508.241477-1-aluvala.sai.teja@intel.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -50,101 +80,67 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A bonded peer's connection parameters are stored under its identity
-address, but hci_conn_params_lookup() matches only the exact address it
-is given, so a caller holding the peer's RPA misses the entry.
+This series moves the btintel_pcie debug INI parsing into the debug
+file and adds a test mode for injecting firmware exceptions.
 
-hci_le_create_conn_sync() is such a caller: hci_connect_le() puts the
-peer's cached RPA in conn->dst, and __hci_conn_add() no longer converts
-it back when the controller cannot translate an identity address. The
-connection is then created with the controller-wide defaults in hdev
-instead of the peer's interval, latency and supervision timeout.
+Patch 1 moves the debug INI parser (DBG_PATH, ENABLE_INI, LOG_MASK)
+from btintel_pcie.c to btintel_pcie_debug.c, so that all debug INI
+handling lives in one file. The parsing behaviour is unchanged.
 
-Resolve the RPA in hci_conn_params_lookup() when the exact match fails,
-so every caller finds the same entry whichever of the peer's addresses
-it holds. The exact match is tried first, so an entry stored under an
-RPA is still found as before.
+Patch 2 adds the FATAL_ERR_TESTMODE debug INI option. It injects a
+firmware exception for testing. The INI value selects the exception
+type and the injection context (thread, IRQ or rfkill). Whether the
+exception is expected to trigger recovery depends on its type. The
+test mode is disabled when the OPFW API lock is set, unless the
+unlocker firmware was loaded.
 
-hci_conn_params_add() and hci_conn_params_del() look up through the
-same function, so given a resolvable RPA they now act on the peer's
-identity entry instead of creating or missing a separate one.
+v5: address the issues raised in the Sashiko cross review of v4:
+ - Commit messages: describe the parser split, the new export and the
+   MODULE_DESCRIPTION update (patch 1), and that the rfkill button only
+   triggers the injection, that the injection is repeated after every
+   setup and recovery re-probe, and that normal rfkill handling applies
+   while HCI is down (patch 2).
+ - Do not log an error when the injection fails with -ENETDOWN (HCI
+   down), and log "unavailable" instead of "not found" when the lookup
+   fails with an error.
+ - Remove the unused api_lock_enabled field.
+ - Reword comments: the initial rfkill check is deferred, not skipped,
+   and "notification" is now "injection".
 
-Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Radek Podgorny <radek@podgorny.cz>
----
-Changes in v2:
-- Resolve the RPA inside hci_conn_params_lookup() rather than at the
-  hci_le_create_conn_sync() call site, as Luiz suggested, so no other
-  caller can miss the entry
-- Exact match still first, so entries stored under an RPA are unchanged.
-  I weighed inlining this as one pass matching either address, but that
-  lets list order rather than exactness decide between an RPA entry and
-  an identity entry, and resolves the IRK on every RPA lookup; a small
-  helper scanned twice seemed cleaner
-- Rebased on bluetooth-next
-- Link to v1: https://patch.msgid.link/20261101-for-upstream-le-conn-params-rpa-v1-1-988629a09bc9@podgorny.cz
+v4:
+ - In test mode, ignore an rfkill release only if the assertion was not
+   handled by the normal path (HWRFKILL_ON clear), instead of testing
+   HCI_UP without req_lock.
 
-Tested on the author's van (BCM4345C0 against a bonded peer that
-rotates RPAs): with v2 the peer's stored connection parameters are used
-again. bluetooth-next itself was only build-tested.
+v3:
+ - Fall back to the normal rfkill handling when HCI is down, so the
+   test mode no longer suppresses it.
+ - Send the deferred post-setup notification when HCI is opened again.
 
-Per Documentation/process/generated-content.rst: the patch and this
-message were done with the Claude coding assistant (model as in the
-Assisted-by trailer). The prompts asked it to fix the lookup miss named
-in the on-air address review and, for v2, to move the fix into
-hci_conn_params_lookup() per review. The author directed the work,
-reviewed the result and tested it on the van.
----
- net/bluetooth/hci_core.c | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
+v2:
+ - Drop the btintel "Zero-initialize new_ver" patch, as
+   btintel_read_version_tlv() already clears the structure.
+ - Arm the post-setup injection before setting SETUP_DONE, so the rfkill
+   work cannot inject ahead of it.
+ - Keep the post-setup injection pending if HCI is down when the rfkill
+   work runs.
+ - Document that the test mode intentionally injects on every rfkill
+   assertion and skips the initial rfkill check after the post-setup
+   injection, and that the api_lock check uses the operational firmware
+   version.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index bfc5bdebc71a2..2dc12c01c4dc1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2285,9 +2285,8 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
- 	return 0;
- }
- 
--/* This function requires the caller holds hdev->lock */
--struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
--					       bdaddr_t *addr, u8 addr_type)
-+static struct hci_conn_params *conn_params_find(struct hci_dev *hdev,
-+						bdaddr_t *addr, u8 addr_type)
- {
- 	struct hci_conn_params *params;
- 
-@@ -2301,6 +2300,27 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
-+					       bdaddr_t *addr, u8 addr_type)
-+{
-+	struct hci_conn_params *params;
-+	struct smp_irk *irk;
-+
-+	params = conn_params_find(hdev, addr, addr_type);
-+	if (params)
-+		return params;
-+
-+	/* A bonded peer's parameters are stored under its identity address,
-+	 * so an RPA that resolves to it finds the same entry.
-+	 */
-+	irk = hci_get_irk(hdev, addr, addr_type);
-+	if (!irk)
-+		return NULL;
-+
-+	return conn_params_find(hdev, &irk->bdaddr, irk->addr_type);
-+}
-+
- /* This function requires the caller holds hdev->lock or rcu_read_lock */
- struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
- 						  bdaddr_t *addr, u8 addr_type)
+Sai Teja Aluvala (2):
+  Bluetooth: btintel_pcie: Move debug INI parsing to debug file
+  Bluetooth: btintel_pcie: Add fatal error injection test mode
 
-base-commit: 3f425f95ba3923d605f6a8b382e8fcdc59d479db
+ drivers/bluetooth/btintel.c            |   5 +-
+ drivers/bluetooth/btintel.h            |   1 +
+ drivers/bluetooth/btintel_pcie.c       | 161 ++++----------
+ drivers/bluetooth/btintel_pcie.h       |   5 +-
+ drivers/bluetooth/btintel_pcie_debug.c | 295 ++++++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie_debug.h |  32 ++-
+ 6 files changed, 371 insertions(+), 128 deletions(-)
+
 -- 
-2.56.0
+2.53.0
 
