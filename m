@@ -1,79 +1,44 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=176.98.248.254
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793785840;
-	b=vmB8QyJiWbp9Szej03wOjtRQ6lAsiwS6/CzTUl/xumj+BcL50pVF7nqszIGLAn+D9ary
-	 jU95PPNL54iwbuQRjlTNK/lONnFpgSlM/CleWvPC3SWuSGo85hG/K0bFnFwo+xzVUaOjX
-	 jzrrjyNuXg6EsTET0vzXWd70Vn/4V4MWDxqti5ACokIhnsYQLaZok5+LfCuZNVXFDrttY
-	 z4PkSUrnkhhNq4DzzUKtgFEUBp8ifmwP9OECR3kb0iDO/zncDZT87xJypgtrBZbxe42ah
-	 4N7S94fjIZN+QWsLn9zq1S1WxbUlVa5EXzgTfxRPSTyI3o5soCIZkdHbz2VnN/Z1liA==
+	t=1793793707;
+	b=JwkVmdylnltBomOG8aLU719w7IHv+mohWeUT7edBg22uEc3jlTDcDSbqs05xgdveiXEE
+	 f7CbSWpmNV6p3f00bPG9hnqCzR4NJQDkPbiEJzTrsmDjh6IbXE7WH/JC/96fqH4AJskZx
+	 i4YF+uFvUE/stp1UpXtP/en5KG3deEWWN2yUPTaN2R5FGn5+2ri3iC5RIn9hsTSsfEEum
+	 5lCobalwCoSYUcpihlJG94o5MEYPZsSCYUhXAFJ6ETu01YcDXoFSCTgFic527X08YCoav
+	 3k0Oo1VUHRL4jq3gm4KMR845iRuQejavBbGpDToh7lX+V3xbbP/4Yccy8dNVtmpO2Lg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793785840;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-Proofpoint-Reinject:X-QCInternal:
-	 X-QCInternal:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=2WqyN61e0h3rhP7eUH1YLO5Fbcnfgh/28o3d/pTv+tQ=;
-	b=a7yj7MRXQrtl63qpQrori6g+LNLC5VpFiWRtws+LRWI7LMBZIXAnkFM+x0RKam48PF0i
-	 4L+V4CtvKUGqGzLfCW6hkYUgOhKyps+5vMLJH3sH4hwS0yjYORrFMpaAyQp9E+wem0lUd
-	 sHl2qxFOOURDUd/Zl7VrkbTMfWz+r7PoxIgjOf/kS/efyPU711TLrQGv76dJF+QGsZJCZ
-	 7ZyWpc+TEE1ejcSRCz31MXSzrIBQUExzO98sAPRO+rZBURzfe9J7emZV4/n7f2ZYxTsc/
-	 SjE1fqGOte3FDIfpqsZrgXPHzrNjxhVzYlqizjmotsng1m376qL6yFGNM7V8fmVKDrQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793793707;
+	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=YY3r/TXTbSQv2f/8wCPyyqFfjDJfFUaHECdMjCQ3O58=;
+	b=zKvENKv2iQM3isB89mwtfT40nbSVx4cUIUstqjHw1rbBiCRDw1NBM+ZZORUX3AObNozW
+	 itU+4C1+7xe9kA979nfcfmgQMdIxqw+FlPzssXAoFSrgbwrt49F8NrwMwxm6Dsee4wvgW
+	 NedJ1di4l/lZjboD8rkXQ0DBOCG60IbgGHCdiOBOExfLn6g/0ilDwDv1wtJCF0dMAxF/k
+	 0WMC/ap4M64BYbinDt35+j2Ni16A2u+51BYOheR6OaJXZZu7ufbdnetaE0+6ME+hZdkeJ
+	 HVtgYcq27aOLHMGvsIZ2xEhkAe2e26v8cX09SUwrh37PkkLzdviapRK7x+5epnx2ZQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=SUjNUPRf;
-	arc=none smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954B606A326;
-	Wed,  4 Nov 2026 09:50:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8954B606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=SUjNUPRf
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48Ktm3715369;
-	Wed, 4 Nov 2026 09:50:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=2WqyN61e0h3rhP7eUH1YLO5Fbcnfgh/28o3
-	d/pTv+tQ=; b=SUjNUPRfNVnf3ow9ISmJZKlfALSbGWRnAkL1WsqOO3TATzg6ays
-	0XjRoiExo3D+sRZ6n/SwrmeyXUfq5y2gS3cDG6GkAXcOWXl4SuKXu94VRxcXvvtA
-	ugdaVGXmhzsijgVQQ7h9NDoHxHYIAWxR6Yf2JwI38YUePP04AGsNyS1X5PsafMJg
-	hG70F6OcSdLuyY2iogwwRNr4ibhCCmFk4/C4XlNfx7ULQj/jcTOzlKODrvg9mEQO
-	lYpgjXXTsWqJdSU4/U5uFNDbV9HCBIOljC+O6MMV7+WFHDgn5cYX4izB48hKS0Qu
-	9C/SIsRGwLauH9d92GQAbzGLEbBsHnFq6Tg==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqn8y34a8-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 04 Nov 2026 09:50:34 +0000 (GMT)
-Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A49oW1W2779018;
-	Wed, 4 Nov 2026 09:50:32 GMT
-Received: from shuaz-gv.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6A49oVwR2779009
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 04 Nov 2026 09:50:31 +0000 (GMT)
-Received: by shuaz-gv.ap.qualcomm.com (Postfix, from userid 4467449)
-	id C1AF4693; Wed,  4 Nov 2026 17:50:30 +0800 (CST)
-From: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        xiuzhuo.shang@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
-        jinwang.li@oss.qualcomm.com,
-        Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Subject: [PATCH] Bluetooth: hci_qca: WCN3988: Drop baudrate change vendor event
-Date: Wed,  4 Nov 2026 17:50:26 +0800
-Message-Id: <20261104095026.3414666-1-shuai.zhang@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dmarc=fail header.from=podgorny.cz;
+	spf=fail smtp.mailfrom=podgorny.cz;
+	arc=none smtp.remote-ip=176.98.248.254
+Received: from ruprt.localdomain (unknown [176.98.248.254])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751A6606A326;
+	Wed,  4 Nov 2026 12:01:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 751A6606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=podgorny.cz
+Received: by ruprt.localdomain (Postfix, from userid 1000)
+	id 362DF186A9A4; Wed, 04 Nov 2026 13:01:38 +0100 (CET)
+From: Radek Podgorny <radek@podgorny.cz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Radek Podgorny <radek@podgorny.cz>
+Subject: [PATCH v2] Bluetooth: find an RPA peer's connection parameters by its identity
+Date: Wed,  4 Nov 2026 13:01:38 +0100
+Message-ID: <20261104120138.1165715-1-radek@podgorny.cz>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,75 +49,102 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-GUID: eigcZJOtxqXZztVLskJu6sJxQG0FYcNg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzOSBTYWx0ZWRfX1yrag7wsF1jT
- CXQtByrbG3ozc1adaszT3qvQH3S5LqMz0+kAPLQyRU0Byoxg0dMWHRUC51U4bAJeruUVp/joVUH
- guDcugYSJAi+03vhW0pvtpk/YoDXoN46r6+wG64ak93MQvDkASYsE081VHdiRvxBrlzNUOsZ1Xy
- Z6BJSpOVHFq2cjLVMJNAf/PjyvqrtxUSTpGFSPtcsFEz+1j0NY9ATKb19rgtOmRUCQ8vUrXVFXd
- eQhuKh8uvtFb27InfhDpEts2QjH7hTc2hp6F+qybZaMyy5ONOw32MOdR+U0emTBeeNgWvpCGfFT
- B0vxZ3OC1Lm8+lmSiv8HkYLh/9kH9wX1b3I4EtYgOlYIiULnAV9GBoIetq7+Rz9AEsx8azWBxfA
- Va5LrO0NP5KQNguldX7Tl2+srS/1QOGXfzoy40+JUQk/oKwaaivPwpsJJpuCubKya3Ci7c43qDi
- HYarp16GzpUeey+xPWg==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzOSBTYWx0ZWRfX5dOFHKn0Ce6D
- XnC8H9KJ1JqKaWdu9F4y+DxbuSkfNBsx8Laln6314yipXG7/XnHkQ9M1CEOPWDjNbJbGtzlnlO8
- qomQXoVaLdYwv9nI/J1UPSSapyXGh5I=
-X-Proofpoint-ORIG-GUID: eigcZJOtxqXZztVLskJu6sJxQG0FYcNg
-X-Authority-Analysis: v=2.4 cv=NP5AaE6g c=1 sm=1 tr=0 ts=6aeaffea cx=c_pps
- a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=_K5XuSEh1TEqbUxoQ0s3:22 a=EUspDBNiAAAA:8 a=QDeELHPiMCJVZ61WT1IA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-04_02,2026-11-03_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 bulkscore=0 suspectscore=0 adultscore=0
- phishscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040039
 
-Firmware download on the WCN3988 sometimes fails and is retried:
+A bonded peer's connection parameters are stored under its identity
+address, but hci_conn_params_lookup() matches only the exact address it
+is given, so a caller holding the peer's RPA misses the entry.
 
-  Bluetooth: hci0: QCA TLV response size mismatch
-  Bluetooth: hci0: QCA Failed to request file: qca/apbtfw11.tlv (-84)
+hci_le_create_conn_sync() is such a caller: hci_connect_le() puts the
+peer's cached RPA in conn->dst, and __hci_conn_add() no longer converts
+it back when the controller cannot translate an identity address. The
+connection is then created with the controller-wide defaults in hdev
+instead of the peer's interval, latency and supervision timeout.
 
-The vendor event answering the baudrate change command can arrive late
-and is then taken as the response of the last firmware segment, which
-waits for any vendor event. Its length is 2 instead of the expected 3:
+Resolve the RPA in hci_conn_params_lookup() when the exact match fails,
+so every caller finds the same entry whichever of the peer's addresses
+it holds. The exact match is tried first, so an entry stored under an
+RPA is still found as before.
 
-  < HCI Command: Vendor (0x3f|0x0000) plen 220    (last segment)
-  > HCI Event: Vendor (0xff) plen 2
-          92 01
+hci_conn_params_add() and hci_conn_params_del() look up through the
+same function, so given a resolvable RPA they now act on the peer's
+identity entry instead of creating or missing a separate one.
 
-Drop and wait for this event on the WCN3988.
-
-Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Radek Podgorny <radek@podgorny.cz>
 ---
- drivers/bluetooth/hci_qca.c | 2 ++
- 1 file changed, 2 insertions(+)
+Changes in v2:
+- Resolve the RPA inside hci_conn_params_lookup() rather than at the
+  hci_le_create_conn_sync() call site, as Luiz suggested, so no other
+  caller can miss the entry
+- Exact match still first, so entries stored under an RPA are unchanged.
+  I weighed inlining this as one pass matching either address, but that
+  lets list order rather than exactness decide between an RPA entry and
+  an identity entry, and resolves the IRK on every RPA lookup; a small
+  helper scanned twice seemed cleaner
+- Rebased on bluetooth-next
+- Link to v1: https://patch.msgid.link/20261101-for-upstream-le-conn-params-rpa-v1-1-988629a09bc9@podgorny.cz
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 7089e9b63..4d502ee82 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1521,6 +1521,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		}
+Tested on the author's van (BCM4345C0 against a bonded peer that
+rotates RPAs): with v2 the peer's stored connection parameters are used
+again. bluetooth-next itself was only build-tested.
+
+Per Documentation/process/generated-content.rst: the patch and this
+message were done with the Claude coding assistant (model as in the
+Assisted-by trailer). The prompts asked it to fix the lookup miss named
+in the on-air address review and, for v2, to move the fix into
+hci_conn_params_lookup() per review. The author directed the work,
+reviewed the result and tested it on the van.
+---
+ net/bluetooth/hci_core.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bfc5bdebc71a2..2dc12c01c4dc1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2285,9 +2285,8 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
+ }
  
- 		switch (soc_type) {
-+		case QCA_WCN3988:
- 		case QCA_WCN3990:
- 			reinit_completion(&qca->drop_ev_comp);
- 			set_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
-@@ -1556,6 +1557,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		}
+-/* This function requires the caller holds hdev->lock */
+-struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+-					       bdaddr_t *addr, u8 addr_type)
++static struct hci_conn_params *conn_params_find(struct hci_dev *hdev,
++						bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
  
- 		switch (soc_type) {
-+		case QCA_WCN3988:
- 		case QCA_WCN3990:
- 			/* Wait for the controller to send the vendor event
- 			 * for the baudrate change command.
+@@ -2301,6 +2300,27 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
++					       bdaddr_t *addr, u8 addr_type)
++{
++	struct hci_conn_params *params;
++	struct smp_irk *irk;
++
++	params = conn_params_find(hdev, addr, addr_type);
++	if (params)
++		return params;
++
++	/* A bonded peer's parameters are stored under its identity address,
++	 * so an RPA that resolves to it finds the same entry.
++	 */
++	irk = hci_get_irk(hdev, addr, addr_type);
++	if (!irk)
++		return NULL;
++
++	return conn_params_find(hdev, &irk->bdaddr, irk->addr_type);
++}
++
+ /* This function requires the caller holds hdev->lock or rcu_read_lock */
+ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+ 						  bdaddr_t *addr, u8 addr_type)
+
+base-commit: 3f425f95ba3923d605f6a8b382e8fcdc59d479db
 -- 
-2.34.1
+2.56.0
 
