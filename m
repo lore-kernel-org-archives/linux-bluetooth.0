@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.216.248.212
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793805376;
-	b=DsvrQSbXAnOvycgicpiqQ0mtCgDK5YTATddkTwYqGDIaScU4tK/2TtlJ6Sr5EuZiLZsq
-	 tfyVGQdaISFIQzWpLNtEiqKAGj5z0if+xoE5Y1QrCJ/0LK4FO0MDRUZlIrUe62E8330vC
-	 slaaErqYBYFunm85og4TsVoybp/AyTKzv8eCEysaRIuRr0xC3pdcWBVxGMtckXi0P8Zym
-	 +N6OYyJSrw3Qpqe9f3BOuszxnVieUvhaUbxW/wg+7MXCDuKCCfcNOieC4JMGElB3/M5CC
-	 PbrA2Vy4eu+2KAVXApv8RJo6POp5wfDS9Cmv/rpIjFFvyAq3unyRmTDS4A+mhUL/Ldw==
+	t=1793805378;
+	b=iIC0ao6Je2pV9VEWyvWar/143uQeMxzQltE93dEQgWTGVUUaTxGWZPXyMTWcDu4tHxv/
+	 gDIq/vaAUYz88GJWwssf/VaEgHmZVFS2NT1xWZLcIKoC4rO5YRsWizh1nY2GvAqalVCuD
+	 UjZqRd7wqx7Ow+oBLLeQA3K+f+vFHS2DoPeNr7LKE5WutTAH3arxMU+ET2g3+ZuCcilCq
+	 VVRYxwx3TGUGg1icKVRmnI+10DPTa2O2Stn+RTKeWQMhfflfRCGvv3G+aWSMh2P/GUixr
+	 j167kRYq7bI0VTMAopDLNwDp8I8BoV67UTdq78/HbIwKBhy1F1CQ/RBXCHIRyXI6qWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793805376;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793805378;
 	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=AiY2yui9DQjU6dkBTFrcvq3Sdje7Pd4O5PPdTtK3bDs=;
-	b=cs7VAmxRXnKmf07wFVFVBLOITstydJx2PQ2HFt8NNoskSt4EHRsSGWF8NAMazdlnlQiS
-	 Lz0H4LPCg3YNiQKwYsYMzKEwiu0PfpNOOOeh+r8fYPKrtz/SQ5YxULFo79bQyc3PovT1D
-	 Hwea7x4YJhF57BEQBOd/kpReQzKXe398Dl96K+FYbgL5f++/Saqz4XCrivymdegfpWRPt
-	 cPmJsaFwXUkqWnEpb8+9JnrbhTDvgP9FlgkbTpjPcsDbtSc7ggSYHnC7cUrhoau9c2+zj
-	 vrjMVcGKmZ4NDqPtsKOJnauxNRMcT8FxsZjNMnAkQeVmzVFU/P4fpNQ11PdeSJMeKNQ==
+	bh=OqDo8ZjWnldpjQLZtviwEAKFTnnvBemRbk1Ky+Mok18=;
+	b=Muqj2C1p7AtPVe/O7KQd7EB/K1S45ia7J9Q5fYjdCiZzv6yDwikG5zLUFS5DkEN0qP9t
+	 C8svw4EURz1DT/NMG1xSe66uBcBtlfAJ9oS9Y5Z9FPfVm42nBSOcjMJs6xJRr6CR03Zgf
+	 8f+XwSHZp3GbrYPZeFq/zRkX6a2nmgG46oiu+6Akr/3tr8wWEK8d5Jh3hmfyRd6gcJCqY
+	 9Y902tITHVAZjRajgg8AZsSxN8HP97nUGxNMOiqZxuTgoW0kKiYKEqhk/fDEVAk1dPFQE
+	 sbah1Wswm0vIu0ZA12HkRWRJKtxZPdVXpBhUKqxzlAB5kAfgWBgYNjGR/CcZkuxO1dA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=deq.rocks;
 	spf=none smtp.mailfrom=deq.rocks;
-	dkim=pass header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b="Na/adWXn";
+	dkim=pass header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=ebBIYhlM;
 	arc=none smtp.remote-ip=91.216.248.212
 Received: from bulk0.mail-out.lima-city.de (bulk0.mail-out.lima-city.de [91.216.248.212])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BA1608362C;
-	Wed,  4 Nov 2026 15:16:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95BA1608362C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAA3606D833;
+	Wed,  4 Nov 2026 15:16:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0DAA3606D833
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=deq.rocks
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=deq.rocks
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=Na/adWXn
+	dkim=pass (2048-bit key, unprotected) header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=ebBIYhlM
 From: Andre Eikmeyer <dev@deq.rocks>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=deq.rocks;
-	s=securedbylima-20251205; t=1793805373;
-	bh=gJ97BxnBMFL4vlZaqEERaFBjAerkYWWjMKMV9bTKY+I=;
+	s=securedbylima-20251205; t=1793805376;
+	bh=JfQzV030AVQ0gGFAqN90Ocdak/ZrdoDwpXmDpK8ZLe0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Na/adWXnVWlf3d1npu9w6rvFzPG8JEFeEbHlld7ytt6E0TqwnABqWqGVAhWvDbMqY
-	 so8EvrcKJi62VsMXLJ4KZJ2d2qT57RxQfmz8bF3IdaL2wOoCnH7zCaQeJv3HtbSfYW
-	 QMqt7bb3hk/Pd2fi3XrnXI7zdViQ94Lua0Bk80L1CaTE1ZU33AoGa+Kks01uQCQ3mW
-	 TucYRdQJnpLjuvSZWy6gWG75e8XMoJU8QW6IRgIpy4+JG6Yb/okzp8layqXvo9AC++
-	 2DCC0tbAwFaqGUj5PdHx5m+qNf6dqLnzGdGZUiGGUbziYp/ZbfoH+ZSnQoV3IVwl5t
-	 onZGb8qEcIHhw==
+	b=ebBIYhlMVX8RH7xQ6B++3qwd5Lv5lPTWN8GoEJOK4SqgVgb3H6FK2eOH04V+qeMob
+	 eJMG7K7RHrV9qvaDSkVwHEwnwJxVN0DYMWnbsRarCzoqyDI9OWT3ny3VpixW3l+6Zq
+	 kOm0dztD0n1UO+vu2xXOMFfRCSQmoh/aiDRW5iX3ffbCZFIIeTux7f/SOFsTr9kvxG
+	 5/Z1Kvr+sJzPgzyZCaiQq+KMKcvCYHMmXY5QNv++Qcu+6XKr3e3J8sDgVyDYxxR8+c
+	 IDgyOL/JXne/SsqdOgSeUC5vc/Hz4br51u8XxVVCTpj9Lh54ENj2bm1UShojJ6rbpS
+	 exvvHQ2iDJI3w==
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
 Cc: linux-bluetooth@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	aditya.garg@linux.dev,
 	Andre Eikmeyer <dev@deq.rocks>,
 	Yossef Osman <Yossef.Osman@proton.me>
-Subject: [PATCH 3/4] Revert "Bluetooth: hci_event: strip Broadcom vendor bits from legacy adv report type"
-Date: Wed,  4 Nov 2026 16:16:00 +0100
-Message-ID: <20261104151601.70493-4-dev@deq.rocks>
+Subject: [PATCH 4/4] Bluetooth: set the strict duplicate filter quirk on Apple Broadcom controllers
+Date: Wed,  4 Nov 2026 16:16:01 +0100
+Message-ID: <20261104151601.70493-5-dev@deq.rocks>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261104151601.70493-1-dev@deq.rocks>
 References: <20261104151601.70493-1-dev@deq.rocks>
@@ -75,44 +75,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This reverts commit 88397423671f2b54119a6162a1834d207dcf1a81.
+btbcm_finalize() sets HCI_QUIRK_STRICT_DUPLICATE_FILTER, but bcm_setup()
+returns before it when no patch file was loaded. The MacBookPro15,1 has
+none for its BCM4364B0 ("BCM: firmware Patch file not found").
+hci_bcm4377 does not use btbcm_finalize() and never sets the quirk. A
+service discovery then scans with "Filter duplicates: Enabled", and the
+controller reports an address once per discovery cycle of about 10.7 s.
+A Mac that changed its advertisement data on the same address was
+reported 6 s after the change, at the next cycle.
 
-The commit clears the upper bits of the legacy LE Advertising Report
-event type for every controller with manufacturer 15, Broadcom. The
-reports of these bits, in its own commit message and here, all come
-from the Broadcom controllers of the Apple T2 Macs.
-
-The previous patch clears the bits in hci_bcm on Apple machines and in
-hci_bcm4377, the drivers of these controllers, before the event reaches
-the core. That makes the check in hci_le_adv_report_evt() redundant
-for them.
+Set the quirk in hci_bcm on that path and in hci_bcm4377.
 
 Tested-by: Yossef Osman <Yossef.Osman@proton.me>
 Tested-by: Aditya Garg <aditya.garg@linux.dev>
 Signed-off-by: Andre Eikmeyer <dev@deq.rocks>
 ---
- net/bluetooth/hci_event.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ drivers/bluetooth/hci_bcm.c     | 5 ++++-
+ drivers/bluetooth/hci_bcm4377.c | 5 +++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 736dd2f741e..0675c224f6c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6683,17 +6683,6 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, void *data,
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 1ae9619ee1e..ee077c8502d 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -597,8 +597,11 @@ static int bcm_setup(struct hci_uart *hu)
+ 	if (err)
+ 		return err;
  
- 		hci_store_wake_reason(hdev, &info->bdaddr, info->bdaddr_type);
+-	if (!fw_load_done)
++	if (!fw_load_done) {
++		/* btbcm_finalize() sets this after loading a patch file */
++		hci_set_quirk(hu->hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER);
+ 		return 0;
++	}
  
--		/* Broadcom ROM firmware (BCM4364B3 on Apple T2 Macs, no
--		 * patchram) sets vendor bits in the legacy Event_Type.
--		 */
--		if (hdev->manufacturer == 15 && info->type > LE_ADV_SCAN_RSP) {
--			/* 0x0f masks out upper vendor bits (0x10, 0x20, 0x80),
--			 * extracting the standard legacy advertising type
--			 * (0x00-0x04) stored in the low nibble (bits 0-3).
--			 */
--			info->type &= 0x0f;
--		}
--
- 		if (info->length <= max_adv_len(hdev)) {
- 			rssi = info->data[info->length];
- 			process_adv_report(hdev, info->type, &info->bdaddr,
+ 	/* Init speed if any */
+ 	if (bcm->dev && bcm->dev->init_speed)
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 8d99a7a8f76..7105372898d 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2392,6 +2392,11 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	hdev->set_bdaddr = bcm4377_hci_set_bdaddr;
+ 	hdev->setup = bcm4377_hci_setup;
+ 
++	/* The controller reports an address once per scan with duplicate
++	 * filtering, also after its advertisement data changed.
++	 */
++	hci_set_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER);
++
+ 	if (bcm4377->hw->broken_mws_transport_config)
+ 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG);
+ 	if (bcm4377->hw->broken_ext_scan)
