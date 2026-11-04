@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793776331;
-	b=ODJ7erorj8PJL3tErz8PACB/VzE4txv3XZR7Enjpf2NsS/Bh2Gvw4sQhQQnK9YV7bJW9
-	 AyjTTTeQlIZWd/LyONEoZxoSLGqmAcAr4Tf1k8+PzA2G6uVetCoHAAz8q3sueXgNcm906
-	 5GSW7MfXCdvkHnYD3EDrbinKUcZCLMcUFLO8xo8e48JcG4N6CcYXltT6o7KoLWLiSnMSK
-	 xCYm71Dptnay7b6huKJ4a1F4IVLDDi/kKkhZaG3AkVVlbu7359wofq3MN1Re+rUo3i0Ej
-	 /7sbkjkJyEPRgGpC41asQnOQzfKki3T5cRVWEcx0D7YRLHhR0oWTImwY11EONlXPyyA==
+	t=1793776335;
+	b=zUmoIt3nAf6Ta6vvf6mwu2RtIbzfF54/L5D33TCo+SnvhP/OPWB0BwOuHsVjWLdftaIa
+	 BRTTSMvv+81Atgm13jaLj6gRsCQksRb8eCrGZlfXEI+pxEu/bOS5BdxG001UmQ7OWZRYi
+	 2AHZ+OLZxtTGD38TllypmLwGD9Aq5g+MuQbzZyn/sjh3gGhYLIYWVMhZhJIofG3JrGiYx
+	 3BEh4IKB+CFYnjDiGpq2t0CsIPPQQSKkHouNh12kuzXseSJ2Y4pVTzjHfQj5c3TB2qBvM
+	 RclsQOFYEF6aIsmqK61r0CUrNQnYMRLyNqNMLUchC6Rp8rS2S2xr5lE7nM5wMI0VQVg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793776331;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793776335;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=RNN4mg4H2dAj5sJ94GXGDPeY4sTTj6BuYZ2rkjfsCWk=;
-	b=zFR+PBm7pwpwcIdjQmBN9o8ABEp/+6A6B9oplqFFDaVcllSzvuF3UXRW9wlHBGwWNDJb
-	 YN/v6wYOqhklDsdEJsAnwS0QDq7YtXOvYw4H+3miCYR+AksuKjG8G6WrH1DnCYKDremdn
-	 MNAaHozr1dHJObp4JvhcxxaoESlzWzLQZ1Mv+k6Hz2TCYHVqHb0yNW3stYKvwTXQmq/ju
-	 oLR1IWwQeCcYZnVtHivWXLH3gQ92i8Kn7I1cqt+hkXlChTPWbcX8w/0/wDGPwRiyVOATL
-	 aWEgvSs9XriW1NletoygvZHH82zTecbxePlXp1qDuRen0LHfyNJzXxZiAacmZn9y8Qg==
+	bh=3GAM+K1BQRgD0LHnnWnhJwsHi1QWVfuoKa6RWb0EbWg=;
+	b=Sj9jQEI1w4jxp8DQecKQP6xSDyvxguWISR+MfuR0uvmzIl0AU1fsNRFG76+MgPJ+sVBa
+	 j2qdVlJCPpoiAiLUnh8yZOpCQrfNVoyY+2qofM3yq7m+WWsCLx5aJjdE/X7zc7/2o2SYd
+	 r/53fcSv7VdUwCP3aeQyFoPOCmWN/GOQEI5Ulceqiqcits532t2AFUPowyO0OKoYvg0pP
+	 vpYnDxHJzG2z8EovCnwgJRqQalueqyfcUl+DzL0Ub+e37IugWdH3EzKl1z9H9KCoYWpxd
+	 UBuJj+2lyoCfRWxGPEpMyXQ7AFCBmr+qywgRn4ddDBglboioBeZqNokpAbWT6m5qeDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cshOMqAV;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d3foo9qM;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0902F606A31B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD4606A32E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 07:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cshOMqAV
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A311F000C1;
-	Wed,  4 Nov 2026 07:12:10 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d3foo9qM
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B5A1F000C1;
+	Wed,  4 Nov 2026 07:12:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793776330;
-	bh=RNN4mg4H2dAj5sJ94GXGDPeY4sTTj6BuYZ2rkjfsCWk=;
+	s=k20260515; t=1793776334;
+	bh=3GAM+K1BQRgD0LHnnWnhJwsHi1QWVfuoKa6RWb0EbWg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=cshOMqAVym3Cfvj7t5iN/KIkCojn3mpcAbVfXJfE7wLtM9Ai4ULcDK+zy0i4fsuEr
-	 hJDgfOYAuIERN6IarSEyZ6lbCTAP7X1QsfDVg0FWSufkocoj/d/w88CsXqYQMYh6sx
-	 osDtY/tKN3uyZ1lR29g12blT1ZrGsR2yqP6MdAdcN62opi7jF+F5FuUGgJvNnLASTy
-	 3j9n/71g/CarnyKXXoZE9eJCxjfhl6bZ526bUTXy6C1MT5LEWVjP0Qnh0PjzkP05sB
-	 mnwycYtv5eM4qn9/iTb2mTXZBsfbtWALsPVN6Rfke0vEms90rAnsLqPesCRUNsBnRY
-	 ViLr7z9JK+uzQ==
-Date: Wed, 4 Nov 2026 08:12:08 +0100
+	b=d3foo9qMHxgdhDlZw1USDCHRK6bRf4bIt8p/xQrVzDCLftqkMMcmAOX9pVJYPYeV2
+	 F5V+P2lveLMsgLG5DgwLwtwEB2cQFHGI1AqaGAo5DO6716H/ndhghh0tE0/+wTo+tP
+	 Xh/5ZhRmFWbZtaf/flwprwyse/ILmXHRMZvUm9GoJaECJmjeRMyCxQ1WD+dZ5H6F+Z
+	 lRMhGbop9xbYc3DxzR/WHPuDgG0fciiBzfnth77CM7LYAxckO65/9kxYNlQh/petGd
+	 Bmyi7hGA1omLsWNwzCaY/veQrklMCWVbxcozhFrOyVRvznZFwSnhWEOs/MZFII3wKj
+	 1MCeI4oBpwGWQ==
+Date: Wed, 4 Nov 2026 08:12:11 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH] Bluetooth: free the mesh tx if queueing the send fails
-Message-ID: <20261104-arboreal-fresh-bettong-e53f50@quoll>
-References: <20261104022809.1484148-1-vulab@iscas.ac.cn>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: delete the new SCO link if linking it fails
+Message-ID: <20261104-tangible-chocolate-badger-d10c90@quoll>
+References: <20261104022807.1484114-1-vulab@iscas.ac.cn>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,29 +58,30 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261104022809.1484148-1-vulab@iscas.ac.cn>
+In-Reply-To: <20261104022807.1484114-1-vulab@iscas.ac.cn>
 
 
-On Wed, 04 Nov 2026 02:28:09 +0000, Wentao Liang wrote:
-> mesh_send() puts the new mesh_tx on hdev->mesh_pending through
-> mgmt_mesh_add(), which takes a socket reference, and only then queues
-> mesh_send_sync(). The cleanup on the failure path is guarded by
-> "sending", but that flag is set from HCI_MESH_SENDING before the queueing
-> and err is only ever set when it is clear: when sending is set no queueing
-> happens and no error is recorded. The guard is therefore never true on the
-> error path, so a failure of hci_cmd_sync_queue() leaves the mesh_tx on the
-> list with its socket reference held and no worker to consume it.
+On Wed, 04 Nov 2026 02:28:07 +0000, Wentao Liang wrote:
+> hci_connect_sco() adds a fresh SCO/eSCO connection with
+> hci_conn_add_unset(), which leaves its hold counter at zero and takes a
+> reference on the controller. If hci_conn_link() then fails, for example
+> because the link cannot be allocated, the error path calls
+> hci_conn_drop() on a connection nobody holds. The counter goes below
+> zero, the delayed deletion work is never armed, and the connection stays
+> in the hash with its controller reference until the controller is
+> unregistered.
 > 
-> Drop the stale guard and always release the mesh_tx when the request
-> cannot be queued.
+> Use hci_conn_del() for a connection created here, as the other
+> hci_conn_add_unset() error paths do, and keep the drop for a connection
+> that was found in the hash.
 > 
-> Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+> Fixes: 06149746e720 ("Bluetooth: hci_conn: Add support for linking multiple hcon")
 > Cc: stable@vger.kernel.org
 > Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
 > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 > ---
->  net/bluetooth/mgmt.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  net/bluetooth/hci_conn.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
 
 Multiple things here:
