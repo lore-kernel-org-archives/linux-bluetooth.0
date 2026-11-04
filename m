@@ -1,102 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.172
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793819850;
-	b=q9kh/sSHhjst61F0dgjYyEt+fS1RWDbsi+I+gxkdIo4mESDmo6oQUkPHB6rQ4CGd8D31
-	 sijiYBBou7bRTslXUAVMB13vOOPPBHwUrD5SQq9N+V9rOJrPmW3qAnRmIaeO5tmH7/afE
-	 oKWIvXKStTqm2KG4AaPM+5XDikYOvf+tnkJ8rD8iMrXuhWkct6yyd+Zro9H8Vd2qOgee+
-	 Fc8nIHwmD+c45Kz9KSFlnvF1uhXQ23Z8uq1P6qly9c8TiWeHEm5K9m7PRNcyIbwNwfCAz
-	 ik2Rs/uMkjBxNTuZuBRbGPB1AemKx97DlLA5SKw1y9dlc/3ND/GGrs3+PsubUdBc5DA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793819850;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.177
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793830405;
+	b=JabDfYTvWIXTghQkPfwlrIkOhXpH9MpFJJV1LH/IKOvojZH5pzSQ8oQNeRpt3kIgPEA9
+	 LDU40RUr1vXs5oge9F8UcnB7zaly5cQCBECE+UC3UCeoSLtsO/u6qAVddOYo4cjGe7TFV
+	 5uRBOMfleqfKXL+YvVqToRmNjvs/sqOvCJseZ0vDO9KZYyrfX0EfbvL8Q1e3aYB0dF+88
+	 z4Vpnmx/BmgfxCm15k8HRKWggRO1V17hwlLr1M8kEj2wk6Geynryguq6xVZcghGZWTVd2
+	 DtC3tCIBwlTWamEEh9V3vFdfZdDSoNtWBCCM3KfLPaUYRACnQ6ZIyQ1bj8P7MhsHzKg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793830405;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=X2FkZOaTFMA6Pn4J0yswUwZWXL0yiL9M7M+FKObeBMI=;
-	b=R6PrC3PQmoPk4SjwWBNyoncQArXYxbVRlQQ4MsEyJ3xyh/3Xe1aS25YOkMOP4xqDQui0
-	 RmXKdIK7t/BK1zXRHQiU5xVCVsjm6yqSyG0oQ593Qp/a3Bhrt4ZVW2M06/e15KTaZ5mDw
-	 YZHf4Fz6FajB35PVBbNahExF+qx9WBy3mZbvl0r6V5YHOCEcxrXbebzvNWk7dQtRZYHc8
-	 3RKNvrYxdU2sQE9GZGeeeGszw0rMlvxf9neKkTvTXbctzcP12Xcyr2E/K5H4k1xRWSGaM
-	 +7JInNNvYO7af9K2R7O0W58xA4FdX4uSgTTEvRDb/s0FooCopbTDWTgHSZ1g4ZKiAyQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=WoBtpaEYnSbQqX4np2oJSDAUkkTR39XZPu0RF3EPWg4=;
+	b=im2u5PvNp+HzMLfnM8+GyjC2fwckoSClKIAo2HU9Ozodj8/RY/VB0qSdfHwqe9rmGNtT
+	 xMAHGgpaJcDkY0bwQSGaTHWLyXS5N62St4NqIKyOR0YMEbhunr8aTD21VhyhozOrrH5yK
+	 HTVlzUuC0YjBfurou9nobm6n8m4zq+okFYE5sc8kkV0PHPaCy27u+OuMo4zrzo2IBFjiw
+	 u/jA2BFjCi+Nevq+ORqKn0+QEhZLYqW19cLxi6IxcY0NScb/DWvZxoW26ZRjBNK/50+49
+	 YmhwfvtvCNueFALFzEXkGn/4+R7BVBsx3dSrW2J3tzAk2GMAoZCMhz715lipGP26vVw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DczrfccH;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.172
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=T975q2ov;
+	arc=none smtp.remote-ip=209.85.221.177
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F73E60A2620
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 19:17:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F73E60A2620
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0CB606A33B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 22:13:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF0CB606A33B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DczrfccH
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-8b306bbff8eso8724257b3.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 11:17:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793819849; cv=none;
-        d=google.com; s=arc-20260327;
-        b=AsiTt3gUDOxr2xlSKKsx+FWK5igoNHHOESleFpXbKvcyk7M6V5Qs0R05INxReoTCJE
-         ooMw8gGodzjX9c3Fg6xkrdLSZ7z31QihML6J8+Y1tNQZ0e5vA+c4xCad+u11ND+CJ6ho
-         YS4pbpCgTG/alBtSDSZAnR6C9JzB+ROxKPMBg4qkyG2l+eahkGuNnWc2uPp5lJjgTL1T
-         iQXn7cqyj+tV2Zl0eiU1U7g6/D3FKK87L1xsr8ylbsGyznXmJUCpEo3wbEFUGxHavFRL
-         oY2O1oxFKLkaenGwkclseCcR45U6cx+WKx7SneGT2Wc2poUbBRCSc2hovwXYT85SP70L
-         zvZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=X2FkZOaTFMA6Pn4J0yswUwZWXL0yiL9M7M+FKObeBMI=;
-        fh=x6aCmrIQNmP7dsV6a+bqB7PnT76WM1oaMmPegXey7Ms=;
-        b=H4NnismssZyzwFNJyZ0sF7PRVV1SCyQUhJi++Toh1VlKzIBrULg0htqTJN91XSYiuF
-         Y6TJlUDiMp+AB8cQb+8hBLVoiFZTiYLjRzPW3rN8Rk/RkTPYV2x1RQeLcEe5m0Exvk5I
-         WZtD5e7SgKd567KDlnpGXsTaV16EcU5CIuwnIswm7My0bzL0VtpVg3dVwVcUD3cb3i/J
-         zJlpV7Y69xsEJfQslDj8oAuZ5DPLAXAPCYV2t9iDSpxM73zQ5RLLiGO70hJGonPG6gtR
-         eOb5BvPMfwxHkzADmDXyXsmzw/VJX6M9/IUcIk+Y+RBTHpnSNiToGEy1lVxA4lrFryEX
-         +1hQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=T975q2ov
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5eaaa9b1591so836420e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 14:13:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793819849; x=1794424649; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=X2FkZOaTFMA6Pn4J0yswUwZWXL0yiL9M7M+FKObeBMI=;
-        b=DczrfccHl1vCyfye/MRZShyO0W7Vf1kRuO/DiQYoaNOH03T3Tz1GxvlATnfwiva9JJ
-         1M3f3I4rBWdMsOqaySVcF1FA6RC974QbHcUoLVxb1R09dVZnNQ5NHrdDt+XIoE9XzOGS
-         usa4jLpmdkL8BdaovGZDewJ3dtam3tMC0x5SvxGrorazWbpGtCxXN9ulX+pikgTWS4WY
-         HONca1YNCn33KM9j66uy0zhvNK1GU/4/FBAI0afGcOnF4v/N0tzJedr/FbOhp45SyIpW
-         JMioSuqPHkhBbxRi6EVwS79MHxwxzdaOe3150wKDvfPte+5o7JuDIb96uqYgdbc8Iw9W
-         I8pw==
+        d=gmail.com; s=20260707; t=1793830403; x=1794435203; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WoBtpaEYnSbQqX4np2oJSDAUkkTR39XZPu0RF3EPWg4=;
+        b=T975q2ovkQp5ijIDtS6o91CYpKnYdDwfsqG/RfUTH1yBqna/dWRyhVg4cmi1Ua/diW
+         J2ocJ0CQnnp6AHHccGVOgk77R3jp4WQE2yPAqp7ZTV6xYt0QQPktS/jKkDRLzMGR1ZIu
+         aSmxRw+BAt3Y7iYSTSMK98lT3ktHoOj7WLmRDXh01ddADvvrOiRSzd0iixvRUo+lQKWj
+         E+SM1zo3vhWew562+2KGz95B4nkpTqd/vqnl6m6PaRS0b6jnEQ1YhX9SUFghCgCTE5wi
+         SKKbXMrjJWOVlkB+4Nqud4PFZQhn69vVZZdUoaGboh1eAfZjTkdRTUlYBQjxibVzdWkI
+         KRUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793819849; x=1794424649;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=X2FkZOaTFMA6Pn4J0yswUwZWXL0yiL9M7M+FKObeBMI=;
-        b=t9EwVWZguGJQBKyg/XMkXMnM0cMAybpiOawfZASzf5JD+adF3Dvz4ZNeUKNnYPBlyw
-         Dcp9O0SIiAALpKBSdi3vbJj8xKTHQ1XrLqTaCPm/eY7P0uso7wmLXLZlPUoa9OjKnyo1
-         /BMsrn/kIDkJ1RrNNNkpepcOaO9cYO0Hgd4PVkj+ItXCbDCKN9lFT6ZWku5qp8LIz8mC
-         BcfNd/jQvkk6qJHVmjQErv/+Kg5ETdAPMiw9AFXSPYf7aPVfGNXWMdVBU18AcKASmx0V
-         mevjNF1adthn+9BZXRqro7nRSqyt0+x7f7Ss3zBFE/sZi8ao6upBIpQGcHh/qDjfIcSf
-         6fiw==
-X-Forwarded-Encrypted: i=1; AKwUvByZ+ulCc5tzzgZ+VapywMzFbtILUQhsKqsTd6KO2tub86gxff5u6XD5QH9Idwu40bFRo3qDGwdCFkPRsap5VcU=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/HqnC86XdY5RWGJPcPW+D2buqx4Dz31TnGicEySdZ6T2V/HT3w
-	Up4wOFFjODN46Oe3vEvhgxBcn9G8uWUIFjPXqOgR09hBwbO+7z8Bcfyey1Oq0k/4BrgChk6aqks
-	1sKgs3mZOw/dyN0Rmz/7re40+GXnerLc=
-X-Gm-Gg: AYBFou1Pptn7QFEHEsnRYnZAMxKLz0cSHKZOhzJnk8DF3WweB+r4CqfqOxm5m9lxk6d
-	5iOlOzP0CrYcnwuroCiHmFNdH299FtOH03O2bU4ZqS1tTBC1Neg9zLW+srCCEHBQtbooICKOWu1
-	zLCzfLfpXkzQ7lsxeespnZKDHx/Yho0svzA0wbVJOBbfOWxBYKt73HIZS627PMFxXRy1Q2gpmtd
-	W6F/JdxOuFKQ/JfUV8lDk1nuKf5gUPRSfDZr5fsOTKAzc4/vd7hwmaXL6TOrCltICzmo1yn64G8
-	zZPm5sV0j9xccEiORD79ldCtq2GcJKr6cJaQzqWLgc8WOtMPcy9bCFatMSiFb0lDf7m4CiQBM5i
-	maKFYmucEjWWr17RxABmKbVSDk6PPycfWPyiUfFRfME+ooJJX7m9d2KsASXkxv3jqSv/RpbGYFE
-	zlPncnyYEAaEYrRn7amVPlBtdfmbkI00b45wolPWfLpASDuEj1rnboghEPJ11/PpHbAEFQ2ZfMB
-	6TM9w==
-X-Received: by 2002:a05:690c:ec5:b0:8b3:392:dc1c with SMTP id
- 00721157ae682-8b30392e155mr29915517b3.36.1793819848895; Wed, 04 Nov 2026
- 11:17:28 -0800 (PST)
+        d=1e100.net; s=20260707; t=1793830403; x=1794435203;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=WoBtpaEYnSbQqX4np2oJSDAUkkTR39XZPu0RF3EPWg4=;
+        b=CTzEVxW6ogUh+E4BQgNJAyjW/Ud7u8M3Z9byUVqqGgFsZ+ksyXi5ZCZ1eV+e31vleN
+         wpevg8gDkVOVDM5xMOlLJgYC8zkwAkeB25OJrAQVpClDhesR094etZkHzQIH/9EMF2vz
+         vyuUMW6G06SPAgN/LPP0my/qVYnOsVVj9klz6P+TMXzM+l0fw5e/riaI3DltC7ok3+1Z
+         YaaQBHL8JthCmLFCMIF0VwWn6zfk9iaxJBEZ9ij3LACiX1yoGFTHSX4bM0SDKWlJ55to
+         aZ1fxirnfvVeJypm8Ob3KE2x925fY/YjGFNkkf3FisNSu0zHI3e6LIbnlJLnSxsEFoJx
+         5KMg==
+X-Gm-Message-State: APuU4Z8nLgOqVqqpl9GfznsEAnR008FMTiNvfNa/VvXj1LIc4PDiYj8h
+	cwbXRQ15IqSdgKm1w4qHF+o9fc+iyrJ5cYc5ESV8ubaUGj9OkGVOhB1dyKkyfw==
+X-Gm-Gg: AYBFou1hNUJ+RXSuZH8s+q2Ok00dOmCjnH70+dQY0CugvhtOpky49w7P6/0lI23a3g5
+	bauGMrGUKUALb62t/Ph7HanKRJgwvwgLJ19is0gOaNce2G9JF7M3P5jou0p34RW20KoqoDBhB76
+	G5CJ1alyphly+uClwWAAwrRRSAK6w+EIXG6KIylbn7FSh0nGFP9vxZxyVEf8lwUNEgjoxinho8i
+	wH+Lbr6O4WUmi+8LkYSnDQO1sTMYKDgfeXkB9iVCKhqbYp4su8EhB456TcfWj+mOHxgfZ9TyH3A
+	g4n1Xi3Ne8285sqjN0ftMc0X6Gczm9VS7NCVg7iRxvB+7Z0iTQHpNs20nQuww8d9mk0NZl2Nj6g
+	qKU7ouXcPXzakyg6OBUb2wYsP8h3zPVJDIIpUg3DquMB6vcQ3CfVBKDBoHCeKB2BNhfzaCDT6KO
+	hXwWMJS4JWp6VaJBbPIm8Zoi0LVaNhUiikhLlVIY2A+/xfSbhpXIIyA39oNE/ogZp5TqelU8Noe
+	udS2v1BYflP6dKMIYrh/pJjQun9ZitLB36thg0P16r1WlwgWaIq+pCV1ckV7rChva6O391/nrIO
+	m/b/HgJe0Q8OXVIMFyAd8uB9WZg9zs7KlAc+OKN68gS59RLcS6XKOkmEMtYfThOMN8k1Hfqt1dM
+	EFObObrZTEpv2BiLDmVsNuYk8q2iQVaCaJzw+2LVR/2mT0v9KQ2my+pH1mMN7DvbXxJdcxkjB7g
+	7kKPQ=
+X-Received: by 2002:a05:6102:c01:b0:7d0:5688:f507 with SMTP id ada2fe7eead31-7d072c596c4mr7464539137.20.1793830403468;
+        Wed, 04 Nov 2026 14:13:23 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-998da178b59sm2934001241.12.2026.11.04.14.13.22
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Nov 2026 14:13:22 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 0/6] Bluetooth: Add support for HDT and EKS
+Date: Wed,  4 Nov 2026 17:13:15 -0500
+Message-ID: <20261104221321.1200529-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -106,100 +93,125 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261102110440.2589-1-25031212351@stu.xidian.edu.cn>
-In-Reply-To: <20261102110440.2589-1-25031212351@stu.xidian.edu.cn>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 4 Nov 2026 14:17:17 -0500
-X-Gm-Features: AclHuK8Gh1sKwYgmSHyb8ITOSoc6I6dAtMKDKXBc5cQEbXG-axXVKo592cfZme8
-Message-ID: <CABBYNZ+iU=riZ8MSTkbqv4vn0OJGLymtN98uJ8_0pw6hEaVWYQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: fix use-after-free in force_poll_sync
-To: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Bin Yu <byu@xidian.edu.cn>, Cheng Wen <wencheng@xidian.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi YuanZhe,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Nov 2, 2026 at 6:04=E2=80=AFAM YuanZhe Liu
-<25031212351@stu.xidian.edu.cn> wrote:
->
-> The force_poll_sync debugfs file uses the driver's struct btusb_data as
-> its private data. The file is created under hdev->debugfs and is removed
-> only when the HCI device is released, while btusb_disconnect() frees
-> btusb_data unconditionally. The HCI device can outlive the driver data,
-> for example when an HCI socket still references it, so reading or
-> writing the already opened file then dereferences freed memory:
->
->   BUG: KASAN: slab-use-after-free in force_poll_sync_read+0x129/0x140
->   Read of size 1 at addr ffff88800cfb7038
->   ...
->   Freed by task ...:
->    kfree
->    btusb_disconnect
->
-> Remove the debugfs file before the private data is freed.
-> debugfs_remove() waits for callers that are already inside the file
-> operations, and any later access fails with -EIO instead of reaching the
-> driver, so btusb_data can no longer be dereferenced after it is gone.
->
-> Fixes: 800fe5ec302e ("Bluetooth: btusb: Add support for queuing during po=
-lling interval")
-> Cc: stable@vger.kernel.org
-> Co-developed-by: Bin Yu <byu@xidian.edu.cn>
-> Signed-off-by: Bin Yu <byu@xidian.edu.cn>
-> Co-developed-by: Cheng Wen <wencheng@xidian.edu.cn>
-> Signed-off-by: Cheng Wen <wencheng@xidian.edu.cn>
-> Signed-off-by: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
-> ---
->  drivers/bluetooth/btusb.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index dc7191bf4234..d928580512fa 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1066,6 +1066,8 @@ struct btusb_data {
->         int (*disconnect)(struct hci_dev *hdev);
->
->         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> +
-> +       struct dentry *force_poll_sync_dentry;
->  };
->
->  static void btusb_reset(struct hci_dev *hdev)
-> @@ -4560,8 +4562,9 @@ static int btusb_probe(struct usb_interface *intf,
->
->         usb_set_intfdata(intf, data);
->
-> -       debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
-> -                           &force_poll_sync_fops);
-> +       data->force_poll_sync_dentry =3D
-> +               debugfs_create_file("force_poll_sync", 0644, hdev->debugf=
-s,
-> +                                   data, &force_poll_sync_fops);
->
->         return 0;
->
-> @@ -4602,6 +4605,9 @@ static void btusb_disconnect(struct usb_interface *=
-intf)
->         if (!data)
->                 return;
->
-> +       debugfs_remove(data->force_poll_sync_dentry);
-> +       data->force_poll_sync_dentry =3D NULL;
-> +
->         hdev =3D data->hdev;
->         usb_set_intfdata(data->intf, NULL);
->
-> --
-> 2.34.1
+This adds support for the LE High Data Throughput (HDT) PHY and the
+Encryption Key Schedule (EKS) introduced in Bluetooth Core 7.0:
 
-Looks like nedev sashiko has found a problem with these changes:
+ - HDT PHY selection for ACL, CIS and BIS, the v2/v3 HCI commands and
+   events that carry the HDT rates, and the LE Set HDT Default
+   Parameters command.
+ - ISO sockets take an extended, versioned QoS (struct bt_iso_qos_ext)
+   through the existing BT_ISO_QOS option, carrying the HDT rates per
+   direction; the legacy struct bt_iso_qos keeps working.
+ - LE Enable Encryption v2 with the MIC length, Encryption Change v3
+   and Key Refresh Complete v2.
+ - L2CAP and BT_SECURITY gain a MIC length requirement; connections
+   whose MIC is too short are refused with the MIC Length Too Short
+   result.
+ - EKS opportunistic encryption, enabled with a new MGMT system
+   configuration parameter.
 
-https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261102113654.8724-1-2=
-5031212351%40stu.xidian.edu.cn
+This series depends on:
+ "Bluetooth: Fix not updating of hdev->commands[] after reset"
 
---=20
-Luiz Augusto von Dentz
+Changes in v3:
+ - Opportunistic encryption sets HCI_CONN_ENCRYPT and HCI_CONN_AES_CCM
+   along with a new HCI_CONN_OPP_ENCRYPT flag, and the L2CAP key size
+   check is skipped for it since it has no key from pairing. Pairing
+   over such a link now completes: its Key Refresh Complete clears the
+   flag. A failure, or a command that can't be sent, leaves the link
+   unencrypted instead of disconnecting, and HCI_CONN_ENCRYPT_PEND is
+   no longer used for it so it doesn't block SMP. The MIC length is
+   taken right before the command is sent.
+ - Changing TLV 0x0024 while the controller is up updates the
+   Opportunistic Encryption host feature bit.
+ - SMP checks the result of hci_le_enable_encrypt().
+ - Set CIG Parameters v2 returns the failure of a response that doesn't
+   match the command, and fails the unbound CIS of the CIG it was sent
+   for.
+ - CIS Established v3 and Create BIG Complete v2 are only unmasked with
+   CIS and BIS support.
+ - BT_PHY rejects HDT6 and HDT7.5 rates the controller doesn't support
+   in that direction, and only reports supported ones.
+ - struct bt_iso_qos_ext replaces its rfu bytes with a 16-bit version
+   and a 16-bit type telling whether the unicast or broadcast member is
+   in use, so each can later grow on its own; the union is the last
+   member for that. BT_ISO_QOS_ANY, used for struct bt_iso_qos, leaves
+   the type to connect() or listen(), which fail with -EINVAL on a
+   mismatch. Connections set up by the controller get the version and
+   type, and BT_ISO_HDT_RATE_* name the rates bits.
+ - The extended ISO QoS is copied field by field, so padding is zeroed,
+   and the v1 CIS Established event clears the HDT rates.
+
+Changes in v2:
+ - Remove the values from drafts of the specification and use the ones
+   from Core 7.0: L2CAP MIC Length Too Short is 0x000C for LE Credit
+   Based and 0x0010 for Enhanced Credit Based, and LE feature page 0
+   bit 59 is no longer checked.
+ - A 64-bit MIC is only used when both sides prefer it, so downgrading
+   on re-encryption is no longer an error.
+ - The key size of Encryption Change v3 is ignored for LE as the spec
+   requires; hci_change_encrypt() no longer takes it.
+ - Rename struct bt_iso_qos_v2 to struct bt_iso_qos_ext with a version
+   field; the length passed to BT_ISO_QOS selects legacy or extended.
+   Convert field by field, which fixes an out-of-bounds copy and an
+   info leak through the legacy struct.
+ - HDT rates are little endian and kept per direction.
+ - HDT PHY selection is gated on hdt_capable(); mixed LE and HDT PHY
+   masks are accepted; phy_opts is initialized.
+ - Create BIG Complete v1/v2 share one bounds-checked handler; Set CIG
+   Parameters v2 response is validated like v1; Create CIS waits for
+   CIS Established v3.
+ - Drop the unused LE Set Data Length v2 command and the unhandled
+   Data Length Change v2 event mask bit.
+ - EKS: copy the LTK under RCU and encrypt after unlocking, zero-pad
+   the key for v1 and copy key_size bytes for v2, free the command
+   when queueing fails, and handle the Command Status of LE Enable
+   Encryption v2.
+ - L2CAP: keep the requested MIC length separate from the negotiated
+   one, take the negotiated one from Encryption Change v3 and Key
+   Refresh Complete v2, propagate the channel MIC length on every LE
+   security path and reject values above 0x02.
+ - RFCOMM BT_SECURITY accepts the 2-byte struct and zeroes the struct
+   returned by getsockopt.
+ - One hci_le_set_hdt_params_sync() is shared by init and MGMT, and the
+   defaults are resent when changed while the controller is up.
+ - Opportunistic encryption requires eks_capable() and its TLV
+   (0x0024) is validated as u8. Encryption Change v3 for it still only
+   clears ENCRYPT_PEND: the key size is 0, so setting ENCRYPT would make
+   the key size check refuse every L2CAP channel.
+
+Luiz Augusto von Dentz (6):
+  Bluetooth: Add initial support for HDT PHY
+  Bluetooth: ISO: Add extended QoS with the HDT rates
+  Bluetooth: Add initial support for EKS
+  Bluetooth: L2CAP: Add MIC length validation for HDT PHY
+  Bluetooth: Add HCI_OP_LE_SET_HDT_DEFAULT_PARAMS support
+  Bluetooth: Add EKS Opportunistic Encryption support
+
+ include/net/bluetooth/bluetooth.h | 101 +++++
+ include/net/bluetooth/hci.h       | 211 +++++++++-
+ include/net/bluetooth/hci_core.h  |  64 ++-
+ include/net/bluetooth/hci_sync.h  |  12 +-
+ include/net/bluetooth/l2cap.h     |   7 +
+ include/net/bluetooth/mgmt.h      |   1 +
+ net/bluetooth/hci_conn.c          | 259 ++++++------
+ net/bluetooth/hci_core.c          |   4 +
+ net/bluetooth/hci_event.c         | 606 ++++++++++++++++++++++++----
+ net/bluetooth/hci_sync.c          | 631 +++++++++++++++++++++++++++++-
+ net/bluetooth/iso.c               | 244 +++++++++++-
+ net/bluetooth/l2cap_core.c        |  50 ++-
+ net/bluetooth/l2cap_sock.c        |  23 +-
+ net/bluetooth/mgmt.c              |   6 +
+ net/bluetooth/mgmt_config.c       |  56 +++
+ net/bluetooth/rfcomm/sock.c       |  13 +-
+ net/bluetooth/smp.c               |  77 +++-
+ net/bluetooth/smp.h               |   2 +
+ 18 files changed, 2125 insertions(+), 242 deletions(-)
+
+-- 
+2.56.0
+
