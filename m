@@ -1,54 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793801141;
-	b=cyOXXInxdj6mEAYuUp4GOYpYL/bXGKZWpLNlCZgnjY+mACf2Ge3d6dvfFaYCwj+IBKKp
-	 +Mx9mJ8pCPDIDxGokkcJZpf6RG92k7tDK2QfM5Xve0Irb1ou7QtCce3fwEiKZ5FNxPOqR
-	 4z67k6qYYzWSQT3cyOmTcMwhzB/1UlHzR8fkjKNfhvzhN99tI2PkkDoVis53kYb8aJjBR
-	 rZVmjMGZyShXQM+lhVV81KjTFcu0VXOCa1aKUonDZpoHVnR+fmCeSO4uVsWCtrUbkgWW0
-	 S6ttzETHebPDcAA92oHECGqio14IbjTBKOoiL0ni6KHqEK19jtlH1+eWOY7dNVULidA==
+	t=1793801330;
+	b=ojTG3xkfIEsZ4FW+8Ve/X+1pgeowumzn3GRC0d15cVhkKTKgSvehy7PCb6EXMSo17Oa7
+	 DAG0AFymZlvVHrmo+O+6Lwyb2IRGsCesz/QtlqGO11BW4SdKB96i4OCVa08HbWZGWhOaY
+	 J8KpilVWH1IYFXzn5QyzjOegezuleXXKriC/Tfzilhuj8dCvY1wNC8gwyWLNF0AYwoaRH
+	 ZwqZf1mFRPqvwq6Pqh/wxxx9bkHa5LYaPq0AF2RvB1qU6Sei0arwtR0ZgFj2kvyd7INdQ
+	 HJcB209spNrnbIJE2/kZzNvBRZMdWAxlJWdOsWQ22MdkP2PeM1fQ+rhlHgrUXoKVEDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793801141;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793801330;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=y71W/g95fxF/Ugo5XgvM8Qi9UKm1XDcqPUoTQ8bLpHg=;
-	b=FEGn8Y47RixPApLCKyD2cxwApEI2ApI/5NQ7ikXiPWs6dgKxeZuAYBqG2+LSRy/Uabzf
-	 w0OMMgFwR31epOLBoCuTDZt7WzNCf4g4S/Syz2LQLqk53H0K7Zu2EiQ55KXKN/x/1Nz4V
-	 9ic6ECyLqZBl0k2wudJfAjKzQRi0ropyQetnuYKgbLLSMzHbG28XlRSjd5XWCu4MzZloE
-	 FZM5xe9vbBx54baN+aC6gmhJtD/I2ZGGjUP6OAI9+ndMQuONhL0NGMYrx2WNdXyOcJXXq
-	 tzQEMpK4brV4A0XrU/EZYXTcwZxC1CXgN1jeZR8pZ7sK+v0tFQ4GW9tNpBiuHB66xDQ==
+	bh=FDQxvaAQImmURkc3bgaPvBRjpqmeWfgOB36Ro55edAo=;
+	b=3kpOLEhvDYAp6PKbxXAwKPewt0K1XcvKfJe3lD6+N/zZz7kcnFrbz85NG+FyIDdEPMrB
+	 z8v+yQ2nrYIER5nZK7nVymkrAzZCDiSzomVaylEMBAu0tpmon9FQivQgY7P0Cvozh3Vag
+	 UG/cK+ukyAxV9yTK22HP2BI36yfmeHMpZF1CHCxy5uA6WredeUMf7HS7xYM+siQNYd2pl
+	 sIPFNsH6dgvXhIaklWlyfgBd5Fq0gYIeMUEp80tIVUTtCjixJgjK3exJmQJADy4mrjEkk
+	 FtKr03qaeiRzNGkI2jLf4JDp+cL/phXUaOQHXvWihjp4vpLWWHjsxcH8/arOXCdCmrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lYguVNeA;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BTYeTOBi;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 71E95606A326;
-	Wed,  4 Nov 2026 14:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id F36DD606A331;
+	Wed,  4 Nov 2026 14:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lYguVNeA
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0FF621F000C1;
-	Wed,  4 Nov 2026 14:05:39 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BTYeTOBi
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B28391F00A16;
+	Wed,  4 Nov 2026 14:08:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793801141;
-	bh=y71W/g95fxF/Ugo5XgvM8Qi9UKm1XDcqPUoTQ8bLpHg=;
+	s=k20260515; t=1793801329;
+	bh=FDQxvaAQImmURkc3bgaPvBRjpqmeWfgOB36Ro55edAo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lYguVNeAyRnaWoBg62QkdfXprDJUFLRfgOS24FjH+LxnHoSWYB6NnTwn8CEKcBmNv
-	 WNZwkv1htuBZ7DNuf6Nzhww+H6pPtE56+8nUZZLV0LH1m5oU+qAkrfiv81u4t2o5Jm
-	 1KT7Ss3iciq5QtIV3wutDt3VENYFhnu4vrbQZbuQEG8YPGzR2DAXljuXvjIPkElXUx
-	 ubAd1QEgEp34Qo+wSU9+mbFUOqCFbYn34sJWzAWRHMV0TS7PBXYWtiN7wXrBCCaclr
-	 uC2Qq8z/5QDtQtLlRVC1oeb/8a2krv1UHS8ZmL4F09L8VV4nudSNl861DG01Uuf9yS
-	 sj0TBo9MGs68A==
-Date: Wed, 4 Nov 2026 15:05:36 +0100
+	b=BTYeTOBiF62ffVdTLfLZyDiy/WfImQbBoboDPXQ/fi5TTy7fcEEbp3DFS3NCJfhZY
+	 MEhiEzwLBpyLT449ce4TLyUPdF/CRqG5TvrGAacNMTgjL4g838hYz1etMBxzyiFZVE
+	 e6jeTbsSIx7DhFTam8faBwQA2YJFGe4x51RfQBAvuuhi/r3OCiWvC8tELHt9QA8cPY
+	 mVTUsV/AIBohTDgCt0nBYW4y75ll1I94i8BXQoj1vod7fXR4qPWbYJxKDqmpXJfRKn
+	 FTHY25UmiMvvxslX44hlgspw66fGmUMIweYInwmy08v/DDt5bMpGMBbxCtQ6ph7OAc
+	 cljlpkr/ZCL4g==
+Date: Wed, 4 Nov 2026 15:08:46 +0100
 From: Bartosz Golaszewski <brgl@kernel.org>
-To: Stanislavs Nilovs <valorcool@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, 
-	linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/1] Bluetooth: qca: Clear 5th byte in TLV tag 27 for
- WCN3950
-Message-ID: <r573oayidxdd7x7mwh5y7m6q6fbcwrsmtaxwksvfhwslt3yoxj@w7b4hcwanhlk>
-References: <20261103103529.804025-1-valorcool@gmail.com>
- <20261103103529.804025-2-valorcool@gmail.com>
+To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com, 
+	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com
+Subject: Re: [PATCH] Bluetooth: hci_qca: WCN3988: Drop baudrate change vendor
+ event
+Message-ID: <47swivwl7ex5zccgxkvj7zbdnn4qrfc7z2npxqhrcv2fjqxog6@5t4h3x5miw26>
+References: <20261104095026.3414666-1-shuai.zhang@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -60,31 +61,25 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261103103529.804025-2-valorcool@gmail.com>
+In-Reply-To: <20261104095026.3414666-1-shuai.zhang@oss.qualcomm.com>
 
-On Tue, Nov 03, 2026 at 12:35:29PM +0200, Stanislavs Nilovs wrote:
-> This fixes an incompatibility issue of TLV with 5th byte set to some
-> value in Tag 27 (Deep Sleep) and the QCA driver for WCN3950 SoC. If the
-> value is set in TLV, then 2 symptoms are observed:
+On Wed, Nov 04, 2026 at 05:50:26PM +0800, Shuai Zhang wrote:
+> Firmware download on the WCN3988 sometimes fails and is retried:
 > 
-> 1) The QCA pre-shutdown command (0xfc08) always fails with timeout.
+>   Bluetooth: hci0: QCA TLV response size mismatch
+>   Bluetooth: hci0: QCA Failed to request file: qca/apbtfw11.tlv (-84)
 > 
-> 2) SoC becomes unstable. During power cycling test it could stop
->     answering to any commands and QCA driver enters into the "SoC crashed"
->     loop and can never recover.
+> The vendor event answering the baudrate change command can arrive late
+> and is then taken as the response of the last firmware segment, which
+> waits for any vendor event. Its length is 2 instead of the expected 3:
 > 
-> Setting the 5th byte to 0 resolves both issues - pre-shutdown never
-> times out (so, is always replied) and no crash loops observed.
+>   < HCI Command: Vendor (0x3f|0x0000) plen 220    (last segment)
+>   > HCI Event: Vendor (0xff) plen 2
+>           92 01
 > 
-> The Claude Opus 5 (Anthropic) was used to create scripts for dumping the
-> tag values from TLV files and compare the differences. The fix itself
-> was written by me and verified on real hardware.
-
-This doesn't need to be in the commit message, please put it under the
-'---' next time.
-
+> Drop and wait for this event on the WCN3988.
 > 
-> Signed-off-by: Stanislavs Nilovs <valorcool@gmail.com>
+> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
 > ---
-
+ 
 Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
