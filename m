@@ -1,76 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793781293;
-	b=LJxmJwT1nZudY3tkiZUf5vZQljDOO4VRA6slqGZqesxKARRwyIfNkhFygK+Obm6h0ZS4
-	 TT1Etv9bXJ4oYCWMRIjy6SblTkRuMZJhFNtc8Q+jwA+rra1wVFDj6uoAXbgmsv0H4gaPi
-	 JcheCuKRbtKIMmUathvJmPBAp/NWJ2lgSfE2uq66NnNBpqaQiMuNy3E1kmO0h8jzpFZrK
-	 Ht/Gae4d/V6O9aaZ3ZaxM26kua8Qu0tStI18nP7XV7oNlKwtiAqA8Nxo+4Go3IYBsXyre
-	 qlzvARnRpI42oyJ3mZzC+u2Eb286phAGlQWHUGfLSW8vPybax8lfFVLzZYLXGc8FXHA==
+	t=1793781294;
+	b=0XpqHgyCCf1HDe6F3nimF01DHQAzAMJYk6WY1LZeUK1NxKQ21xbjAJM6lgD0QYhy394H
+	 HgHkRjgXyvqp9p0iO74mqHvwjcslXDU347X/LHmPlRWq+Mwn+sOTUmZfhQurHQqsrlY4P
+	 fJNuAP3T9L2VJpOsFN2K0g9W7mNCIC1qgK+QsQxG0mlP0ZmJY4hjMRKf4y4vlv2iStztQ
+	 XNdT9jNDYMk9hacUlFASXUC43zooA68DBmFd8Bc7vw4hdljJL+tKGCcvfgxgoeB3p9UiF
+	 l3ZJtWsgNxPKV/O60wrRr6lnQYQ7JrEBBdffWgl3bB7OVlWEFWIx/LWtEBEl4qxqQRA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793781293;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793781294;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:
-	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:X-Proofpoint-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:X-Authority-Analysis:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=MzeBPzIObCXLdBRU5ZeQ1Wc3yJ5WrYb7bHwYpLiRAgk=;
-	b=4Dc1dmbiN4/uxe/qLf40Iw4PlDSAbibwcbl1uCM3zo2EhW+WlQ63qMQSV351q3U1oJcc
-	 f9RnYI7gdJHx3THIIALufIg6It5d7Ls19PsXWyySoSc5eHXMJoQ4HMkb+K6gwMn+LGElk
-	 h9U3k0GVeGpqu0z45YeFOZRXzD3vrkg5c8JJIj/xK8Uea8RkDY6cNSQ/PEMbVdMFGjW3R
-	 WRMRcCLjGqBO2Bt5HxNJ8LNj1ekz27/toZSExXc/toPvsxTYPVxWHyCuqulkblLirzgYK
-	 rHr85zQgfecFPM2LTifoaF0j1RQWazIsiELQYbYJsCLzXFOK+vf4iSKgPrwuFL5bW+Q==
+	bh=tlFsRVa9iakvEG8viNsYxi+LpAy1CFFSbRs+46MnmjY=;
+	b=FuvQUFUM/TTD2sfW9vb9fKDL4jg5JANCUv3ug8woXHf4aob1Zp7OQ0/OaJvE2G+Ho6uS
+	 mt5fnvOK/71kK7o2DaBOYPBpNvgG/hGL3W+bQM/u9SwRrNnCTuFFBIiT42uV1QWC1qxlp
+	 7q6Fmg/FDPd0oJv58Uxq45R8FxbBbnqKL8+UxLDY0xNKmoFrp4UVnAtWMbYgGDM4r8ofI
+	 2+9r3352ndncXYOGx1+Fhco2Rx60nG6qMjp+2mRFHIAe8tKbH9DLKNtRYR8DV1bFjKBAk
+	 UmilkqM4Dd6XoIqMUSMK865VzNVe5x9LOVii3/pGIJcOzMEZpxO6rMtnBDPRyUIJAtw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=AZCL5JnJ;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lPLMyG76;
 	arc=none smtp.remote-ip=205.220.180.131
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F27606D80E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF3F606D80F
 	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Nov 2026 08:34:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39F27606D80E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AF3F606D80F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=AZCL5JnJ
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48KiwJ175447
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=lPLMyG76
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48L0Cm1274964
 	for <linux-bluetooth@vger.kernel.org>; Wed, 4 Nov 2026 08:34:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=MzeBPzIObCX
-	LdBRU5ZeQ1Wc3yJ5WrYb7bHwYpLiRAgk=; b=AZCL5JnJ2vYCODjWEbQBhbk1rW+
-	jz+VLd4mkvZwahxlpj2EyLtmcGvjWIXbgV+KkMJ7OXHyhm+4fQGQjgABxFkdrKQ2
-	2NekIMMcqqIY3CqXZVurR8sxTFDwhpR1eJpmcFsegVKXKTpdvlOk5K8ZIdlFumQu
-	mLpnoavdtXPTZpEesVxoh1ynsMln3kxbPZQW5btCgLIPsAt3DKdDi+6xpRyVDB49
-	g8HGDhJ6oXF3KXeVcIkuPQ4FVRiBQ49jMTy5lSBYo3n5bwHTQpp68UiBbM+VQT6E
-	QEsl94wO/R9QST7SezeJ16/mNj0plGjdfQrjlleW74bfe1WpgvYUV9UAc0Q==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=tlFsRVa9iak
+	vEG8viNsYxi+LpAy1CFFSbRs+46MnmjY=; b=lPLMyG76P2004Bt8U3lyDQkiMAm
+	B8uzCNVfTaJcJnrxqk9Yw07jZrole1o3srd4HVBBkzfRJ8HsVeZwntg9hnuobNAx
+	UIBOkBoM+OAGQMDD2OUYKiACzRjlSU65PCcf54G7nQYaphN4bDoXcIxfZFCBJCJj
+	g0F9FQHnuSdhk9p5N9DR50x88TAd1s8L1lcFCW+OiarmddaP5x9KMnGW4lvHqHEM
+	rk0INQX/9usgTbTK/04gQP2eOPAXLCMyPPYfgauwi8O9sz39jqq6YIvOvsGyFvr9
+	ucsQg2JwPyZyS2awksLNZNlBoapLfxfz8e6KLzwtjNLCAbAhSv4JU/bzaFA==
 Received: from aptaippmta01.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqmjbu21s-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hqhypm1af-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 08:34:38 +0000 (GMT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 04 Nov 2026 08:34:39 +0000 (GMT)
 Received: from pps.filterd (aptaippmta01.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48YZmD2686413
-	for <linux-bluetooth@vger.kernel.org>; Wed, 4 Nov 2026 08:34:36 GMT
+	by APTAIPPMTA01.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A48YaiB2686473;
+	Wed, 4 Nov 2026 08:34:36 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6A48Ya2J2686430
+	by APTAIPPMTA01.qualcomm.com (PPS) with ESMTPS id 6A48Yaac2686431
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Wed, 04 Nov 2026 08:34:36 +0000 (GMT)
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 6FBFB279BA; Wed,  4 Nov 2026 16:34:34 +0800 (CST)
+	id 80A64279BE; Wed,  4 Nov 2026 16:34:34 +0800 (CST)
 From: Jinwang Li <jinwang.li@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cheng.jiang@oss.qualcomm.com, quic_chezhou@quicinc.com,
         wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
         mengshi.wu@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v1 08/18] obexd/pbap: Add NewMissedCalls to vCard listing responses
-Date: Wed,  4 Nov 2026 16:34:19 +0800
-Message-Id: <20261104083429.4111632-9-jinwang.li@oss.qualcomm.com>
+Subject: [PATCH v1 12/18] obexd/pbap: Add persistent database identifier
+Date: Wed,  4 Nov 2026 16:34:23 +0800
+Message-Id: <20261104083429.4111632-13-jinwang.li@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
 References: <20261104083429.4111632-1-jinwang.li@oss.qualcomm.com>
@@ -87,285 +87,413 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Proofpoint-GUID: zBpue6SWJtNRq8zIafej-MOKAkUm2abe
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX8ZBCvLAZrTbI
- CNFkACCLpsZCN0nFIIro02tpBzcBLyKIoEMUOxQoSKpBtoF3GL9CEMwHaeqzk1WTH4MpFRqPLMk
- o8ULn/4GRQ7EKoRoCqPqktSElsXPSl3x44W5Jk9n3LS5w+i3cZ1u3+UYIG0rnKpitLf+lTxFF6Z
- ZfdBqFdcEpvMmLODuyAeCoS+w4UFv774c0bV8674Bs2K386tUIHzgpmQYBi96/FnsmEw+TolyDV
- gT9FA2d1WDaYcoxcfebtI+3MkGFHnAMcqf99v5mNAfCEBUyTZjwAQuKUSR/JbJ9VluTdL9r67/z
- hND14Q//JMy+qRYlA4Zibf6TnCZFWDIJlBUnEHg1fra/9L0OJy5QSOk71Gw72GUnF3CSSBGPGSy
- YI2WYkCJc+HD25qeVydeE5F9aoN3/CZcV7+9gGpzgOaIZiQm9JSOm/1MQqDcFgM8bRkgj+3qz8e
- ehKxVAedCovsEMkys/Q==
-X-Proofpoint-ORIG-GUID: zBpue6SWJtNRq8zIafej-MOKAkUm2abe
-X-Authority-Analysis: v=2.4 cv=NMhAaE6g c=1 sm=1 tr=0 ts=6aeaee1f cx=c_pps
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzNCBTYWx0ZWRfX8HFtSPBfuWVn
+ 1L9C4FYcbzn2o/echth/g4gMFVADKPDYMCt8fytpF35Wv3A/u7WRQjJmFSlMBSOjraUaDd/MALd
+ W7CZ7GgfqHawICKE6oCyNF0Dpc/y+V8=
+X-Proofpoint-ORIG-GUID: NnZw-9CDex3QNpDMeYJ0xSYhVWbASBsu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA0MDAzNCBTYWx0ZWRfX6lSJ/w3K3CA7
+ /IIdzZ8j84g3HOWgWJTkSuF5g3d1nyHeDjAiAuiuVdDLfTZ5YwiDXdhvkvkyEa2ul3eKnuwP3yC
+ penQdC/I35QVEU108UnD7nEe0RifdNktyDFJQG0q21yVj8e4XrL0GxqbKgELXhs8NyX3f5ezzEi
+ CI2t+naMUhoc/OhQjFss4u8+z3pKSU4+NzJDOe7+AHpPxRufcOvrP1kQL1AKa8qQs3knuxz5XaU
+ hU3ITqqw4MlCzXS0uwOUjsIVPM1Vr2eQw7HCL4/7afc80A/2+/UCE2rMaoWhfWFcRMOG+la271v
+ IYo51FKePwWO6TAg/nXK4D8kUrixzxfV4aI9kx/zuAp5HNcIYCd7iPh+/PerWF9qGMTXODqJraN
+ Z9GmBAae0GNKx0/y02IoaHl6yqxe6fEd3uIXJlUXE5tdw2xpnPpqCFJr6Lz6S/wKLck7+urWGt2
+ xJRXHjnNvIUS41BhtVg==
+X-Proofpoint-GUID: NnZw-9CDex3QNpDMeYJ0xSYhVWbASBsu
+X-Authority-Analysis: v=2.4 cv=T94Z3PKQ c=1 sm=1 tr=0 ts=6aeaee1f cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=yx91gb_oNiZeI1HMLzn7:22 a=2PuV6dCUR46KBApHW4wA:9
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA0MDAzMyBTYWx0ZWRfX9m1O7wD00qPU
- 59Pr+pd//MXUhq7duMhI/hlgjTsO+UzU7scCneV7hdW/sRNBWghjNynMt9S8TsTkoQkbylMmrvJ
- 4qkAn/TpObI9DIb+PXKU9w+25e4OjlU=
+ a=gowsoOTTUOVcmtlkKump:22 a=cJBrMpTn7pYZM8YZh9UA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-04_02,2026-11-03_04,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 lowpriorityscore=0 clxscore=1015
- impostorscore=0 suspectscore=0 phishscore=0 adultscore=0 malwarescore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2610300000
- definitions=main-2611040033
+ spamscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0 clxscore=1015
+ adultscore=0 suspectscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610300000 definitions=main-2611040034
 
-Pass the missed call count from the backends to the PBAP core and
-include NewMissedCalls in vCard listing responses.
+Add a 128-bit Database Identifier for the PSE. The dummy backend
+generates it when it is missing and stores it in a metadata file. The
+ebook and tracker backends do not persist it and report it as zero.
 
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- obexd/plugins/pbap.c              | 14 ++++++----
- obexd/plugins/phonebook-dummy.c   | 10 ++++++-
- obexd/plugins/phonebook-ebook.c   |  2 +-
- obexd/plugins/phonebook-tracker.c | 44 +++++++++++++++++++++++++------
- obexd/plugins/phonebook.h         |  7 ++---
- 5 files changed, 57 insertions(+), 20 deletions(-)
+ Makefile.obexd                     |   2 +
+ obexd/plugins/phonebook-dummy.c    |  23 ++++
+ obexd/plugins/phonebook-metadata.c | 194 +++++++++++++++++++++++++++++
+ obexd/plugins/phonebook-metadata.h |  45 +++++++
+ obexd/plugins/phonebook.c          |   7 ++
+ obexd/plugins/phonebook.h          |  11 ++
+ 6 files changed, 282 insertions(+)
+ create mode 100644 obexd/plugins/phonebook-metadata.c
+ create mode 100644 obexd/plugins/phonebook-metadata.h
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index e0d0cf1ab..02664e538 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -353,15 +353,16 @@ static GSList *sort_entries(GSList *l, uint8_t order, uint8_t search_attrib,
- 	return sorted;
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 9daa5aac2..4b3d08f01 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -49,6 +49,8 @@ obexd_builtin_sources += obexd/plugins/pbap.c \
+ 				obexd/plugins/vcard.h obexd/plugins/vcard.c \
+ 				obexd/plugins/phonebook.h \
+ 				obexd/plugins/phonebook.c \
++				obexd/plugins/phonebook-metadata.h \
++				obexd/plugins/phonebook-metadata.c \
+ 				obexd/plugins/phonebook-@PLUGIN_PHONEBOOK@.c
+ EXTRA_DIST += obexd/plugins/phonebook-dummy.c obexd/plugins/phonebook-ebook.c \
+ 				obexd/plugins/phonebook-tracker.c
+diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
+index 237349bef..698510f6f 100644
+--- a/obexd/plugins/phonebook-dummy.c
++++ b/obexd/plugins/phonebook-dummy.c
+@@ -31,6 +31,7 @@
+ 
+ #include "obexd/src/log.h"
+ #include "phonebook.h"
++#include "phonebook-metadata.h"
+ 
+ typedef void (*vcard_func_t) (const char *file, VObject *vo, void *user_data);
+ 
+@@ -75,14 +76,36 @@ static void query_free(void *user_data)
+ 	g_free(query);
  }
  
--static int generate_response(void *user_data)
-+static int generate_response(struct pbap_session *pbap, uint8_t missed)
- {
--	struct pbap_session *pbap = user_data;
- 	GSList *sorted;
- 	GSList *l;
- 	uint16_t max = pbap->params->maxlistcount;
- 
- 	DBG("");
- 
-+	response_add_missed_calls(pbap, missed);
++static void dummy_metadata_init(void)
++{
++	metadata_identifier_update();
++	metadata_save();
++}
 +
- 	if (max == 0) {
- 		/* Ignore all other parameter and return PhoneBookSize */
- 		uint16_t size = g_slist_length(pbap->cache.entries);
-@@ -401,10 +402,13 @@ static int generate_response(void *user_data)
- 							VCARD_LISTING_END);
- 	g_slist_free(sorted);
+ int phonebook_driver_init(void)
+ {
++	char *metadata_path;
++	uint8_t id[16];
++
+ 	if (root_folder)
+ 		return 0;
  
-+	if (pbap->obj->apparam)
-+		pbap->obj->firstpacket = TRUE;
+ 	/* FIXME: It should NOT be hard-coded */
+ 	root_folder = g_build_filename(getenv("HOME"), "phonebook", NULL);
+ 
++	metadata_path = g_build_filename(root_folder,
++					"phonebook-metadata", NULL);
++
++	if (!metadata_file_open(metadata_path)) {
++		g_free(metadata_path);
++		return 0;
++	}
++
++	g_free(metadata_path);
++
++	if (!metadata_get("identifier", "value", id))
++		dummy_metadata_init();
 +
  	return 0;
  }
  
--static void cache_ready_notify(void *user_data)
-+static void cache_ready_notify(uint8_t missed, void *user_data)
- {
- 	struct pbap_session *pbap = user_data;
- 
-@@ -415,11 +419,11 @@ static void cache_ready_notify(void *user_data)
- 
- 	pbap->cache.valid = TRUE;
- 
--	generate_response(pbap);
-+	generate_response(pbap, missed);
- 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- }
- 
--static void cache_entry_done(void *user_data)
-+static void cache_entry_done(uint8_t missed, void *user_data)
- {
- 	struct pbap_session *pbap = user_data;
- 	const char *id;
-diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-index 7c11ac975..237349bef 100644
---- a/obexd/plugins/phonebook-dummy.c
-+++ b/obexd/plugins/phonebook-dummy.c
-@@ -49,6 +49,7 @@ struct cache_query {
- 	phonebook_cache_ready_cb ready_cb;
- 	void *user_data;
- 	DIR *dp;
-+	uint8_t newmissedcalls;
- };
- 
- static char *root_folder = NULL;
-@@ -381,7 +382,7 @@ static gboolean create_cache(void *user_data)
- 	 */
- 	foreach_vcard(query->dp, entry_notify, 0, 0xffff, query, NULL);
- 
--	query->ready_cb(query->user_data);
-+	query->ready_cb(query->newmissedcalls, query->user_data);
- 
- 	return FALSE;
- }
-@@ -653,6 +654,13 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 	query->user_data = user_data;
- 	query->dp = dp;
- 
-+	if (g_str_equal(name, PB_CALLS_MISSED_FOLDER)) {
-+		foldername = g_build_filename(root_folder,
-+						PB_CALLS_MISSED_FOLDER, NULL);
-+		query->newmissedcalls = count_vcards(foldername);
-+		g_free(foldername);
+diff --git a/obexd/plugins/phonebook-metadata.c b/obexd/plugins/phonebook-metadata.c
+new file mode 100644
+index 000000000..06cfa2a8a
+--- /dev/null
++++ b/obexd/plugins/phonebook-metadata.c
+@@ -0,0 +1,194 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  OBEX Server
++ *
++ *  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++#include <stdio.h>
++#include <string.h>
++
++#include <glib.h>
++
++#include "obexd/src/log.h"
++#include "phonebook.h"
++#include "phonebook-metadata.h"
++
++static char *metadata_file;
++static GKeyFile *metadata_kf;
++static gboolean metadata_dirty;
++
++gboolean metadata_get(const char *group,
++					const char *key, uint8_t buf[16])
++{
++	char *str;
++	uint8_t value[16];
++	unsigned int i;
++
++	if (!metadata_kf)
++		return FALSE;
++
++	str = g_key_file_get_string(metadata_kf, group, key, NULL);
++	if (!str || strlen(str) != 32)
++		goto failed;
++
++	for (i = 0; i < 16; i++) {
++		int high = g_ascii_xdigit_value(str[i * 2]);
++		int low = g_ascii_xdigit_value(str[i * 2 + 1]);
++
++		if (high < 0 || low < 0)
++			goto failed;
++
++		value[i] = (high << 4) | low;
 +	}
 +
- 	dummy = g_new0(struct dummy_data, 1);
- 
- 	dummy->id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, create_cache,
-diff --git a/obexd/plugins/phonebook-ebook.c b/obexd/plugins/phonebook-ebook.c
-index beb72b22b..0df8f2d0e 100644
---- a/obexd/plugins/phonebook-ebook.c
-+++ b/obexd/plugins/phonebook-ebook.c
-@@ -540,7 +540,7 @@ static void phonebook_create_cache_ready(GObject *source_object,
- 
- done:
- 	if (data->queued_calls == 0)
--		data->ready_cb(data->user_data);
-+		data->ready_cb(0, data->user_data);
- 
- 	return;
- 
-diff --git a/obexd/plugins/phonebook-tracker.c b/obexd/plugins/phonebook-tracker.c
-index 326bf8892..07d8dd34b 100644
---- a/obexd/plugins/phonebook-tracker.c
-+++ b/obexd/plugins/phonebook-tracker.c
-@@ -480,6 +480,12 @@ struct pending_reply {
- 	int num_fields;
- };
- 
-+enum phonebook_request {
-+	PHONEBOOK_REQUEST_PULL,
-+	PHONEBOOK_REQUEST_ENTRY,
-+	PHONEBOOK_REQUEST_CACHE,
-+};
++	memcpy(buf, value, sizeof(value));
++	g_free(str);
++	return TRUE;
 +
- struct contact_data {
- 	char *id;
- 	struct phonebook_contact *contact;
-@@ -489,7 +495,7 @@ struct phonebook_data {
- 	phonebook_cb cb;
- 	void *user_data;
- 	int index;
--	gboolean vcardentry;
-+	enum phonebook_request request;
- 	const struct apparam_field *params;
- 	GSList *contacts;
- 	phonebook_cache_ready_cb ready_cb;
-@@ -1278,7 +1284,7 @@ static int pull_contacts(const char **reply, int num_fields, void *user_data)
- 	}
- 
- 	/* We are doing a PullvCardEntry, no need for those checks */
--	if (data->vcardentry)
-+	if (data->request == PHONEBOOK_REQUEST_ENTRY)
- 		goto add_entry;
- 
- 	/* Last four fields are always present, ignoring them */
-@@ -1411,7 +1417,8 @@ static int add_to_cache(const char **reply, int num_fields, void *user_data)
- 
- done:
- 	if (num_fields <= 0)
--		data->ready_cb(data->user_data);
-+		data->ready_cb(num_fields < 0 ? 0 : data->newmissedcalls,
-+							data->user_data);
- 
- 	return -EINTR;
- 	/*
-@@ -1517,7 +1524,11 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
- 	int nmissed;
- 
- 	if (num_fields < 0) {
--		data->cb(NULL, 0, num_fields, 0, TRUE, data->user_data);
-+		if (data->request == PHONEBOOK_REQUEST_CACHE)
-+			data->ready_cb(0, data->user_data);
-+		else
-+			data->cb(NULL, 0, num_fields, 0, TRUE,
-+							data->user_data);
- 
- 		return -EINTR;
- 	}
-@@ -1531,7 +1542,12 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
- 		return 0;
- 	}
- 
--	if (data->params->maxlistcount == 0) {
-+	if (data->request == PHONEBOOK_REQUEST_CACHE) {
-+		query = folder2query(data->req_name);
-+		col_amount = 8;
-+		pull_cb = add_to_cache;
-+	} else if (data->request == PHONEBOOK_REQUEST_PULL &&
-+					data->params->maxlistcount == 0) {
- 		query = name2count_query(PB_CALLS_MISSED);
- 		col_amount = COUNT_QUERY_COL_AMOUNT;
- 		pull_cb = pull_contacts_size;
-@@ -1543,7 +1559,10 @@ static int pull_newmissedcalls(const char **reply, int num_fields,
- 
- 	err = query_tracker(query, col_amount, pull_cb, data);
- 	if (err < 0) {
--		data->cb(NULL, 0, err, 0, TRUE, data->user_data);
-+		if (data->request == PHONEBOOK_REQUEST_CACHE)
-+			data->ready_cb(0, data->user_data);
-+		else
-+			data->cb(NULL, 0, err, 0, TRUE, data->user_data);
- 
- 		return -EINTR;
- 	}
-@@ -1580,6 +1599,7 @@ void *phonebook_pull(const char *name, const struct apparam_field *params,
- 	DBG("name %s", name);
- 
- 	data = g_new0(struct phonebook_data, 1);
-+	data->request = PHONEBOOK_REQUEST_PULL;
- 	data->params = params;
- 	data->user_data = user_data;
- 	data->cb = cb;
-@@ -1656,7 +1676,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
- 	data->user_data = user_data;
- 	data->params = params;
- 	data->cb = cb;
--	data->vcardentry = TRUE;
-+	data->request = PHONEBOOK_REQUEST_ENTRY;
- 
- 	if (g_str_has_prefix(id, CONTACT_ID_PREFIX) == TRUE ||
- 				g_strcmp0(id, TRACKER_DEFAULT_CONTACT_ME) == 0)
-@@ -1694,11 +1714,19 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 	}
- 
- 	data = g_new0(struct phonebook_data, 1);
-+	data->request = PHONEBOOK_REQUEST_CACHE;
- 	data->entry_cb = entry_cb;
- 	data->ready_cb = ready_cb;
- 	data->user_data = user_data;
-+	data->req_name = g_strdup(name);
++failed:
++	g_free(str);
++	return FALSE;
++}
 +
-+	if (g_str_equal(name, PB_CALLS_MISSED_FOLDER))
-+		ret = query_tracker(NEW_MISSED_CALLS_COUNT_QUERY,
-+					COUNT_QUERY_COL_AMOUNT,
-+					pull_newmissedcalls, data);
-+	else
-+		ret = query_tracker(query, 8, add_to_cache, data);
++void metadata_set(const char *group, const char *key,
++						const uint8_t buf[16])
++{
++	char hex[33];
++	unsigned int i;
++
++	if (!metadata_file || !metadata_kf)
++		return;
++
++	for (i = 0; i < 16; i++)
++		sprintf(hex + (i * 2), "%02X", buf[i]);
++
++	g_key_file_set_string(metadata_kf, group, key, hex);
++	metadata_dirty = TRUE;
++}
++
++void metadata_identifier_update(void)
++{
++	uint8_t identifier[16];
++	unsigned int i;
++
++	if (!metadata_file || !metadata_kf)
++		return;
++
++	for (i = 0; i < 16; i += sizeof(uint32_t)) {
++		uint32_t value = g_random_int();
++
++		identifier[i] = (value >> 24) & 0xff;
++		identifier[i + 1] = (value >> 16) & 0xff;
++		identifier[i + 2] = (value >> 8) & 0xff;
++		identifier[i + 3] = value & 0xff;
++	}
++
++	metadata_set("identifier", "value", identifier);
++}
++
++gboolean metadata_save(void)
++{
++	char *data;
++	gsize len;
++	GError *gerr = NULL;
++
++	if (!metadata_file || !metadata_kf)
++		return FALSE;
++
++	if (!metadata_dirty)
++		return TRUE;
++
++	data = g_key_file_to_data(metadata_kf, &len, NULL);
++
++	if (len > 0) {
++		if (!g_file_set_contents(metadata_file, data, len, &gerr)) {
++			error("Unable to save metadata file: %s",
++					gerr->message);
++			g_error_free(gerr);
++			g_free(data);
++			return FALSE;
++		}
++	}
++
++	g_free(data);
++	metadata_dirty = FALSE;
++
++	return TRUE;
++}
++
++gboolean metadata_file_open(const char *file)
++{
++	GError *gerr = NULL;
++
++	if (!file)
++		return FALSE;
++
++	metadata_file = g_strdup(file);
++	if (!metadata_file)
++		return FALSE;
++
++	if (!g_file_test(metadata_file, G_FILE_TEST_EXISTS)) {
++		if (!g_file_set_contents(metadata_file, "", 0, &gerr)) {
++			error("Unable to create metadata file: %s",
++							gerr->message);
++			g_error_free(gerr);
++			gerr = NULL;
++		}
++	}
++
++	metadata_kf = g_key_file_new();
++
++	if (metadata_kf && !g_key_file_load_from_file(metadata_kf,
++					metadata_file, 0, &gerr)) {
++		error("Unable to load metadata file: %s", gerr->message);
++		g_error_free(gerr);
++		g_key_file_free(metadata_kf);
++		metadata_kf = NULL;
++		g_free(metadata_file);
++		metadata_file = NULL;
++		return FALSE;
++	}
++
++	metadata_dirty = FALSE;
++
++	return TRUE;
++}
++
++gboolean metadata_read(struct phonebook_metadata *metadata)
++{
++	memset(metadata, 0, sizeof(*metadata));
++
++	if (!metadata_file || !metadata_kf)
++		return FALSE;
++
++	/* Values which are not saved are reported as not persistent. */
++	if (metadata_dirty)
++		return FALSE;
++
++	if (!metadata_get("identifier", "value", metadata->database_identifier))
++		DBG("identifier not found in metadata");
++
++	return TRUE;
++}
++
++void metadata_file_close(void)
++{
++	if (metadata_kf) {
++		g_key_file_free(metadata_kf);
++		metadata_kf = NULL;
++	}
++
++	if (metadata_file) {
++		g_free(metadata_file);
++		metadata_file = NULL;
++	}
++}
+diff --git a/obexd/plugins/phonebook-metadata.h b/obexd/plugins/phonebook-metadata.h
+new file mode 100644
+index 000000000..c70c20ecd
+--- /dev/null
++++ b/obexd/plugins/phonebook-metadata.h
+@@ -0,0 +1,45 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  OBEX Server
++ *
++ *  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
++ *
++ *
++ */
++
++#include <stdint.h>
++
++#include <glib.h>
++
++struct phonebook_metadata;
++
++/*
++ * Opens and loads the metadata file, creating it when it doesn't exist.
++ * The key file is cached internally. Returns FALSE on error.
++ */
++gboolean metadata_file_open(const char *file);
++
++/* Closes the metadata file and releases cached resources. */
++void metadata_file_close(void);
++
++/* Reads metadata and zeroes invalid or unsaved values. */
++gboolean metadata_read(struct phonebook_metadata *metadata);
++
++/* Stores a hex encoded byte array. */
++void metadata_set(const char *group, const char *key,
++						const uint8_t buf[16]);
++
++/*
++ * Reads a hex encoded byte array. Returns FALSE when the value is
++ * missing or invalid.
++ */
++gboolean metadata_get(const char *group, const char *key, uint8_t buf[16]);
++
++/* Generates and stores a new database identifier. */
++void metadata_identifier_update(void);
++
++/*
++ * Persists the metadata file. Returns TRUE on success.
++ */
++gboolean metadata_save(void);
+diff --git a/obexd/plugins/phonebook.c b/obexd/plugins/phonebook.c
+index 6afdb7abb..059414446 100644
+--- a/obexd/plugins/phonebook.c
++++ b/obexd/plugins/phonebook.c
+@@ -17,6 +17,7 @@
+ #include <glib.h>
  
--	ret = query_tracker(query, 8, add_to_cache, data);
- 	if (err)
- 		*err = ret;
+ #include "phonebook.h"
++#include "phonebook-metadata.h"
  
+ static unsigned int refcount = 0;
+ 
+@@ -44,4 +45,10 @@ void phonebook_exit(void)
+ 		return;
+ 
+ 	phonebook_driver_exit();
++	metadata_file_close();
++}
++
++int phonebook_get_metadata(struct phonebook_metadata *metadata)
++{
++	return metadata_read(metadata);
+ }
 diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
-index 7e99de6e7..9ab5b72f6 100644
+index 9ab5b72f6..6fb91f7e0 100644
 --- a/obexd/plugins/phonebook.h
 +++ b/obexd/plugins/phonebook.h
-@@ -72,11 +72,8 @@ typedef void (*phonebook_entry_cb) (const char *id, uint32_t handle,
- 					const char *name, const char *sound,
- 					const char *tel, void *user_data);
+@@ -55,6 +55,11 @@ struct apparam_field {
+ 	char *searchval;
+ };
  
--/*
-- * After notify all entries to PBAP core, the backend
-- * needs to notify that the operation has finished.
-- */
--typedef void (*phonebook_cache_ready_cb) (void *user_data);
-+/* Notifies cache completion and the number of undismissed missed calls. */
-+typedef void (*phonebook_cache_ready_cb) (uint8_t missed, void *user_data);
- 
- 
++/* Metadata identifying the current database contents. */
++struct phonebook_metadata {
++	uint8_t database_identifier[16];
++};
++
  /*
+  * Interface between the PBAP core and backends to retrieve
+  * all contacts that match the application parameters rules.
+@@ -99,6 +104,12 @@ void phonebook_driver_exit(void);
+ char *phonebook_set_folder(const char *current_folder,
+ 		const char *new_folder, uint8_t flags, int *err);
+ 
++/*
++ * Returns the metadata identifying the current database contents. A zero
++ * database identifier means the values are not persistent.
++ */
++int phonebook_get_metadata(struct phonebook_metadata *metadata);
++
+ /*
+  * phonebook_pull should be used only to prepare pull request - prepared
+  * request data is returned by this function. Start of fetching data from
 -- 
 2.34.1
 
