@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793830825;
-	b=gPe12VeB2Ou8j53sPwoXYUxsp+WJ2rN0C8i+ZEM2UuXVmuJUa/zoiCLPNWStU9JWUGFO
-	 nOFxJsE7pp3dmC2UwevV+0s0l2eIY3a+PYLWlhX+1TPVmMCuttbIwkeCdmYodh3zZ3esb
-	 Y9DhU6iparAefrfabqjws2NWdQuUiP35HC5DYcjA0sfcF3K0zwv3EqQ7FrmB/s2zNV46I
-	 pBjQ5uMGVLHq3P9rNmbWgV3pkfNx7QoN/ArqNHFPl059G/oZEOE04xdbGZlgPl7ls48YL
-	 V6QTks7gTV/Msw7THXRyaDfbP1WuVzjmkwMW5OwdUgNSnsV3gcHRMrtUWXQm52ai/WQ==
+	t=1793830827;
+	b=RdpsOyzrxIaQz1DvBEmZStSUKZ6HhUHLynpI6S/VkZAXWJgRGANbhIxEy/TDhlcTEfNR
+	 aOIHy4jntTSF+5yOkLJOVFeduLJZeBOKayz3x5ueR0OFPXuZcI9aHMjOcnnE1U1dmdJPv
+	 I64DxZ302l0DSHVJWjmdxfbizyf//Mdvj4mtrzJnUM8PYi9+8xFagKH9D0GADoX4azsLJ
+	 VHlPzbaPRmFFlCbFo6j/FGh3MOqByrywu7U3kC83IDbDxclO92QFEOGZIjUGU9BpuOy61
+	 l9fIoc68EfJ0uBqj+zAuR5W0b9KpPdE2JSnhUom674//6nuXEF76C5JXkkIrYGC8YZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793830825;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793830827;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=l26EY1ejppvc6S1xS9OtShxfLhsLOgdFFgxCGty35fU=;
-	b=MgVm7qJfEGzGi5yjDBOig6y6vHYpY/DtIRItXv7BOux3wkBVlsKS1ncgUa8ITHjrquFL
-	 4qLR+iG6l3kXVwZVfn+x5yxDmK//YbxY6W8duki4McyX37ynROy9NOSeJmz/iF3Z0Ay6D
-	 cWy9mmnL86+NBhAVNOzoqiQpdaJkuMMVpomZD3ogEhw7filPaqOwhEBwkHySqM8yuwVQV
-	 NzwLJKgWaeKFmBrwbGDFws40M8q/01H2SvcIb8tEJQf1Rws9dexLUvkRLAnzk/8kr/F+/
-	 fOIqVacdY5j28LkUvSInnMmX6VIxPjxKMLYm/4Tpa/42ZJouYzO9DgxPpo+ThY9obvw==
+	bh=k8m1ft/HEsASnyAsoytyRld6KpMVlVnsxyzHUrDxgJw=;
+	b=I3deg45DZ/+DJyzlPeYXKW524h4Iwj4k+b0vBwVMSszZbSk+aGUEmws9DuMn14ggCpV/
+	 7w9NEwyZ55KQagu1qp8TjbfWtKG1vgy/VnFNnu8RhLr5HNcNMk1vqG+w0NBZOtY9kW9kq
+	 T9hztANG1OcHPoyRaFHuuqFU8eNnF4UCWmlSdTAfJpNETJvPTy4vFR+5TcRzmqrbrRkHY
+	 BkvpACoaOakiCmTI10M7l+u4+D42LA/SNDua9LOOxVz5KyV7ZzIOtOsq6qM8gDAHxMks0
+	 +FW7Ob4xP14IXlAQUAXiPmQxggXA8YXuTf7PEUmXQUfpeoOranYEv8bPmLNIvnd38gQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Aiis5fA4;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VAe2ARzv;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EE8606A326;
-	Wed,  4 Nov 2026 22:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4227D606B2E0;
+	Wed,  4 Nov 2026 22:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Aiis5fA4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BBA81F00A16;
-	Wed,  4 Nov 2026 22:20:25 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VAe2ARzv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AFA31F00A1F;
+	Wed,  4 Nov 2026 22:20:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793830825;
-	bh=l26EY1ejppvc6S1xS9OtShxfLhsLOgdFFgxCGty35fU=;
+	s=k20260515; t=1793830827;
+	bh=k8m1ft/HEsASnyAsoytyRld6KpMVlVnsxyzHUrDxgJw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Aiis5fA41Fu9KJipr/SgQ0+UkaITBlLkJvXKq53oqxMrhQSDfjoQu1+ldh7dRge4Y
-	 SQSsaXxWr1PLpWn1D8ox0hDnhD9BS0Co4mLefTqkeN7qiG2lUBumCCvegKJWEdqtiv
-	 pYieOdcfbBecascygyZQK9tMy5zqO5fP+ePsDMrsDVV8NxGWlese03OArLVTkTxVRX
-	 nUXjhzlg/kX13tjHoKvzroiQUvcdlSM21cj4dRB9NqYV7ElNbdkqTw60NdV7G0xk2T
-	 auHzxgfYaKM7CkiKuKiiQ6IsblCnyLXlVt9ikPwEEQc/7BVPbEQPqcgAvJiorU6RUX
-	 qPp0POZjhF/Jw==
+	b=VAe2ARzvufSZ6HOGmOxqG7T+J3uWTaHL/FeXzcnAKtSCLrKEe0GTAidU0rw8scOIU
+	 GNa/GgKmS5JRJwZCFREDII3E83Q3tiLs+pP5sa68l30OnfHQ7xAuDhOpaZSgT9uVPi
+	 FVCHdiy23ydpcyj/8RoUrFsA06AOK5aQ1Af9hPppmJUhIpkE3HbD3kUeyiXCUKtP8d
+	 rjNi80OHNPCdtjpNl4NBtbG9xqlqodhv4njdeF4sTm0wI7mYmhOth5hC7cnfHNpv25
+	 7NLzGaRy96H6U4hDlQdgWvHw+0xCS3galGAofXZ6OIVlZddU9WWbXFPCCZeHoFwBR3
+	 WQTZHVXCN66rw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0311A38003E1;
-	Wed,  4 Nov 2026 22:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 031B838003E1;
+	Wed,  4 Nov 2026 22:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,35 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: L2CAP: Match LE responses to outstanding
- requests
+Subject: Re: [PATCH] Bluetooth: qca: Disable SoC debug logging for WCN3950
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179383082342.3253812.9942140641407431585.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Nov 2026 22:20:23 +0000
-References: <20261102124735.23199-1-enderaoelyther@gmail.com>
-In-Reply-To: <20261102124735.23199-1-enderaoelyther@gmail.com>
-To: Zhao Li <enderaoelyther@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@intel.com,
- security@kernel.org, linux-bluetooth@vger.kernel.org,
+ <179383082559.3253812.14222626454934978611.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Nov 2026 22:20:25 +0000
+References: <20261103103414.803861-1-valorcool@gmail.com>
+In-Reply-To: <20261103103414.803861-1-valorcool@gmail.com>
+To: Stanislavs Nilovs <valorcool@gmail.com>
+Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
  linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon,  2 Nov 2026 20:47:33 +0800 you wrote:
-> An LE peer that can reach a local L2CAP listener can use unsolicited
-> responses or Command Rejects to bypass deferred setup, remove an
-> established channel, or leak an unaccepted socket and channel.
-> Authentication requirements depend on the listener's security setting;
-> whether a default configuration exposes such a listener has not been
-> checked.
+On Tue,  3 Nov 2026 12:34:14 +0200 you wrote:
+> Added WCN3950 module to the switch-case to disable SoC debug packets.
 > 
-> [...]
+> Fixes: 590deccf4c06 ("Bluetooth: hci_qca: Disable SoC debug logging for WCN3991")
+> Signed-off-by: Stanislavs Nilovs <valorcool@gmail.com>
+> ---
+>  drivers/bluetooth/btqca.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Here is the summary with links:
-  - [1/2] Bluetooth: L2CAP: Only accept LE responses to outstanding requests
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f50b32aa233d
-  - [2/2] Bluetooth: L2CAP: Clear request identifiers on incoming LE connections
-    https://git.kernel.org/bluetooth/bluetooth-next/c/15a80cc8263a
+  - Bluetooth: qca: Disable SoC debug logging for WCN3950
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d97b618b6675
 
 You are awesome, thank you!
 -- 
