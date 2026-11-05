@@ -1,67 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.216.248.212
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.15
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793869082;
-	b=dd0p45m9QuL4q+/S3HpGa7XLJDvZkNOPkzzk2nrDbZ0i6imeWrBg7v40s07fOgQblykJ
-	 uLK2l222as1hNiIJlkWQdpjCe/AgrOnDQhJfua7Q7xGWL024Ac6sRyUmmMfE9y0GdsBkS
-	 Nv9Us0kyUL6NvDWQ6DKCQoqA3kOqjYw5DB6eU131tm6xU5NslL/aKhZWI9R59oOTp9zJg
-	 HLEnLpQ7zwKi+QNeRXJ+weBFF/ex8jVoa01lO6OPYB2yBBJ9UVEW9ZiN4LEY80sRQMQim
-	 kS1JDYRUxr4dozA7eqmMMfbT5Tc6fOem/iTklGa1xx6j6Rd1437NbZWdfknDr/1LgHA==
+	t=1793869883;
+	b=zbwc6E6JiwYmh69qik3b7ToMc58m3RNxNLrxG/p7J1p9LIqm5TSIQYbeLJUug0cCv1Si
+	 CPsP2Hr4crfnWG0Yfgn9mOod/VhIiu57o0h8fq3g8O572u+HeP7fwXZ1OsNc1O/xaVzLr
+	 k5LsrDZrlAD4QhoQmEeBZohNLe1UK4ZxZf1AtUpW5NB8Ve0os/6fxcrEn70WB44YMkVS1
+	 X5MtegqiAK+vt2Gl36mYONA54+CGZZYjttBZ8LiVmaFj6dV+owvRVOpTAUI6N+uzDRtA7
+	 QNxp30UvDqWWqGYixvZSB3bp+STji+gaYTa9FyHHdKiU9KfoawMAZ4GBJiPWGwlZ/dg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793869082;
-	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=6UOkymQhnfOrj2yAZv17rmW+xuQ+0zZXE06/CQLTSww=;
-	b=0GfboqYPWwkas3/bdH3K0iuW+eb1CdZHytQ+81QSy7OzyC7boJ3qOdssqnrx6ElA5O3R
-	 NRRBFwAO5XQPQtbr26DZRO3CM+JqmS1lEotut8Ow3j4YjDF41eeknm/G689FQ3PxcTAqw
-	 mvVd7W/X7OVs4kzFgEHIW6hmyJHf4HX8AlEXPgIkAqEfs7AmQKSvsg8641nbDXY7DRS42
-	 vuMPlmrU61vP+c27BIsa0iSdS+F6Cdpf8dc2rCaPSfgxDiOEtXAItXqKtd2eYS8/ZLyE+
-	 HIHRGXop3KdrHou4UiXyp3bf/+DGXcAv/pq4wuhKHLLn2ygFA4dSncpDPm5FHBotIUg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793869883;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=oUTkOjhpSta2G99V+EvRj5jWYOqvSjQ/adQtpHhKIwA=;
+	b=4Qsm6d0aUK2knd1oG5GXfji/ID9QfZDUljb7TpOEbbZz32PJMLMtaUsl4uLT+pfEzfJ2
+	 B0PcWc06PezrjINhKF4jam53UhoRRH4Z0xyN8e79raOMipHbqLZSL3ZarQeasiSBYgWm6
+	 kCcE4v/YRcO+D5UYolojWuth591NIGOZNuVCpOtz/0pb+7Lw2d1jlG9qdNi0rQE9bVch4
+	 9+VK19GxKDvzV9QW/df2og3YclFUeMiKhyxe8Amk3j/gcs0sVtsjXArSX4PMEOcuBdzmv
+	 8x8WUQRtzobCx6okhZ/jmbi3hq/WZyK4pWs97kYknMDOFQjj3x4PVTMZCp+mB4gMzAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=deq.rocks;
-	spf=none smtp.mailfrom=deq.rocks;
-	dkim=pass header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=cbGVGSKj;
-	arc=none smtp.remote-ip=91.216.248.212
-Received: from bulk0.mail-out.lima-city.de (bulk0.mail-out.lima-city.de [91.216.248.212])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OOkERDIk;
+	arc=none smtp.remote-ip=198.175.65.15
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7527A606A334;
-	Thu,  5 Nov 2026 08:58:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7527A606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=deq.rocks
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=deq.rocks
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD40606A32D;
+	Thu,  5 Nov 2026 09:11:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7FD40606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=cbGVGSKj
-From: Andre Eikmeyer <dev@deq.rocks>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=deq.rocks;
-	s=securedbylima-20251205; t=1793869079;
-	bh=AlntEjGZGdpJydOR7xazAe3mieEGTxbT1NLXNTsDkjY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cbGVGSKjSlLWifvxO0qrhgHm2nn1svRBdsFavoAUjaVD7q5UqCRG4z/V75mVI/6a4
-	 jlyqAKYQAY+rZqxFunTLXcylQ3O0rSxOPXT6UrU4GdqoMtzEQNLD+maF5j1tawaB/U
-	 fS6LtVJ8jrUDq6UfE6hqnIKuRPY9kmDk1Pm4xZw+wb3yNuNAgJNurn0YDarmiihN8U
-	 4Lsz9/dzZp7SLvZs0xDfqueoCDOvVx8H2ZiJ1niRiqSG3ahJ2aTLMDCreGu3OJVC0F
-	 1pv1SpPCWUIOiI6gmb4okeTXIRiuY33yZetuU2NZ4C1sPufQBGlC83lsrtKglvf0AK
-	 15Fn9UO9skexQ==
-To: marcel@holtmann.org,
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OOkERDIk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793869881; x=1825405881;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RlhKt0yBUlimxXsYRHNpAnCiVlMNcaFnOQtcMg7QbUY=;
+  b=OOkERDIkUoRQ+Un8CLHvkU2ND/FrFZ1TdaYIU4aqsx/6VmipbhQ9je1Q
+   tenwDvD04gLrfcGcnfXqOBdul7jzfCQutKidsEEPFDCS8ZeRT0jzNRMgz
+   ozBDEaVOM+ldOdD54MSJVBJy/G5t4OpwgNx/zE2Rh3+2xCaoL1x/CjppI
+   VxP2x4JYISTHZ5RrTG6J1FjBLKeWev86kgqyoFBbfpqeZQsI+5yahLQnq
+   vpA5042LHvyNcJKKHyQ08g6MuqZeHRept/LMq2m6frJcLSn7QQuTy8vYM
+   bAyEud3i8479kpFRNwITa4wzwVC8d708843whY1ir0JJ856+BbYgOi8dT
+   A==;
+X-CSE-ConnectionGUID: E7zfK6lBQIyUaf8d7LYwIw==
+X-CSE-MsgGUID: 5RQJM1FrTiKiLmxwVEWC5g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11956"; a="2655232"
+X-IronPort-AV: E=Sophos;i="6.27,197,1787036400"; 
+   d="scan'208";a="2655232"
+Received: from fmviesa013.fm.intel.com ([10.60.135.153])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2026 01:11:20 -0800
+X-CSE-ConnectionGUID: C1Le9xQ2Sh6VQxIkMkQ3Nw==
+X-CSE-MsgGUID: wFUwFvH9SZmi8pDGQQmKCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,197,1787036400"; 
+   d="scan'208";a="8819549"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa013.fm.intel.com with ESMTP; 05 Nov 2026 01:11:16 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xOtV3-00000000lzL-1HII;
+	Thu, 05 Nov 2026 09:11:13 +0000
+Date: Thu, 5 Nov 2026 17:10:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andre Eikmeyer <dev@deq.rocks>, marcel@holtmann.org,
 	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	sven@kernel.org,
-	j@jannau.net,
-	neal@gompa.dev,
-	asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sven@kernel.org, j@jannau.net,
+	neal@gompa.dev, asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, 66ton99@gmail.com,
+	josemiguelo.ochoa@gmail.com, aditya.garg@linux.dev,
 	Andre Eikmeyer <dev@deq.rocks>,
-	Yossef Osman <Yossef.Osman@proton.me>,
-	Aditya Garg <aditya.garg@linux.dev>
-Subject: [PATCH v2 2/2] Bluetooth: set the strict duplicate filter quirk on Apple Broadcom controllers
-Date: Thu,  5 Nov 2026 09:57:50 +0100
-Message-ID: <20261105085750.120392-3-dev@deq.rocks>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261105085750.120392-1-dev@deq.rocks>
-References: <20261105085750.120392-1-dev@deq.rocks>
+	Yossef Osman <Yossef.Osman@proton.me>
+Subject: Re: [PATCH 2/4] Bluetooth: btbcm: clear vendor bits in LE
+ advertising report types
+Message-ID: <202611051954.fni86ioX-lkp@intel.com>
+References: <20261104151601.70493-3-dev@deq.rocks>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -71,57 +89,36 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261104151601.70493-3-dev@deq.rocks>
 
-btbcm_finalize() sets HCI_QUIRK_STRICT_DUPLICATE_FILTER, but bcm_setup()
-returns before it when no patch file was loaded. The MacBookPro15,1 has
-none for its BCM4364B0 ("BCM: firmware Patch file not found").
-hci_bcm4377 does not use btbcm_finalize() and never sets the quirk. A
-service discovery then scans with "Filter duplicates: Enabled", and the
-controller reports an address once per discovery cycle of about 10.7 s.
-A Mac that changed its advertisement data on the same address was
-reported 6 s after the change, at the next cycle.
+Hi Andre,
 
-Set the quirk in hci_bcm on that path and in hci_bcm4377.
+kernel test robot noticed the following build warnings:
 
-Tested-by: Yossef Osman <Yossef.Osman@proton.me>
-Tested-by: Aditya Garg <aditya.garg@linux.dev>
-Signed-off-by: Andre Eikmeyer <dev@deq.rocks>
----
- drivers/bluetooth/hci_bcm.c     | 5 ++++-
- drivers/bluetooth/hci_bcm4377.c | 5 +++++
- 2 files changed, 9 insertions(+), 1 deletion(-)
+[auto build test WARNING on 3f425f95ba3923d605f6a8b382e8fcdc59d479db]
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index cf4f1455cf9..9eeeaf5d6b0 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -596,8 +596,11 @@ static int bcm_setup(struct hci_uart *hu)
- 	if (err)
- 		return err;
- 
--	if (!fw_load_done)
-+	if (!fw_load_done) {
-+		/* btbcm_finalize() sets this after loading a patch file */
-+		hci_set_quirk(hu->hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER);
- 		return 0;
-+	}
- 
- 	/* Init speed if any */
- 	if (bcm->dev && bcm->dev->init_speed)
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 30fcadfae3f..66cdd896c95 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -2391,6 +2391,11 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	hdev->set_bdaddr = bcm4377_hci_set_bdaddr;
- 	hdev->setup = bcm4377_hci_setup;
- 
-+	/* The controller reports an address once per scan with duplicate
-+	 * filtering, also after its advertisement data changed.
-+	 */
-+	hci_set_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER);
-+
- 	if (bcm4377->hw->broken_mws_transport_config)
- 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG);
- 	if (bcm4377->hw->broken_ext_scan)
+url:    https://github.com/intel-lab-lkp/linux/commits/Andre-Eikmeyer/Bluetooth-btbcm-raise-ACL-priority-on-Apple-Broadcom-controllers/20261104-161558
+base:   3f425f95ba3923d605f6a8b382e8fcdc59d479db
+patch link:    https://lore.kernel.org/r/20261104151601.70493-3-dev%40deq.rocks
+patch subject: [PATCH 2/4] Bluetooth: btbcm: clear vendor bits in LE advertising report types
+config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20261105/202611051954.fni86ioX-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 16.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261105/202611051954.fni86ioX-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611051954.fni86ioX-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'acl_priority' not described in 'bcm_device'
+>> Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'adv_type_fixup' not described in 'bcm_device'
+   Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'acl_priority' not described in 'bcm_device'
+>> Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'adv_type_fixup' not described in 'bcm_device'
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
