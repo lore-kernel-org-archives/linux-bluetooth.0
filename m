@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793869883;
-	b=zbwc6E6JiwYmh69qik3b7ToMc58m3RNxNLrxG/p7J1p9LIqm5TSIQYbeLJUug0cCv1Si
-	 CPsP2Hr4crfnWG0Yfgn9mOod/VhIiu57o0h8fq3g8O572u+HeP7fwXZ1OsNc1O/xaVzLr
-	 k5LsrDZrlAD4QhoQmEeBZohNLe1UK4ZxZf1AtUpW5NB8Ve0os/6fxcrEn70WB44YMkVS1
-	 X5MtegqiAK+vt2Gl36mYONA54+CGZZYjttBZ8LiVmaFj6dV+owvRVOpTAUI6N+uzDRtA7
-	 QNxp30UvDqWWqGYixvZSB3bp+STji+gaYTa9FyHHdKiU9KfoawMAZ4GBJiPWGwlZ/dg==
+	t=1793870164;
+	b=VJ2MjH2XXWim/8JB9pMj8YtGrnurUbBwc2OYSvf7vl+BYP+GvGGhG8Q0Ei4kQfZC8ikV
+	 FR8RQ5J6zcheOQmbwr1/EqSUJDMzsTl1GIc8d2FSFHrVBuTwGY5t9HzCFFRjewo4cZNAi
+	 sVY/BdqFtHyhgNtBGO/+n628r3Ba4I9YlUImyFSPyhqBHg+aFplAimENZIb5+xBttUuog
+	 ZJI3ljd+u5LxA/rxrgrCYnYUlXTiZ/NuklEuji1mBxtHlEvsQMVonl+JgZ6cKuJr7wBUK
+	 07S3vv9beiNfG+L34QASYCxkJF3PBBIaFY/ueHtyc78XVfM/vGA2dOiFvalfdPgZ7OA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793869883;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=oUTkOjhpSta2G99V+EvRj5jWYOqvSjQ/adQtpHhKIwA=;
-	b=4Qsm6d0aUK2knd1oG5GXfji/ID9QfZDUljb7TpOEbbZz32PJMLMtaUsl4uLT+pfEzfJ2
-	 B0PcWc06PezrjINhKF4jam53UhoRRH4Z0xyN8e79raOMipHbqLZSL3ZarQeasiSBYgWm6
-	 kCcE4v/YRcO+D5UYolojWuth591NIGOZNuVCpOtz/0pb+7Lw2d1jlG9qdNi0rQE9bVch4
-	 9+VK19GxKDvzV9QW/df2og3YclFUeMiKhyxe8Amk3j/gcs0sVtsjXArSX4PMEOcuBdzmv
-	 8x8WUQRtzobCx6okhZ/jmbi3hq/WZyK4pWs97kYknMDOFQjj3x4PVTMZCp+mB4gMzAg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793870164;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=G69kYeU+Df02my1NDGMrntDSbBuBH+hFhEbwjOsqnlw=;
+	b=kABmLZ2ZqekRYM5goWgEVTGToWUXwb01asnMilVMSzvxN66PpRx7X5ujpdOY+EqliT9B
+	 +eJDKU4WPzywr+J3538g1KmD4AiVG69wf0zKYBOMAPpI6oqC5K4klF7gADBuQekvDYJKe
+	 JLPr86VmfZ9AT3hnwFHPNzF1G0CwWLPvzhI223MHkpLhT9RZwwSHqPwLXelXeEC5z/qpY
+	 IqNICKCgYJIHSJDrdrzIm/Zar8bUO8uWOFEvdSImQnC2MZDhvrgzG/ZfG2q3tgvQuzYg4
+	 UQWBaiPu8LWoT2i8pcVdSzJoHmZr8uzw7UgTZ6knsRM0paASQMHhE9gqj9/AQKKrnCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OOkERDIk;
-	arc=none smtp.remote-ip=198.175.65.15
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xyCDF5YT;
+	arc=none smtp.remote-ip=209.85.160.47
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD40606A32D;
-	Thu,  5 Nov 2026 09:11:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7FD40606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C98606A31B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 09:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2C98606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=OOkERDIk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793869881; x=1825405881;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RlhKt0yBUlimxXsYRHNpAnCiVlMNcaFnOQtcMg7QbUY=;
-  b=OOkERDIkUoRQ+Un8CLHvkU2ND/FrFZ1TdaYIU4aqsx/6VmipbhQ9je1Q
-   tenwDvD04gLrfcGcnfXqOBdul7jzfCQutKidsEEPFDCS8ZeRT0jzNRMgz
-   ozBDEaVOM+ldOdD54MSJVBJy/G5t4OpwgNx/zE2Rh3+2xCaoL1x/CjppI
-   VxP2x4JYISTHZ5RrTG6J1FjBLKeWev86kgqyoFBbfpqeZQsI+5yahLQnq
-   vpA5042LHvyNcJKKHyQ08g6MuqZeHRept/LMq2m6frJcLSn7QQuTy8vYM
-   bAyEud3i8479kpFRNwITa4wzwVC8d708843whY1ir0JJ856+BbYgOi8dT
-   A==;
-X-CSE-ConnectionGUID: E7zfK6lBQIyUaf8d7LYwIw==
-X-CSE-MsgGUID: 5RQJM1FrTiKiLmxwVEWC5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11956"; a="2655232"
-X-IronPort-AV: E=Sophos;i="6.27,197,1787036400"; 
-   d="scan'208";a="2655232"
-Received: from fmviesa013.fm.intel.com ([10.60.135.153])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2026 01:11:20 -0800
-X-CSE-ConnectionGUID: C1Le9xQ2Sh6VQxIkMkQ3Nw==
-X-CSE-MsgGUID: wFUwFvH9SZmi8pDGQQmKCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,197,1787036400"; 
-   d="scan'208";a="8819549"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa013.fm.intel.com with ESMTP; 05 Nov 2026 01:11:16 -0800
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xOtV3-00000000lzL-1HII;
-	Thu, 05 Nov 2026 09:11:13 +0000
-Date: Thu, 5 Nov 2026 17:10:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andre Eikmeyer <dev@deq.rocks>, marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sven@kernel.org, j@jannau.net,
-	neal@gompa.dev, asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, 66ton99@gmail.com,
-	josemiguelo.ochoa@gmail.com, aditya.garg@linux.dev,
-	Andre Eikmeyer <dev@deq.rocks>,
-	Yossef Osman <Yossef.Osman@proton.me>
-Subject: Re: [PATCH 2/4] Bluetooth: btbcm: clear vendor bits in LE
- advertising report types
-Message-ID: <202611051954.fni86ioX-lkp@intel.com>
-References: <20261104151601.70493-3-dev@deq.rocks>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xyCDF5YT
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-4a6f2825dd6so457592fac.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 01:16:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793870163; x=1794474963; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=G69kYeU+Df02my1NDGMrntDSbBuBH+hFhEbwjOsqnlw=;
+        b=xyCDF5YTMYKpim0Z2dWox2vRlYmXetCZg97u1BH2u9MspVISPMcKQVMaEMTu6mPbPI
+         0ZIDJET8e2U7Rz/Ng/csfmxouIFYWl8glRwcvGaHGeCCDvMaA3IGdLtPBzkGjZrAvLCi
+         alrkSI7qpE1lmZCJPVPfIZgYTNDoZfpO4LulOAxeDT7x3MhkbRd7TEcjMT1AO7f0UZ2W
+         ExDWHkkv4AuAds6fDsjTyI/gupIoTQh0+6/Vxd/XPvxzlxhVew0iWjOaXZC/L6nYb3EU
+         apcRcsJchrkJJqJIvkAU2Xd3giNgpYjis+aFvGRRNBgi3Q9dQ+iquD4OWXJ3Dh7FfgJ+
+         FY8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793870163; x=1794474963;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=G69kYeU+Df02my1NDGMrntDSbBuBH+hFhEbwjOsqnlw=;
+        b=2PVQIRZ6h9B/++EneOtunFVmSseFTwSFF6oE+hnbVuKyHNvIRmPrsXd6+f6I4MHhAB
+         ONopFKuIItg/7gVTvjmn5Oz3FtCIWeDM62yyPrtJQH+4+r2zawzL8OdMxK7bjvbVqgVz
+         b7jzGZwXOp8oyHetIF4VgqiVw2t1V4gJIPwh9FELbDQcI9znppdHHO0Qwn+MjRw/+ycc
+         00bEillOIWYvieZcJO01mPNplSKgx/G3z51VJqmDpfo9vQhyX+QmU7FbiW29EiJ8wZsk
+         EkDE+ZkyZeF74GD3l+NAYj7c59gnti0uLfLZg6LT5FboARSuMv5dm92kiQVO+okx1SU1
+         3fyw==
+X-Gm-Message-State: APuU4Z8JLGUi3ObPAFm+La1Q3bFC1Szau31oY07a9mE7yvWD0prCdQ7g
+	CF3QTESkU3cl6staRQ22QOVu5Z5Q8nTnnOKnQJVIETO0eyWJfQQXainqFEJfPw==
+X-Gm-Gg: AYBFou0jYK7KoUvbzDGmnS9cn7YoJ8SaAfLb4viyfbaB+g+7scVKEek3XcO19NOwU67
+	rnCH0euDiLZZBRmWGA/EPTJNm2c++IXqwcwF4yHxdxMSlo5eH/uTvWomN402c81aGpUVFFuaMkZ
+	kErczyeTU0Yyl1AS2qKIc7jKnZeNTY6cN77dOM3so8RonSCOPLbu+X7BChb5UeiH5nLphmPjc49
+	Pbm0Re52n+Up99DA+VQ1vws9CXoIWNiISoQ5tyTlsTUEUxWAf4/3RO+FQapHApAWkTdsk+6JXn8
+	tPDTDdHS+V/GYiEDJIy9A7/+3stm5bwTf884r55Z30PPuQY0VrAVPPeUrfvwPdt13xqk1ONXjjo
+	hFF6h9Ito4XJJEgiN0i3rQRalxLgPLZC61MVM2kKZq2fjBwnaSGNS0mHp+gNfwQyLVIPgZm7+i/
+	4OQeVpAWd8JTYLtQ9dzGzanLZTxKIXz+r+yAMMppTVM23NpQ8yLhSRGzI4j6Q8vd1jWGYcikntG
+	xdCxwhsYdMbwWA2tZFEVRAR1gyRmur504idtwdUXJx/TTFtkAMp/b1JD02NTWXlF7j0tOOWGN0T
+	at4aKyc=
+X-Received: by 2002:a05:6808:244e:b0:4f4:73a9:f838 with SMTP id 5614622812f47-5640dcea0camr13842292b6e.22.1793870162617;
+        Thu, 05 Nov 2026 01:16:02 -0800 (PST)
+Received: from [172.17.0.2] ([20.80.111.50])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-567a9f400fasm3784582b6e.8.2026.11.05.01.16.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2026 01:16:00 -0800 (PST)
+Message-ID: <6aec4950.a96d76c3.73922.59ce@mx.google.com>
+Date: Thu, 05 Nov 2026 01:16:00 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4698156939012741048=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,36 +89,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261104151601.70493-3-dev@deq.rocks>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, 25031212351@stu.xidian.edu.cn
+Subject: RE: Bluetooth: hci_qca: fix use-after-free in ibs debugfs files
+In-Reply-To: <20261105055645.12917-1-25031212351@stu.xidian.edu.cn>
+References: <20261105055645.12917-1-25031212351@stu.xidian.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Andre,
+--===============4698156939012741048==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on 3f425f95ba3923d605f6a8b382e8fcdc59d479db]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andre-Eikmeyer/Bluetooth-btbcm-raise-ACL-priority-on-Apple-Broadcom-controllers/20261104-161558
-base:   3f425f95ba3923d605f6a8b382e8fcdc59d479db
-patch link:    https://lore.kernel.org/r/20261104151601.70493-3-dev%40deq.rocks
-patch subject: [PATCH 2/4] Bluetooth: btbcm: clear vendor bits in LE advertising report types
-config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20261105/202611051954.fni86ioX-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 16.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261105/202611051954.fni86ioX-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1202755/
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202611051954.fni86ioX-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    PASS      0.54 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      5.49 seconds
+GitLint                       PASS      9.75 seconds
+SubjectPrefix                 PASS      0.50 seconds
+BuildKernel                   PASS      23.24 seconds
+CheckAllWarning               PASS      22.03 seconds
+CheckSparse                   PASS      24.64 seconds
+BuildKernel32                 PASS      20.28 seconds
+CheckKernelLLVM               PASS      21.23 seconds
+TestRunnerSetup               PASS      454.56 seconds
+IncrementalBuild              PASS      44.95 seconds
 
-   Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'acl_priority' not described in 'bcm_device'
->> Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'adv_type_fixup' not described in 'bcm_device'
-   Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'acl_priority' not described in 'bcm_device'
->> Warning: drivers/bluetooth/hci_bcm.c:153 struct member 'adv_type_fixup' not described in 'bcm_device'
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+https://github.com/bluez/bluetooth-next/pull/1070
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4698156939012741048==--
