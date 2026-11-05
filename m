@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793896334;
-	b=2j001K8ayAyj2pVnip4nUuYmbN8kWBaLmhfAYRtIddqy++PDvUGjojual3Kh0kz847G3
-	 ewV9dIPFuGp5fSNIykaC16TP5IUylRDRVh1uZ7ZJKMz9KEEJT7c+oc+yvateDco4WRooY
-	 HrlgDlu5Ooo73Uhf83ps+LFVCz3qQTIMUx0WkeyDsIIbhJ7EtKQc1aDvk5PgzYwk1EU+0
-	 73Mk1TVCORbypKUZ7a45l8SmxmwrFaLEFsHwVXUoszZ16JNSQtXXksL/2AKy9ccqLNLz4
-	 KE8UEpI9HWgFEqFzYeDBx2eEVuOeyoFBYaCHiYkRvGYfJwJUkfMCoEiNXKeLyc9rHCQ==
+	t=1793896332;
+	b=yI0XF6J7GYqKD0ZKkWeC46HdiPEE7BP5tEpxQ8NizWZ0hUxUFXNKl2KbyfCgHl5otRaV
+	 wsjrMfVKDyR5GsDDpxKmU2pWMRy6//alXzDY2Q3L9DlWHl/I5Mwp3phEvjcATkdFKx7hQ
+	 mGPECKqZOtU8eh82pBbk5I865EZkOgEiiZqxdQzVYJpAjDyzntqdmNC94rt3fyaKFQZLB
+	 KNOjSWWvSaW9qQ2YfYfhPNjQHHyof9USHN0uxyXZ08d+YJ9ASKTI+BNSRbQCv6UlMxhjz
+	 NIx+rPF6n+ygvYNO/1BOj91SE32eO5BPJOhYmRnJ7ayCEwNI2MqTkseE8XqswhM2GkQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793896334;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793896332;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=fo4PMdOFg30qC0TjoVY0NWXy42OB9DCI70/PSOM+Vu4=;
-	b=oBkC5QuGwyVYIPwDZi7u/lyVaVKlvSwbTUYT5LOFqmZRtk/dmVYsT2pvbf2R4Ho6bYWF
-	 L7kqPaV8SYcp5rf6IVxCroNvtn1SZ9DlqGyGC+7lKMY9TAbNjpaCyzFS5FEd6U43UzoY+
-	 0SG09ILQbNYCXFSrEo6sH1k/s2bfDABZWhpnbHcvN2badAGD3o6GubyNsl/N+f4v3tWAV
-	 jm8P8tcUKqEZJhcua2Jxp2Kbw/wf81mpw4/dlEvFE7VAzNwMAgbbH1/CuhXxHzjeZknkb
-	 HrO0+WVpmd/dPk6Hx75t+dY9SZ1nRJZo5dIphygixj0+n2P/X4I3kMbkVlLC0tBUigg==
+	bh=s4NWbuvuth328WuI4yRDsUxrAkUoeScZ/xXaa/okTGo=;
+	b=oyaWajuJM4UVhe7fgkUlKDdempOBvJFzXz3YMMAKAdizhgmitZ3n7U5EPcTZm8ZfkPVG
+	 EnSTeHbeBCQHZ64AA8su5kgraDbDnluTn4jJoGjLta7BSnxov6GddidyaCUgrA1cMOpVQ
+	 SNcKaxOPzoIqwDOEAHt7QJHPTMfGzKyDc0LvIX0TB26dWYkFUIPCWXQTiDYQDH4LLZn6M
+	 WcGhrj+1FtEEYQyyPm8BGrmknYCBzOeqLLObWOcJze1ooCdkHT79TIcMPw4LT7rBzH2yg
+	 bURNV1ZaT+oJhmYdONeq8u7FXpMl6AcLrSkWMCJKJrevJMtycLkikQpU/4r9PJpZKJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W5YGtVW7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ss+SidAd;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E4E606A921
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 16:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FC3606A903;
+	Thu,  5 Nov 2026 16:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W5YGtVW7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D351F000C1;
-	Thu,  5 Nov 2026 16:32:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ss+SidAd
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4812F1F00919;
+	Thu,  5 Nov 2026 16:32:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793896333;
-	bh=fo4PMdOFg30qC0TjoVY0NWXy42OB9DCI70/PSOM+Vu4=;
+	s=k20260515; t=1793896332;
+	bh=s4NWbuvuth328WuI4yRDsUxrAkUoeScZ/xXaa/okTGo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=W5YGtVW7qDiwRR6OEC3hsqNVdSiowAbMmIJ/S8wWRIif0xYLBeTTQFO0RQGOyOQ1f
-	 HAOiKAq4zDK+qWZXp0Bj71RqIyupLBCLWRzZZ7drxd7JH8rM47hSmAXY9dJIje2PIJ
-	 l9ww9+vowAiePYymWseVPQXWkhVyna26kc4Meute1Wj0VUmcSECCvCg/y1Va+8clCp
-	 svebhkcoofm1pNFhxCFsKvZoLJhOjo6xw+DcuOaxgUMLg+HM5cXl0huzIv+xNPE9v4
-	 9rh+sxWL+6nKPUB0dKrw2Xr8rDA0eQ1bjc6cSOIMiU7lEcyCjdqpcgpCw7a+dCUDaz
-	 RjSzCDOc3ma9A==
+	b=Ss+SidAd9Ug/IgXRLh8zcNtTp4uGU1wbcjxsOnIdvA77IsvoeiNkVVJt+Dw08tI1E
+	 gK5ka5TJzeYUuK8Motq0qGhsAfwiH4c9unVA+oWMHn0EuF9TwqTjaZV1pbHuBqrx8l
+	 0ZBYeUFPElB9HMit1Ae1h623UYkPWpIpnyVL5rQ8qV/6lpvr5tJK9QMCtaOTmsR7Ui
+	 FueVTyzPHTH23ho0yLG672cy7aVIkoLtAAIEGdiVmGf1POks5zDh8TkF+Zn7FPr9px
+	 SxTpkyz3JZYrai8A6DHXO55lPAs2UKDqeN5XY8i4ZARuXJFdc7SQCnOHF9nfnQcw4g
+	 XTPg9rXBF/kHA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA23F391B173;
-	Thu,  5 Nov 2026 16:32:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 4022F391B173;
+	Thu,  5 Nov 2026 16:32:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,35 +54,38 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: Fix not updating of hdev->commands[] after
- reset
+Subject: Re: [PATCH] Bluetooth: hci_qca: fix use-after-free in ibs debugfs
+ files
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179389633229.103975.4552218809952719575.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Nov 2026 16:32:12 +0000
-References: <20261104221956.1207025-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261104221956.1207025-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+ <179389633088.103975.11910858924814622408.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Nov 2026 16:32:10 +0000
+References: <20261105055645.12917-1-25031212351@stu.xidian.edu.cn>
+In-Reply-To: <20261105055645.12917-1-25031212351@stu.xidian.edu.cn>
+To: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
+Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, ytkim@qca.qualcomm.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  4 Nov 2026 17:19:56 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Read Local Supported Commands was only read once during the INIT/SETUP
-> flow, but the supported commands bits may change at runtime, for
-> example after a firmware change applied with vendor commands, so update
-> hdev->commands[] every time the response is received.
+On Thu,  5 Nov 2026 13:56:45 +0800 you wrote:
+> qca_debugfs_init() creates an "ibs" directory under hdev->debugfs and
+> stores pointers to fields of struct qca_data in the debugfs files.
+> qca_close() frees qca_data without removing that directory, while
+> hdev->debugfs is only removed when the HCI device is released. The HCI
+> device can outlive the driver data, for example when an HCI socket still
+> references it, so reading or writing one of the ibs files then
+> dereferences freed memory.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v1] Bluetooth: Fix not updating of hdev->commands[] after reset
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e00aa1a33f81
+  - Bluetooth: hci_qca: fix use-after-free in ibs debugfs files
+    https://git.kernel.org/bluetooth/bluetooth-next/c/eeca795cec6d
 
 You are awesome, thank you!
 -- 
