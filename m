@@ -1,57 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.216.248.212
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793858267;
-	b=YM+qJq/q/mYvXRAMo4k77GbKIZW95m9EZGXeYHPugxshY0QnEUeMhAKtxp028WaOHPM9
-	 EVowQfb8vWyLZI0DlB3zqwzluOJsOlGxRBUIx2f5Q1qto+S6C8DbOeDZ+iEc98OjEfc6M
-	 XmzsW2B2yZBjPEbplEQSrvEDccG+kF88rm5udEuK5D43jUv1BipHla3usYuuqXVoyohgW
-	 xvJuwbBCOEQmDc4GFKxLyy88Nq7t2pSupdjJFfDRIsrpQUIdrJEQv/NyrpMuBSBr+vI7L
-	 3EtotJqvpqGSqyUK6zTIfG4qdpQ1ltAb/am44A+aWnlVmfgxvUEgexfCcIRC/QRf5uQ==
+	t=1793869078;
+	b=232OUyAp7D5z9BVtijrlceV8iKxSQmLf9SVAxaLsYWVd9yvK2cnuIA4Zhe/FvwW1W03i
+	 f/MBAWqTIRI3jHmTb013mHzMzTuyZTE/jcSvZvKXxPD4qBhZNJWBvrB4ZQ7xKmlILwpID
+	 IpkmhC2ER7ZQFa36N37ldlzBJn6iiNnRCugcVwlWLzAdMEZAcypStoxnXOrsUtORlfgS1
+	 OtpgJ/dyiSPQJqHf+Exg6LR9KZyGjiIX/dl02WCw21Gfz0ojrncABfn2etED6+FDEeNx4
+	 Q0chp1MoHF6WNgziV5U+AxI3KNE8dFXaJK2N2shq0uP4HpoVuA2uFksRBfJ/ye38mGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793858267;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:Content-Type:Content-Transfer-Encoding:
-	 MIME-Version:X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=CzugvlBhqbMDKAvT3TfBg5pfX9J4bdWCzsHPnxIZ4/4=;
-	b=wlY9JgjbI7CTsYBKbdU3jCMIp6HupSZrZoP2tRsEl1P1/23PJrbqh8FDSrJ7N/f1Gc2P
-	 5Gh8r1EhwVWIxCV4EfZe49wVrCvuM0VJrf7tm9HqUVgSBvwcy4lTvTC4zu5k4im9fIJtj
-	 ZGrY8QSZCJGLuQ1GFH4tWBDddN61fmaqioDu1OyHHL+HYatUK3OVEATqwUWEepUaNRvq3
-	 rHVCSnOlZdkPoLeken1WvaijB38weispXYeAMUgHO9lkNUX0vTr0GNKEJ4xWCnXGcmaEx
-	 6wlhjT77UQRu2gg+bjj0BTbwey2q0+gCzOD3BNd+GXuXLHbUE+G/6AKp0pG27CnxMtg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793869078;
+	h=DMARC-Filter:From:X-Lima-ML-UUID:DKIM-Signature:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=+OEukqBjZ4Nc8BCDu/WoG17PIAdLhibLS5ySFrI+Syw=;
+	b=O5jq92G8X8xEhAeczva+d+yhZGeFYARqqBwKCc8oMVYbXxaM+YaAFt3J+wJf//n18+/0
+	 VgmDWdOAmeK0fr57RcHXf8I+fHOVmBTPz2iKIOFQ4Q8EUS4cSSqc5iKEf/0Nsea66tpSq
+	 qc38zdXXhHglmVbObDacMJkIqIZyXROQsa4NAlLKeo4vnKSfvWYbHeItI4AUeafIkc7+X
+	 hQGhuSeU2QlnXRgP4YYUt6um2a5pc5vT4D6Ixk/kzOwljg152GbwxVQYr7We71wew/bPz
+	 3Nv3IFDv+WpiLhfDvJ/DPltqrm46DirBPIcBhx0Wai1TOo6JiAWZBJbtnbDIkASSz1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=stu.xidian.edu.cn;
-	spf=pass smtp.mailfrom=stu.xidian.edu.cn;
-	arc=none smtp.remote-ip=162.243.164.118
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB02606A31B;
-	Thu,  5 Nov 2026 05:57:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CB02606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	In-Reply-To:References:Date:Message-ID:Content-Type:
-	Content-Transfer-Encoding:MIME-Version; bh=CzugvlBhqbMDKAvT3TfBg
-	5pfX9J4bdWCzsHPnxIZ4/4=; b=aljBKnVfi7a+9CRk0N7rMwDGulEDoJPsZBVF3
-	fyQ/HKunQQBWecVAGgBp2moonDv/BLQD1qoefRMxV55YDyJzE26Hf5NObMjw3ZyP
-	gFHmU/IQAxT4VOJb4miT+dFVmhXUqtFmIjJaUuRBY927xIKMBRCav76bOSwc9Yaw
-	pYQrgI=
-Received: from [127.0.1.1] (unknown [113.200.174.104])
-	by hzbj-edu-front-2.icoremail.net (Coremail) with UTF8SMTPA id BLQMCkD2Of_TGuxqiwApAQ--.63435S2;
-	Thu, 05 Nov 2026 13:57:39 +0800 (CST)
-From: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- Bin Yu <byu@xidian.edu.cn>, Cheng Wen <wencheng@xidian.edu.cn>
-Subject: Re: [PATCH] Bluetooth: btusb: fix use-after-free in force_poll_sync
-In-Reply-To:
- <CABBYNZ+iU=riZ8MSTkbqv4vn0OJGLymtN98uJ8_0pw6hEaVWYQ@mail.gmail.com>
-References: <20261102110440.2589-1-25031212351@stu.xidian.edu.cn>
- <CABBYNZ+iU=riZ8MSTkbqv4vn0OJGLymtN98uJ8_0pw6hEaVWYQ@mail.gmail.com>
-Date: Thu, 05 Nov 2026 13:57:39 +0800
-Message-ID: <179385825903.13262.2748533820947958224@stu.xidian.edu.cn>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dmarc=none header.from=deq.rocks;
+	spf=none smtp.mailfrom=deq.rocks;
+	dkim=pass header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=XUim8JGm;
+	arc=none smtp.remote-ip=91.216.248.212
+Received: from bulk0.mail-out.lima-city.de (bulk0.mail-out.lima-city.de [91.216.248.212])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6899606A326;
+	Thu,  5 Nov 2026 08:57:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6899606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=deq.rocks
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=deq.rocks
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=XUim8JGm
+From: Andre Eikmeyer <dev@deq.rocks>
+X-Lima-ML-UUID: 03bf1ce5-610b-4b95-b93f-bc73e1d656ec
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=deq.rocks;
+	s=securedbylima-20251205; t=1793869073;
+	bh=jbMk5zFI/hHGFxPw9ffoT+Q2QeN+W0YqVUTB4WZlEfg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XUim8JGmqk3A1Wm2m0CInsOy8epbIAo3Kixqlf4l6cNHDe8A5Llw4ZJ9v4rcNTvUR
+	 hTcJv0z2jC49j38CMSBqCCrNPT1EN5d3+qLdMj/mekAXaBneySor9pT1nlCO4zW4MS
+	 fb/SDWr2o0nA+haydi8L8F7dMACn01sv/EMb7ybm7E+DVaxtL/cryEmL+9aF/YaP/j
+	 LUtnqVm8/N6LQYo9L5rNKxobLBkmmFPY58rjn5gSo314vQw/N/CunsHC3jrq5IGGuh
+	 SaQ8I5bsCFpFsyMJ2JtN+uUvg3KBkpcxiZe7VCY9p+RRSLWWS9GwQjqI/gYpl88zvn
+	 OYb5xPl7Vu/VA==
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	sven@kernel.org,
+	j@jannau.net,
+	neal@gompa.dev,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Andre Eikmeyer <dev@deq.rocks>
+Subject: [PATCH v2 0/2] Bluetooth: Broadcom controllers of the Apple T2 Macs
+Date: Thu,  5 Nov 2026 09:57:48 +0100
+Message-ID: <20261105085750.120392-1-dev@deq.rocks>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -61,53 +67,44 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-CM-TRANSID:BLQMCkD2Of_TGuxqiwApAQ--.63435S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw45Cr4fXw43Xr4DXFWDArb_yoW8Xr47pa
-	9Yk3Z8Jr4DKrsYq3s5uF4xX34SyryxWay3t3yfWw1Fy3y3Cr13tr4xJrZ0qa4xuFZ3tFWj
-	vw45WrW0qFn8JaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9ab7Iv0xC_Cr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
-	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq
-	07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r
-	17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l
-	c7CjxVAaw2AFwI0_JF0_Jw1lc2xSY4AK67AK6r4rMxAIw28IcxkI7VAKI48JMxC20s026x
-	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
-	JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
-	1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_
-	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
-	UvcSsGvfC2KfnxnUUI43ZEXa7IU8hjjDUUUUU==
-X-CM-SenderInfo: ysvqjiysrsjkur6v33wo0lvxldqovvfxof0/1tbiAgUID2rrTMSUAQAAsc
+Content-Transfer-Encoding: 8bit
 
-Hi Luiz,
+Hello everyone,
 
-Thanks for the review.
+This series is for the Broadcom Bluetooth controllers of the Apple T2
+Macs, the BCM4364 over UART (hci_bcm) and the BCM4377 over PCIe
+(hci_bcm4377).
 
-The vendor_diag observation is correct. For BTUSB_BCM_PATCHRAM and
-BTUSB_BCM_APPLE, btusb_probe() sets hdev->set_diag = btusb_bcm_set_diag,
-and hci_debugfs_create_basic() creates vendor_diag under hdev->debugfs.
-btusb does not set HCI_QUIRK_NON_PERSISTENT_DIAG, so vendor_diag_write()
-calls hdev->set_diag() even after the device has been unregistered, and
-btusb_bcm_set_diag() reads btusb_data->diag before checking HCI_RUNNING.
-As hdev->debugfs is only removed in hci_release_dev(), a write after
-btusb_disconnect() can reach freed btusb_data.
+Patch 1 builds on a vendor command the Android Broadcom vendor library
+uses, 0xfc57, to keep A2DP from dropping out while WLAN runs on 2.4 GHz.
+Patch 2 sets the strict duplicate filter quirk in both drivers, so a
+discovery reports changed advertisement data before its next cycle.
 
-That is a separate pre-existing issue: force_poll_sync is not the only
-HCI debugfs file that can reach btusb_data, and the changelog sentence
-claiming btusb_data can no longer be dereferenced was too broad. v3
-scopes that guarantee to the force_poll_sync file.
+The KaiT2en community, about 280 members, runs these patches with its
+kernels. Users reported them working on the MacBookPro15,1, 15,2, 15,3,
+15,4, 16,1, 16,4, MacBookAir9,1 and iMac20,1, and nobody reported a
+regression.
 
-For hci_qca, qca_debugfs_init() stores pointers to qca_data in the ibs
-files and qca_close() frees qca_data without removing them. That is also
-pre-existing but self-contained in the driver, so I sent a separate
-patch that removes the ibs directory before qca_data is freed.
+Changes in v2:
+- Dropped "Bluetooth: btbcm: clear vendor bits in LE advertising report
+  types" and the revert of 88397423671f. The mask in hci_event.c stays
+  as it is.
+- Link to v1:
+  https://lore.kernel.org/all/20261104151601.70493-1-dev@deq.rocks/
 
-For vendor_diag, btusb cannot remove a file it does not own, so I think
-the fix belongs in hci_debugfs: either remove the basic files in
-hci_unregister_dev(), or make vendor_diag_write() reject writes once
-HCI_UNREGISTER is set. I can prepare that as a follow-up if you agree.
 
-Thanks,
-YuanZhe
 
+Andre Eikmeyer (2):
+  Bluetooth: btbcm: raise ACL priority on Apple Broadcom controllers
+  Bluetooth: set the strict duplicate filter quirk on Apple Broadcom
+    controllers
+
+ drivers/bluetooth/Kconfig       |  1 +
+ drivers/bluetooth/btbcm.c       | 71 +++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btbcm.h       |  7 ++++
+ drivers/bluetooth/hci_bcm.c     | 23 +++++++++--
+ drivers/bluetooth/hci_bcm4377.c |  8 ++++
+ 5 files changed, 107 insertions(+), 3 deletions(-)
+
+
+base-commit: 3f425f95ba3923d605f6a8b382e8fcdc59d479db
