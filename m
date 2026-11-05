@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793917003;
-	b=2oaAOuzz0tl87kcjoI+pdFOUGw1XAPXkAYeDBqQK4h63DeEuJBTfi/mVDZWXCPcB3xc7
-	 Qc1RCJRlyPEm9lFuqJNRykcgVANo1UQFNrmjUqvR4Wrndelg9vyOkcgIRlp3YsJk2OU4c
-	 Ogyh7c8/HryqYLq0AptlNSG3egGw6mtOSKix5bQUNW9DLATB48z6KOyrh14FAIRdUX1nQ
-	 t+j2Hmw3p9IxI0J8QR+ps/D66bWAQhnPRZii1P8oyvln0CsPyVqcEfK/QeahvA0LTKMaQ
-	 Cqv1w3z3Isc5lwKXhBjfp/H45eCgVMdf1o7qqB7ccqhqbwl6buWo1xI7+WNjHVDWZUw==
+	t=1793917004;
+	b=5EsrEd75D8YnESCdGHN8lPkDh/6/GLFcRrcWV+xVwFLTIcSRmWndakkn/yagHxnLNwyX
+	 XvitJaSLU1m4txsvIxSZxvXmI1PUH/6UBF1IkIIohvqRFQgFo3moU/e8zglM0LlWgjgSz
+	 mZBb4UqeEuFcCZ981TiAonqBiVu9Q72H2rFTiqG81Pd6LBeYPKcttyn02PjjEl/c8R0KJ
+	 WdLHsOsoR9Ngx3DJzX0UYwn6Tsw8I8+nDRjcwP492YjFrZE3HIMjuG81JazBFCThX/qco
+	 bmMAP3ZafKOSpvWoNgLqf/U6DVHZUal1Hmxa4GNXslqLF1hEUYrkNyOMgoJJcutykfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793917003;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793917004;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=fLGqe0xIjuBs7QvGvPAxQNPs3KVLT+z5sUHLw5OLIMg=;
-	b=x0Oc6M9L0CmBDwStA1RdwMakstG00IMWq6vmHtc6rnp1ip/86UW+r3dDtkjeir4cVn72
-	 ZOqqsWVOdbDbsvo7VzVCtSRmK6H3dwlNWjtoBcG6xx0/oyeSJsxDyUn/kkNnIwBdxlj7W
-	 199jFYJC6l1QwuTxI+4LzyxfxxMHuhikqsq3222nLo1njUhssTpFB6CHi97wgA1IKFODN
-	 wUkwydwa2Iaggrcy6+UPtWcFFEkddrh9NkB3MA6BQK6f7XuXvUkdzGu6+8Ti6OxEDwZo1
-	 o2grWNdK6Ceu0JIRDx9IidB5kDYD99xsl9AAwN6tCb+3JjIDGN2+XX+ea5N3KUj5gdA==
+	bh=bzS+SjN3Y8Enl5m9zEwLGXmnA33H6ppVXksHbwSTwdA=;
+	b=OxtIU1IGh4hkIV0TfRDrgtxa+5q0zDog8YNo0SL4x3dE7Wyp2Js92S/1823/DlfGiYyc
+	 zRsP2SuGYONBp4DbG4GXWrjaN9qHEXPokUg8JdJSXjEIPqXSPsWuD0vqAIqb7PLD9c6Ch
+	 xO2xfyur2HwK4+G81pGDz9y5NtTjAWAn1SJj5eP1NgJbBLuh28qV6c7CfFUZJegUWCuDL
+	 swCCnbh7moPaEQIcxWRK5mrH/t3K4y4A/kvO3+6QFasEJv2hobxlclZAbvm65UBNvyP5b
+	 f0u5mD/DsuIVe5VrY8C0Hke7U7RAspYnQOCgnFRBbe85KbcMPwvGqbmTZFhUU0Hbr7g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=uTRz59hV;
-	arc=none smtp.remote-ip=209.85.217.41
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=eyO9+s1W;
+	arc=none smtp.remote-ip=209.85.217.50
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3167606A32E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 22:16:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E3167606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E873D606A332
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 22:16:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E873D606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=uTRz59hV
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-7cc53938a8fso50663137.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 14:16:42 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=eyO9+s1W
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-7d06763335aso21844137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 14:16:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793917002; x=1794521802; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793917003; x=1794521803; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=fLGqe0xIjuBs7QvGvPAxQNPs3KVLT+z5sUHLw5OLIMg=;
-        b=uTRz59hVjdiHEsaNVWtohuA90JaL7EgajjJhPYuk5ZZzMyGl70eRGvMG6PLVMkZ170
-         lUyFvLCC5z/c1m6tcsUZkEA5uJJzvjeCpC9LJOLbvElgijHixq4yyQkEFoZQaHQPDTKi
-         KNVm2gkINnuUzB7y1VApmTHB5qGttj39lqsGZ6+sZjc0Ew4018trHJTTIlkRYbXkeOhs
-         AHPZw/rhXR2XAzJs22Wg/YtOoDBV8ce+A9ANaFBd4Hg5+wkQcTYGdmGOV9kEF7J1maK2
-         RCLUG7C30IJBaTXtbV1VhPp7pMGaWSJB/cf0X7Qd/Wb+knVYNJKxr+qB9jwOm4tWY4ze
-         /2VQ==
+        bh=bzS+SjN3Y8Enl5m9zEwLGXmnA33H6ppVXksHbwSTwdA=;
+        b=eyO9+s1WHvh43nPJIhTZhYdGfUH5AIZoDWNg3R/jecLmDSHRqUPHGOQ8TPgviZr5gU
+         r2fGA7i6tedOX7kmCRFhuNGHYiIEwPEPoCdIin8bfxF5/w82gMJvgZJXdNa6Aoh4geFS
+         cYL3MfUCcqNgfx1AkENKnc6StN9FKfyoRAi1ViN28/nbS0e5cBYF2lvgZKUq0QLJGeSr
+         O+IH0raQfolzv8879Nd6FTI8HKeaCLrMaN8BOAQd5UK42LUwP7nhfudMsZcaTIrj6Id1
+         R63Vjp0UVS37ZjIVZwBWINz4ODuJyM3/6wLjGZz8plObDQdaF0+TQvzBxmNMPrBBXdWc
+         SJ7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793917002; x=1794521802;
+        d=1e100.net; s=20260707; t=1793917003; x=1794521803;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=fLGqe0xIjuBs7QvGvPAxQNPs3KVLT+z5sUHLw5OLIMg=;
-        b=LDSHwGGFTIDG1W9cUacGzxwSx6PbvtCAFM6IQlgJ9YbYzgxa5oPrkJuj2fU3tI+bq9
-         c3Gmt4I2v7NcPlutWXIL9n7vs/k8MZRbJWyiU+YjZRtsqb/PWtL6mX8+mrLVIHc8eatg
-         BH1Bgp16KYAd7lCj9r+newsbUREtT8MYKTrOx9odvrYu3F+Vuq2i30K3Y0UtiGait4Va
-         bUu9BsNrSd8MVjVzBqAD6ha1b/3kBhIYtCgMrQKBoEkgjCSf1XVwN/eEDSBz6NIGwaEz
-         U+n4CEsF3NzAwkQOoT4q5yyZhWwYI+JFno1xexAdKM29hxnYXglLTyqNVvTU6ZpD8+rr
-         4klA==
-X-Gm-Message-State: APuU4Z+HyzwYPo8DqArmi1rSmi/VGJU76x2Wq+WfqsAW/RYe+AS5q4R2
-	AkYtuq6ugrv4Zj7KACwYQI5UsB1dtPn46ajRhJkepqoiQOA/sYWsywRfoc7dzA==
-X-Gm-Gg: AYBFou2DjZBl4CfYeDnqEOmyZogRTEyFtsh0Xev0tZAhjeC+3WLy40LtDuhvdhdBiBT
-	20v7vxbwRzWNr8UXupxAO4VpZMS1ZfZX9ZXFmi11yXv94qjmZhOIHgCSfvE6GD0Y1yk/pwxpsbv
-	hT+eut2JKvIX5uePJfV2f/djrKuvyjl+IKyMRhGybWKO9LCOATT+anSGQzSXhlRRyreAvQhsqqE
-	8kef7CxqqoH0ofs2nI26FGwbagUtGDda4eNYR6vC34tvU3dGHC1812MbhNDovHZixt0MHuUXQpi
-	Iv4SCU/SLjwXW2m32Y1JExezXdZbiN1UNgqKivnciZtjEyNJPsGP6AUI2Q39k5r7Bo2RXrtA84Q
-	Jsu4aJfl6h/dG3FtlWhL/a2ltKPnSaGhRaLZmep2JfA7Jr1RrAM2j3Js9L6e4F0i4Syf4OG6hHi
-	XAHnKyy+nYkuI28ODKFFc1WSDVNgKiMSsc/FKsyXsqmeMNkti7Z1qUhtpWI4Y6+AFFaBrK2HVD1
-	eY8b6UVOO0CSpVu9Z3Gn07LBziFR85MmCPpaHaodXBYGuhUM/wnvfpXavhT/sWH0AFn6rvL7jfl
-	g1ocGuXWt0fPyzNTsEaB4p1jUVGtCl023hRG6amBy+XUMFY5RwRCO/bGYkdnV7dL23b9BdZeagg
-	y3YcKsnYx51mJoe4xWU1nqLkYRokAQyQCTc7dPg8V0hO9GxJwRXLzVYO783ZBadKCFZ2+ubERBB
-	O4AEw=
-X-Received: by 2002:a05:6102:4456:b0:7a8:10eb:96ce with SMTP id ada2fe7eead31-7d2a130980emr625550137.4.1793917001752;
-        Thu, 05 Nov 2026 14:16:41 -0800 (PST)
+        bh=bzS+SjN3Y8Enl5m9zEwLGXmnA33H6ppVXksHbwSTwdA=;
+        b=e9Xc4Hwn9jw5dyDa+f1XMk0gvqSbtcd5tq97ucZyG0cvvf1HbGQQuWlkJIEBkU0Se3
+         krN9H/hW7uSb0DzsJuDWtAywtCzzoATEYWgBw44+L9TFPy0pdDoB03z5qs04NE8ZqA0U
+         /SryJ0hdPoXU3GEvU/oZJMaDosqoODqs1TT1IhxUEepdnmrY0kwTchCaEa9DgSy1MFYt
+         S1xP1YUU1dOuxq3zebpXA5EDuh+XEh5k15tT5pvWOpNsjAzM+1jxhO1r8ED0pgGQcMRK
+         8UnYDJ0amjofzjTMRSzpc4/m8aeY0k/Zz3jA1JxyD8EB/cPCsQgXA/jBhVAqXdlYRTs8
+         ZaoQ==
+X-Gm-Message-State: APuU4Z8boicj8LIw/xFVa/sVk9LWyACCMrgRWdxVfjBfdF9MT8NaagrW
+	LNj1ekaYCRAbOtzb/S1DwoWafXALT7wXM17sdtaEebsLn8NGNVO/7w6fZ8QlLw==
+X-Gm-Gg: AYBFou0dY+2WjYYYHXyP8lH8dY3MINSq3xN8EZUkor3xDBjbzE/+e5rPFqL6FT4fx5g
+	jLJuN2hmQUQQkTU5rlAcrfi7qYQZP6mytemsZbku2pT0CmDLH4YxWmLi0QeNZRszrYR71wsjBSE
+	aNZrPZ/P0D68NUNo394c/FaJdcIxg3bESoYSqJeTylj8Oj6jXotFBJkI71z5yhsMLk42Zp3iCIy
+	NpB/qFO0tBRO3FIDbfkYc/DfI6MDQIQNnf3RgATUo/lYbgWcnzM9vHEOgEfnfGGJqQ5CrH0UFrh
+	KC788bDPj/KtG6zH8X9yRM7BLLDkxmgIfVzS7rnOcTqVgy4lMQwxWeR+92+dAk4AiP28qsTFwE5
+	9RwBv14dj/F+NXge1RqX+nHIzaHZ2swecLM3j+v72McMRlvwSeeVpWrzsKl8+7dIkDjP3TvX+YQ
+	iYDGEw1K25uCbfrdid6ABH3i8UWRHQVq1kD+JS1K7zsI/1xgD8AcDetxa0YW5Fu3cvu1Cga80dv
+	m5oXQ30GZDvn6Ts8A31LTYBHXu4bVqqZnnM9GuE+kcG8u8eNc6MG6WcP1nz/tTEqa5uIWcbYnYH
+	+cLOP8ymwXjrG7j8hWgiak7IrZw00gFCGOKNaE4H2mWMWK3QYVvGMXbX17T6H6E0j5szwanwsBy
+	xA2Vam72tKIWtgH+Q7wdEK4e1YHGJOl7Z7TEIOzYJtkzmZ2d0LHrq6lnBj7j8tirGG1FQi50W9L
+	fLRndL8MgjQl+7bliO3vDEGDpj
+X-Received: by 2002:a67:e114:0:b0:7cc:a3a4:2a04 with SMTP id ada2fe7eead31-7d2a12d6d07mr667641137.3.1793917002744;
+        Thu, 05 Nov 2026 14:16:42 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d29d1ea0efsm1355419137.6.2026.11.05.14.16.40
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d29d1ea0efsm1355419137.6.2026.11.05.14.16.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 14:16:41 -0800 (PST)
+        Thu, 05 Nov 2026 14:16:42 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/8] shared/gatt: Validate Read By Type responses
-Date: Thu,  5 Nov 2026 17:16:31 -0500
-Message-ID: <20261105221638.2332398-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/8] unit/test-gatt: Add malformed Read By Type response tests
+Date: Thu,  5 Nov 2026 17:16:32 -0500
+Message-ID: <20261105221638.2332398-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261105221638.2332398-1-luiz.dentz@gmail.com>
 References: <20261105221638.2332398-1-luiz.dentz@gmail.com>
@@ -101,63 +101,127 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-read_by_type_cb used the peer-provided Attribute Data Length without
-validation, causing a division by zero when it was 0 and out-of-bounds
-reads when it was shorter than a handle or the PDU itself. Reject such
-responses as the other discovery handlers do.
+Add tests for Read By Type responses with invalid Attribute Data Length,
+truncated data, empty values and an empty Server Features value.
 
-Also check the iterator result and value length before reading the
-Server Features value.
-
-Closes: https://github.com/bluez/bluez/issues/2746
-Fixes: d21412b96048 ("shared/gatt: Implement "Characteristic Discovery" procedures.")
-Fixes: 76d63c91b27a ("shared/gatt-client: Add support for EATT features")
 Assisted-by: OpenCode:claude-opus-5.5
 ---
- src/shared/gatt-client.c  | 6 ++++--
- src/shared/gatt-helpers.c | 7 ++++---
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ unit/test-gatt.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 836a59a8c990..09bd9c971ee5 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1565,8 +1565,10 @@ static void db_server_feat_read(bool success, uint8_t att_ecode,
- 	if (!result)
- 		return;
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 6d6d0c73ed40..26768e1aca82 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2064,6 +2064,18 @@ static const struct test_step test_read_by_type_6 = {
+ 	.expected_att_ecode = 0x0c,
+ };
  
--	bt_gatt_iter_init(&iter, result);
--	bt_gatt_iter_next_read_by_type(&iter, &handle, &len, &value);
-+	if (!bt_gatt_iter_init(&iter, result) ||
-+			!bt_gatt_iter_next_read_by_type(&iter, &handle,
-+						&len, &value) || !len)
-+		return;
++static const struct test_step test_read_by_type_malformed = {
++	.handle = 0x0001,
++	.end_handle = 0xffff,
++};
++
++static const struct test_step test_read_by_type_empty = {
++	.handle = 0x0001,
++	.end_handle = 0xffff,
++	.expected_att_ecode = 0x0a,
++	.value = read_data_1,
++};
++
+ static void multiple_read_cb(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+@@ -2146,6 +2158,7 @@ static void read_by_type_cb(bool success, uint8_t att_ecode,
+ 	struct bt_gatt_iter iter;
  
- 	DBG(client, "Server Features found: handle 0x%04x "
- 				"length 0x%04x value 0x%02x", handle, len,
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index b3d5d8f1a483..e3281ec17758 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -1299,14 +1299,15 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
- 		goto done;
- 	}
+ 	g_assert(att_ecode == step->expected_att_ecode);
++	g_assert(success == !!step->value);
  
--	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu) {
-+	if (opcode != BT_ATT_OP_READ_BY_TYPE_RSP || !pdu || length < 3) {
- 		success = false;
- 		att_ecode = 0;
- 		goto done;
- 	}
+ 	if (success) {
+ 		uint16_t length, handle;
+@@ -2957,6 +2970,81 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
+ 			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0c));
  
--	data_length = ((uint8_t *) pdu)[0];
--	if (((length - 1) % data_length)) {
-+	data_length = ((const uint8_t *) pdu)[0];
-+	if (data_length < 2 || data_length > length - 1U ||
-+					(length - 1) % data_length) {
- 		success = false;
- 		att_ecode = 0;
- 		goto done;
++	define_test_att("/read-by-type/zero-data-length", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x00, 0x0a, 0x00));
++
++	define_test_att("/read-by-type/short-data-length", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x01, 0x0a, 0x00));
++
++	define_test_att("/read-by-type/missing-data", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x12));
++
++	define_test_att("/read-by-type/short-handle", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x02, 0x0a));
++
++	define_test_att("/read-by-type/oversized-data-length",
++			test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x04, 0x0a, 0x00));
++
++	define_test_att("/read-by-type/truncated-data", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_malformed,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x03, 0x0a, 0x00, 0x01, 0x0b));
++
++	define_test_att("/read-by-type/empty-value", test_read_by_type,
++			&uuid_char_16, &test_read_by_type_empty,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x09, 0x02, 0x0a, 0x00),
++			raw_pdu(0x08, 0x0b, 0x00, 0xff, 0xff, 0x0d, 0x2a),
++			raw_pdu(0x01, 0x08, 0x0b, 0x00, 0x0a));
++
++	define_test_client("/read-by-type/empty-server-features", test_client,
++			service_db_1, NULL,
++			MTU_EXCHANGE_CLIENT_PDUS,
++			raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x3a, 0x2b),
++			raw_pdu(0x09, 0x02, 0xff, 0xff),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01,
++					0x18),
++			raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x11, 0x06, 0x05, 0x00, 0x08, 0x00, 0x0d,
++					0x18),
++			raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
++			raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
++			raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),
++			raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),
++			raw_pdu(0x08, 0x01, 0x00, 0x08, 0x00, 0x02, 0x28),
++			raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++			raw_pdu(0x08, 0x01, 0x00, 0x08, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00,
++					0x00, 0x2a),
++			raw_pdu(0x08, 0x03, 0x00, 0x08, 0x00, 0x03, 0x28),
++			raw_pdu(0x09, 0x07, 0x06, 0x00, 0x0a, 0x07, 0x00,
++					0x29, 0x2a),
++			raw_pdu(0x08, 0x07, 0x00, 0x08, 0x00, 0x03, 0x28),
++			raw_pdu(0x01, 0x08, 0x07, 0x00, 0x0a),
++			raw_pdu(0x04, 0x04, 0x00, 0x04, 0x00),
++			raw_pdu(0x05, 0x01, 0x04, 0x00, 0x01, 0x29),
++			raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),
++			raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29));
++
+ 	define_test_server("/TP/GAR/SR/BV-03-C/small", test_server, ts_small_db,
+ 			NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
 2.56.0
 
