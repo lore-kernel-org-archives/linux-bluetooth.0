@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793904296;
-	b=JOx1ZQyf/xuRnVJWkGUyZ2srRo4Em2MxjiNi7mMOapRmnDydWNvCxQu0ER33POwj91Pc
-	 A2KkKgGbdbsVXa4J4HQb5bdzC2y+gO79tKbO5V5QdNKWbNRBI6W+5ONXhDsFjcklKDL3Z
-	 YfraetWOnLvY8ySyDJYxIILQWA0HtUaBD84vq0UWLgSNUDQ+ytSxE4fG4gL3SlXhb1vqy
-	 FH4Fs/EVd7PWrPjrN0ZpeaSlsn19uSRWFDjTMPuO8YwJIX1wPEBrIM/rTLeLJWozmkFKS
-	 5JOmALUPdCC+0JM2DPCD9S0eog9vn0XzBWiyCYUYSaBUqm8nHct4OpuvBexMKizmlcg==
+	t=1793904297;
+	b=C2GtPfQIf81lXVndjmGCXVo4rV96yke9TfnY7rTfroWFqUwAGYevNx0n76cyfaAt0iKU
+	 sa8uDBsulGXn7LNymwvtm9Yr4dNlFqknUlu4cxg03fbGHSIeX4oXkbEcAYjaZ9EQYC0Xk
+	 al0EXYPH1YFJfITwqz/HEPdk5YPu4L3g/ohstYnvx796Ef5B+KHTuhvCnVcnsBSUiKprm
+	 mH4Opj1xOHjFS5By/eDYr03HsFoHGaklMqLl96mph9Ps0RMlDjNTrOQ2kQc4Clsu337RQ
+	 oGGQHK9Bur5sMs8vfGw2Q9hYWxhANxFKh3loAH8NlGWlOKVb5vYopWbtO0kqJPk9+bg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793904296;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793904297;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=RqKiTKDpZyrMwySy6o9CpKSYRFgd7lxKSCFs06+v0wY=;
-	b=wGJgfBZ0GiV6SMraUdhDp5WIR4l8CNR6OCrcoLsBeMpvSw/TRwHwxyxJJKWZbjYSRNhD
-	 utJ90aZXNapHUWg3mxshpzlYKp9LPLIAgi360ogAXcmkjVWxVlZiTm1zjJ4jwKRSc5Qw9
-	 aBy8NhhefETJ2N4c47ALQfZj1kxnbav2V0Slo//k5E1DGmRutQGRJaVtROvmSM91HUslE
-	 Pr0JfAqP0NHAFlX3tpTPpIcnku+3aupDv0ndD7GtG2LKOMvxwnfPH5+MJhyM25HDjoW56
-	 uJwklm3lLRh/JRNrqXauJ3yB1s+6BoR0Ig5qxx/ImmKHlzIy1Lk2iTh3oj2haT95SJg==
+	bh=3OPxWm2cxRcGebCjp0sH5lgDbKSyxplQIZ8UzYJQUVA=;
+	b=XCxQFnWSzElvTsAZib/z8id5uUSSewWZdXFlxWFtyaIgbgc6Uiz5t2Jqu1PMlm0RMlv2
+	 /JmT9vUEEQzqKoQpWcpKn1d60y0oQ7knPXZKf/C6mVNoEMTGg+Ggtxl9wL7msKnlXE3Fh
+	 bKy4HPmj2sYUREAESvVmw3KUgjVyEu+FfaEhsNkLqdgx6Rngo/cLizZjNEvevP8OmOcsZ
+	 qFIbTHwZ+1K2cruF5y+fp3Fhk9+mxz+VQiRfUqQvUen5ddMYVb/MAUK5MOKwJ/vWP7ndN
+	 3IEXy+xgXO4JthECPqPa5TRFBm7pJS27GlOXcW6wV7YSVH+z1/IxVTKrChxzagQLC7g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ouqa0ikY;
-	arc=none smtp.remote-ip=209.85.222.48
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nEZe1P3k;
+	arc=none smtp.remote-ip=209.85.217.49
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC4B606D804
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 18:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CC4B606D804
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3891606A329
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 18:44:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3891606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ouqa0ikY
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-99075306daaso1162020241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 10:44:55 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nEZe1P3k
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-7cc3eb09dd2so791873137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 10:44:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793904295; x=1794509095; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793904296; x=1794509096; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=RqKiTKDpZyrMwySy6o9CpKSYRFgd7lxKSCFs06+v0wY=;
-        b=ouqa0ikYVODx4/FFG8QS5YJ2lHqD7sn7lT0PrXKYWebjtOEaEKM0JxDBaeFXTyLwc2
-         W3M5Zqx6jU/FrC5CiIdDylcwFLwX/9NpzjEEv9YRC/kx7fLxJn8xlYC4zOmvmFuCFxBM
-         RUEzE9ZnbrxmtaGC1GMU3c3Jaz3SFXPj/A+b8VeTl6rMXhASN8BCNW2hpCfGBa8ZDR1c
-         AnhnpDjkDxSqPQ8XgdfHnVfWhOjKpLx1Ktlgz13eJXNt2AbPO0Mg6w09j+ZsijqkwbPb
-         byKZJmq/5s+djqaKjsyXrGkeRm6OWJbBg19Vtqcfs8ua/MmYDPL9uRCXuqZyggLtJcPq
-         wjdg==
+        bh=3OPxWm2cxRcGebCjp0sH5lgDbKSyxplQIZ8UzYJQUVA=;
+        b=nEZe1P3kaM7TLxT8iEO3x5WdP4tL+anFiDmAsgnvGmZF9ytdAYMC/+E0bYbKldeOR0
+         0CfzQeQOLmPmtocoCZeIBBmvju/eSnVAcOq97+WLcY4/LdI/8vDfC+tU4x6iZrPUdHtG
+         WErZIFZAQzRLVQTkJeT77mRN2rnLmjMcsrblsynnHTx0hUCDg+GDsEbONuC2qGtCzYHL
+         5iialgriWALgWqbHaihDI11/+ERU6nj8jq/NB+bcdpzz64w9vkkb+nsxoNAho42SHvqv
+         lWxAGU5uEPIZiVFejORCmaB2HxhbGNIDNhf1k3uBPlcbf82sfGHdTmiimqK1cV8TRBnZ
+         0Gcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793904295; x=1794509095;
+        d=1e100.net; s=20260707; t=1793904296; x=1794509096;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=RqKiTKDpZyrMwySy6o9CpKSYRFgd7lxKSCFs06+v0wY=;
-        b=RuOCsSXrvVrHK2ZF3hJJWzV9GrSuLqB4fxXAwVS/CT/g4W2kplMRxdb8quP7LIOtvW
-         HhwxbVQFOHeLFqBtvGovThTWN2Kf6kstdRRtdasqHN6Vum3a3sLgMAN1FwrHvDn+cQ0I
-         Bm62o0imuxa6Aj9ngwKVTJq06meW70RL7KGUCJFPXcVgobpgpEWmVOwZP17kDT4sEkdt
-         EBvJ+8uPM7F8ZULHAXIu9KO1HIkZxyhpyNWOJTv+YaByZeQ5aVkxqvSkcsPi0vmpsawC
-         cs6go3644gJOlyCfOhaOWx9t2GOzy7QPxrNTAPSpaFhjXQdh4AURcpngfi9/HSdhZrYH
-         cOGw==
-X-Gm-Message-State: APuU4Z8AU1UkoIHwAkBazW/kYQRXCNzUhnA5AOXGs/+azGi/+aFndxrZ
-	yfy7aY1kCY/lbiO6Zk22Pn4llVXxpAqRNIJUwvLzJMenPijTc7TEluSxWTcYZA==
-X-Gm-Gg: AYBFou0cqkQyujxCp0Jthq5y61JUTk2MPFyj6sav8Q5pMALv1ffC4sB04qd/+bf26J9
-	inbd8rqYFJKA87Rl/WkVhwYnC+mJIDLpKq0Vrqm/tx8XGiL3r2YtHSud5hp2bcGWJ9VOMOdcXu4
-	uV4uoVFWrwDLrEAX873+INQCzL5tczqqIQFbLUWaGAQmc0LSNihvCBbWSMUXRYgx5bFH5jei5GA
-	oVpaYaFw4mql7GLvxYvvPsa01wFX8bFHhrX73GQV+7lnScOC3I21p5tl3fWADYttdmMzQbfkqTJ
-	nAe/KkD7c60K2EO0jvtj3BGzTDOH3u/afU0VYp3ZRhKFRwnfIBVZelBqm8AcwbzSFR6k1vk0Y3v
-	ikjbI6JR5UvUaW6hFcBKld1mcfQ0ahD/nxBWeBM86GW81nE6ZYNjwgAmyIlEHKgvaL/V/hUc5p5
-	o5GZiyltaGeKuvihfHiW9kBp66EyejxLFIW0F8SOQzgPmLTsi3BoQBW/aipP5uQO20nbJdojdBk
-	nZDXPfNHW/ePzB+nkFWRDs4Loh/bljFcb6YMeDTOqoLAjya6x0Poq/HHUSKCAS61gGd05Hq4jWc
-	rAoGxz7yvUz7qst2SpfdFOszdgUFhVVD+9DBaUt1NLFWAowJ0J/EeNkzOo5wb88NS5WwVUQndFa
-	+COdBSXnOJ3a1+YfBdMOJc6iOBgVI5MphgJz6aiffCCOyLmkQnCYCToKUAXX9xQZAedvKCcdrJt
-	mAbnk=
-X-Received: by 2002:a05:6102:6f08:b0:7d1:cf05:f2fc with SMTP id ada2fe7eead31-7d2a164d1d6mr341531137.27.1793904294600;
-        Thu, 05 Nov 2026 10:44:54 -0800 (PST)
+        bh=3OPxWm2cxRcGebCjp0sH5lgDbKSyxplQIZ8UzYJQUVA=;
+        b=BP9APC7VJa3SpPL3pdmeWXcni1Ardv3KNOv9GNq+V9z8xR5qwFyYJazEC/sf14e5xP
+         MRERbZ8PUtLVNSQIy09W037PuAhufnM8/rimCffrfr5f73g66kBOKWeW9hRGF0tX7ixU
+         QoIqkjZl3gyKf10Ju1UsZLkhkNSVXAhmNgSrnpNmB00OIs83X59jxaR9ED+Ym5v2LQyp
+         g0DwF9qbOG3JXRs624oqun/aHZzc983St1lCK9ts6gq1V3hTki5Bn0hOKPYP8V40LK2N
+         JDX8AxPo2pggKiJs/WrnIdFx6MFBOg+8PPWOtTxiMYfEm9v2cvHwfuTjV8GDZtl5XuzN
+         HPCQ==
+X-Gm-Message-State: APuU4Z/zeDNU5AfaKRBDmo8g4BHuowCnQUGHkHBSxekFQvnXk3HxBxMp
+	TVgWNbhQRv3ZS/aVdz/3He1IPQlT4g7fk/zxcaO115rqJapfRboI+1fBH5Mdfg==
+X-Gm-Gg: AYBFou2GUoS+jGrupO2YE5R/nco14hiRToIZIYHJVohlm0o6jSgv15u87veFmpDV3JI
+	Yr3sJM5AO7t4h9NARmDEf1S4jVO3t73FB4mrbAnEkvYZA/hi6wzuodvzgaNhoM2XHdM5QDYwIxx
+	VPpHqaauJCuq5I7fprE2DihwGb7+WPQT3ep/FQmA+E/UhciIRYCHu0OuyZzqHFPegKdGqIJ6NVk
+	FIVpD3Y39c4BCL4gOciMWUqmlftIWH+OQEvVdfIhIqqz12frRy4fvYmAfZygnY65MsvB9tYLkNg
+	fVfM73Bnz6uvvBEH71VGYXUa2l194pYQRHlYc/DiWIlGL0xAIvxajYsu5PNwAXp861JsMkWAums
+	be2mf25CXw8pjU/D6kYbllptApWDAXEroi75AO26V//doCvnsJpgX34N8uQw3aXpyNR5Vz7dHLE
+	mqq8xOTZt9S2b/2JZjPy1XHcF+C4oToL/NE4UWsBG+Tg0H0HI0ptviRAkmv5t9L8He3WLY88Skp
+	VkHIKtskrJlX3YFH5JKVAATTHNry9zorHNoJRqpfbDd1hlQWieD15oyTAKkjZU82FjSGrRMYsuA
+	HQLxBodNywvmGitghRe06LMQMNkPi/1c9bTIUKLd3XeMaCI050ME8HSphsWTzTJ0/XS47Xsk/PN
+	dr4tknbCvuzGFN5XREPCqmYP40iHsPkAsS+maP/huFVAeLEe1SgGp741J4h+D4WLWJBJ5AEaf0X
+	wkLD4=
+X-Received: by 2002:a05:6102:6053:b0:7c3:873c:b3fa with SMTP id ada2fe7eead31-7d2a12d95bemr356411137.4.1793904295417;
+        Thu, 05 Nov 2026 10:44:55 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99baea8aeb0sm12182241.9.2026.11.05.10.44.53
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99baea8aeb0sm12182241.9.2026.11.05.10.44.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 05 Nov 2026 10:44:54 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 3/6] Bluetooth: Add initial support for EKS
-Date: Thu,  5 Nov 2026 13:44:46 -0500
-Message-ID: <20261105184449.2149626-4-luiz.dentz@gmail.com>
+Subject: [PATCH v5 4/6] Bluetooth: L2CAP: Add MIC length validation for HDT PHY
+Date: Thu,  5 Nov 2026 13:44:47 -0500
+Message-ID: <20261105184449.2149626-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261105184449.2149626-1-luiz.dentz@gmail.com>
 References: <20261105184449.2149626-1-luiz.dentz@gmail.com>
@@ -101,706 +101,385 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support for Encryption Key Schedule (EKS) introduced in Bluetooth
-7.0:
+Add a mic_len field to struct bt_security so userspace can require a
+minimum MIC length on an L2CAP channel with BT_SECURITY, and read the
+MIC length in use on the link back. The field is added at the end of
+the struct, so the shorter struct is still accepted by L2CAP and RFCOMM,
+leaving mic_len unset, and values other than 32, 64 and 128 bits are
+rejected.
 
- - LE Enable Encryption v2, which replaces LE Start Encryption on EKS
-   capable controllers and carries the MIC length to use on the LE HDT
-   PHY. SMP now starts encryption through hci_le_enable_encrypt(),
-   which picks the version the controller supports, outside of the RCU
-   read-side section since queueing the command may sleep. If it can't
-   be queued SMP fails the pairing or doesn't consider the encryption
-   started. A Command Status error disconnects the link as it does for
-   LE Start Encryption, and so does a command that fails without one,
-   such as one that couldn't be sent. The command, which carries the
-   key, is freed with kfree_sensitive().
- - Encryption Change v3 and Encryption Key Refresh Complete v2, enabled
-   through Event Mask Page 2, which report the MIC length and whether
-   the key schedule is in use. The encryption change and key refresh
-   handling is moved to helpers shared by every version of the events.
- - eks_capable() for the Encryption Key Schedule feature bit.
+The MIC length a channel requires is requested on the connection on
+every path starting LE security, so LE Enable Encryption v2 asks for
+it, while the MIC length the controller reports with Encryption Change
+v3 and Encryption Key Refresh Complete v2 is kept separately, so a
+request never stands for what is in use. When a connection is
+encrypted on the LE HDT PHY with a MIC shorter than the channel
+requires, the LE Credit Based and Enhanced Credit Based connection
+requests are rejected with MIC Length Too Short.
+
+The reported MIC length only applies on the LE HDT PHY, the MIC is
+always 32 bits on the GFSK PHYs, so hci_conn_mic_len() reports it as
+such both for the check and for BT_SECURITY.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci.h      |  30 +++++
- include/net/bluetooth/hci_core.h |   4 +-
- include/net/bluetooth/hci_sync.h |   3 +
- net/bluetooth/hci_conn.c         |  18 ---
- net/bluetooth/hci_event.c        | 211 ++++++++++++++++++++++---------
- net/bluetooth/hci_sync.c         | 124 ++++++++++++++++++
- net/bluetooth/smp.c              |  67 +++++++---
- 7 files changed, 362 insertions(+), 95 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ include/net/bluetooth/hci_core.h  |  9 +++++++
+ include/net/bluetooth/l2cap.h     |  7 +++++
+ net/bluetooth/hci_event.c         | 19 ++++++++++---
+ net/bluetooth/hci_sync.c          |  5 +++-
+ net/bluetooth/l2cap_core.c        | 44 ++++++++++++++++++++++++++++++-
+ net/bluetooth/l2cap_sock.c        | 23 +++++++++++++---
+ net/bluetooth/rfcomm/sock.c       | 13 ++++++---
+ 8 files changed, 110 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e60686cf978d..778c234385ce 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2564,6 +2564,16 @@ struct hci_rp_le_read_def_data_len_v2 {
- 	__le16	tx_time;
- } __packed;
- 
-+#define HCI_OP_LE_ENABLE_ENCRYPT_V2		0x20af
-+struct hci_cp_le_enable_encrypt_v2 {
-+	__le16  handle;
-+	__le64  rand;
-+	__le16  ediv;
-+	__u8    ltk[16];
-+	__u8    mic_len;
-+	__u8    encryption;
-+} __packed;
-+
- #define HCI_OP_LE_READ_MAX_DATA_LEN_V2		0x20b0
- struct hci_cp_le_read_max_data_len_v2 {
- 	__u8    phy;
-@@ -3039,6 +3049,26 @@ struct hci_ev_sync_train_complete {
- 
- #define HCI_EV_PERIPHERAL_PAGE_RESP_TIMEOUT	0x54
- 
-+#define HCI_EVT_KEY_REFRESH_COMPLETE_V2		0x5b
-+struct hci_evt_key_refresh_complete_v2 {
-+	__u8    status;
-+	__le16  handle;
-+	__u8    mic_len;
-+	__u8    eks_mode;
-+	__u8    eks_debug;
-+} __packed;
-+
-+#define HCI_EVT_ENCRYPT_CHANGE_V3		0x5a
-+struct hci_evt_encrypt_change_v3 {
-+	__u8    status;
-+	__le16  handle;
-+	__u8    mode;
-+	__u8    key_size;
-+	__u8    mic_len;
-+	__u8    eks_mode;
-+	__u8    eks_debug;
-+} __packed;
-+
- #define HCI_EV_LE_CONN_COMPLETE		0x01
- struct hci_ev_le_conn_complete {
- 	__u8     status;
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index d59407349b3e..777bc1a0336b 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -66,6 +66,7 @@
+ struct bt_security {
+ 	__u8 level;
+ 	__u8 key_size;
++	__u8 mic_len;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1158ec218e1a..7a4f87236854 100644
+index 7a4f87236854..fb4f6735f69b 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -2178,6 +2178,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+@@ -765,6 +765,8 @@ struct hci_conn {
+ 	__u8		pending_sec_level;
+ 	__u8		pin_length;
+ 	__u8		enc_key_size;
++	__u8		mic_len;
++	__u8		req_mic_len;
+ 	__u8		io_capability;
+ 	__u32		passkey_notify;
+ 	__u8		passkey_entered;
+@@ -2178,6 +2180,13 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
  	(le_feature(dev, 1, 2) & HCI_LE_HDT_7_5_TX_FEATURE)
  #define hdt_pf1_capable(dev) \
  	(le_feature(dev, 1, 2) & HCI_LE_HDT_PF_1)
-+#define eks_capable(dev) \
-+	(le_feature(dev, 1, 1) & HCI_LE_EKS_FEATURE)
++/* The MIC length reported by the controller only applies on the LE HDT PHY,
++ * the MIC is always 32 bits (0x00) on the GFSK PHYs.
++ */
++static inline __u8 hci_conn_mic_len(struct hci_conn *conn)
++{
++	return conn->le_rx_phy == 0x05 ? conn->mic_len : 0x00;
++}
+ #define eks_capable(dev) \
+ 	(le_feature(dev, 1, 1) & HCI_LE_EKS_FEATURE)
  
- /* Channel sounding support */
- #define le_cs_capable(dev) \
-@@ -2625,8 +2627,6 @@ void mgmt_conn_subrate_notify(struct hci_dev *hdev, struct hci_conn *conn,
- int hci_abort_conn(struct hci_conn *conn, u8 reason);
- void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
--void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
--		      __u8 ltk[16], __u8 key_size);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 54eddcdd341f..7eda42071b06 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -285,6 +285,11 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CR_LE_SCID_IN_USE		0x000A
+ #define L2CAP_CR_LE_UNACCEPT_PARAMS	0x000B
+ #define L2CAP_CR_LE_INVALID_PARAMS	0x000C
++/* MIC Length Too Short has a different value in each response: the LE Credit
++ * Based value is Invalid Parameters in the Enhanced Credit Based one.
++ */
++#define L2CAP_CR_LE_MIC_LEN_TOO_SHORT	0x000C
++#define L2CAP_CR_ECRED_MIC_LEN_TOO_SHORT	0x0010
  
- void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 *bdaddr_type);
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index aa12250eca52..ab880384614a 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -197,3 +197,6 @@ int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys, u16 phy_opts);
- int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id);
- int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
- 			   u8 num_bis);
-+
-+int hci_le_enable_encrypt(struct hci_conn *conn, __le16 ediv, __le64 rand,
-+			  __u8 ltk[16], __u8 key_size);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a853750d63f8..fb2eaa9815a0 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -598,24 +598,6 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 	}
- }
+ /* connect/create channel status */
+ #define L2CAP_CS_NO_INFO	0x0000
+@@ -533,6 +538,7 @@ struct l2cap_chan {
+ 	__u8		chan_policy;
  
--void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
--		      __u8 ltk[16], __u8 key_size)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_start_enc cp;
--
--	BT_DBG("hcon %p", conn);
--
--	memset(&cp, 0, sizeof(cp));
--
--	cp.handle = cpu_to_le16(conn->handle);
--	cp.rand = rand;
--	cp.ediv = ediv;
--	memcpy(cp.ltk, ltk, key_size);
--
--	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
--}
--
- /* Device _must_ be locked */
- void hci_sco_setup(struct hci_conn *conn, __u8 status)
- {
+ 	__u8		sec_level;
++	__u8		mic_len;
+ 
+ 	__u8		ident;
+ 
+@@ -981,6 +987,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		    const struct sockcm_cookie *sockc);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail);
++void l2cap_chan_req_mic_len(struct l2cap_chan *chan, struct hci_conn *hcon);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f7297179e69c..557e8b25ae2c 100644
+index 557e8b25ae2c..e7ddf3985abc 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3071,6 +3071,41 @@ static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
+@@ -3760,7 +3760,8 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
  	hci_dev_unlock(hdev);
  }
  
-+static void hci_cs_le_enable_encrypt_v2(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_le_enable_encrypt_v2 *cp;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-+
-+	if (!status)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_ENABLE_ENCRYPT_V2);
-+	if (!cp)
-+		goto unlock;
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	clear_bit(HCI_CONN_ENCRYPT_PEND, conn->flags);
-+
-+	/* An opportunistic encryption that cannot be started just leaves
-+	 * the link unencrypted, as it was.
-+	 */
-+	if (cp->encryption == 0x01 || conn->state != BT_CONNECTED)
-+		goto unlock;
-+
-+	hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-+	hci_conn_drop(conn);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cs_switch_role(struct hci_dev *hdev, u8 status)
+-static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt)
++static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt,
++			       u8 mic_len)
  {
- 	struct hci_cp_switch_role *cp;
-@@ -3725,22 +3760,12 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
+ 	struct hci_dev *hdev = conn->hdev;
  
--static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
--				   struct sk_buff *skb)
-+static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt)
- {
--	struct hci_ev_encrypt_change *ev = data;
--	struct hci_conn *conn;
-+	struct hci_dev *hdev = conn->hdev;
- 
--	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
--
--	hci_dev_lock(hdev);
--
--	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
--	if (!conn)
--		goto unlock;
--
--	if (!ev->status) {
--		if (ev->encrypt) {
-+	if (!status) {
-+		if (encrypt) {
- 			/* Encryption implies authentication */
- 			set_bit(HCI_CONN_AUTH, conn->flags);
- 			set_bit(HCI_CONN_ENCRYPT, conn->flags);
-@@ -3750,7 +3775,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 			if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
- 				set_bit(HCI_CONN_FIPS, conn->flags);
- 
--			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
-+			if ((conn->type == ACL_LINK && encrypt == 0x02) ||
+@@ -3779,6 +3780,14 @@ static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt)
  			    conn->type == LE_LINK)
  				set_bit(HCI_CONN_AES_CCM, conn->flags);
  
-@@ -3781,7 +3806,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 	/* We should disregard the current RPA and generate a new one
- 	 * whenever the encryption procedure fails.
- 	 */
--	if (ev->status && conn->type == LE_LINK) {
-+	if (status && conn->type == LE_LINK) {
- 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
- 		hci_adv_instances_set_rpa_expired(hdev, true);
- 	}
-@@ -3790,23 +3815,23 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 
- 	/* Check link security requirements are met */
- 	if (!hci_conn_check_link_mode(conn))
--		ev->status = HCI_ERROR_AUTH_FAILURE;
-+		status = HCI_ERROR_AUTH_FAILURE;
- 
--	if (ev->status && conn->state == BT_CONNECTED) {
--		if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
-+	if (status && conn->state == BT_CONNECTED) {
-+		if (status == HCI_ERROR_PIN_OR_KEY_MISSING)
- 			set_bit(HCI_CONN_AUTH_FAILURE, conn->flags);
- 
- 		/* Notify upper layers so they can cleanup before
- 		 * disconnecting.
- 		 */
--		hci_encrypt_cfm(conn, ev->status);
-+		hci_encrypt_cfm(conn, status);
- 		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
- 		hci_conn_drop(conn);
--		goto unlock;
-+		return;
- 	}
- 
- 	/* Try reading the encryption key size for encrypted ACL links */
--	if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
-+	if (!status && encrypt && conn->type == ACL_LINK) {
- 		if (hci_read_enc_key_size(hdev, conn)) {
- 			/* Could not even issue the key-size read: report the
- 			 * security level now since hci_cc_read_enc_key_size()
-@@ -3816,7 +3841,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 			goto notify;
- 		}
- 
--		goto unlock;
-+		return;
- 	}
- 
- 	/* We skip the WRITE_AUTH_PAYLOAD_TIMEOUT for ATS2851 based controllers
-@@ -3846,7 +3871,44 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- notify:
--	hci_encrypt_cfm(conn, ev->status);
-+	hci_encrypt_cfm(conn, status);
-+}
++			/* The key size of Encryption Change v3 is not used:
++			 * it is ignored for LE, where it comes from SMP, and
++			 * the ACL key size is read below.
++			 *
++			 * A 32-bit MIC is reported as 0x00.
++			 */
++			conn->mic_len = mic_len;
 +
-+static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
-+{
-+	struct hci_ev_encrypt_change *ev = data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	hci_change_encrypt(conn, ev->status, ev->encrypt);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
-+static void hci_encrypt_change_v3_evt(struct hci_dev *hdev, void *data,
-+				      struct sk_buff *skb)
-+{
-+	struct hci_evt_encrypt_change_v3 *ev = data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	hci_change_encrypt(conn, ev->status, ev->mode);
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -4760,6 +4822,7 @@ static const struct hci_cs {
- 	HCI_CS(HCI_OP_LE_CREATE_CONN, hci_cs_le_create_conn),
- 	HCI_CS(HCI_OP_LE_READ_REMOTE_FEATURES, hci_cs_le_read_remote_features),
- 	HCI_CS(HCI_OP_LE_START_ENC, hci_cs_le_start_enc),
-+	HCI_CS(HCI_OP_LE_ENABLE_ENCRYPT_V2, hci_cs_le_enable_encrypt_v2),
- 	HCI_CS(HCI_OP_LE_SET_PHY, hci_cs_le_set_phy),
- 	HCI_CS(HCI_OP_LE_EXT_CREATE_CONN, hci_cs_le_ext_create_conn),
- 	HCI_CS(HCI_OP_LE_CREATE_CIS, hci_cs_le_create_cis),
-@@ -5555,6 +5618,46 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev, void *edata,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_conn_refresh_key(struct hci_conn *conn, u8 status)
-+{
-+	/* For BR/EDR the necessary steps are taken through the
-+	 * auth_complete event.
-+	 */
-+	if (conn->type != LE_LINK)
-+		return;
-+
-+	if (!status) {
-+		bool sec_level_changed =
-+				conn->sec_level != conn->pending_sec_level;
-+
-+		conn->sec_level = conn->pending_sec_level;
-+		if (sec_level_changed)
-+			mgmt_security_level_changed(conn);
-+	}
-+
-+	clear_bit(HCI_CONN_ENCRYPT_PEND, conn->flags);
-+
-+	if (status && conn->state == BT_CONNECTED) {
-+		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-+		hci_conn_drop(conn);
-+		return;
-+	}
-+
-+	if (conn->state == BT_CONFIG) {
-+		if (!status)
-+			conn->state = BT_CONNECTED;
-+
-+		hci_connect_cfm(conn, status);
-+		hci_conn_drop(conn);
-+	} else {
-+		hci_auth_cfm(conn, status);
-+
-+		hci_conn_hold(conn);
-+		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-+		hci_conn_drop(conn);
-+	}
-+}
-+
- static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 					 struct sk_buff *skb)
- {
-@@ -5570,42 +5673,28 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
+ 			/* For ACL links the encryption key size is still
+ 			 * validated below via hci_read_enc_key_size(). Its
+ 			 * completion handler, hci_cc_read_enc_key_size(),
+@@ -3888,7 +3897,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
  	if (!conn)
  		goto unlock;
  
--	/* For BR/EDR the necessary steps are taken through the
--	 * auth_complete event.
--	 */
--	if (conn->type != LE_LINK)
-+	hci_conn_refresh_key(conn, ev->status);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
-+static void hci_key_refresh_complete_v2_evt(struct hci_dev *hdev, void *data,
-+					    struct sk_buff *skb)
-+{
-+	struct hci_evt_key_refresh_complete_v2 *ev = data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x handle 0x%4.4x", ev->status,
-+		   __le16_to_cpu(ev->handle));
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
- 		goto unlock;
- 
--	if (!ev->status) {
--		bool sec_level_changed =
--				conn->sec_level != conn->pending_sec_level;
--
--		conn->sec_level = conn->pending_sec_level;
--		if (sec_level_changed)
--			mgmt_security_level_changed(conn);
--	}
--
--	clear_bit(HCI_CONN_ENCRYPT_PEND, conn->flags);
--
--	if (ev->status && conn->state == BT_CONNECTED) {
--		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
--		hci_conn_drop(conn);
--		goto unlock;
--	}
--
--	if (conn->state == BT_CONFIG) {
--		if (!ev->status)
--			conn->state = BT_CONNECTED;
--
--		hci_connect_cfm(conn, ev->status);
--		hci_conn_drop(conn);
--	} else {
--		hci_auth_cfm(conn, ev->status);
--
--		hci_conn_hold(conn);
--		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
--		hci_conn_drop(conn);
--	}
-+	hci_conn_refresh_key(conn, ev->status);
+-	hci_change_encrypt(conn, ev->status, ev->encrypt);
++	hci_change_encrypt(conn, ev->status, ev->encrypt, 0);
  
  unlock:
  	hci_dev_unlock(hdev);
-@@ -8408,6 +8497,12 @@ static const struct hci_ev {
- 	/* [0x3e = HCI_EV_LE_META] */
- 	HCI_EV_REQ_VL(HCI_EV_LE_META, hci_le_meta_evt,
- 		      sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_PLEN),
-+	/* [0xfb = HCI_EVT_LE_ENCRYPT_KEY_REFRESH_COMPLETE_V2] */
-+	HCI_EV(HCI_EVT_KEY_REFRESH_COMPLETE_V2, hci_key_refresh_complete_v2_evt,
-+	       sizeof(struct hci_evt_key_refresh_complete_v2)),
-+	/* [0xfc = HCI_EVT_LE_ENCRYPT_CHANGE_V3 */
-+	HCI_EV(HCI_EVT_ENCRYPT_CHANGE_V3, hci_encrypt_change_v3_evt,
-+	       sizeof(struct hci_evt_encrypt_change_v3)),
- 	/* [0xff = HCI_EV_VENDOR] */
- 	HCI_EV_VL(HCI_EV_VENDOR, hci_vendor_evt, 0, HCI_MAX_EVENT_PLEN),
- };
+@@ -3908,7 +3917,7 @@ static void hci_encrypt_change_v3_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
+ 
+-	hci_change_encrypt(conn, ev->status, ev->mode);
++	hci_change_encrypt(conn, ev->status, ev->mode, ev->mic_len);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -5694,6 +5703,10 @@ static void hci_key_refresh_complete_v2_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
+ 
++	/* The key refresh may change the MIC length */
++	if (!ev->status)
++		conn->mic_len = ev->mic_len;
++
+ 	hci_conn_refresh_key(conn, ev->status);
+ 
+ unlock:
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9e670c5acd48..dff5ee237b9f 100644
+index dff5ee237b9f..59db2e2668d1 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -5180,6 +5180,13 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
- 		changed = true;
+@@ -8673,7 +8673,10 @@ static int hci_le_enable_encrypt_v2(struct hci_conn *conn, __le16 ediv,
+ 	cp->handle = cpu_to_le16(conn->handle);
+ 	cp->rand = rand;
+ 	cp->ediv = ediv;
+-	cp->mic_len = 0x02; /* Always prefer 128 bits? */
++	/* Use the MIC length requested for the connection, default to 128
++	 * bits if unset.
++	 */
++	cp->mic_len = conn->req_mic_len ? conn->req_mic_len : 0x02;
+ 
+ 	/* The key is zero padded when shorter than 16 octets */
+ 	if (ltk) {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 70ad30b091e4..b19dd027adc3 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -579,6 +579,7 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan)
+ 		chan->tx_win = pchan->tx_win;
+ 		chan->tx_win_max = pchan->tx_win_max;
+ 		chan->sec_level = pchan->sec_level;
++		chan->mic_len = pchan->mic_len;
+ 		chan->conf_state = pchan->conf_state;
+ 		chan->flags = pchan->flags;
+ 		chan->tx_credits = pchan->tx_credits;
+@@ -1025,14 +1026,26 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
  	}
- 
-+	if (eks_capable(hdev)) {
-+		/* EKS events */
-+		events[3] |= BIT(2);	/* Encrytion Change v3 */
-+		events[3] |= BIT(3);	/* Encrytion Key Refresh Complete v2 */
-+		changed = true;
-+	}
-+
- 	/* Some Broadcom based controllers indicate support for Set Event
- 	 * Mask Page 2 command, but then actually do not support it. Since
- 	 * the default value is all bits set to zero, the command is only
-@@ -8459,6 +8466,7 @@ static int hci_le_set_cig_params_v2_sync(struct hci_dev *hdev, u8 cig_id)
- 			      qos->ucast.out.phys;
- 		cis->c_rtn  = qos->ucast.out.rtn;
- 		cis->p_rtn  = qos->ucast.in.rtn;
-+		cis->mic_len = 0x02; /* Always prefer 128 bits? */
- 
- 		/* Use the rates of each direction, or all the HDT rates the
- 		 * controller supports if none were set.
-@@ -8607,3 +8615,119 @@ int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG,
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
  }
-+
-+/* Both LE Start Encryption and LE Enable Encryption v2 start with the
-+ * connection handle.
+ 
++/* Raise the MIC length requested for the connection to the one the channel
++ * requires, so the next time encryption is started it asks for it.
 + */
-+static void le_enable_encrypt_complete(struct hci_dev *hdev, void *data, int err)
++void l2cap_chan_req_mic_len(struct l2cap_chan *chan, struct hci_conn *hcon)
 +{
-+	struct hci_cp_le_start_enc *cp = data;
-+	struct hci_conn *conn;
-+
-+	bt_dev_dbg(hdev, "err %d", err);
-+
-+	/* If the command failed without a Command Status, such as when it
-+	 * could not be sent, nothing else clears the pending encryption, so
-+	 * handle it as a Command Status error would.
-+	 */
-+	if (err) {
-+		hci_dev_lock(hdev);
-+
-+		conn = hci_conn_hash_lookup_handle(hdev,
-+						   le16_to_cpu(cp->handle));
-+		if (conn &&
-+		    test_and_clear_bit(HCI_CONN_ENCRYPT_PEND, conn->flags) &&
-+		    conn->state == BT_CONNECTED) {
-+			hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-+			hci_conn_drop(conn);
-+		}
-+
-+		hci_dev_unlock(hdev);
-+	}
-+
-+	/* The command carries the key */
-+	kfree_sensitive(data);
++	if (chan->mic_len > hcon->req_mic_len)
++		hcon->req_mic_len = chan->mic_len;
 +}
 +
-+static int hci_le_enable_encrypt_v2_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct hci_cp_le_enable_encrypt_v2 *cp = data;
-+
-+	return __hci_cmd_sync_status(hdev, HCI_OP_LE_ENABLE_ENCRYPT_V2,
-+				     sizeof(*cp), cp, HCI_CMD_TIMEOUT);
-+}
-+
-+static int hci_le_enable_encrypt_v2(struct hci_conn *conn, __le16 ediv,
-+				    __le64 rand, __u8 ltk[16], __u8 key_size)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_cp_le_enable_encrypt_v2 *cp;
-+	int err;
-+
-+	bt_dev_dbg(hdev, "hcon %p", conn);
-+
-+	cp = kzalloc_obj(*cp);
-+	if (!cp)
-+		return -ENOMEM;
-+
-+	cp->handle = cpu_to_le16(conn->handle);
-+	cp->rand = rand;
-+	cp->ediv = ediv;
-+	cp->mic_len = 0x02; /* Always prefer 128 bits? */
-+
-+	/* The key is zero padded when shorter than 16 octets */
-+	if (ltk) {
-+		memcpy(cp->ltk, ltk, key_size);
-+		cp->encryption = 0x00; /* Use LTK provided in LTK field */
-+	} else {
-+		cp->encryption = 0x01; /* Use opportunistic with EKS */
-+	}
-+
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_enable_encrypt_v2_sync, cp,
-+				      le_enable_encrypt_complete);
-+	if (err)
-+		kfree_sensitive(cp);
-+
-+	return err;
-+}
-+
-+static int hci_le_enable_encrypt_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct hci_cp_le_start_enc *cp = data;
-+
-+	return __hci_cmd_sync_status(hdev, HCI_OP_LE_START_ENC,
-+					sizeof(*cp), cp,
-+					HCI_CMD_TIMEOUT);
-+}
-+
-+int hci_le_enable_encrypt(struct hci_conn *conn, __le16 ediv, __le64 rand,
-+			  __u8 ltk[16], __u8 key_size)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_cp_le_start_enc *cp;
-+	int err;
-+
-+	/* Check if EKS and HCI_OP_LE_ENABLE_ENCRYPT_V2 are supported */
-+	if (eks_capable(hdev) && (hdev->commands[50] & BIT(4)))
-+		return hci_le_enable_encrypt_v2(conn, ediv, rand, ltk,
-+						key_size);
-+
-+	bt_dev_dbg(hdev, "hcon %p", conn);
-+
-+	/* The key is zero padded when shorter than 16 octets */
-+	cp = kzalloc_obj(*cp);
-+	if (!cp)
-+		return -ENOMEM;
-+
-+	cp->handle = cpu_to_le16(conn->handle);
-+	cp->rand = rand;
-+	cp->ediv = ediv;
-+	memcpy(cp->ltk, ltk, key_size);
-+
-+	err = hci_cmd_sync_queue_once(hdev, hci_le_enable_encrypt_sync, cp,
-+				      le_enable_encrypt_complete);
-+	if (err)
-+		kfree_sensitive(cp);
-+
-+	return err;
-+}
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b7015e37e1f1..140b9813998b 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -987,7 +987,12 @@ static u8 smp_random(struct smp_chan *smp)
- 		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags))
- 			return SMP_UNSPECIFIED;
- 
--		hci_le_start_enc(hcon, ediv, rand, stk, smp->enc_key_size);
-+		if (hci_le_enable_encrypt(hcon, ediv, rand, stk,
-+					  smp->enc_key_size)) {
-+			clear_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags);
-+			return SMP_UNSPECIFIED;
-+		}
-+
- 		hcon->enc_key_size = smp->enc_key_size;
- 		set_bit(HCI_CONN_STK_ENCRYPT, hcon->flags);
- 	} else {
-@@ -2209,30 +2214,46 @@ static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ /* Service level security */
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
  {
- 	struct smp_ltk *key;
- 	struct hci_conn *hcon = conn->hcon;
--	bool ret = false;
-+	u8 val[16], enc_size;
-+	__le64 rand;
-+	__le16 ediv;
+ 	struct l2cap_conn *conn = chan->conn;
+ 	__u8 auth_type;
  
- 	rcu_read_lock();
- 
- 	key = hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type, hcon->role);
--	if (!key)
--		goto unlock;
-+	if (!key || smp_ltk_sec_level(key) < sec_level) {
-+		rcu_read_unlock();
-+		return false;
-+	}
- 
--	if (smp_ltk_sec_level(key) < sec_level)
--		goto unlock;
-+	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags)) {
-+		rcu_read_unlock();
-+		return true;
-+	}
- 
--	ret = true;
--	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags))
--		goto unlock;
-+	/* Starting the encryption may sleep, so take a copy of the key and
-+	 * leave the RCU read-side section first.
-+	 */
-+	memcpy(val, key->val, sizeof(val));
-+	enc_size = key->enc_size;
-+	rand = key->rand;
-+	ediv = key->ediv;
- 
--	hci_le_start_enc(hcon, key->ediv, key->rand, key->val, key->enc_size);
--	hcon->enc_key_size = key->enc_size;
-+	rcu_read_unlock();
+-	if (conn->hcon->type == LE_LINK)
++	if (conn->hcon->type == LE_LINK) {
++		l2cap_chan_req_mic_len(chan, conn->hcon);
 +
-+	if (hci_le_enable_encrypt(hcon, ediv, rand, val, enc_size)) {
-+		memzero_explicit(val, sizeof(val));
-+		clear_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags);
-+		return false;
+ 		return smp_conn_security(conn->hcon, chan->sec_level);
 +	}
+ 
+ 	auth_type = l2cap_get_auth_type(chan);
+ 
+@@ -1512,6 +1525,8 @@ static void l2cap_le_start(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 
++	l2cap_chan_req_mic_len(chan, conn->hcon);
 +
-+	hcon->enc_key_size = enc_size;
-+	memzero_explicit(val, sizeof(val));
+ 	if (!smp_conn_security(conn->hcon, chan->sec_level))
+ 		return;
  
- 	/* We never store STKs for initiator role, so clear this flag */
- 	clear_bit(HCI_CONN_STK_ENCRYPT, hcon->flags);
- 
--unlock:
--	rcu_read_unlock();
--	return ret;
-+	return true;
+@@ -1579,6 +1594,18 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon,
+ 		hcon->enc_key_size >= min_key_size);
  }
  
- bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level,
-@@ -2924,13 +2945,25 @@ static int smp_cmd_dhkey_check(struct l2cap_conn *conn, struct sk_buff *skb)
- 		sc_dhkey_check(smp);
++static bool l2cap_check_mic_len(struct hci_conn *hcon, struct l2cap_chan *chan)
++{
++	/* If the channel has no MIC length requirement, skip check */
++	if (!chan->mic_len)
++		return true;
++
++	if (!test_bit(HCI_CONN_ENCRYPT, hcon->flags))
++		return true;
++
++	return hci_conn_mic_len(hcon) >= chan->mic_len;
++}
++
+ static void l2cap_do_start(struct l2cap_chan *chan)
+ 	__must_hold(&chan->lock)
+ 	__must_hold(&chan->conn->lock)
+@@ -5119,6 +5146,7 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
+ 		/* We'll need to send a new Connect Request */
+ 		clear_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags);
+ 
++		l2cap_chan_req_mic_len(chan, hcon);
+ 		smp_conn_security(hcon, chan->sec_level);
+ 		break;
+ 
+@@ -5283,6 +5311,13 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+ 		goto response_unlock;
  	}
  
--	sc_add_ltk(smp);
--
- 	if (test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
--		hci_le_start_enc(hcon, 0, 0, smp->tk, smp->enc_key_size);
-+		/* Mark the encryption pending, as smp_random() does, before
-+		 * adding the LTK so it doesn't get started a second time with
-+		 * it, and so a failure doesn't remove a previously stored key.
-+		 */
-+		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags))
-+			return SMP_UNSPECIFIED;
++	/* Check if MIC length is sufficient for HDT PHY */
++	if (!l2cap_check_mic_len(conn->hcon, pchan)) {
++		result = L2CAP_CR_LE_MIC_LEN_TOO_SHORT;
++		chan = NULL;
++		goto response_unlock;
++	}
 +
-+		if (hci_le_enable_encrypt(hcon, 0, 0, smp->tk,
-+					  smp->enc_key_size)) {
-+			clear_bit(HCI_CONN_ENCRYPT_PEND, hcon->flags);
-+			return SMP_UNSPECIFIED;
+ 	/* Check for valid dynamic CID range */
+ 	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_LE_DYN_END) {
+ 		result = L2CAP_CR_LE_INVALID_SCID;
+@@ -5501,6 +5536,12 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
+ 		goto unlock;
+ 	}
+ 
++	/* Check if MIC length is sufficient */
++	if (!l2cap_check_mic_len(conn->hcon, pchan)) {
++		result = L2CAP_CR_ECRED_MIC_LEN_TOO_SHORT;
++		goto unlock;
++	}
++
+ 	/* Check if the listening channel has set an output MTU then the
+ 	 * requested MTU shall be less than or equal to that value.
+ 	 */
+@@ -5697,6 +5738,7 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 			/* We'll need to send a new Connect Request */
+ 			clear_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags);
+ 
++			l2cap_chan_req_mic_len(chan, hcon);
+ 			smp_conn_security(hcon, chan->sec_level);
+ 			break;
+ 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 7a2551ef7f50..2fa93e84dc91 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -623,8 +623,10 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		if (conn) {
+ 			sec.level = conn->hcon->sec_level;
+ 
+-			if (sk->sk_state == BT_CONNECTED)
++			if (sk->sk_state == BT_CONNECTED) {
+ 				sec.key_size = conn->hcon->enc_key_size;
++				sec.mic_len = hci_conn_mic_len(conn->hcon);
++			}
+ 		} else {
+ 			sec.level = chan->sec_level;
+ 		}
+@@ -960,9 +962,16 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		sec.level = BT_SECURITY_LOW;
++		/* mic_len was added at the end of struct bt_security, so
++		 * accept the shorter struct as well, leaving mic_len unset.
++		 */
++		if (optlen < offsetofend(struct bt_security, key_size)) {
++			err = -EINVAL;
++			break;
++		}
+ 
+-		err = copy_safe_from_sockptr(&sec, sizeof(sec), optval, optlen);
++		err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
++					       optlen);
+ 		if (err)
+ 			break;
+ 
+@@ -972,7 +981,14 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
++		/* MIC_Length values: 32, 64 and 128 bits */
++		if (sec.mic_len > 0x02) {
++			err = -EINVAL;
++			break;
 +		}
 +
- 		hcon->enc_key_size = smp->enc_key_size;
- 	}
+ 		chan->sec_level = sec.level;
++		chan->mic_len = sec.mic_len;
  
-+	sc_add_ltk(smp);
-+
- 	return 0;
- }
+ 		conn = l2cap_chan_conn(chan);
+ 		if (!conn)
+@@ -980,6 +996,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
  
+ 		/* change security for LE channels */
+ 		if (chan->scid == L2CAP_CID_ATT) {
++			l2cap_chan_req_mic_len(chan, conn->hcon);
+ 			if (smp_conn_security(conn->hcon, sec.level)) {
+ 				err = -EINVAL;
+ 				break;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 3fb8b5474948..3ec2fb4ce580 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -700,9 +700,16 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		sec.level = BT_SECURITY_LOW;
++		/* mic_len was added at the end of struct bt_security, so
++		 * accept the shorter struct as well. RFCOMM ignores it.
++		 */
++		if (optlen < offsetofend(struct bt_security, key_size)) {
++			err = -EINVAL;
++			break;
++		}
+ 
+-		err = copy_safe_from_sockptr(&sec, sizeof(sec), optval, optlen);
++		err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
++					       optlen);
+ 		if (err)
+ 			break;
+ 
+@@ -844,8 +851,8 @@ static int rfcomm_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
++		memset(&sec, 0, sizeof(sec));
+ 		sec.level = rfcomm_pi(sk)->sec_level;
+-		sec.key_size = 0;
+ 
+ 		len = min(len, sizeof(sec));
+ 		if (copy_to_iter(&sec, len, &sopt->iter_out) != len)
 -- 
 2.56.0
 
