@@ -1,86 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793914254;
-	b=ULWHY8q8EqcBihOb50aOa9tqWELzFthFZ1R+xlZr7dAgBQx5gH4J3Ygux50QzFxIJr9U
-	 22v9V3XSTsZAhLJGKf4dNDZp4fg+WSX7erdEgovwS9itNYUWEeAzucORcT9CdIp9DXN79
-	 2WJBjErULLO51smQLLnYOIZXQ2PxCZy3HgRS3rPDxteSucp8vL6fPINPqYAzdaqbd0/HI
-	 5RPmLED6i0bxLR1S8lcCdArQAzpMDYz5GqgDtr2XGJivaE50u567I0laTMCPUknkBpK3U
-	 b9DXBSntERqMyoXiG3M4og8ZNzrEGwNiwIUXC3ovdxHWlEyMMnwmD8W1vCEo2KEe5wQ==
+	t=1793916983;
+	b=4hGlsl5Qz0RcwNDrZ4P1l3+Aq9T08z0l3MpXOde9yJ1P59iZaP0uN77KXtUcPOsGxWw3
+	 YN09Kex/jCk31+Mnrh0PXxXOAyRJrjWm3ncfMJn6Q2+25J4kzp90HrS01yl7YtryFV97k
+	 kJcFrBYGkp4gQ/RZN9feUa09C2ZSVkZ720RTunC9nBvAnjxNAwEFIwPlAnbtXIlCfrh8i
+	 et7Zu6K1As1F8RGnQW3o7Xh43zx9ZaP6qrfHheEYFuiWLFQD41zR84gwZG6FudgdGj8QL
+	 R7sdkwhp4sPtv4uGRJ+7YOBwb/X77yF+3Op7FesdRKf0Q5EDBbOlX+Bt/nM+MYJ1Dcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793914254;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793916983;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:To:Content-Language:From:Subject:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=h5dwP+J0pikfHmn14P8uKG8YB4Qt1bUrFyirRsB2r1w=;
-	b=X/bBHQhAM8UtGT315dW0wQuINHQzAUgXptxhBFaitbIsINMgpd8/GrlRbXN5iSpYZRgw
-	 ixZHIHWrpxArQXpx/BXg8B/qSqQNX7taQ4BRMzDnZAPHvzVQEUBs6j+87Qts9hORQ8Glb
-	 RDYTdbJ0dpI0IE2KPnpfnsGmTmyhzA5bSX0a6ll57v0G1NgB182ZwYHx/J3O/fkbLLTWF
-	 lsrISeHx3R8iElpvOVMRis5tUbpn7GPrhf3q0we4o9jXlm2hZhPdI6pmmgKxY+DCpn5S5
-	 sANnjVooN8kuMwYhzduiUvTabAgig4yPEmVU4FeJ6Y66yfFWR9Fvx50mJ6LOaWy+Wgw==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=wakOPvOzDFrUTLM5X9N9PuL8EpOeXSCtyuQ3d6RRqcs=;
+	b=gPvCbbZyFlzTJF/ToT6cAGtV9nxQ40JD6tzBR+RVJ7yZhulDnXryLDAu19WmxvEeMl5+
+	 qVgaWhCzMITFNQkubL1L5HKNrHgqjdM+vsmKWFxcEtybp7kpiqBSE3K9ta8HikWMpdIBv
+	 ErYpY2BYW7PfPsyIFzltofyr7a+2syMAzBGlHAOS8kEJNjjADcD3d+Bh6h6shZrACdJ+z
+	 m6NHbu0jDlp9Jl26YounM898k2aqahOVBt/9t8hZDWaKAKaujv4Hwxsk2MBJttzoSHo9H
+	 qIie0w/081RDrHFE0j/tX9+ynxGq/HKZ50RqiLMBlcoAN8UGTR+KK5qJQExS3Aao7fg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YzgEjb2e;
-	arc=none smtp.remote-ip=209.85.216.48
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QJjgdaCE;
+	arc=none smtp.remote-ip=209.85.217.48
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE0F606A329
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 21:30:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6FE0F606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893D7606A31B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 22:16:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 893D7606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YzgEjb2e
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3b0b3754f57so4233a91.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 13:30:54 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QJjgdaCE
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-77bf892b496so32152137.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 14:16:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793914254; x=1794519054; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:subject:from
-         :content-language:to:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=h5dwP+J0pikfHmn14P8uKG8YB4Qt1bUrFyirRsB2r1w=;
-        b=YzgEjb2e5d1WJmDApuIcv3GK7Tu31riGNGo8cdLC5GcW8O74odHXNMUyYOzktUD7SR
-         7iv8Nj3NCamASTbHols6u7CnHZywWwc0w4fR8JI4X+cGRwMqIUzxzi25pFmo0/VF3b8r
-         ooyY7Fi1s3dV/YCK9AvKttpnhax74cTxbVOgl3FS1YvbW5ZdLyBO8N+8wC17BnkI6pMx
-         eAo3f/u4RjKkL3oCklI9cq73zUpr5+Fl7Brhpuj/QfpITal2waJZe6wHx3Q9yIudehEe
-         oH0VhXhdfm9nq2YDPGQMkAB8311KzmZCBRKKDPtmqLwT//Z8Wlc4VrUO1u6O6rcwdGue
-         KuYw==
+        d=gmail.com; s=20260707; t=1793916982; x=1794521782; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=wakOPvOzDFrUTLM5X9N9PuL8EpOeXSCtyuQ3d6RRqcs=;
+        b=QJjgdaCEInW2HWLn8SwJYujUP75HxFMcKu6n4wZ/3p78BzmEjJWjs9axp0TN5aQPp+
+         6LodmKtXbR17kbueHTjRekfqlWOasyiJAHkcdTliCNKSNm7fd/ct4iuyTVKYY8Y+7u0w
+         exz8mucxWuENZulsKnnGWLMQicI5dQvafdHa20bkl655459/dTAw4BZFK/jY1m3ginkP
+         W7sm+MowPBGTeuMcEXkvOMHRn9DZVOaqqmoe/mWkqGCJvlo8v2bnWIdhC31prL2zT5Hl
+         l2h2L6AH/KRLzIUosblY1yDNUlZEfpbt3vLLBrjBLwSJPXnda2auyDuw8CA+qQV0/5Rd
+         IXog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793914254; x=1794519054;
-        h=content-transfer-encoding:content-type:subject:from
-         :content-language:to:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=h5dwP+J0pikfHmn14P8uKG8YB4Qt1bUrFyirRsB2r1w=;
-        b=M8UsiRVxkEQ6A7WS+ckTWPOC0/+J7KtuLBvsb30eJ5IKFs2OB4FuK5LEIzxkakkgMj
-         b0cv72ADbHjRRD+Vp9b0bqkzUwVVLlN7YtzWaPDFlMx/aLKgbeimTMKnq1ZI3ZUTypKb
-         jdXNJ873c1hEGR4XJwQmzqUQuVV65ynYzaVOGN8iRLO/0XYIRJwxnplOhOURfGxY05wT
-         bE7QazIYnanSDQ2z+zQP7UYbNsotqitI2u5sReCR3pBv28vCRF3PeNwQep8qAfLCMeKg
-         KJJfbDAfZo1ZFn4rSrrjDRgzSw1S4v6n4zJjvL7/gPuANGmgN8sTBl+x+9CxgRAHNHe5
-         Ki9A==
-X-Gm-Message-State: APuU4Z/AFmWdrXt+f1uzwyNWXmTtTdipMhdte7CfyKUtz/j7Lk1l2CBh
-	XGxrY6mIgJmL5l/5HXU7EUy7nL+GGPghjrXoZgJHlqwERDldGAU8fHejLuqZ
-X-Gm-Gg: AYBFou0DAbG8KFpCz3qxnvp0lAV9Z3qGbnmXvFXr6FO3HQ+lvqf8ENW5ARIsXa1Y1J6
-	qCpkEuFRW/X4T0chzk4piHyfwGAxRZrs2/Pq3+fOlrMahu14CGe0Ezak9XYStbEtsblBR9zV1/y
-	09f+YSs70+DgcRnZWGbclGGJHyqv03dZXkDgAA398thglI5LBpsrMyUsNiVXLSYkzO2n2EVCcEk
-	sWUkwreY2rAcLKaFHzMhDmZcN24rilsUCCzfa4borzkPnRojKLE4Gh6L+E0unem1zsUYAP5MFfa
-	9cw7BM5JfYTgHvIHLCgBz+UIHIdKdEYdaMLpuheo5yrQvfURWwZRHVck29/Ehn1NgVdTBA5LVB4
-	vlSeiBx1Na57n0LNQtYPV498JYAa6jmn6ZrwTW5V7JZSN56WE63cyGcKgVlRYQX17oDAsNpoWlE
-	qKMwD0vuLkPaxU1wsqLp1c9/F5zA4p9ZA0BJ76js3/yBa3AS24h2phrSQ+6z68Tg7Fab1BfUZlF
-	RY9+eEzn7GE41+dOtTGfs86o8yz1GTo9devVyH7MDL/E+i/wrROEv3JpC0hnK0ngD6i0B88/4V+
-	+cnbG4TCD0vOqPNIPPRerH1LxQ8hx7h9yB5Ojh4VSI9o4aVMLJd21Jwah8+cfrJk
-X-Received: by 2002:a17:90b:270e:b0:3b0:ac2c:1619 with SMTP id 98e67ed59e1d1-3b0db70a2b5mr273477a91.39.1793914253567;
-        Thu, 05 Nov 2026 13:30:53 -0800 (PST)
-Received: from [192.168.10.136] ([27.147.237.15])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b0b313c143sm5211775a91.2.2026.11.05.13.30.52
+        d=1e100.net; s=20260707; t=1793916982; x=1794521782;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wakOPvOzDFrUTLM5X9N9PuL8EpOeXSCtyuQ3d6RRqcs=;
+        b=cJ6jU2auHxfEUXKrRiJyaVqAj8mUlFup0MYmT14pDKt9fYj2VqhEMh9pcOjLzJoJ4R
+         CsfYPFJW8V9PxXL+EdyvGFm9X+yalG+h2HnmSylUaQNkLzr/OB0e1KbExpKSyrGKYXWr
+         pXvdIt5w7SL09Oo1Xduxk93/4IiXI7KgnB/aE3hOQrl0Vy4hJ4lqbB3swHoEU/WAPdjk
+         4IbbnBmmZ9vlAlsqlZU9Y8pdzz4ooH7NrwzPbUL9ksXvhGZ/Mmit5uuJS0fTr8CZAcwo
+         PrEgG15P8Rd0+227V2JEJkspRLNi9I0qqC41GR4ZERuD78YLMI6hN7oJs4IHkCvi/JC/
+         joHQ==
+X-Gm-Message-State: APuU4Z9uXmMsHdwr7jtEgrzd9I7d9w9c8UGNsdOMofT+QjIjajmY8JAB
+	kZ9mmcJHCdtx3L6iA86nykSBMpTsnB8kmT11UKf0uKv2JivrBCj9dAWXAvuArQ==
+X-Gm-Gg: AYBFou3tq99Gn/+Px6R/VTj2tuCxUrlL1LwQRjd0dITQSm9WX9M/fV02sMMm576xaJi
+	JRGObKDr2P2BeVBZwCkNH/2z5CX+5INSiXW9ofR5ejD0ds7WFw1DGcKUollH/ubgzSUU3L39SUF
+	W1qMon1uHHLIw5q1ZASejqkYeN97s40n+w0yzu4DOfhDfWBgckYDLvMTv1pZOzRH4xLTrDQUTaD
+	ieLrqioSOeEz+dhnfBvSCr7mjac+0RuLggItBe3otBV7xgBmCcbrtzvaCZ7l3km84Q8GS1zTiC6
+	/Sm8F7Wl1LYXOgkTAYm4r0aZQapmZWbWC9EaXR7COdbbiiQNh4pG1brJBbg6PuEN21NUE26sC1d
+	bwEEJQ2amwDLc0F0bov2sA9CCo90nZ3aUAzfgX3e9OPhjyhHEQyDWWUHb73rc0fnTO1cCNeDitE
+	hH1lW6SdQXoHyjb+u6/beP06xvPo7xdsdy3AbqBNOdXqoRSYDc16tzE2Yqffhv27l9znkL5X/5j
+	inMzLSJcC0GnveMMy1fBPa6zTIWYIRcAxh9sGR0Nn+fsH1TKPbFBLPTwhziwCvvcUnu+OC3t+gm
+	yHlxo8dFHCgIuTmfNRRrsSbcHr4b+iAlxeU5dHRWGCKOSzaR1S5UbuDS36zwSMpXLYwJmBXzdW3
+	gJXgWDJDlSkYZRBa+A+/9FY2Wiwe/fpIvJ3WPUAcPlp/aH1rRTxdkmBjU9LVPskPt3ZBOnIsFz/
+	pu4t8=
+X-Received: by 2002:a05:6102:f11:b0:7d2:8cb8:dbea with SMTP id ada2fe7eead31-7d2a16a52d7mr721975137.36.1793916982247;
+        Thu, 05 Nov 2026 14:16:22 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99bae599ec0sm434156241.8.2026.11.05.14.16.21
         for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Nov 2026 13:30:53 -0800 (PST)
-Message-ID: <ebfb1f3b-99f4-42bc-b79a-5085af6824ae@gmail.com>
-Date: Fri, 6 Nov 2026 03:30:49 +0600
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2026 14:16:21 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] avrcp: Fix GetTotalNumberOfItems command encoding
+Date: Thu,  5 Nov 2026 17:16:20 -0500
+Message-ID: <20261105221620.2332170-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,96 +93,77 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-bluetooth@vger.kernel.org
-Content-Language: en-US
-From: Arka Bhuiyan <arkabhuiyancsedu@gmail.com>
-Subject: Sony WF-1000XM6 call audio fails on Linux: first eSCO setup gets
- 0x1f, then ACL timeout
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-My Sony WF-1000XM6 does not carry call audio on Linux. I'm sending this 
-to report the failure and the evidence I have. I don't know whether the 
-bug is in PipeWire, BlueZ, the kernel, or the device, so I'm asking here.
+GetTotalNumberOfItems only takes the Scope as parameter, but the command
+declared 11 parameter bytes and sent 7, which targets such as iPhones
+drop, stalling following browsing requests until BROWSING_TIMEOUT.
 
-My setup
+Also return FALSE on every response error path since the callback is a
+gboolean and negative errno values would keep the request pending.
 
-- HP Victus laptop and a personal workstation, both with Intel AX201 
-(8087:0026).
-- Kernel 7.3.1-1-cachyos (linux-cachyos 7.3.1-1), bluez 5.87-2.1, 
-pipewire 1:1.6.8-1.2, wireplumber 0.5.15-1, linux-firmware 1:20261019-1. 
-PipeWire and WirePlumber are pinned, so these are the versions running.
-- Firmware loaded: intel/ibt-19-0-4.sfi, Firmware Version 83-7.26.
-- Earbuds: Sony WF-1000XM6. I haven't checked its firmware version yet.
-- I also have other Sony headsets and see the same failure with them. I 
-haven't captured those yet.
+Closes: https://github.com/bluez/bluez/issues/2745
+Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
+Assisted-by: OpenCode:claude-opus-5.5
+---
+ profiles/audio/avrcp.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-What happens
-
-When a call starts, the host sends an Enhanced Setup Synchronous 
-Connection command. The controller accepts it (Command Status: Success), 
-but no Synchronous Connect Complete follows. Later, an SCO Connect 
-Complete arrives with Unspecified Error (0x1f) and handle 0xFFFF. About 
-1 ms after that, the ACL link drops with Connection Timeout (0x08). In 
-every failing capture I have, there is no codec exchange (+BCS or 
-AT+BCS) between connect and that first setup.
-
-How to reproduce
-
-1. Pair and connect the WF-1000XM6.
-2. Start a call in Teams for Linux, with nothing else changed.
-3. Capture with sudo btmon.
-
-Evidence (btmon times, in seconds)
-
-- Cold run: setups at 26.02 and 50.12 are accepted with no completion. 
-SCO Connect Complete with 0x1f at 46.345 and 62.114, each followed by 
-ACL Disconnect with 0x08.
-- Debug run: Enhanced Setup at 83.73 has no completion. SCO failure with 
-0x1f at 104.078, then ACL 0x08 at 104.079. Another failure at 123.558. 
-Before the first setup, the only HFP message is +CIEV: 2,1.
-- Call capture: Enhanced Setup at 76.276, no completion. SCO 0x1f at 
-96.628, ACL 0x08 at 96.629. The first codec exchange comes after the 
-reconnect.
-
-Workaround
-
-If I force the codec exchange first, the setup succeeds. Before the 
-call, I run two short capture streams: one on mSBC, then one on LC3-SWB. 
-In the primed capture, +BCS: 2 and AT+BCS=2 come before the mSBC setup 
-at 23.733, which succeeds at 24.19 (eSCO, Transparent). The LC3-SWB 
-setup comes after +BCS: 3 and AT+BCS=3, and it also succeeds.
-
-In a real call with the workaround, the mSBC setup at 43.23 succeeded at 
-43.63, and the LC3-SWB setup at 52.22 succeeded at 53.28. Audio worked. 
-There was a brief drop of about 1.2 seconds while the link switched.
-
-What I ruled out or haven't checked
-
-- Duplicate device records: there is only one record.
-- Multipoint: it still fails with the phone's Bluetooth off.
-- Wi-Fi coexistence: not tested properly.
-- Firmware: not confirmed as the cause. I haven't compared it with the 
-September update.
-- CVE-2026-90255 and commit 0f00cd322d22: I haven't checked them against 
-the 7.3.1-1 source.
-
-Questions
-
-1. Is it expected that a controller accepts Enhanced Setup Synchronous 
-Connection and never completes it, with no earlier error?
-2. Should the host time out sooner than the ACL supervision timeout?
-3. Should the codec selection before the first setup come from the 
-userspace implementation (PipeWire here) or from BlueZ?
-
-I can send redacted btmon excerpts on request. I won't attach raw .snoop 
-files or /var/lib/bluetooth info files, since they contain link keys.
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index df5f97eafc88..c09a32766a31 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3495,26 +3495,26 @@ static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
+ 	uint8_t status;
+ 
+ 	if (operands == NULL)
+-		return -ETIMEDOUT;
++		return FALSE;
+ 
+ 	if (!avrcp_pull_browsing_header(&iov) ||
+ 			!util_iov_pull_u8(&iov, &status))
+-		return -EINVAL;
++		return FALSE;
+ 
+ 	if (status == AVRCP_STATUS_OUT_OF_BOUNDS)
+ 		goto done;
+ 
+ 	if (status != AVRCP_STATUS_SUCCESS)
+-		return -EINVAL;
++		return FALSE;
+ 
+ 	if (!util_iov_pull_be16(&iov, &uid_counter) ||
+ 			!util_iov_pull_be32(&iov, &num_of_items))
+-		return -EINVAL;
++		return FALSE;
+ 
+ 	player->uid_counter = uid_counter;
+ 
+ 	if (!num_of_items)
+-		return -EINVAL;
++		return FALSE;
+ 
+ done:
+ 	media_player_total_items_complete(mp, num_of_items);
+@@ -3523,14 +3523,14 @@ done:
+ 
+ static void avrcp_get_total_numberofitems(struct avrcp *session)
+ {
+-	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 7];
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 1];
+ 	struct avrcp_player *player = session->controller->player;
+ 	struct avrcp_browsing_header *pdu = (void *) buf;
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+ 	pdu->pdu_id = AVRCP_GET_TOTAL_NUMBER_OF_ITEMS;
+-	pdu->param_len = cpu_to_be16(7 + sizeof(uint32_t));
++	pdu->param_len = cpu_to_be16(1);
+ 
+ 	pdu->params[0] = player->scope;
+ 
 -- 
-
-Best Regards,
-*Arka Bhuiyan*
+2.56.0
 
