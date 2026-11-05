@@ -1,85 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793856181;
-	b=03wBYWsv+Ih7QZE6NhTrQq6dDXpFcIDshsJNey47Fm4+tdVQdVEfKZOq0kY2P8ROocPv
-	 mSqbk6ZJG4jD6bFijdjt0cNstkpCjE89k2rbQpG40mqO3VIfwJ1FCJzgnJeTx+sjqJD9y
-	 UFbDDTsHS9qLvVzS8AONeJlj+TNw7V40x5s6OurokrQN+x+drdmWM/hQkuQfWlkFeocjI
-	 BlEzNL4z4YjTlT8yUMIARc/Uenn+aiBIhtlsZkO3n2zGOYaSsE7NceNx0TuESvg/OrN71
-	 fDR+8KMZQTpEEdDJEtxUjTOYccK86j6dsOfiS6JzX8ziKUk5zaw7yhIz6Ha/KiQY44A==
+	t=1793858215;
+	b=Aad0QCkmmbY8qHRPzvuPIyx1owQTZlUF/AdrCHe7N2PP/EOYQxh/CvS92TRwRu5uE7B2
+	 BA1KYt36DJ7SkREn/WLbX5ryPT34tB05tZJs8xNQ3CfuhOoPQS1IoosFtByJHi1Dxfz9h
+	 uyihhHgqY5eDNeEJ5Pk3D2AZzXuCarzvotyhVCcgRqZ9aCqanKqIvK7nmTILEChFHi7U5
+	 nCwffnYWhRn6qEA/gfVHwWMSBPbqQHQzgl3Z7bRK2yh/gH3te0JrNO3Tv/fOQzXnooy3g
+	 1Z8/1CuSy4hE2ciH54M8kunhBOr5n8PW7z5Dduz8/J5drD8Wu1yV/od0Mky6qzoLr+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793856181;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=rQr7yvtDdjv+uqRleV0ogoSLK/6tS11R1tEZLnAV5R0=;
-	b=TosrKLj/ClVuOEJ8TGGspd8JXmLruR2A5dIDkxORuJN5cDw4koXmls7lIAYUf0E9rIZT
-	 LutzhQ39M0ken6vPzI/ZIK0/ylsrC7nwk2J8mdCW0wJSQg0rt6XY9Il0JSq0idJIDlnAU
-	 oinHSWJvdQ5vVLNWjVcRzBK3aj2jj9cGEz6kQeIGkb8AIx+PpcJrm2Q+Lch6p77B1nJ/R
-	 PRZgdd95YAb18kkKcizSinDESRz6wZ4S/3/hAxc8zDbQt+gIyabJRd2TkQ+3CY1GysQaw
-	 ImA8gNCC9nC7P4Xb1mCXGN5rRLhotCE9gactb/MNdQ9ag12baGr3YrNCKOe6+OAS00g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793858215;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
+	bh=slh0g6QAgnW7NAG54cOhS+cSI62lJb7/WrZKg47ntE4=;
+	b=HrGXdHPaN5kV7RjgZRD3j99ARN8PjXDuQb4RnywY6HAEhjV46jOPWOOwlfnEWg+k92lZ
+	 eQt9CJaOPNl2YTy5h0inFqpGSJW+gzEs5oLR3vtKJeAWUzMl5KeT14uUID0TtCSPWviYu
+	 SZb4REF+zcoKitwoCGZbp1LBsvqg0BeXRPBlW294/20o15uQtOGm4ANyCuKsJGg70wgGO
+	 iiqS7fB72VhtxrUsmYuSnBsif9UC0nBEx2bWDm278N9Ay63dNhBv7IVmFvfaqSlh08zxN
+	 iw6O/yohtAnuheYb3AAbQFIisbCatflnrUxCylGaDYXwvwY3LyXQyteOcddIQOwm91Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=l1zqNp6g;
-	arc=none smtp.remote-ip=198.175.65.14
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56A1606A31B;
-	Thu,  5 Nov 2026 05:22:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B56A1606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=l1zqNp6g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793856180; x=1825392180;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Q0/e6ShWRmdK7g8M5BxZX/k/BD9zq62vEtWX/MYfK5Q=;
-  b=l1zqNp6gdfoS+W1127Z7NnWzKSZfEfBk39TQOcI2n3dYmt0M4t5AJWvK
-   Brm+fo8+buS1Kp5sKJWN4KgTqqCdXslERrlYOwanJ1YfZjUnGe2J+IRP5
-   l3yIBiYWnQvqm/mGUN10iRvL6r8vPIx6I8v1xisJbauuHJGx670upmnbb
-   Nu3VFpPFYzQhGGgXqoQlFbSn8bfWlYUNOHGVWTApDhr+wwykUe8Pb73Ov
-   shlifWjsVanDb5y771OnSEXdHB49LWpsExci21QRHwGBL9mymgdVwtNgD
-   Ux3fvOYaJupLv+5kDMx69LqjfV8hIqLWSF9DEXDnFL3TvZoI6/uTst/5O
-   w==;
-X-CSE-ConnectionGUID: WqXlCus7Qmyx4BYFi+EtTA==
-X-CSE-MsgGUID: 1jGx33V9QNaVWsectWGABA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11956"; a="2519744"
-X-IronPort-AV: E=Sophos;i="6.27,196,1787036400"; 
-   d="scan'208";a="2519744"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 21:22:59 -0800
-X-CSE-ConnectionGUID: WpFMwuZUQIiAaXokdmgZEw==
-X-CSE-MsgGUID: 5dMSsW/sRGu3mh6f50Anhw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,196,1787036400"; 
-   d="scan'208";a="7254379"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 04 Nov 2026 21:22:55 -0800
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xOpw4-00000000lih-2CSt;
-	Thu, 05 Nov 2026 05:22:52 +0000
-Date: Thu, 5 Nov 2026 13:22:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andre Eikmeyer <dev@deq.rocks>, marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, sven@kernel.org, j@jannau.net,
-	neal@gompa.dev, asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, 66ton99@gmail.com,
-	josemiguelo.ochoa@gmail.com, aditya.garg@linux.dev,
-	Andre Eikmeyer <dev@deq.rocks>,
-	Yossef Osman <Yossef.Osman@proton.me>
-Subject: Re: [PATCH 1/4] Bluetooth: btbcm: raise ACL priority on Apple
- Broadcom controllers
-Message-ID: <202611051559.brx1v0og-lkp@intel.com>
-References: <20261104151601.70493-2-dev@deq.rocks>
+	dmarc=pass header.from=stu.xidian.edu.cn;
+	spf=pass smtp.mailfrom=stu.xidian.edu.cn;
+	arc=none smtp.remote-ip=162.243.164.118
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F28606A31B;
+	Thu,  5 Nov 2026 05:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D1F28606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=slh0g6QAgn
+	W7NAG54cOhS+cSI62lJb7/WrZKg47ntE4=; b=ZunScl6pxsP1P1pv6p3Pn3IJhr
+	z3QUYzI3TDLVAwVUpXtuZybRzEytLC8rNJyIoX8nCqn+0bjCk8s2KPR8cvrQYAhq
+	j5I1hWHslhLIAGkfdU6z7kvUNqpRW+cvl7XZo5jsmB8cIHHCGilRbb33+PKrNsij
+	gvhJrghXGIobHr8qQ=
+Received: from user-virtual-machine.localdomain (unknown [113.200.174.104])
+	by hzbj-edu-front-4.icoremail.net (Coremail) with UTF8SMTPA id BrQMCkBWdfuXGuxqyS0pAQ--.27356S2;
+	Thu, 05 Nov 2026 13:56:41 +0800 (CST)
+From: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Bin Yu <byu@xidian.edu.cn>,
+	Cheng Wen <wencheng@xidian.edu.cn>
+Subject: [PATCH v3] Bluetooth: btusb: fix use-after-free in force_poll_sync
+Date: Thu,  5 Nov 2026 13:56:39 +0800
+Message-Id: <20261105055639.12824-1-25031212351@stu.xidian.edu.cn>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,34 +58,97 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261104151601.70493-2-dev@deq.rocks>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BrQMCkBWdfuXGuxqyS0pAQ--.27356S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr43Ary3uF18ur47Zw4rGrg_yoW5Xr4kpF
+	Z8Ca4Yk3yDJrs5Crn8Aa1xAFyFvws7Xa4UCa429w15Wr9xWry8AFyxtrWYgr9rCrWUAF12
+	yFnrKFy3u3W5CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9vb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq
+	07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r
+	15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vI
+	r41lc7CjxVAaw2AFwI0_JF0_Jw1lc2xSY4AK67AK6r4rMxAIw28IcxkI7VAKI48JMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8siSPUUUUU==
+X-CM-SenderInfo: ysvqjiysrsjkur6v33wo0lvxldqovvfxof0/1tbiAQUID2rrSlWWGwAAsQ
 
-Hi Andre,
+The force_poll_sync debugfs file uses the driver's struct btusb_data as
+its private data. The file is created under hdev->debugfs and is removed
+only when the HCI device is released, while btusb_disconnect() frees
+btusb_data unconditionally. The HCI device can outlive the driver data,
+for example when an HCI socket still references it, so reading or
+writing the already opened file then dereferences freed memory:
 
-kernel test robot noticed the following build warnings:
+  BUG: KASAN: slab-use-after-free in force_poll_sync_read+0x129/0x140
+  Read of size 1 at addr ffff88800cfb7038
+  ...
+  Freed by task ...:
+   kfree
+   btusb_disconnect
 
-[auto build test WARNING on 3f425f95ba3923d605f6a8b382e8fcdc59d479db]
+Remove the debugfs file before the private data is freed.
+debugfs_remove() waits for callers that are already inside the file
+operations, and any later access fails with -EIO instead of reaching the
+driver, so the force_poll_sync file can no longer dereference btusb_data
+after it is gone.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andre-Eikmeyer/Bluetooth-btbcm-raise-ACL-priority-on-Apple-Broadcom-controllers/20261104-161558
-base:   3f425f95ba3923d605f6a8b382e8fcdc59d479db
-patch link:    https://lore.kernel.org/r/20261104151601.70493-2-dev%40deq.rocks
-patch subject: [PATCH 1/4] Bluetooth: btbcm: raise ACL priority on Apple Broadcom controllers
-config: sh-allyesconfig (https://download.01.org/0day-ci/archive/20261105/202611051559.brx1v0og-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 16.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261105/202611051559.brx1v0og-lkp@intel.com/reproduce)
+Fixes: 800fe5ec302e ("Bluetooth: btusb: Add support for queuing during polling interval")
+Cc: stable@vger.kernel.org
+Co-developed-by: Bin Yu <byu@xidian.edu.cn>
+Signed-off-by: Bin Yu <byu@xidian.edu.cn>
+Co-developed-by: Cheng Wen <wencheng@xidian.edu.cn>
+Signed-off-by: Cheng Wen <wencheng@xidian.edu.cn>
+Signed-off-by: YuanZhe Liu <25031212351@stu.xidian.edu.cn>
+---
+Changes in v3:
+  - Scope the changelog claim to the force_poll_sync file: the
+    vendor_diag file used by Broadcom devices has a separate,
+    pre-existing lifetime problem and is not covered here.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202611051559.brx1v0og-lkp@intel.com/
+ drivers/bluetooth/btusb_main.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-All warnings (new ones prefixed by >>):
+diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
+index 92a78a7e6039..95398e2ca098 100644
+--- a/drivers/bluetooth/btusb_main.c
++++ b/drivers/bluetooth/btusb_main.c
+@@ -1088,6 +1088,8 @@ struct btusb_data {
+ 	int (*disconnect)(struct hci_dev *hdev);
+ 
+ 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
++
++	struct dentry *force_poll_sync_dentry;
+ };
+ 
+ static void btusb_reset(struct hci_dev *hdev)
+@@ -4820,8 +4822,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	usb_set_intfdata(intf, data);
+ 
+-	debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
+-			    &force_poll_sync_fops);
++	data->force_poll_sync_dentry =
++		debugfs_create_file("force_poll_sync", 0644, hdev->debugfs,
++				    data, &force_poll_sync_fops);
+ 
+ 	return 0;
+ 
+@@ -4862,6 +4865,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	if (!data)
+ 		return;
+ 
++	debugfs_remove(data->force_poll_sync_dentry);
++	data->force_poll_sync_dentry = NULL;
++
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
+-- 
+2.34.1
 
->> Warning: drivers/bluetooth/hci_bcm.c:152 struct member 'acl_priority' not described in 'bcm_device'
->> Warning: drivers/bluetooth/hci_bcm.c:152 struct member 'acl_priority' not described in 'bcm_device'
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
