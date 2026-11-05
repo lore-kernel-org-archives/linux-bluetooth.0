@@ -1,85 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793922011;
-	b=0grnz8fXdiUYTPw8Wh2p9NykhRMLDvGJchXYO8SWJ1n2Tpi4Ixd0Gi7tZbsndhIh8Od/
-	 gmzLDsrxBbCcSO1fgpn97xULt+8KglMQckSPabZjWvVKOZ7rLaRgKMH+eEeecLJK2nN8p
-	 iXsr/I3CNJQOIc3ZlHui3ADrBcD/zNiFM1AS4WxYRwsXtI+ridrtRvBJJg5+EV6RqBbxe
-	 FljUcSMG7sj5AbNUt67t59+g57odw8gPvo7PB5tEVhM68+oYkM2kodYa3ECEr8z/sqbnm
-	 poE9vkrQ2dhDaA4iqwzbDtMwtWOghqRB9mP5+dTBPtuwUHS6RdtTh3fGyl3mU1zg9oA==
+	t=1793922376;
+	b=duG9PfRWM6h2fDObObiIIUCTYhKQdygKIeqDnCuNMlX3ag82pMgzSixcfYcisAMbzjQ/
+	 V2pfoDIBfaKIaXxSMVEmXUqyhdo1JDcwHB3SMApMItRhyYjmvxE6WmXYnn2qFN2vtyDRh
+	 1ybRVKwpP/Lmln8s9Tl7OAo4VqQJYw3SsyUtvJVE5TBN69PaHGISH3gHROfgzRa2IlSol
+	 vTsEyk9SOtDjtNAl74sjfKUa0syAnW3E8TPKrOqmQX1rSEt9ZqnQ3O+mJri0Y66Inplox
+	 KMhRNPBD1oVyl8CLrtPqVxV1JA4ioDp5vUTjzM5Nfeb9Pb/s0XplJGH80f2S9GIVipg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793922011;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793922376;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=3aqwlMZwedv1BxgNCD6bn07pbWp3Nf2Jn9pnL/ezZNo=;
-	b=kSg4uNqLdXieXbKnGe6Z3M3Rafhe6p3CGsNp/6cTWcCXksl1n9bCYndZJEqqOZmIRFAi
-	 rwQNJgQov/M16r1QOvyc+wJhYL8LAi/HrX4S9QhLj31OTeU3zzm/XA77FPshpuARUGWDa
-	 R6TxsAIBHDKQIzvA69sD7TKucTS6odqJYVvTrNna1C2f3XN8Wh/Offse+7SiDOnqf/8Dg
-	 4/WkfBGtGyx9N28TwF8XFVhaVwfebX2DGb0ij25WJw1WocDzsxPDNIFJ/mSrjlPprhSER
-	 pzS4eMP2nKfFoZthc3+pAcCZaP4p9YWvPNY7223CWbNg4KLrEHBzzKbadf+1EidDsBg==
+	bh=7baA2rtL7kM4sGnECdCuamhsPyeLyCE2si/52aQLWzQ=;
+	b=30EIalj5rWwsgGzdlaWIb45j+SrKlsGajPvaP6K6702nOMIUedp/OVpdUZ5BjYKa1Psv
+	 3mC/tIkcx2/v295Y4fhj4dznOnvxOdNImK+iGZLYYIcrZbOIcJ6hMAclWoVLxwUZo2qLK
+	 ZJflDvSkUTQ3QOir4TNi1YOfdLKsO8ccE1Wg12Yg3UIVZxKz5XmNEuofoxNbiA0tJ5sXK
+	 cnjegm5G4/hMDu+INnWsgtu04mXlSa/qIWDmCrvxmHjl21wLWPFvi7Y+yTyrFl32JRG55
+	 Vtfm3gJ1nqcEnvtU+7+xh/K1i4Jstr42apCXoEFTKxvKOXztq5XFtFb9acIg5H6lwow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZgszEWhJ;
-	arc=none smtp.remote-ip=209.85.160.171
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YQeJbb0Z;
+	arc=none smtp.remote-ip=209.85.210.54
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AA5606A31B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 23:40:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12AA5606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9D606A31B
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 23:46:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8BD9D606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZgszEWhJ
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-535179e995bso260541cf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 15:40:09 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YQeJbb0Z
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-85a5455bd3cso75733a34.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 15:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793922009; x=1794526809; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793922374; x=1794527174; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=3aqwlMZwedv1BxgNCD6bn07pbWp3Nf2Jn9pnL/ezZNo=;
-        b=ZgszEWhJLckJhYG5XYU/p2tZsf5PfRe0RcAJo6h/5NIy/iD1SqjomjkaigncZ6V6xh
-         IVgJxkyHeOCjPLDt6LEaGldjqDFisywJzYF3NGrHL/r7HwIg4xb2PzeAd6GysaDY9mTl
-         2eot7VbfLws7JZcQPy1c9htlcKs37meBi9HKnQWbWxqlMetcc4Vvs7LI2x+sC7PPNvb1
-         rDPfm3b8kpZFXmSAPnkfiEeUzTC9eSUSamkd8flq/C94XmdKSSxteZYTjvFQAObbZfpS
-         HJuGnzRUBTM7A/bpP0Cd67VsLlz3+Pi3APoQiJeyCH6/BO/Iiuiv0O99cI1hE/QN94K1
-         XipA==
+        bh=7baA2rtL7kM4sGnECdCuamhsPyeLyCE2si/52aQLWzQ=;
+        b=YQeJbb0ZcSra9Z/jzSBvwGKtHdv++/5lfIOmVevZbWIdrExg0vIpvEKYlfj2RcDoSc
+         aSLIUSPp+/WwQNbDPEb7zrf+BLB0sY0tC45MyejULGawDJj2UbepRwR6l8Y3wQoMk0pn
+         xI7NCsylDyjFF1y5E9HtcfhrL+4fTrkkcfK3YCNSXWL+q/0cMPXn6LpRCZoB1z8fbBkI
+         +rKzOew24EVWaTFZRJj8Xm/eXm+5P6W89Z7iL29UNFeppmjDDe+QHcovQ+nHxNtP8WpZ
+         r6fvDu8QWIPMNwVwz9Z6TkSfM2id/Q89LdSUNuPJ6yF3K+ldbWB4PIBFYVnddfIoVV2d
+         SmTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793922009; x=1794526809;
+        d=1e100.net; s=20260707; t=1793922374; x=1794527174;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=3aqwlMZwedv1BxgNCD6bn07pbWp3Nf2Jn9pnL/ezZNo=;
-        b=D+yalBD6BtN+DRbZEfbH8WjIg6vIB2ofEoKq9ZiQ7gGy1loHgM74q/T8HnU4BqFhGc
-         nuPQxDW04Q1EIxPptPuYqp/4BYLLoRmCwuAx91sQk0sUcxQ8Rrikp20+TytOkLmu0er7
-         b2FTe92V3dZ8qx9vZdl6gsPX/yw2CmKQ6vAytQpIrh5BwaRqjMlLDglG3Il9lAXpcn6M
-         LWLA//hraKZ5+FDAsxCu1YvloSKlZaEQdlq045TMaMFOr7PQaCbFg6eq3bE42PD+veeF
-         K/ehR028MmRQwOVrmQYUwtnCWrtHk1EGZ56GhgVSTMMH8/LZ7Cnsi3dOXIjJKHwcM1dm
-         GbWA==
-X-Gm-Message-State: APuU4Z8OEuRFSCN3aEEV+dXbzV6iIeo9XJm/cg+dr2GvHwJ986fi0wWu
-	td2XMI5+90pWAdmNvfejUQXiyiPd3HjBrTpsxYJF/tMd9WqaSlNjY9/inrAq5w==
-X-Gm-Gg: AYBFou02Joo6SUDBSDeU3R6RNKxZXEPDWJ8lKnFR2gHPbyftSLeffOoPHik39uVgSvB
-	fX3Rx9wYdXihEKVGhzJNnqe7JRyljypCYToXSuxXvWelCl2LVSV0EGRKQdTmnslkOqLntb2REzR
-	eiwboBpfm+rzMXc2o4+/TYCHmFA2lYQ2fgwhEsfUWECIyTgN2X0wiTsV2INntQFq267MbLSaTvy
-	eke1cp6FK52I0YnPV3gHMd6ARBHB610MdrRJghvv+vCD7I3mOmda+XqH2i5w8eQk7ymGLr+PBkr
-	TSAccz205iw5Fsl1ZFMkhBSR6Ct9PwZYjkuObruZ0H1qUVhnMbtjTz2zA3qWx7rPN4VLsDLG2uJ
-	+Sj+4cgAbCR1/vdzKrBrHrpfEzjEbSS8bcMLn8sJi7dZqRLCPbK3FljJwCnlhgeX4yoVFO8DTXR
-	AFlIRTnBVyV2b1aAQnDWOEetPTpdQDqo3NwVKEFEqKKgl/qGbUZkbFj+LNTTvOJY4oXquVzKTDi
-	CKcDqxt3u76IUEJBEN2qsFBWcrUhy0G6Dg3FeCPWBRGLNtsTw7GPdLXUk5i2wPsnenaf7SaJuYw
-	We7e0/I=
-X-Received: by 2002:a05:622a:313:b0:536:5783:43ac with SMTP id d75a77b69052e-54e13d77cf7mr15378721cf.35.1793922008158;
-        Thu, 05 Nov 2026 15:40:08 -0800 (PST)
-Received: from [172.17.0.2] ([40.76.239.96])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-54e26835bf8sm5564311cf.19.2026.11.05.15.40.07
+        bh=7baA2rtL7kM4sGnECdCuamhsPyeLyCE2si/52aQLWzQ=;
+        b=XohrrBhsqroyMxkCoYEf6/CJooc6/WfdTnapF4i+H08sA0gPyZSsB3zC/OAEAdc5vn
+         bxNJdANfCE5Odj7dXeCO748NcTSmek4MCuzJmFMxdpiDjK5E2jUd8t7r9M+Q4AV6Dp57
+         zCEMXdoHGD7+C3jVnwlIt8uZMq/k9GKS+12qQffWLb1VynPWd2qQBeGd1T8+Qu0m6gn4
+         qhn1AzJB9TTHyVbb0d7mUt60nyQhpnHmMwvEhzoBArpH+GbpNzpxP3e/9IeQphHsse6N
+         GQH/nQRcWfR+hYurnT79Z6aHM6fTKQpVbumsUYRXUZAGnZz+7OdvCfuj27pWreGqcWiR
+         pscQ==
+X-Gm-Message-State: APuU4Z8l1IIH7YF7nFb1F+oIgdqKdmMMDK+9FC6LsfjPeZ3SNvP5NZZ1
+	7JaVKcRNezwwivR5vgRMdflgMThBJzh8RWa/Hsb3VgO+aICV/zo2NuvjZFjuRg==
+X-Gm-Gg: AYBFou0wTeGQWdmyXXY27or6kgg/SKSLR32Pcr5b6N11GF2uysta0pGdoU9XETQR2Q1
+	dnKWzdVoWZ0rXrmcnVnU8GDiD4EYmfmlHlm2gN5+Q444XVFq+eNaHbe2wIDYnTO3G+HFNBMefyy
+	ew70GfU54DnfJGH1fm0STqiPxDbIWqLx1xQRT0G2rqa//Z750/KyANC/bmO6Cz7nK/nFUnT7DeZ
+	t9cuiiECHzIwPDQmjcptV3ZghPt4wWQFsTT6y4deoVzhW6ZsviUZlY7Lz1gTjNZ4Ixktjnt2cjD
+	721lMhrQCMwv1DNHERXrEWxGc7LjfQTzHMwmCVFhM1AlZBt8k/7T6QbrNkcPqg/9qFnEaMsmj5e
+	zcbq5o4F/0CI+vTxtzwXWtyYGkSyA1x3Av6RQDnU1YvPnCWV1t2NVnwRs+Kfjg2qYFo6hZCfVwI
+	C3kbQCYL/r95k8+Bf5AqbSvJMSHtLytdIThy9fL6m5sFp3DqZAEafIlljWAGqMd2WzpFWHq4vma
+	OU+n5A6SSRWVCzLhEijGI7RBIDKLttBuR/DHUst4XwtRP9xYb+U1qRn+vhVyAZK
+X-Received: by 2002:a05:6830:6815:b0:843:cc20:9d03 with SMTP id 46e09a7af769-85f1cf43d24mr905031a34.6.1793922374517;
+        Thu, 05 Nov 2026 15:46:14 -0800 (PST)
+Received: from [172.17.0.2] ([135.232.193.33])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-85f1d951a8csm635448a34.3.2026.11.05.15.46.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 15:40:07 -0800 (PST)
-Message-ID: <6aed13d7.9674e226.11b298.4384@mx.google.com>
-Date: Thu, 05 Nov 2026 15:40:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8120030594721622676=="
+        Thu, 05 Nov 2026 15:46:14 -0800 (PST)
+Message-ID: <6aed1546.b906deeb.120ef5.a084@mx.google.com>
+Date: Thu, 05 Nov 2026 15:46:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4357753014150550392=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -91,12 +90,12 @@ Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Fix handling of malformed GATT PDUs
-In-Reply-To: <20261105221638.2332398-2-luiz.dentz@gmail.com>
-References: <20261105221638.2332398-2-luiz.dentz@gmail.com>
+Subject: RE: Add support for HDT and EKS
+In-Reply-To: <20261105171229.2053802-2-luiz.dentz@gmail.com>
+References: <20261105171229.2053802-2-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============8120030594721622676==
+--===============4357753014150550392==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,162 +106,112 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1203587/
+PW Link:https://patchwork.kernel.org/series/1203383/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      4.29 seconds
-GitLint                       FAIL      3.23 seconds
-BuildEll                      PASS      21.09 seconds
-BluezMake                     PASS      316.54 seconds
-MakeCheck                     PASS      14.98 seconds
-MakeDistcheck                 PASS      159.02 seconds
-CheckValgrind                 PASS      361.88 seconds
-CheckSmatch                   WARNING   309.85 seconds
-bluezmakeextell               PASS      104.44 seconds
-TestFunctional                FAIL      1292.58 seconds
-IncrementalBuild              PASS      455.41 seconds
-ScanBuild                     PASS      1207.27 seconds
+CheckPatch                    FAIL      24.26 seconds
+GitLint                       PASS      3.59 seconds
+BuildEll                      PASS      20.95 seconds
+BluezMake                     PASS      314.62 seconds
+MakeCheck                     PASS      15.44 seconds
+MakeDistcheck                 PASS      164.89 seconds
+CheckValgrind                 PASS      364.64 seconds
+CheckSmatch                   WARNING   387.23 seconds
+bluezmakeextell               PASS      101.95 seconds
+TestFunctional                PASS      1209.23 seconds
+IncrementalBuild              PASS      826.88 seconds
+ScanBuild                     PASS      1206.63 seconds
 
 Details
 ##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
 Output:
-[BlueZ,v1,6/8] shared/gatt-client: Fix parsing Read Multiple Variable Length response
+[BlueZ,v4,01/11] monitor: Use __packed in bt.h and its users
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#230: FILE: monitor/bt.h:16:
++#define __packed __attribute__((packed))
 
-1: T1 Title exceeds max length (85>80): "[BlueZ,v1,6/8] shared/gatt-client: Fix parsing Read Multiple Variable Length response"
+/home/runner/work/bluez/bluez/src/patch/14954491.patch total: 0 errors, 1 warnings, 4719 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14954491.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v4,10/11] l2cap-tester, iso-tester, mgmt-tester: Add HDT tests
+WARNING:MACRO_ARG_UNUSED: Argument 'name' is not used in function-like macro
+#414: FILE: tools/iso-tester.c:954:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+WARNING:MACRO_ARG_UNUSED: Argument 'setup' is not used in function-like macro
+#414: FILE: tools/iso-tester.c:954:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+WARNING:MACRO_ARG_UNUSED: Argument 'func' is not used in function-like macro
+#414: FILE: tools/iso-tester.c:954:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+/home/runner/work/bluez/bluez/src/patch/14954497.patch total: 0 errors, 3 warnings, 2922 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14954497.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
 ##############################
 Test: CheckSmatch - WARNING
 Desc: Run smatch tool with source
 Output:
-src/shared/gatt-helpers.c:764:31: warning: Variable length array is used.src/shared/gatt-helpers.c:842:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1336:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1367:23: warning: Variable length array is used.src/shared/gatt-helpers.c:764:31: warning: Variable length array is used.src/shared/gatt-helpers.c:842:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1336:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1367:23: warning: Variable length array is used.src/shared/gatt-helpers.c:764:31: warning: Variable length array is used.src/shared/gatt-helpers.c:842:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1336:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1367:23: warning: Variable length array is used.
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bearer::test_bearer_le_conn_update[hosts14-vm2]: failed on teardown with "pytest_bluezenv.plugin.CoredumpWarning: Core dump: test-bluezenv-hosts14.1-bluetoothd-1793920035-190.core
-        /usr/bin/gdb: warning: Couldn't determine a path for the index cache directory.
-        [New LWP 190]
-        [Thread debugging using libthread_db enabled]
-        Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
-        Core was generated by `/home/runner/work/bluez/bluez/src/src/src/bluetoothd --nodetach -f /run/bluetoo'.
-        Program terminated with signal SIGABRT, Aborted.
-        #0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44
-
-        warning: 44	./nptl/pthread_kill.c: No such file or directory
-
-        Thread 1 (Thread 0x7fd912ca6900 (LWP 190)):
-        #0  __pthread_kill_implementation (threadid=<optimized out>, signo=6, no_tid=0) at ./nptl/pthread_kill.c:44
-                tid = <optimized out>
-                ret = 0
-                pd = <optimized out>
-                old_mask = {__val = {4412750543122677053}}
-                ret = <optimized out>
-        #1  __pthread_kill_internal (threadid=<optimized out>, signo=6) at ./nptl/pthread_kill.c:89
-        No locals.
-        #2  __GI___pthread_kill (threadid=<optimized out>, signo=signo@entry=6) at ./nptl/pthread_kill.c:100
-        No locals.
-        #3  0x00007fd913401b7e in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
-                ret = <optimized out>
-        #4  0x00007fd9133e48ec in __GI_abort () at ./stdlib/abort.c:77
-                act = {__sigaction_handler = {sa_handler = 0x0, sa_sigaction = 0x0}, sa_mask = {__val = {0, 0, 0, 140737438815152, 140737438815440, 140737438815296, 22, 140570304502736, 0, 140737438815232, 140570321348118, 140570290610176, 4096, 0, 6775025475302540032, 140570294788120}}, sa_flags = 343068672, sa_restorer = 0x16}
-        #5  0x00007fd91400ca0f in __sanitizer::Abort () at ../../../../src/libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp:165
-        No locals.
-        #6  0x00007fd914132c2d in __sanitizer::Die () at ../../../../src/libsanitizer/sanitizer_common/sanitizer_termination.cpp:58
-        No locals.
-        #7  0x00007fd91410793c in __asan::ScopedInErrorReport::~ScopedInErrorReport (this=0x7ffffd0c1576) at ../../../../src/libsanitizer/asan/asan_report.cpp:221
-                buffer_copy = {buffer_ = {<__sanitizer::InternalMmapVectorNoCtor<char, false>> = {data_ = 0x7bd90cf70000 '=' <repeats 65 times>, "\n==190==ERROR: AddressSanitizer: heap-use-after-free on address 0x7ce9121e1720 at pc 0x562ab9ea5bcd bp 0x7ffffd0c21f0 sp 0x7ffffd0c21e0"..., capacity_bytes_ = 8192, size_ = 4282}, <No data fields>}}
-                buffer_copy = <optimized out>
-                l = <optimized out>
-        #8  0x00007fd914106e02 in __asan::ReportGenericError (pc=94741507759053, bp=140737438818800, sp=sp@entry=140737438818784, addr=137340473186080, is_write=is_write@entry=false, access_size=8, fatal=true, exp=<optimized out>) at ../../../../src/libsanitizer/asan/asan_report.cpp:536
-                in_report = {error_report_lock_ = {<No data fields>}, static current_error_ = {kind = __asan::kErrorKindGeneric, {Base = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, DeadlySignal = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, signal = {siginfo = 0x5e05b9c600000002, context = 0x7ce9121e1720, addr = 0, pc = 0, sp = 6124623364552, bp = 137340473186080, is_memory_access = 96, write_flag = __sanitizer::SignalContext::Unknown, is_true_faulting_addr = 192}}, DoubleFree = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, second_free_stack = 0x5e05b9c600000002, addr_description = {addr = 137340473186080, alloc_tid = 0, free_tid = 0, alloc_stack_id = 456, free_stack_id = 1426, chunk_access = {bad_addr = 137340473186080, offset = 96, chunk_begin = 137340473185984, chunk_size = 232, user_requested_alignment = 8, access_type = 2, alloc_type = 1}}}, NewDeleteTypeMismatch = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, free_stack = 0x5e05b9c600000002, addr_description = {addr = 137340473186080, alloc_tid = 0, free_tid = 0, alloc_stack_id = 456, free_stack_id = 1426, chunk_access = {bad_addr = 137340473186080, offset = 96, chunk_begin = 137340473185984, chunk_size = 232, user_requested_alignment = 8, access_type = 2, alloc_type = 1}}, delete_size = 140570291886400, delete_alignment = 140737438816896}, FreeNotMalloced = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, free_stack = 0x5e05b9c600000002, addr_description = {data = {kind = 303961888, {shadow = {addr = 0, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 0, alloc_tid = 0, free_tid = 6124623364552, alloc_stack_id = 303961888, free_stack_id = 31977, chunk_access = {bad_addr = 96, offset = 137340473185984, chunk_begin = 232, chunk_size = 140733193412616, user_requested_alignment = 2368, access_type = 1, alloc_type = 1}}, stack = {addr = 0, tid = 0, offset = 6124623364552, frame_pc = 137340473186080, access_size = 96, frame_descr = 0x7ce9121e16c0 "\222\005"}, global = {addr = 0, static kMaxGlobals = 4, globals = {{beg = 0, size = 6124623364552, size_with_redzone = 137340473186080, name = 0x60 <error: Cannot access memory at address 0x60>, module_name = 0x7ce9121e16c0 "\222\005", has_dynamic_init = 232, gcc_location = 0x7fff00006008, odr_indicator = 140570291886400}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321915840, name = 0x7cb9121e0b90 "\003\021", module_name = 0x7ffffd0c1a50 "\240\"\f\375\377\177", has_dynamic_init = 140570320267064, gcc_location = 0xa0, odr_indicator = 137134314752912}, {beg = 140570294919376, size = 140737438816880, size_with_redzone = 137134314752928, name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136172222140704, gcc_location = 0x7ffffd0c22a0, odr_indicator = 140570321195969}, {beg = 140737438816880, size = 129173661314, size_with_redzone = 140737438816896, name = 0x2 <error: Cannot access memory at address 0x2>, module_name = 0x7fd9140f9400 <___interceptor_free(void*)+176> "D\213\215\314\367\377\377E\205\311t4H\211m\330A\203\371\001tzE\017\276\3061\311H\211\352H\211\306H\215\275\320\367\377\377\3502\026\001", has_dynamic_init = 94741506707048, gcc_location = 0x7ffffd0c2280, odr_indicator = 140737438818704}}, reg_sites = {324849120, 32729, 323672931, 32729}, access_size = 1, size = 205 '\315'}, wild = {addr = 0, access_size = 0}}}}}, AllocTypeMismatch = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, dealloc_stack = 0x5e05b9c600000002, alloc_type = 303961888, dealloc_type = 31977, addr_description = {data = {kind = __asan::kAddressKindWild, {shadow = {addr = 0, kind = (unknown: 0xc8), shadow_byte = 1 '\001'}, heap = {addr = 0, alloc_tid = 6124623364552, free_tid = 137340473186080, alloc_stack_id = 96, free_stack_id = 0, chunk_access = {bad_addr = 137340473185984, offset = 232, chunk_begin = 140733193412616, chunk_size = 140570291886400, user_requested_alignment = 2688, access_type = 1, alloc_type = 0}}, stack = {addr = 0, tid = 6124623364552, offset = 137340473186080, frame_pc = 96, access_size = 137340473185984, frame_descr = 0xe8 <error: Cannot access memory at address 0xe8>}, global = {addr = 0, static kMaxGlobals = 4, globals = {{beg = 6124623364552, size = 137340473186080, size_with_redzone = 96, name = 0x7ce9121e16c0 "\222\005", module_name = 0xe8 <error: Cannot access memory at address 0xe8>, has_dynamic_init = 140733193412616, gcc_location = 0x7fd912505940, odr_indicator = 140737438816896}, {beg = 2, size = 140570321915840, size_with_redzone = 137134314752912, name = 0x7ffffd0c1a50 "\240\"\f\375\377\177", module_name = 0x7fd914016738 <__sanitizer::Quarantine<__asan::QuarantineCallback, __asan::AsanChunk>::Put(__sanitizer::QuarantineCache<__asan::QuarantineCallback>*, __asan::QuarantineCallback, __asan::AsanChunk*, unsigned long)+248> "H\203;", has_dynamic_init = 160, gcc_location = 0x7cb9121e0b90, odr_indicator = 140570294919376}, {beg = 140737438816880, size = 137134314752928, size_with_redzone = 94741506794864, name = 0x7ffffd0c2380 "", module_name = 0x7bd910edd120 "pU\036\022I|", has_dynamic_init = 140737438818976, gcc_location = 0x7fd9140f93c1 <___interceptor_free(void*)+113>, odr_indicator = 140737438816880}, {beg = 129173661314, size = 140737438816896, size_with_redzone = 2, name = 0x7fd9140f9400 <___interceptor_free(void*)+176> "D\213\215\314\367\377\377E\205\311t4H\211m\330A\203\371\001tzE\017\276\3061\311H\211\352H\211\306H\215\275\320\367\377\377\3502\026\001", module_name = 0x562ab9da4e68 <gatt_server_cleanup+200> "H\205\333t{\366\303\auvH\211\350H\301\350\003\200\270", has_dynamic_init = 140737438818944, gcc_location = 0x7ffffd0c2190, odr_indicator = 140570309479904}}, reg_sites = {323672931, 32729, 1, 0}, access_size = 94741507759053, size = 240 '\360'}, wild = {addr = 0, access_size = 6124623364552}}}}}, MallocUsableSizeNotOwned = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, addr_description = {data = {kind = 303961888, {shadow = {addr = 0, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 0, alloc_tid = 0, free_tid = 6124623364552, alloc_stack_id = 303961888, free_stack_id = 31977, chunk_access = {bad_addr = 96, offset = 137340473185984, chunk_begin = 232, chunk_size = 140733193412616, user_requested_alignment = 2368, access_type = 1, alloc_type = 1}}, stack = {addr = 0, tid = 0, offset = 6124623364552, frame_pc = 137340473186080, access_size = 96, frame_descr = 0x7ce9121e16c0 "\222\005"}, global = {addr = 0, static kMaxGlobals = 4, globals = {{beg = 0, size = 6124623364552, size_with_redzone = 137340473186080, name = 0x60 <error: Cannot access memory at address 0x60>, module_name = 0x7ce9121e16c0 "\222\005", has_dynamic_init = 232, gcc_location = 0x7fff00006008, odr_indicator = 140570291886400}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321915840, name = 0x7cb9121e0b90 "\003\021", module_name = 0x7ffffd0c1a50 "\240\"\f\375\377\177", has_dynamic_init = 140570320267064, gcc_location = 0xa0, odr_indicator = 137134314752912}, {beg = 140570294919376, size = 140737438816880, size_with_redzone = 137134314752928, name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136172222140704, gcc_location = 0x7ffffd0c22a0, odr_indicator = 140570321195969}, {beg = 140737438816880, size = 129173661314, size_with_redzone = 140737438816896, name = 0x2 <error: Cannot access memory at address 0x2>, module_name = 0x7fd9140f9400 <___interceptor_free(void*)+176> "D\213\215\314\367\377\377E\205\311t4H\211m\330A\203\371\001tzE\017\276\3061\311H\211\352H\211\306H\215\275\320\367\377\377\3502\026\001", has_dynamic_init = 94741506707048, gcc_location = 0x7ffffd0c2280, odr_indicator = 140737438818704}}, reg_sites = {324849120, 32729, 323672931, 32729}, access_size = 1, size = 205 '\315'}, wild = {addr = 0, access_size = 0}}}}}, SanitizerGetAllocatedSizeNotOwned = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, addr_description = {data = {kind = 303961888, {shadow = {addr = 0, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 0, alloc_tid = 0, free_tid = 6124623364552, alloc_stack_id = 303961888, free_stack_id = 31977, chunk_access = {bad_addr = 96, offset = 137340473185984, chunk_begin = 232, chunk_size = 140733193412616, user_requested_alignment = 2368, access_type = 1, alloc_type = 1}}, stack = {addr = 0, tid = 0, offset = 6124623364552, frame_pc = 137340473186080, access_size = 96, frame_descr = 0x7ce9121e16c0 "\222\005"}, global = {addr = 0, static kMaxGlobals = 4, globals = {{beg = 0, size = 6124623364552, size_with_redzone = 137340473186080, name = 0x60 <error: Cannot access memory at address 0x60>, module_name = 0x7ce9121e16c0 "\222\005", has_dynamic_init = 232, gcc_location = 0x7fff00006008, odr_indicator = 140570291886400}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321915840, name = 0x7cb9121e0b90 "\003\021", module_name = 0x7ffffd0c1a50 "\240\"\f\375\377\177", has_dynamic_init = 140570320267064, gcc_location = 0xa0, odr_indicator = 137134314752912}, {beg = 140570294919376, size = 140737438816880, size_with_redzone = 137134314752928, name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136172222140704, gcc_location = 0x7ffffd0c22a0, odr_indicator = 140570321195969}, {beg = 140737438816880, size = 129173661314, size_with_redzone = 140737438816896, name = 0x2 <error: Cannot access memory at address 0x2>, module_name = 0x7fd9140f9400 <___interceptor_free(void*)+176> "D\213\215\314\367\377\377E\205\311t4H\211m\330A\203\371\001tzE\017\276\3061\311H\211\352H\211\306H\215\275\320\367\377\377\3502\026\001", has_dynamic_init = 94741506707048, gcc_location = 0x7ffffd0c2280, odr_indicator = 140737438818704}}, reg_sites = {324849120, 32729, 323672931, 32729}, access_size = 1, size = 205 '\315'}, wild = {addr = 0, access_size = 0}}}}}, CallocOverflow = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, count = 137340473186080, size = 0}, ReallocArrayOverflow = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, count = 137340473186080, size = 0}, PvallocOverflow = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, size = 137340473186080}, InvalidAllocationAlignment = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, alignment = 137340473186080}, InvalidAlignedAllocAlignment = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, size = 137340473186080, alignment = 0}, InvalidPosixMemalignAlignment = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, alignment = 137340473186080}, AllocationSizeTooBig = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, user_size = 137340473186080, total_size = 0, max_size = 0}, RssLimitExceeded = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002}, OutOfMemory = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, requested_size = 137340473186080}, StringFunctionMemoryRangesOverlap = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, length1 = 137340473186080, length2 = 0, addr1_description = {data = {kind = __asan::kAddressKindWild, {shadow = {addr = 6124623364552, kind = (unknown: 0x20), shadow_byte = 23 '\027'}, heap = {addr = 6124623364552, alloc_tid = 137340473186080, free_tid = 96, alloc_stack_id = 303961792, free_stack_id = 31977, chunk_access = {bad_addr = 232, offset = 140733193412616, chunk_begin = 140570291886400, chunk_size = 140737438816896, user_requested_alignment = 2, access_type = 0, alloc_type = 0}}, stack = {addr = 6124623364552, tid = 137340473186080, offset = 96, frame_pc = 137340473185984, access_size = 232, frame_descr = 0x7fff00006008 <error: Cannot access memory at address 0x7fff00006008>}, global = {addr = 6124623364552, static kMaxGlobals = 4, globals = {{beg = 137340473186080, size = 96, size_with_redzone = 137340473185984, name = 0xe8 <error: Cannot access memory at address 0xe8>, module_name = 0x7fff00006008 <error: Cannot access memory at address 0x7fff00006008>, has_dynamic_init = 140570291886400, gcc_location = 0x7ffffd0c1a80, odr_indicator = 2}, {beg = 140570321915840, size = 137134314752912, size_with_redzone = 140737438816848, name = 0x7fd914016738 <__sanitizer::Quarantine<__asan::QuarantineCallback, __asan::AsanChunk>::Put(__sanitizer::QuarantineCache<__asan::QuarantineCallback>*, __asan::QuarantineCallback, __asan::AsanChunk*, unsigned long)+248> "H\203;", module_name = 0xa0 <error: Cannot access memory at address 0xa0>, has_dynamic_init = 137134314752912, gcc_location = 0x7fd9127ea0d0, odr_indicator = 140737438816880}, {beg = 137134314752928, size = 94741506794864, size_with_redzone = 140737438819200, name = 0x7bd910edd120 "pU\036\022I|", module_name = 0x7ffffd0c22a0 "\200\t\036\022I}", has_dynamic_init = 140570321195969, gcc_location = 0x7ffffd0c1a70, odr_indicator = 129173661314}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321196032, name = 0x562ab9da4e68 <gatt_server_cleanup+200> "H\205\333t{\366\303\auvH\211\350H\301\350\003\200\270", module_name = 0x7ffffd0c2280 " \321\355\020\331{", has_dynamic_init = 140737438818704, gcc_location = 0x7fd9135ccde0 <_nl_C_locobj>, odr_indicator = 140570308303715}}, reg_sites = {1, 0, 3119143885, 22058}, access_size = 140737438818800, size = 224 '\340'}, wild = {addr = 6124623364552, access_size = 137340473186080}}}}, addr2_description = {data = {kind = 8, {shadow = {addr = 140570321627031, kind = __asan::kShadowKindLow, shadow_byte = 253 '\375'}, heap = {addr = 140570321627031, alloc_tid = 140737438874880, free_tid = 140737438818440, alloc_stack_id = 799097600, free_stack_id = 1577433542, chunk_access = {bad_addr = 140737438818640, offset = 140570321457021, chunk_begin = 136653278434696, chunk_size = 140570321891192, user_requested_alignment = 4095, access_type = 3, alloc_type = 3}}, stack = {addr = 140570321627031, tid = 140737438874880, offset = 140737438818440, frame_pc = 6775025475302540032, access_size = 140737438818640, frame_descr = 0x7fd914138f7d <__sanitizer::DTLS_on_tls_get_addr(void*, void*, unsigned long, unsigned long)+125> "I\211\302H\205\300u\035\351\213"}, global = {addr = 140570321627031, static kMaxGlobals = 4, globals = {{beg = 140737438874880, size = 140737438818440, size_with_redzone = 6775025475302540032, name = 0x7ffffd0c2150 "H\024\036\022\331|", module_name = 0x7fd914138f7d <__sanitizer::DTLS_on_tls_get_addr(void*, void*, unsigned long, unsigned long)+125> "I\211\302H\205\300u\035\351\213", has_dynamic_init = 136653278434696, gcc_location = 0x7fd9141a2f78, odr_indicator = 65535}, {beg = 6775025475302540032, size = 140570299885752, size_with_redzone = 140570321891192, name = 0x7c39121e7070 "", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136584558964800, gcc_location = 0x7c39121e7068, odr_indicator = 136584558964848}, {beg = 94741507683476, size = 64, size_with_redzone = 17021527767588, name = 0x7c59121e1620 "@\024\036\022\331|", module_name = 0x7bd910edd1c0 "\0166\340E", has_dynamic_init = 136309681111504, gcc_location = 0x562ab9e9d452 <bt_att_chan_cancel+402>, odr_indicator = 10}, {beg = 136584558964848, size = 10, size_with_redzone = 94741507725080, name = 0x7cd9121e1440 "", module_name = 0x7bd910edd220 "", has_dynamic_init = 17021527767608, gcc_location = 0x7ffffd0c2160, odr_indicator = 137271753708616}}, reg_sites = {4245431168, 32767, 315254968, 32729}, access_size = 136996875800576, size = 144 '\220'}, wild = {addr = 140570321627031, access_size = 140737438874880}}}}, function = 0x7fd9140d1359 <___interceptor___tls_get_addr(void*)+89> "L\211\360H\213]\360L\213u\370\311\303f.\017\037\204"}, StringFunctionSizeOverflow = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, addr_description = {data = {kind = 303961888, {shadow = {addr = 0, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 0, alloc_tid = 0, free_tid = 6124623364552, alloc_stack_id = 303961888, free_stack_id = 31977, chunk_access = {bad_addr = 96, offset = 137340473185984, chunk_begin = 232, chunk_size = 140733193412616, user_requested_alignment = 2368, access_type = 1, alloc_type = 1}}, stack = {addr = 0, tid = 0, offset = 6124623364552, frame_pc = 137340473186080, access_size = 96, frame_descr = 0x7ce9121e16c0 "\222\005"}, global = {addr = 0, static kMaxGlobals = 4, globals = {{beg = 0, size = 6124623364552, size_with_redzone = 137340473186080, name = 0x60 <error: Cannot access memory at address 0x60>, module_name = 0x7ce9121e16c0 "\222\005", has_dynamic_init = 232, gcc_location = 0x7fff00006008, odr_indicator = 140570291886400}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321915840, name = 0x7cb9121e0b90 "\003\021", module_name = 0x7ffffd0c1a50 "\240\"\f\375\377\177", has_dynamic_init = 140570320267064, gcc_location = 0xa0, odr_indicator = 137134314752912}, {beg = 140570294919376, size = 140737438816880, size_with_redzone = 137134314752928, name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136172222140704, gcc_location = 0x7ffffd0c22a0, odr_indicator = 140570321195969}, {beg = 140737438816880, size = 129173661314, size_with_redzone = 140737438816896, name = 0x2 <error: Cannot access memory at address 0x2>, module_name = 0x7fd9140f9400 <___interceptor_free(void*)+176> "D\213\215\314\367\377\377E\205\311t4H\211m\330A\203\371\001tzE\017\276\3061\311H\211\352H\211\306H\215\275\320\367\377\377\3502\026\001", has_dynamic_init = 94741506707048, gcc_location = 0x7ffffd0c2280, odr_indicator = 140737438818704}}, reg_sites = {324849120, 32729, 323672931, 32729}, access_size = 1, size = 205 '\315'}, wild = {addr = 0, access_size = 0}}}}, size = 140737438818800}, BadParamsToAnnotateContiguousContainer = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, beg = 137340473186080, end = 0, old_mid = 0, new_mid = 6124623364552}, BadParamsToAnnotateDoubleEndedContiguousContainer = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, storage_beg = 137340473186080, storage_end = 0, old_container_beg = 0, old_container_end = 6124623364552, new_container_beg = 137340473186080, new_container_end = 96}, BadParamsToCopyContiguousContainerAnnotations = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, stack = 0x5e05b9c600000002, old_storage_beg = 137340473186080, old_storage_end = 0, new_storage_beg = 0, new_storage_end = 6124623364552}, ODRViolation = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, global1 = {beg = 6775025474503442434, size = 137340473186080, size_with_redzone = 0, name = 0x0, module_name = 0x592000001c8 <error: Cannot access memory at address 0x592000001c8>, has_dynamic_init = 137340473186080, gcc_location = 0x60, odr_indicator = 137340473185984}, global2 = {beg = 232, size = 140733193412616, size_with_redzone = 140570291886400, name = 0x7ffffd0c1a80 "", module_name = 0x2 <error: Cannot access memory at address 0x2>, has_dynamic_init = 140570321915840, gcc_location = 0x7cb9121e0b90, odr_indicator = 140737438816848}, stack_id1 = 335636280, stack_id2 = 32729}, InvalidPointerPair = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, pc = 6775025474503442434, bp = 137340473186080, sp = 0, addr1_description = {data = {kind = __asan::kAddressKindWild, {shadow = {addr = 6124623364552, kind = (unknown: 0x20), shadow_byte = 23 '\027'}, heap = {addr = 6124623364552, alloc_tid = 137340473186080, free_tid = 96, alloc_stack_id = 303961792, free_stack_id = 31977, chunk_access = {bad_addr = 232, offset = 140733193412616, chunk_begin = 140570291886400, chunk_size = 140737438816896, user_requested_alignment = 2, access_type = 0, alloc_type = 0}}, stack = {addr = 6124623364552, tid = 137340473186080, offset = 96, frame_pc = 137340473185984, access_size = 232, frame_descr = 0x7fff00006008 <error: Cannot access memory at address 0x7fff00006008>}, global = {addr = 6124623364552, static kMaxGlobals = 4, globals = {{beg = 137340473186080, size = 96, size_with_redzone = 137340473185984, name = 0xe8 <error: Cannot access memory at address 0xe8>, module_name = 0x7fff00006008 <error: Cannot access memory at address 0x7fff00006008>, has_dynamic_init = 140570291886400, gcc_location = 0x7ffffd0c1a80, odr_indicator = 2}, {beg = 140570321915840, size = 137134314752912, size_with_redzone = 140737438816848, name = 0x7fd914016738 <__sanitizer::Quarantine<__asan::QuarantineCallback, __asan::AsanChunk>::Put(__sanitizer::QuarantineCache<__asan::QuarantineCallback>*, __asan::QuarantineCallback, __asan::AsanChunk*, unsigned long)+248> "H\203;", module_name = 0xa0 <error: Cannot access memory at address 0xa0>, has_dynamic_init = 137134314752912, gcc_location = 0x7fd9127ea0d0, odr_indicator = 140737438816880}, {beg = 137134314752928, size = 94741506794864, size_with_redzone = 140737438819200, name = 0x7bd910edd120 "pU\036\022I|", module_name = 0x7ffffd0c22a0 "\200\t\036\022I}", has_dynamic_init = 140570321195969, gcc_location = 0x7ffffd0c1a70, odr_indicator = 129173661314}, {beg = 140737438816896, size = 2, size_with_redzone = 140570321196032, name = 0x562ab9da4e68 <gatt_server_cleanup+200> "H\205\333t{\366\303\auvH\211\350H\301\350\003\200\270", module_name = 0x7ffffd0c2280 " \321\355\020\331{", has_dynamic_init = 140737438818704, gcc_location = 0x7fd9135ccde0 <_nl_C_locobj>, odr_indicator = 140570308303715}}, reg_sites = {1, 0, 3119143885, 22058}, access_size = 140737438818800, size = 224 '\340'}, wild = {addr = 6124623364552, access_size = 137340473186080}}}}, addr2_description = {data = {kind = 8, {shadow = {addr = 140570321627031, kind = __asan::kShadowKindLow, shadow_byte = 253 '\375'}, heap = {addr = 140570321627031, alloc_tid = 140737438874880, free_tid = 140737438818440, alloc_stack_id = 799097600, free_stack_id = 1577433542, chunk_access = {bad_addr = 140737438818640, offset = 140570321457021, chunk_begin = 136653278434696, chunk_size = 140570321891192, user_requested_alignment = 4095, access_type = 3, alloc_type = 3}}, stack = {addr = 140570321627031, tid = 140737438874880, offset = 140737438818440, frame_pc = 6775025475302540032, access_size = 140737438818640, frame_descr = 0x7fd914138f7d <__sanitizer::DTLS_on_tls_get_addr(void*, void*, unsigned long, unsigned long)+125> "I\211\302H\205\300u\035\351\213"}, global = {addr = 140570321627031, static kMaxGlobals = 4, globals = {{beg = 140737438874880, size = 140737438818440, size_with_redzone = 6775025475302540032, name = 0x7ffffd0c2150 "H\024\036\022\331|", module_name = 0x7fd914138f7d <__sanitizer::DTLS_on_tls_get_addr(void*, void*, unsigned long, unsigned long)+125> "I\211\302H\205\300u\035\351\213", has_dynamic_init = 136653278434696, gcc_location = 0x7fd9141a2f78, odr_indicator = 65535}, {beg = 6775025475302540032, size = 140570299885752, size_with_redzone = 140570321891192, name = 0x7c39121e7070 "", module_name = 0x7ffffd0c2380 "", has_dynamic_init = 136584558964800, gcc_location = 0x7c39121e7068, odr_indicator = 136584558964848}, {beg = 94741507683476, size = 64, size_with_redzone = 17021527767588, name = 0x7c59121e1620 "@\024\036\022\331|", module_name = 0x7bd910edd1c0 "\0166\340E", has_dynamic_init = 136309681111504, gcc_location = 0x562ab9e9d452 <bt_att_chan_cancel+402>, odr_indicator = 10}, {beg = 136584558964848, size = 10, size_with_redzone = 94741507725080, name = 0x7cd9121e1440 "", module_name = 0x7bd910edd220 "", has_dynamic_init = 17021527767608, gcc_location = 0x7ffffd0c2160, odr_indicator = 137271753708616}}, reg_sites = {4245431168, 32767, 315254968, 32729}, access_size = 136996875800576, size = 144 '\220'}, wild = {addr = 140570321627031, access_size = 140737438874880}}}}}, Generic = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, addr_description = {data = {kind = __asan::kAddressKindHeap, {shadow = {addr = 137340473186080, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 137340473186080, alloc_tid = 0, free_tid = 0, alloc_stack_id = 456, free_stack_id = 1426, chunk_access = {bad_addr = 137340473186080, offset = 96, chunk_begin = 137340473185984, chunk_size = 232, user_requested_alignment = 8, access_type = 2, alloc_type = 1}}, stack = {addr = 137340473186080, tid = 0, offset = 0, frame_pc = 6124623364552, access_size = 137340473186080, frame_descr = 0x60 <error: Cannot access memory at address 0x60>}, global = {addr = 137340473186080, static kMaxGlobals = 4, globals = {{beg = 0, size = 0, size_with_redzone = 6124623364552, name = 0x7ce9121e1720 "\240\025\036\022Y|", module_name = 0x60 <error: Cannot access memory at address 0x60>, has_dynamic_init = 137340473185984, gcc_location = 0xe8, odr_indicator = 140733193412616}, {beg = 140570291886400, size = 140737438816896, size_with_redzone = 2, name = 0x7fd9141a8fc0 <__asan::instance> "", module_name = 0x7cb9121e0b90 "\003\021", has_dynamic_init = 140737438816848, gcc_location = 0x7fd914016738 <__sanitizer::Quarantine<__asan::QuarantineCallback, __asan::AsanChunk>::Put(__sanitizer::QuarantineCache<__asan::QuarantineCallback>*, __asan::QuarantineCallback, __asan::AsanChunk*, unsigned long)+248>, odr_indicator = 160}, {beg = 137134314752912, size = 140570294919376, size_with_redzone = 140737438816880, name = 0x7cb9121e0ba0 "\224\005", module_name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", has_dynamic_init = 140737438819200, gcc_location = 0x7bd910edd120, odr_indicator = 140737438818976}, {beg = 140570321195969, size = 140737438816880, size_with_redzone = 129173661314, name = 0x7ffffd0c1a80 "", module_name = 0x2 <error: Cannot access memory at address 0x2>, has_dynamic_init = 140570321196032, gcc_location = 0x562ab9da4e68 <gatt_server_cleanup+200>, odr_indicator = 140737438818944}}, reg_sites = {4245430672, 32767, 324849120, 32729}, access_size = 140570308303715, size = 1 '\001'}, wild = {addr = 137340473186080, access_size = 0}}}}, pc = 94741507759053, bp = 140737438818800, sp = 140737438818784, access_size = 8, bug_descr = 0x7fd914162797 "heap-use-after-free", is_write = false, shadow_val = 253 '\375'}}}, halt_on_error_ = true}
-                error = {<__asan::ErrorBase> = {scariness = {score = 51, descr = "8-byte-read-heap-use-after-free\000\331\177\000\000\305,\021\024\331\177\000\000`\200\036\0229|\000\000:\000\000\000\000\000\000\000@\200\036\0229|\000\000P\200\036\0229|\000\000`\026\f\375\377\177\000\000\005\214\005\024\331\177\000\000\260\026\f\375\377\177\000\000\000\240~\022\331\177\000\000\001\000\000\000\000\000\000\000\001\000\000\000*\000\001\001\000\000\000\000\000\000\000\000\370\377\377\377\377\377\377\377\232\200\036\0229|\000\000\240\026\f\375\377\177\000\000\001\000\000\000\000\000\000\000:\000\000\000\000\000\000\000\000P\214\374\377\177\000\000:\000\000\000\000\000\000\000\240M\377\020\331{\000\0009\000\000\000"...}, tid = 0}, addr_description = {data = {kind = __asan::kAddressKindHeap, {shadow = {addr = 137340473186080, kind = __asan::kShadowKindLow, shadow_byte = 0 '\000'}, heap = {addr = 137340473186080, alloc_tid = 0, free_tid = 0, alloc_stack_id = 456, free_stack_id = 1426, chunk_access = {bad_addr = 137340473186080, offset = 96, chunk_begin = 137340473185984, chunk_size = 232, user_requested_alignment = 8, access_type = 2, alloc_type = 1}}, stack = {addr = 137340473186080, tid = 0, offset = 0, frame_pc = 6124623364552, access_size = 137340473186080, frame_descr = 0x60 <error: Cannot access memory at address 0x60>}, global = {addr = 137340473186080, static kMaxGlobals = 4, globals = {{beg = 0, size = 0, size_with_redzone = 6124623364552, name = 0x7ce9121e1720 "\240\025\036\022Y|", module_name = 0x60 <error: Cannot access memory at address 0x60>, has_dynamic_init = 137340473185984, gcc_location = 0xe8, odr_indicator = 140733193412616}, {beg = 140570291886400, size = 140737438816896, size_with_redzone = 2, name = 0x7fd9141a8fc0 <__asan::instance> "", module_name = 0x7cb9121e0b90 "\003\021", has_dynamic_init = 140737438816848, gcc_location = 0x7fd914016738 <__sanitizer::Quarantine<__asan::QuarantineCallback, __asan::AsanChunk>::Put(__sanitizer::QuarantineCache<__asan::QuarantineCallback>*, __asan::QuarantineCallback, __asan::AsanChunk*, unsigned long)+248>, odr_indicator = 160}, {beg = 137134314752912, size = 140570294919376, size_with_redzone = 140737438816880, name = 0x7cb9121e0ba0 "\224\005", module_name = 0x562ab9dba570 <device_free> "\363\017\036\372USH\211\373H\203\354\030H\205\377\017\204-\n", has_dynamic_init = 140737438819200, gcc_location = 0x7bd910edd120, odr_indicator = 140737438818976}, {beg = 140570321195969, size = 140737438816880, size_with_redzone = 129173661314, name = 0x7ffffd0c1a80 "", module_name = 0x2 <error: Cannot access memory at address 0x2>, has_dynamic_init = 140570321196032, gcc_location = 0x562ab9da4e68 <gatt_server_cleanup+200>, odr_indicator = 140737438818944}}, reg_sites = {4245430672, 32767, 324849120, 32729}, access_size = 140570308303715, size = 1 '\001'}, wild = {addr = 137340473186080, access_size = 0}}}}, pc = 94741507759053, bp = 140737438818800, sp = 140737438818784, access_size = 8, bug_descr = 0x7fd914162797 "heap-use-after-free", is_write = false, shadow_val = 253 '\375'}
-        #9  0x00007fd914106f8d in __asan::ReportGenericError (pc=<optimized out>, bp=bp@entry=140737438818800, sp=sp@entry=140737438818784, addr=<optimized out>, is_write=is_write@entry=false, access_size=access_size@entry=8, exp=<optimized out>, fatal=true) at ../../../../src/libsanitizer/asan/asan_report.cpp:536
-                in_report = <optimized out>
-                error = <optimized out>
-                enable_fp = <optimized out>
-        #10 0x00007fd9141083f9 in __asan::__asan_report_load8 (addr=<optimized out>) at ../../../../src/libsanitizer/asan/asan_rtl.cpp:131
-                bp = 140737438818800
-                pc = <optimized out>
-                local_stack = 140737438819200
-                sp = 140737438818784
-        #11 0x0000562ab9ea5bcd in discovery_op_free (op=0x7c59121e16a0) at src/shared/gatt-client.c:407
-        No locals.
-        #12 0x0000562ab9fd2dea in bt_gatt_request_unref (req=0x7c59121e2020) at src/shared/gatt-helpers.c:577
-        No locals.
-        #13 bt_gatt_request_unref (req=0x7c59121e2020) at src/shared/gatt-helpers.c:566
-        No locals.
-        #14 0x0000562ab9e93494 in cancel_att_send_op (data=0x7c39121e7040) at src/shared/att.c:229
-                op = 0x7c39121e7040
-        #15 0x0000562ab9e9e1d9 in bt_att_cancel_all (att=<optimized out>) at src/shared/att.c:1954
-                chan = 0x7c59121e1620
-                entry = 0x7bf9121f41d0
-        #16 bt_att_cancel_all (att=<optimized out>) at src/shared/att.c:1935
-                entry = <optimized out>
-                chan = <optimized out>
-        #17 0x0000562ab9e9efc0 in bt_att_unref (att=0x7cd9121e1440) at src/shared/att.c:1353
-        No locals.
-        #18 bt_att_unref (att=0x7cd9121e1440) at src/shared/att.c:1344
-        No locals.
-        #19 0x0000562ab9dba1df in attio_cleanup (device=device@entry=0x7d49121e0780) at src/device.c:873
-        No locals.
-        #20 0x0000562ab9dba717 in device_free (user_data=0x7d49121e0780) at src/device.c:918
-                device = 0x7d49121e0780
-                __func__ = "device_free"
-        #21 0x0000562ab9e3b4ca in remove_interface (data=0x7c49121e5570, name=name@entry=0x562aba061380 "org.bluez.Device1") at gdbus/object.c:742
-                iface = 0x7c39121e6260
-        #22 0x0000562ab9e3e08c in g_dbus_unregister_interface (connection=<optimized out>, path=<optimized out>, name=<optimized out>) at gdbus/object.c:1499
-                data = <optimized out>
-        #23 0x0000562ab9d7035b in remove_temporary_devices (adapter=adapter@entry=0x7d09121e0200) at src/adapter.c:826
-                dev = 0x7d49121e0780
-                l = <optimized out>
-                next = 0x0
-        #24 0x0000562ab9d716ba in adapter_shutdown () at src/adapter.c:11503
-                adapter = 0x7d09121e0200
-                list = 0x7c09121e3910 = {0x7d09121e0200}
-                __func__ = "adapter_shutdown"
-        #25 0x0000562ab9e1219c in signal_callback (signum=<optimized out>, user_data=<optimized out>) at src/main.c:1517
-                terminated = false
-        #26 signal_callback (signum=<optimized out>, user_data=<optimized out>) at src/main.c:1504
-                terminated = false
-        #27 0x0000562ab9fc737e in signal_read (io=<optimized out>, user_data=0x7c09121e34c0) at src/shared/mainloop-notify.c:145
-                data = <optimized out>
-                si = <optimized out>
-                result = <optimized out>
-                fd = <optimized out>
-        #28 0x0000562ab9fc4275 in watch_callback (channel=<optimized out>, cond=<optimized out>, user_data=<optimized out>) at src/shared/io-glib.c:173
-                watch = <optimized out>
-                result = <optimized out>
-                destroy = <optimized out>
-        #29 0x00007fd913e12b9b in ?? () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #30 0x00007fd913e141d7 in ?? () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #31 0x00007fd913e14577 in g_main_loop_run () from /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-        No symbol table info available.
-        #32 0x0000562ab9fc71d9 in mainloop_run () at src/shared/mainloop-glib.c:65
-        No locals.
-        #33 0x0000562ab9fc7b0b in mainloop_run_with_signal (func=func@entry=0x562ab9e12120 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-notify.c:196
-                data = 0x7c09121e34c0
-                io = 0x7c19121f9590
-                ret = <optimized out>
-        #34 0x0000562ab9b433eb in main (argc=<optimized out>, argv=<optimized out>) at src/main.c:1745
-                context = <optimized out>
-                err = <optimized out>
-                sdp_mtu = 0
-                sdp_flags = <optimized out>
-                gdbus_flags = <optimized out>
-                __func__ = "main""
-FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: AssertionError: Failed to acquire: org.bluez.Error.Failed
+emulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.monitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresemulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
 
 
-https://github.com/bluez/bluez/pull/2768
+https://github.com/bluez/bluez/pull/2766
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============8120030594721622676==--
+--===============4357753014150550392==--
