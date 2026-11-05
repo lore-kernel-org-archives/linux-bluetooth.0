@@ -1,124 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793899480;
-	b=I/60VRnQOqRVx8xpEqxdknvelBo9UgXrQushKwHVuL2/rnfwXFLs/0cD7uj61P9wE+MU
-	 B2r+7A7GGNc3dkGzVMdIIN23UD+551Fb6QKnQ1xCPEuZjkgJrjon9U34n4WJzq8OHygad
-	 3rWFxEDEDnzkWGuRA5pj2XTRqU+m+5AeZA8RJdXFpkPS5gx3HQlAyJrT/fdVUqxwQFTU4
-	 5tpcYQMkvDG9nIMJ1skICyuPY+5/a8lf8H+eTXEEi0lIsByRRQWqI5W7pbqDjo5X5eki7
-	 HjDra2p3gKhGYuR4SiKBHULMER3QNrcobUfLGX7EHsd89kBILNJ5MuPEtigKc/Xv8vg==
+	t=1793900303;
+	b=ZACXEqIQaOjRS4EOCYAhkEUxCxvb5UlSA5QD2Kz07jm+J72SJxyc9vz6Id+pW3iDf9MN
+	 sqqSWxVnCUNM7ofnulv1TtMHcHNdsmiID3qZCdDUioFxeZxfmGjBoJc8T//L0/ujw3QMt
+	 zp3Ru6YzwOTok7QgYdB4qL2fyu5toJox4EOAABfruAR6zShGYmyp8Fe+ga4AlCdVYP7ut
+	 iQlC6eu8cICbnzsknjLKHqPcP+4PD2JWSbwB+H931Vg5z6SYf4aFog6jr6smSQhHMRTGI
+	 ZMwltXl9cbmdCpCGbkjwFzHmFLO+dEUHdq4kDI8BSTQlnu2EB9EpvHN/DyF7Z19JcVg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793899480;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793900303;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=+Sc9yPGaNTmoDAc39XzEsbXpXvtl7Fk3dFBI/g/ZPmw=;
-	b=bw9kNQ/HdC1Mfi9DYyPB69I2xcAqjGV7RtVevH1mg53HixiNOMoCIR80XuC9uwNUSgQm
-	 X5TnUIZJzMZN/dgZDHaSSD8GP+Odah0hbafc5g8MbQczVL0TeoJtq9GgWR/ykoayhKul5
-	 9tF1D2EXOdR0RWQXi7vquKmaSg30tSD+btzecn9xnVx9JEe9RPSmc7oVghHh8Rm4FVylc
-	 lbzp6Pa/ErjXEwpGkuDbEgVtjwyyVtUV1fkw38z5GP9hlZnd9Gp/LkqCGAcTWxZUL3egw
-	 k8AuSaGpDkDBciWQjVWz3QRCmr+kD2Tns+odXyRwEQFZ1uA2cw6H82zBqBQMB81dMcA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=j0J+eZYiw5xV12js7fNPzjW3saOfPH2WxVmvac0Qksc=;
+	b=nvNH54ie8uHcvzdYWBchbENgzSiMAnubvbue8XJxVoJrcP/iIDSejg31eL3u4eLKHLzZ
+	 fPVvtt0/OBVdLccZeG2pQbTHzueo2mpNVgdJTrRHJ1YefdXfDAAFcbPzqxKK2zagd4z3E
+	 i6PAJ5lJxaloNz5BJtyWXug/yICIeQOc13jcMBvdqE1FkrkY5/e8rBvCmoeoPZ2pvthuL
+	 XHXOLHB/0QZx5IZvdVMYjuxe0Vc59RzmWZkrfSUXgBhNzvzLekuVsDTtlrs+MCCbBE3Hw
+	 +GP7jSTnjAX+Y5MQTUedyusCMO1d6wlvAfE5bnfYb/EqGWQxz6XhQcNkxbD689GqkbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=rowland.harvard.edu;
-	spf=fail smtp.mailfrom=g.harvard.edu;
-	dkim=pass header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.a=rsa-sha256 header.s=google header.b=OXXcUxth;
-	arc=none smtp.remote-ip=209.85.160.178
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=v2aMRcE3;
+	arc=none smtp.remote-ip=74.125.82.43
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9CF606EE83
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 17:24:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C9CF606EE83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E04C606A326
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 17:38:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0E04C606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.a=rsa-sha256 header.s=google header.b=OXXcUxth
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-533778ab0bdso23563741cf.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 09:24:39 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=v2aMRcE3
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1ae18eb9b69so2248812c88.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 09:38:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1793899478; x=1794504278; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+Sc9yPGaNTmoDAc39XzEsbXpXvtl7Fk3dFBI/g/ZPmw=;
-        b=OXXcUxthtyymPU3fwfbcr40/daOdZ4UuV0IOhK3r7k3BfuoZd0x2qWahN2YNfUretu
-         Tvwnl0KFWoKOeZb7Eb3uBsqzIqq8J25exR7V5CgkLuEPZfnZT4ED35Z0b9rlaw575Jgj
-         FQy6EYxV5onXU0wpKN8YyESt8CkDTpTTkNBn9V25Xj56jakQJCIeQ+jbdgqM3xEfnuQB
-         l6A1FG/uOsFRxdidxCtIsyNflhv6dRW8a6chHrMU0u2dgaNP3KFe01+lBZywKoRsUbeP
-         mAwXyFk8XjT9tW3AtUvUEUaho7CfMrUWwbB5j2cn7aptAgB87xrCSo1TqcjbSZYZh8xc
-         JpZA==
+        d=gmail.com; s=20260707; t=1793900302; x=1794505102; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=j0J+eZYiw5xV12js7fNPzjW3saOfPH2WxVmvac0Qksc=;
+        b=v2aMRcE303iCO47zgnEK1ck73l5a18SebhB77/1tMZGmsPhowTksKWd0WAIulSGbe1
+         hmYC6NhBwiCAO0wwXcBpFrBwDfdUkOP9C32nTzUFwUwdP0Avs8g0ISOP3l2a5A7acvlo
+         GRxdPVwUjzyhdl1Mouex71HqkJxIGjXOnIKRjZ4fY5w/qLPe1Fvhbo0whcIKIGcf9X29
+         mjky4tBG8YvkmCi0epsM1JRBYr7Urk8P5BCpgk/4sZaolitq26Otsu3H8fTdCq5LakSd
+         3QRk0823RqsfkU8aTDdoGM5EC+YgFvmVuAT/crfWjl4IQLPnIN2zE35AeMhKIqlFcnIR
+         ZssA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793899478; x=1794504278;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+Sc9yPGaNTmoDAc39XzEsbXpXvtl7Fk3dFBI/g/ZPmw=;
-        b=lCr8Q+OjrYD5eRkrG1TIMGkcIB3sYzXEdYcklvCtcyGQj3XDy/gays4xy6OG0Xu8cQ
-         kWFS5EzxzUU2/dhRbphdYXpq9itDsra9iTs7Vf4FvQTcQx1+VmcqpEHH2F8hBQ98TVyP
-         D1qBO4gaklbRwjb3EOO/2jRRgbOBLW6pXjLnPkc4Pvq6pCHanCnjn3AiU1tAM7rzwaYp
-         0yE+Hg+q1g9QaLUKI/sBBF8gDZchTMWVCZwn1ISSfFG4C7lTrkjQ98jRKJUkmcmiR8c6
-         mKdpFip0j0rDhrS09AOL65NU7DXdzzpTatXZvjnZFbKovvLXgA+FktOGmYwBg7ikIdo2
-         KHYw==
-X-Forwarded-Encrypted: i=1; AKwUvBxBGA9QTrB+HC7cMsCnlLo7LpjM7aSdi/a7zs5V9BrcRGR/I18QNKv39SS5XgGDvS9n7jD2tqxYzCmMT3LuioM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/75FhTJr1t41aihQbDswT1fQa0810EpUfWMdQnEHg4Tql9IsCY
-	sKrqWt3k3PYZS3KUlzFiVR+/v7bPuWfnameeAHWhxhrNBxfi3+MBYKZAWpr8jQ1ebw==
-X-Gm-Gg: AYBFou3kudQZkb1k/qrXgSCQw9tnLOwFHyX6hU8tP/7uPx+EJY6GjXqeCD73pFjyqMj
-	IW2Q869HqIsfDpGid7dxdAew6OEWusaMpuJipb5tuYCWUHbDAREOl6WjLeFAJKW4VKBiw2b0KXA
-	zVn3qreGHwK3jep0b3nl0oKrB4Q1HgaDfvpwiKMlwSt8qfq/+Ic0wBUXG8b9UBB9IBSTCVCEJMG
-	vHPAjG1uTMLySVC0NMceNa6pTa06qBx6zowmc7BBbpsGLoJE1tE3ytoUOyCtdDY+ftBXfrwA+C+
-	JSMt4gsCeUkIbE3GW2kIoVcTEibHI2Ccg+t7+3OWdxtg17oiATbvowwwGrLDZnmNPOjlBQJ7PM9
-	8HPOtmGWo2umGTfyl6DCchJ/dAu+PhogWe23oBAhaA329/MUuLrjOOg9wVOo3fpnyWbXLiTIqRB
-	vYqN8j6Yg6JqsRNe5hrZZZ+6dabCNfhZB/sTO6az2Tfq0xdfCkZ3vIa+tV31q5abZNj4qcBb1G7
-	luK7rhloUAUHmZsfFMi7zEUhU9w6m3dLeUTHKyz3jf6kdGXbI1V8OCPwaNkaSENVC53xNfuPclp
-	QMgE6c4g6r2Jmy5KN2UigL9cH2r5
-X-Received: by 2002:a05:622a:2515:b0:536:52ae:d92c with SMTP id d75a77b69052e-542b6e55bebmr328898701cf.35.1793899478212;
-        Thu, 05 Nov 2026 09:24:38 -0800 (PST)
-Received: from rowland.harvard.edu ([2601:19b:d01:d210::66b0])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-54b10a6ca24sm57130131cf.14.2026.11.05.09.24.36
+        d=1e100.net; s=20260707; t=1793900302; x=1794505102;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=j0J+eZYiw5xV12js7fNPzjW3saOfPH2WxVmvac0Qksc=;
+        b=IUGh4ZsyeF6Ydn2qXJgNReV46c6As6iOpYjjFmf3aBmp+dfeGJlYk0iBNffBbZGUL8
+         LM5k4z7hknHoESicD3d9TPHO9AeBynBs4DAq8YJf71Kzkl2+1UIJ/dGgEWm49Vndqa46
+         BMaI+72lOA3Kpy0gaDld5mRjgactjCPpL7E4nOkrB76ijqE6da6eb4sNrGb2iBUBVdZ5
+         brUCtQz3RY0E66Nh6pLqqyliQ4FB/Anpvpp3QgkDgrtsesZ5AA/PmL2+ag4Tvsi1H60g
+         LW+sZ/GdVASlbAU0APlpS8x0PmikFET5CDxPIrObn7rcvlTRgB7liucDTfDs6aRzlKIc
+         8F1Q==
+X-Gm-Message-State: APuU4Z+WfsBGkonlaD4FLVm4mo/LE+Nuo7SekkmSRTZ9zek91fWQWDp+
+	IMtDg33FsmLspz7JV368UnMj/O0mWMQumxUNcWd1xcGsYwCyJrk4JolLLLAjqA==
+X-Gm-Gg: AYBFou0iQvjbiQO/PJEnxmPbM7z5+b/PenhE9YBp+xN5fWT6xjLp2CtCIYVuljl5a6n
+	L42UyEEm+LQy5csa9Pg186+At5lWIGp4VcX4dS61OsVesW4y7Ghb8kXFix0ByQY2gIX12g/2hC+
+	fT9ou0REI4BOG5KY3J/Qb5GxsrUW9SshYZi4mPQY8H8YbxSUPG5yRyvkIn6NTjwdkgKiHFD66Na
+	2fGrT7QIDAGRiHkJMiOVne//pU2V4CK+SqyuQmy+ur3bJTh2f1VjB8hpDqf9BX0AXM41S0pmiwP
+	fXIRwKhWaT103D8Bc7FKzFFkW6aNta5ob0Wyylyeppqt/2/YpFOJAQ+U2GZSthBRBLSemuNuNlu
+	hw9pereyzrL7msDDcldXjbEiwXIp0DSd/FmSaSQUL9Tqip7UH8xnuKJTBuZcvU0hVn+CYYegE1t
+	cLkSBXCbgpWqXOhI7N8m/BOC+mLO4KumJCT6hzxNf0WaWA6kjijaE+UhufqwOcGnZ0Ew1vAHAJA
+	s8x86TLaS0KBCbYQVjCjGjBJcNbMfq8od6Rnt0b8SFUYDH2sScAlYzl/APEwA==
+X-Received: by 2002:a05:7022:f115:b0:183:7d42:cfb5 with SMTP id a92af1059eb24-1ac5d88c1famr26727802c88.19.1793900301895;
+        Thu, 05 Nov 2026 09:38:21 -0800 (PST)
+Received: from [172.17.0.2] ([13.71.226.87])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b245c2de58sm16749968c88.12.2026.11.05.09.38.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 09:24:37 -0800 (PST)
-Date: Thu, 5 Nov 2026 12:24:33 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH 05/17] USB: Lock registered interfaces during manual
- driver binding
-Message-ID: <bb83fe3c-cebb-4bc8-bfc9-24df1cf72b0b@rowland.harvard.edu>
-References: <20261105-device-trust-core-v1-0-1e536825b4eb@nvidia.com>
- <20261105-device-trust-core-v1-5-1e536825b4eb@nvidia.com>
+        Thu, 05 Nov 2026 09:38:21 -0800 (PST)
+Message-ID: <6aecbf0d.5bfb57e8.8fec5.93c1@mx.google.com>
+Date: Thu, 05 Nov 2026 09:38:21 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7859005525101484267=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -128,91 +88,57 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261105-device-trust-core-v1-5-1e536825b4eb@nvidia.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dev@deq.rocks
+Subject: RE: Bluetooth: Broadcom controllers of the Apple T2 Macs
+In-Reply-To: <20261105085750.120392-2-dev@deq.rocks>
+References: <20261105085750.120392-2-dev@deq.rocks>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, Nov 05, 2026 at 01:42:18PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Interface claims hold the USB device lock, but device_bind_driver()
-> requires the target interface lock. Without it, trust-policy writes can
-> race admission.
+--===============7859005525101484267==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This says nothing about usb_driver_release_refused_claim() and the code 
-related to it.  It is an incomplete description of the patch.
+This is automated email and please do not reply to this email!
 
-Note that nothing prevents drivers from using an interface they claim 
-before that interface is registered.  For your scheme to work properly, 
-you should make sure the claim is authorized when 
-usb_driver_claim_interface() is called, not when the interface is 
-registered.
+Dear submitter,
 
-Alan Stern
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1202866/
 
-> +/*
-> + * The driver core refused to bind an interface that a sibling claimed before
-> + * it was registered, and dropped the claim. Let the claimant release the
-> + * interface instead of operating it with a bound interface but no driver.
-> + */
-> +void usb_driver_release_refused_claim(struct usb_interface *iface,
-> +				      struct device_driver *claimant)
-> +{
-> +	struct device *dev = &iface->dev;
-> +
-> +	device_lock(dev);
-> +	if (!dev->driver && iface->condition == USB_INTERFACE_BOUND) {
-> +		dev->driver = claimant;
-> +		usb_unbind_interface(dev);
-> +		dev_set_drvdata(dev, NULL);
-> +		dev->driver = NULL;
-> +	}
-> +	device_unlock(dev);
-> +}
-> +
->  /* returns 0 if no match, 1 if match */
->  int usb_match_device(struct usb_device *dev, const struct usb_device_id *id)
->  {
-> diff --git a/drivers/usb/core/message.c b/drivers/usb/core/message.c
-> index a738d03c23eac..d35a7710c8ef4 100644
-> --- a/drivers/usb/core/message.c
-> +++ b/drivers/usb/core/message.c
-> @@ -2264,6 +2264,7 @@ int usb_set_configuration(struct usb_device *dev, int configuration)
->  	 */
->  	for (i = 0; i < nintf; ++i) {
->  		struct usb_interface *intf = cp->interface[i];
-> +		struct device_driver *claimant;
->  
->  		if (intf->dev.of_node &&
->  		    !of_device_is_available(intf->dev.of_node)) {
-> @@ -2277,7 +2278,14 @@ int usb_set_configuration(struct usb_device *dev, int configuration)
->  			dev_name(&intf->dev), configuration,
->  			intf->cur_altsetting->desc.bInterfaceNumber);
->  		device_enable_async_suspend(&intf->dev);
-> +		claimant = intf->dev.driver;
-> +		if (claimant && !try_module_get(claimant->owner))
-> +			claimant = NULL;
->  		ret = device_add(&intf->dev);
-> +		if (!ret && claimant && !intf->dev.driver)
-> +			usb_driver_release_refused_claim(intf, claimant);
-> +		if (claimant)
-> +			module_put(claimant->owner);
->  		if (ret != 0) {
->  			dev_err(&dev->dev, "device_add(%s) --> %d\n",
->  				dev_name(&intf->dev), ret);
-> diff --git a/drivers/usb/core/usb.h b/drivers/usb/core/usb.h
-> index a9b37aeb515be..293340a48b6c5 100644
-> --- a/drivers/usb/core/usb.h
-> +++ b/drivers/usb/core/usb.h
-> @@ -49,6 +49,8 @@ extern int usb_set_isoch_delay(struct usb_device *dev);
->  extern int usb_get_bos_descriptor(struct usb_device *dev);
->  extern void usb_release_bos_descriptor(struct usb_device *dev);
->  extern int usb_set_configuration(struct usb_device *dev, int configuration);
-> +void usb_driver_release_refused_claim(struct usb_interface *iface,
-> +				      struct device_driver *claimant);
->  extern int usb_choose_configuration(struct usb_device *udev);
->  extern int usb_generic_driver_probe(struct usb_device *udev);
->  extern void usb_generic_driver_disconnect(struct usb_device *udev);
-> 
-> -- 
-> 2.56.0
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.12 seconds
+VerifyFixes                   PASS      0.09 seconds
+VerifySignedoff               PASS      0.09 seconds
+GitLint                       FAIL      0.66 seconds
+SubjectPrefix                 PASS      0.46 seconds
+BuildKernel                   PASS      31.70 seconds
+CheckAllWarning               PASS      35.36 seconds
+CheckSparse                   PASS      50.29 seconds
+BuildKernel32                 PASS      30.91 seconds
+CheckKernelLLVM               PASS      32.74 seconds
+TestRunnerSetup               PASS      742.33 seconds
+IncrementalBuild              PASS      33.64 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,2/2] Bluetooth: set the strict duplicate filter quirk on Apple Broadcom controllers
+
+1: T1 Title exceeds max length (87>80): "[v2,2/2] Bluetooth: set the strict duplicate filter quirk on Apple Broadcom controllers"
+
+
+https://github.com/bluez/bluetooth-next/pull/1071
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7859005525101484267==--
