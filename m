@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793898756;
-	b=HFMd1KsqlMbi2MKbD2jhNb0Mfqd7UMCYtWNrMfdiKPn2CLbkexx2o5TI3PeMbZmYORf5
-	 XD/DpXFitZIcglP1pmd2EAzBK5pZ2gZYAa/X0rHCL+vELNHQAWjuwMSP6C9q84Pk1OS2a
-	 yIBIfxvHCwhl9IR7MIo1oSpajfFDYDl7I/5DUIdVWNDvITDNkJ4DZ3MEA2ymIMSnp7GBm
-	 apqOKn4/R5OvoWQX87NO21a9lJrFDnDD3gCPqUnJEbxi6IQH6q81WMHNp3I/2DKmWgOy0
-	 rKMYblKp9Q5sFKX1Ag365WZHNRSz+P5atJsAjOMRoCl8xoRLOwNIQppveK+uq3hGvhQ==
+	t=1793898760;
+	b=P4xWJBMq0/SDQQ3IuOSbo0eHLefVE2c/kSfwfAltNwG2kUGgQLDmQNAVkE6RxO9KsUE3
+	 a2iqEPPvqp6wikcaMnkE0wXZIhbRsSJDjVfmI0ixgZeSDB3/CydJKn9JCUq31Uhl8nm1s
+	 v+QgMzMxN+CsqiIOhZNuraZly3thPmNVmuDVg0cSW/ewz4DjqW6quGXY5A+Z7FmW1AgMs
+	 7jcLdT9TSsXiU+j9QN2sfjEqpRHqyfe0pLJnptBTtyntP23JA94A0NrKaRcVv1DLJgdZg
+	 0SaWKKDBoJhWr75C8VXWtYqVXSlM18Ne/ChXNsn46noZSA0909BovzCR6OLAEQv1o8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793898756;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793898760;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=OlVrLyzL+2ZnGkMnDz5/fhh/VZLUqVVMM3t+XxYM1Mo=;
-	b=RIrExQztjb0avMVKYAqvLnCSVoGeYbhkm26od6uEgkW01pl9ZiBet5pen0k9tsBufWoK
-	 s06k4+9Hnw3iuhhd1kT2iyk4z0NLmstPCU+GDbtgMAyHAZ+9+cKELX2CMl6EXox/Yg5ji
-	 bxCUuaDhWxKaW4QUObBdK3yQLgl9wVmL2L6PhUprI3eoraIIOhOMvMyQPIvM79b8rTeox
-	 pDtJQ7LoCH5Cz8UMTVs64G3KtBQ5xER48/BwqUQBWLqaDdgSy7+s232Xj2eWBy+VE5Ewy
-	 r1rIub1KCmrRNxAcPUcQxsHZvqZqR2v/tTvH13pY61RX6tJJjj4ooAp/hj8U+sqiXBQ==
+	bh=g184wJY9a7NvAFegdoJBlFkUo5qH8Y0Xdjg3iqZPUu0=;
+	b=L0ygSdhn43regPA3r+BiCrfHO8jUOjpn2FgDTcm7rYEErJKF4A8s/c6SgHcKhGa5cqOk
+	 /f/M8Y4ToFrI7Q47K0Jg1M3yKCGqMFoHhYQXrXAYNxlXLdc5OKRiqKx8LTU48jeASYxiV
+	 qqJrJNO1BBUI1cTaXT0JeBbWA6sZc8WpbvoMZlxrw3MlTO2EcohDyrMp+UTTrkgZnlQi2
+	 Qa6HAfoR5drE7clwx9cKP2u6Vc9M5o5Gnwjo7v3RKlpFmneEK4I8va5gZJ0dipBHcgqFm
+	 V28cci2y8nGALEn6xPTVKYmKJz5hN8we63rGKmwnISxfpZarGG/vqaUs+7+Pj7+sicA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PPEjVRq4;
-	arc=none smtp.remote-ip=209.85.217.51
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TDI0PaEb;
+	arc=none smtp.remote-ip=209.85.217.43
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480ED606A336
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 17:12:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 480ED606A336
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA583606D813
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Nov 2026 17:12:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AA583606D813
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PPEjVRq4
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-7ccae9f1a9eso1107932137.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 09:12:36 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TDI0PaEb
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7cc013095d4so679609137.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 09:12:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793898755; x=1794503555; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793898758; x=1794503558; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=OlVrLyzL+2ZnGkMnDz5/fhh/VZLUqVVMM3t+XxYM1Mo=;
-        b=PPEjVRq4VFxpK66uxZ/eOQtLVKhH8Y+HQt0koablbrIZL1T5wSdRZ4f5e1j1YeWYST
-         IsxZicyhjLRobWIh9bNvXIao3LApP3ar2vhmORedBwbkPot/yOoGy9E9WMtV5bJ7x9zo
-         UEgryYn7b2pfRH7bHWayovgWLlb+fJylBYxWD1JSCPqacJqseSNCE63nqazYIo9WlTEX
-         pGPWt39+IN+oLFjViH2hzppGn7oQahYQ7InaEQhRVq5aOsrL/yTSbHWzxX3tP0/nDX8l
-         /DZBBSxPEqNIuXR2wOef9JO3HPVyW2QCVZm2hY3k0b0GcckEC2ABYlmKkbWKvSiYgIUd
-         OQpA==
+        bh=g184wJY9a7NvAFegdoJBlFkUo5qH8Y0Xdjg3iqZPUu0=;
+        b=TDI0PaEbLbZ/wwBfFk+F9Fp/9aHc51C5C3zhpAM5tOsq9qQVG9vf9N3WiJPCYf/Xxu
+         4Q071FFNWRShQqxWaKWeDgV5IQeCUvat92/z20bTXgla6YyWyMjSlGGk2X2c17D9R86X
+         ed3+Xp88liUz0WibfIG4ohrFsyeHK5fjeN8U6ro+vqi1/4XCEbmlRN0HXr5hj9Je2UZd
+         PCXTnPeoIChKmP2BmLBhnr0PFI/91cKnaV3iS0r439Z1ZyZtFxaHzSXJX4NsNLFOKYrS
+         kCpatfOePFBLrLsWE6iyiVYYUE2vWkNdGBgnKuVTumBNBh2NBubKGjVgBIBqaAgz+NSl
+         5Spw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793898755; x=1794503555;
+        d=1e100.net; s=20260707; t=1793898758; x=1794503558;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=OlVrLyzL+2ZnGkMnDz5/fhh/VZLUqVVMM3t+XxYM1Mo=;
-        b=Q6LESCgBIPawmTiI5ZDa5M4Fr+ZDecR3+AHizMaRUojdBazl/OBDHsIWRXk3ymHMUS
-         BUGGbv6wm1C6x4G6N9sxTVsIsw7lHicUBy6YDJFQCnJsQR2jE7k6PcU8dHYpKkyenyiC
-         kbvMJIrOWkVVUKZsYB6ugTkSl7WE3Q2jnluML4B2GYzhXnOUE3t9o7yIBh0YjNLr2NPd
-         qGt/6K3C0OhlYmWWSSTsv4UoTlPoLgabc1Mh/mVon7gNYUA3voXIwkmA18RTNtRZWo/q
-         /NoEmnUp7YQndrpavo/My0Kpn6xP26H7Rg4hhKHiti3tJV3aSAOgB9fPWGMovwAW0nlP
-         f6CQ==
-X-Gm-Message-State: APuU4Z80kHRWrDFqIyizWhRaFrJ+z1COAXuYFmHIiieEhw3fX7FvjHHU
-	t+xc8kr8kBAc/TGupFprWENIzJqo9XIfkBTSMUsg7lQeHMlxQ0RggwaP7JEieQ==
-X-Gm-Gg: AYBFou0sk9m4ioVCGQBKdXcw/6vgGd60r7bLYC+e3v+DvzMTnY387H+jf/XHp+hpiGc
-	dZ/kNuBwNi39QavH0NzcmE/FHKEus5oWWnz5gFJmX0IiJdruBm2dflE33GDw8XgHut/iZqOXNhB
-	uIU6JATT0v0H4rEZR/UdFpMcxlvMHJUDT0/QZ5eviZyaIs+xRE4q0Vx+rw9x/WwDyQVnCQ9Zl72
-	Qi5ZzCOsT5NoGj3V2HVC/6WpQ9Pvx+v0HVWyRn7ZbjFhk1lXe/jr9bj2CcXlgh0qxkCxhtvW5vB
-	+3FqSu9zWGQ++qRD4wJrL7P5GGoPLisN+6vjRUhyK6Vkkf3PIPrbtvvQFCuLDABZDNwyuSIhk78
-	a2yE/Q4+eSPuKTQK7CKUI3J+FRZlAYkRf+cUKgBEeSZj/rNoehIL94viB8OY6ffe8rjsKqBVS3d
-	4bkVr4WIs+XUz9fFoCy3FaILJDTcoFA72Ydu36w8BiDYkWxGnOGx4zpn3MX4WsRIOkWugaP48iY
-	q2EfqPh67PS8+LwEOzBqKoyC/9Gbudjv1VUjalBjWrqBXYjnSfErPdpUHrYS8dO3Rd8l98WmWF3
-	43ZepxTRk4KAZ4ZyLhjopSycoivvr7y5LGGp5TBnF2PzA2sDZd4JMA1IZBHifD7eNjIarnvDJLy
-	cvSmxd5VQCTSNY9ffRq2O8ra3edu1L91Gfp1PP8lckEyyhgK5lUI5aNPtuuEHHgE7md03DtAQN9
-	W10V1yvmF4KxXk7/TzsH5QuEqK
-X-Received: by 2002:a05:6102:14a3:b0:7cc:94e0:ad23 with SMTP id ada2fe7eead31-7d2a165ea7dmr179183137.31.1793898755089;
-        Thu, 05 Nov 2026 09:12:35 -0800 (PST)
+        bh=g184wJY9a7NvAFegdoJBlFkUo5qH8Y0Xdjg3iqZPUu0=;
+        b=A4Ur+799fgS+EcKjW3MFq34EfvW+2YAIGgex5pWxDWrLaWrNlVtP8pkmo5OpW4lFbZ
+         ezatgOPR7S4NFzmisfkxDkaUi2Yk39LKYCgVy8lGNr1yzTtWrES4GaTyfasEQb2EiDu9
+         +mlRtT5AjZeHCqAwUnuM7ydUiFhP7/H08NQLxV1EoZdjA0uN8GNgAMQPwlqUsKar0i3M
+         DHMfi4zWd3E//4LiPtOolU/jNjVo67pWkKv01ozXpvra97fj7iCUCOHj/XUf1G9aH0d6
+         sDSBpmpH8LtYWuIUO7IBSKX03+HTqHAYQHhN5vmo7b/ShuFo5zhTl660zNCvK3/U+BtJ
+         XHHg==
+X-Gm-Message-State: APuU4Z9YHrcbP+xwkAMAl8yLe92SEnXxhGZvfpUfLapOGr+QSfZRT3jc
+	+yMq+nshjI+06/D+REVlTTN6o7xrT/jrjs4m/906Ui6HgzznmNqTyxW/ZKmGdA==
+X-Gm-Gg: AYBFou2SzJpq43l1Vi2tcV3BLbuMjUSbjyy2aL+E1bZYhfBQ+BoCwwFk62YB0CCJs10
+	JuIyIdyZ393h8MSFgkkPbDXz8MbapFnEKg2+l5BN22n06Y18pKBTxy8q2t6VlgIl6ePLChSBETI
+	+fl4Ikh+eL4ruklgduf9wagMf/HtvFjbqUYKbZBLv5d0aVTTSe6vJRf4u1W5XnzPp2EnvsKd1jW
+	viZ9AK+DemX0wzdsuyC+h5OekzgAbazPfj5+eh7EWJRm70mOSRcRk1YZJUsv+IfZPpBnTA2XO/x
+	xSPMJZfpRHs4Q1SdZOurirDpPzpF3e01dzPKAfm4ZeMgjZY6GqVnDqLI55nHO6r39jCWS3hn+Aa
+	nXxyg97h7/eh+/CrxJy3pVWYTGHctLO9wVpOgpldbYKpc/zspXEV3ughOprv+IYg11+AFwsLLBa
+	J8JFzHHvblNu8wK+IEP8Lt3PPcxlUEnWMh6cwYSgsmhDB/xviwWUtPEHlOv/tcV4/zDxwkXec5p
+	N+n0q0OioB3OE5dOAd+PPgwc/gUu/AUzmq+7dWHG1g3RyFb4ehNPftFaQPyER0RZJLZ+rm8PiUO
+	kA66GYY6jZ2mgkaJtUs0p5Zouv4e/3I8WQZGO/uw2Ya9U2ExW3BgjBkih3LsVxyPXQcTYGlFcsw
+	NawfBqc/96/aICuJVfwcKQH8whiXWilh5fM3ivLItLDxotVzLeOrOR08p2DISrQAajWV5+rppr7
+	07sME=
+X-Received: by 2002:a05:6102:c51:b0:7cc:2152:4f95 with SMTP id ada2fe7eead31-7d2a12c4598mr207592137.3.1793898758509;
+        Thu, 05 Nov 2026 09:12:38 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d277d13753sm4050798137.10.2026.11.05.09.12.34
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d277d13753sm4050798137.10.2026.11.05.09.12.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 09:12:34 -0800 (PST)
+        Thu, 05 Nov 2026 09:12:37 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 02/11] lib: Add HDT definitions
-Date: Thu,  5 Nov 2026 12:12:14 -0500
-Message-ID: <20261105171229.2053802-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 05/11] monitor: Add LL decoding for HDT
+Date: Thu,  5 Nov 2026 12:12:17 -0500
+Message-ID: <20261105171229.2053802-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261105171229.2053802-1-luiz.dentz@gmail.com>
 References: <20261105171229.2053802-1-luiz.dentz@gmail.com>
@@ -101,157 +101,317 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add the socket API needed for the LE HDT PHY:
-
-- BT_PHY bits for the HDT2, HDT3, HDT4, HDT6 and HDT7.5 rates in each
-  direction.
-- bt_security.mic_len to request and read the MIC length of a link.
-- struct bt_iso_qos_ext, an extensible ISO QoS passed with BT_ISO_QOS
-  and told apart from struct bt_iso_qos by its length, along with the
-  BT_ISO_PHY_* values and BT_ISO_HDT_RATE_* for its rates field.
-
-struct bt_iso_qos_ext is meant to grow rather than adding new socket
-options or structs, which is what its first two fields are for:
-
-- version tells which fields are valid, so later versions can add
-  fields while applications built for an earlier version keep working.
-  Version 1 adds the HDT rates of each direction.
-- type tells which member of the union is in use, unicast or
-  broadcast. The QoS is usually set before bind() or connect(), when
-  the kernel can't tell which one it was given, so with type each can
-  grow on its own by adding fields at its end, which is also why the
-  union is the last member. BT_ISO_QOS_ANY leaves it to connect() or
-  listen().
+Decode the LL_ENC_ECDH_REQ/RSP, LL_HDT_CONFIG_REQ/RSP and
+LL_HDT_LQF_REPORTING_IND Link Layer PDUs introduced by HDT and EKS.
 ---
- lib/bluetooth/bluetooth.h | 101 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+ monitor/ll.c | 221 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 215 insertions(+), 6 deletions(-)
 
-diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
-index f9f22c3f7523..e321dd40926f 100644
---- a/lib/bluetooth/bluetooth.h
-+++ b/lib/bluetooth/bluetooth.h
-@@ -53,6 +53,7 @@ extern "C" {
- struct bt_security {
- 	uint8_t level;
- 	uint8_t key_size;
-+	uint8_t mic_len;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
-@@ -130,6 +131,16 @@ struct bt_voice {
- #define BT_PHY_LE_2M_RX		0x00001000
- #define BT_PHY_LE_CODED_TX	0x00002000
- #define BT_PHY_LE_CODED_RX	0x00004000
-+#define BT_PHY_HDT_2M_TX	0x00008000
-+#define BT_PHY_HDT_2M_RX	0x00010000
-+#define BT_PHY_HDT_3M_TX	0x00020000
-+#define BT_PHY_HDT_3M_RX	0x00040000
-+#define BT_PHY_HDT_4M_TX	0x00080000
-+#define BT_PHY_HDT_4M_RX	0x00100000
-+#define BT_PHY_HDT_6M_TX	0x00200000
-+#define BT_PHY_HDT_6M_RX	0x00400000
-+#define BT_PHY_HDT_7_5M_TX	0x00800000
-+#define BT_PHY_HDT_7_5M_RX	0x01000000
- 
- #define BT_MODE			15
- 
-@@ -219,6 +230,96 @@ struct bt_iso_qos {
- 	};
+diff --git a/monitor/ll.c b/monitor/ll.c
+index 6c0f67b5dcae..5baf334f3768 100644
+--- a/monitor/ll.c
++++ b/monitor/ll.c
+@@ -537,7 +537,9 @@ static void length_req_rsp(const void *data, uint8_t size)
+ static const struct bitfield_data le_phys[] = {
+ 	{  0, "LE 1M"	},
+ 	{  1, "LE 2M"	},
+-	{  2, "LE Coded"},
++	{  2, "LE Coded S=8"},
++	{  3, "LE Coded S=2"},
++	{  4, "LE HDT"	},
+ 	{ }
  };
  
-+/* Extended ISO QoS, set and read with BT_ISO_QOS.
-+ *
-+ * The option length tells it apart from struct bt_iso_qos, which is kept for
-+ * existing applications. New fields are added by extending this struct rather
-+ * than by adding new socket options or structs:
-+ *
-+ * - version tells which fields are valid, so later versions can add fields
-+ *   while older applications keep working with the fields they know.
-+ * - type tells which member of the union is in use. The QoS is usually set
-+ *   before bind() or connect(), so the socket can't tell unicast from
-+ *   broadcast at that point. With type, struct bt_iso_ucast_qos_ext and
-+ *   struct bt_iso_bcast_qos_ext can each grow on their own, by adding fields
-+ *   at their end, without the kernel having to guess which one it was given.
-+ *   For that the union shall remain the last member.
-+ *
-+ * BT_ISO_QOS_ANY leaves the type to be set by connect() or listen(), which is
-+ * possible with version 1 since its unicast fields are a prefix of the
-+ * broadcast ones. A type that doesn't match how the socket is used makes
-+ * connect() or listen() fail with -EINVAL, or setsockopt() on a socket that
-+ * already has a connection, such as with deferred setup. getsockopt() reports
-+ * the type in use once it is known.
-+ *
-+ * Version 1 adds the HDT rates of each direction, see BT_ISO_HDT_RATE_*, used
-+ * when the PHY is BT_ISO_PHY_HDT; 0 means every rate the controller supports.
-+ */
-+#define BT_ISO_QOS_VERSION_1	0x0001
+@@ -558,6 +560,16 @@ static void phy_req_rsp(const void *data, uint8_t size)
+ 	if (mask)
+ 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
+ 							" (0x%2.2x)", mask);
 +
-+#define BT_ISO_QOS_ANY		0x0000
-+#define BT_ISO_QOS_UCAST	0x0001
-+#define BT_ISO_QOS_BCAST	0x0002
++	/* [v2] */
++	if (size >= sizeof(*pdu) + sizeof(struct bt_ll_phy_v2)) {
++		const struct bt_ll_phy_v2 *v2 = (const void *) (pdu + 1);
 +
-+#define BT_ISO_HDT_RATE_2M	0x0001
-+#define BT_ISO_HDT_RATE_3M	0x0002
-+#define BT_ISO_HDT_RATE_4M	0x0004
-+#define BT_ISO_HDT_RATE_6M	0x0008
-+#define BT_ISO_HDT_RATE_7_5M	0x0010
++		print_field("Refresh: %u", v2->flags & 0x01);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x02 ? "64 bits" : "128 bits",
++				(v2->flags >> 1) & 0x01);
++	}
+ }
+ 
+ static void phy_update_ind(const void *data, uint8_t size)
+@@ -580,6 +592,22 @@ static void phy_update_ind(const void *data, uint8_t size)
+ 							" (0x%2.2x)", mask);
+ 
+ 	print_field("Instant: 0x%4.4x", pdu->instant);
 +
-+#define BT_ISO_PHY_1M		0x01
-+#define BT_ISO_PHY_2M		0x02
-+#define BT_ISO_PHY_CODED	0x04
-+#define BT_ISO_PHY_HDT		0x10
-+#define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
-+				 BT_ISO_PHY_CODED)
++	/* [v2] */
++	if (size >= sizeof(*pdu) + sizeof(struct bt_ll_phy_update_ind_v2)) {
++		const struct bt_ll_phy_update_ind_v2 *v2;
 +
-+struct bt_iso_io_qos_ext {
-+	uint32_t interval;
-+	uint16_t latency;
-+	uint16_t sdu;
-+	uint8_t  phys;
-+	uint8_t  rtn;
-+	uint16_t rates;
++		v2 = (const void *) (pdu + 1);
++
++		print_field("Address: %2.2x%2.2x%2.2x%2.2x%2.2x",
++				v2->address[4], v2->address[3],
++				v2->address[2], v2->address[1],
++				v2->address[0]);
++		print_field("Refresh: %u", v2->flags & 0x01);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x02 ? "64 bits" : "128 bits",
++				(v2->flags >> 1) & 0x01);
++	}
+ }
+ 
+ static void min_used_channels(const void *data, uint8_t size)
+@@ -648,6 +676,42 @@ static void clock_acc_req_rsp(const void *data, uint8_t size)
+ 	print_field("SCA: 0x%2.2x", pdu->sca);
+ }
+ 
++static const struct bitfield_data coded_rates[] = {
++	{ 0, "CODED S=8" },
++	{ 1, "CODED S=2" },
++	{ }
 +};
 +
-+struct bt_iso_ucast_qos_ext {
-+	uint8_t  cig;
-+	uint8_t  cis;
-+	uint8_t  sca;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
++static const struct bitfield_data hdt_rates[] = {
++	{ 0, "HDT 2M" },
++	{ 1, "HDT 3M" },
++	{ 2, "HDT 4M" },
++	{ 3, "HDT 6M" },
++	{ 4, "HDT 7.5M" },
++	{ }
 +};
 +
-+struct bt_iso_bcast_qos_ext {
-+	uint8_t  big;
-+	uint8_t  bis;
-+	uint8_t  sync_factor;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
-+	uint8_t  encryption;
-+	uint8_t  bcode[16];
-+	uint8_t  options;
-+	uint16_t skip;
-+	uint16_t sync_timeout;
-+	uint8_t  sync_cte_type;
-+	uint8_t  mse;
-+	uint16_t timeout;
++/* The rates are those of the PHY set in phys, as defined in Table 2.24 */
++static void print_rates(const char *prefix, uint8_t phys, uint16_t rates)
++{
++	const struct bitfield_data *fields = NULL;
++
++	if (phys & BIT(4))
++		fields = hdt_rates;
++	else if (phys & BIT(2))
++		fields = coded_rates;
++
++	print_field("%s: 0x%4.4x", prefix, rates);
++
++	if (fields) {
++		uint16_t mask = print_bitfield(2, rates, fields);
++
++		if (mask)
++			print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%4.4x)", mask);
++	}
++}
++
+ static void cis_req(const void *data, uint8_t size)
+ {
+ 	const struct bt_ll_cis_req *cmd = data;
+@@ -699,6 +763,26 @@ static void cis_req(const void *data, uint8_t size)
+ 	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
+ 
+ 	print_field("Connection Event Count: %u", cmd->conn_event_count);
++
++	/* [v2] */
++	if (size >= sizeof(*cmd) + sizeof(struct bt_ll_cis_req_v2)) {
++		const struct bt_ll_cis_req_v2 *v2 = (const void *) (cmd + 1);
++
++		print_rates("Central to Peripheral Rates", cmd->c_phys,
++						le16_to_cpu(v2->c_rates));
++		print_rates("Peripheral To Central Rates", cmd->p_phys,
++						le16_to_cpu(v2->p_rates));
++		print_field("Config ID: %u", v2->config_id);
++		print_field("TL Group ID: %u", v2->tl_group_id & 0x1f);
++		print_field("Central to Peripheral Payload Window Size: %u",
++						v2->flags & 0x03);
++		print_field("Peripheral to Central Payload Window Size: %u",
++						(v2->flags >> 2) & 0x03);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x10 ? "64 bits" : "128 bits",
++				(v2->flags >> 4) & 0x01);
++		print_field("SE Length: %u us", get_le24(v2->se_length));
++	}
+ }
+ 
+ static void cis_rsp(const void *data, uint8_t size)
+@@ -730,6 +814,13 @@ static void cis_ind(const void *data, uint8_t size)
+ 	print_field("CIS Synchronization Delay: %u us",
+ 					le32_to_cpu(interval));
+ 	print_field("Connection Event Count: %u", ind->conn_event_count);
++
++	/* [v2] */
++	if (size >= sizeof(*ind) + sizeof(struct bt_ll_cis_ind_v2)) {
++		const struct bt_ll_cis_ind_v2 *v2 = (const void *) (ind + 1);
++
++		print_field("PCA-H: 0x%2.2x", v2->pca_h);
++	}
+ }
+ 
+ static void cis_term_ind(const void *data, uint8_t size)
+@@ -759,6 +850,107 @@ static void feature_ext_rsp(const void *data, uint8_t size)
+ 	packet_print_features_ext_ll(rsp->page, rsp->features);
+ }
+ 
++static const struct bitfield_data lqf_transports[] = {
++	{ 0, "ACL" },
++	{ 1, "CIS" },
++	{ }
 +};
 +
-+struct bt_iso_qos_ext {
-+	uint16_t version;
-+	uint16_t type;
-+	union {	/* Shall be the last member */
-+		struct bt_iso_ucast_qos_ext ucast;
-+		struct bt_iso_bcast_qos_ext bcast;
-+	};
++static void hdt_lqf_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_lqf_ind *pdu = data;
++	uint8_t mask;
++
++	print_field("Transport: 0x%2.2x", pdu->transport);
++
++	mask = print_bitfield(2, pdu->transport, lqf_transports);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++}
++
++static void hdt_config_req(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_config_req *pdu = data;
++
++	print_field("ACL RX Payload Windows Size: %u",
++			pdu->wincfg & 0x03);
++	print_field("Max CIS TX Windows Size: %u",
++			(pdu->wincfg >> 2) & 0x03);
++	print_field("Max CIS RX Windows Size: %u",
++			(pdu->wincfg >> 4) & 0x03);
++	print_rates("ACL RX Rates", BIT(4), le16_to_cpu(pdu->acl_rx_rates));
++	print_field("Max ACL RX Packet Size: %u",
++					le16_to_cpu(pdu->acl_rx_mtu));
++}
++
++static void hdt_config_rsp(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_config_rsp *pdu = data;
++
++	print_field("ACL RX Payload Windows Size: %u",
++			pdu->wincfg & 0x03);
++	print_field("Max CIS TX Windows Size: %u",
++			(pdu->wincfg >> 2) & 0x03);
++	print_field("Max CIS RX Windows Size: %u",
++			(pdu->wincfg >> 4) & 0x03);
++	print_rates("ACL RX Rates", BIT(4), le16_to_cpu(pdu->acl_rx_rates));
++	print_field("Max ACL RX Packet Size: %u",
++					le16_to_cpu(pdu->acl_rx_mtu));
++}
++
++static const struct bitfield_data ecdh_flags[] = {
++	{ 0, "Allow 64-bit MIC length" },
++	{ 1, "Opportunistic encryption" },
++	{ }
 +};
 +
- #define BT_CODEC		19
- struct bt_codec {
- 	uint8_t id;
++static void print_key_type(const char *str, uint8_t type)
++{
++	switch (type) {
++	case 0x00:
++		print_field("%s: Public key P-256 (0x00)", str);
++		break;
++	default:
++		print_field("%s: Reserved (0x%2.2x)", str, type);
++		break;
++	}
++}
++
++static void enc_ecdh_req(const void *data, uint8_t size)
++{
++	const struct bt_ll_enc_ecdh_req *cmd = data;
++	uint8_t mask;
++
++	print_field("Flags: 0x%2.2x", cmd->flags);
++
++	mask = print_bitfield(2, cmd->flags, ecdh_flags);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_hex_field("Rand", cmd->rand, 16);
++	print_key_type("Key Type", cmd->key_type);
++	print_hex_field("Public Key", cmd->pubkey, 64);
++}
++
++static void enc_ecdh_rsp(const void *data, uint8_t size)
++{
++	const struct bt_ll_enc_ecdh_rsp *rsp = data;
++	uint8_t mask;
++
++	print_field("Flags: 0x%2.2x", rsp->flags);
++
++	mask = print_bitfield(2, rsp->flags, ecdh_flags);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_hex_field("Rand", rsp->rand, 16);
++	print_key_type("Key Type", rsp->key_type);
++	print_hex_field("Public Key", rsp->pubkey, 64);
++}
++
+ struct llcp_data {
+ 	uint8_t opcode;
+ 	const char *str;
+@@ -767,6 +959,12 @@ struct llcp_data {
+ 	bool fixed;
+ };
+ 
++#define LLCP_OP_VL(_op, _str, _func, _type) \
++	{ _op, _str, _func, sizeof(_type), false }
++
++#define LLCP_OP(_op, _str, _func, _type) \
++	{ _op, _str, _func, sizeof(_type), true }
++
+ static const struct llcp_data llcp_table[] = {
+ 	{ 0x00, "LL_CONNECTION_UPDATE_REQ", conn_update_req,   11, true },
+ 	{ 0x01, "LL_CHANNEL_MAP_REQ",       channel_map_req,    7, true },
+@@ -790,9 +988,9 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x13, "LL_PING_RSP",              null_pdu,           0, true },
+ 	{ 0x14, "LL_LENGTH_REQ",            length_req_rsp,     8, true },
+ 	{ 0x15, "LL_LENGTH_RSP",            length_req_rsp,     8, true },
+-	{ 0x16, "LL_PHY_REQ",               phy_req_rsp,        2, true },
+-	{ 0x17, "LL_PHY_RSP",               phy_req_rsp,        2, true },
+-	{ 0x18, "LL_PHY_UPDATE_IND",        phy_update_ind,     4, true },
++	{ 0x16, "LL_PHY_REQ",               phy_req_rsp,        2, false },
++	{ 0x17, "LL_PHY_RSP",               phy_req_rsp,        2, false },
++	{ 0x18, "LL_PHY_UPDATE_IND",        phy_update_ind,     4, false },
+ 	{ 0x19, "LL_MIN_USED_CHANNELS_IND", min_used_channels,  2, true },
+ 	{ 0x1a, "LL_CTE_REQ",               cte_req,            1, true },
+ 	{ 0x1b, "LL_CTE_RSP",               null_pdu,           0, true },
+@@ -800,11 +998,11 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x1d, "LL_CLOCK_ACCURACY_REQ",    clock_acc_req_rsp,  1, true },
+ 	{ 0x1e, "LL_CLOCK_ACCURACY_RSP",    clock_acc_req_rsp,  1, true },
+ 	{ BT_LL_CIS_REQ, "LL_CIS_REQ",      cis_req,
+-					sizeof(struct bt_ll_cis_req), true },
++					sizeof(struct bt_ll_cis_req), false },
+ 	{ BT_LL_CIS_RSP, "LL_CIS_RSP",      cis_rsp,
+ 					sizeof(struct bt_ll_cis_rsp), true },
+ 	{ BT_LL_CIS_IND, "LL_CIS_IND",      cis_ind,
+-					sizeof(struct bt_ll_cis_ind), true },
++					sizeof(struct bt_ll_cis_ind), false },
+ 	{ BT_LL_CIS_TERMINATE_IND, "LL_CIS_TERMINATE_IND", cis_term_ind,
+ 					sizeof(struct bt_ll_cis_term_ind),
+ 					true },
+@@ -814,6 +1012,17 @@ static const struct llcp_data llcp_table[] = {
+ 	{ BT_LL_CIS_RSP, "LL_FEATURE_EXT_RSP", feature_ext_rsp,
+ 					sizeof(struct bt_ll_feature_ext_rsp),
+ 					true },
++	/* HDT LLCP commands */
++	LLCP_OP(BT_LL_HDT_LQF_REPORTING_IND, "LL_HDT_LQF_REPORTING_IND",
++					hdt_lqf_ind, struct bt_ll_hdt_lqf_ind),
++	LLCP_OP(BT_LL_HDT_CONFIG_REQ, "LL_HDT_CONFIG_REQ", hdt_config_req,
++					struct bt_ll_hdt_config_req),
++	LLCP_OP(BT_LL_HDT_CONFIG_RSP, "LL_HDT_CONFIG_RSP", hdt_config_rsp,
++					struct bt_ll_hdt_config_rsp),
++	LLCP_OP(BT_LL_ENC_ECDH_REQ, "LL_ENC_ECDH_REQ", enc_ecdh_req,
++					struct bt_ll_enc_ecdh_req),
++	LLCP_OP(BT_LL_ENC_ECDH_RSP, "LL_ENC_ECDH_RSP", enc_ecdh_rsp,
++					struct bt_ll_enc_ecdh_rsp),
+ 	{ }
+ };
+ 
 -- 
 2.56.0
 
