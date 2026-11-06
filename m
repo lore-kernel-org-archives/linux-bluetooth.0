@@ -1,59 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=149.157.246.25
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793962878;
-	b=PzOdTv8YthyK/PKv/pPsfvRiYqyB/8U3tdMjDqmgr6TCO3EGYSueWYH7sN5iSGeFR8YP
-	 RJKq7uhk8ypWGSTrDZ+XAcLlkxd1FZ5xAkKPiquKCCV883yNnYKeqcWWSeB0wvnPodUWX
-	 WRHGLW2gw8BFUw0ju6ERadDd7it0aNOTyj33uUPqIeAbulvJ9sIk4Ot5JxlR0Sv+CRNV7
-	 7MLoQeGsDeOlur6scLuV+uCcaxuePLNqVfCM/BDb1FhLeYJijNaei3uviLuHk4O+b+H38
-	 pUph8cwpu1PZvzaMdgho0GDnCXnEz5Ia4iMVTxsAirh7O2Ay1EE9OJ133BQm74/vKog==
+	t=1793963089;
+	b=4+6euCF5PBJAsujNHGgDhSEq9gUrFlpsWLkgEZ3qYgFznNHp3WM8X3go5PBM9j4Wpp9q
+	 U0QgPve5Xnx94bBJxaXyg87cdmdXZ5yxGhkTB+m/LoBsjFHn842KuP9wIZLTRfWfC7M/N
+	 Pe8MctL5BS3qZDS+zTPgMu1NGaXoPx+YeSzKmnl5OT19MH0zQrqLXhLpllF0GyvMuE73N
+	 oZRGYpabDay4Uw+86wz5CzHyoe8h96m8iNqfSHrfA8Vp7wO4dtVMm2ISxa+PXe45Ff46d
+	 AQsPE6PQIIqCo1cWdLWNAhxk/XdmzzWk5KBpp0GsTgqdc8n0NE6MsUNASyFZLBtUhIQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793962878;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Subject:
-	 Message-ID:MIME-Version:Content-Type:Content-Disposition;
-	bh=3OVWukCObF+HaNI3ZO5OFqNe+4QpKGocOyCTLOD3r/Q=;
-	b=sxWd22nG1edFyFlUn7DekM9/o414KOCC6FX8WIoeLWkGq2fft489YDvJFmS7OLd6g1wv
-	 9aDnh2YCYFXHesHOBKVqH7fsBLtjF1fm7yRBQmiteG25c4hc0sGnfNfN/u6SrxggrxD2R
-	 Ng2zNg7kUZSzUVoslcgQvmGj1vtX7G3xHVVbnbbNsLV3cYpIdm0L4JRvdG0PDjTXJi8S6
-	 q+QxPvM7ASr9mFW8lqXEcXEMdmUBxrgENLoCWnBIOVXnzYnsYRRBXlL5lHSe+MhqsYOcy
-	 SfhN9kbga9/CycdjGtpcmMFuBMnjife2cCUjQlKlm5trCIr/hLUO3CqEHuzD67LX5Qw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793963089;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=p5rcHdzvYlXcHGU8jG0wQTXpF4tpuL2TL+Yp8hMJxLo=;
+	b=WZIEibuRaWytkePJ0P5Ipdz3hWTgathfqvjMYjuB6lvljsg65fFRKZt7hizFsTYoHb8w
+	 CIng558qqQdWU58y5cYOhWdGEsaCZpZ/7ZMBCqpcPrNzENkt5vLnQOM6l894+CDwTq6T3
+	 05qAm6wWCl6Vh64f1x+Nl23SRckvYXq6yWpZqhQc7qDgCqjIxBeIzzzKD+zZCeO0KOjxQ
+	 DWOuo7e0Nh8C2k9Hnw65U1ipGrPcLARWMZcbwPR4bh35hWm/QqvIsXIwQADVERm9SbD2I
+	 1Fqx0ClvqxE9/a/6T+sSVtKxI4hcc9Axt+u/pOGtLOUWCv+K/BVZMg5Uynoa0/z5tnw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cs.nuim.ie;
-	spf=pass smtp.mailfrom=cs.nuim.ie;
-	dkim=pass header.d=cs.nuim.ie header.i=@cs.nuim.ie header.a=rsa-sha256 header.s=selector1 header.b=rEEaSd7E;
-	arc=none smtp.remote-ip=149.157.246.25
-Received: from mta-srv-01.cs.nuim.ie (mta-srv-01.cs.nuim.ie [149.157.246.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SbMMariK;
+	arc=none smtp.remote-ip=74.125.82.41
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA84606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 11:01:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8AA84606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cs.nuim.ie
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.nuim.ie
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73295606A333
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 11:04:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73295606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=cs.nuim.ie header.i=@cs.nuim.ie header.a=rsa-sha256 header.s=selector1 header.b=rEEaSd7E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cs.nuim.ie;
- i=@cs.nuim.ie; q=dns/txt; s=selector1; t=1793962875; h=date : from :
- to : subject : message-id : mime-version : content-type : from;
- bh=O2COWLoBrQWGA5GPsR7n+J1mv/36a3c54n+fLu5kR+0=;
- b=rEEaSd7E9f8yvAlRApGkd8wg8amNbc79f3NDD7nY65omRocvWkHWF+b34WHUaUNR+gs32
- 2VRNbUH4dm2lyHXqxVyGq3cmwBYGMiFucupweUudR3cJDR4pKGTZ0xh4y3rPiSdbmTk646H
- 2Sv+sG62zRHuwyJ3vcBg7MEPBqt8g4nijdp8g0wqQHjlGflg4Ct6whKAkFItKjnooYuJ+Wj
- IR8gQNs0w4e6AoZOTA7sCNDlbOolRQMBmwCRKicRZs/uIw1kB2BFYu9QhPkgvShM3UbI2p+
- 31DxlQn2CGizE0FyvIDXxH6KN2oPGSw5GD5wg3etMUOxvkqvM2vzEWGwYKrA==
-Received: from port-kadr (port-kadr.cs.nuim.ie [149.157.248.96])
-	by mta-srv-01.cs.nuim.ie (Postfix) with ESMTPS id 5530B600A7;
-	Fri,  6 Nov 2026 11:01:15 +0000 (GMT)
-Received: from barak by port-kadr with local (Exim 4.100.1)
-	(envelope-from <barak@port-kadr.cs.nuim.ie>)
-	id 1xPHh5-0000000AgAP-0hsA;
-	Fri, 06 Nov 2026 11:01:15 +0000
-Date: Fri, 6 Nov 2026 11:01:15 +0000
-From: Barak Pearlmutter <barak@cs.nuim.ie>
-To: linux-bluetooth@vger.kernel.org
-Subject: btrtl/btusb: RTL8761BU enters unrecoverable USB reset storm after
- autosuspend
-Message-ID: <au2ze1UbFsDuQvVs@port-kadr.cs.nuim.ie>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SbMMariK
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1ae18eb9ad0so706206c88.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 03:04:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793963088; x=1794567888; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=p5rcHdzvYlXcHGU8jG0wQTXpF4tpuL2TL+Yp8hMJxLo=;
+        b=SbMMariK9Qqtp66jm5VvGmILokjYL2VthNPf1pClaoEyveJGPgXDssvRCD9Jn8EC/K
+         aXVR3BqV8uWije1FLRNuuNTlFy4vx51O0UOJJHRkdr/T8ombe4Oe4SbcLPtURNjoW1l7
+         T/YNxchGnvHhRrVjR0YhN3WeOOmdvtgAQRpTRyH1pKgcTngUl/Br+eGVlBZlODQX1B8H
+         A5/wqnaqNjNnQOOIFIn7jiNzpk2v9lQPcRT9iCHMJO/m+nIySiVPmxQXyA4Ly1t5MB7p
+         bbZY5FUlkvh1LIGDQUnZYmytKF5r81MHDqNoz/d1Dv099iF2PtvDNFQBBfrEjqZN47eL
+         QyPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793963088; x=1794567888;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=p5rcHdzvYlXcHGU8jG0wQTXpF4tpuL2TL+Yp8hMJxLo=;
+        b=MJGK+jdjS5/zBq+6d4T/Eby/zTHCG6f0uiCrC/kIpu8/NxFkESWsuSOhUsOP21E6aL
+         DukTFISUbRUyIZvk1uvHAxyZMO4AOTJQ/xWkM/uPAHAb6xckAAP6DfKEsdpnevbHXtEG
+         NmwOiJ9Cp1ZBLGqY1MT48kQLrlO2L3QfnGiaB6G6bNGHr8plGclhUtp4VB0NjTyU+AlC
+         jit5ngMR8SHXv9xOWfZI1NvV069pRgUU2zWFN6ImEUl5EIBmHozdHX31qYPrMx+0fy/n
+         8nEpJ8ZNDWvnPHe11zjD513cAW/ibhxNv2BtzLSO1jf+L34VM6ift5kzhkuyorOFlOfe
+         STdg==
+X-Gm-Message-State: APuU4Z+vDIwNylKc/96FekYOE82R8LwCYqO1EXFnbGt5ZCIJEBQTWnWN
+	fwUl9sZ32rIn8SQizhRtmHnEU50OtcACE7JhGK0m5anQx+k7gCNEGmDIjk3/dw==
+X-Gm-Gg: AYBFou2jBzfe7EqqSSaGQrWSUtUKyTK0MHlgggClE2RJhItnA9cuFm3ySlNfHBnaaqF
+	/Jppq8bTBGtdMQzrMPLY0tJ/dFsGzP5lkKQZF8gL5JBFl2S1Fh0gNtVEjA4GZ87OYFICAfchYJy
+	aNR8ZpsFj8AZS+gs5+FNFanPk+5n1yAAYJqoO+0TR3bcalA++N5Eoblq5wDNfFrmxh4ca5NyoVj
+	cKgZKe/inC2eoTEGIIls3Grz+FWMpY5FloqB6c0kzOq5tg3Fyy8UdkRbiJTYilLOvaaCJjy6nT5
+	ZCt/+t+ld06gd3ivhHHA9hCa87AUEE0Lhf1dsd2chIKkmyoMTLa8WFNtD1QAWJZ2tnR/SAM3eyc
+	oJ7O+EDaQafmEjL5uBqB9p8CIUSdKekLSmt7acz82xFClHfrX2KXl/Utg7DkfIXRfoQC3Zgjgek
+	7Q2remNZk5vqFJPyU45EltkNx16LpCxZtbj5tsJ8Po9PyzxhKS0pTtIl7Wbp1WHNJkbsmGzU11e
+	0QP+S+FU35QWnbjkx4UDTq8au9YlwZm5sMPgvYJ14fG15AQd8FU2pygFd01pw==
+X-Received: by 2002:a05:7022:ef07:b0:143:2701:9198 with SMTP id a92af1059eb24-1b25d34a7ffmr2992064c88.36.1793963088178;
+        Fri, 06 Nov 2026 03:04:48 -0800 (PST)
+Received: from [172.17.0.2] ([52.225.97.18])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b25e485ce2sm4894940c88.7.2026.11.06.03.04.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2026 03:04:47 -0800 (PST)
+Message-ID: <6aedb44f.bdce4de1.179353.c4a6@mx.google.com>
+Date: Fri, 06 Nov 2026 03:04:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3460135077849090690=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -63,99 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
+Subject: RE: shared/timeout: Keep callback data alive during removal
+In-Reply-To: <20261106042339.811655-1-cochcoder@proton.me>
+References: <20261106042339.811655-1-cochcoder@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Reporting a bug where a Realtek RTL8761BU Bluetooth USB adapter enters an
-infinite reset loop (~every 2 seconds) after coming out of USB autosuspend,
-from which it cannot recover without a physical power cycle (unplugging
-and replugging the dongle).
+--===============3460135077849090690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Device:
-  Realtek Bluetooth 5.1 Radio
-  USB ID: 0bda:a725 (RTL8761BU)
-  Firmware: rtl_bt/rtl8761bu_fw.bin, version 0xdfc6d922
-  Driver: btusb/btrtl (in-tree)
-  Kernel: 7.2.15+deb14-amd64 (Debian 13 / linux-image-amd64)
-  Note: this is a Debian-patched kernel; Debian-specific patches may be
-  relevant, though the btusb/btrtl driver is unlikely to be heavily patched.
-  USB autosuspend delay at time of failure: 2 seconds (default)
+This is automated email and please do not reply to this email!
 
-Failure sequence:
+Dear submitter,
 
-The adapter is idle (nothing paired/connected).  After ~2 seconds the
-kernel autosuspends the USB device.  On the next activity, the firmware
-fails to respond to register reads (-ETIMEDOUT / error -110):
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1203742/
 
-  Bluetooth: hci0: command 0xfc61 tx timeout
-  Bluetooth: hci0: RTL: Failed to generate devcoredump
-  Bluetooth: hci0: Resetting usb device.
-  Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
-  usb 3-3: reset full-speed USB device number 2 using xhci_hcd
+---Test result---
 
-This repeats every ~2 seconds indefinitely.  The driver's own USB reset
-does not clear the firmware hang state.  Workarounds attempted without
-success:
+Test Summary:
+CheckPatch                    PASS      0.40 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      20.57 seconds
+BluezMake                     PASS      313.57 seconds
+MakeCheck                     PASS      24.95 seconds
+MakeDistcheck                 PASS      146.74 seconds
+CheckValgrind                 PASS      349.87 seconds
+CheckSmatch                   PASS      303.95 seconds
+bluezmakeextell               PASS      102.86 seconds
+TestFunctional                PASS      1193.44 seconds
+IncrementalBuild              PASS      306.99 seconds
+ScanBuild                     PASS      1186.81 seconds
 
-  - sudo usbreset 0bda:a725       (USB reset, same as driver does)
-  - driver unbind/rebind           (echo "3-3" to unbind then bind)
-  - deauthorize/reauthorize        (echo 0/1 to authorized)
 
-None of these recover the device.  Only a physical unplug/replug works.
 
-Secondary effect:
+https://github.com/bluez/bluez/pull/2769
 
-The BT reset storm generates substantial USB bus traffic on a shared
-xhci_hcd controller.  On this machine a companion RTL8822BU WiFi adapter
-(0bda:b812) on a different USB port begins emitting "failed to get tx
-report from firmware" kernel messages within 21 seconds of the BT storm
-starting, and the WiFi interface eventually deauthenticates (~20 minutes
-later).  Fixing the BT autosuspend issue therefore also fixes spurious
-WiFi failures.
+---
+Regards,
+Linux Bluetooth
 
-Workaround:
 
-Disabling USB autosuspend for the device via udev prevents the failure
-from occurring in the first place:
-
-  ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda",
-    ATTRS{idProduct}=="a725", ATTR{power/autosuspend}="-1"
-
-With this rule in place and the device freshly power-cycled the adapter
-initialises cleanly and has remained stable.
-
-Possibly related: Red Hat bug #2521504 describes an RTL8761BU (TP-Link
-UB500, 2357:0604) entering an infinite USB reset loop, but with a
-different error (0x200c timeout rather than "Read reg16 failed (-110)")
-and reportedly fixed in kernel 7.1.13.  Our kernel is 7.2.15 and the
-bug is present, suggesting this may be a distinct failure mode, or the
-fix was not complete.
-
-Log excerpt (storm onset):
-
-  Nov 06 06:49:50 kernel: Bluetooth: hci0: command 0xfc61 tx timeout
-  Nov 06 06:49:50 kernel: Bluetooth: hci0: RTL: Failed to generate devcoredump
-  Nov 06 06:49:50 kernel: Bluetooth: hci0: Resetting usb device.
-  Nov 06 06:49:50 kernel: Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
-  Nov 06 06:49:51 kernel: usb 3-3: reset full-speed USB device number 2 using xhci_hcd
-  Nov 06 06:49:53 kernel: Bluetooth: hci0: command 0xfc61 tx timeout
-  Nov 06 06:49:53 kernel: Bluetooth: hci0: RTL: Failed to generate devcoredump
-  Nov 06 06:49:53 kernel: Bluetooth: hci0: Resetting usb device.
-  Nov 06 06:49:53 kernel: Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
-  Nov 06 06:49:53 kernel: usb 3-3: reset full-speed USB device number 2 using xhci_hcd
-  [continues every ~2 seconds for 20+ minutes until manual intervention]
-
-Log excerpt (clean initialisation after power cycle, with autosuspend fix applied):
-
-  kernel: usb 3-3: New USB device found, idVendor=0bda, idProduct=a725, bcdDevice= 2.00
-  kernel: usb 3-3: Product: Bluetooth 5.1 Radio
-  kernel: usb 3-3: Manufacturer: Realtek
-  kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_fw.bin
-  kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_config.bin
-  kernel: Bluetooth: hci0: RTL: fw version 0xdfc6d922
-  kernel: Bluetooth: MGMT ver 1.23
-  [no further errors]
-
-Happy to test a patched kernel or provide further information.
-
-Barak Pearlmutter <barak@cs.nuim.ie>
+--===============3460135077849090690==--
