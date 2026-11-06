@@ -1,60 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.31
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793940972;
-	b=V+iLYyb6PBt8EV2UOGFTi7PTusRSfLi1ZMRQ1gFvQmOVH3Eb8J/y/NHWbBTcf/ZoiWss
-	 aQuc52TvjyneB+yNl0ebANwHnuUejwcPIqVrRFoXSNfIenTDGLi1IjllczrIzx/3snQus
-	 dsZB0X49xkg8sZwD8HBebe6rG2QlPfJeoqowvcFJlrfd3emssZA0x1ZrpA2wLdi9xfGbu
-	 3CkzhQSiWVcNTLOCLsSVH+XU4Uc8Y1GpkIOSaOyaauvUzen1Pe37TpTQ0y1yGJ3jk6r2n
-	 veTcgOr41HgIR/Yar5d/N92D3UjtRQrvuM2Omb9Axung+sGDUgspH/2leR54bycMgpQ==
+	t=1793945129;
+	b=zZK61bphx4DkqwqCIi3S+zCKH907kHF8jQXcY4Y/cwDcr02C03LxZZlAMgWv8NdbFXgG
+	 ItEgOxBlJsE0VCGwuoLACxFxzx2aeEjH0WS8iq+dHx3OzDrzZw6fMoQcsLsCq1jaifbTm
+	 IWhDd5EFTi6ruY/yLiHb9G9yUXfuKfiBVGd63T/d5tRT6wciBBq+8/+NkPYKwRuF4dsRV
+	 Jq9uMjINscscx44oKvMWee+vwoEDuNCYFeajZ8i+/W/K0+ANdUiI4TIhkprGCkjEbF1HZ
+	 yV9OY07sRrFf2rjkaDRQjtYyGeaXNK2caDN5vNM/YR6MMAVg+/8aKBJkAamIiu00xgw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793940972;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=lqqB5syzjzLAkhdvBwHvqSYGDeFYQmOJTV77GTgjLkA=;
-	b=N6o8kw/A4l5tqnfLKRoHqGbCWh16WQhdVzR926Fgn19VPrIiPQ1lEthDQqW27EYoFs3O
-	 VTEuIFNXhZGnpHblqSN2uyGpENxFfpV1JE1Dgk8bOqS6jXk87J2b8vmgT+iXOutcr4G2z
-	 zCHN78HYyIEt/P/l4xdjfefHCtEAEVpeeC2HL83mZyvsZfDMFpo80WjzqdhsKpYQHqdnv
-	 0RVmtNjLSzDerD4mLWxJFpApec3CzEr+wbd+lPhhQAScEAHzoc1s/+3cC86YVvIs0sM5+
-	 GCZUBEwUtjhkh+B2KXH8dr7RVDutBqFkaSf4CSzcWFhDWzN6jD7ID6p5N9zeZI92ZMg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793945129;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=5KBUz5itfW2H0npvZHDcjaGSjYLfy+DCPcwOiE7R4cY=;
+	b=A+8gvYOeA9bVwAWGrrhMh4cKbuz3Gwz1fYt1AGsSW/moZkkSBDIsE8fEDfBUBKqT5ghP
+	 QTY1xQjAIgz98wogvoKEIqBAncmeFt11mPhEOIaP75HsUHzlTRlXVqywd+hRy3UHXJIA4
+	 Hrpeg3Jj09nVbjLJHmb6hvrhCY9RiOq/mTWlJHleKg87AGOV+IrboaOFGhiPvoKU0YHCU
+	 WAy1nFahA4Ly7olZLYIA2B0StMJcyvV8LOOWdpBU4goEgDJbR1ZqP1T7s6pdAtthww2PU
+	 dQd0IQ8XJXTbjY4BZD0SD6ez9ZiBhHdL4wHx6ZaPg+NkDZnzfqOf+2XVPFs1W6Lmmbw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=opiv4elrcvclzigtz5y5hxt56q.protonmail2 header.b=NNNmJBVH;
-	arc=none smtp.remote-ip=79.135.106.31
-Received: from mail-10631.protonmail.ch (mail-10631.protonmail.ch [79.135.106.31])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=D5xMsX5Q;
+	arc=none smtp.remote-ip=209.85.210.177
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95055606A31B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 04:56:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95055606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DE6606A326
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 06:05:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2DE6606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=opiv4elrcvclzigtz5y5hxt56q.protonmail2 header.b=NNNmJBVH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=opiv4elrcvclzigtz5y5hxt56q.protonmail2; t=1793940968;
-	x=1794200168; bh=lqqB5syzjzLAkhdvBwHvqSYGDeFYQmOJTV77GTgjLkA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=NNNmJBVHKnMi74ZQ2jXTCF9mZgVNR/YRexL02aMxojGYCuWglmfrla+OAhDPaxrPB
-	 FpM4XMscOCxbwYbyd7OLCVPgKemnXk24MAELNmjRVvmSWBRqFigG+UYa7bYt72x4hs
-	 Qupw40cBco8XhEKg6CjONoWs5qMjay6bwB1b9KQBUUt6CWXueeqwdFQePdtIQle6wC
-	 wC45G1Gc7o9P/Z5FIcM1FgoXOnj1TQ4cmMEW7D8xcKgKBljSqnPMGlgSrHJvr5G0he
-	 cUJl7LYBEyEyDER3R4gijR/w9rDsfZbRhVMyNO1MsPdHwUBtl3ZnuqZAF4wlw0tRdE
-	 qMPyy+nKC3vSw==
-Date: Fri, 06 Nov 2026 04:56:04 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH v5 2/2] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
-Message-ID: <20261106045515.853897-2-cochcoder@proton.me>
-In-Reply-To: <20261106045515.853897-1-cochcoder@proton.me>
-References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me> <20261106021723.631339-1-cochcoder@proton.me> <20261106045515.853897-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 3be4ac843c75ee3278691da332ea809e5afbe382
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=D5xMsX5Q
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-89f639ba307so85301b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 22:05:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793945128; x=1794549928; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=5KBUz5itfW2H0npvZHDcjaGSjYLfy+DCPcwOiE7R4cY=;
+        b=D5xMsX5Q5Y+ELb1XuZwb7AiDoSadX6UgEPUlS5WvNXHL33zjCUzQr0hbNSBgVmOF02
+         98n9gc4/ACh89x4RlkfqkaT0D2rZhfnyFm0Y1roVjJxqiOyTB4aMKuQgn4ShRIB5qaiV
+         ewksZawLdzpD+lSJvqtrRRmHByuk1RoJiHwmE0v4QmHHCxyZJwqbxkAZzSd5Qt/AZpP/
+         XdPXYfVvaZwqmNMlNokEyFPVqEpUBHMqtcw2K6U3khlFwe1Ro01kR1nXeCiQHRbp2Abv
+         s3UUNgbMO6YcxszmjLWASodBHsdSjrFx9K8qHetjhAwIn+DHdN4tfk8Dt99rUCzUPWAS
+         Gemw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793945128; x=1794549928;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5KBUz5itfW2H0npvZHDcjaGSjYLfy+DCPcwOiE7R4cY=;
+        b=h6HXqmSuoC66w3SmEJEUjQu/5UsqL5OjgHxoWR2s/UK5V5PJlLRdcbjZBybEk77W7H
+         VmAGM7ChlHoP6HEWfZIc4OyurO/QkrKvgQqHSZraERkx80Eu/80IWomazrp2tioYGTnF
+         jEOr/6+mZnvVWXk6KmEjPdCo2iNVbvobCbkpGPL54fE0ueXqAOhdwZOBvLqrep/ly38M
+         vjORndo0MRBvDLURNHv7XMuCbnRLpGuCSnHHu2SM92wDcVBdO0346asY9j4sm8luHDiP
+         hN8/BEX2Ejvo8bfyEr41Sln2Nztvu/dGajlAo/hd+31Tw/NvpynoVhCRyU6yhroJ3+ln
+         pN9A==
+X-Forwarded-Encrypted: i=1; AKwUvBxk8wp+OKYUM/P0OPbAIvCagNObf1WWaZfuZkEercMNeUSTjZa4EA3Ymx2Ctesma/J2uRst0OIETuVxYMVFkBQ=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/wspaD0T4ZsW6hGqLEV/ekHOx8oxG53zt2XB/TwO3W4CbwJoVy
+	BrsfbHrsDI95JCahzEkponSKseZIgsg5bLV32ve/XhdDBHyG+ORlYN+v
+X-Gm-Gg: AYBFou0voPFdK3PXoSjgWjy+hkG5qoOCh07W7QROuIpWBKBov5FcPnEVLCmvIGGOFUJ
+	ROJTla3GNl+RFpwVHhA6c4WEdbrLF60/tACUVP+YslqTkBfMdIKP144OfpOQo2wXD99XjMdjLhi
+	XHJKaQIOF+H0dIFcPCcop12OY5TDSLAlBAm9aAbhabVvTGyn5ubQrWRZZhm159AdDb8BPaRQvji
+	OfBqfw2VvDSxEg7XePUvLD8AceRcYFDYo4RVtDRFkB1ZLXqHkd59a65gGP+P3ZfQOqJ857rUJa/
+	4ipV7tKkBOLnkh4phs5vRpQF9ei7O+Vv2txg/DmPNJPPFMacpv5tVtVIfdG1bGakmFDhJCdLY6X
+	wriKN3vHsve/WGAE5Tn9v8k5WoS8BzFQpbFnBr/N2MRH+JH9tB86QQx/y7IKnN/hNx4W8v+kqa4
+	QU909oQvO8nYq9z+5irvvawcu+TPptQsFKJIfSgV84oQ7UbiBuSWpW5Pl40pSgjStGUs1u3yi+M
+	LMcAYCuOFdne+x2w/mhGzPdHA+LLnAakiMz3zCQx4y0JGiGYMdRpIQWMXrdQna1fOzM7hx35lNl
+	5bmbKSVr3q7+/Lsd8s7hMG1SMJ6+
+X-Received: by 2002:a05:6a00:4211:b0:87c:e44e:5694 with SMTP id d2e1a72fcca58-8b37ae9cca3mr1380301b3a.21.1793945127925;
+        Thu, 05 Nov 2026 22:05:27 -0800 (PST)
+Received: from macbookair ([150.203.68.27])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8b3597f0161sm306194b3a.26.2026.11.05.22.05.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Nov 2026 22:05:26 -0800 (PST)
+Date: Fri, 6 Nov 2026 17:05:19 +1100
+From: Myria Sarvay <myrialsarvay@gmail.com>
+To: Andre Eikmeyer <dev@deq.rocks>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sven@kernel.org, j@jannau.net, neal@gompa.dev,
+	asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Yossef Osman <Yossef.Osman@proton.me>,
+	Aditya Garg <aditya.garg@linux.dev>
+Subject: Re: [PATCH v2 1/2] Bluetooth: btbcm: raise ACL priority on Apple
+ Broadcom controllers
+Message-ID: <au1uH6uxtsw2vHfP@macbookair>
+References: <20261105085750.120392-1-dev@deq.rocks>
+ <20261105085750.120392-2-dev@deq.rocks>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,85 +102,35 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261105085750.120392-2-dev@deq.rocks>
 
-Cochlear Nucleus N8 captures contain LE credit indications with
-identifier zero. The specification forbids zero identifiers, so the
-current parser discards these grants and leaves the channel without
-usable transmit credits.
+On Thu, Nov 05, 2026 at 09:57:49AM +0100, Andre Eikmeyer wrote:
+> On the MacBookPro15,1 (BCM4364B0 over UART) A2DP audio drops out as
+> soon as WLAN runs on 2.4 GHz with traffic. The host keeps the eight ACL
+> buffers of the controller filled, but the controller holds single ACL
+> packets for 160-200 ms, so the sink runs dry.
+> 
+> Sending the Broadcom vendor command 0xfc57 (HCI_BRCM_SET_ACL_PRIORITY,
+> handle and priority, as used by the Android Broadcom vendor library) with
+> priority high for the audio link stops the dropouts. Setting it back to
+> normal brings them back right away. The BCM4377 of the MacBookAir9,1
+> accepts the command as well.
+> 
+> Raise the priority for every BR/EDR ACL link once its Connection Complete
+> event arrives. This covers audio as well as HID links. hci_bcm does this
+> on Apple machines only, hci_bcm4377 always, since it only runs on Apple
+> machines. The PCIe driver receives events in hard interrupt context, so
+> the command is queued from a work item.
+Hi Andre,
 
-Accept nonzero grants only for connected legacy LE CoC channels. Keep
-ECRED and all other commands excluded because the observed
-interoperability issue concerns legacy LE CoC. Apply normal credit
-overflow and pending-security handling, including the shared transmit
-guard from the preceding patch.
+Just wanted to point it out, if you hadn't seen it before, that Sasha
+has in the past sent a different patch [1] to run these priority
+commands. They seem to take a different approach to when to enable/run
+them. Wasn't sure if one was better or worse though.
 
-Let the credit handler validate the exact payload size after the
-signaling parser validates framing.
+Thanks,
+Myria
 
-Assisted-by: LLM
-
-Signed-off-by: Kyle Pepper <cochcoder@proton.me>
----
-Changes in v5:
-- Explain the observed Nucleus N8 behavior and legacy LE CoC restriction.
-- Use the credit handler's existing exact payload-size validation.
-- Depend on v5's shared security transmit guard.
-
-AI review:
-https://sashiko.dev/#/patchset/20261106021723.631339-1-cochcoder%40proton.m=
-e
-
-Credit/parser fixtures pass. ECRED remains excluded from the zero-ID except=
-ion.
-Native L2CAP and hardware behavior remain unverified. The interoperability
-exception remains subject to maintainer policy approval.
-
-AI assistance: Codex prepared source revisions, descriptions and local test=
-s
-in response to the v4 automated review. Attribution is retained.
-
- net/bluetooth/l2cap_core.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ae6659fab..d3b875c47 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5388,6 +5388,10 @@ static inline int l2cap_le_credits(struct l2cap_conn=
- *conn,
- =09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
- =09=09goto unlock;
-=20
-+=09/* Tolerate identifier-zero credits only for a live LE CoC. */
-+=09if (!cmd->ident && (!credits || chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
-+=09=09goto unlock;
-+
- =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
- =09if (credits > max_credits) {
- =09=09BT_ERR("LE credits overflow");
-@@ -5997,11 +6001,20 @@ static inline void l2cap_le_sig_channel(struct l2ca=
-p_conn *conn,
-=20
- =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
-=20
--=09if (len !=3D skb->len || !cmd->ident) {
-+=09if (len !=3D skb->len) {
- =09=09BT_DBG("corrupted command");
- =09=09goto drop;
- =09}
-=20
-+=09if (!cmd->ident) {
-+=09=09if (cmd->code !=3D L2CAP_LE_CREDITS)
-+=09=09=09goto drop;
-+
-+=09=09/* Credits have no response or identifier-matched transaction. */
-+=09=09l2cap_le_credits(conn, cmd, len, skb->data);
-+=09=09goto drop;
-+=09}
-+
- =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
- =09if (err) {
- =09=09struct l2cap_cmd_rej_unk rej;
-
+[1]: https://lore.kernel.org/asahi/20260525-brcm-prio-v3-1-6259e10233f8@chaosmail.tech/
