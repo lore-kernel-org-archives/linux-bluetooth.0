@@ -1,62 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.69.30.187
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793993347;
-	b=agWvms1/gkIQjPZuC+md1XSYNTixy+Mi9ntyE4tOe4UM+AYD+wB7yy5Y+k2cB9NW55II
-	 CsuTHxy/92J7uobsdq3RYLS5qw5vf+iInO3rrgv6AKcPOEo1wENUu8b9E2vWwxG6FMtAi
-	 R+m5SP45hfJ+Jwx5IYG1Lz6baHazGxDnX//+2hAJGMIem2mwn+gxREGjELHCVKCkoObof
-	 Vxr9eOHNddRmFDmD3+8Z/ESzpMndog8sj5nPgIi+KSmN9hvDGYcR4FsVa5w4zXalKewYT
-	 lC9lUSFvip31ahSmylh9cf89yaJgQ3sMvoSDL9pUddzC5eVCO1xdWsovB2kyimx6kNw==
+	t=1793996411;
+	b=Hbmy4xePpJ6GwmZA5G2S2b0mpr6EVay1ZS2cNQu/iyhwHTLSStOlgINB2sMYs9GvqPRl
+	 CF+Rqmfrlvg+FUE0UkuQNnp1KFccF2W0OrrgMtxu/B+GvfXZdTLzMewc1dCXgIt42drbP
+	 c1yeUygnB7DpLCxcfKpaAQk0Zn6ihiVBEaFvWIJpQi/Fq4UTFKnellDoNkMmApHPklM/E
+	 Vx08mQ8O97zwT9SBRSbRG/en4wCmlKilCcxYenYppf7Lc1/BGqL9Hv4Hj5PvYYpU/8mGN
+	 mTCNzt6BB3P756IG0I3xeoGO1jhj6iYAnacLqJD0Q7fjqaZCjqhF5f/yMGI0DomMkeQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793993347;
-	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=UiuovoevWXu9XJy5bFhJVWdiIRXYyIvXEQ85Dby6mgk=;
-	b=hsJ6zpvYgIFsOJMi69ITIwpJzy4zcz74mmZrexC7SS7J3VRAYDpp9DGrKuSbmOPWDU4B
-	 9jJCKx6eT2T8yK8oqt2929rUPYXJBIV+FZrLghagnz6qh5qotH47+n5ECDqwO3GlZs6Wd
-	 ibFKD9VquI/4muG/iaihd4eDgUBtIG6YWrYZWqPUVnaiAv6Hb3Z7gPy0wXvfuEGgXBun3
-	 7eHTTGJUrWbZadEnG9JlIGyZxwcAtOw/47lIMRPs16EzZUqHlegRb1ag3ujK9Kv4e33ai
-	 FAPPFKdxmJxrnNZaUBU9SK1bymdyg97vuB16VHCIUlpv6DuEm+HKmsYdN4TjcUbfqHg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793996411;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=AO2+n8gK23Koa+vRbAITmdI/tHEJFEMJAWSibYx0ks0=;
+	b=dl9tYpxhZuN/u18G6a+rOwE0v3wmlmPozV63InS7kizaG/ULFxXpZ2770cLANmrvMOMf
+	 LEgZD2iJOr/i4KHFUHQfsH3TUnkU9afXL+dlQmJIluASGcm/AONQn36JHx37Dy7LsYynH
+	 C+QRWFnuOz6zRyccZmNYQSFLz1oGW5BbcmwtavLSZ0C+qDguMS/DFWxROt9oVG7fHkRcd
+	 7CRKeYhY8tnVWqkE6GQIZKketClqswZqEpXouPLEbYulz6yvYaSHkSyKDMK2SAAq/uqxN
+	 QUa9NkJiRjuKeDpmJjehdCZJ5rh+0rqCCanFNvnYKQhQmndVdQjrR2Pm1Tc6D7Xn7cQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=freenixos.com;
-	spf=pass smtp.mailfrom=freenixos.com;
-	dkim=pass header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=lr0pDVYh;
-	arc=none smtp.remote-ip=54.69.30.187
-Received: from mail.freenixos.com (mail.freenixos.com [54.69.30.187])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FMmSEEHn;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B23A606A329;
-	Fri,  6 Nov 2026 19:29:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B23A606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenixos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freenixos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A833F606A33B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 20:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=lr0pDVYh
-From: Hex Lindqvist <hex@freenixos.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freenixos.com;
-	s=mail; t=1793993345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UiuovoevWXu9XJy5bFhJVWdiIRXYyIvXEQ85Dby6mgk=;
-	b=lr0pDVYhUQPa9H+L629Nktye7hj/QSJsIRxA9WbdR2ytXVKmqkfkoophSyk++3zuwFfL7H
-	bdnDX5VyBVwCzYPKAu+6l1VOZ2EXnE68Eo6+ZyT39j94nqhtlw4dnZgpV5j/iqOJusp+Gy
-	vLdB2bYKUWd2O2QkigAr+yW8UhDRjOIWa/aZnOklUNLjLYNk5i9f6U3msoSHuJYWeQ+rNd
-	SPn7qLXrBmb5V0tw66XpN5mLONU/XI+Cc4pBFUB+tGNnXTjQE2vbZUO/oJx4zLFmJ43HtI
-	Dyi4XXq3JY0BNkm7mn38ktaOjVwLMFAkrGNnBMIrGrFeVh1dc4Nqpdh9VqcQQg==
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: qca: Disable SoC debug logging for WCN3990
-Date: Fri,  6 Nov 2026 11:29:01 -0800
-Message-ID: <20261106192901.1930168-1-hex@freenixos.com>
-In-Reply-To: <56866622-a854-4aae-9e97-40eecc4adbe1@molgen.mpg.de>
-References: <20261105201952.1556185-1-hex@freenixos.com> <56866622-a854-4aae-9e97-40eecc4adbe1@molgen.mpg.de>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FMmSEEHn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AAA41F00900;
+	Fri,  6 Nov 2026 20:20:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793996411;
+	bh=AO2+n8gK23Koa+vRbAITmdI/tHEJFEMJAWSibYx0ks0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=FMmSEEHnDUaRomYV9Lrvz2mBY7MgjvlnEXTkGHrBOMMZXXEDpFgatX697SmFMlTxo
+	 rJAfJ/VmgH4gEEcQy/GSpk2XXUWhTtqvSEObE7xrSTlCsfDegqDe72O7hgkN0VShqv
+	 LFr1XRHYuO2XCM+/f5zX3g4w2Atcq+cUguZ71X/LMgm3OK5pPrnJ9/mBs2o+3yvJQM
+	 /WQb1syMEYS+u3vx1RQ9LX6etW9wn0Yfy1GuQ+SCakjEmGH9626bvqo4APEcWEJzqe
+	 mhtZ7Gi9NrBH1u4H1VwQDI/NNniexCuJchtN7pS/KOWQ3wprfjTugT6/RfTNYWEOHb
+	 08S7vSmcr9UYg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 210683A4102A;
+	Fri,  6 Nov 2026 20:20:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,34 +54,42 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/1] Bluetooth: reject invalid LE supervision timeout
+ relationships
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179399640976.849577.17436810105504463448.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Nov 2026 20:20:09 +0000
+References: <20261106172404.591900-1-cochcoder@proton.me>
+In-Reply-To: <20261106172404.591900-1-cochcoder@proton.me>
+To: Kyle Pepper <cochcoder@proton.me>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org
 
-On 06.11.26 11:57, Paul Menzel wrote:
-> Does Linux log anything about this? Maybe, also paste an excerpt from
-> btmon capture?
+Hello:
 
-No, Linux logs nothing; the packets only show up in btmon:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  = Vendor Diagnostic (len 492)                      [hci0] 0.761331
-          dc 2e e8 01 e4 01 03 00 0a ff 10 04 01 00 55 53  ..............US
-  = Vendor Diagnostic (len 481)                     [hci0] 11.334015
-          dc 2e dd 01 d9 01 04 00 0a ff 10 04 01 00 51 d3  ..............Q.
+On Fri, 06 Nov 2026 17:24:57 +0000 you wrote:
+> The LE parameter validator calculates an unsigned maximum latency by
+> subtracting one from a truncated quotient. If the quotient is zero,
+> this wraps and accepts invalid parameters. Exact quotient boundaries
+> also accept equality where the supervision timeout must be greater.
+> 
+> Compare the products directly after checking the field bounds. The
+> validated interval and latency limits keep the products within int.
+> This enforces the strict timeout relationship without division or
+> unsigned subtraction.
+> 
+> [...]
 
-I will add this to the commit message in v2.
+Here is the summary with links:
+  - [v2,1/1] Bluetooth: reject invalid LE supervision timeout relationships
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c1d50a71cdee
 
-> Both firmware file names are the same. What is the difference?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-They are different builds with the same file name:
 
-  OnePlus:        BTFM.CHE.2.1.4.c2-00002-QCACHROMZ-2.184841.1
-                  (216380 bytes, built Jan 3 2019, shipped with OxygenOS)
-  linux-firmware: BTFM.CHE.2.1.3.c7-00024-QCACHROM-1
-                  (177060 bytes, built Dec 4 2018)
-
-Both TLV headers report the same ROM build (0x0201) and patch version
-(0x0002), so only the build label tells them apart. The controller
-returns the OnePlus label when asked with EDL_GET_BUILD_INFO_CMD;
-btqca does not send that for WCN3990, so it is not in the kernel log.
-
-Thank you for the review.
-
-Hex
