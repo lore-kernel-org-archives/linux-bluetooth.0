@@ -1,47 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=149.157.246.25
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793962696;
-	b=m7/BedtoU/NXC8qIw1fJLE/cp0BfMS1Qq95wGwrVAuOAOerHZMoJBQ32R0oGkz5+YINb
-	 Zqo0yekgyiGhhccS2OtD5blvzL8R7MnsK/vaEzqHIlj2qo24qPc5TGQcvxdf+kQRn/Pl8
-	 /gDJ8iK2f+SpbCP+CnponjjUl37LLvoG3/SWDBqTdo2LYV/dSotZY+hmuMseky770mUzz
-	 rataPUSMQyOCESeRlRo0gqfwer/+JiDPcEbf7aMy4Y66qsBZlbUGpp2LhFbYjVM42wtKX
-	 2U5OeldO2fvo8fwzINNAhDHkbrvgXlvuv8bOO9lH4EuofEvZ7U1FZ7E7Hut83zdruWA==
+	t=1793962878;
+	b=PzOdTv8YthyK/PKv/pPsfvRiYqyB/8U3tdMjDqmgr6TCO3EGYSueWYH7sN5iSGeFR8YP
+	 RJKq7uhk8ypWGSTrDZ+XAcLlkxd1FZ5xAkKPiquKCCV883yNnYKeqcWWSeB0wvnPodUWX
+	 WRHGLW2gw8BFUw0ju6ERadDd7it0aNOTyj33uUPqIeAbulvJ9sIk4Ot5JxlR0Sv+CRNV7
+	 7MLoQeGsDeOlur6scLuV+uCcaxuePLNqVfCM/BDb1FhLeYJijNaei3uviLuHk4O+b+H38
+	 pUph8cwpu1PZvzaMdgho0GDnCXnEz5Ia4iMVTxsAirh7O2Ay1EE9OJ133BQm74/vKog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793962696;
-	h=DMARC-Filter:Received:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:DKIM-Signature;
-	bh=SigG/up2gMWRUySXAnA/Afal/pPumps4/i8yYtBo2BY=;
-	b=t6v7jYZc2LYgOqE0Rt6qlrwFVHntM+IOuYCkznsfXYN4BaIaM6FrZzd1KnYkUeHb1CNo
-	 dyemWrwE8Zi/Rg2hZKgtsA0EFGfbM42G5WIm8+qq9n/CNcmQflfs+a3lawkm83lpmzKOK
-	 9hndtWmFsyJi5MOPApKPF1qLIj/+fAn+DoNKsJhW90W1oD/UeYxN2VUQOocfWUeoxmNDd
-	 ZQNe4l0+f7eTrerKAvkYA8e3oK4T/ms3A/+Y5406BDHGYuPicdvYlyv5KiAoE1BYeFwR6
-	 8byRTr6k/pSO9e7mGb+VDUEUCjAEPdUaP/npVpC7NECGC1vZfhfeil1KRTZ9hpjBx4w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793962878;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Subject:
+	 Message-ID:MIME-Version:Content-Type:Content-Disposition;
+	bh=3OVWukCObF+HaNI3ZO5OFqNe+4QpKGocOyCTLOD3r/Q=;
+	b=sxWd22nG1edFyFlUn7DekM9/o414KOCC6FX8WIoeLWkGq2fft489YDvJFmS7OLd6g1wv
+	 9aDnh2YCYFXHesHOBKVqH7fsBLtjF1fm7yRBQmiteG25c4hc0sGnfNfN/u6SrxggrxD2R
+	 Ng2zNg7kUZSzUVoslcgQvmGj1vtX7G3xHVVbnbbNsLV3cYpIdm0L4JRvdG0PDjTXJi8S6
+	 q+QxPvM7ASr9mFW8lqXEcXEMdmUBxrgENLoCWnBIOVXnzYnsYRRBXlL5lHSe+MhqsYOcy
+	 SfhN9kbga9/CycdjGtpcmMFuBMnjife2cCUjQlKlm5trCIr/hLUO3CqEHuzD67LX5Qw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=molgen.mpg.de;
-	spf=pass smtp.mailfrom=molgen.mpg.de;
-	dkim=pass header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=gqugLq4D;
-	arc=none smtp.remote-ip=141.14.17.11
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	dmarc=pass header.from=cs.nuim.ie;
+	spf=pass smtp.mailfrom=cs.nuim.ie;
+	dkim=pass header.d=cs.nuim.ie header.i=@cs.nuim.ie header.a=rsa-sha256 header.s=selector1 header.b=rEEaSd7E;
+	arc=none smtp.remote-ip=149.157.246.25
+Received: from mta-srv-01.cs.nuim.ie (mta-srv-01.cs.nuim.ie [149.157.246.25])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC56606A326;
-	Fri,  6 Nov 2026 10:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5CC56606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA84606A326
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 11:01:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8AA84606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cs.nuim.ie
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.nuim.ie
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=gqugLq4D
-Received: from [192.168.0.5] (ip-095-090-245-054.vkd79.pools.vodafone-ip.de [95.90.245.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D8FC64C2F3FFE7;
-	Fri, 06 Nov 2026 11:57:42 +0100 (CET)
-Message-ID: <56866622-a854-4aae-9e97-40eecc4adbe1@molgen.mpg.de>
-Date: Fri, 6 Nov 2026 11:57:41 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=cs.nuim.ie header.i=@cs.nuim.ie header.a=rsa-sha256 header.s=selector1 header.b=rEEaSd7E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cs.nuim.ie;
+ i=@cs.nuim.ie; q=dns/txt; s=selector1; t=1793962875; h=date : from :
+ to : subject : message-id : mime-version : content-type : from;
+ bh=O2COWLoBrQWGA5GPsR7n+J1mv/36a3c54n+fLu5kR+0=;
+ b=rEEaSd7E9f8yvAlRApGkd8wg8amNbc79f3NDD7nY65omRocvWkHWF+b34WHUaUNR+gs32
+ 2VRNbUH4dm2lyHXqxVyGq3cmwBYGMiFucupweUudR3cJDR4pKGTZ0xh4y3rPiSdbmTk646H
+ 2Sv+sG62zRHuwyJ3vcBg7MEPBqt8g4nijdp8g0wqQHjlGflg4Ct6whKAkFItKjnooYuJ+Wj
+ IR8gQNs0w4e6AoZOTA7sCNDlbOolRQMBmwCRKicRZs/uIw1kB2BFYu9QhPkgvShM3UbI2p+
+ 31DxlQn2CGizE0FyvIDXxH6KN2oPGSw5GD5wg3etMUOxvkqvM2vzEWGwYKrA==
+Received: from port-kadr (port-kadr.cs.nuim.ie [149.157.248.96])
+	by mta-srv-01.cs.nuim.ie (Postfix) with ESMTPS id 5530B600A7;
+	Fri,  6 Nov 2026 11:01:15 +0000 (GMT)
+Received: from barak by port-kadr with local (Exim 4.100.1)
+	(envelope-from <barak@port-kadr.cs.nuim.ie>)
+	id 1xPHh5-0000000AgAP-0hsA;
+	Fri, 06 Nov 2026 11:01:15 +0000
+Date: Fri, 6 Nov 2026 11:01:15 +0000
+From: Barak Pearlmutter <barak@cs.nuim.ie>
+To: linux-bluetooth@vger.kernel.org
+Subject: btrtl/btusb: RTL8761BU enters unrecoverable USB reset storm after
+ autosuspend
+Message-ID: <au2ze1UbFsDuQvVs@port-kadr.cs.nuim.ie>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -51,100 +63,99 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: qca: Disable SoC debug logging for WCN3990
-To: Hex Lindqvist <hex@freenixos.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20261105201952.1556185-1-hex@freenixos.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20261105201952.1556185-1-hex@freenixos.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=molgen.mpg.de; s=20260906; 
-	t=1793962663; 
-	h=from:from:subject:date:message-id:mime-version:content-type:content-transfer-encoding; 
-	bh=SigG/up2gMWRUySXAnA/Afal/pPumps4/i8yYtBo2BY=; 
-	b=gqugLq4D1JCEXa6fBfbmfyeBVO3p0y0uVSIa8cPMj3DKqWuZrgkFrWkLPtFWeTcXzOGHtSShm3w4
-	FrksYy49XTzE1VVP5Ws0U5Re5MUu6Zc7MrThLQcWIw1soIFk899Ztt8+ogNw+VEK9kB6ozFRO0egx/
-	z0OGdzhDRL/skemdipB81xasrakPlBvay4cDEip0vchA6W4dFfQDC1fBDYLNYqX0WVxUPlJ4PLNnu8
-	wezlFPs2BtGdwRODLZ4QBzM0j49Ju770sC6GQyJG3iswu5cqB6ZWYmNB8yLg3HDgNqmb/OOI6aN7/h
-	H5t/9pd+OHiM0hUMnDbvzfe24RBQb57Q==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Dear Hex,
+Reporting a bug where a Realtek RTL8761BU Bluetooth USB adapter enters an
+infinite reset loop (~every 2 seconds) after coming out of USB autosuspend,
+from which it cannot recover without a physical power cycle (unplugging
+and replugging the dongle).
 
+Device:
+  Realtek Bluetooth 5.1 Radio
+  USB ID: 0bda:a725 (RTL8761BU)
+  Firmware: rtl_bt/rtl8761bu_fw.bin, version 0xdfc6d922
+  Driver: btusb/btrtl (in-tree)
+  Kernel: 7.2.15+deb14-amd64 (Debian 13 / linux-image-amd64)
+  Note: this is a Debian-patched kernel; Debian-specific patches may be
+  relevant, though the btusb/btrtl driver is unlikely to be heavily patched.
+  USB autosuspend delay at time of failure: 2 seconds (default)
 
-Thank you for your patch.
+Failure sequence:
 
-Am 05.11.26 um 21:19 schrieb Hex Lindqvist:
-> Unless the host turns it off, the WCN3990 firmware sends debug logs to
-> the host as ACL packets on handle 0x2EDC. hci_qca passes them on as
-> diagnostic packets, which the core copies to the monitor socket and then
-> frees. On a OnePlus 6T (SoC version 0x40010214, ROM version 0x0201) that
-> is a packet of about 490 bytes every seven seconds on average, for as
-> long as the controller is up.
+The adapter is idle (nothing paired/connected).  After ~2 seconds the
+kernel autosuspends the USB device.  On the next activity, the firmware
+fails to respond to register reads (-ETIMEDOUT / error -110):
 
-Does Linux log anything about this? Maybe, also paste an excerpt from 
-btmon capture?
+  Bluetooth: hci0: command 0xfc61 tx timeout
+  Bluetooth: hci0: RTL: Failed to generate devcoredump
+  Bluetooth: hci0: Resetting usb device.
+  Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
+  usb 3-3: reset full-speed USB device number 2 using xhci_hcd
 
-> The driver already turns this logging off after the firmware download
-> for WCN3950 and WCN3991. Do the same for WCN3990.
-> 
-> Tested on a OnePlus 6T. With the crbtfw21.tlv rampatch from the OnePlus
-> firmware, no diagnostic packets arrive any more. The controller also
-> accepts the command with the crbtfw21.tlv from linux-firmware.
+This repeats every ~2 seconds indefinitely.  The driver's own USB reset
+does not clear the firmware hang state.  Workarounds attempted without
+success:
 
-Both firmware file names are the same. What is the difference?
+  - sudo usbreset 0bda:a725       (USB reset, same as driver does)
+  - driver unbind/rebind           (echo "3-3" to unbind then bind)
+  - deauthorize/reauthorize        (echo 0/1 to authorized)
 
-> An AI assistant helped find and test this change and drafted this
-> message.
-> 
-> Signed-off-by: Hex Lindqvist <hex@freenixos.com>
-> ---
-> 
-> Notes:
->      Test details (OnePlus 6T, crnv21.bin from the OnePlus firmware, counts
->      from btmon):
->      
->      - v7.2.10 with the postmarketOS sdm845 patches, OnePlus crbtfw21.tlv:
->        87 diagnostic packets in a ten-minute capture started a minute after
->        boot without this patch, none with it.
->      - bluetooth-next (31333770a468), same firmware, btmon from boot: 42 in
->        the first seven minutes without this patch, none with it; the command
->        succeeded at every setup. Plain bluetooth-next hangs this phone after
->        about seven minutes with or without this patch, hence the shorter
->        window.
->      - v7.2.10 with linux-firmware's crbtfw21.tlv (its only WCN3990
->        rampatch): the controller returns success for the command (btmon
->        during setup; not a ten-minute run).
->      
->      Not tested on other WCN3990 boards.
-> 
->   drivers/bluetooth/btqca.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 60735b70d89a..1db2cc626def 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -944,6 +944,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	case QCA_QCA2066:
->   	case QCA_QCA6390:
->   	case QCA_WCN3950:
-> +	case QCA_WCN3990:
->   	case QCA_WCN3991:
->   	case QCA_WCN6750:
->   	case QCA_WCN6855:
+None of these recover the device.  Only a physical unplug/replug works.
 
-The diff looks good.
+Secondary effect:
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+The BT reset storm generates substantial USB bus traffic on a shared
+xhci_hcd controller.  On this machine a companion RTL8822BU WiFi adapter
+(0bda:b812) on a different USB port begins emitting "failed to get tx
+report from firmware" kernel messages within 21 seconds of the BT storm
+starting, and the WiFi interface eventually deauthenticates (~20 minutes
+later).  Fixing the BT autosuspend issue therefore also fixes spurious
+WiFi failures.
 
+Workaround:
 
-Kind regards,
+Disabling USB autosuspend for the device via udev prevents the failure
+from occurring in the first place:
 
-Paul
+  ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda",
+    ATTRS{idProduct}=="a725", ATTR{power/autosuspend}="-1"
+
+With this rule in place and the device freshly power-cycled the adapter
+initialises cleanly and has remained stable.
+
+Possibly related: Red Hat bug #2521504 describes an RTL8761BU (TP-Link
+UB500, 2357:0604) entering an infinite USB reset loop, but with a
+different error (0x200c timeout rather than "Read reg16 failed (-110)")
+and reportedly fixed in kernel 7.1.13.  Our kernel is 7.2.15 and the
+bug is present, suggesting this may be a distinct failure mode, or the
+fix was not complete.
+
+Log excerpt (storm onset):
+
+  Nov 06 06:49:50 kernel: Bluetooth: hci0: command 0xfc61 tx timeout
+  Nov 06 06:49:50 kernel: Bluetooth: hci0: RTL: Failed to generate devcoredump
+  Nov 06 06:49:50 kernel: Bluetooth: hci0: Resetting usb device.
+  Nov 06 06:49:50 kernel: Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
+  Nov 06 06:49:51 kernel: usb 3-3: reset full-speed USB device number 2 using xhci_hcd
+  Nov 06 06:49:53 kernel: Bluetooth: hci0: command 0xfc61 tx timeout
+  Nov 06 06:49:53 kernel: Bluetooth: hci0: RTL: Failed to generate devcoredump
+  Nov 06 06:49:53 kernel: Bluetooth: hci0: Resetting usb device.
+  Nov 06 06:49:53 kernel: Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
+  Nov 06 06:49:53 kernel: usb 3-3: reset full-speed USB device number 2 using xhci_hcd
+  [continues every ~2 seconds for 20+ minutes until manual intervention]
+
+Log excerpt (clean initialisation after power cycle, with autosuspend fix applied):
+
+  kernel: usb 3-3: New USB device found, idVendor=0bda, idProduct=a725, bcdDevice= 2.00
+  kernel: usb 3-3: Product: Bluetooth 5.1 Radio
+  kernel: usb 3-3: Manufacturer: Realtek
+  kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_fw.bin
+  kernel: Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_config.bin
+  kernel: Bluetooth: hci0: RTL: fw version 0xdfc6d922
+  kernel: Bluetooth: MGMT ver 1.23
+  [no further errors]
+
+Happy to test a patched kernel or provide further information.
+
+Barak Pearlmutter <barak@cs.nuim.ie>
