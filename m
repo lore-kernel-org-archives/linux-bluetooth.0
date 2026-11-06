@@ -1,89 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793989068;
-	b=VHPR9xC/lurQaBXEak3mz26FIaqHRLkTg29ChEpEJegiVRMiupozt7r+eobJCP4Pj1ZP
-	 ZKTBlEOcTzU3QDAx9JMoFfjX29dwC4DBYJyqIfiS8sX37ZFlzokc4EblyTyAxzukfEFB1
-	 Zd8QAdvQGEq1mEzjUifE1k1WPBnvizuV+UGPu2WvQEJxvsce/jxm44oWPpaM/OjuF8VAD
-	 i63/mYkVzwomCn+qjXsBV83LlFf2u7UCyLFx7gF3D1QM4/EB9RifQbulbKHNMoedmtjAi
-	 uB9UdK5pXZgoaD8KjyUrAEhfhjDWrzMs25mAc9rOLu66HOB7IQilwouwXtTD+aoc8BA==
+	t=1793989071;
+	b=NDwDUb4I8775SqhM38cZakcjMIGUzZ9t7lhpvzKWI+vW2WI6K/5BPfXqnq77yb4YmUsr
+	 GcqW45QUdL53CRQBN18vCmlnaQYWrUh6EXUQb9XkBvMo6lQgAPRO0h7J4OgA3nVXffVi1
+	 A2GADiTZBXbZ/nMN0ETY4+ayqc0bq2m/O8zZqfD7UH/bR/ygsQt6HQgxuJUZzoZNrWPyr
+	 kBQt2uQyjp0CQ00lYGWSWAFWppVRSVgFRcL2a7cpyVlZZpTl2tXXLyO94MXnsqwbnZFWy
+	 47wpz9jlT0wiIDEX5Pcsjx3i26yg1hNi6cGqdWiqtyMmP2LI5Dv2OWlJTUE/fSkRDjQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793989068;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793989071;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=f9ZrrXZo8JHZG5xFzIxwG6MJEzLQxSEuuKcyQtKkQL0=;
-	b=CdQB/RawSo5DNIXd6gVlxTbacrkL4R/saJVE7zMGlaDV5Dj1/ZEm6HAvB8NyAFW+F2nj
-	 Riqskl9jqwFKtRiF2UG0dj3lnyN4P0l2TjSvkUkD2qkE9bg8/SnnLcj2czUiqW9GciP1y
-	 fetskwfooHN7ceD/6Fl2MmI4XJPEYkIlbef+Lc/mZv6NX7LSrwrOc8q5U8m/xXQoTaOyX
-	 P/zDpecc09jznJdO+UQgb9m9IQDj8/PKJPoy4N7GHlFLrh/wsqX4iZhOgHJVQE89f+kY1
-	 hT4choqm3KvszCtVCsVU4rMjy+uF/bMC/iUeWzsFcm+jGu+htb61GS9yZUaj5Kf/07w==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=RrdqOyh8TfrGuSz+7xxaiGGZJ0Ajb7g1DU9NCJMmAWE=;
+	b=iAkEczZXoF7Xrm2LIHcENjITmVs3zM/pC6nEiSrWzEQGb0sHlkmfwSJrmuOaC7EyR3kv
+	 RyidMBrLdg++hB1RZlsFNepkkshel+hzrxqpfbBtUf/uwMiEa9FQLmXKkMACaetlLMkfc
+	 WB5Owmv5qMfRo6t3MRXe9JSRuEGnT95zz8/T7sudlYw3Oc1gpWDo78Eom3ivvyQf2bZmA
+	 S0dnnKNPZTOEl4RkGJENsN66zQVlrTDZ4GIrvQ3hy0anIr7FuDy4FV75cFObznl/3oeme
+	 ijAO1zKRnFAqm6sGK+ccWvUct4Y3yIvseYDxEKJAts+da3QPEKH45wz/TqlqqSqKVxg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tVBBzeZ6;
-	arc=none smtp.remote-ip=209.85.221.176
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qGhfV5Hb;
+	arc=none smtp.remote-ip=209.85.221.180
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3FC606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 18:17:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC3FC606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EB8606A330
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 18:17:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50EB8606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tVBBzeZ6
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5e948e56af3so403977e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 10:17:47 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qGhfV5Hb
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5eadf48fb2dso404049e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 10:17:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793989067; x=1794593867; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=f9ZrrXZo8JHZG5xFzIxwG6MJEzLQxSEuuKcyQtKkQL0=;
-        b=tVBBzeZ6xoNZ2GDZxHi6cWWIOHdUk659bq7NOxLDb3SJPeKUfrk2UiKvkYPZizAKQz
-         Mq2tl9IDurOb2sUQrC4qx9vviLgnxWDVxv7D8zzJm0YjMXRScfDI9c1ojODyKjs7lPqN
-         uFZo+y6xRuVAkIBzD8rOS5Wc3ml3kBwKo9/NcMMBZBkg7SvuHhG00ysh6QJEt7EK3fS/
-         YZguoGR44KBKOx/XpkvSbn8vdPOgmxbKN4duTE2BPRVIETBRvjwRXZHvSIU6+G4ZBI9N
-         qz1X7GxY6O2Si0ZAllQRNnMTxdLo3KDxV7zEfZxa6vzR+oXwx8sDzbIJgbi2gejcA0sH
-         1UyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793989067; x=1794593867;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20260707; t=1793989069; x=1794593869; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=f9ZrrXZo8JHZG5xFzIxwG6MJEzLQxSEuuKcyQtKkQL0=;
-        b=sGZFGThqSvfSqQxDDAXdphiiVHgIJcGmhDz87KzCkJr86SiwpQTbdHw5Qo9+NtmgMD
-         hUy5qJP/xg3k6Led31B6By9QcKq9BlFXsMwVIK3erJRA/PhxR3F2qCW/7AH+lgpbX9GG
-         ZB2QAVUm3opbT6k+TqDCNkdFMR254S1SPtU2Y5KAdM++xHit4pF0/G4lqF9uU527GJC9
-         a+cAQ5oEOT1/8qbhn9pSsG9JJ1Ezf6bktfITGxeBwKHP90he//cAO0HvfWqBbX0/a0Yy
-         SbGuz7ndq08BKtFSAVbpZn0TAqk9cj5ZzvfMvcRyzv20goOyMXgzVWIf3uFfsokhiU7N
-         /2rQ==
-X-Gm-Message-State: APuU4Z85x66lo6ikaR2t1F6EeZhsIzE1KovDt4crUyYYHmXYQTeXgDfQ
-	PBldwnuBYsVtUO2xPp6O8wOkKjiqXDuY6q/SV/B+cOQKjKM9KMd/+56Au/PXYA==
-X-Gm-Gg: AYBFou0E2mEKf5enoxWiMNpksobufqAGwC9hrTtDG9gd5CiGX2zHT23Omc+FCkep4RH
-	ORlF7hcr51/QRo0RxNN9MIULwaiBrZAGjw00APpz2P56LEs4fS7PCUIb3rb9e/KNWhzcbuqVGbO
-	igS1lxLW2NbuT+biQbtRhke/shrAYiA8vcb7yRMdbkODji+CccTFS7/b3+4vSqddIvI41P2aIov
-	cfHd41OdKMAbqXHMAha59hPqJKeOBXjb8/QdMp6ck4THPehP7C+29MLprhyMN41dB0MudBxRO6y
-	qmbfKOOoUH94tg6dkLG2eLoY8yGZ3EQaVt8rkADXXYqQ9HNYnQNcaQLS78qw9FBp1/mz/Mm+ZxO
-	m8ApCuOMU+kyveN7A54cmBT5/buR/zzq7Nzl0z5eqYI/35a0GqiktuvG/2OzWd/6QwHgvdP2sJr
-	V2fcfkIE2O0K2LVe1VkKGMNTsWm15EM78sPpUht3eR1ztYYEdMj7p0X1D3dJMFWLVC79iy8tcvE
-	aDZJ4mvTFKP/PugwpINayEsbC2eSIhN191TQs/Xrkl0Ukp26A1+Z3q5ZPMnHmIlLvodafbCteSM
-	nUppoXEffbjhNDj/H3kWtbL57VS3GEL4Z0xVSL5LtbfywKohxrouNzi1ESLWl/zXmKe0cPhC4i4
-	7DOHpOS7XyfvJQJUZjVqda/6apyDidaZnNsOfh9d/sbp2fWs8rW/Fncy3h3VkTkvy3jVe9Vk6GG
-	s+edc=
-X-Received: by 2002:a05:6122:8b8c:b0:5ea:c6c1:8dd4 with SMTP id 71dfb90a1353d-5ecc43bb9d5mr1640840e0c.5.1793989066595;
-        Fri, 06 Nov 2026 10:17:46 -0800 (PST)
+        bh=RrdqOyh8TfrGuSz+7xxaiGGZJ0Ajb7g1DU9NCJMmAWE=;
+        b=qGhfV5HbeLUZwhcKj/Dq/dB91PUi4/nk62ajIvOELtTO/L5+jkfLvMh+C640zvGOzi
+         +wOHl15QCpIQ/TguepHjVxvkoS9+KaR4u+laU1/Sfr/SUl9Ku9rg7eIaIvyUeRXQkhmz
+         VAUsdJQ17Zn/OQRGg5F3hnE9Ek2mRUgmAKbqgbIOPYN64AExXHwGIqhKVd74mWO7Vluc
+         8TLCU5PAZlcV+Ruh7LqQndMrrVVCeRuGiG0yJqoXSQCehU7gqir9KJWYUnQjgpE84JST
+         ABSOldf0RrVB0fehbTPxSjwZVGNHWozEtXmYRijk4QMMTfv3jFiLYGBM2VJMnHZNWzR9
+         wvpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793989069; x=1794593869;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=RrdqOyh8TfrGuSz+7xxaiGGZJ0Ajb7g1DU9NCJMmAWE=;
+        b=Mv2bCP6WmH5+pLaQxIQ1DieCA7hBpdjF2+NG2+ROjDuDLyBbepzNWsPzD9itZ/W24I
+         p2svYSCCz8OTqHdIUM31sxvkGiWbnqcvOun9MUNpH2Q/ktXxFKvJE6VQgDelVYLUqDPA
+         sc66mqyy0JLANdWc+HzWEHCIWn04rFph1mVp3L18Rbg4gMb5RGoKy+jYFpldFBvLBD+C
+         zxKTl+NarWgIOuRqLDqGWOllGRUrWrZ0lbawVDbvZ2Xzlwp6PWg5EEAC1rDYT0NZK+Wh
+         8JkDqhFUnFhket4PGeGwQSd0rrsHjVZVPgoLLPbJ47lKb/Tr5IEGFYbu7X9VqNB3XdnT
+         biXA==
+X-Gm-Message-State: APuU4Z/yCHQHNGj6nJytQn/6NJ1pEGslX8u+1UsZw1vFAhtOvao7buhu
+	6hPS3G3J42+bjxHFmHegiqN7NGF1nERB2ToM8/vOCMkmpUn/pwPp5ev+yzRQIA==
+X-Gm-Gg: AYBFou2NIpni4gJxxg/Dum2DqmF3B8EVjmomOe3OdRS+SzeFgKUUmMUUKK0xTBnTFGE
+	SxHU2niTcXBMiPmM5cJi2t37vrPDr2zJE/kX+nmSIw4BuV5+t4QxSRzA8tpMgyBZ+cRYG5ip1gi
+	KdO+yzs57RHBbPK+WKMIcjwSJvRsCrZK6nCzEkhHFsYeRSGgFOMAUyxzb0Ti6RmsQlRmE6mgK1m
+	gMtxR5kglIGagHiPlMsOQRSYEseBU09gWzBRLTpE1WVt0G7GkN0k+bJwi9l7d8L5zvcqtXb7rUZ
+	EUB74Lql3fyxeMi8AgLJET5iLcRblayWEkXxS6BZ9azGsnAUj47p4MK2r/SKxgzmj3vPOLGaG/X
+	5iGBLEJ1Ui4hP0Kpx5HwBZf+MceaDZ54ZKIaTqMFkddyg5XulhQiAYYjAtMObBYOOq3dRjTy/Nc
+	6apw0Ade/H+2k3D1OgNZEwLXxH2mqPpYw+nIIdSjU7xY/r9jDgCFsREkScpQdh+skHDNivyJlRd
+	YU3XAdZagcvMrnPHoVoP4QvjPepxNBau7U/7/TM6SuWufKzgw/ePqzeKL8L1gyugR7fqTD8x38w
+	Uop4xeVj3/IRRK+TivzBdaFxW6UTzHw7WK9z2juhA0dnJEblzwu24YIr7fWN6MG45X5GguOQjEg
+	qhSkXba8RWDdv4drfJKxRuJrOPmikMGNnt/JRaUHwSl62lgslI2nm+nRtvec/FSGxb9HkV6MEq9
+	tGw+xp
+X-Received: by 2002:a05:6122:1d93:b0:5e9:7458:9bb2 with SMTP id 71dfb90a1353d-5ecc43a4a5cmr1755135e0c.5.1793989068513;
+        Fri, 06 Nov 2026 10:17:48 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ecc64ee921sm1951946e0c.12.2026.11.06.10.17.45
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ecc64ee921sm1951946e0c.12.2026.11.06.10.17.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2026 10:17:46 -0800 (PST)
+        Fri, 06 Nov 2026 10:17:47 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 0/6] Bluetooth: Add support for HDT and EKS
-Date: Fri,  6 Nov 2026 13:17:39 -0500
-Message-ID: <20261106181745.3134593-1-luiz.dentz@gmail.com>
+Subject: [PATCH v8 1/6] Bluetooth: Add initial support for HDT PHY
+Date: Fri,  6 Nov 2026 13:17:40 -0500
+Message-ID: <20261106181745.3134593-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261106181745.3134593-1-luiz.dentz@gmail.com>
+References: <20261106181745.3134593-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,184 +101,1658 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for the LE High Data Throughput (HDT) PHY and the
-Encryption Key Schedule (EKS) introduced in Bluetooth Core 7.0:
+Add support for the LE HDT PHY introduced by High Data Throughput (HDT)
+in Bluetooth 7.0:
 
- - HDT PHY selection for ACL, CIS and BIS, the v2/v3 HCI commands and
-   events that carry the HDT rates, and the LE Set HDT Default
-   Parameters command.
- - ISO sockets take an extended, versioned QoS (struct bt_iso_qos_ext)
-   through the existing BT_ISO_QOS option, carrying the HDT rates per
-   direction; the legacy struct bt_iso_qos keeps working.
- - LE Enable Encryption v2 with the MIC length, Encryption Change v3
-   and Key Refresh Complete v2.
- - L2CAP and BT_SECURITY gain a MIC length requirement; connections
-   whose MIC is too short are refused with the MIC Length Too Short
-   result.
- - EKS opportunistic encryption, enabled with a new MGMT system
-   configuration parameter.
+ - The HDT feature bits (Link Layer feature bits 76-83) and the
+   le_feature() helper to access the FeatureSet pages above page 0,
+   along with hdt_capable() and the per-rate capability checks.
+ - BT_PHY_HDT_* bits for the HDT2, HDT3, HDT4, HDT6 and HDT7.5 rates in
+   each direction, so userspace can select them with BT_PHY, which map
+   to the LE HDT PHY and the rate bits of PHY_Options in LE Set PHY.
+ - LE Read Maximum Data Length v2 and LE Read/Write Suggested Default
+   Data Length v2, used instead of their v1 counterparts on HDT capable
+   controllers so the default data length is set for each PHY. The
+   values given to LE Write Suggested Default Data Length are clamped to
+   the maximum the specification allows.
+ - LE Set CIG Parameters v2, LE CIS Established v3, LE Create BIG v2 and
+   LE Create BIG Complete v2, which carry the HDT rates, MIC length and
+   packet format of a CIS or BIS. The CIS and BIS default to all the HDT
+   rates the controller supports when the HDT PHY is selected.
+ - MGMT_SETTING_HDT to report HDT support to userspace.
 
-This series depends on:
- "Bluetooth: Fix not updating of hdev->commands[] after reset"
-
-Changes in v8:
- - The ISO QoS rates are validated: reserved bits, or rates without
-   BT_ISO_PHY_HDT, are rejected rather than passed to the controller.
-
-Changes in v7:
- - The MIC length of LE Enable Encryption v2 is taken when the command
-   is sent, so channels raising it after it was queued are taken into
-   account, and incoming LE and Enhanced Credit Based connection
-   requests record the MIC length of the listening channel before
-   checking the security.
- - A failed Key Refresh Complete reporting opportunistic encryption is
-   handled as any other failed refresh, disconnecting the link.
-
-Changes in v6:
- - An encryption command that fails without a Command Status is
-   handled where it is sent, aborting the link with
-   hci_abort_conn_sync() without holding hdev->lock, rather than from
-   its completion callback, which could deadlock, also when canceled,
-   and drop the connection twice. LE Start Encryption's Command Status
-   error now clears the pending encryption too.
- - Opportunistic encryption sends its command without that handling,
-   so its failure can't disconnect a link SMP is encrypting.
- - SMP doesn't distribute keys on opportunistic encryption.
- - An Encryption Change failure on an opportunistically encrypted link
-   is handled as for any encrypted link, clearing its encryption flags.
-
-Changes in v5:
- - A CIS bound with BT_ISO_PHY_ANY keeps the GFSK PHYs of the ACL, as
-   HDT isn't part of it, so a deferred CIS setup matches its binding.
- - LE Remote Features Complete clears HDT from the default PHYs, as
-   HDT is a feature of page 1 which it doesn't report.
- - CIS Established v3 takes Max_SDU from its SDU fields rather than
-   Max_PDU.
- - The default data length is only skipped if both its length and
-   time are already at their maximum.
- - Encryption commands that fail without a Command Status clear the
-   pending encryption and disconnect, as a Command Status error does,
-   and are freed with kfree_sensitive() as they carry the key.
- - SMP starts encryption after DHKey Check before adding the LTK, so a
-   failure doesn't remove a previously stored key.
- - Encryption Change v3 reporting opportunistic encryption for a link
-   with a key from pairing disconnects it, as Key Refresh Complete
-   does, and only a failure is taken as the one of an opportunistic
-   encryption being started. A failed key refresh replacing the
-   opportunistic key no longer reports the link as encrypted.
-
-Changes in v4:
- - LE Set CIG Parameters v2 is limited to the CIS that fit in the 255
-   octets of command parameters, and a CIS that would exceed that is
-   refused when it is bound to the CIG.
- - setsockopt(BT_ISO_QOS) on a socket that already has a connection,
-   such as with deferred setup or a PA sync, checks the QoS type there,
-   since connect() or listen() won't.
- - SMP marks the encryption started after DHKey Check as pending, as it
-   does after Random, so it isn't started a second time.
- - A Key Refresh Complete reporting opportunistic encryption, such as
-   one changing the MIC length, keeps the link opportunistic, and
-   disconnects a link with a key from pairing since that would be a
-   downgrade. A key from pairing replacing the opportunistic one is
-   handled as Encryption Change is for an unencrypted link.
- - Restore the lockdep_assert_held() before smp_pairing_in_progress(),
-   which context analysis needs to know conn->hdev->lock is held.
-
-Changes in v3:
- - Opportunistic encryption sets HCI_CONN_ENCRYPT and HCI_CONN_AES_CCM
-   along with a new HCI_CONN_OPP_ENCRYPT flag, and the L2CAP key size
-   check is skipped for it since it has no key from pairing. Pairing
-   over such a link now completes: its Key Refresh Complete clears the
-   flag. A failure, or a command that can't be sent, leaves the link
-   unencrypted instead of disconnecting, and HCI_CONN_ENCRYPT_PEND is
-   no longer used for it so it doesn't block SMP. The MIC length is
-   taken right before the command is sent.
- - Changing TLV 0x0024 while the controller is up updates the
-   Opportunistic Encryption host feature bit.
- - SMP checks the result of hci_le_enable_encrypt().
- - Set CIG Parameters v2 returns the failure of a response that doesn't
-   match the command, and fails the unbound CIS of the CIG it was sent
-   for.
- - CIS Established v3 and Create BIG Complete v2 are only unmasked with
-   CIS and BIS support.
- - BT_PHY rejects HDT6 and HDT7.5 rates the controller doesn't support
-   in that direction, and only reports supported ones.
- - struct bt_iso_qos_ext replaces its rfu bytes with a 16-bit version
-   and a 16-bit type telling whether the unicast or broadcast member is
-   in use, so each can later grow on its own; the union is the last
-   member for that. BT_ISO_QOS_ANY, used for struct bt_iso_qos, leaves
-   the type to connect() or listen(), which fail with -EINVAL on a
-   mismatch. Connections set up by the controller get the version and
-   type, and BT_ISO_HDT_RATE_* name the rates bits.
- - The extended ISO QoS is copied field by field, so padding is zeroed,
-   and the v1 CIS Established event clears the HDT rates.
-
-Changes in v2:
- - Remove the values from drafts of the specification and use the ones
-   from Core 7.0: L2CAP MIC Length Too Short is 0x000C for LE Credit
-   Based and 0x0010 for Enhanced Credit Based, and LE feature page 0
-   bit 59 is no longer checked.
- - A 64-bit MIC is only used when both sides prefer it, so downgrading
-   on re-encryption is no longer an error.
- - The key size of Encryption Change v3 is ignored for LE as the spec
-   requires; hci_change_encrypt() no longer takes it.
- - Rename struct bt_iso_qos_v2 to struct bt_iso_qos_ext with a version
-   field; the length passed to BT_ISO_QOS selects legacy or extended.
-   Convert field by field, which fixes an out-of-bounds copy and an
-   info leak through the legacy struct.
- - HDT rates are little endian and kept per direction.
- - HDT PHY selection is gated on hdt_capable(); mixed LE and HDT PHY
-   masks are accepted; phy_opts is initialized.
- - Create BIG Complete v1/v2 share one bounds-checked handler; Set CIG
-   Parameters v2 response is validated like v1; Create CIS waits for
-   CIS Established v3.
- - Drop the unused LE Set Data Length v2 command and the unhandled
-   Data Length Change v2 event mask bit.
- - EKS: copy the LTK under RCU and encrypt after unlocking, zero-pad
-   the key for v1 and copy key_size bytes for v2, free the command
-   when queueing fails, and handle the Command Status of LE Enable
-   Encryption v2.
- - L2CAP: keep the requested MIC length separate from the negotiated
-   one, take the negotiated one from Encryption Change v3 and Key
-   Refresh Complete v2, propagate the channel MIC length on every LE
-   security path and reject values above 0x02.
- - RFCOMM BT_SECURITY accepts the 2-byte struct and zeroes the struct
-   returned by getsockopt.
- - One hci_le_set_hdt_params_sync() is shared by init and MGMT, and the
-   defaults are resent when changed while the controller is up.
- - Opportunistic encryption requires eks_capable() and its TLV
-   (0x0024) is validated as u8. Encryption Change v3 for it still only
-   clears ENCRYPT_PEND: the key size is 0, so setting ENCRYPT would make
-   the key size check refuse every L2CAP channel.
-
-Luiz Augusto von Dentz (6):
-  Bluetooth: Add initial support for HDT PHY
-  Bluetooth: ISO: Add extended QoS with the HDT rates
-  Bluetooth: Add initial support for EKS
-  Bluetooth: L2CAP: Add MIC length validation for HDT PHY
-  Bluetooth: Add HCI_OP_LE_SET_HDT_DEFAULT_PARAMS support
-  Bluetooth: Add EKS Opportunistic Encryption support
-
- include/net/bluetooth/bluetooth.h | 102 +++++
- include/net/bluetooth/hci.h       | 216 +++++++++-
- include/net/bluetooth/hci_core.h  |  66 ++-
- include/net/bluetooth/hci_sync.h  |  12 +-
- include/net/bluetooth/l2cap.h     |   7 +
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |  18 ++
+ include/net/bluetooth/hci.h       | 178 ++++++++++++++-
+ include/net/bluetooth/hci_core.h  |  29 +++
+ include/net/bluetooth/hci_sync.h  |   5 +-
  include/net/bluetooth/mgmt.h      |   1 +
- net/bluetooth/hci_conn.c          | 279 +++++++-----
- net/bluetooth/hci_core.c          |   4 +
- net/bluetooth/hci_event.c         | 680 +++++++++++++++++++++++++----
- net/bluetooth/hci_sync.c          | 691 +++++++++++++++++++++++++++++-
- net/bluetooth/iso.c               | 264 +++++++++++-
- net/bluetooth/l2cap_core.c        |  60 ++-
- net/bluetooth/l2cap_sock.c        |  23 +-
+ net/bluetooth/hci_conn.c          | 227 ++++++++++++-------
+ net/bluetooth/hci_event.c         | 363 ++++++++++++++++++++++++++++--
+ net/bluetooth/hci_sync.c          | 358 ++++++++++++++++++++++++++++-
+ net/bluetooth/iso.c               |   2 +-
  net/bluetooth/mgmt.c              |   6 +
- net/bluetooth/mgmt_config.c       |  56 +++
- net/bluetooth/rfcomm/sock.c       |  13 +-
- net/bluetooth/smp.c               |  96 ++++-
- net/bluetooth/smp.h               |   2 +
- 18 files changed, 2323 insertions(+), 255 deletions(-)
+ 10 files changed, 1075 insertions(+), 112 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index cd9189244566..fbedd1ebd051 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -142,6 +142,16 @@ struct bt_voice {
+ #define BT_PHY_LE_2M_RX		BIT(12)
+ #define BT_PHY_LE_CODED_TX	BIT(13)
+ #define BT_PHY_LE_CODED_RX	BIT(14)
++#define BT_PHY_HDT_2M_TX	BIT(15)
++#define BT_PHY_HDT_2M_RX	BIT(16)
++#define BT_PHY_HDT_3M_TX	BIT(17)
++#define BT_PHY_HDT_3M_RX	BIT(18)
++#define BT_PHY_HDT_4M_TX	BIT(19)
++#define BT_PHY_HDT_4M_RX	BIT(20)
++#define BT_PHY_HDT_6M_TX	BIT(21)
++#define BT_PHY_HDT_6M_RX	BIT(22)
++#define BT_PHY_HDT_7_5M_TX	BIT(23)
++#define BT_PHY_HDT_7_5M_RX	BIT(24)
+ 
+ #define BT_PHY_BREDR_MASK	(BT_PHY_BR_1M_1SLOT | BT_PHY_BR_1M_3SLOT | \
+ 				 BT_PHY_BR_1M_5SLOT | BT_PHY_EDR_2M_1SLOT | \
+@@ -151,6 +161,13 @@ struct bt_voice {
+ #define BT_PHY_LE_MASK		(BT_PHY_LE_1M_TX | BT_PHY_LE_1M_RX | \
+ 				 BT_PHY_LE_2M_TX | BT_PHY_LE_2M_RX | \
+ 				 BT_PHY_LE_CODED_TX | BT_PHY_LE_CODED_RX)
++#define BT_PHY_HDT_TX_MASK	(BT_PHY_HDT_2M_TX | BT_PHY_HDT_3M_TX | \
++				 BT_PHY_HDT_4M_TX | BT_PHY_HDT_6M_TX | \
++				 BT_PHY_HDT_7_5M_TX)
++#define BT_PHY_HDT_RX_MASK	(BT_PHY_HDT_2M_RX | BT_PHY_HDT_3M_RX | \
++				 BT_PHY_HDT_4M_RX | BT_PHY_HDT_6M_RX | \
++				 BT_PHY_HDT_7_5M_RX)
++#define BT_PHY_HDT_MASK		(BT_PHY_HDT_TX_MASK | BT_PHY_HDT_RX_MASK)
+ 
+ #define BT_MODE			15
+ 
+@@ -221,6 +238,7 @@ struct bt_iso_qos {
+ #define BT_ISO_PHY_1M		BIT(0)
+ #define BT_ISO_PHY_2M		BIT(1)
+ #define BT_ISO_PHY_CODED	BIT(2)
++#define BT_ISO_PHY_HDT		BIT(4)
+ #define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
+ 				 BT_ISO_PHY_CODED)
+ 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1c992e87534d..e60686cf978d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -659,6 +659,16 @@ enum {
+ #define HCI_LE_SCI			0x01	/* byte 9 - Shorter Connection Intervals */
+ #define HCI_LE_SCI_HOST			0x02	/* byte 9 - Shorter Connection Intervals (Host) */
+ 
++/* HDT features - Page 1 */
++#define HCI_LE_EKS_FEATURE		BIT(4)	/* Byte 1 */
++#define HCI_LE_HDT_FEATURE		BIT(5)
++#define HCI_LE_HDT_6_RX_FEATURE		BIT(6)
++#define HCI_LE_HDT_6_TX_FEATURE		BIT(7)
++#define HCI_LE_HDT_7_5_RX_FEATURE	BIT(0)	/* Byte 2 */
++#define HCI_LE_HDT_7_5_TX_FEATURE	BIT(1)
++#define HCI_LE_HDT_PF_1			BIT(2)
++#define HCI_LE_HDT_LQF_FEATURE		BIT(3)
++
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+ #define HCI_CM_HOLD	0x0001
+@@ -1891,9 +1901,10 @@ struct hci_cp_le_set_default_phy {
+ 	__u8    rx_phys;
+ } __packed;
+ 
+-#define HCI_LE_SET_PHY_1M		0x01
+-#define HCI_LE_SET_PHY_2M		0x02
+-#define HCI_LE_SET_PHY_CODED		0x04
++#define HCI_LE_SET_PHY_1M		BIT(0)
++#define HCI_LE_SET_PHY_2M		BIT(1)
++#define HCI_LE_SET_PHY_CODED		BIT(2)
++#define HCI_LE_SET_PHY_HDT		BIT(4)
+ 
+ #define HCI_OP_LE_SET_PHY		0x2032
+ struct hci_cp_le_set_phy {
+@@ -2216,7 +2227,7 @@ struct hci_bis {
+ 	__le16  sdu;
+ 	__le16  latency;
+ 	__u8    rtn;
+-	__u8    phy;
++	__u8    phys;
+ 	__u8    packing;
+ 	__u8    framing;
+ 	__u8    encryption;
+@@ -2535,6 +2546,113 @@ struct hci_rp_le_read_conn_interval {
+ 	struct hci_le_conn_interval_group grps[];
+ } __packed;
+ 
++#define HCI_OP_LE_WRITE_DEF_DATA_LEN_V2		0x20b2
++struct hci_cp_le_write_def_data_len_v2 {
++	__le16	tx_len;
++	__le16	tx_time;
++	__u8	phys;
++} __packed;
++
++#define HCI_OP_LE_READ_DEF_DATA_LEN_V2		0x20b1
++struct hci_cp_le_read_def_data_len_v2 {
++	__u8	phys;
++} __packed;
++
++struct hci_rp_le_read_def_data_len_v2 {
++	__u8	status;
++	__le16	tx_len;
++	__le16	tx_time;
++} __packed;
++
++#define HCI_OP_LE_READ_MAX_DATA_LEN_V2		0x20b0
++struct hci_cp_le_read_max_data_len_v2 {
++	__u8    phy;
++} __packed;
++
++struct hci_rp_le_read_max_data_len_v2 {
++	__u8    status;
++	__le16  tx_len;
++	__le16  tx_time;
++	__le16  rx_len;
++	__le16  rx_time;
++	__u8    tx_win;
++	__u8    rx_win;
++	__le16  rx_packet;
++} __packed;
++
++/* HDT_Rates bits of the CIS and BIS parameters */
++#define HCI_HDT_RATE_2M		BIT(0)
++#define HCI_HDT_RATE_3M		BIT(1)
++#define HCI_HDT_RATE_4M		BIT(2)
++#define HCI_HDT_RATE_6M		BIT(3)
++#define HCI_HDT_RATE_7_5M	BIT(4)
++
++#define HCI_OP_LE_SET_CIG_PARAMS_V2		0x20b3
++struct hci_cis_params_v2 {
++	__u8    cis_id;
++	__le16  c_sdu;
++	__le16  p_sdu;
++	__u8    c_phys;
++	__u8    p_phys;
++	__u8    c_rtn;
++	__u8    p_rtn;
++	__u8    c_coded_rates;
++	__u8    p_coded_rates;
++	__le16  c_hdt_rates;
++	__le16  p_hdt_rates;
++	__u8    mic_len;
++	__u8    format;
++} __packed;
++
++struct hci_cp_le_set_cig_params_v2 {
++	__u8    cig_id;
++	__u8    c_interval[3];
++	__u8    p_interval[3];
++	__u8    sca;
++	__u8    packing;
++	__u8    framing;
++	__le16   c_latency;
++	__le16   p_latency;
++	__u8    num_cis;
++	struct hci_cis_params_v2 cis[] __counted_by(num_cis);
++} __packed;
++
++/* The CIS that fit in the 255 octets of command parameters */
++#define HCI_LE_CIG_PARAMS_V2_MAX_CIS \
++	((U8_MAX - sizeof(struct hci_cp_le_set_cig_params_v2)) / \
++	 sizeof(struct hci_cis_params_v2))
++
++struct hci_rp_le_set_cig_params_v2 {
++	__u8    status;
++	__u8    cig_id;
++	__u8    num_handles;
++	__le16  handle[];
++} __packed;
++
++#define HCI_OP_LE_CREATE_BIG_V2			0x20b6
++struct hci_bis_v2 {
++	__u8    sdu_interval[3];
++	__le16  sdu;
++	__le16  latency;
++	__u8    rtn;
++	__u8    phys;
++	__u8    packing;
++	__u8    framing;
++	__u8    encryption;
++	__u8    bcode[16];
++	__u8    coded_rates;
++	__le16  hdt_rates;
++	__u8    mic_len;
++	__u8    format;
++} __packed;
++
++struct hci_cp_le_create_big_v2 {
++	__u8    handle;
++	__u8    adv_handle;
++	__u8    num_bis;
++	struct hci_bis_v2 bis;
++} __packed;
++
+ /* ---- HCI Events ---- */
+ struct hci_ev_status {
+ 	__u8    status;
+@@ -3360,6 +3478,58 @@ struct hci_evt_le_conn_rate_change {
+ 	__le16	supv_timeout;
+ } __packed;
+ 
++#define HCI_EVT_LE_CIS_ESTABLISHED_V3			0x3a
++struct hci_evt_le_cis_established_v3 {
++	__u8    status;
++	__le16  handle;
++	__u8    cig_sync_delay[3];
++	__u8    cis_sync_delay[3];
++	__u8    c_latency[3];
++	__u8    p_latency[3];
++	__u8    c_phy;
++	__u8    p_phy;
++	__u8    nse;
++	__u8    c_bn;
++	__u8    p_bn;
++	__u8    c_ft;
++	__u8    p_ft;
++	__le16  c_mtu;
++	__le16  p_mtu;
++	__le16  interval;
++	__u8    sub_interval[3];
++	__le16  c_sdu;
++	__le16  p_sdu;
++	__u8    c_sdu_interval[3];
++	__u8    p_sdu_interval[3];
++	__u8    framing;
++	__le16  c_rates;
++	__le16  p_rates;
++	__u8    config_id;
++	__u8    group_id;
++	__u8    encryption;
++	__u8    mic_len;
++} __packed;
++
++#define HCI_EVT_LE_CREATE_BIG_COMPLETE_V2	0x3b
++struct hci_evt_le_create_big_complete_v2 {
++	__u8    status;
++	__u8    handle;
++	__u8    sync_delay[3];
++	__u8    latency[3];
++	__u8    phy;
++	__u8    nse;
++	__u8    bn;
++	__u8    pto;
++	__u8    irc;
++	__le16  max_pdu;
++	__le16  interval;
++	__le16  rates;
++	__u8    encryption;
++	__u8    mic_len;
++	__u8    num_bis;
++	__le16  bis_handle[];
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
+ 
+ /* Internal events generated by Bluetooth stack */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e33b158086fd..689e2a1266b4 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -424,6 +424,15 @@ struct hci_dev {
+ 	__u16		le_max_tx_time;
+ 	__u16		le_max_rx_len;
+ 	__u16		le_max_rx_time;
++	__u16		hdt_def_tx_len;
++	__u16		hdt_def_tx_time;
++	__u16		hdt_max_tx_len;
++	__u16		hdt_max_tx_time;
++	__u16		hdt_max_rx_len;
++	__u16		hdt_max_rx_time;
++	__u8		hdt_max_tx_win;
++	__u8		hdt_max_rx_win;
++	__u16		hdt_max_rx_packet;
+ 	__u8		le_max_key_size;
+ 	__u8		le_min_key_size;
+ 	__u16		discov_interleaved_timeout;
+@@ -784,6 +793,7 @@ struct hci_conn {
+ 	__u8		le_rx_def_phys;
+ 	__u8		le_tx_phy;
+ 	__u8		le_rx_phy;
++	__u16		le_phy_opts;
+ 	__s8		rssi;
+ 	__s8		tx_power;
+ 	__s8		max_tx_power;
+@@ -2148,6 +2158,25 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ 	(past_sender_enabled(dev) || past_receiver_enabled(dev))
+ #define ll_ext_feature_capable(dev) \
+ 	((dev)->le_features[7] & HCI_LE_LL_EXT_FEATURE)
++#define le_feature(dev, page, byte) \
++	(page ? ((dev)->le_features[(page - 1) * 24 + 8 + byte]) : \
++	((dev)->le_features[byte]))
++#define hdt_capable(dev) \
++	(le_feature(dev, 1, 1) & HCI_LE_HDT_FEATURE)
++#define le_set_cig_params_v2_capable(dev) \
++	(hdt_capable(dev) && ((dev)->commands[51] & BIT(0)))
++#define hdt_enabled(dev) \
++	(le_enabled(dev) && hdt_capable(dev))
++#define hdt_6_rx_capable(dev) \
++	(le_feature(dev, 1, 1) & HCI_LE_HDT_6_RX_FEATURE)
++#define hdt_6_tx_capable(dev) \
++	(le_feature(dev, 1, 1) & HCI_LE_HDT_6_TX_FEATURE)
++#define hdt_7_5_rx_capable(dev) \
++	(le_feature(dev, 1, 2) & HCI_LE_HDT_7_5_RX_FEATURE)
++#define hdt_7_5_tx_capable(dev) \
++	(le_feature(dev, 1, 2) & HCI_LE_HDT_7_5_TX_FEATURE)
++#define hdt_pf1_capable(dev) \
++	(le_feature(dev, 1, 2) & HCI_LE_HDT_PF_1)
+ 
+ /* Channel sounding support */
+ #define le_cs_capable(dev) \
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 59cb918d1405..a24f6a84a447 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -193,4 +193,7 @@ int hci_past_sync(struct hci_conn *conn, struct hci_conn *le);
+ int hci_le_read_remote_features(struct hci_conn *conn);
+ 
+ int hci_acl_change_pkt_type(struct hci_conn *conn, u16 pkt_type);
+-int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys);
++int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys, u16 phy_opts);
++int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id);
++int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos *qos,
++			   u8 num_bis);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index b02e915bb44c..17bdd6345d19 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -119,6 +119,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_PAST_SENDER	BIT(23)
+ #define MGMT_SETTING_PAST_RECEIVER	BIT(24)
+ #define MGMT_SETTING_SCI		BIT(25)
++#define MGMT_SETTING_HDT		BIT(26)
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b007f623b2ec..b0584b0f6abd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1941,11 +1941,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+-	struct hci_cp_le_create_big cp;
+ 	struct iso_list_data data;
+ 
+-	memset(&cp, 0, sizeof(cp));
+-
+ 	data.big = qos->bcast.big;
+ 	data.bis = qos->bcast.bis;
+ 	data.count = 0;
+@@ -1954,84 +1951,14 @@ static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	hci_conn_hash_list_state(hdev, bis_list, BIS_LINK,
+ 				 BT_BOUND, &data);
+ 
+-	cp.handle = qos->bcast.big;
+-	cp.adv_handle = qos->bcast.bis;
+-	cp.num_bis  = data.count;
+-	hci_cpu_to_le24(qos->bcast.out.interval, cp.bis.sdu_interval);
+-	cp.bis.sdu = cpu_to_le16(qos->bcast.out.sdu);
+-	cp.bis.latency =  cpu_to_le16(qos->bcast.out.latency);
+-	cp.bis.rtn  = qos->bcast.out.rtn;
+-	cp.bis.phy  = qos->bcast.out.phys;
+-	cp.bis.packing = qos->bcast.packing;
+-	cp.bis.framing = qos->bcast.framing;
+-	cp.bis.encryption = qos->bcast.encryption;
+-	memcpy(cp.bis.bcode, qos->bcast.bcode, sizeof(cp.bis.bcode));
+-
+-	return hci_send_cmd(hdev, HCI_OP_LE_CREATE_BIG, sizeof(cp), &cp);
++	return hci_le_create_big_sync(conn, qos, data.count);
+ }
+ 
+ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
+ {
+-	DEFINE_FLEX(struct hci_cp_le_set_cig_params, pdu, cis, num_cis, 0x1f);
+ 	u8 cig_id = PTR_UINT(data);
+-	struct hci_conn *conn;
+-	struct bt_iso_qos *qos;
+-	u8 aux_num_cis = 0;
+-	u8 cis_id;
+ 
+-	hci_dev_lock(hdev);
+-
+-	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
+-	if (!conn) {
+-		hci_dev_unlock(hdev);
+-		return 0;
+-	}
+-
+-	qos = &conn->iso_qos;
+-	pdu->cig_id = cig_id;
+-	hci_cpu_to_le24(qos->ucast.out.interval, pdu->c_interval);
+-	hci_cpu_to_le24(qos->ucast.in.interval, pdu->p_interval);
+-	pdu->sca = qos->ucast.sca;
+-	pdu->packing = qos->ucast.packing;
+-	pdu->framing = qos->ucast.framing;
+-	pdu->c_latency = cpu_to_le16(qos->ucast.out.latency);
+-	pdu->p_latency = cpu_to_le16(qos->ucast.in.latency);
+-
+-	/* Reprogram all CIS(s) with the same CIG, valid range are:
+-	 * num_cis: 0x00 to 0x1F
+-	 * cis_id: 0x00 to 0xEF
+-	 */
+-	for (cis_id = 0x00; cis_id < 0xf0 &&
+-	     aux_num_cis < pdu->num_cis; cis_id++) {
+-		struct hci_cis_params *cis;
+-
+-		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, cig_id, cis_id);
+-		if (!conn)
+-			continue;
+-
+-		qos = &conn->iso_qos;
+-
+-		cis = &pdu->cis[aux_num_cis++];
+-		cis->cis_id = cis_id;
+-		cis->c_sdu  = cpu_to_le16(conn->iso_qos.ucast.out.sdu);
+-		cis->p_sdu  = cpu_to_le16(conn->iso_qos.ucast.in.sdu);
+-		cis->c_phys = qos->ucast.out.phys ? qos->ucast.out.phys :
+-			      qos->ucast.in.phys;
+-		cis->p_phys = qos->ucast.in.phys ? qos->ucast.in.phys :
+-			      qos->ucast.out.phys;
+-		cis->c_rtn  = qos->ucast.out.rtn;
+-		cis->p_rtn  = qos->ucast.in.rtn;
+-	}
+-	pdu->num_cis = aux_num_cis;
+-
+-	hci_dev_unlock(hdev);
+-
+-	if (!pdu->num_cis)
+-		return 0;
+-
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_CIG_PARAMS,
+-				     struct_size(pdu, cis, pdu->num_cis),
+-				     pdu, HCI_CMD_TIMEOUT);
++	return hci_le_set_cig_params_sync(hdev, cig_id);
+ }
+ 
+ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+@@ -2064,6 +1991,20 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 		qos->ucast.cig = data.cig;
+ 	}
+ 
++	/* LE Set CIG Parameters v2 only fits so many CIS in a CIG */
++	if (le_set_cig_params_v2_capable(hdev)) {
++		data.cig = qos->ucast.cig;
++		data.count = 0;
++		hci_conn_hash_list_state(hdev, find_cis, CIS_LINK, BT_BOUND,
++					 &data);
++		hci_conn_hash_list_state(hdev, find_cis, CIS_LINK, BT_CONNECT,
++					 &data);
++		hci_conn_hash_list_state(hdev, find_cis, CIS_LINK,
++					 BT_CONNECTED, &data);
++		if (data.count >= HCI_LE_CIG_PARAMS_V2_MAX_CIS)
++			return false;
++	}
++
+ 	if (qos->ucast.cis != BT_ISO_QOS_CIS_UNSET) {
+ 		if (hci_conn_hash_lookup_cis(hdev, NULL, 0, qos->ucast.cig,
+ 					     qos->ucast.cis))
+@@ -2245,9 +2186,11 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
+ 	if (!qos->sdu && qos->phys)
+ 		qos->sdu = conn->mtu;
+ 
+-	/* Use the same PHY as ACL if set to any */
++	/* Use the same PHY as ACL if set to any, which doesn't include HDT,
++	 * so the QoS stays the same as when it was bound.
++	 */
+ 	if (qos->phys == BT_ISO_PHY_ANY)
+-		qos->phys = phys;
++		qos->phys = (phys & BT_ISO_PHY_ANY) ? : BT_ISO_PHY_ANY;
+ 
+ 	/* Use LE ACL connection interval if not set */
+ 	if (!qos->interval)
+@@ -3122,6 +3065,78 @@ u32 hci_conn_get_phy(struct hci_conn *conn)
+ 		if (conn->le_rx_def_phys & HCI_LE_SET_PHY_CODED)
+ 			phys |= BT_PHY_LE_CODED_RX;
+ 
++		if (conn->le_tx_def_phys & HCI_LE_SET_PHY_HDT) {
++			/* If le_phy_opts is set, it means user has
++			 * specified specific PHYs to use rather than the
++			 * default ones. PHY_Options is common to both
++			 * directions, so only the rates this direction
++			 * supports are reported.
++			 */
++			if (conn->le_phy_opts) {
++				if (conn->le_phy_opts & BIT(2))
++					phys |= BT_PHY_HDT_2M_TX;
++
++				if (conn->le_phy_opts & BIT(3))
++					phys |= BT_PHY_HDT_3M_TX;
++
++				if (conn->le_phy_opts & BIT(4))
++					phys |= BT_PHY_HDT_4M_TX;
++
++				if (conn->le_phy_opts & BIT(5) &&
++				    hdt_6_tx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_6M_TX;
++
++				if (conn->le_phy_opts & BIT(6) &&
++				    hdt_7_5_tx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_7_5M_TX;
++			} else {
++				phys |= BT_PHY_HDT_2M_TX;
++				phys |= BT_PHY_HDT_3M_TX;
++				phys |= BT_PHY_HDT_4M_TX;
++
++				if (hdt_6_tx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_6M_TX;
++
++				if (hdt_7_5_tx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_7_5M_TX;
++			}
++		}
++
++		if (conn->le_rx_def_phys & HCI_LE_SET_PHY_HDT) {
++			/* If le_phy_opts is set, it means user has
++			 * specified specific PHYs to use rather than the
++			 * default ones.
++			 */
++			if (conn->le_phy_opts) {
++				if (conn->le_phy_opts & BIT(2))
++					phys |= BT_PHY_HDT_2M_RX;
++
++				if (conn->le_phy_opts & BIT(3))
++					phys |= BT_PHY_HDT_3M_RX;
++
++				if (conn->le_phy_opts & BIT(4))
++					phys |= BT_PHY_HDT_4M_RX;
++
++				if (conn->le_phy_opts & BIT(5) &&
++				    hdt_6_rx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_6M_RX;
++
++				if (conn->le_phy_opts & BIT(6) &&
++				    hdt_7_5_rx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_7_5M_RX;
++			} else {
++				phys |= BT_PHY_HDT_2M_RX;
++				phys |= BT_PHY_HDT_3M_RX;
++				phys |= BT_PHY_HDT_4M_RX;
++
++				if (hdt_6_rx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_6M_RX;
++
++				if (hdt_7_5_rx_capable(conn->hdev))
++					phys |= BT_PHY_HDT_7_5M_RX;
++			}
++		}
++
+ 		break;
+ 	}
+ 
+@@ -3175,7 +3190,7 @@ static u16 bt_phy_pkt_type(struct hci_conn *conn, u32 phys)
+ 	return pkt_type;
+ }
+ 
+-static int bt_phy_le_phy(u32 phys, u8 *tx_phys, u8 *rx_phys)
++static int bt_phy_le_phy(u32 phys, u8 *tx_phys, u8 *rx_phys, u16 *phy_opts)
+ {
+ 	if (!tx_phys || !rx_phys)
+ 		return -EINVAL;
+@@ -3201,12 +3216,47 @@ static int bt_phy_le_phy(u32 phys, u8 *tx_phys, u8 *rx_phys)
+ 	if (phys & BT_PHY_LE_CODED_RX)
+ 		*rx_phys |= HCI_LE_SET_PHY_CODED;
+ 
++	if (phys & BT_PHY_HDT_2M_TX || phys & BT_PHY_HDT_3M_TX ||
++	    phys & BT_PHY_HDT_4M_TX || phys & BT_PHY_HDT_6M_TX ||
++	    phys & BT_PHY_HDT_7_5M_TX) {
++		*tx_phys |= HCI_LE_SET_PHY_HDT;
++
++		if (phys & BT_PHY_HDT_2M_TX)
++			*phy_opts |= BIT(2);
++		if (phys & BT_PHY_HDT_3M_TX)
++			*phy_opts |= BIT(3);
++		if (phys & BT_PHY_HDT_4M_TX)
++			*phy_opts |= BIT(4);
++		if (phys & BT_PHY_HDT_6M_TX)
++			*phy_opts |= BIT(5);
++		if (phys & BT_PHY_HDT_7_5M_TX)
++			*phy_opts |= BIT(6);
++	}
++
++	if (phys & BT_PHY_HDT_2M_RX || phys & BT_PHY_HDT_3M_RX ||
++	    phys & BT_PHY_HDT_4M_RX || phys & BT_PHY_HDT_6M_RX ||
++	    phys & BT_PHY_HDT_7_5M_RX) {
++		*rx_phys |= HCI_LE_SET_PHY_HDT;
++
++		if (phys & BT_PHY_HDT_2M_RX)
++			*phy_opts |= BIT(2);
++		if (phys & BT_PHY_HDT_3M_RX)
++			*phy_opts |= BIT(3);
++		if (phys & BT_PHY_HDT_4M_RX)
++			*phy_opts |= BIT(4);
++		if (phys & BT_PHY_HDT_6M_RX)
++			*phy_opts |= BIT(5);
++		if (phys & BT_PHY_HDT_7_5M_RX)
++			*phy_opts |= BIT(6);
++	}
++
+ 	return 0;
+ }
+ 
+ int hci_conn_set_phy(struct hci_conn *conn, u32 phys)
+ {
+ 	u8 tx_phys, rx_phys;
++	u16 phy_opts = 0;
+ 
+ 	switch (conn->type) {
+ 	case SCO_LINK:
+@@ -3221,13 +3271,28 @@ int hci_conn_set_phy(struct hci_conn *conn, u32 phys)
+ 					       bt_phy_pkt_type(conn, phys));
+ 	case LE_LINK:
+ 		/* Only allow setting LE PHYs if link type is LE */
+-		if (phys & ~BT_PHY_LE_MASK)
++		if (phys & ~(BT_PHY_LE_MASK | BT_PHY_HDT_MASK))
+ 			return -EINVAL;
+ 
+-		if (bt_phy_le_phy(phys, &tx_phys, &rx_phys))
++		/* HDT PHYs can only be selected if the controller supports
++		 * them.
++		 */
++		if (phys & BT_PHY_HDT_MASK && !hdt_capable(conn->hdev))
+ 			return -EINVAL;
+ 
+-		return hci_le_set_phy(conn, tx_phys, rx_phys);
++		/* HDT6 and HDT7.5 are optional in each direction */
++		if ((phys & BT_PHY_HDT_6M_TX && !hdt_6_tx_capable(conn->hdev)) ||
++		    (phys & BT_PHY_HDT_6M_RX && !hdt_6_rx_capable(conn->hdev)) ||
++		    (phys & BT_PHY_HDT_7_5M_TX &&
++		     !hdt_7_5_tx_capable(conn->hdev)) ||
++		    (phys & BT_PHY_HDT_7_5M_RX &&
++		     !hdt_7_5_rx_capable(conn->hdev)))
++			return -EINVAL;
++
++		if (bt_phy_le_phy(phys, &tx_phys, &rx_phys, &phy_opts))
++			return -EINVAL;
++
++		return hci_le_set_phy(conn, tx_phys, rx_phys, phy_opts);
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f0ce124bb12b..cdf010a2c37f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2995,6 +2995,7 @@ static void hci_cs_le_set_phy(struct hci_dev *hdev, u8 status)
+ 	if (conn) {
+ 		conn->le_tx_def_phys = cp->tx_phys;
+ 		conn->le_rx_def_phys = cp->rx_phys;
++		conn->le_phy_opts = __le16_to_cpu(cp->phy_opts);
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+@@ -3942,6 +3943,35 @@ static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
+ 	rcu_read_unlock();
+ }
+ 
++static u8 hci_cc_le_read_def_data_len_v2(struct hci_dev *hdev, void *data,
++					 struct sk_buff *skb)
++{
++	struct hci_rp_le_read_def_data_len_v2 *rp = data;
++	struct hci_cp_le_read_def_data_len_v2 *cp;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_READ_DEF_DATA_LEN_V2);
++	if (!cp)
++		return rp->status;
++
++	switch (cp->phys) {
++	case 0x00: /* All GFSK PHYs */
++		hdev->le_def_tx_len = le16_to_cpu(rp->tx_len);
++		hdev->le_def_tx_time = le16_to_cpu(rp->tx_time);
++		break;
++	case 0x01: /* HDT PHY */
++		hdev->hdt_def_tx_len = le16_to_cpu(rp->tx_len);
++		hdev->hdt_def_tx_time = le16_to_cpu(rp->tx_time);
++		break;
++	}
++
++	return rp->status;
++}
++
+ static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
+ 					struct sk_buff *skb)
+ {
+@@ -3969,6 +3999,78 @@ static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static u8 hci_cc_le_read_max_data_len_v2(struct hci_dev *hdev, void *data,
++					 struct sk_buff *skb)
++{
++	struct hci_rp_le_read_max_data_len_v2 *rp = data;
++	struct hci_cp_le_read_max_data_len_v2 *cp;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_READ_MAX_DATA_LEN_V2);
++	if (!cp)
++		return rp->status;
++
++	switch (cp->phy) {
++	case 0x00:
++	case 0x01:
++	case 0x02:
++	case 0x03:
++		hdev->le_max_tx_len = le16_to_cpu(rp->tx_len);
++		hdev->le_max_tx_time = le16_to_cpu(rp->tx_time);
++		hdev->le_max_rx_len = le16_to_cpu(rp->rx_len);
++		hdev->le_max_rx_time = le16_to_cpu(rp->rx_time);
++		break;
++	case 0x05:
++		hdev->hdt_max_tx_len = le16_to_cpu(rp->tx_len);
++		hdev->hdt_max_tx_time = le16_to_cpu(rp->tx_time);
++		hdev->hdt_max_rx_len = le16_to_cpu(rp->rx_len);
++		hdev->hdt_max_rx_time = le16_to_cpu(rp->rx_time);
++		hdev->hdt_max_tx_win = rp->tx_win;
++		hdev->hdt_max_rx_win = rp->rx_win;
++		hdev->hdt_max_rx_packet = le16_to_cpu(rp->rx_packet);
++		break;
++	}
++
++	return rp->status;
++}
++
++static u8 hci_cc_le_write_def_data_len_v2(struct hci_dev *hdev, void *data,
++					  struct sk_buff *skb)
++{
++	struct hci_cp_le_write_def_data_len_v2 *sent;
++	struct hci_ev_status *rp = data;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_WRITE_DEF_DATA_LEN_V2);
++	if (!sent)
++		return rp->status;
++
++	hci_dev_lock(hdev);
++
++	switch (sent->phys) {
++	case 0x00:
++		hdev->le_def_tx_len = le16_to_cpu(sent->tx_len);
++		hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);
++		break;
++	case 0x01:
++		hdev->hdt_def_tx_len = le16_to_cpu(sent->tx_len);
++		hdev->hdt_def_tx_time = le16_to_cpu(sent->tx_time);
++		break;
++	}
++
++	hci_dev_unlock(hdev);
++
++	return rp->status;
++}
++
+ static void hci_unbound_cis_failed(struct hci_dev *hdev, u8 cig, u8 status)
+ {
+ 	struct hci_conn *conn, *tmp;
+@@ -4121,6 +4223,81 @@ static u8 hci_cc_le_read_all_local_features(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static u8 hci_cc_le_set_cig_params_v2(struct hci_dev *hdev, void *data,
++				      struct sk_buff *skb)
++{
++	struct hci_rp_le_set_cig_params_v2 *rp = data;
++	struct hci_cp_le_set_cig_params_v2 *cp;
++	struct hci_conn *conn;
++	u8 status = rp->status;
++	bool pending = false;
++	size_t len;
++	int i;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	cp = hci_sent_cmd_data_len(hdev, HCI_OP_LE_SET_CIG_PARAMS_V2, &len);
++	if (!rp->status &&
++	    (!cp || len < sizeof(*cp) ||
++	     len < struct_size(cp, cis, cp->num_cis) ||
++	     rp->num_handles != cp->num_cis ||
++	     rp->cig_id != cp->cig_id ||
++	     skb->len < array_size(rp->num_handles, sizeof(*rp->handle)))) {
++		bt_dev_err(hdev,
++			   "unexpected Set CIG Parameters v2 response data");
++		status = HCI_ERROR_UNSPECIFIED;
++	}
++
++	hci_dev_lock(hdev);
++
++	/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E page 2554
++	 *
++	 * If the Status return parameter is non-zero, then the state of the CIG
++	 * and its CIS configurations shall not be changed by the command. If
++	 * the CIG did not already exist, it shall not be created.
++	 */
++	if (status) {
++		/* Keep current configuration, fail only the unbound CIS of the
++		 * CIG the command was sent for.
++		 */
++		hci_unbound_cis_failed(hdev, cp && len >= sizeof(*cp) ?
++				       cp->cig_id : rp->cig_id, status);
++		goto unlock;
++	}
++
++	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2553
++	 *
++	 * If the Status return parameter is zero, then the Controller shall
++	 * set the Connection_Handle arrayed return parameter to the connection
++	 * handle(s) corresponding to the CIS configurations specified in
++	 * the CIS_IDs command parameter, in the same order.
++	 */
++	for (i = 0; i < rp->num_handles; ++i) {
++		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, rp->cig_id,
++						cp->cis[i].cis_id);
++		if (!conn || !bacmp(&conn->dst, BDADDR_ANY))
++			continue;
++
++		if (conn->state != BT_BOUND && conn->state != BT_CONNECT)
++			continue;
++
++		if (hci_conn_set_handle(conn, __le16_to_cpu(rp->handle[i])))
++			continue;
++
++		if (conn->state == BT_CONNECT)
++			pending = true;
++	}
++
++unlock:
++	if (pending)
++		hci_le_create_cis_pending(hdev);
++
++	hci_dev_unlock(hdev);
++
++	/* A response that doesn't match the command fails it */
++	return status;
++}
++
+ static void hci_cs_le_create_big(struct hci_dev *hdev, u8 status)
+ {
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
+@@ -4409,8 +4586,14 @@ static const struct hci_cc {
+ 	HCI_CC(HCI_OP_LE_READ_TRANSMIT_POWER, hci_cc_le_read_transmit_power,
+ 	       sizeof(struct hci_rp_le_read_transmit_power)),
+ 	HCI_CC_STATUS(HCI_OP_LE_SET_PRIVACY_MODE, hci_cc_le_set_privacy_mode),
++	HCI_CC(HCI_OP_LE_READ_DEF_DATA_LEN_V2, hci_cc_le_read_def_data_len_v2,
++	       sizeof(struct hci_rp_le_read_def_data_len_v2)),
+ 	HCI_CC(HCI_OP_LE_READ_BUFFER_SIZE_V2, hci_cc_le_read_buffer_size_v2,
+ 	       sizeof(struct hci_rp_le_read_buffer_size_v2)),
++	HCI_CC(HCI_OP_LE_READ_MAX_DATA_LEN_V2, hci_cc_le_read_max_data_len_v2,
++	       sizeof(struct hci_rp_le_read_max_data_len_v2)),
++	HCI_CC_STATUS(HCI_OP_LE_WRITE_DEF_DATA_LEN_V2,
++		      hci_cc_le_write_def_data_len_v2),
+ 	HCI_CC_VL(HCI_OP_LE_SET_CIG_PARAMS, hci_cc_le_set_cig_params,
+ 		  sizeof(struct hci_rp_le_set_cig_params), HCI_MAX_CC_PLEN),
+ 	HCI_CC(HCI_OP_LE_SETUP_ISO_PATH, hci_cc_le_setup_iso_path,
+@@ -4418,6 +4601,9 @@ static const struct hci_cc {
+ 	HCI_CC(HCI_OP_LE_READ_ALL_LOCAL_FEATURES,
+ 	       hci_cc_le_read_all_local_features,
+ 	       sizeof(struct hci_rp_le_read_all_local_features)),
++	HCI_CC_VL(HCI_OP_LE_SET_CIG_PARAMS_V2, hci_cc_le_set_cig_params_v2,
++		  sizeof(struct hci_rp_le_set_cig_params_v2),
++		  HCI_MAX_CC_PLEN),
+ };
+ 
+ static u8 hci_cc_func(struct hci_dev *hdev, const struct hci_cc *cc,
+@@ -6945,6 +7131,12 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
+ 				conn->le_tx_def_phys &= ~HCI_LE_SET_PHY_CODED;
+ 				conn->le_rx_def_phys &= ~HCI_LE_SET_PHY_CODED;
+ 			}
++
++			/* HDT is a feature of page 1, which this event doesn't
++			 * report, so it can't be assumed.
++			 */
++			conn->le_tx_def_phys &= ~HCI_LE_SET_PHY_HDT;
++			conn->le_rx_def_phys &= ~HCI_LE_SET_PHY_HDT;
+ 		}
+ 
+ 		if (conn->state == BT_CONFIG) {
+@@ -7185,6 +7377,8 @@ static u8 le_phy_qos(u8 phy)
+ 		return HCI_LE_SET_PHY_2M;
+ 	case 0x03:
+ 		return HCI_LE_SET_PHY_CODED;
++	case 0x05:
++		return HCI_LE_SET_PHY_HDT;
+ 	}
+ 
+ 	return 0;
+@@ -7368,51 +7562,45 @@ static int hci_iso_term_big_sync(struct hci_dev *hdev, void *data)
+ 					 HCI_ERROR_LOCAL_HOST_TERM);
+ }
+ 
+-static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+-					   struct sk_buff *skb)
++static void hci_le_create_big_complete(struct hci_dev *hdev, u8 status,
++				       u8 handle, u8 num_bis,
++				       const __le16 *bis_handle)
+ {
+-	struct hci_evt_le_create_big_complete *ev = data;
+ 	struct hci_conn *conn;
+ 	__u8 i = 0;
+ 
+-	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+-
+-	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_CREATE_BIG_COMPLETE,
+-				flex_array_size(ev, bis_handle, ev->num_bis)))
+-		return;
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	/* Connect all BISes that are bound to the BIG */
+-	while ((conn = hci_conn_hash_lookup_big_state(hdev, ev->handle,
++	while ((conn = hci_conn_hash_lookup_big_state(hdev, handle,
+ 						      BT_BOUND,
+ 						      HCI_ROLE_MASTER))) {
+-		if (ev->status) {
+-			hci_connect_cfm(conn, ev->status);
++		if (status) {
++			hci_connect_cfm(conn, status);
+ 			hci_conn_del(conn);
+ 			continue;
+ 		}
+ 
+-		if (ev->num_bis <= i) {
++		if (num_bis <= i) {
+ 			bt_dev_err(hdev,
+ 				   "Not enough BIS handles for BIG 0x%2.2x",
+-				   ev->handle);
+-			ev->status = HCI_ERROR_UNSPECIFIED;
+-			hci_connect_cfm(conn, ev->status);
++				   handle);
++			status = HCI_ERROR_UNSPECIFIED;
++			hci_connect_cfm(conn, status);
+ 			hci_conn_del(conn);
+ 			continue;
+ 		}
+ 
+ 		if (hci_conn_set_handle(conn,
+-					__le16_to_cpu(ev->bis_handle[i++]))) {
++					__le16_to_cpu(bis_handle[i++]))) {
+ 			bt_dev_err(hdev,
+ 				   "Failed to set BIS handle for BIG 0x%2.2x",
+-				   ev->handle);
++				   handle);
+ 			/* Force error so BIG gets terminated as not all BIS
+ 			 * could be connected.
+ 			 */
+-			ev->status = HCI_ERROR_UNSPECIFIED;
+-			hci_connect_cfm(conn, ev->status);
++			status = HCI_ERROR_UNSPECIFIED;
++			hci_connect_cfm(conn, status);
+ 			hci_conn_del(conn);
+ 			continue;
+ 		}
+@@ -7427,18 +7615,33 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 	/* If there is an unexpected error or if no BISes have been connected
+ 	 * for the BIG, terminate it.
+ 	 */
+-	if (ev->status == HCI_ERROR_UNSPECIFIED || (!ev->status && !i))
++	if (status == HCI_ERROR_UNSPECIFIED || (!status && !i))
+ 		/* If no BISes have been connected for the BIG,
+ 		 * terminate. This is in case all bound connections
+ 		 * have been closed before the BIG creation
+ 		 * has completed.
+ 		 */
+ 		hci_cmd_sync_queue(hdev, hci_iso_term_big_sync,
+-				   UINT_PTR(ev->handle), NULL);
++				   UINT_PTR(handle), NULL);
+ 
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
++					   struct sk_buff *skb)
++{
++	struct hci_evt_le_create_big_complete *ev = data;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
++
++	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_CREATE_BIG_COMPLETE,
++				flex_array_size(ev, bis_handle, ev->num_bis)))
++		return;
++
++	hci_le_create_big_complete(hdev, ev->status, ev->handle, ev->num_bis,
++				   ev->bis_handle);
++}
++
+ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 					    struct sk_buff *skb)
+ {
+@@ -7623,6 +7826,11 @@ static void hci_le_read_all_remote_features_evt(struct hci_dev *hdev,
+ 			conn->le_tx_def_phys &= ~HCI_LE_SET_PHY_CODED;
+ 			conn->le_rx_def_phys &= ~HCI_LE_SET_PHY_CODED;
+ 		}
++
++		if (!hdt_capable(conn)) {
++			conn->le_tx_def_phys &= ~HCI_LE_SET_PHY_HDT;
++			conn->le_rx_def_phys &= ~HCI_LE_SET_PHY_HDT;
++		}
+ 	}
+ 
+ 	if (conn->state == BT_CONFIG) {
+@@ -7682,6 +7890,109 @@ static void hci_le_conn_rate_change_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_cis_established_evt_v3(struct hci_dev *hdev, void *data,
++					  struct sk_buff *skb)
++{
++	struct hci_evt_le_cis_established_v3 *ev = data;
++	struct hci_conn *conn;
++	struct bt_iso_qos *qos;
++	bool pending = false;
++	u16 handle = __le16_to_cpu(ev->handle);
++	u32 c_sdu_interval, p_sdu_interval;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!conn) {
++		bt_dev_err(hdev,
++			   "Unable to find connection with handle 0x%4.4x",
++			   handle);
++		goto unlock;
++	}
++
++	if (conn->type != CIS_LINK) {
++		bt_dev_err(hdev,
++			   "Invalid connection link type handle 0x%4.4x",
++			   handle);
++		goto unlock;
++	}
++
++	qos = &conn->iso_qos;
++
++	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, conn->flags);
++
++	c_sdu_interval = get_unaligned_le24(ev->c_sdu_interval);
++	p_sdu_interval = get_unaligned_le24(ev->p_sdu_interval);
++
++	switch (conn->role) {
++	case HCI_ROLE_SLAVE:
++		qos->ucast.in.interval = c_sdu_interval;
++		qos->ucast.out.interval = p_sdu_interval;
++		/* Convert Transport Latency (us) to Latency (msec) */
++		qos->ucast.in.latency =
++			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
++					  1000);
++		qos->ucast.out.latency =
++			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
++					  1000);
++		qos->ucast.in.sdu = ev->c_bn ? le16_to_cpu(ev->c_sdu) : 0;
++		qos->ucast.out.sdu = ev->p_bn ? le16_to_cpu(ev->p_sdu) : 0;
++		qos->ucast.in.phys = le_phy_qos(ev->c_phy);
++		qos->ucast.out.phys = le_phy_qos(ev->p_phy);
++		break;
++	case HCI_ROLE_MASTER:
++		qos->ucast.in.interval = p_sdu_interval;
++		qos->ucast.out.interval = c_sdu_interval;
++		/* Convert Transport Latency (us) to Latency (msec) */
++		qos->ucast.out.latency =
++			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
++					  1000);
++		qos->ucast.in.latency =
++			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
++					  1000);
++		qos->ucast.out.sdu = ev->c_bn ? le16_to_cpu(ev->c_sdu) : 0;
++		qos->ucast.in.sdu = ev->p_bn ? le16_to_cpu(ev->p_sdu) : 0;
++		qos->ucast.out.phys = le_phy_qos(ev->c_phy);
++		qos->ucast.in.phys = le_phy_qos(ev->p_phy);
++		break;
++	}
++
++	if (!ev->status) {
++		conn->state = BT_CONNECTED;
++		hci_debugfs_create_conn(conn);
++		hci_conn_add_sysfs(conn);
++		hci_iso_setup_path(conn);
++		goto unlock;
++	}
++
++	conn->state = BT_CLOSED;
++	hci_connect_cfm(conn, ev->status);
++	hci_conn_del(conn);
++
++unlock:
++	if (pending)
++		hci_le_create_cis_pending(hdev);
++
++	hci_dev_unlock(hdev);
++}
++
++static void hci_le_create_big_complete_v2_evt(struct hci_dev *hdev, void *data,
++					      struct sk_buff *skb)
++{
++	struct hci_evt_le_create_big_complete_v2 *ev = data;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
++
++	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_CREATE_BIG_COMPLETE_V2,
++				flex_array_size(ev, bis_handle, ev->num_bis)))
++		return;
++
++	hci_le_create_big_complete(hdev, ev->status, ev->handle, ev->num_bis,
++				   ev->bis_handle);
++}
++
+ #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
+ [_op] = { \
+ 	.func = _func, \
+@@ -7799,6 +8110,14 @@ static const struct hci_le_ev {
+ 	/* [0x37 = HCI_EVT_LE_CONN_RATE_CHANGE] */
+ 	HCI_LE_EV(HCI_EVT_LE_CONN_RATE_CHANGE, hci_le_conn_rate_change_evt,
+ 		  sizeof(struct hci_evt_le_conn_rate_change)),
++	/* [0x3a = HCI_EVT_LE_CIS_ESTABLISHED_V3] */
++	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED_V3, hci_le_cis_established_evt_v3,
++		  sizeof(struct hci_evt_le_cis_established_v3)),
++	/* [0x3b = HCI_EVT_LE_CREATE_BIG_COMPLETE_V2] */
++	HCI_LE_EV_VL(HCI_EVT_LE_CREATE_BIG_COMPLETE_V2,
++		     hci_le_create_big_complete_v2_evt,
++		     sizeof(struct hci_evt_le_create_big_complete_v2),
++		     HCI_MAX_LE_SUBEVT_PLEN),
+ };
+ 
+ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 9213e3ef9f26..0a39df952522 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4717,6 +4717,16 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 	if (le_sci_capable(hdev))
+ 		events[6] |= 0x40;	/* LE Connection Rate Change event */
+ 
++	/* With the newer versions of these events unmasked the controller
++	 * reports them instead of the older ones.
++	 */
++	if (hdt_capable(hdev)) {
++		if (cis_capable(hdev))
++			events[7] |= BIT(1);	/* LE CIS Established v3 */
++		if (bis_capable(hdev))
++			events[7] |= BIT(2);	/* LE Create BIG Complete v2 */
++	}
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
+ 				     sizeof(events), events, HCI_CMD_TIMEOUT);
+ }
+@@ -4794,22 +4804,71 @@ static int hci_le_set_rpa_timeout_sync(struct hci_dev *hdev)
+ 				     HCI_CMD_TIMEOUT);
+ }
+ 
++/* Read LE Maximum Data Length V2 */
++static int hci_le_read_max_data_len_v2_sync(struct hci_dev *hdev, u8 phy)
++{
++	struct hci_cp_le_read_max_data_len_v2 cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.phy = phy;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_MAX_DATA_LEN_V2,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ /* Read LE Maximum Data Length */
+ static int hci_le_read_max_data_len_sync(struct hci_dev *hdev)
+ {
+ 	if (!(hdev->le_features[0] & HCI_LE_DATA_LEN_EXT))
+ 		return 0;
+ 
++	/* Check if HDT PHY and HCI_OP_LE_READ_MAX_DATA_LEN_V2 are supported */
++	if (hdt_capable(hdev) && hdev->commands[50] & BIT(5)) {
++		int err;
++
++		/* Read max data length for non-hdt PHYs (use 0x01 for LE 1M) */
++		err = hci_le_read_max_data_len_v2_sync(hdev, 0x01);
++		if (err)
++			return err;
++
++		/* Read max data length for HDT (0x05) */
++		return hci_le_read_max_data_len_v2_sync(hdev, 0x05);
++	}
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_MAX_DATA_LEN, 0, NULL,
+ 				     HCI_CMD_TIMEOUT);
+ }
+ 
++/* Read LE Suggested Default Data Length V2 */
++static int hci_le_read_def_data_len_v2_sync(struct hci_dev *hdev, u8 phys)
++{
++	struct hci_cp_le_read_def_data_len_v2 cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.phys = phys;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_DEF_DATA_LEN_V2,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ /* Read LE Suggested Default Data Length */
+ static int hci_le_read_def_data_len_sync(struct hci_dev *hdev)
+ {
+ 	if (!(hdev->le_features[0] & HCI_LE_DATA_LEN_EXT))
+ 		return 0;
+ 
++	if (hdt_capable(hdev) && hdev->commands[50] & BIT(6)) {
++		int err;
++
++		/* All GFSK PHYs */
++		err = hci_le_read_def_data_len_v2_sync(hdev, 0x00);
++		if (err)
++			return err;
++
++		/* HDT PHY */
++		return hci_le_read_def_data_len_v2_sync(hdev, 0x01);
++	}
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_DEF_DATA_LEN, 0, NULL,
+ 				     HCI_CMD_TIMEOUT);
+ }
+@@ -5233,6 +5292,41 @@ static const struct hci_init_stage hci_init4[] = {
+ 	{}
+ };
+ 
++/* Write Suggested Default Data Length V2 */
++static int hci_le_write_def_data_len_v2_sync(struct hci_dev *hdev, u8 phys)
++{
++	struct hci_cp_le_write_def_data_len_v2 cp;
++
++	switch (phys) {
++	case 0x00:
++		/* If already set to max skip */
++		if (hdev->le_def_tx_len == hdev->le_max_tx_len &&
++		    hdev->le_def_tx_time == hdev->le_max_tx_time)
++			return 0;
++
++		memset(&cp, 0, sizeof(cp));
++		/* All GFSK PHYs */
++		cp.tx_len = cpu_to_le16(hdev->le_max_tx_len);
++		cp.tx_time = cpu_to_le16(hdev->le_max_tx_time);
++		break;
++	case 0x01:
++		/* If already set to max skip */
++		if (hdev->hdt_def_tx_len == hdev->hdt_max_tx_len &&
++		    hdev->hdt_def_tx_time == hdev->hdt_max_tx_time)
++			return 0;
++
++		memset(&cp, 0, sizeof(cp));
++		/* HDT PHY */
++		cp.phys = 0x01;
++		cp.tx_len = cpu_to_le16(hdev->hdt_max_tx_len);
++		cp.tx_time = cpu_to_le16(hdev->hdt_max_tx_time);
++		break;
++	}
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_WRITE_DEF_DATA_LEN_V2,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ /* Set Suggested Default Data Length to maximum if supported */
+ static int hci_le_set_write_def_data_len_sync(struct hci_dev *hdev)
+ {
+@@ -5241,7 +5335,32 @@ static int hci_le_set_write_def_data_len_sync(struct hci_dev *hdev)
+ 	if (!(hdev->le_features[0] & HCI_LE_DATA_LEN_EXT))
+ 		return 0;
+ 
++	/* Clamp if reported value is over maximum allowed by spec */
++	if (hdev->le_max_tx_len > 0x00fb)
++		hdev->le_max_tx_len = 0x00fb;
++
++	if (hdev->le_max_tx_time > 0x4290)
++		hdev->le_max_tx_time = 0x4290;
++
++	/* If controller is HDT check if it support V2 then use it */
++	if (hdt_capable(hdev) && hdev->commands[50] & BIT(7)) {
++		int err;
++
++		/* All GFSK PHYs */
++		err = hci_le_write_def_data_len_v2_sync(hdev, 0x00);
++		if (err)
++			return err;
++
++		return hci_le_write_def_data_len_v2_sync(hdev, 0x01);
++	}
++
++	/* If already set to max skip */
++	if (hdev->le_def_tx_len == hdev->le_max_tx_len &&
++	    hdev->le_def_tx_time == hdev->le_max_tx_time)
++		return 0;
++
+ 	memset(&cp, 0, sizeof(cp));
++
+ 	cp.tx_len = cpu_to_le16(hdev->le_max_tx_len);
+ 	cp.tx_time = cpu_to_le16(hdev->le_max_tx_time);
+ 
+@@ -5282,6 +5401,12 @@ static int hci_le_set_default_phy_sync(struct hci_dev *hdev)
+ 		cp.rx_phys |= HCI_LE_SET_PHY_CODED;
+ 	}
+ 
++	/* Enables HDT PHY if supported */
++	if (hdt_capable(hdev)) {
++		cp.tx_phys |= HCI_LE_SET_PHY_HDT;
++		cp.rx_phys |= HCI_LE_SET_PHY_HDT;
++	}
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEFAULT_PHY,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+@@ -7253,10 +7378,14 @@ int hci_le_create_cis_sync(struct hci_dev *hdev)
+ 	if (!aux_num_cis)
+ 		return 0;
+ 
+-	/* Wait for HCI_LE_CIS_Established */
++	/* Wait for HCI_LE_CIS_Established, which HDT capable controllers
++	 * report with the v3 event since it is the one unmasked.
++	 */
+ 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CIS,
+ 					struct_size(cmd, cis, cmd->num_cis),
+-					cmd, HCI_EVT_LE_CIS_ESTABLISHED,
++					cmd, hdt_capable(hdev) ?
++					HCI_EVT_LE_CIS_ESTABLISHED_V3 :
++					HCI_EVT_LE_CIS_ESTABLISHED,
+ 					timeout, NULL);
+ }
+ 
+@@ -8225,7 +8354,7 @@ static int hci_le_set_phy_sync(struct hci_dev *hdev, void *data)
+ 					HCI_CMD_TIMEOUT, NULL);
+ }
+ 
+-int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys)
++int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys, u16 phy_opts)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_le_set_phy *cp;
+@@ -8239,6 +8368,7 @@ int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys)
+ 	cp->handle = cpu_to_le16(conn->handle);
+ 	cp->tx_phys = tx_phys;
+ 	cp->rx_phys = rx_phys;
++	cp->phy_opts = cpu_to_le16(phy_opts);
+ 
+ 	err = hci_cmd_sync_queue_once(hdev, hci_le_set_phy_sync, cp,
+ 				      le_phy_update_complete);
+@@ -8247,3 +8377,225 @@ int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys)
+ 
+ 	return (err == -EEXIST) ? 0 : err;
+ }
++
++/* HDT rates the controller supports in each direction: HDT2, HDT3 and HDT4
++ * are mandatory, HDT6 and HDT7.5 are optional.
++ */
++static u16 hci_hdt_tx_rates(struct hci_dev *hdev)
++{
++	u16 rates = HCI_HDT_RATE_2M | HCI_HDT_RATE_3M | HCI_HDT_RATE_4M;
++
++	if (hdt_6_tx_capable(hdev))
++		rates |= HCI_HDT_RATE_6M;
++
++	if (hdt_7_5_tx_capable(hdev))
++		rates |= HCI_HDT_RATE_7_5M;
++
++	return rates;
++}
++
++static u16 hci_hdt_rx_rates(struct hci_dev *hdev)
++{
++	u16 rates = HCI_HDT_RATE_2M | HCI_HDT_RATE_3M | HCI_HDT_RATE_4M;
++
++	if (hdt_6_rx_capable(hdev))
++		rates |= HCI_HDT_RATE_6M;
++
++	if (hdt_7_5_rx_capable(hdev))
++		rates |= HCI_HDT_RATE_7_5M;
++
++	return rates;
++}
++
++/* LE Set CIG Params v2 */
++static int hci_le_set_cig_params_v2_sync(struct hci_dev *hdev, u8 cig_id)
++{
++	DEFINE_FLEX(struct hci_cp_le_set_cig_params_v2, pdu, cis, num_cis,
++		    HCI_LE_CIG_PARAMS_V2_MAX_CIS);
++	struct hci_conn *conn;
++	struct bt_iso_qos *qos;
++	u8 aux_num_cis = 0;
++	u8 cis_id;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
++	if (!conn) {
++		hci_dev_unlock(hdev);
++		return 0;
++	}
++
++	qos = &conn->iso_qos;
++	pdu->cig_id = cig_id;
++	hci_cpu_to_le24(qos->ucast.out.interval, pdu->c_interval);
++	hci_cpu_to_le24(qos->ucast.in.interval, pdu->p_interval);
++	pdu->sca = qos->ucast.sca;
++	pdu->packing = qos->ucast.packing;
++	pdu->framing = qos->ucast.framing;
++	pdu->c_latency = cpu_to_le16(qos->ucast.out.latency);
++	pdu->p_latency = cpu_to_le16(qos->ucast.in.latency);
++
++	/* Reprogram all CIS(s) with the same CIG, valid range are:
++	 * num_cis: 0x00 to 0x1F
++	 * cis_id: 0x00 to 0xEF
++	 */
++	for (cis_id = 0x00; cis_id < 0xf0 &&
++	     aux_num_cis < pdu->num_cis; cis_id++) {
++		struct hci_cis_params_v2 *cis;
++
++		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, cig_id, cis_id);
++		if (!conn)
++			continue;
++
++		qos = &conn->iso_qos;
++
++		cis = &pdu->cis[aux_num_cis++];
++		cis->cis_id = cis_id;
++		cis->c_sdu  = cpu_to_le16(conn->iso_qos.ucast.out.sdu);
++		cis->p_sdu  = cpu_to_le16(conn->iso_qos.ucast.in.sdu);
++		cis->c_phys = qos->ucast.out.phys ? qos->ucast.out.phys :
++			      qos->ucast.in.phys;
++		cis->p_phys = qos->ucast.in.phys ? qos->ucast.in.phys :
++			      qos->ucast.out.phys;
++		cis->c_rtn  = qos->ucast.out.rtn;
++		cis->p_rtn  = qos->ucast.in.rtn;
++
++		if (cis->c_phys & HCI_LE_SET_PHY_HDT)
++			cis->c_hdt_rates = cpu_to_le16(hci_hdt_tx_rates(hdev));
++
++		if (cis->p_phys & HCI_LE_SET_PHY_HDT)
++			cis->p_hdt_rates = cpu_to_le16(hci_hdt_rx_rates(hdev));
++	}
++	pdu->num_cis = aux_num_cis;
++
++	hci_dev_unlock(hdev);
++
++	if (!pdu->num_cis)
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_CIG_PARAMS_V2,
++				     struct_size(pdu, cis, pdu->num_cis),
++				     pdu, HCI_CMD_TIMEOUT);
++}
++
++/* LE Set CIG Params */
++int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id)
++{
++	DEFINE_FLEX(struct hci_cp_le_set_cig_params, pdu, cis, num_cis, 0x1f);
++	struct hci_conn *conn;
++	struct bt_iso_qos *qos;
++	u8 aux_num_cis = 0;
++	u8 cis_id;
++
++	if (le_set_cig_params_v2_capable(hdev))
++		return hci_le_set_cig_params_v2_sync(hdev, cig_id);
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_cig(hdev, cig_id);
++	if (!conn) {
++		hci_dev_unlock(hdev);
++		return 0;
++	}
++
++	qos = &conn->iso_qos;
++	pdu->cig_id = cig_id;
++	hci_cpu_to_le24(qos->ucast.out.interval, pdu->c_interval);
++	hci_cpu_to_le24(qos->ucast.in.interval, pdu->p_interval);
++	pdu->sca = qos->ucast.sca;
++	pdu->packing = qos->ucast.packing;
++	pdu->framing = qos->ucast.framing;
++	pdu->c_latency = cpu_to_le16(qos->ucast.out.latency);
++	pdu->p_latency = cpu_to_le16(qos->ucast.in.latency);
++
++	/* Reprogram all CIS(s) with the same CIG, valid range are:
++	 * num_cis: 0x00 to 0x1F
++	 * cis_id: 0x00 to 0xEF
++	 */
++	for (cis_id = 0x00; cis_id < 0xf0 &&
++	     aux_num_cis < pdu->num_cis; cis_id++) {
++		struct hci_cis_params *cis;
++
++		conn = hci_conn_hash_lookup_cis(hdev, NULL, 0, cig_id, cis_id);
++		if (!conn)
++			continue;
++
++		qos = &conn->iso_qos;
++
++		cis = &pdu->cis[aux_num_cis++];
++		cis->cis_id = cis_id;
++		cis->c_sdu  = cpu_to_le16(conn->iso_qos.ucast.out.sdu);
++		cis->p_sdu  = cpu_to_le16(conn->iso_qos.ucast.in.sdu);
++		cis->c_phys = qos->ucast.out.phys ? qos->ucast.out.phys :
++			      qos->ucast.in.phys;
++		cis->p_phys = qos->ucast.in.phys ? qos->ucast.in.phys :
++			      qos->ucast.out.phys;
++		cis->c_rtn  = qos->ucast.out.rtn;
++		cis->p_rtn  = qos->ucast.in.rtn;
++	}
++	pdu->num_cis = aux_num_cis;
++
++	hci_dev_unlock(hdev);
++
++	if (!pdu->num_cis)
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_CIG_PARAMS,
++				     struct_size(pdu, cis, pdu->num_cis),
++				     pdu, HCI_CMD_TIMEOUT);
++}
++
++static int hci_le_create_big_v2_sync(struct hci_conn *conn,
++				     struct bt_iso_qos *qos, u8 num_bis)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_create_big_v2 cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = qos->bcast.big;
++	cp.adv_handle = qos->bcast.bis;
++	cp.num_bis  = num_bis;
++	hci_cpu_to_le24(qos->bcast.out.interval, cp.bis.sdu_interval);
++	cp.bis.sdu = cpu_to_le16(qos->bcast.out.sdu);
++	cp.bis.latency = cpu_to_le16(qos->bcast.out.latency);
++	cp.bis.rtn = qos->bcast.out.rtn;
++	cp.bis.phys = qos->bcast.out.phys;
++	cp.bis.packing = qos->bcast.packing;
++	cp.bis.framing = qos->bcast.framing;
++	cp.bis.encryption = qos->bcast.encryption;
++	memcpy(cp.bis.bcode, qos->bcast.bcode, sizeof(cp.bis.bcode));
++
++	/* Check if HDT PHY is set then enable HDT supported rates */
++	if (cp.bis.phys & HCI_LE_SET_PHY_HDT)
++		cp.bis.hdt_rates = cpu_to_le16(hci_hdt_tx_rates(hdev));
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG_V2,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos *qos,
++			   u8 num_bis)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_create_big cp;
++
++	if (hdt_capable(hdev) && hdev->commands[51] & BIT(3))
++		return hci_le_create_big_v2_sync(conn, qos, num_bis);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = qos->bcast.big;
++	cp.adv_handle = qos->bcast.bis;
++	cp.num_bis  = num_bis;
++	hci_cpu_to_le24(qos->bcast.out.interval, cp.bis.sdu_interval);
++	cp.bis.sdu = cpu_to_le16(qos->bcast.out.sdu);
++	cp.bis.latency =  cpu_to_le16(qos->bcast.out.latency);
++	cp.bis.rtn  = qos->bcast.out.rtn;
++	cp.bis.phys = qos->bcast.out.phys;
++	cp.bis.packing = qos->bcast.packing;
++	cp.bis.framing = qos->bcast.framing;
++	cp.bis.encryption = qos->bcast.encryption;
++	memcpy(cp.bis.bcode, qos->bcast.bcode, sizeof(cp.bis.bcode));
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 06f1e7ba2cb1..cc6c8b7ba027 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1875,7 +1875,7 @@ static bool check_io_qos(struct bt_iso_io_qos *qos)
+ 	if (qos->latency && (qos->latency < 0x05 || qos->latency > 0xfa0))
+ 		return false;
+ 
+-	if (qos->phys > BT_ISO_PHY_ANY)
++	if (qos->phys & ~(BT_ISO_PHY_ANY | BT_ISO_PHY_HDT))
+ 		return false;
+ 
+ 	return true;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 260ef2a45719..6ed3bf6f1738 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -865,6 +865,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 	if (le_sci_capable(hdev))
+ 		settings |= MGMT_SETTING_SCI;
+ 
++	if (hdt_capable(hdev))
++		settings |= MGMT_SETTING_HDT;
++
+ 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
+ 
+ 	return settings;
+@@ -959,6 +962,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (le_sci_enabled(hdev))
+ 		settings |= MGMT_SETTING_SCI;
+ 
++	if (hdt_enabled(hdev))
++		settings |= MGMT_SETTING_HDT;
++
+ 	return settings;
+ }
+ 
 -- 
 2.56.0
 
