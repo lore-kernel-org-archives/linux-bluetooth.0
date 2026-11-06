@@ -1,49 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.69.30.187
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793991008;
-	b=K/vfnxJHpVLBA++dD7SoHBk6veshHJ/kofpvTVmUEspkaQNI9734lJPaIAXP23YvQLSO
-	 fYMJT2STT5biBYEHHKfmwVlPkaglvpasfSYK1vJYUYLCxjsd+fjG/WpbbV6Z+6Iv0S0GJ
-	 AFl4phdBOXBYqnu3fdQzxoWcOmJ/bpVF3qnjdddLOc/SBSjSCV/U0YgL6/zDsHTTl7ezA
-	 yFAHoPhHRUXxxxbgMDj9bCjFl5afhOhRjDsmYuLlq8sYvgfWb9ISMD9dXgOoQW+TwmAla
-	 B+bf9jlvBWp5d8E+wfODCTkfnelKVcsZMlFHXx2fcWxfLEO1pELXW9aItIgDKLyyRhA==
+	t=1793993347;
+	b=agWvms1/gkIQjPZuC+md1XSYNTixy+Mi9ntyE4tOe4UM+AYD+wB7yy5Y+k2cB9NW55II
+	 CsuTHxy/92J7uobsdq3RYLS5qw5vf+iInO3rrgv6AKcPOEo1wENUu8b9E2vWwxG6FMtAi
+	 R+m5SP45hfJ+Jwx5IYG1Lz6baHazGxDnX//+2hAJGMIem2mwn+gxREGjELHCVKCkoObof
+	 Vxr9eOHNddRmFDmD3+8Z/ESzpMndog8sj5nPgIi+KSmN9hvDGYcR4FsVa5w4zXalKewYT
+	 lC9lUSFvip31ahSmylh9cf89yaJgQ3sMvoSDL9pUddzC5eVCO1xdWsovB2kyimx6kNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793991008;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=OrfRYCBlbmflIvhtxvG/f3svmEmtBxYlNU2+D3tCqpw=;
-	b=QMe7OikJPVOJTqyWwimUG4wOR/ZtTMO1bM4Z+1YPlrnH1u42JAh/SRWSvrHieo2z+5ip
-	 YxqwPi1fuBH8yVggIpGND76tBrBiOjXd8C4GOnfrSAkShXqo9JeRaehx6n/Xz6ljLL5fS
-	 9+KZebwKEpoz+0wt9CQBuRr7H/Iz0vC665e6AvQLWec6XiQYDjNyBriGYS8dyX34OxuNE
-	 gsacm+jXrrd4enIKcUKwjCDS/IOpHCCirBLKay3lb18+XYO0y88idB+46Sv5+PXlzBYuG
-	 RIHa8zFIBOWRifrzBbIzUm5S1V8A2rbLRgXP/6ZcjcJS3RXnVF2+GJeUuFBNkfMDsyw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793993347;
+	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=UiuovoevWXu9XJy5bFhJVWdiIRXYyIvXEQ85Dby6mgk=;
+	b=hsJ6zpvYgIFsOJMi69ITIwpJzy4zcz74mmZrexC7SS7J3VRAYDpp9DGrKuSbmOPWDU4B
+	 9jJCKx6eT2T8yK8oqt2929rUPYXJBIV+FZrLghagnz6qh5qotH47+n5ECDqwO3GlZs6Wd
+	 ibFKD9VquI/4muG/iaihd4eDgUBtIG6YWrYZWqPUVnaiAv6Hb3Z7gPy0wXvfuEGgXBun3
+	 7eHTTGJUrWbZadEnG9JlIGyZxwcAtOw/47lIMRPs16EzZUqHlegRb1ag3ujK9Kv4e33ai
+	 FAPPFKdxmJxrnNZaUBU9SK1bymdyg97vuB16VHCIUlpv6DuEm+HKmsYdN4TjcUbfqHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aWgfY8Lw;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=freenixos.com;
+	spf=pass smtp.mailfrom=freenixos.com;
+	dkim=pass header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=lr0pDVYh;
+	arc=none smtp.remote-ip=54.69.30.187
+Received: from mail.freenixos.com (mail.freenixos.com [54.69.30.187])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F32F606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B23A606A329;
+	Fri,  6 Nov 2026 19:29:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B23A606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenixos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freenixos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aWgfY8Lw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A4411F008A1;
-	Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793991008;
-	bh=OrfRYCBlbmflIvhtxvG/f3svmEmtBxYlNU2+D3tCqpw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=aWgfY8LwbfXBMmA8lIe8zSWVOP4ltVtxxagYN1AAY75EILJnq907KKEbqKlk8Vvtg
-	 eydn/uRecsxgo6RyHcPwaE5gvEMRHm6PWwbtHzrdF+ZFDBFq7UL3u5eGjh58+SiXAL
-	 hN3gDcXoQBu/gk58O2Tq/+w4r3wmZFg7BGAQ480Qk92r8fgqGPgtZ4Aq7f0SIqF/Q3
-	 RmCVN9PvEDPV6auGduMwf6P8EV+yALebAFdTKXppXUXQYSarZjzNNS0tVU11ai5ZXg
-	 pxeInmGuK2YqlF21nozmImbDBQa0y85iFyP3oPB3tT/fSq8fd4rQ+Eq1ZTr4268kTg
-	 m8DmBVuxnB42g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5E01B3A41021;
-	Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key, unprotected) header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=lr0pDVYh
+From: Hex Lindqvist <hex@freenixos.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freenixos.com;
+	s=mail; t=1793993345;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UiuovoevWXu9XJy5bFhJVWdiIRXYyIvXEQ85Dby6mgk=;
+	b=lr0pDVYhUQPa9H+L629Nktye7hj/QSJsIRxA9WbdR2ytXVKmqkfkoophSyk++3zuwFfL7H
+	bdnDX5VyBVwCzYPKAu+6l1VOZ2EXnE68Eo6+ZyT39j94nqhtlw4dnZgpV5j/iqOJusp+Gy
+	vLdB2bYKUWd2O2QkigAr+yW8UhDRjOIWa/aZnOklUNLjLYNk5i9f6U3msoSHuJYWeQ+rNd
+	SPn7qLXrBmb5V0tw66XpN5mLONU/XI+Cc4pBFUB+tGNnXTjQE2vbZUO/oJx4zLFmJ43HtI
+	Dyi4XXq3JY0BNkm7mn38ktaOjVwLMFAkrGNnBMIrGrFeVh1dc4Nqpdh9VqcQQg==
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Bartosz Golaszewski <brgl@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: qca: Disable SoC debug logging for WCN3990
+Date: Fri,  6 Nov 2026 11:29:01 -0800
+Message-ID: <20261106192901.1930168-1-hex@freenixos.com>
+In-Reply-To: <56866622-a854-4aae-9e97-40eecc4adbe1@molgen.mpg.de>
+References: <20261105201952.1556185-1-hex@freenixos.com> <56866622-a854-4aae-9e97-40eecc4adbe1@molgen.mpg.de>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -54,41 +67,34 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] avrcp: Fix GetTotalNumberOfItems command
- encoding
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179399100691.811161.16790714216807073653.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Nov 2026 18:50:06 +0000
-References: <20261105221620.2332170-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261105221620.2332170-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+On 06.11.26 11:57, Paul Menzel wrote:
+> Does Linux log anything about this? Maybe, also paste an excerpt from
+> btmon capture?
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+No, Linux logs nothing; the packets only show up in btmon:
 
-On Thu,  5 Nov 2026 17:16:20 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> GetTotalNumberOfItems only takes the Scope as parameter, but the command
-> declared 11 parameter bytes and sent 7, which targets such as iPhones
-> drop, stalling following browsing requests until BROWSING_TIMEOUT.
-> 
-> Also return FALSE on every response error path since the callback is a
-> gboolean and negative errno values would keep the request pending.
-> 
-> [...]
+  = Vendor Diagnostic (len 492)                      [hci0] 0.761331
+          dc 2e e8 01 e4 01 03 00 0a ff 10 04 01 00 55 53  ..............US
+  = Vendor Diagnostic (len 481)                     [hci0] 11.334015
+          dc 2e dd 01 d9 01 04 00 0a ff 10 04 01 00 51 d3  ..............Q.
 
-Here is the summary with links:
-  - [BlueZ,v1] avrcp: Fix GetTotalNumberOfItems command encoding
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a8067198717b
+I will add this to the commit message in v2.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> Both firmware file names are the same. What is the difference?
 
+They are different builds with the same file name:
 
+  OnePlus:        BTFM.CHE.2.1.4.c2-00002-QCACHROMZ-2.184841.1
+                  (216380 bytes, built Jan 3 2019, shipped with OxygenOS)
+  linux-firmware: BTFM.CHE.2.1.3.c7-00024-QCACHROM-1
+                  (177060 bytes, built Dec 4 2018)
+
+Both TLV headers report the same ROM build (0x0201) and patch version
+(0x0002), so only the build label tells them apart. The controller
+returns the OnePlus label when asked with EDL_GET_BUILD_INFO_CMD;
+btqca does not send that for WCN3990, so it is not in the kernel log.
+
+Thank you for the review.
+
+Hex
