@@ -1,60 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793931458;
-	b=s7P1kOJ7Egw5E7x/hX1Db6veBj82o5zgZJgvDEZYINuPQ4Fwv1O0UrfVR4eflyxZiPfT
-	 s6oUYmdgOz3mg6FE6BLzBqcnm0ffLyNPnva5HN3Dud0zMVib78Q0GAbGsiPji7wKU/V/y
-	 FJ3MPD5joKWfTcet45V6r2/c2c5IRF6mAl/oF+cTFkAOIf6CJ8HFRQIlv7LIiVWa4mNvw
-	 /nzkodso1vVaGWzBWHsEDHC6P4p+eYq3EBhKkXG3KGT8ygY5XDccpbInge7Elzf5kMHy2
-	 ynzCSkny9TeEO5Nq7uDR1K6ESk9tTuktf9hePteIYIjkrAs+fr0uqR6My2VK25JeTIQ==
+	t=1793931495;
+	b=DdjwwPfOxVY9NKKwnGUQwq6MxtiGrcRF7yeSNviPYoQqewConOXkFjp3Akb4t7l01AZA
+	 +yxNpSpu5x3lOkZU3MsQ1sHbw9BUOF/iUYqwPNY6kBLjVwgOixD/eujiwDNlPS+EtT6hb
+	 A7hBhYlB7Mnl2Z/PxE+vSj5rQZXCSpkqsIeQrfYc5EouPIOavICV2QtRqpbiKEInOMPBv
+	 ySVRP3XRqZh9cJDZTmOPRnCTbWTmYgVW+GG0n6SzpsDjGEhnL0GePU16sgrdQioCrjX0n
+	 GtBlfx+VaBFGMQ0zxx6Omn+K+4XOehPUMRXgk+5LBya6QrauwV6Dw/I+kCPe3+yNddA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793931458;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793931495;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
 	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=fnuxqyrG6REhIII7Ib8S+VJizUwMGc2b7hlQV0mN0WI=;
-	b=066iNKUF9dhMkDAD6uiHAP0C7iDn0amsNpjFPCIZSNUPcjuOnj9PQgf6AK0ta9cQxq5a
-	 n8UbqEzkZnw1apov54QN18OxkvUJNlPSALNKxxdrzzlHbyvRdHZmjOj6zcME7Rs0oNPe8
-	 UyZFSFiIgfXGkj/dVmPhxi9683S81ioVgPuYoKSX97u6Mvlb8kSQlj7WPVKBllqCUHrxH
-	 gz6QdCf56ApiYiSuOWMzewuW7KpJDR4w5m6+RDNM1X8EQlBp15Efqf54MQHz9RDc+ux4/
-	 YK+hxZ3B8xv2e4X36MGaXCEiAB0iLAKjAjUpxCeb4yKQmcwUGjcmHWuLRAZD4myKIHg==
+	bh=vJAwnH6DqhVCv2oRViwC2Bi0m/mhC0czlGN3s2VpsuY=;
+	b=Eb3GDbSp1jtzZD+tQrytWTON1iewD/1ImtkjQDU0wTFeSnq5JgXfwwrWwafrjEzgqh1J
+	 BSWvQ1xh/YO/kKgHNFluUAC8TOL7qnWMDP2C3dYmk1v2q3Vw6RKtyLhh1a32Y+lNOiR8F
+	 7rvUpV5IcSBaLzkqXev4VToVeN7U0v+Zzsd/nPFOv37V52pD+ifKyc4lHchljVy4ytyMG
+	 6aGynMC6J4jxd9usZ/hsszPynRFB2/D51GjT0rSFqIsuVxV+dBRL9ntgbtJN3ZfNV88au
+	 jVZDElnOb6IgnN6wG30scd+NTURDuRTv+sDx4lGo0Xudol7cFTwziI954HeTJBFzCtw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=ZLX14Gio;
-	arc=none smtp.remote-ip=185.70.43.22
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b="X3pNd/SK";
+	arc=none smtp.remote-ip=185.70.43.101
+Received: from mail-43101.protonmail.ch (mail-43101.protonmail.ch [185.70.43.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20B3606A31B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 02:17:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E20B3606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BA4606A326
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 02:18:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46BA4606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=ZLX14Gio
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=X3pNd/SK
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793931453; x=1794190653;
-	bh=fnuxqyrG6REhIII7Ib8S+VJizUwMGc2b7hlQV0mN0WI=;
+	s=protonmail2; t=1793931491; x=1794190691;
+	bh=vJAwnH6DqhVCv2oRViwC2Bi0m/mhC0czlGN3s2VpsuY=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=ZLX14GiojuHGctHf/UFt3QCMZMiFSoBLjGG/TOhuWyw3HC+9n09L4vb8qotZlRf/L
-	 ZKjckeknu1WUKhPtfpQ2joeuLVG+FicURHIQHLVZOER4tfRMDdNdqoihdNE5Dnj5oj
-	 N/EcCkY7FE7nDhlpisr4tfipleHJyZbPbUsXCmidVbwTkm2sI41Yd3pwnsihLYeX12
-	 AAUuwKDf5Rzpm/cgSjnLCn1LvnfwQy9W87zyOIt6R20qZ11B60Ez6jgfNRfsvQ3zXC
-	 ynsNGQtx0kK6E/a1S5l8o6mLeh+WdHW01bzC9fQQ82KGVYccIsRDA2mgv7ncXIvZsX
-	 Eo0hDWtqZC8zg==
-Date: Fri, 06 Nov 2026 02:17:30 +0000
+	b=X3pNd/SKlZDw0N6dndGskcsPrsU/zRrOZ3CTHXX9BQCJf1TtAj7Y7Qds0vDMhZfqp
+	 A8EEnW9fgRAEh2Qv0dl37eCkBqkLAoo80AJDItoEATM9y43VnGI+5zVc6NjBqLvl+S
+	 Lgw/fpStjQWh/X5fI0pQKqNIv6ctOGLuUH2WXGb3cO5u4pM1XCVOg+dhrVZ97qcSG8
+	 9D9X20lejcpMx/ZxP/1SMsQb86ZFQidgFrnt0G/U1D0/wYGL+7hsgXxETcdzKLAS7y
+	 cghTu27YDHqpCvhKlNVBhcAOsrgg+YDPF23E1i982JY8x8wgSuc4sOHZr/Z3P6LwsC
+	 SXTTDKDwkA+Rw==
+Date: Fri, 06 Nov 2026 02:18:07 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH v4 1/2] Bluetooth: L2CAP: Keep credits from completing security upgrades
-Message-ID: <20261106021723.631339-1-cochcoder@proton.me>
-In-Reply-To: <20261015181624.48318-1-cochcoder@proton.me>
-References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me>
+Subject: [RFC PATCH v4 2/2] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
+Message-ID: <20261106021723.631339-2-cochcoder@proton.me>
+In-Reply-To: <20261106021723.631339-1-cochcoder@proton.me>
+References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me> <20261106021723.631339-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: a29f4e7611c1994cba9a395d763fc47ee7d1a9e6
+X-Pm-Message-ID: 874f26d40e2051fa6d311ad2d565f4765e7b6134
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,151 +67,63 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Validate credit targets and retain credits without sending or resuming
-while an LE or ECRED security upgrade is pending. Keep the requested
-security level until encryption and key size satisfy it.
+Keep the narrow identifier-zero exception for nonzero credit grants to
+connected LE CoC channels. Apply the same mode, state and pending
+security checks as ordinary credit indications.
 
-Schedule immediate channel timeout work if the upgrade fails. This runs
-the normal close path outside the security callback list traversal and
-keeps traffic suspended until teardown. Complete deferred security
-without accepting the connection or sending queued data.
+This interoperability exception depends on the security fix and still
+requires maintainer policy approval.
 
-Drain connected channels after successful security completion. Resume
-LE credit-based sockets only when credits remain, including background
-encryption changes with no locally pending upgrade.
-
-Fixes: fad5fc89594d ("Bluetooth: Add LE flow control discipline")
 Assisted-by: LLM
 
 Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-v4: Fix failed/deferred security completion and credit-aware wakeups.
+No code change; depends on patch 1. Maintainer policy approval remains requ=
+ired.
 AI review: https://sashiko.dev/#/patchset/20261015181624.48318-1-cochcoder%=
 40proton.me
 
- net/bluetooth/l2cap_core.c | 50 ++++++++++++++++++++++++++++++++++++--
- net/bluetooth/l2cap_sock.c |  9 +++++--
- 2 files changed, 55 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7dcb0586a..9463ac215 100644
+index 9463ac215..4bef75235 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5380,6 +5380,11 @@ static inline int l2cap_le_credits(struct l2cap_conn=
+@@ -5385,6 +5385,10 @@ static inline int l2cap_le_credits(struct l2cap_conn=
  *conn,
+ =09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
+ =09=09goto unlock;
 =20
- =09l2cap_chan_lock(chan);
-=20
-+=09if (chan->state !=3D BT_CONNECTED ||
-+=09    (chan->mode !=3D L2CAP_MODE_LE_FLOWCTL &&
-+=09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
++=09/* Tolerate identifier-zero credits only for a live LE CoC. */
++=09if (!cmd->ident && (!credits || chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
 +=09=09goto unlock;
 +
  =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
  =09if (credits > max_credits) {
  =09=09BT_ERR("LE credits overflow");
-@@ -5393,6 +5398,9 @@ static inline int l2cap_le_credits(struct l2cap_conn =
-*conn,
+@@ -5994,11 +5998,21 @@ static inline void l2cap_le_sig_channel(struct l2ca=
+p_conn *conn,
 =20
- =09chan->tx_credits +=3D credits;
+ =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
 =20
-+=09if (test_bit(FLAG_PENDING_SECURITY, &chan->flags))
-+=09=09goto unlock;
+-=09if (len !=3D skb->len || !cmd->ident) {
++=09if (len !=3D skb->len) {
+ =09=09BT_DBG("corrupted command");
+ =09=09goto drop;
+ =09}
+=20
++=09if (!cmd->ident) {
++=09=09if (cmd->code !=3D L2CAP_LE_CREDITS ||
++=09=09    len !=3D sizeof(struct l2cap_le_credits))
++=09=09=09goto drop;
 +
- =09/* Resume sending */
- =09l2cap_le_flowctl_send(chan);
-=20
-@@ -7976,6 +7984,8 @@ static void l2cap_security_cfm(struct hci_conn *hcon,=
- u8 status, u8 encrypt)
- =09mutex_lock(&conn->lock);
-=20
- =09list_for_each_entry(chan, &conn->chan_l, list) {
-+=09=09bool le_flowctl, pending_le;
++=09=09/* Credits have no response or identifier-matched transaction. */
++=09=09l2cap_le_credits(conn, cmd, len, skb->data);
++=09=09goto drop;
++=09}
 +
- =09=09l2cap_chan_lock(chan);
-=20
- =09=09lockdep_assert_held(&chan->conn->lock);
-@@ -7983,7 +7993,13 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
-, u8 status, u8 encrypt)
- =09=09BT_DBG("chan %p scid 0x%4.4x state %s", chan, chan->scid,
- =09=09       state_to_string(chan->state));
-=20
--=09=09if (!status && encrypt)
-+=09=09le_flowctl =3D hcon->type =3D=3D LE_LINK &&
-+=09=09=09     (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
-+=09=09=09      chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL);
-+=09=09pending_le =3D le_flowctl &&
-+=09=09=09     test_bit(FLAG_PENDING_SECURITY, &chan->flags);
-+
-+=09=09if (!status && encrypt && !pending_le)
- =09=09=09chan->sec_level =3D hcon->sec_level;
-=20
- =09=09if (!__l2cap_no_conn_pending(chan)) {
-@@ -7991,9 +8007,39 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
-, u8 status, u8 encrypt)
- =09=09=09continue;
- =09=09}
-=20
-+=09=09if (pending_le && (chan->state =3D=3D BT_CONNECTED ||
-+=09=09=09=09   chan->state =3D=3D BT_CONFIG ||
-+=09=09=09=09   chan->state =3D=3D BT_CONNECT2)) {
-+=09=09=09if (status || !encrypt ||
-+=09=09=09    !smp_sufficient_security(hcon, chan->sec_level,
-+=09=09=09=09=09=09    SMP_ALLOW_STK) ||
-+=09=09=09    !l2cap_check_enc_key_size(hcon, chan)) {
-+=09=09=09=09/* Keep traffic suspended until timeout work closes
-+=09=09=09=09 * the channel outside this list traversal.
-+=09=09=09=09 */
-+=09=09=09=09__set_chan_timer(chan, 0);
-+=09=09=09=09l2cap_chan_unlock(chan);
-+=09=09=09=09continue;
-+=09=09=09}
-+
-+=09=09=09clear_bit(FLAG_PENDING_SECURITY, &chan->flags);
-+=09=09=09chan->sec_level =3D hcon->sec_level;
-+
-+=09=09=09/* Security completion must not accept deferred setup. */
-+=09=09=09if (chan->state =3D=3D BT_CONNECT2) {
-+=09=09=09=09if (chan->tx_credits)
-+=09=09=09=09=09chan->ops->resume(chan);
-+=09=09=09=09l2cap_chan_unlock(chan);
-+=09=09=09=09continue;
-+=09=09=09}
-+
-+=09=09=09l2cap_le_flowctl_send(chan);
-+=09=09}
-+
- =09=09if (!status && (chan->state =3D=3D BT_CONNECTED ||
- =09=09=09=09chan->state =3D=3D BT_CONFIG)) {
--=09=09=09chan->ops->resume(chan);
-+=09=09=09if (!le_flowctl || chan->tx_credits)
-+=09=09=09=09chan->ops->resume(chan);
- =09=09=09l2cap_check_encryption(chan, encrypt);
- =09=09=09l2cap_chan_unlock(chan);
- =09=09=09continue;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 7a2551ef7..2cf91d0a0 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -993,10 +993,15 @@ static int l2cap_sock_setsockopt(struct socket *sock,=
- int level, int optname,
- =09=09} else if ((sk->sk_state =3D=3D BT_CONNECT2 &&
- =09=09=09    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
- =09=09=09   sk->sk_state =3D=3D BT_CONNECTED) {
--=09=09=09if (!l2cap_chan_check_security(chan, true))
-+=09=09=09if (!l2cap_chan_check_security(chan, true)) {
-+=09=09=09=09if (conn->hcon->type =3D=3D LE_LINK &&
-+=09=09=09=09    (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
-+=09=09=09=09     chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL))
-+=09=09=09=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
- =09=09=09=09set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
--=09=09=09else
-+=09=09=09} else {
- =09=09=09=09sk->sk_state_change(sk);
-+=09=09=09}
- =09=09} else {
- =09=09=09err =3D -EINVAL;
- =09=09}
-
-base-commit: a063a00e6cd9e354aa6d67a154a0527951d7f881
+ =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
+ =09if (err) {
+ =09=09struct l2cap_cmd_rej_unk rej;
 
