@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793991007;
-	b=Kb2ER7vWClKlELfEz6qFpGs44HsNE3RH9CHiqBVnLKqr5/ZFZKBuPqX7mtGovZwGk1O/
-	 3L00p//g08w7NSNdHNVm8/eOGnfuFzHOTMivoyYkvxQalwuOdUDQpMPItMAl/X1Xpj+uQ
-	 6fSU+j4Z418Jd26PQ3aNFYegM5eQJdUgQd3vv07niAJ1hdl/1h1JrHl/U+eoR+WXRsF7/
-	 ycKOZkqgOOoXsYiykbDGmf5tyzf2rFQCoYSloDLgySkHkMKJbUCDuUb/dY/hQNtJ5YenD
-	 iTFFN3NhXGgXGAdw6+HU4kvI19sZ0lRnxO23z8Wo7fxby1A0hUG/aaMFcAPW7kbnVMA==
+	t=1793991008;
+	b=K/vfnxJHpVLBA++dD7SoHBk6veshHJ/kofpvTVmUEspkaQNI9734lJPaIAXP23YvQLSO
+	 fYMJT2STT5biBYEHHKfmwVlPkaglvpasfSYK1vJYUYLCxjsd+fjG/WpbbV6Z+6Iv0S0GJ
+	 AFl4phdBOXBYqnu3fdQzxoWcOmJ/bpVF3qnjdddLOc/SBSjSCV/U0YgL6/zDsHTTl7ezA
+	 yFAHoPhHRUXxxxbgMDj9bCjFl5afhOhRjDsmYuLlq8sYvgfWb9ISMD9dXgOoQW+TwmAla
+	 B+bf9jlvBWp5d8E+wfODCTkfnelKVcsZMlFHXx2fcWxfLEO1pELXW9aItIgDKLyyRhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793991007;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793991008;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=qbqjD2iEGNEAahdAjmc4YuwNw0rF7X3YJg4pPlcB0EE=;
-	b=ErZfI9V7AaRrQBISOZ7C2DYppLHDaM2kAbVg3XNSBfJWAtmJNHM1Ll47dyk8LRYLJTOS
-	 89sYDJQEywrQkVGYHl7kj8r4T1swmlmDCzOW/TmrpKpeLAB4bzDdSb4Nlywp3t07rcqA5
-	 Cvh0m6cEZfQgEtQeRXBA2IP/dKV3HYgJF7wvC/p9ztT726xMebmTdYlgn5BeYUal46pEs
-	 5yhhhH+koUoz9Nx9O6I1NMASV0lSOo9qH31ziZgJBX6AmRkhzciAm4gYM54zWf11LhXqM
-	 n8XnZSL/6v1A6W0HTPBBldvCUeo8JWMphwyhPCtKZOdEtRqhsrm4pEE8xkinGTC56AA==
+	bh=OrfRYCBlbmflIvhtxvG/f3svmEmtBxYlNU2+D3tCqpw=;
+	b=QMe7OikJPVOJTqyWwimUG4wOR/ZtTMO1bM4Z+1YPlrnH1u42JAh/SRWSvrHieo2z+5ip
+	 YxqwPi1fuBH8yVggIpGND76tBrBiOjXd8C4GOnfrSAkShXqo9JeRaehx6n/Xz6ljLL5fS
+	 9+KZebwKEpoz+0wt9CQBuRr7H/Iz0vC665e6AvQLWec6XiQYDjNyBriGYS8dyX34OxuNE
+	 gsacm+jXrrd4enIKcUKwjCDS/IOpHCCirBLKay3lb18+XYO0y88idB+46Sv5+PXlzBYuG
+	 RIHa8zFIBOWRifrzBbIzUm5S1V8A2rbLRgXP/6ZcjcJS3RXnVF2+GJeUuFBNkfMDsyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=liUv6RC9;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aWgfY8Lw;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC34606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 18:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F32F606A326
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=liUv6RC9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E111F0089F;
-	Fri,  6 Nov 2026 18:50:06 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aWgfY8Lw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A4411F008A1;
+	Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793991006;
-	bh=qbqjD2iEGNEAahdAjmc4YuwNw0rF7X3YJg4pPlcB0EE=;
+	s=k20260515; t=1793991008;
+	bh=OrfRYCBlbmflIvhtxvG/f3svmEmtBxYlNU2+D3tCqpw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=liUv6RC9s2E0jZsesRu4Tvr2Ss9DpgBQeNJNwNS7KJKf6U9dlt4BAGvPuZeiDJdKU
-	 g5br5Wnzz3hCYml2MoNMj0O/1RUPqfYJJAnk2q7lEbAx9pdDu2OLCVFvzdLqu+5Zk6
-	 oKZ7V9jBO/M/rInFyWjR9sQ/7xEs0wMmnO6ifcsak8bhVW304SQBiYgKB1CTfdQNDK
-	 G6ZcyP0fdEd5+OvdnJl9TWc23P7errV1HOW0dqTJ1vtM+V8sp5/XrQFljstWYEDD47
-	 y2veH7HtVaHcczbzM64K9fNEjhLYKnYlIv3+/P7u3cd24aUrd+YY6kdyYZcjh1sbIy
-	 LRFqqJDV0ymig==
+	b=aWgfY8LwbfXBMmA8lIe8zSWVOP4ltVtxxagYN1AAY75EILJnq907KKEbqKlk8Vvtg
+	 eydn/uRecsxgo6RyHcPwaE5gvEMRHm6PWwbtHzrdF+ZFDBFq7UL3u5eGjh58+SiXAL
+	 hN3gDcXoQBu/gk58O2Tq/+w4r3wmZFg7BGAQ480Qk92r8fgqGPgtZ4Aq7f0SIqF/Q3
+	 RmCVN9PvEDPV6auGduMwf6P8EV+yALebAFdTKXppXUXQYSarZjzNNS0tVU11ai5ZXg
+	 pxeInmGuK2YqlF21nozmImbDBQa0y85iFyP3oPB3tT/fSq8fd4rQ+Eq1ZTr4268kTg
+	 m8DmBVuxnB42g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D81BD3A41021;
-	Fri,  6 Nov 2026 18:50:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5E01B3A41021;
+	Fri,  6 Nov 2026 18:50:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,15 +54,14 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] shared/timeout: Fix use-after-free when a
- timeout
- removes itself
+Subject: Re: [PATCH BlueZ v1] avrcp: Fix GetTotalNumberOfItems command
+ encoding
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179399100567.811161.6597744778392597032.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Nov 2026 18:50:05 +0000
-References: <20261030134426.420979-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261030134426.420979-1-luiz.dentz@gmail.com>
+ <179399100691.811161.16790714216807073653.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Nov 2026 18:50:06 +0000
+References: <20261105221620.2332170-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261105221620.2332170-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -71,19 +70,21 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 30 Oct 2026 09:44:26 -0400 you wrote:
+On Thu,  5 Nov 2026 17:16:20 -0500 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> If the callback of a timeout_add() timer removes it, e.g. the tester
-> test timeout restarting it for teardown, its data is freed before
-> timeout_callback() reads the id, and the id may already be reused by a
-> timeout added in the callback, which then gets removed instead.
+> GetTotalNumberOfItems only takes the Scope as parameter, but the command
+> declared 11 parameter bytes and sent 7, which targets such as iPhones
+> drop, stalling following browsing requests until BROWSING_TIMEOUT.
+> 
+> Also return FALSE on every response error path since the callback is a
+> gboolean and negative errno values would keep the request pending.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v1] shared/timeout: Fix use-after-free when a timeout removes itself
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=70197a083fa6
+  - [BlueZ,v1] avrcp: Fix GetTotalNumberOfItems command encoding
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a8067198717b
 
 You are awesome, thank you!
 -- 
