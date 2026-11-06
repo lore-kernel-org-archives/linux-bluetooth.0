@@ -1,60 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793939299;
-	b=FcMbU9amMQ5kj83f14D+vu2GRQXlsNWjAbH61PGHrhZpAmUhXG/eNJ1w0w7GdYSOGLFO
-	 cFbbwGEG8WU8mUWxmAFnqQVKo8JeIXcV/Mkvji9uNjDDvpR0rSvTarUr8xycGcuK52Ven
-	 xIV+ODU2bJfs6idjfYLUvmwnkPwSUBv6LLZqflVAxE/C0BLXFmHwtlaogJ55PKaKbNTco
-	 p1ZQaeqHbR8C2RwiOQtO188O+VGhhCia/l2qeqKuNGBobg0o3jCvPI1eW9B5C7Tll6nKg
-	 tUpgZkJZczIKzH9beZbcz7jA5KZlSXJ8Diceikr6bjSg3IbFART9X/uOq0QB+9wgzmA==
+	t=1793939631;
+	b=zAtT8ryN6l740ceRdLnLuoZTMW+Qs3O0uZuEZuWdMfuCuB86EPdxj5q8FxVDAHT/EzyM
+	 kY2Z6J60Kyk4p53uXOUxBEljyxBEC/+KrqQtwIOubivvJlKt73an4ChYcBX+TuGS7MRbb
+	 7g6IqSZ/T/iUDdX+5PSXM9f5nUP5Vx06ncR7UfQ70VhP1z0R/VE0eMEcYi9FERRjF2g2A
+	 CYF/Yk8VdLiu17PJmTrAVdjTAQPSowbK6fMCnXEX8QjWqjvaN8DIhRc3Bu3whjKMnssLu
+	 v7MFFOtaQMAquQ+2JemlxwaNk9RRmfTonhvsqzRw65+8LS4EJQeI26IhRnRJKITszOg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793939299;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=VUbLFpGC6oJfJwdNxVP8oejHx2h8X3UnbAiDfBqngiY=;
-	b=NSIK/dbfAfocHZ1e/uqPQQoxyeeh0UrWErKxxEK4yoEx2C+x/eE5Gszl8CIlZ1vgcNcl
-	 K6+mjoA9jfYeDForNNI1mPZPqYyDUmHzza2VeRo1nSOg8cGLpF+dYtazU0tgf+tSVACDn
-	 2J1KDq0R0EtK+Lvb4R1vsT1O6MjZdiabHm7/66mWOTNuwTuVBpIjEoKUiYcn43fAbepi7
-	 Cp+x5fZpueRKJ9K8mt/zPIRVaQVqRRrFl6IBLcQYi45+1o6wStw65Y2YN/lDliUfojsTh
-	 iZRL8/CNjWFN7t6fVS5Wy5HUw19L3hpepHG61miG5SxKfYXFmxHdnqoiiUWVevDyC4A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793939631;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 MIME-Version:X-Received:Date:X-Google-Appengine-App-Id:
+	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
+	 Content-Type;
+	bh=Q2tmnUML9xjff6/p1fEMU5at38Hc24S806y3q3ahbQA=;
+	b=Va/o+mXQw1xw+qQXeA8wu8ml+SrhG6F6B6z8c8Np0ouAmMC48rSjLo4JLFnuH04jBdDC
+	 ko27E4YuNGM+Va3edfArKT3O0OgXS/heVrzLt1Jk0KGEIRDQ01LM6ppohrvD/jWt1LJF0
+	 nfx25JTEl8CaQIrBWEpcPvI6xJQWGnBMEWZDGbnFw12Vnwz/44Kgz9BxmZQcb1PVHzcPX
+	 tVfTSVPRB4avdiv0AwatX0bq+88HjUfuOyLA8wjzBFPyk3r78M2U/67c2KMGyPshYaJMW
+	 uS4i9BgbepgVSLmV7fUicCM3BdIUIiGPDTjHFhXc3PiGQa58DbKlf45SzU3kylGb6/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=W1+jZ6o9;
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.197
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8619E606A31B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 04:28:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8619E606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=W1+jZ6o9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793939294; x=1794198494;
-	bh=VUbLFpGC6oJfJwdNxVP8oejHx2h8X3UnbAiDfBqngiY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=W1+jZ6o9iwwDynJKl+Pwq/pWQcpkv2r6xPoEUXpwDKtLfE1q45Xgnuu6GDA2n2etu
-	 wenxxjnkB6mu9IuL5wxMp3Cur18IhuHHDTGiFJ40wOAEaY24Lkx+2HHq0g/+OEUNAQ
-	 eM3vDYGL0ukRtdv8cmW2cUOg8zFEvh0R8fpt4Cd7YTdrBl6kAiZlEwKiBYmiPhlAco
-	 lr+TmPNEtGYyLos/amh05FQoEF0xOIiasmbQJ41iiRbeO+dZq0TSG/IDXRqCtu6qUd
-	 /7rDW5eWjpnBmnfQmqtzxGPtKR3/bMjdIOjb7s3VulQhAl0E1JGC0YC/4vrT3AEc1J
-	 Z4Q34MBBqm6Sg==
-Date: Fri, 06 Nov 2026 04:28:09 +0000
-To: linux-bluetooth@vger.kernel.org
-From: cochcoder <cochcoder@proton.me>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: Re: [PATCH 1/1] Bluetooth: reject invalid LE supervision timeout relationships
-Message-ID: <O8KSCk4Dqp1dOjSn_XmazuZF_32_hNdKU_RUTXgga7xPpkYoXvQWc0uEEDHhp4y26pjYI3LCaYhCt0g5L_csS_uZitb6Uo9YpbBfcPOaqiM=@proton.me>
-In-Reply-To: <20261106021809.631456-1-cochcoder@proton.me>
-References: <20261013033118.501182-1-cochcoder@proton.me> <20261015043336.47734-1-cochcoder@proton.me> <20261015181041.42873-1-cochcoder@proton.me> <20261106021809.631456-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: b024a9441cc69009f4b236e9a45c0c29887769dd
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE49A606A331
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 04:33:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE49A606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4a41f46d629so344064b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Nov 2026 20:33:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793939629; x=1794544429;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Q2tmnUML9xjff6/p1fEMU5at38Hc24S806y3q3ahbQA=;
+        b=H1d2Mxs+aLSxkyQn+dihS8JWUx0JzFoDb9HRTlJ0TcUbxBpMlYScDoo1KDdEPkVIRF
+         UpUdZtcEFekLaxiOjiDP2mT+3slOpUA9YAQIL2TYOgeeot1RpxgCoe5X1argwIun9aG3
+         M6YIhafrBTNPt/wlYzNNdZtVhz/C3PX97QelLypJRcPMxQiLOGr1MoDF0BlOhseL9Bl0
+         iGFT5XJvNtqaW35TiDM8X9KCtYmw2S/nXIWa6a8PfGRhrO3KaaTNUA1j/s08AyMq1Q7Z
+         AsyqhegbhhUQPDM/o4HhZFNom6AR+2GN9mY9zT6DRhgZIRKA8jzMD8JqpFvrM9XBS4pI
+         DaMw==
+X-Gm-Message-State: APuU4Z8BPviBH4JvHvFFxx5zk6hSrjFZOIYmtP3pATGeQ3qq3u9YYzim
+	br7gjCJO/mC30CQiTYFyEF6p7SMLSkI4iknfebS/b+oyz9CS73fCa64FJw0c0nHHvOioGCAS5c0
+	O18SwOizKXkwcCqcFKaXeoZ7HAJuqT/2/zW3m74sscY0JqRyMQRB1LnLrphw=
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,85 +57,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a05:6808:c110:b0:4f6:a430:1822 with SMTP id
+ 5614622812f47-567e0fa62f4mr1022308b6e.7.1793939629709; Thu, 05 Nov 2026
+ 20:33:49 -0800 (PST)
+Date: Thu, 05 Nov 2026 20:33:49 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6aed58ad.02d3f859.2829d1.0003.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Nov 2026)
+From: syzbot <syzbot+listd5b89f3aed1bfe64dd6e@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-I sent a separate BlueZ fix for the timeout-wrapper use-after-free
-reported by l2cap-tester:
+Hello bluetooth maintainers/developers,
 
-[PATCH] shared/timeout: Keep callback data alive during removal
-https://lore.kernel.org/linux-bluetooth/20261106042339.811655-1-cochcoder@p=
-roton.me/
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 14 issues are still open and 116 have already been fixed.
+There are also 6 low-priority issues.
 
+Some of the still happening issues:
 
-On Thursday, November 5th, 2026 at 9:18 PM, Kyle Pepper <cochcoder@proton.m=
-e> wrote:
+Ref Crashes Repro Title
+<1> 10047   Yes   WARNING in call_timer_fn
+                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<2> 5030    Yes   INFO: task hung in synchronize_rcu (4)
+                  https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
+<3> 162     Yes   kernel panic: kernel: panic_on_warn set ... (3)
+                  https://syzkaller.appspot.com/bug?extid=fe5ea83cdd7fc263f452
+<4> 17      No    possible deadlock in rfcomm_run
+                  https://syzkaller.appspot.com/bug?extid=0adf2aef8ca78b84c4df
+<5> 10      No    WARNING in hci_send_cmd (4)
+                  https://syzkaller.appspot.com/bug?extid=00f5a866124dc44cce14
 
-> The LE parameter validator calculates an unsigned maximum latency by
-> subtracting one from a truncated quotient. If the quotient is zero,
-> this wraps and accepts invalid parameters. Exact quotient boundaries
-> also accept equality where the supervision timeout must be greater.
->=20
-> Compare the products directly after checking the field bounds. The
-> validated interval and latency limits keep the products within int.
-> This enforces the strict timeout relationship without division or
-> unsigned subtraction.
->=20
-> Sashiko identified the underflow while reviewing the soft interval
-> preference RFC. The bug is already present in its unpatched base; keep
-> this common-validator fix independent of that preference policy.
->=20
-> Assisted-by: LLM
->=20
-> Signed-off-by: Kyle Pepper <cochcoder@proton.me>
-> ---
-> Fix the pre-existing validator bug found during interval RFC review.
-> AI review: https://sashiko.dev/#/patchset/20261015181041.42873-1-cochcode=
-r%40proton.me
->=20
->  include/net/bluetooth/hci_core.h | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
->=20
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index e33b15808..97ba716c0 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -2371,8 +2371,6 @@ static inline struct smp_irk *hci_get_irk(struct hc=
-i_dev *hdev,
->  static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
->  =09=09=09=09=09u16 to_multiplier)
->  {
-> -=09u16 max_latency;
-> -
->  =09if (min > max) {
->  =09=09BT_WARN("min %d > max %d", min, max);
->  =09=09return -EINVAL;
-> @@ -2398,19 +2396,14 @@ static inline int hci_check_conn_params(u16 min, =
-u16 max, u16 latency,
->  =09=09return -EINVAL;
->  =09}
-> =20
-> -=09if (max >=3D to_multiplier * 8) {
-> -=09=09BT_WARN("max %d >=3D to_multiplier %d * 8", max, to_multiplier);
-> -=09=09return -EINVAL;
-> -=09}
-> -
-> -=09max_latency =3D (to_multiplier * 4 / max) - 1;
->  =09if (latency > 499) {
->  =09=09BT_WARN("latency %d > 499", latency);
->  =09=09return -EINVAL;
->  =09}
-> =20
-> -=09if (latency > max_latency) {
-> -=09=09BT_WARN("latency %d > max_latency %d", latency, max_latency);
-> +=09if ((latency + 1) * max >=3D to_multiplier * 4) {
-> +=09=09BT_WARN("latency %d, max %d and timeout %d are incompatible",
-> +=09=09=09latency, max, to_multiplier);
->  =09=09return -EINVAL;
->  =09}
-> =20
->=20
-> base-commit: a063a00e6cd9e354aa6d67a154a0527951d7f881
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
