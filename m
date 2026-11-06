@@ -1,60 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793931495;
-	b=DdjwwPfOxVY9NKKwnGUQwq6MxtiGrcRF7yeSNviPYoQqewConOXkFjp3Akb4t7l01AZA
-	 +yxNpSpu5x3lOkZU3MsQ1sHbw9BUOF/iUYqwPNY6kBLjVwgOixD/eujiwDNlPS+EtT6hb
-	 A7hBhYlB7Mnl2Z/PxE+vSj5rQZXCSpkqsIeQrfYc5EouPIOavICV2QtRqpbiKEInOMPBv
-	 ySVRP3XRqZh9cJDZTmOPRnCTbWTmYgVW+GG0n6SzpsDjGEhnL0GePU16sgrdQioCrjX0n
-	 GtBlfx+VaBFGMQ0zxx6Omn+K+4XOehPUMRXgk+5LBya6QrauwV6Dw/I+kCPe3+yNddA==
+	t=1793931518;
+	b=r/1EZXC/Lz+4NgpOccd+3lfRDiDtHih8vw/mdAy2vuCjXalZfTSEM1iiOu4NHYxGiU2M
+	 7FKsjt3f4Ltr6hHogSmlRCymdw2JVbJDvkq1pDuhcPQE1RLfK3MWbw9mKLfbptzfcsqpF
+	 BXYYf8S9FWb/fXh6ajwtHlAT9Om0JfwA7k5hcVj484SkTvIZq99PTM5EzyqwJYw4lw3TC
+	 z/KagvsMIh+bBzUKmh9EqJpoPiCgwItF2avG0FJvf+2F5FS+WMu8wwP5y6foVdVnttGu2
+	 PGS3Ab7yv6cTAU1z1f6hXEYuKQ3Von091b3YexgY5v57NY1IlKZYuzk8vf6oVQH2YKQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793931495;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793931518;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
 	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=vJAwnH6DqhVCv2oRViwC2Bi0m/mhC0czlGN3s2VpsuY=;
-	b=Eb3GDbSp1jtzZD+tQrytWTON1iewD/1ImtkjQDU0wTFeSnq5JgXfwwrWwafrjEzgqh1J
-	 BSWvQ1xh/YO/kKgHNFluUAC8TOL7qnWMDP2C3dYmk1v2q3Vw6RKtyLhh1a32Y+lNOiR8F
-	 7rvUpV5IcSBaLzkqXev4VToVeN7U0v+Zzsd/nPFOv37V52pD+ifKyc4lHchljVy4ytyMG
-	 6aGynMC6J4jxd9usZ/hsszPynRFB2/D51GjT0rSFqIsuVxV+dBRL9ntgbtJN3ZfNV88au
-	 jVZDElnOb6IgnN6wG30scd+NTURDuRTv+sDx4lGo0Xudol7cFTwziI954HeTJBFzCtw==
+	bh=s9mYTm91eGDfuuManX45DwLeoHxJ64BDjGSH6sXiwKw=;
+	b=HxJHeL6PNdzI5Ji+1iRNpj+weqzlEQQFVvToQTsKSdTQUuo4NARKyyrZOF5vuFLypCH+
+	 NiWkkkKFOoi5RM9dtT2q5Hq45LlW9kPo5+YM4v4FSk0AOGxLNI+2iS7w0AYN0UdgRk7I9
+	 XPMJ+xphGTDFY8IwIKE8FaQnwn/tEsjuA5pCNB4s3Zy20w0NGjkfytZRWgUcCqmUS5AWX
+	 TM/NIjMm7ctlCG3E8ndD/6oBJp5oNcCB5Z3UaoWHG4A6rPKx9zYAw+IxMR/vsWEXdHP2P
+	 L2U4kweameLafkWf36iObtEjLDxbjcdRgkEGo322ayD6Pl4i+F4BgF7crzmuYqL6L4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b="X3pNd/SK";
-	arc=none smtp.remote-ip=185.70.43.101
-Received: from mail-43101.protonmail.ch (mail-43101.protonmail.ch [185.70.43.101])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=rd3WIGcX;
+	arc=none smtp.remote-ip=185.70.43.103
+Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BA4606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 02:18:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46BA4606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F702606A31B
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Nov 2026 02:18:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F702606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=X3pNd/SK
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=rd3WIGcX
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1793931491; x=1794190691;
-	bh=vJAwnH6DqhVCv2oRViwC2Bi0m/mhC0czlGN3s2VpsuY=;
+	s=protonmail2; t=1793931516; x=1794190716;
+	bh=s9mYTm91eGDfuuManX45DwLeoHxJ64BDjGSH6sXiwKw=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=X3pNd/SKlZDw0N6dndGskcsPrsU/zRrOZ3CTHXX9BQCJf1TtAj7Y7Qds0vDMhZfqp
-	 A8EEnW9fgRAEh2Qv0dl37eCkBqkLAoo80AJDItoEATM9y43VnGI+5zVc6NjBqLvl+S
-	 Lgw/fpStjQWh/X5fI0pQKqNIv6ctOGLuUH2WXGb3cO5u4pM1XCVOg+dhrVZ97qcSG8
-	 9D9X20lejcpMx/ZxP/1SMsQb86ZFQidgFrnt0G/U1D0/wYGL+7hsgXxETcdzKLAS7y
-	 cghTu27YDHqpCvhKlNVBhcAOsrgg+YDPF23E1i982JY8x8wgSuc4sOHZr/Z3P6LwsC
-	 SXTTDKDwkA+Rw==
-Date: Fri, 06 Nov 2026 02:18:07 +0000
+	b=rd3WIGcXC0SaSuNDqT62+jQSP8A2cdZpkdmwv1+GMnUYDvfVKNvgfJAbKXc2keVds
+	 GVksIpwq6Kvfw14TPx9C8a8G+yTWj9aayqa5WmgOW1GoNto3MypHjxr71xKh3XpktI
+	 zcSQjZ9LoGBmAeu7REdZ5o6fh8FqbY6QQ7rzpKQtm/RfwZ6ImqsbHMwX/XiS9lxLDE
+	 Ajyoo1CH6qtAFFbA/VRRODCavqvpe9Vy+/DzXDLewde1ZEIKa/SDv8zA0MzrOSv1Ss
+	 fgcSf3Rjd0M6dSYLCymlbwmq6pa6jEO63ScUNjwt5kcAQjtWGPVXO6S+58HTHdUFZ0
+	 jauwPwB8gVJaA==
+Date: Fri, 06 Nov 2026 02:18:33 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH v4 2/2] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
-Message-ID: <20261106021723.631339-2-cochcoder@proton.me>
-In-Reply-To: <20261106021723.631339-1-cochcoder@proton.me>
-References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me> <20261106021723.631339-1-cochcoder@proton.me>
+Subject: [PATCH 1/1] Bluetooth: reject invalid LE supervision timeout relationships
+Message-ID: <20261106021809.631456-1-cochcoder@proton.me>
+In-Reply-To: <20261015181041.42873-1-cochcoder@proton.me>
+References: <20261013033118.501182-1-cochcoder@proton.me> <20261015043336.47734-1-cochcoder@proton.me> <20261015181041.42873-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 874f26d40e2051fa6d311ad2d565f4765e7b6134
+X-Pm-Message-ID: cccb7fd61247527647f938117c1d4ec569f97d51
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,63 +67,70 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Keep the narrow identifier-zero exception for nonzero credit grants to
-connected LE CoC channels. Apply the same mode, state and pending
-security checks as ordinary credit indications.
+The LE parameter validator calculates an unsigned maximum latency by
+subtracting one from a truncated quotient. If the quotient is zero,
+this wraps and accepts invalid parameters. Exact quotient boundaries
+also accept equality where the supervision timeout must be greater.
 
-This interoperability exception depends on the security fix and still
-requires maintainer policy approval.
+Compare the products directly after checking the field bounds. The
+validated interval and latency limits keep the products within int.
+This enforces the strict timeout relationship without division or
+unsigned subtraction.
+
+Sashiko identified the underflow while reviewing the soft interval
+preference RFC. The bug is already present in its unpatched base; keep
+this common-validator fix independent of that preference policy.
 
 Assisted-by: LLM
 
 Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-No code change; depends on patch 1. Maintainer policy approval remains requ=
-ired.
-AI review: https://sashiko.dev/#/patchset/20261015181624.48318-1-cochcoder%=
+Fix the pre-existing validator bug found during interval RFC review.
+AI review: https://sashiko.dev/#/patchset/20261015181041.42873-1-cochcoder%=
 40proton.me
 
- net/bluetooth/l2cap_core.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9463ac215..4bef75235 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5385,6 +5385,10 @@ static inline int l2cap_le_credits(struct l2cap_conn=
- *conn,
- =09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
- =09=09goto unlock;
-=20
-+=09/* Tolerate identifier-zero credits only for a live LE CoC. */
-+=09if (!cmd->ident && (!credits || chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
-+=09=09goto unlock;
-+
- =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
- =09if (credits > max_credits) {
- =09=09BT_ERR("LE credits overflow");
-@@ -5994,11 +5998,21 @@ static inline void l2cap_le_sig_channel(struct l2ca=
-p_conn *conn,
-=20
- =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
-=20
--=09if (len !=3D skb->len || !cmd->ident) {
-+=09if (len !=3D skb->len) {
- =09=09BT_DBG("corrupted command");
- =09=09goto drop;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_c=
+ore.h
+index e33b15808..97ba716c0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2371,8 +2371,6 @@ static inline struct smp_irk *hci_get_irk(struct hci_=
+dev *hdev,
+ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
+ =09=09=09=09=09u16 to_multiplier)
+ {
+-=09u16 max_latency;
+-
+ =09if (min > max) {
+ =09=09BT_WARN("min %d > max %d", min, max);
+ =09=09return -EINVAL;
+@@ -2398,19 +2396,14 @@ static inline int hci_check_conn_params(u16 min, u1=
+6 max, u16 latency,
+ =09=09return -EINVAL;
  =09}
 =20
-+=09if (!cmd->ident) {
-+=09=09if (cmd->code !=3D L2CAP_LE_CREDITS ||
-+=09=09    len !=3D sizeof(struct l2cap_le_credits))
-+=09=09=09goto drop;
-+
-+=09=09/* Credits have no response or identifier-matched transaction. */
-+=09=09l2cap_le_credits(conn, cmd, len, skb->data);
-+=09=09goto drop;
-+=09}
-+
- =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
- =09if (err) {
- =09=09struct l2cap_cmd_rej_unk rej;
+-=09if (max >=3D to_multiplier * 8) {
+-=09=09BT_WARN("max %d >=3D to_multiplier %d * 8", max, to_multiplier);
+-=09=09return -EINVAL;
+-=09}
+-
+-=09max_latency =3D (to_multiplier * 4 / max) - 1;
+ =09if (latency > 499) {
+ =09=09BT_WARN("latency %d > 499", latency);
+ =09=09return -EINVAL;
+ =09}
+=20
+-=09if (latency > max_latency) {
+-=09=09BT_WARN("latency %d > max_latency %d", latency, max_latency);
++=09if ((latency + 1) * max >=3D to_multiplier * 4) {
++=09=09BT_WARN("latency %d, max %d and timeout %d are incompatible",
++=09=09=09latency, max, to_multiplier);
+ =09=09return -EINVAL;
+ =09}
+=20
+
+base-commit: a063a00e6cd9e354aa6d67a154a0527951d7f881
 
