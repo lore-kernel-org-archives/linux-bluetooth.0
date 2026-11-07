@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794087986;
-	b=3hGYZZAaekz/q0ts9vpbKKUqL9A/Y+F6HRBC7O6swU2JIABidkIIpJVyzOP3FBZiSlWf
-	 HuYw7JHhMjrfOjPyiSt884SAp/oNhk8pnWGT6Tu7heiUZoqHlUJ6z4JizUcz8vOAaBbrs
-	 fqLKMxZMD5c3d3DZooUBMic2/a6l3jjTV7DvuiMHVO90PXZ5b8nj4xlhfJHxOFTNxJCpj
-	 YOTSWdhvBqP0oaP94VnF9YJPtdcTcu09IJN9aYlM/Muj6CUZYm8SrWxWoBczTug1BQjiu
-	 DVYPzJqfNxCY2+pw/nHtegjb4QBiPXaMJlfG/A7HtAfqV/Wb0NVgLgXgRPyUozXoO3A==
+	t=1794087987;
+	b=f4ZYda2H0luAkIHWPYU8RqhCsXkxw9uYBeMfKJ8J+VlEhWSO5cyLsfFDfgKPDEydkkF0
+	 kJ5c8bWSGGWzDXYAYlWsmkHyaNjen3G2kgmsYMOcqLfbCU76LpNfgA8berEwWBXbLjw08
+	 tQbuQkPT0anCym8qxMjaZMDM3Ic5O3Uw2usjEZVS2d1CI3QBeASM//ZWkG2BXs2crnTJy
+	 NgekV4VAc7o1qh80/lvbTfxOms+TwW1ZHYcM9jRuElrnFdVAxwDa8unWJQcoFWJ/6hMw3
+	 NdsU1tIY2GOG3aTz+xr+BWfaSYriKSvLAr3Y8h3xMsFOizUqoSmgD8tG3U0e5WRCROQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794087986;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794087987;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=5d49qTKAVE7z7WxDmCLXh2spUGiMZLvPBSIGW99sb3k=;
-	b=sFfgcrrtm5yvPd8K07Aqqa3tTSRNcV75qfV7h643ZIx256ObOVvfVJlJ4DA32EN0nDU0
-	 1ApYUGRtws7zX4AgTrnr3xe+Ksx4FuU1JocVci8LmehumC1m8dLlOjx/+nNvor2dGqorj
-	 XrvWkkOt0x4uFqKEfIBJc6elsJfPVcvb6Rm7p9G5aN3wlVmZqU396OL+eoBgZMWhAx8R/
-	 5FQmixXl7c2G7o3YH2fI06NYABmhGdZkFBtmkt1IC6UpL1xZRAvnoF2rvTUQtJ4259LKf
-	 pa+MdSM8SiUkpN6m4qNT3NRSUS8QThUxAKwKSa0+DQhLQiCVBQszItFMa78WajH9bmQ==
+	bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
+	b=kdzDTFRihXnpxASRAc+V4IbzPzr94qZefl9USSRtvr8RFelQcMtIVOOU0Lew1MXG0kEA
+	 ZUViOh4ZIMgnZ2ysVd0Kx0Vesgmvq308i3AdPE2G2uI6Xq76j1NNs/XqUCxZWlYG7H9v9
+	 0pPRmcpT7iyDRH1hb4XScrnkcQvU2V+qhVfuNuZXd+C75Ag671OPKBGwdnEa1w6QZE2aL
+	 iOXV6lgGtDPAd77VA73SVHeir4QMdjgzEV476xvVyE8fCKhfcxt+PpSDo3wy+pf0i9MVY
+	 3rSJWQ+CQxJ17iXOWyxmLXgbiCCHRoihfYtqoOfN8bU7GUak8BHIm5MtmwKtaOqkFRw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=unsh11I5;
-	arc=none smtp.remote-ip=209.85.217.45
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MxptnoIu;
+	arc=none smtp.remote-ip=209.85.217.52
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE220606A326
-	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 21:46:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CE220606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AEE606A330
+	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 21:46:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12AEE606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=unsh11I5
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-7cc1cf48a39so16795137.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2026 13:46:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MxptnoIu
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7d2d95c5d81so59280137.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2026 13:46:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794087985; x=1794692785; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794087986; x=1794692786; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=5d49qTKAVE7z7WxDmCLXh2spUGiMZLvPBSIGW99sb3k=;
-        b=unsh11I5T5VRZn4nC32QJ+eP9c6Hdhr+RF2lJ/LxSupYMRfHoLHMjjRhTVnaIwUK9J
-         Qv9hj1yaCAF9urhyEf3B0SJutGbASHBDZwJ5UUJquaQGNb+OUJAFDtOJXI0luuVc8Yp7
-         NBAlj/bOa6KodsfntPTgKMW7u4i5QVPRn9sVIieCufNwtS5ST9HFbp4jJLOK6jIQhyCq
-         55cbYdPNeY+4AAyC+GW25v9+bSB8P80/ljvId+gQSnZnwV2bNLekhN3widmhu+GLZhV0
-         NbaHY6Q76vKXnrjUoA/EItU4sNXGPrcl04nLVFHDJH4Q6StQeSBQaXF+fKA421Vg7oxA
-         x1+A==
+        bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
+        b=MxptnoIuVsSVixbqiNw9H/5Ia2JB9A9mt1zB0S5D+TFzeq2iCxSkj4UB23jat1PmB9
+         pEtoihCTHR6ov+mHTl1bNeKTNFwBmnUHDwHvZH0xPBGB6o5/gayqnb0yu3CzsLpopmCB
+         x0JrH+FNlUixe50K9UHkgyTZs6P87aumh0oNRky26cGk0yd0vn11B1umfudVhT/DoE/m
+         vMeyM3Q7JS9pdnJZTaROwCWnq+3liiksmqawu1gFg0G4YUdF64sEMu+h9ho3v2OBouKd
+         foA+GyPsaV5dkIMZsMnkQPBK72nCBsmjFDYIb4UaVUfBmgIHUpK61QDCNGdOyTJcNIJD
+         j70Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794087985; x=1794692785;
+        d=1e100.net; s=20260707; t=1794087986; x=1794692786;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=5d49qTKAVE7z7WxDmCLXh2spUGiMZLvPBSIGW99sb3k=;
-        b=OTsbFP5e/2xurygp5+u5yO5U3uOKdT3kUQ3CpCuiPOnWlodnzq/d8cqG7bPiWF/CRL
-         Afike+MXVrYTVwvGenbDuqEutcY062eP9XdsVn6at9mo7vvamp68n3OL7jEL0JpzACQ5
-         h0oewtoVsnavp0SP1HomVKx8lyfC5o3etImx4LG1+jrG+QjFxkVNCCMgQVvdwdrGYigc
-         uqcGdKGNim+jPx6dKA3QELPLCbcbKrNt71matja65err1seJWw9XkSfkGsHP3Pe1sUXu
-         qHco/N5hRx94ijTSO6s1RFbKeOB3vQS/V2wvny7zLAfmV0PqmaMgEUrlbUkwg2khQO1d
-         7z1g==
-X-Gm-Message-State: APuU4Z8yD6uhir5kQtERThEaDwX7vUflaaYBMG2utXCzzeSQsia8nbW/
-	EjRPB4165dD6XomoWBTpuPuOaa3yfKtPI/CzsccnCO2xIAvdZ7Rg9cNLpEe3SQ==
-X-Gm-Gg: AYBFou20k+BwvN9nWSlT5hDt8XlDdZR1v51KUxehAIyip/5Xj1B6gg2jfzrrQxQAHVC
-	RL0uITE27qmfBbc5LZiz4rtCNDnkgFCQyUXsYpok2ylXrFbrj8ZvCd6DjymunPjBqAa0DrIl6BW
-	mQkK0BvafYrHk7yBQEeuRxEo5fBCRQvAg4Dk/F76CnnHE2zBgdvAz38or+B9jj/XuAvz0BwrxTZ
-	eDT7tIgh2ItCXHLrkisom5iVrySXe1e7kuwhAE+rC4NBu5nCrF9fwYxbbMZleCFOT249Eoku9An
-	P1Y27OJHb8IqPpjqKLfMvN13pV9c3D2jjT8Y+bEeE3D/iC5hF9LmnmrNKJTnhQ9sJGKU8u4UArm
-	s9W91q1LbnI86Qy0SlfKjrdd3izJVdsFtghcozeXPyEZwtXxXuVkw7/llSVgHvaaQRvOQUGSgNJ
-	Hdz128a4J+sjNA6XDJCX6L2Yx8jUHu1cKyW4cpccJ0rhJD9e2ESOBUIPJxKpI0T9Wvrox+cyBDG
-	lKCkcG0cyCxTsZiZUPJvH+I0idifk6xH6Qze6mHJOvYhvrhim3BDA1lFybaY9sNgJkYo4Ze6HNG
-	3jC4FJIQOhktvLfvJn6jbMJF0yDIZz5OBOG39J+zjLRMGUEZRO7SuUw5eFOLVHOZl6CbIz2Ri8M
-	IXvqCpBpNPhOWr1nRe/wCQnN37qAdBKan4BIEPcyPhgvDpx8a2bkBxFPLNtND05n6xPTFWPjPuQ
-	d0sV2j
-X-Received: by 2002:a05:6102:914:b0:7cc:118e:7bfe with SMTP id ada2fe7eead31-7d2db102570mr27146137.19.1794087984606;
-        Sat, 07 Nov 2026 13:46:24 -0800 (PST)
+        bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
+        b=wYQ+54R1ssbafcZCV5Qp+6LqbUBvJ41RvseF4h4JI5K6fiwWQTP7M11/wIEOO9wMqa
+         nqXuRb6vbhZrz/Hxc5Sz/4cA1CjMHEXk3+R1Vynu3by3sJZH+uOEn7yvaB1H6J4NN/7x
+         1fkfKtOyom8YTV38yzqevrhRRjipFLNWNeC64yqlv5BlQwaYNaUunjILnbrrtVREhfc8
+         9wZE7ISZHh+/dzqSrh+3Z4NXiG1GpzF1PWks/gfyLR27H5WutFtrtYLp/XgDSjEypKDc
+         OBmQNyiEp/xtHHsH9e500l2/+JQHxllKOOWphqBlk3ST7/dVdcL5YtbLIPacjUQ0HhZU
+         iLLA==
+X-Gm-Message-State: APuU4Z87DoOSYsIKE1SRQ6kKeUFUgMFA3w583vwJ0zSUx64sUF1fxXXj
+	ler1uSTgKRg9bp4iS7MSP3ikY1CLTAc6IMBEJRPilNMP99wlO1EFvHJEm+m+tw==
+X-Gm-Gg: AYBFou10Sh5iOLbQUS92o7HyIoV7gYF7OAJ1rDc09gMBoS5Yj4vtq1vDue4LfY0+pDS
+	EtUJ9tAmd/8wo/17TZDbtAZ6t3rTx93V3ks2hXM3A19XT+aQNd+gqsX5wb6plsYDK/rqdaJ7/aW
+	/N1vJev530fx8xZx3N72iwIGqFA14EgGmhIpcThPH1Rf09zjEVcOQHjPdpP9Da7bphvK0e8BGq/
+	zzBc+Y4mhrFmFYi0XUXqHinQmwqHIgWKnBGTpTupWFQG9qtuz/9D8UGduYTkGlrqeeEKXEUOJAz
+	dmLM17QejLaYZv45ME/Zrw15a0bmFMZU08K/KCwIcVn/S4U13N9qCYcLQ00dhSrMXpczn+9jyGR
+	39K4jqrOeFwGdzOcg2R83JWoJ2B+1FvHjterTe53a4HsWLWZk0/LSNiJOeDwkoXu8e8B3xAzcAT
+	IPXLmc3aPvKJWjh3Lt3fWf/JLzQ27TSyKKctCfEITDidFVgWMdGLSMlKfiyH/40veOhp47M4Jzg
+	si3kqY309xxeGKIChzC+n1HVCttcJDsJ+xUrqNgNzlOv/YAlQ2JfW4mWx7z1tW3k2OXxja+Sdze
+	hfQqJy8yY8r2uVGccy5w3yog3nCcRGgVk9TQq82K/LB5apt4PgpEE3vUwWvTYGb5hIgVM0TFBhf
+	/2ThN1xUScGWPemSdB0UvvNq5E8bdktU1rb33JjDR1z2lYfvMH9Cma+52tjAtIUMY03ij5w+izO
+	hlaZk=
+X-Received: by 2002:a05:6102:41a8:b0:7cb:bd9b:4873 with SMTP id ada2fe7eead31-7d2bd87885bmr570698137.21.1794087985791;
+        Sat, 07 Nov 2026 13:46:25 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece6418de3sm382617e0c.13.2026.11.07.13.46.23
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece6418de3sm382617e0c.13.2026.11.07.13.46.24
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Nov 2026 13:46:23 -0800 (PST)
+        Sat, 07 Nov 2026 13:46:25 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 08/11] shared/gatt: Add MIC length permission checks
-Date: Sat,  7 Nov 2026 16:46:07 -0500
-Message-ID: <20261107214611.388705-9-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 09/11] main.conf: Add HDT configuration
+Date: Sat,  7 Nov 2026 16:46:08 -0500
+Message-ID: <20261107214611.388705-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261107214611.388705-1-luiz.dentz@gmail.com>
 References: <20261107214611.388705-1-luiz.dentz@gmail.com>
@@ -101,508 +101,219 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add read and write MIC length permissions for 64-bit and 128-bit MICs,
-take the MIC length of the link from the BT_SECURITY socket option, and
-reject access with MIC Length Too Short when the link uses a shorter
-one. Expose the permissions as GATT characteristic and descriptor flags
-over D-Bus, and add bluetoothctl scripts exercising them.
----
- client/scripts/gatt-mic-128.bt       |   5 ++
- client/scripts/gatt-mic-64-128.bt    |   7 ++
- client/scripts/gatt-mic-64.bt        |   5 ++
- doc/org.bluez.GattCharacteristic.rst |   4 ++
- doc/org.bluez.GattDescriptor.rst     |   4 ++
- src/gatt-database.c                  |  26 +++++++
- src/shared/att-types.h               |  17 ++++-
- src/shared/att.c                     |  39 +++++++++++
- src/shared/att.h                     |   3 +
- src/shared/gatt-db.c                 |   9 +++
- src/shared/gatt-db.h                 |   3 +
- src/shared/gatt-server.c             |  56 ++++++++++++++-
- unit/test-gatt.c                     | 101 +++++++++++++++++++++++++++
- 13 files changed, 275 insertions(+), 4 deletions(-)
- create mode 100644 client/scripts/gatt-mic-128.bt
- create mode 100644 client/scripts/gatt-mic-64-128.bt
- create mode 100644 client/scripts/gatt-mic-64.bt
+Add an [HDT] group with DefaultMICLength, DefaultPacketFormat,
+DefaultRates and EKSOpportunistic, and pass them to the kernel with the
+LE HDT default parameters and Opportunistic Encryption system
+configuration TLVs, documented in mgmt-protocol.rst.
 
-diff --git a/client/scripts/gatt-mic-128.bt b/client/scripts/gatt-mic-128.bt
-new file mode 100644
-index 000000000000..9d566ae5bf9c
---- /dev/null
-+++ b/client/scripts/gatt-mic-128.bt
-@@ -0,0 +1,5 @@
-+gatt.register-service 12345678-1234-5678-1234-56789abcdef0
-+yes
-+gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef2 mic-128-read,mic-128-write
-+01 02 03 04
-+gatt.register-application
-diff --git a/client/scripts/gatt-mic-64-128.bt b/client/scripts/gatt-mic-64-128.bt
-new file mode 100644
-index 000000000000..f4e595165e71
---- /dev/null
-+++ b/client/scripts/gatt-mic-64-128.bt
-@@ -0,0 +1,7 @@
-+gatt.register-service 12345678-1234-5678-1234-56789abcdef0
-+yes
-+gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef1 mic-64-read,mic-64-write
-+01 02 03 04
-+gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef2 mic-128-read,mic-128-write
-+05 06 07 08
-+gatt.register-application
-diff --git a/client/scripts/gatt-mic-64.bt b/client/scripts/gatt-mic-64.bt
-new file mode 100644
-index 000000000000..b79717ae2534
---- /dev/null
-+++ b/client/scripts/gatt-mic-64.bt
-@@ -0,0 +1,5 @@
-+gatt.register-service 12345678-1234-5678-1234-56789abcdef0
-+yes
-+gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef1 mic-64-read,mic-64-write
-+01 02 03 04
-+gatt.register-application
-diff --git a/doc/org.bluez.GattCharacteristic.rst b/doc/org.bluez.GattCharacteristic.rst
-index 805f39593903..6dd5d44c04cf 100644
---- a/doc/org.bluez.GattCharacteristic.rst
-+++ b/doc/org.bluez.GattCharacteristic.rst
-@@ -382,6 +382,10 @@ Possible values:
- :"secure-write" (Server only):
- :"secure-notify" (Server only):
- :"secure-indicate" (Server only):
-+:"mic-64-read" (Server only):
-+:"mic-64-write" (Server only):
-+:"mic-128-read" (Server only):
-+:"mic-128-write" (Server only):
- :"authorize":
+The values are those of LE Set HDT Default Parameters. In particular
+DefaultMICLength can only be 64 or 128 bits: the spec reserves every
+other value, the 32-bit MIC being the one of the GFSK PHYs, and the
+controller rejects it, which would fail powering on the controller.
+---
+ doc/mgmt-protocol.rst |  3 +++
+ src/adapter.c         | 28 +++++++++++++++++++++++++
+ src/btd.h             |  7 +++++++
+ src/main.c            | 48 +++++++++++++++++++++++++++++++++++++++++++
+ src/main.conf         | 27 ++++++++++++++++++++++++
+ 5 files changed, 113 insertions(+)
+
+diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
+index bf6a3b20084c..c4e1421e3a5c 100644
+--- a/doc/mgmt-protocol.rst
++++ b/doc/mgmt-protocol.rst
+@@ -3469,6 +3469,9 @@ Currently defined Parameter_Type values are:
+ 	0x001e, LE No Filter Scanning Duration for adv monitoring
+ 	0x001f, LE Enable Interleave Scan for adv monitoring
+ 	0x0020, BR/EDR Connection Idle Timeout
++	0x0021, LE HDT Default MIC Length
++	0x0022, LE HDT Default Packet Format
++	0x0023, LE HDT Default Rates
  
- uint16 Handle [read-only] (Client Only)
-diff --git a/doc/org.bluez.GattDescriptor.rst b/doc/org.bluez.GattDescriptor.rst
-index 790a5482d080..425d9becf635 100644
---- a/doc/org.bluez.GattDescriptor.rst
-+++ b/doc/org.bluez.GattDescriptor.rst
-@@ -160,6 +160,10 @@ Possible values:
- :"encrypt-authenticated-write":
- :"secure-read" (Server Only):
- :"secure-write" (Server Only):
-+:"mic-64-read" (Server Only):
-+:"mic-64-write" (Server Only):
-+:"mic-128-read" (Server Only):
-+:"mic-128-write" (Server Only):
- :"authorize":
- 
- uint16 Handle [read-only] (Client Only)
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index d8e45581a138..cbee49d59f55 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1799,6 +1799,21 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
- 		} else if (!strcmp("secure-write", flag)) {
- 			*props |= BT_GATT_CHRC_PROP_WRITE;
- 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
-+		} else if (!strcmp("mic-64-read", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_MIC_LEN_64;
-+		} else if (!strcmp("mic-64-write", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+			*perm |= BT_ATT_PERM_WRITE |
-+						BT_ATT_PERM_WRITE_MIC_LEN_64;
-+		} else if (!strcmp("mic-128-read", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+			*perm |= BT_ATT_PERM_READ |
-+						BT_ATT_PERM_READ_MIC_LEN_128;
-+		} else if (!strcmp("mic-128-write", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+			*perm |= BT_ATT_PERM_WRITE |
-+						BT_ATT_PERM_WRITE_MIC_LEN_128;
- 		} else if (!strcmp("authorize", flag)) {
- 			*req_prep_authorization = true;
- 		} else if (!strcmp("encrypt-notify", flag)) {
-@@ -1860,6 +1875,17 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm,
- 			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_SECURE;
- 		else if (!strcmp("secure-write", flag))
- 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
-+		else if (!strcmp("mic-64-read", flag))
-+			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_MIC_LEN_64;
-+		else if (!strcmp("mic-64-write", flag))
-+			*perm |= BT_ATT_PERM_WRITE |
-+						BT_ATT_PERM_WRITE_MIC_LEN_64;
-+		else if (!strcmp("mic-128-read", flag))
-+			*perm |= BT_ATT_PERM_READ |
-+						BT_ATT_PERM_READ_MIC_LEN_128;
-+		else if (!strcmp("mic-128-write", flag))
-+			*perm |= BT_ATT_PERM_WRITE |
-+						BT_ATT_PERM_WRITE_MIC_LEN_128;
- 		else if (!strcmp("authorize", flag))
- 			*req_prep_authorization = true;
- 		else {
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index 69f45b6aa6d7..687ebf66cafa 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -98,6 +98,7 @@ struct bt_att_pdu_error_rsp {
- #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
- #define BT_ATT_ERROR_DB_OUT_OF_SYNC			0x12
- #define BT_ATT_ERROR_VALUE_NOT_ALLOWED			0x13
-+#define BT_ATT_ERROR_MIC_LEN_TOO_SHORT			0x14
- 
- /*
-  * Common Profile and Service Error Code descriptions (see Supplement to the
-@@ -131,14 +132,26 @@ struct bt_att_pdu_error_rsp {
- #define BT_ATT_PERM_WRITE_SECURE	0x0200
- #define BT_ATT_PERM_SECURE		(BT_ATT_PERM_READ_SECURE | \
- 					BT_ATT_PERM_WRITE_SECURE)
-+#define BT_ATT_PERM_READ_MIC_LEN_64	0x0400
-+#define BT_ATT_PERM_READ_MIC_LEN_128	0x0800
-+#define BT_ATT_PERM_WRITE_MIC_LEN_64	0x1000
-+#define BT_ATT_PERM_WRITE_MIC_LEN_128	0x2000
-+#define BT_ATT_PERM_MIC_LEN_64		(BT_ATT_PERM_READ_MIC_LEN_64 | \
-+					BT_ATT_PERM_WRITE_MIC_LEN_64)
-+#define BT_ATT_PERM_MIC_LEN_128	(BT_ATT_PERM_READ_MIC_LEN_128 | \
-+					BT_ATT_PERM_WRITE_MIC_LEN_128)
- #define BT_ATT_PERM_READ_MASK		(BT_ATT_PERM_READ | \
- 					BT_ATT_PERM_READ_AUTHEN | \
- 					BT_ATT_PERM_READ_ENCRYPT | \
--					BT_ATT_PERM_READ_SECURE)
-+					BT_ATT_PERM_READ_SECURE | \
-+					BT_ATT_PERM_READ_MIC_LEN_64 | \
-+					BT_ATT_PERM_READ_MIC_LEN_128)
- #define BT_ATT_PERM_WRITE_MASK		(BT_ATT_PERM_WRITE | \
- 					BT_ATT_PERM_WRITE_AUTHEN | \
- 					BT_ATT_PERM_WRITE_ENCRYPT | \
--					BT_ATT_PERM_WRITE_SECURE)
-+					BT_ATT_PERM_WRITE_SECURE | \
-+					BT_ATT_PERM_WRITE_MIC_LEN_64 | \
-+					BT_ATT_PERM_WRITE_MIC_LEN_128)
- 
- /* GATT Characteristic Properties Bitfield values */
- #define BT_GATT_CHRC_PROP_BROADCAST			0x01
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 80b415540ee6..1ab7497d83f8 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -63,6 +63,7 @@ struct bt_att {
- 	bool close_on_unref;
- 	struct queue *chans;
- 	uint8_t enc_size;
-+	uint8_t mic_len;
- 	uint16_t mtu;			/* Biggest possible MTU */
- 
- 	struct queue *notify_list;	/* List of registered callbacks */
-@@ -2133,6 +2134,44 @@ void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
- 	att->enc_size = enc_size;
- }
- 
-+static uint8_t bt_att_chan_get_mic_len(struct bt_att_chan *chan)
-+{
-+	struct bt_security sec;
-+	socklen_t len;
-+
-+	if (chan->type == BT_ATT_LOCAL)
-+		return chan->att->mic_len;
-+
-+	memset(&sec, 0, sizeof(sec));
-+	len = sizeof(sec);
-+	if (getsockopt(chan->fd, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0)
-+		return 0;
-+
-+	return sec.mic_len;
-+}
-+
-+uint8_t bt_att_get_mic_len(struct bt_att *att)
-+{
-+	struct bt_att_chan *chan;
-+
-+	if (!att)
-+		return 0;
-+
-+	chan = queue_peek_tail(att->chans);
-+	if (!chan)
-+		return 0;
-+
-+	return bt_att_chan_get_mic_len(chan);
-+}
-+
-+void bt_att_set_mic_len(struct bt_att *att, uint8_t mic_len)
-+{
-+	if (!att)
-+		return;
-+
-+	att->mic_len = mic_len;
-+}
-+
- static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
- 				bt_att_counter_func_t func, void *user_data)
- {
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 5b5cd4fbab2c..4bee694e4352 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -116,6 +116,9 @@ int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
- bool bt_att_set_security(struct bt_att *att, int level);
- void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
- 
-+uint8_t bt_att_get_mic_len(struct bt_att *att);
-+void bt_att_set_mic_len(struct bt_att *att, uint8_t mic_len);
-+
- bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
- 			bt_att_counter_func_t func, void *user_data);
- bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 23c705bd9d16..2384c5fc8135 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -2180,6 +2180,15 @@ gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib)
- 	return attrib->permissions;
- }
- 
-+void gatt_db_attribute_set_permissions(struct gatt_db_attribute *attrib,
-+							uint32_t permissions)
-+{
-+	if (!attrib)
-+		return;
-+
-+	attrib->permissions = permissions;
-+}
-+
- static bool read_timeout(void *user_data)
- {
- 	struct pending_read *p = user_data;
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 5e7e7203fcc3..8640768850fd 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -265,6 +265,9 @@ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
- uint32_t
- gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib);
- 
-+void gatt_db_attribute_set_permissions(struct gatt_db_attribute *attrib,
-+							uint32_t permissions);
-+
- bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
- 						uint16_t len);
- 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 15944bd1478f..8f094f355fa5 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -189,7 +189,11 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
- 	iov->iov_len = length;
- }
- 
--static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
-+static uint8_t check_permissions(struct bt_gatt_server *server,
-+				struct gatt_db_attribute *attr, uint32_t mask);
-+
-+static bool encode_read_by_grp_type_rsp(struct bt_gatt_server *server,
-+						struct queue *q,
- 						struct bt_att *att,
- 						uint16_t mtu, uint8_t *pdu,
- 						uint16_t *len)
-@@ -204,6 +208,21 @@ static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
- 	while (queue_peek_head(q)) {
- 		struct gatt_db_attribute *attrib = queue_pop_head(q);
- 
-+		/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
-+		 * Section 3.4.4.9:
-+		 *
-+		 * If an attribute in the set of requested attributes would
-+		 * cause an ATT_ERROR_RSP PDU then this attribute cannot be
-+		 * included in an ATT_READ_BY_GROUP_TYPE_RSP PDU and the
-+		 * attributes before this attribute shall be returned.
-+		 *
-+		 * So stop before a service the link does not have the
-+		 * security to read, the caller reports it if it is the first
-+		 * one.
-+		 */
-+		if (check_permissions(server, attrib, BT_ATT_PERM_READ_MASK))
-+			break;
-+
- 		value.iov_base = NULL;
- 		value.iov_len = 0;
- 
-@@ -320,13 +339,27 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint16_t mtu,
- 		goto error;
+ This command can be used at any time and will return a list of supported default
+ parameters as well as their current value.
+diff --git a/src/adapter.c b/src/adapter.c
+index 6588a6e2bdc9..ea438375cc72 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5167,6 +5167,34 @@ static bool load_le_defaults(struct btd_adapter *adapter,
+ 			return false;
  	}
  
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
-+	 * Section 3.4.4.9:
-+	 *
-+	 * If the first attribute in the set of requested attributes would
-+	 * cause an ATT_ERROR_RSP PDU then no other attributes in the
-+	 * requested attributes can be considered.
-+	 */
-+	ecode = check_permissions(server, queue_peek_head(q),
-+							BT_ATT_PERM_READ_MASK);
-+	if (ecode) {
-+		ehandle = gatt_db_attribute_get_handle(queue_peek_head(q));
-+		goto error;
++	if (btd_opts.hdt.mic_len >= 0) {
++		uint8_t val = btd_opts.hdt.mic_len;
++
++		if (!mgmt_tlv_add_fixed(list, 0x0021, &val))
++			return false;
 +	}
 +
- 	rsp_pdu = malloc(mtu);
- 	if (!rsp_pdu) {
- 		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
- 		goto error;
- 	}
- 
--	if (!encode_read_by_grp_type_rsp(server->db, q, server->att, mtu,
-+	if (!encode_read_by_grp_type_rsp(server, q, server->att, mtu,
- 							rsp_pdu, &rsp_len)) {
- 		ecode = BT_ATT_ERROR_UNLIKELY;
- 		goto error;
-@@ -460,6 +493,25 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
- 			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
- 	}
- 
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
-+	 * Section 3.2.5:
-+	 *
-+	 * If access to a secure attribute requires an encrypted link, and
-+	 * the link is encrypted with an encryption key size that is long
-+	 * enough but a MIC length that is too short for the level of
-+	 * security required, then an ATT_ERROR_RSP PDU shall be sent with
-+	 * the Error Code parameter set to MIC Length Too Short (0x14).
-+	 */
-+	if (perm & (BT_ATT_PERM_READ_MIC_LEN_128 |
-+					BT_ATT_PERM_WRITE_MIC_LEN_128)) {
-+		if (bt_att_get_mic_len(server->att) < 0x02)
-+			return BT_ATT_ERROR_MIC_LEN_TOO_SHORT;
-+	} else if (perm & (BT_ATT_PERM_READ_MIC_LEN_64 |
-+					BT_ATT_PERM_WRITE_MIC_LEN_64)) {
-+		if (bt_att_get_mic_len(server->att) < 0x01)
-+			return BT_ATT_ERROR_MIC_LEN_TOO_SHORT;
++	if (btd_opts.hdt.format >= 0) {
++		uint8_t val = btd_opts.hdt.format;
++
++		if (!mgmt_tlv_add_fixed(list, 0x0022, &val))
++			return false;
 +	}
 +
- 	return 0;
++	if (btd_opts.hdt.rates >= 0) {
++		uint16_t val = cpu_to_le16(btd_opts.hdt.rates);
++
++		if (!mgmt_tlv_add_fixed(list, 0x0023, &val))
++			return false;
++	}
++
++	if (btd_opts.hdt.eks_oppt >= 0) {
++		uint8_t val = btd_opts.hdt.eks_oppt ? 0x01 : 0x00;
++
++		if (!mgmt_tlv_add_fixed(list, 0x0024, &val))
++			return false;
++	}
++
+ 	return true;
  }
  
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 2d654299852d..5e66b2ca0a01 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -2615,10 +2615,46 @@ static void test_hash_db(gconstpointer data)
- 	context_quit(context);
+diff --git a/src/btd.h b/src/btd.h
+index b059ab872764..9bf310271972 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -180,6 +180,13 @@ struct btd_opts {
+ 	struct btd_advmon_opts	advmon;
+ 
+ 	struct btd_csis csis;
++
++	struct {
++		int16_t	mic_len;	/* -1 = not set */
++		int16_t	format;		/* -1 = not set */
++		int32_t	rates;		/* -1 = not set */
++		int8_t	eks_oppt;	/* -1 = not set, 0/1 = off/on */
++	} hdt;
+ };
+ 
+ extern struct btd_opts btd_opts;
+diff --git a/src/main.c b/src/main.c
+index 8e58b6b58ae2..3a051c5a46dd 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -190,6 +190,14 @@ static const char *advmon_options[] = {
+ 	NULL
+ };
+ 
++static const char *const hdt_options[] = {
++	"DefaultMICLength",
++	"DefaultPacketFormat",
++	"DefaultRates",
++	"EKSOpportunistic",
++	NULL
++};
++
+ static const struct group_table {
+ 	const char *name;
+ 	const char * const *options;
+@@ -204,6 +212,7 @@ static const struct group_table {
+ 	{ "AVRCP",	avrcp_options },
+ 	{ "ChannelSounding",	bcs_options },
+ 	{ "AdvMon",	advmon_options },
++	{ "HDT",	hdt_options },
+ 	{ }
+ };
+ 
+@@ -1398,6 +1407,39 @@ static void parse_advmon(GKeyFile *config)
+ 				0, UINT8_MAX);
  }
  
-+/*
-+ * Test database for MIC length validation:
-+ * Primary service at handle 0x0001 with 4 handles.
-+ * Characteristic at handle 0x0003 (value handle) with read/write permissions
-+ * requiring 128-bit MIC length.
-+ * Service declaration also has MIC length permission for Read By Group Type.
-+ */
-+static struct gatt_db *make_mic_len_db(void)
++static void parse_hdt(GKeyFile *config)
 +{
-+	const struct att_handle_spec specs[] = {
-+		PRIMARY_SERVICE(0x0001, GAP_UUID, 4),
-+		CHARACTERISTIC(GATT_CHARAC_DEVICE_NAME,
-+				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE |
-+				BT_ATT_PERM_READ_MIC_LEN_128 |
-+				BT_ATT_PERM_WRITE_MIC_LEN_128,
-+				BT_GATT_CHRC_PROP_READ |
-+				BT_GATT_CHRC_PROP_WRITE,
-+				0x01, 0x02, 0x03),
-+		{ }
-+	};
-+	struct gatt_db *db;
-+	struct gatt_db_attribute *attr;
++	int val;
++	bool bval;
 +
-+	db = make_db(specs);
-+
-+	/* Set MIC length permission on the service declaration for
-+	 * Read By Group Type test.
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
++	 * Section 7.8.159:
++	 *
++	 * Preferred_MIC_Length: 0x01 Preferred MIC length is 64 bits.
++	 * 0x02 MIC length is 128 bits (default). All other values Reserved
++	 * for future use.
++	 *
++	 * So 0x00 (32 bits) is not valid, the controller would reject it.
 +	 */
-+	attr = gatt_db_get_attribute(db, 0x0001);
-+	gatt_db_attribute_set_permissions(attr, BT_ATT_PERM_READ |
-+						BT_ATT_PERM_READ_MIC_LEN_128);
++	if (parse_config_int(config, "HDT", "DefaultMICLength", &val, 1, 2))
++		btd_opts.hdt.mic_len = val;
 +
-+	return db;
++	/* Preferred_Packet_Format: 0x00 any supported, 0x01 packet format 0,
++	 * 0x02 packet format 1. All other values Reserved for future use.
++	 */
++	if (parse_config_int(config, "HDT", "DefaultPacketFormat", &val, 0, 2))
++		btd_opts.hdt.format = val;
++
++	/* Preferred_ACL_Rates: bits 0 to 4 are HDT2, HDT3, HDT4, HDT6 and
++	 * HDT7.5. All other bits Reserved for future use.
++	 */
++	if (parse_config_int(config, "HDT", "DefaultRates", &val, 0, 0x1f))
++		btd_opts.hdt.rates = val;
++
++	if (parse_config_bool(config, "HDT", "EKSOpportunistic", &bval))
++		btd_opts.hdt.eks_oppt = bval ? 1 : 0;
 +}
 +
- int main(int argc, char *argv[])
+ static void parse_config(GKeyFile *config)
  {
- 	struct gatt_db *service_db_1, *service_db_2, *service_db_3;
- 	struct gatt_db *ts_small_db, *ts_large_db_1, *ts_tail_db;
-+	struct gatt_db *mic_len_db;
- 
- 	tester_init(&argc, &argv);
- 
-@@ -2628,6 +2664,7 @@ int main(int argc, char *argv[])
- 	ts_small_db = make_test_spec_small_db();
- 	ts_large_db_1 = make_test_spec_large_db_1();
- 	ts_tail_db = make_test_tail_db();
-+	mic_len_db = make_mic_len_db();
- 
- 	/*
- 	 * Server Configuration
-@@ -4908,5 +4945,69 @@ int main(int argc, char *argv[])
- 			test_hash_db, ts_tail_db, NULL,
- 			{});
- 
-+	/*
-+	 * MIC Length Too Short
-+	 *
-+	 * Verify that the server rejects requests with error 0x14
-+	 * (MIC Length Too Short) when the connection MIC length is
-+	 * insufficient for the attribute's requirement.
-+	 */
-+
-+	/* Read By Type Request */
-+	define_test_server("/robustness/mic-len/read-by-type", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x00, 0x2a),
-+			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x14));
-+
-+	/* Read Request */
-+	define_test_server("/robustness/mic-len/read", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x0a, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x14));
-+
-+	/* Read Blob Request */
-+	define_test_server("/robustness/mic-len/read-blob", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
-+			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x14));
-+
-+	/* Read Multiple Request */
-+	define_test_server("/robustness/mic-len/read-multiple", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x0e, 0x03, 0x00, 0x03, 0x00),
-+			raw_pdu(0x01, 0x0e, 0x03, 0x00, 0x14));
-+
-+	/* Read Multiple Variable Request */
-+	define_test_server("/robustness/mic-len/read-multiple-variable",
-+			test_server, mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x20, 0x03, 0x00, 0x03, 0x00),
-+			raw_pdu(0x01, 0x20, 0x03, 0x00, 0x14));
-+
-+	/* Write Request */
-+	define_test_server("/robustness/mic-len/write", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x03, 0x00, 0x01),
-+			raw_pdu(0x01, 0x12, 0x03, 0x00, 0x14));
-+
-+	/* Prepare Write Request */
-+	define_test_server("/robustness/mic-len/prepare-write", test_server,
-+			mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0x01),
-+			raw_pdu(0x01, 0x16, 0x03, 0x00, 0x14));
-+
-+	/* Read By Group Type Request */
-+	define_test_server("/robustness/mic-len/read-by-group-type",
-+			test_server, mic_len_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x10, 0x01, 0x00, 0x04, 0x00, 0x00, 0x28),
-+			raw_pdu(0x01, 0x10, 0x01, 0x00, 0x14));
-+
- 	return tester_run();
+ 	if (!config)
+@@ -1417,6 +1459,7 @@ static void parse_config(GKeyFile *config)
+ 	parse_avrcp(config);
+ 	parse_le_cs_config(config);
+ 	parse_advmon(config);
++	parse_hdt(config);
  }
+ 
+ static void init_defaults(void)
+@@ -1444,6 +1487,11 @@ static void init_defaults(void)
+ 	btd_opts.defaults.le.addr_resolution = 0x01;
+ 	btd_opts.defaults.le.enable_advmon_interleave_scan = 0xFF;
+ 
++	btd_opts.hdt.mic_len = -1;
++	btd_opts.hdt.format = -1;
++	btd_opts.hdt.rates = -1;
++	btd_opts.hdt.eks_oppt = -1;
++
+ 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
+ 		return;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index 7eb75d87163c..714e1e6fab49 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -253,6 +253,33 @@ KernelExperimental = 6fbaf188-05e0-496a-9885-d6ddfdb4e03e
+ # Defaults to 1
+ #EnableAdvMonInterleaveScan=
+ 
++[HDT]
++# Default Parameters sent to the controller via HCI_LE_Set_HDT_Default_Parameters.
++
++# Default MIC Length
++# 0x01: 64-bit
++# 0x02: 128-bit
++# The 32-bit MIC is only used on the GFSK PHYs, so it can't be set here.
++#DefaultMICLength=0x02
++
++# Default Packet Format
++# 0x00: No preference
++# 0x01: Packet Format 0
++# 0x02: Packet Format 1
++#DefaultPacketFormat=0x00
++
++# Default Rates (bitmask)
++# Bit 0: HDT 2M
++# Bit 1: HDT 3M
++# Bit 2: HDT 4M
++# Bit 3: HDT 6M
++# Bit 4: HDT 7.5M
++#DefaultRates=0x001f
++
++# Enable EKS Opportunistic Encryption. When both sides support it and no
++# LTK is available, the link will be encrypted with an ephemeral key.
++#EKSOpportunistic=true
++
+ [GATT]
+ # GATT attribute cache.
+ # Possible values:
 -- 
 2.56.0
 
