@@ -1,94 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794016615;
-	b=xzq0Ld9tdSIpDhwpKNsqflfI2Q3d2iY2QeHUjr9MmR3Z8gjsuRj4NcIR/h1/yVgKG0Yo
-	 5fWmR9MyMBtoLu+/hteMz3bOGkliG3zoVJDhmq3JFGftaIjx27JSAJWnygR1ZcfL8O0Cj
-	 h7xzs01m2sSrzmXVj3W7LnYrCxp6uqQrN2g8CGXaVfSHZv3TowllKnJXsxjbAaMeYbXEy
-	 sS4XHCzmvYRPDY5oqB1BP1SxlO1LOIAn/zuuamYahC6w+GGzkXNeSNGSUJ6bWK75OV98P
-	 /HWE+sDz9DW3HeHoaegCewPGbPAdk43JdXY3FwNL3f3NvfHDe6OrC6qDmG25Qjy61XA==
+	t=1794018582;
+	b=1j1ILd31CcMP+xjNro3vEA6JJ//mrreqJLSy+IJufBR65yM7FpecKg4fPTYDpcGTvtBL
+	 EGzkhpcCjUWDETZzjX1r49qgRB7mIkH7flNA08kTM/RnPGkFk5SPiLQ7QgXHVPWZdv2zO
+	 Ct/feVly2GeL10zFT81ZmusJUJTbKWAwCwUfY90aDEbt+8+JSQ2VKGeIdgMJx6r0+72jQ
+	 yzIqEvtuDfGZXVqUIdntToG3171ZBWsJQ1zbAaS8aTcQHWeHqGupEEJcHcNTMWq7WhzCf
+	 BBwH7DZaGnb059dSv78pmGDP4oA62A/K+fKuVlyFz/AQiwQEj/XncH6w9zeBpSkQS3Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794016615;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794018582;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=YVYC3iptg43wPhJ1sfqvNFuV6lIk+3V7yiLWS2UB2s4=;
-	b=mtZBNCYz7zPL8p9IvNilnBtPrpKZuazj/lhlq3RbMJ+8w9Nz9G5DX3NI3eyXy0HvBD7X
-	 YEOsv+MbDiLPJsCor8n7XbTD7XPFrhZjMVASfUCPz4sS5arAjqBN+48KfWdyg+BnhszZ9
-	 E3/guvA5Z9CJ70UW2ez3UXFQxqe9Zk4YUeZH6UcK38zqUm8nmHbU0O4jPt26TaEixr6+j
-	 ChBHx5yny6mQUVqlksWB7v8HoEXEajdu3EYihufC9Gs5dU5K5GqGQ1dTa39oZNJ8DHelx
-	 wyFFn4neSWYq0NDWXei4Qe8k36t9wqmRnKQ6PmoMnswKVxaBcVmZMQYlhhwnVnJ6G/Q==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=IFbD+cIWUyqDmGXizk9r+V35BNnh2eXYMTxLcB3olXg=;
+	b=1T/P2pdcuiimsLpLeAP/0iUT4BZkKyZ/N5/M1h0P/2R9Ym8M6GCLokMhH3ANeIqIlp5Z
+	 RF54jXPdAuOZUB/itTzxTNBr0PsXMqCAYnbcaDb094yKMCv+K/u/ItkkygYQsWtrAy87a
+	 LVYNZqJdONEszSwIXeQLt9AAaTE/mvb1tA2el5Crc4TPMSg4MdW7H6/EkSbkYUXWbN8wA
+	 5oZ4UJMaLFuZYJjxQZA+UaO72ggyt4dWf7ZNwnOzLaIquKRxkdczjJMNvdluVReCRr6A/
+	 JzuIlFLKPbRFVQnymbOW4k/DDPeIe+/xKVgqADCe0GCFBqTD/OaCImy9DhaZkZtTYuA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=simpleble.org;
-	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b="Y8/hEAcM";
-	arc=none smtp.remote-ip=74.125.82.174
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="c/tnXG21";
+	arc=none smtp.remote-ip=209.85.222.171
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BEE606A333
-	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 01:56:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83BEE606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C6D606A333
+	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 02:29:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30C6D606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=Y8/hEAcM
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-36cad25b8b0so2001149eec.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 17:56:55 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c/tnXG21
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-93f2049ea7aso101320885a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 18:29:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1794016614; x=1794621414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YVYC3iptg43wPhJ1sfqvNFuV6lIk+3V7yiLWS2UB2s4=;
-        b=Y8/hEAcMkrO/beOGTJsN+DUR9f9z8BENLYn36dLRoapm24xBiiJXaLXbnMoJ1hH+yM
-         UB+MOzKLabdf4Ts6WKn1juVGcAr7VB3T4nfZrStPdGWn5Wb+b/FZYR+7mpTnKygycAq/
-         5eY+zg810oDZO07qxw3On1QYAfV38YcHKvQsQj1lzYWhQJJe6pqePOQwfYuzSZ6KthwB
-         dyeBSJovt4Ss+SoG+1kKkG/6f4RORd9hVtYRpcZHnh9cOs/9yuoz4WW+x9U5MxzbaGab
-         CcX3Pn5hDR3PSmo+X18YxIesDTk8nhY4kjb7cWtR5tyGv5SclP0tVPyj8c7JT9+MJrR6
-         b+Ow==
+        d=gmail.com; s=20260707; t=1794018581; x=1794623381; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=IFbD+cIWUyqDmGXizk9r+V35BNnh2eXYMTxLcB3olXg=;
+        b=c/tnXG21v/icTIDM6IVgdST2C3G6PPdAfi1OPAHUZnHvr1kACF9S4Jqm/6Y1AydEO7
+         iYJCeFoUx3+BXNtF6RaSJa2rBaomkE5pP/kUuIriO+xyPZWxfFELeSdrbQ03hoIvhWaB
+         /i+7jkyF6woz6bxeUzA5ltXRIzKjA5ps+7ph/bTnUO3/SnNhFHxdaaQGsD527wKtbYY7
+         5uCpsdiYiidng6jZw6D8tLU+Df1L8GgyWch7h2GqRUPFgJeCmxrnyuqQ1GpvX7lH/VOK
+         oL2B2SsxPjT5/SM55RuvDLOGOBYfhqKmLhXkJBMXpsG9KSrDdMksXfW3KJrfgNEMaHi3
+         L0fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794016614; x=1794621414;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YVYC3iptg43wPhJ1sfqvNFuV6lIk+3V7yiLWS2UB2s4=;
-        b=GNIMjDns+4VnqX9GLvjMQRnbJri4r6eI3A2XuDVeRmTOTmkQg0P2l4TiyqahuCDlA1
-         J5b2uokczCkppsAQ36GMVygF7AFEGeL3hDiYTNR0+hicIgPMnL06LDNkv9sjZKXsUVJ0
-         +a0RJj8DghQu3MVlJnaA90KsPEsdzEVCT6WVOw30xFsWIy0FoJw/h2J/tEuavRTJBQqn
-         EmvKPE/EgxeJR7vimYmgKQ2vyLTAxf5xg7Q4KB06TiDTt8rElj96tFrh56GoYUkwTail
-         aEaGD3x2EP+O7Hc6OIJ5RLP32UK8i8vSjnEMG1Akn+k8j9kYXjfvdaeSFMw5Ib9ucNSq
-         3Ylw==
-X-Gm-Message-State: APuU4Z/VrTHflCheenVPGPS/r24eNKpAlbdlp430BArLQn6RhsCPRLTc
-	+BWokP7TYzXtu7tphs52jA/wp/8hFuoq24v4EWHIrO6H0BZrwFa8exqnmJAaBHlWrtEieYa+fkC
-	g8cvfmu4=
-X-Gm-Gg: AYBFou3FYz6VwAo/cBwD1XCS5leDw/CLydyIl4Cf5YbxiGqvwsjE6U/tOowsy37uGl1
-	B63d35OWELSKMtZ4vPtwM6RTlP/FW3I8LH5PaxC/CXtFTJGFWkzDwGNQAuzDM0c1KsG3k/SEojv
-	78hSBWbXqPHqiEmSCumN3jm/0wGVLbSz4co2V+eUC9DyWpX1iIcLYeV4+zltbi/0cFHt17I549Z
-	NiPEcF1FbrDZDujlK9t5SXkyj6k+reESgQYGUvELuCpW81jKjYdvMGum3mvQrrj/3FUKYEhES7Y
-	Mn6aofPG2uHqNeMIyK0nrPAmELdKv/ycxHjmibqJPhw7L0hmtMhk7btA+irFd7+YNABHf65J5t1
-	gwTThyxzYxIjCJAfAIV1/UntFpAsjhPMOsfzaec6RQz/2u8YnZSYkz5Gpo0WOl9HydWPAWxfzCf
-	7fmao4+ssE2RVDHopc93fV9JK9Fr9+q4K3DuaI2rzzABJfAUB9s6OSV8FaFCg3dwaizKdF9D8GU
-	Fr0NeURL7Vp9D9b150S4+qFaDpN4m/0s37t95vG5uh5d0A17SRnIEhEfsPrccX+CRgXllaQYoCW
-	LTs11W3vgV5EdB5UfxCsuvYdmjf+GWPGNrHolB9z7KGYkfG+eeIuRDmXMqj/MWCB2KcQJbZN22X
-	z5UH1oRkdOAvbznUnt/HyoEPRx33o7sLPtylbwW9qRpC4Qg5ozMqic4bZmtkR/Y0r7+C4yL0=
-X-Received: by 2002:a05:7301:6486:b0:36e:97b4:1071 with SMTP id 5a478bee46e88-36f75b1f828mr5256326eec.14.1794016614411;
-        Fri, 06 Nov 2026 17:56:54 -0800 (PST)
-Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa651e6b1sm22977994eec.3.2026.11.06.17.56.53
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 06 Nov 2026 17:56:54 -0800 (PST)
-From: Kevin Dewald <kevin@simpleble.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ 2/2] bearer: Fix LE Connect and Disconnect ignoring auto-connect
-Date: Fri,  6 Nov 2026 17:56:49 -0800
-Message-ID: <20261107015649.84892-3-kevin@simpleble.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261107015649.84892-1-kevin@simpleble.org>
-References: <20261107015649.84892-1-kevin@simpleble.org>
+        d=1e100.net; s=20260707; t=1794018581; x=1794623381;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=IFbD+cIWUyqDmGXizk9r+V35BNnh2eXYMTxLcB3olXg=;
+        b=G3ZVCGTTkAjLpYv3mqR7QPjxX1SMmwn2BFG1siWgGnXQFPYKzEap55xailtgVsMxlC
+         sKW0R7+fNrR465FLiMi1Y0LS23ju75eGSDaMavK0JiwLuHaxxhnBGfh0afARQDq7aiY0
+         Wcqucb2bw+7Pak6m8oZvziOHYvbHgUNZbRlobTNSFi1kDYKBSa6CPZIfN6bjeJ9i1AL2
+         sGvmy52fFmHFBZKJg6SlpVO2Lop171z7sbKYjGP/+hIFacK6ynFjJ+heLe035fx/5Kls
+         +pBpE/FOJqt2GKZ8bYdt+QDcbdmna5UcpKEA4aU0JA7a/8nssxQR5bjZvxeGxNwYkOSL
+         haHg==
+X-Gm-Message-State: APuU4Z//ZX/SeV8wsD6Lk77iDe1KQLSejWMjewo2WH34nz4NsppKSoEN
+	JpZrk91yZ29a5JJiOCAi7PqBsn/6x5CFdmefhtlFAg+5mudE6UlfRtNzTL9CNw==
+X-Gm-Gg: AYBFou33nYsZ1lx6vPEAb9zKBjeKN5qa8FfaN9f+jONNlC/gSD4gYCF5P94+OZSv8fS
+	hj8+kfbazd8n4uB8WuNK+q1guOkJ7oaf3YT5VyjnCC9NyDmdl6/CeZ60N24lq4V3HfSxW1kdi5o
+	Ljon+vt94arGchsPZ3JsBYCn36cZDeqRkC6jD9o87/TlrjwNIu2ZrMOXnfPV7L3dYTyORn8LCoV
+	xfDKYyBaHY/TeIZSnpuVfzvvGm5RA2PrFpXUaUa+6Jngw2TLFGPKXgcEDJ4TGAKgjW6AOvjhjqH
+	qYJYMd6nGVkZqdGEmqgv9wo6tNOUzSa5wg3NwAMbPiRlTkYafJuajcCTUmuVWiErPkwV4YKg7HP
+	1S9d6E9ur0PkTS/5xojO+zinvIXS9VIFPdBC38JY436XZ6noFyW2QngMTrZ8aIss6bM6Lnf7l3a
+	dbUOejdu0EoJHQ6wqPA1gInYnMWxhUXah/2ztpFnOU2kXFZbWd/d9wGP9k/kKd792ltiAzfFc2s
+	6sW//Yj8eraFM0f4e3CZxAdDYBBKy0FfGHRkSVljUtFsdNO3ip3Ha/BJiOIWuddVA==
+X-Received: by 2002:a05:620a:461f:b0:93c:c73b:39ed with SMTP id af79cd13be357-945f353723fmr742412985a.39.1794018581222;
+        Fri, 06 Nov 2026 18:29:41 -0800 (PST)
+Received: from [172.17.0.2] ([172.190.118.238])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-945f599bd5fsm278556385a.9.2026.11.06.18.29.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2026 18:29:40 -0800 (PST)
+Message-ID: <6aee8d14.4001fe38.37437.e453@mx.google.com>
+Date: Fri, 06 Nov 2026 18:29:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5090561434217079308=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -98,51 +88,66 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, roman.gushchin@linux.dev
+Subject: RE: [net] 6lowpan: fix netdev_priv() type confusion in lowpan_event()
+In-Reply-To: <20261106225930.1379968-1-roman.gushchin@linux.dev>
+References: <20261106225930.1379968-1-roman.gushchin@linux.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Bearer.LE1.Disconnect is documented to disable incoming connections of
-a device that is not trusted until Connect is called again, as
-Device1.Disconnect does, but it left the device in the auto-connect
-list. A device that keeps advertising, such as a HID device, was then
-connected back right after the disconnection.
+--===============5090561434217079308==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Bearer.LE1.Connect did not put a device back in the auto-connect list
-either, unlike Device1.Connect. A device taken out of it by
-Device1.Disconnect, or left out of it because it was temporary when its
-profiles were probed, was then not reconnected after losing the
-connection.
+This is automated email and please do not reply to this email!
 
-Fix it by pausing and resuming auto-connect as Device1 does.
+Dear submitter,
 
-Fixes: 4e21ebcaa5d0 ("bearer: Implement Connect/Disconnect methods")
-Assisted-by: Claude:claude-opus-5.5
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1204595/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.26 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.90 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 FAIL      0.18 seconds
+BuildKernel                   PASS      31.03 seconds
+CheckAllWarning               PASS      35.02 seconds
+CheckSparse                   PASS      39.77 seconds
+BuildKernel32                 PASS      31.26 seconds
+CheckKernelLLVM               PASS      35.89 seconds
+TestRunnerSetup               PASS      748.50 seconds
+TestRunner_l2cap-tester       PASS      12.85 seconds
+TestRunner_iso-tester         PASS      11.04 seconds
+TestRunner_bnep-tester        PASS      4.13 seconds
+TestRunner_mgmt-tester        PASS      89.48 seconds
+TestRunner_rfcomm-tester      PASS      8.33 seconds
+TestRunner_sco-tester         PASS      5.80 seconds
+TestRunner_ioctl-tester       PASS      4.76 seconds
+TestRunner_mesh-tester        PASS      5.59 seconds
+TestRunner_smp-tester         PASS      4.44 seconds
+TestRunner_userchan-tester    PASS      3.30 seconds
+TestRunner_6lowpan-tester     PASS      4.55 seconds
+IncrementalBuild              PASS      28.41 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+
+
+https://github.com/bluez/bluetooth-next/pull/1083
+
 ---
- src/bearer.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/bearer.c b/src/bearer.c
-index 5285e0274..e11a844d8 100644
---- a/src/bearer.c
-+++ b/src/bearer.c
-@@ -153,6 +153,7 @@ static DBusMessage *bearer_connect(DBusConnection *conn, DBusMessage *msg,
- 								msg, NULL);
- 	else {
- 		btd_device_set_temporary(device, false);
-+		device_resume_auto_connect(device);
- 		err = device_connect_le(device);
- 		if (err < 0)
- 			return btd_error_failed(msg, strerror(-err));
-@@ -183,6 +184,10 @@ static DBusMessage *bearer_disconnect(DBusConnection *conn, DBusMessage *msg,
- 		return NULL;
- 	}
- 
-+	/* Auto-connect is only done over LE */
-+	if (bearer->type != BDADDR_BREDR)
-+		device_pause_auto_connect(device);
-+
- 	if (msg)
- 		queue_push_tail(bearer->disconnects, dbus_message_ref(msg));
- 
--- 
-2.54.0 (Apple Git-157)
 
+--===============5090561434217079308==--
