@@ -1,89 +1,93 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794087975;
-	b=sshdrHdIdLBCazF/CpIxDy3S8ftJhGjrQHmzFFbgHmYADEpYDnnSQNVhcAGXW8Zll8Of
-	 cal+7qgPqorlmO9m4RmREsQbKyHDEYy8NrZuJ5e3Hp0ohiEx3IaMEay09fbOYjIc8nmeQ
-	 ee/oitXfWff1qny9NilgMQlysFsXoNgphckdbku4UlJmTWQR/yydH+F9b/eDQYIxzDMjh
-	 J1+ZsWP8WFCeinThMkgV0H25TtJEiACqs0KaV/UivpADF51QDhFtRxDbri2x/rKlXZqSr
-	 IX9CmypYPsv7Bl8Z1Ltr/jHhwLCMuiZWnlmr94NOUtSt85JOi2ZrPgZR/+6PSk+DxKQ==
+	t=1794087978;
+	b=4RvZ9xzqVaOIxqClku7L5jTVfBVoYyHOuGoN4PPV1eCe805XkOYSUrupcEAbXCEf9Cqe
+	 Jup0HjSvDHGWPrjTH/xtTvSggPTn1HkIye4BmDp+hAFq0O34/8wfE5UhLL4GFTdpMAxDQ
+	 7ccBM2yahxF+M2GNq5l5UbSun2QiXNnh5Zn90KC7kSdDdZb3MVCiygjScl2TZW7rYQU71
+	 1Gcb5eFCfEPFigUF5KGMj/snwy9P1EJ9d78S8VyaktQJvwOqarso3TFou1bfDizZr0TZT
+	 lQ7z8+F08mlVxGNf2E+CyqhZT5ErRSmR+qr8QokqhboPpnnmgLwQOu672niH1aPZ9dg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794087975;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794087978;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=naWTz6lsmUxkvluRaUfd2ncwkVHh0ckB679ByCBdvOU=;
-	b=dtvHqFRknWFDg/qt3F5QHv1qT0SqUD5BZaM907xSVfS+3+JHVbS/GcKFKXvZkJFDLonu
-	 sy8tW4dT5KFGKA5PibYE37t61BMlIfD1qk0AM9Xy4LaDwyJrR/es7eotwPfxljo6DbV8U
-	 0wy/QeriGl8iGSvZkIUzsFNH0/uP3+KRmx8VdcbH4KFFHuDRivDUSmzNhyHFsVqnXlKQA
-	 gDlAAq4N8eXfsC7rzPeUBLiaBqGMmZLN8AFR2jP5OfHBdJ+mmEyAv1x+wG9TLDOOdwY31
-	 na7jrOQKhuz/GqGqe20LAvYGs4G5Obc2U+ZMLzjdGUfaE8IU/SOk/OH88er+4qBiINA==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
+	b=l1H5oEp0fTXdMcmAWSEfOTbzZFFZ4QBhWwLp9sEUwIFnz3tigZYu6Uxxy5xCEyQ6qJAf
+	 RAUfU/FXMF9i09lotffyx4yb8i5ODov/bOttcwGG5VCJFcsGFqjFHNLKhiDUluE92BT7F
+	 0XodTXcSaKJPxL3H76/1gBcCdLwUp7niTBuhuttuYtCc5FgPq6vX6aY5hiWRIQ3jo6W8A
+	 jFaHHk0r7/MpbPt+H2jiPtky+9zZYjADG/Cv9E1gQCZlgp0n6adVeZ06tjQSEpnyJMbbh
+	 3qacsCxYx+GBmQpOYqssE/o28g8dGThjVs5CGtVLNmc2XHUNiHfmeOQddGP+NkWVicQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=au8mpuF1;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rF5zHs+5;
 	arc=none smtp.remote-ip=209.85.221.172
 Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F957606A32C
-	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 21:46:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F957606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479F6606A32C
+	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 21:46:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 479F6606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=au8mpuF1
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5ecd9a400cbso26928e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2026 13:46:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rF5zHs+5
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5ecde8e8e5bso11172e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2026 13:46:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794087974; x=1794692774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=naWTz6lsmUxkvluRaUfd2ncwkVHh0ckB679ByCBdvOU=;
-        b=au8mpuF1M9ELxPn/CxJdui58wa3UrR2Sg8Ou04ZgoN9jro7YMnUqYwx+QhRCq7qJ3A
-         0HlgaXnYvZ931AkyLPmHT2uvrOn1WRQ44QS17WPfmJY/yt5e+Rhamkw0RcorI8Ea5XQh
-         rL9Whz2zjFGbqKFAZW67n+Yz4/Qzl97mpPpqK45+DqY4YSynvXP/4tNmSwSE/AjYm9BN
-         RU8eLdUCywWIudcgg9jATBbPB9k/uk1ixLkrrep1n74stXiCaPvWt759wMsaeWkRJYpW
-         KhTHVH5shBKns2pBDVLwDQPHhuG2szKhNDTzA2NHzL4BizBR00lvvnYdiz2dSmuVPWMZ
-         DFeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794087974; x=1794692774;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20260707; t=1794087977; x=1794692777; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=naWTz6lsmUxkvluRaUfd2ncwkVHh0ckB679ByCBdvOU=;
-        b=AZY/xWXYu9ZsskpHgt8TTI39sQllOZkNCXDR+mSxRO+yI42cEtdKlLguxHCs6MyQol
-         PSCmJlpZ5+kbtVnj/p4vT044+OsPGtYUXXs0g94NdKLY6z9f8egyhwKXRAA3GZ58AOJ2
-         /xogUbF5sER86icjXzLEsITSY+HQPcP5uKh3+7FSdBY7H+W4vEAo7QxjMkHS93yBJMMl
-         TXx+j0BTPftnBuRyt5MEBGPzpw7X9Fj8NGaDnOYS2vs8MihPIfzzEFJvXcSP25J7oA8x
-         BWzpD24jj4QXW6JPDGI9f5YVndm613+mxsvrDeSic5tqUgS74sMTpSGihK9TximXt+P4
-         27JQ==
-X-Gm-Message-State: APuU4Z8vkPhArPeB0hsw6GRXSWeAMd3evMdAGww8peK4WignBgHOk45B
-	DbsUgGt0rOlw8ym0VNAQ2qlZqZ54LmY+mgUVbsrsMSetY3F82LWmqBIzotSZSQ==
-X-Gm-Gg: AYBFou01xEB8BaBJHF3m0j20ce6hyaUUMNZYLHcr4kMOZztWMR54YnBuKqr4xY7IgvJ
-	uCfn0jQNO/sxP3TNlW8wf45KyOQapdTy/487HGYhSIwT8QgKURXhODW3LRuyvlWrd2XiYJ92lun
-	o33INBWh+kj9Tax8lnXTvNQ/GbjY11y+XRE+Te3GwmVxRah2ba/e2JoTzMwNPb/N95uweY6CXG3
-	yXcYYphWmaGQ8ZLjBoFciCJyToXC4VpX6uvD9rWd+sztMuOqTYVU74h6y1imrfqFC5d1sMOUKbO
-	L4qAyI4iZtkZW8451lKaXIOkgjn4s6mmtou9kPx+bO4jixsRwh8FTf06h5UcHmNjqqMfowtaJtT
-	X6Re69UhlkHIDgRDRHB3CiEv54i5WyhJtrOk8lfXbCQ+PZ8Nj2Dg6IFozf90Skr0SLQbP0svtfn
-	4uTtAPPaGwb/vvMs1Qp+MHw3jdq2/73p9KJzkYjc5/szNIzABddR/Ao8ZaiwsVvSBJqHqt2EZEr
-	mYinJQHQ7BqlCOLRBnCUDjbZQSx98yRSF4R3HFqxVLKSV2/Xb/Wx5Q9XP6+DdHce2EM+U6bi8qK
-	pETud5PVPOkXGeFQKLfCkUTO0g/jArbEv4Uq+TKR4h2bmenixKcAqMkz9S+ZKkzBSUeAkPFSuYK
-	evOity0m0NmyM5l242V1YpEIAYyLE3CXQO/LawLRFhsltRMWUbGoytU7rocyOtW2IZW/UApjN0+
-	k40sI=
-X-Received: by 2002:a05:6122:e16b:b0:5ea:c11b:431a with SMTP id 71dfb90a1353d-5ece72321bemr55152e0c.9.1794087974083;
-        Sat, 07 Nov 2026 13:46:14 -0800 (PST)
+        bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
+        b=rF5zHs+5RD6z+Gprk0pTQ+odrYwrbvb6Dx3xjR5aZTspOcjHQq5GxlX/NN3AUkGuIp
+         jWdkkYQosKURstFzSRRzZyrWCx/YuNo3x69gIKPB/kSSLhityLBl3N+9f6n6V3g+oG/8
+         RXYYtc+3g8SX8rlnKp50pFORRe6fbLUFzixedmNBb2p0dGukr9kXlRJFNwNVjeUYPzUC
+         m9QIwWSJZ14zx7HeCbvr4sMTlxb0U4yrGdsbhbX56UF4DO365qgAVaqpTtLSTOfcI+EN
+         eZdYa3/ORV+ppjqpSIqWqsKf10+TwKzxumLu81eMr0yvWB2ywkP3dQSdCM9aK2S6dkEL
+         aEHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794087977; x=1794692777;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
+        b=s4uZcVh5noTKoWU/e0kwlIWeBuViFkeUyqBbfqonTcNRoLUoH95gFIcwm6m3lWTRrU
+         YX6DumkofkW+vGgizgyZ9GNTSAA2VuMiAH65kkVK4EMLMGjhmZP72tf4vnjyWOxJowsZ
+         7xeFgx6lfglz6KSemvyDavgwlPBlJu+Kv3YikP79z7GRq1YgO3yMT4yuMiQH33LwgKD/
+         OYVZ/zvYwMIvWLFikYlBvJNXwI+ecDPmi3od/QYKUzwwkzL4aZaJJVtlH9GnF5b573Fd
+         4DcgAJdqJI++UiZc3pw70LmgRTfMNM2DtK/y1x9+ggTUZlH6AxjhOQJma6azMYBFRj0v
+         096A==
+X-Gm-Message-State: APuU4Z+nsPNTHFZDdnoN9XKRQMoDZk0IFvaomoDAGwhdiZRvHdNuaGwJ
+	aS9+j20kHfPjplgD/UchLIAMQNgUEkI7ne88mAmUaaZWkB522OIMtQ3RmaYcLg==
+X-Gm-Gg: AYBFou2a9tMSsTNlOwNc2mjuhNJ78j/C4XRS2zruqCmGG0F6GVHHJEeFVBoNY1Vf98D
+	p0BW8E98QA+UncQdQRg5CPkXDCel38IR/YmmIFb40C71Ocf8z1hWeu1iDmSm6ghhuoQ6DvZipy7
+	ns5YNsAQO7qbCQQ4+n+EfcVWWV+tCt7l5cgPLMm4mghvdNiqdH2ZZRqcz+xGCDsxXBxLFUwCfZN
+	smdrMeLBEZoGgWb59eCLFblri78DGpUc+erVSivRPl7I+xGvDl5J5W1cdCiR+VTCUAlCdEdu+0p
+	eaKF3St5/+sfw/MziTgy4DUyMquKACIicxEpiHivxos1e+EwBUhehZl8a8bR1iqi08wtrCclGoJ
+	nJXwpFydl58JYhd0FR3RHVYdaReRs+KM0A0ScDLx8KqMSTCjzncr+Z9NRBsOtMsLcAslUd6rvVU
+	7gWa1srUGnIPMJBFQQ/Be8cbfZ16fmO75UR9JWqaHIRZUIsS6qETDxTWX1aMCEmpiNeLgcx+820
+	Zq+mDVkePfeHOZA5qr6rYHLcvnlu//RrmGnmJ00u92fULa98G70Qrl99oHx2GaZNDNNcTrU7PQH
+	KDMsC25UxwESlw9Uz3jMTP6d9sukb4nnrUa5EonzqxpcR3YgAgu0GjryUQDB2qqOZagggAY8uum
+	QW24a22ISU08fLXtUr4+KA5Xj2xzNy+NWGDUB6M4QNXFKWb9N3OGmai8+aSHXKbOjqWYgVHK2bc
+	uBbHQg
+X-Received: by 2002:a05:6122:e22f:b0:5ec:1996:43e5 with SMTP id 71dfb90a1353d-5ece725c6camr47648e0c.14.1794087977076;
+        Sat, 07 Nov 2026 13:46:17 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece6418de3sm382617e0c.13.2026.11.07.13.46.12
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece6418de3sm382617e0c.13.2026.11.07.13.46.16
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Nov 2026 13:46:13 -0800 (PST)
+        Sat, 07 Nov 2026 13:46:16 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 00/11] Add support for HDT and EKS
-Date: Sat,  7 Nov 2026 16:45:59 -0500
-Message-ID: <20261107214611.388705-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 02/11] lib: Add HDT definitions
+Date: Sat,  7 Nov 2026 16:46:01 -0500
+Message-ID: <20261107214611.388705-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261107214611.388705-1-luiz.dentz@gmail.com>
+References: <20261107214611.388705-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,172 +101,178 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for the LE High Data Throughput (HDT) PHY and the
-Encryption Key Schedule (EKS) introduced in Bluetooth Core 7.0:
-definitions, btmon HCI and LL decoding, btdev/bthost emulation, GATT
-MIC length permissions, main.conf options, tests in l2cap-tester,
-iso-tester and mgmt-tester, and l2test options.
+Add the socket API needed for the LE HDT PHY:
 
-Changes in v6:
- - mgmt-tester: add an SSP pairing test on a 7.0 controller, where
-   Encryption Change v3 reports the BR/EDR key size.
- - mgmt-tester: test that a reserved HDT MIC length, packet format and
-   rate set with the system configuration are rejected.
- - main.conf: DefaultMICLength only takes 0x01 (64 bits) and 0x02 (128
-   bits), as LE Set HDT Default Parameters reserves every other value,
-   32 bits being the one of the GFSK PHYs, and the controller rejects
-   it, which failed powering on. btdev rejects it too.
- - monitor: decode PHY_Options as the spec defines it, the LE Coded
-   coding and the HDT packet format being values, with the 64-bit MIC
-   preference and the forced key refresh having their own bits, and
-   show the payload window sizes of the HDT LL PDUs, which are encoded
-   as one less than the size.
- - Quote the Core 7.0 specification where the code relies on it: the
-   HDT default parameters, MIC length negotiation and values, the PHY
-   and rate bits and their tables, the LL PDU fields, the key refresh
-   and the Encryption Change fields, LE Enable Encryption with
-   opportunistic encryption, the event version sent, the ATT MIC Length
-   Too Short error and what Read By Group Type returns.
+- BT_PHY bits for the HDT2, HDT3, HDT4, HDT6 and HDT7.5 rates in each
+  direction.
+- bt_security.mic_len to request and read the MIC length of a link.
+- struct bt_iso_qos_ext, an extensible ISO QoS passed with BT_ISO_QOS
+  and told apart from struct bt_iso_qos by its length, along with the
+  BT_ISO_PHY_* values and BT_ISO_HDT_RATE_* for its rates field.
 
-Changes in v5:
- - btdev: Create BIG Complete v2 reports NSE, BN and IRC of 1, as
-   the BIGInfo does, rather than 0.
- - l2cap-tester: the MIC length tests only send their connection
-   request once, not again when the link is re-encrypted.
- - doc/l2cap-protocol: document the MIC Length Too Short result of
-   each mode (0x000C and 0x0010) and that it applies on the LE HDT
-   PHY, and that an unset MIC length requests the default one.
- - iso-tester: test that reserved HDT rates, and HDT rates without
-   the LE HDT PHY, are rejected.
+struct bt_iso_qos_ext is meant to grow rather than adding new socket
+options or structs, which is what its first two fields are for:
 
-Changes in v4:
- - lib, doc/iso-protocol: setsockopt(BT_ISO_QOS) on a socket that
-   already has a connection fails if the type doesn't match.
- - Fix checkpatch errors and warnings: long lines, missing blank lines
-   after declarations, a static initialised to 0 and a non-const
-   option array; mgmt-tester uses struct
-   bt_hci_cmd_le_enable_encrypt_v2 instead of a copy of it.
- - Add "monitor: Use __packed in bt.h and its users", defining __packed
-   in monitor/bt.h and using it there and in the files including it,
-   so new definitions are no longer flagged by checkpatch; the new
-   structs use C99 flexible arrays.
- - monitor: the [v2] LL fields are reached past the fixed part of the
-   PDU rather than with sizeof arithmetic on a void pointer (CodeQL),
-   and little-endian HCI fields are converted before printing.
- - bthost: handle Encryption Key Refresh Complete, so pairing over an
-   already encrypted link distributes its keys, and convert the CIS
-   Established v3 handle.
- - btdev: reject the reserved PHY bit, select LE Coded when it is the
-   only common PHY, and convert the little-endian fields of Create BIG
-   Complete v2 and LE Set HDT Default Parameters.
- - l2test: an explicit -f 0 sets a 32-bit MIC requirement.
+- version tells which fields are valid, so later versions can add
+  fields while applications built for an earlier version keep working.
+  Version 1 adds the HDT rates of each direction.
+- type tells which member of the union is in use, unicast or
+  broadcast. The QoS is usually set before bind() or connect(), when
+  the kernel can't tell which one it was given, so with type each can
+  grow on its own by adding fields at its end, which is also why the
+  union is the last member. BT_ISO_QOS_ANY leaves it to connect() or
+  listen().
+---
+ lib/bluetooth/bluetooth.h | 119 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 119 insertions(+)
 
-Changes in v3:
- - btdev: encrypting a link that is already encrypted, such as one
-   with opportunistic encryption, sends Encryption Key Refresh Complete
-   (v2 when unmasked) like a controller does.
- - l2cap-tester: add Opportunistic Encryption tests, connecting over
-   an opportunistically encrypted link and pairing over it afterwards.
- - lib: struct bt_iso_qos_ext has a 16-bit version and a 16-bit type
-   instead of rfu, and BT_ISO_PHY_* and BT_ISO_HDT_RATE_* are added.
- - doc/iso-protocol: document BT_ISO_QOS, the extended QoS and why it
-   has version and type, with examples.
- - iso-tester: set the type of the extended QoS and test BT_ISO_QOS_ANY
-   and a type mismatch.
-
-Changes in v2:
- - Remove the values from drafts of the specification and use the ones
-   from Core 7.0:
-   - ATT MIC Length Too Short is 0x14; L2CAP results are 0x000C (LE
-     Credit Based) and 0x0010 (Enhanced Credit Based); the HCI error
-     0xFE is removed and btmon decodes the 7.0 errors 0x49-0x4B.
-   - The draft LL PDUs are replaced by the versioned LL_PHY_REQ,
-     LL_PHY_RSP, LL_PHY_UPDATE_IND, LL_CIS_REQ and LL_CIS_IND [v2],
-     decoded by length.
-   - 0x20AA is LE Set Data Length v2; LE feature page 0 bit 59 is
-     removed; Set CIG Parameters Test v2 decodes
-     Anchor_Update_Buffer_Time.
- - btdev: a 64-bit MIC is only used when both sides prefer it; the
-   re-encryption tests now pair with Secure Connections and check the
-   128-bit MIC is kept.
- - lib: struct bt_iso_qos_ext replaces bt_iso_qos_v2, BT_PHY_* without
-   BIT().
- - btmon: Create BIG Complete v2 bounds the BIS handles and shows the
-   MIC length, CIG Parameters Test v2 and Create BIG Test v2 are
-   variable length, Data Length Change v2 checks its own size,
-   PHY_Options S=8 is bit 1, Coded rates label S=2, LL window size
-   fields are masked.
- - btdev: Create BIG v2 rejects an invalid Num_BIS without completing,
-   opportunistic encryption reports key size 0 and EKS mode 2, the
-   peer PHY Update Complete swaps TX/RX, fixes default PHY selection,
-   BIS rates come from the PHY value, unknown handles return the v2
-   opcode, and CIS Established uses the version the host unmasked.
- - shared/gatt: Read By Group Type checks every service before
-   encoding it.
- - main.conf: DefaultRates is sent little endian.
- - Testers wait for the re-encryption result; iso-tester converts the
-   extended QoS for the emulated remote.
- - l2test: the requested PHY is separate from the queried one and the
-   MIC requirement keeps the requested security level.
-
-Luiz Augusto von Dentz (11):
-  monitor: Use __packed in bt.h and its users
-  lib: Add HDT definitions
-  doc/iso-protocol: Document BT_ISO_QOS
-  monitor: Add HCI decoding for HDT
-  monitor: Add LL decoding for HDT
-  emulator: Add HDT support to btdev
-  emulator: Add HDT support to bthost
-  shared/gatt: Add MIC length permission checks
-  main.conf: Add HDT configuration
-  l2cap-tester, iso-tester, mgmt-tester: Add HDT tests
-  l2test: Add HDT options
-
- client/scripts/gatt-mic-128.bt       |    5 +
- client/scripts/gatt-mic-64-128.bt    |    7 +
- client/scripts/gatt-mic-64.bt        |    5 +
- doc/iso-protocol.rst                 |  207 ++++
- doc/l2cap-protocol.rst               |   50 +-
- doc/mgmt-protocol.rst                |    3 +
- doc/org.bluez.GattCharacteristic.rst |    4 +
- doc/org.bluez.GattDescriptor.rst     |    4 +
- emulator/btdev.c                     |  998 +++++++++++++--
- emulator/btdev.h                     |    1 +
- emulator/bthost.c                    |  137 ++-
- emulator/bthost.h                    |   14 +
- emulator/hciemu.c                    |    3 +
- emulator/hciemu.h                    |    1 +
- emulator/main.c                      |    5 +-
- emulator/vhci.c                      |    4 +-
- lib/bluetooth/bluetooth.h            |  119 ++
- monitor/att.c                        |    3 +
- monitor/bt.h                         | 1672 ++++++++++++++++----------
- monitor/l2cap.c                      |    6 +
- monitor/ll.c                         |  281 ++++-
- monitor/packet.c                     |  939 ++++++++++++++-
- src/adapter.c                        |   28 +
- src/btd.h                            |    7 +
- src/gatt-database.c                  |   26 +
- src/main.c                           |   48 +
- src/main.conf                        |   27 +
- src/shared/att-types.h               |   17 +-
- src/shared/att.c                     |   39 +
- src/shared/att.h                     |    3 +
- src/shared/gatt-db.c                 |    9 +
- src/shared/gatt-db.h                 |    3 +
- src/shared/gatt-server.c             |   56 +-
- tools/3dsp.c                         |    4 +-
- tools/bluemoon.c                     |   24 +-
- tools/iso-tester.c                   | 1418 +++++++++++++++++++++-
- tools/l2cap-tester.c                 |  942 ++++++++++++++-
- tools/l2test.c                       |  156 ++-
- tools/mgmt-tester.c                  |  218 ++++
- unit/test-gatt.c                     |  101 ++
- 40 files changed, 6777 insertions(+), 817 deletions(-)
- create mode 100644 client/scripts/gatt-mic-128.bt
- create mode 100644 client/scripts/gatt-mic-64-128.bt
- create mode 100644 client/scripts/gatt-mic-64.bt
-
+diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
+index f9f22c3f7523..58bb65d7b1d3 100644
+--- a/lib/bluetooth/bluetooth.h
++++ b/lib/bluetooth/bluetooth.h
+@@ -50,9 +50,17 @@ extern "C" {
+ #endif
+ 
+ #define BT_SECURITY	4
++/* mic_len is the MIC length required of the link on the LE HDT PHY when set,
++ * and the one in use when read. BLUETOOTH CORE SPECIFICATION Version 7.0 |
++ * Vol 4, Part E, Section 7.7.8, MIC_Length: 0x00 MIC length is 32 bits, 0x01
++ * MIC length is 64 bits, 0x02 MIC length is 128 bits, all other values
++ * Reserved for future use. The 32 bits are those of the GFSK PHYs, so on the
++ * LE HDT PHY 0x00 means no requirement.
++ */
+ struct bt_security {
+ 	uint8_t level;
+ 	uint8_t key_size;
++	uint8_t mic_len;
+ };
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
+@@ -130,6 +138,16 @@ struct bt_voice {
+ #define BT_PHY_LE_2M_RX		0x00001000
+ #define BT_PHY_LE_CODED_TX	0x00002000
+ #define BT_PHY_LE_CODED_RX	0x00004000
++#define BT_PHY_HDT_2M_TX	0x00008000
++#define BT_PHY_HDT_2M_RX	0x00010000
++#define BT_PHY_HDT_3M_TX	0x00020000
++#define BT_PHY_HDT_3M_RX	0x00040000
++#define BT_PHY_HDT_4M_TX	0x00080000
++#define BT_PHY_HDT_4M_RX	0x00100000
++#define BT_PHY_HDT_6M_TX	0x00200000
++#define BT_PHY_HDT_6M_RX	0x00400000
++#define BT_PHY_HDT_7_5M_TX	0x00800000
++#define BT_PHY_HDT_7_5M_RX	0x01000000
+ 
+ #define BT_MODE			15
+ 
+@@ -219,6 +237,107 @@ struct bt_iso_qos {
+ 	};
+ };
+ 
++/* Extended ISO QoS, set and read with BT_ISO_QOS.
++ *
++ * The option length tells it apart from struct bt_iso_qos, which is kept for
++ * existing applications. New fields are added by extending this struct rather
++ * than by adding new socket options or structs:
++ *
++ * - version tells which fields are valid, so later versions can add fields
++ *   while older applications keep working with the fields they know.
++ * - type tells which member of the union is in use. The QoS is usually set
++ *   before bind() or connect(), so the socket can't tell unicast from
++ *   broadcast at that point. With type, struct bt_iso_ucast_qos_ext and
++ *   struct bt_iso_bcast_qos_ext can each grow on their own, by adding fields
++ *   at their end, without the kernel having to guess which one it was given.
++ *   For that the union shall remain the last member.
++ *
++ * BT_ISO_QOS_ANY leaves the type to be set by connect() or listen(), which is
++ * possible with version 1 since its unicast fields are a prefix of the
++ * broadcast ones. A type that doesn't match how the socket is used makes
++ * connect() or listen() fail with -EINVAL, or setsockopt() on a socket that
++ * already has a connection, such as with deferred setup. getsockopt() reports
++ * the type in use once it is known.
++ *
++ * Version 1 adds the HDT rates of each direction, see BT_ISO_HDT_RATE_*, used
++ * when the PHY is BT_ISO_PHY_HDT; 0 means every rate the controller supports.
++ */
++#define BT_ISO_QOS_VERSION_1	0x0001
++
++#define BT_ISO_QOS_ANY		0x0000
++#define BT_ISO_QOS_UCAST	0x0001
++#define BT_ISO_QOS_BCAST	0x0002
++
++/* The HDT rates are those of the HDT_Rates parameters: BLUETOOTH CORE
++ * SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.97:
++ * HDT_Rates_C_To_P[i] bits 0 to 4 are the HDT2, HDT3, HDT4, HDT6 and HDT7.5
++ * rates of the LE HDT PHY "(possibly among others)", all other bits are
++ * Reserved for future use.
++ */
++#define BT_ISO_HDT_RATE_2M	0x0001
++#define BT_ISO_HDT_RATE_3M	0x0002
++#define BT_ISO_HDT_RATE_4M	0x0004
++#define BT_ISO_HDT_RATE_6M	0x0008
++#define BT_ISO_HDT_RATE_7_5M	0x0010
++
++/* The PHYs are the bits of PHY_C_To_P[i] and PHY_P_To_C[i], BLUETOOTH CORE
++ * SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.97: bit 0 is LE 1M,
++ * bit 1 is LE 2M, bit 2 is LE Coded, bit 4 is LE HDT and all other bits are
++ * Reserved for future use.
++ */
++#define BT_ISO_PHY_1M		0x01
++#define BT_ISO_PHY_2M		0x02
++#define BT_ISO_PHY_CODED	0x04
++#define BT_ISO_PHY_HDT		0x10
++#define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
++				 BT_ISO_PHY_CODED)
++
++struct bt_iso_io_qos_ext {
++	uint32_t interval;
++	uint16_t latency;
++	uint16_t sdu;
++	uint8_t  phys;
++	uint8_t  rtn;
++	uint16_t rates;
++};
++
++struct bt_iso_ucast_qos_ext {
++	uint8_t  cig;
++	uint8_t  cis;
++	uint8_t  sca;
++	uint8_t  packing;
++	uint8_t  framing;
++	struct bt_iso_io_qos_ext in;
++	struct bt_iso_io_qos_ext out;
++};
++
++struct bt_iso_bcast_qos_ext {
++	uint8_t  big;
++	uint8_t  bis;
++	uint8_t  sync_factor;
++	uint8_t  packing;
++	uint8_t  framing;
++	struct bt_iso_io_qos_ext in;
++	struct bt_iso_io_qos_ext out;
++	uint8_t  encryption;
++	uint8_t  bcode[16];
++	uint8_t  options;
++	uint16_t skip;
++	uint16_t sync_timeout;
++	uint8_t  sync_cte_type;
++	uint8_t  mse;
++	uint16_t timeout;
++};
++
++struct bt_iso_qos_ext {
++	uint16_t version;
++	uint16_t type;
++	union {	/* Shall be the last member */
++		struct bt_iso_ucast_qos_ext ucast;
++		struct bt_iso_bcast_qos_ext bcast;
++	};
++};
++
+ #define BT_CODEC		19
+ struct bt_codec {
+ 	uint8_t id;
 -- 
 2.56.0
 
