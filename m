@@ -1,60 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794016156;
-	b=n11kgSrSTT8RNNfRkpw91ojegBO3pxB0sAK9jXbOGkYw1o3TUaUXMxaz+V95pvkFuX9S
-	 4AHmyy7ogbNAz0Be/ff5lxKedY1HUydhJkJs/7cJCHWnNUvJXBnLs9BLRlg/wACw4o2ZI
-	 mDd5hhq0MH7zb0oQyB4g1jJ+0OLj5lilhwlMCLDKvRmd9oGLljhADvm0bUqxTrlWx93UT
-	 Oxiajj6HKS8v6oZ371x5IWPEF+aav50dGGQf2Tc9q8MJ79+nZ7JzSL7I4xMxyLWgzJE6M
-	 uC3bSZjN802QIAohZIg+QIe/IfoWRc3aGRXoHEnh9SAH4a+7gDbU9+0TQBZ8mRPZDhw==
+	t=1794016614;
+	b=paXcR9MEYr/baY6XWjVHPh12/tUw/IdWM8qL51UznEjJXC59ufxHKtHBCaNBPaBTdXQH
+	 KYzQO+pRNgU96H6C6LP2QhqfxtDgDwwXwi0T85wn0rNuvTMZqv+bheFMlq2o1s4XJGv1N
+	 khquolHXY0ZdmxBxIw3O9FpeD0EEFMToaU/ntLD3gMI1pVV9UF0/WXDEd0CwrBIu5+jWg
+	 sCVdby+VwvUfkM3lnCxhTUa27EO++UVS5s/5SPraW8yIL37NtbzvTw/7te6Ef+yXH8FER
+	 hfYElSDaDJisX3lsnIDqthdjk3PQFlzzoKAZ3S7kVTyEjQy3/j0TySI+ZzejfyT7j0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794016156;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=XxJv+pLIWROHU7dPv9tau1Bun+RZi38NIKxxXl4OL+k=;
-	b=5no4OfOWMSHdTXVA4a1TuM5FNO8qh/LyLrMDm0XBy3S47tJ+HP73er49jSvWpOPCfHva
-	 uKHVNDat4vqizy+2PLxwvh2Dw55+T2Erox5NglGtnKXbhYpVbAkxsTPJt/dff+fuXgUfU
-	 iElLNux6O00B65LuVJ8WV/2jSKpJUuzWVvTby3H5nVY9TCflUGc1ITOhRhF1Eho4B0++h
-	 o0SRT8wMpL2wWDUQyA5UrTXNRLHStxF7FYLUqSuXUfisxLzentim9HMv/waSrEyVv5daw
-	 tPfW0FMqOLpQPkTUac8ETpvGnQUUc35n1+CBXSvXoLgrvU165MTInmcaMmr3f2tFUWQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794016614;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=RtWAahkiJQf+KQQeeOZAQ52FxTvlKO8W/nA8X7WBVdY=;
+	b=1tseGxTMJjjC+1bPeloIgf+JBSr01sNFUKOI7hmflZyGVOQ0l6Ekr/nlTet+tid+rsWJ
+	 fn0UNNtOS+jL6jXKN0HI4gFj+KhtEfZELsjgNNXkQyrCAnEXzI97mlaAD4QQD2F3kEjog
+	 mO9DkUl5+zMKctDZivvqgnwmd3JFQuyC3W+S11q0xv7bbn2Fk8564fIMGey01ARrMqxWf
+	 ivopZxXFTxXJUY3/6D/IuAqDBstbrfroBb1keHBrj+5ylQRkib/yLKyIq07WgkHhm/h3K
+	 RNTU24kJQQ0+4BPHWMf5yySzuLoxsEvFlNvFRwC2hKpgqpve3cdzHXQWBkuZ+Hx9trA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=Gh9GlrfF;
-	arc=none smtp.remote-ip=185.70.43.22
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=simpleble.org;
+	spf=pass smtp.mailfrom=californiaopensource.com;
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=yNHGD3Gj;
+	arc=none smtp.remote-ip=74.125.82.181
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839DB606A326
-	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 01:49:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 839DB606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7F0606A32E
+	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Nov 2026 01:56:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0D7F0606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=Gh9GlrfF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794016152; x=1794275352;
-	bh=XxJv+pLIWROHU7dPv9tau1Bun+RZi38NIKxxXl4OL+k=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Gh9GlrfF82Vh19SyanYj+03jcbfYpCT+b6xAOtPq7wTWts4379fUW9WUANsz048fE
-	 S+ncoPCAsZOeMN4arfAijtpDqTQwYBsVczs83MsWsfongtEdd7POUI+Lpzn5Vfe12a
-	 40eRsObo4UbH4wEDeRANGSV85ZbFhbiRTidbw121ftsD1gmcloJsASG+ZqH2Qbc9BG
-	 pf57lAKQXU6RiaqPWefZ56EdphhbN/Uf8pglFqsBQweYyWGMXZBHjzZQ7B/e/8ayJo
-	 XmgIS3tG9nuw9k6IxxoYThAvhRavxnUM2/PHJ4qoXPRHmi/WFNLKPFGnHbxsHfgpAD
-	 itUOWWEj4GZIw==
-Date: Sat, 07 Nov 2026 01:49:08 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=yNHGD3Gj
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-37000e7234bso1579013eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Nov 2026 17:56:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=simpleble.org; s=google; t=1794016613; x=1794621413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=RtWAahkiJQf+KQQeeOZAQ52FxTvlKO8W/nA8X7WBVdY=;
+        b=yNHGD3GjZyH4S1v9h9new/3X4/tLRMCgcJhMrd5OPfV8V7q2RSpeelhQNMe4OzaTV6
+         keHCmusuEYHM/wT8dOVMlPZ0PzJeaE04XullKADb4YF63spM324oQRe5DnN45nBtF6Fi
+         fKdBnAhyarA9fwrwzJKerW24OJSDwDdu1mQPcAuJ4jrsaKR1O8WpgVb+mLt2tYGMIZuH
+         VrgFX6p21VsS3zkaV+iTe/+I9HaZ4jqvirc17ZytSV+9L03tOK6Vj3R0L6K7sfg+90CJ
+         Jw8vxKB+KIHk7cBrXqWAvRJf5C3HD34hf7SNXu6KLUQaiem/QZpc3yyfZrzyVzweNlUl
+         UHKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794016613; x=1794621413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RtWAahkiJQf+KQQeeOZAQ52FxTvlKO8W/nA8X7WBVdY=;
+        b=qb0wquPuBDBUBthMzznrQ5AKIwOd780FcX3eS/9fiuAUc5a+i/sQhacg9t7Fgp67m7
+         QnmiVTIceKUZm+Y4AFauUh6jT9Rc7szBQHFNXCPwR+xWnxjx8xZxdFwjWpWjz+HbUIhK
+         5jGWvEXkx3ILiE+dTmaot9nGuY1UlnZi0QOuXHYVdLqwDyXoc4aFeQuLhrwmERfOLJGZ
+         Ob2uMjEgMUwhje0/tMyEmXEyShfjkKXcgwJ0fk1++jMaWYwm3/6DJCV9Pfy6mbDmgrQj
+         iKNDu5equBD7TgFdJRufkWaBrQUHAQ6aGfxfsfizmBgAvNuZe3MZNZJkB77MXdSuwkSc
+         mTDg==
+X-Gm-Message-State: APuU4Z962yP3I5dWiFzCtrIZoQG0IoJ3g8bosRhRhviGi/tb6yYcJMEb
+	xs1R+f51rEFSCzXjSul5Ob24YPa9yWA0csU50jsRGxqrN0I5O+gMVRrkCTwkrpeFd14+Vs0MTTl
+	c/6Iy/vo=
+X-Gm-Gg: AYBFou1wM2T6yjBPb8Q+/pwndBRNYHQCVSzM1KuNght1MXmPisThQa9f+p8cQ/+cvif
+	2iGS3PCSO5sfxTwmsLVpWArpaTg3aXzWvGNRXkb8yIBHC2gDyqv0yPcoRYsGj41JiZ+5BObE7Ja
+	/UCWHvoiBHftH0Gt2QsiiNDh2Xi52yf0BYkSJEq1kqpB0QQYngwUscF0NB0JRM/r32sDwTVRotJ
+	/CsZgKwqRErDFp7DPlKZMGRBQ1lDzBNFLKjOvYM426conyB/ENmZ4ha9zyG7H3k5jW4IJJZ5hq2
+	33exM7lKE+Dk7/aMGIOTLGJb7z4TltZQWgoailZPdxJg5yj+bbBfIf0Wys2xXDSf0tkZ3Njtqfs
+	4xUqSpraHlZM/j0Lt8pduyvumQX4QDqyNNNXbXXdT69kkKehlZ+I1QI9h1YLlj1zT+gxou1XJmH
+	EZLNq31JA3ceIQ7Tzf9wtS77b3oTLaHgWi0EATnwvsQRkQtOETv80zAylvnwdrdII+w9A5XCqja
+	6YodTyekomfsoofV2WLKduqV+Ib90SHAqBwwXks7AAGWDPAxW1tuB813ojdv2kNs9OxZkB+7mI6
+	AFdGINo/gQt2sgwPApgWD/dICJksZH+WkX8BOnhClzOiYxdcpKesWxd7rRbXybmU7G9y9mla6Wk
+	P3pQ53xufIBZGj2A7XXOPzwuC/NT6cCC2NS17UTl9/7KnPSv3ytXFBCJH2uryVirxQkV3qwk=
+X-Received: by 2002:a05:7300:ce92:b0:351:6409:25c9 with SMTP id 5a478bee46e88-36f7700ab0fmr5559247eec.35.1794016612889;
+        Fri, 06 Nov 2026 17:56:52 -0800 (PST)
+Received: from localhost.localdomain ([147.185.47.151])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa651e6b1sm22977994eec.3.2026.11.06.17.56.52
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 06 Nov 2026 17:56:52 -0800 (PST)
+From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com
-Subject: [RFC PATCH v2] asha: Defer BR/EDR inquiry while streaming
-Message-ID: <20261107014841.1452698-1-cochcoder@proton.me>
-In-Reply-To: <20261028133243.262314-1-cochcoder@proton.me>
-References: <20261028133243.262314-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: b0c020971683538a4296416245e2c92a43d6a4e5
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Kevin Dewald <kevin@simpleble.org>
+Subject: [PATCH BlueZ 0/2] bearer: Fix auto-connect handling of LE Connect and Disconnect
+Date: Fri,  6 Nov 2026 17:56:47 -0800
+Message-ID: <20261107015649.84892-1-kevin@simpleble.org>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,327 +94,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Defer BR/EDR inquiry while ASHA streams are active. Keep LE discovery
-available and preserve client filters for restoration after audio stops.
-Return Busy if a new request leaves no permitted scan type. Recheck
-pending discovery starts when audio changes.
+org.bluez.Bearer.LE1.Disconnect is documented, like
+org.bluez.Device1.Disconnect, to disable incoming connections of a
+device that is not trusted until Connect is called again. Device1 does
+this by taking the device out of the auto-connect list, but the LE
+bearer does not: a paired HID device that is not trusted and keeps
+advertising is connected back right after Bearer.LE1.Disconnect.
 
-Release the stream count when START cannot be queued or its callback
-reports failure, so a failed acquisition cannot keep inquiry suppressed.
+Bearer.LE1.Connect does not put a device back in the list either,
+unlike Device1.Connect, so a device taken out of it by
+Device1.Disconnect is not reconnected after it loses the connection.
 
-Assisted-by: OpenCode:gpt-6.1-sol
-Assisted-by: Codex:gpt-6
----
-v2: Consolidate scan selection and remove periodic polling. Release the
-stream count on START queue and callback failures. Clarify Busy behavior.
+The first patch moves what Device1 does into two functions, and the
+second one calls them from the LE bearer. The BR/EDR bearer is left as
+it is, as auto-connect is only done over LE.
 
-Previous version:
-https://lore.kernel.org/linux-bluetooth/20261028133243.262314-1-cochcoder@p=
-roton.me/
+I reproduced this with a functional test using the HID device of
+test_hog.py, on master and bluetooth-next 3f425f95ba39:
 
-The resend passed all 12 archived CI checks. Local mocked tests exercise
-discovery and START failures; native MGMT/client arbitration and isolated
-hardware validation remain. Full local make check is blocked by an SDP
-debug-symbol linker failure also reproduced on unchanged upstream.
+  Disconnect, untrusted   master              with the series
+  Device1.Disconnect      stays disconnected  stays disconnected
+  Bearer.LE1.Disconnect   connected back      stays disconnected
 
+  Connect, then the HID device drops the link
+  Device1.Connect         reconnected         reconnected
+  Bearer.LE1.Connect      not reconnected     reconnected
 
- profiles/audio/asha.c | 46 +++++++++++++++++++++++---
- src/adapter.c         | 75 ++++++++++++++++++++++++++++++++++++++++---
- src/adapter.h         |  4 +++
- 3 files changed, 116 insertions(+), 9 deletions(-)
+A trusted device is connected back after Device1.Disconnect in both, as
+expected. make check and the functional tests using the bearers, HoG,
+btmgmt, bluetoothctl or the agent pass as before.
 
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-index 8e625fdca3..59a0247b37 100644
---- a/profiles/audio/asha.c
-+++ b/profiles/audio/asha.c
-@@ -60,8 +60,35 @@ struct bt_asha_device {
- =09uint16_t imtu, omtu;
-=20
- =09unsigned int resume_id;
-+=09bool streaming_counted;
-+=09bt_asha_cb_t start_cb;
-+=09void *start_cb_data;
- };
-=20
-+static void asha_set_streaming(struct bt_asha_device *asha_dev, bool strea=
-ming)
-+{
-+=09if (streaming =3D=3D asha_dev->streaming_counted)
-+=09=09return;
-+
-+=09if (streaming)
-+=09=09btd_adapter_le_audio_ref(device_get_adapter(asha_dev->device));
-+=09else
-+=09=09btd_adapter_le_audio_unref(device_get_adapter(asha_dev->device));
-+
-+=09asha_dev->streaming_counted =3D streaming;
-+}
-+
-+static void asha_start_cb(int status, void *user_data)
-+{
-+=09struct bt_asha_device *asha_dev =3D user_data;
-+
-+=09if (status)
-+=09=09asha_set_streaming(asha_dev, false);
-+
-+=09if (asha_dev->start_cb)
-+=09=09asha_dev->start_cb(status, asha_dev->start_cb_data);
-+}
-+
- static char *make_endpoint_path(struct bt_asha_device *asha_dev)
- {
- =09char *path;
-@@ -91,6 +118,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpoi=
-nter user_data)
-=20
- =09if (err) {
- =09=09error("%s", err->message);
-+=09=09asha_set_streaming(asha_dev, false);
- =09=09return;
- =09}
-=20
-@@ -107,8 +135,11 @@ static void connect_cb(GIOChannel *io, GError *err, gp=
-ointer user_data)
-=20
- =09asha_dev->io =3D io;
-=20
--=09bt_asha_start(asha_dev->asha, conn_data->cb,
--=09=09=09=09=09conn_data->cb_user_data);
-+=09asha_dev->start_cb =3D conn_data->cb;
-+=09asha_dev->start_cb_data =3D conn_data->cb_user_data;
-+
-+=09if (bt_asha_start(asha_dev->asha, asha_start_cb, asha_dev))
-+=09=09asha_set_streaming(asha_dev, false);
- }
-=20
- static int asha_connect_socket(struct bt_asha_device *asha_dev,
-@@ -171,12 +202,15 @@ unsigned int bt_asha_device_start(struct bt_asha_devi=
-ce *asha_dev,
-=20
- =09if (ret < 0)
- =09=09return 0;
--=09else
--=09=09return (++asha_dev->resume_id);
-+
-+=09asha_set_streaming(asha_dev, true);
-+=09return (++asha_dev->resume_id);
- }
-=20
- unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev)
- {
-+=09asha_set_streaming(asha_dev, false);
-+
- =09bt_asha_stop(asha_dev->asha);
-=20
- =09if (asha_dev->io) {
-@@ -190,6 +224,8 @@ unsigned int bt_asha_device_stop(struct bt_asha_device =
-*asha_dev)
-=20
- void bt_asha_device_state_reset(struct bt_asha_device *asha_dev)
- {
-+=09asha_set_streaming(asha_dev, false);
-+
- =09if (asha_dev->io) {
- =09=09g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
- =09=09g_io_channel_unref(asha_dev->io);
-@@ -371,6 +407,8 @@ static void asha_source_device_remove(struct btd_servic=
-e *service)
- =09=09return;
- =09}
-=20
-+=09asha_set_streaming(asha_dev, false);
-+
- =09bt_asha_free(asha_dev->asha);
- =09g_free(asha_dev);
- }
-diff --git a/src/adapter.c b/src/adapter.c
-index 6588a6e2bd..74fdfb41c4 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -304,6 +304,7 @@ struct btd_adapter {
- =09=09=09=09=09 * without delay */
- =09uint8_t discovery_type;=09=09/* current active discovery type */
- =09uint8_t discovery_enable;=09/* discovery enabled/disabled */
-+=09unsigned int le_audio_active;=09/* Active ASHA streams */
- =09bool discovery_suspended;=09/* discovery has been suspended */
- =09bool discovery_discoverable;=09/* discoverable while discovering */
- =09GSList *discovery_list;=09=09/* list of discovery clients */
-@@ -1886,6 +1887,8 @@ static void discovery_remove(struct discovery_client =
-*client)
- }
-=20
- static void trigger_start_discovery(struct btd_adapter *adapter, guint del=
-ay);
-+static int update_discovery_filter(struct btd_adapter *adapter);
-+static uint8_t discovery_scan_type(struct btd_adapter *adapter);
-=20
- static struct discovery_client *discovery_complete(struct btd_adapter *ada=
-pter,
- =09=09=09=09=09=09uint8_t status)
-@@ -1964,6 +1967,11 @@ static void start_discovery_complete(uint8_t status,=
- uint16_t length,
-=20
- =09=09discovery_complete(adapter, status);
-=20
-+=09=09/* Audio or filters may change while START is pending. */
-+=09=09if (!adapter->discovery_suspended &&
-+=09=09    adapter->discovery_type !=3D discovery_scan_type(adapter))
-+=09=09=09trigger_start_discovery(adapter, 0);
-+
- =09=09if (adapter->discovering)
- =09=09=09return;
-=20
-@@ -1987,23 +1995,39 @@ static void start_discovery_complete(uint8_t status=
-, uint16_t length,
- =09trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT * 2);
- }
-=20
-+static uint8_t discovery_scan_type(struct btd_adapter *adapter)
-+{
-+=09uint8_t type =3D adapter->current_discovery_filter ?
-+=09=09=09=09adapter->current_discovery_filter->type :
-+=09=09=09=09get_scan_type(adapter);
-+
-+=09if (adapter->le_audio_active)
-+=09=09type &=3D ~SCAN_TYPE_BREDR;
-+
-+=09return type;
-+}
-+
- static bool start_discovery_timeout(gpointer user_data)
- {
- =09struct btd_adapter *adapter =3D user_data;
- =09struct mgmt_cp_start_service_discovery *sd_cp;
-+=09size_t sd_len;
- =09uint8_t new_type;
-=20
- =09DBG("");
-=20
- =09adapter->discovery_idle_timeout =3D 0;
-=20
-+=09if (!adapter->discovery_list || adapter->discovery_suspended)
-+=09=09return FALSE;
-+
- =09/* If we're doing filtered discovery, it must be quickly restarted */
- =09adapter->no_scan_restart_delay =3D !!adapter->current_discovery_filter;
-=20
- =09DBG("adapter->current_discovery_filter =3D=3D %d",
- =09    !!adapter->current_discovery_filter);
-=20
--=09new_type =3D get_scan_type(adapter);
-+=09new_type =3D discovery_scan_type(adapter);
-=20
- =09if (adapter->discovery_enable =3D=3D 0x01) {
- =09=09struct mgmt_cp_stop_discovery cp;
-@@ -2047,11 +2071,27 @@ static bool start_discovery_timeout(gpointer user_d=
-ata)
-=20
- =09}
-=20
-+=09if (!new_type) {
-+=09=09struct discovery_client *client;
-+
-+=09=09/* Reject new requests; retain accepted sessions until audio stops. =
-*/
-+=09=09client =3D discovery_complete(adapter, MGMT_STATUS_BUSY);
-+=09=09if (client) {
-+=09=09=09discovery_remove(client);
-+
-+=09=09=09if (adapter->discovery_list)
-+=09=09=09=09update_discovery_filter(adapter);
-+=09=09}
-+
-+=09=09return FALSE;
-+=09}
-+
- =09/* Regular discovery is required */
- =09if (!adapter->current_discovery_filter) {
- =09=09struct mgmt_cp_start_discovery cp;
-=20
- =09=09cp.type =3D new_type;
-+
- =09=09mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
- =09=09=09=09=09adapter->dev_id, sizeof(cp), &cp,
- =09=09=09=09=09start_discovery_complete, adapter,
-@@ -2060,18 +2100,25 @@ static bool start_discovery_timeout(gpointer user_d=
-ata)
- =09=09return FALSE;
- =09}
-=20
--=09/* Filtered discovery is required */
--=09sd_cp =3D adapter->current_discovery_filter;
-+=09/* Keep the requested filter intact for when audio stops. */
-+=09sd_len =3D sizeof(*sd_cp) +
-+=09=09btohs(adapter->current_discovery_filter->uuid_count) * 16;
-+=09sd_cp =3D util_memdup(adapter->current_discovery_filter, sd_len);
-+=09if (!sd_cp)
-+=09=09return FALSE;
-+
-+=09sd_cp->type =3D new_type;
-=20
- =09DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
- =09=09=09=09sd_cp->rssi, sd_cp->type,
- =09=09=09=09btohs(sd_cp->uuid_count));
-=20
- =09mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
--=09=09  adapter->dev_id, sizeof(*sd_cp) +
--=09=09  btohs(sd_cp->uuid_count) * 16,
-+=09=09  adapter->dev_id, sd_len,
- =09=09  sd_cp, start_discovery_complete, adapter, NULL);
-=20
-+=09free(sd_cp);
-+
- =09return FALSE;
- }
-=20
-@@ -6358,6 +6405,24 @@ struct btd_adapter *btd_adapter_ref(struct btd_adapt=
-er *adapter)
- =09return adapter;
- }
-=20
-+void btd_adapter_le_audio_ref(struct btd_adapter *adapter)
-+{
-+=09if (adapter->le_audio_active++)
-+=09=09return;
-+
-+=09if (adapter->discovery_list && !adapter->discovery_suspended)
-+=09=09trigger_start_discovery(adapter, 0);
-+}
-+
-+void btd_adapter_le_audio_unref(struct btd_adapter *adapter)
-+{
-+=09if (!adapter->le_audio_active || --adapter->le_audio_active)
-+=09=09return;
-+
-+=09if (adapter->discovery_list && !adapter->discovery_suspended)
-+=09=09trigger_start_discovery(adapter, 0);
-+}
-+
- void btd_adapter_unref(struct btd_adapter *adapter)
- {
- =09if (__sync_sub_and_fetch(&adapter->ref_count, 1))
-diff --git a/src/adapter.h b/src/adapter.h
-index 583168f4bc..d5cda2d96b 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -119,6 +119,10 @@ bool btd_adapter_uuid_is_allowed(struct btd_adapter *a=
-dapter, const char *uuid);
- struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
- void btd_adapter_unref(struct btd_adapter *adapter);
-=20
-+/* Defer BR/EDR discovery while ASHA streams are active. */
-+void btd_adapter_le_audio_ref(struct btd_adapter *adapter);
-+void btd_adapter_le_audio_unref(struct btd_adapter *adapter);
-+
- void btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
- =09=09=09=09=09=09=09uint8_t minor);
- int btd_adapter_set_name(struct btd_adapter *adapter, const char *name);
+I have the test as two test cases for test_bearer.py, documented in
+doc/functional-bearer.rst, and can send them as a third patch if you
+want them.
+
+Kevin Dewald (2):
+  device: Add functions to pause and resume auto-connect
+  bearer: Fix LE Connect and Disconnect ignoring auto-connect
+
+ src/bearer.c |  5 +++++
+ src/device.c | 42 +++++++++++++++++++++++++-----------------
+ src/device.h |  2 ++
+ 3 files changed, 32 insertions(+), 17 deletions(-)
+
 
 base-commit: a8067198717b38391ca183ed7f41a69ec4b81b6e
---=20
-2.56.0
-
+-- 
+2.54.0 (Apple Git-157)
 
