@@ -1,59 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.69.30.187
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794096301;
-	b=DLByyk/7dL+tauoMzcAa0v0NMTtKyQ3x/XDDAjt+OUJle0AQmtderA8BV+gd935ZZ5WE
-	 d/CluZnAcJ7Xtfdfpk7MkwhGUE57DzzictMGh6HJMogxn/HP9QKre9oMmr3yxuQ+/kXgj
-	 pT/4GLc42YDto9+uqGml8+hXkeKvxzig94qCOeNy0Vprh0CjWQojuDk5jzDz2cytsZvxc
-	 bIgflBtOLVDgsoCP2rVtTLLpEDUJIWUxDxPeBDvlSWqWve4wBpHX6cNa9Cc4aeFomfmdH
-	 /1eeaZ6mIbPR2hcMDDziV8P6A2R0AXlRZTH8Q+uqF9YJqXoWKWf3nGYFVQjJfdhirTw==
+	t=1794104698;
+	b=wipMKRu9o+M+vA0mzwPgIvHeTGLg+DvREwVafJblPv1ejB81/Itjt5QvmlHNuAoqkbTf
+	 TFCnSnj/b8EQD8AJ8OpgIBEr4qlMSPfYfAvfNPwC/onRMUVQE0g8Ryb+Da5mLwrdXxe6j
+	 vV4+vzmWerYmTX33qfdn8vLJPE3hDvwvcm+l7/qIZybHIiFzH5zuztZvmK+7BdNqSHuTe
+	 cHWfO4Q3TdaleOfXQonBAtXMJrVPtqgr6QbBsMvOhPpv101mQ9E5MrMFiuw4X6VOI5Isf
+	 GYSO16Kkwk1I83A3frSg/2qNsx+VDCNeU8Cpl4NEKY5ItQqRv8vaNgc587L6ti2SdJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794096301;
-	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=LmZxkVpHpG5gwGpw1CjPnOAKtcfXo0x6WpaFvpVN4Lc=;
-	b=ffMwyS9QhKuYdOdVwfR6Qqrw82H4WqpZSRSrMR5H4gwuhmw4+UYouOlURJlbQJNhTDP7
-	 XGfcGCNw0FKHUak5avRBQzByeT+c+A1oQnAlVSEnPzVBeLBluArhicSBEgk4mCgoYMslK
-	 r+sH+u1CfO4Nl1MEEf8yQoxKolP6FKZ+eZfIwDjW20WoXc/eU7dLS+L2FefFkcPggZXVx
-	 7U5gkrlZtKCZL+YtJt9Sm+Te10bbdkdNLNpUWULoDEjBBzklQwDDhv9Ckl2QkWOXMxX4E
-	 DnfyM/TVUlZJdGy6uhVSlgxolw++ej5ofl7KOMThDzXYt9Guaf+uEpWf6qSL/pyaEEw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794104698;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=6VQSXMHBF/7d9l4hDf/IKRCi5MyedcgD0zyX09Drsbw=;
+	b=5dEKMr/a/2z2As/xN/4JN9JtjgsW0Py2I7H88IXUp0F/7dVikxmCpgfNjZszStt+0fvI
+	 MLCZE9Db9l9/dL42Isl2fF5fQSFpbVY++Vzl4msASgMFvzIvlBKN5G5zN1rAJURH/eZAG
+	 tvErDRfFE4KEVJEI5p3MElK8KLk9072B7qzXJV/SNLNf0zR3Co6jntq2f9tGYA9CIT3uu
+	 e9TaO+QxvkE0/WLZPan9080cG8Me4y1JOhZ/RX14yK9vr13qkdxJp8jm+ks2+Z/Rzrayu
+	 bNrAsg6tMm6teOHPvb/Wp9sWsnS4tcsBk3dvio9jxE5S9cM+asFw1GXeWaze8pgLFjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=freenixos.com;
-	spf=pass smtp.mailfrom=freenixos.com;
-	dkim=pass header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=SY2u16Qi;
-	arc=none smtp.remote-ip=54.69.30.187
-Received: from mail.freenixos.com (mail.freenixos.com [54.69.30.187])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LH53hlK0;
+	arc=none smtp.remote-ip=209.85.219.47
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7E0606A326;
-	Sun,  8 Nov 2026 00:05:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D7E0606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=freenixos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freenixos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AB1606A31C
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 02:24:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85AB1606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=freenixos.com header.i=@freenixos.com header.a=rsa-sha256 header.s=mail header.b=SY2u16Qi
-From: Hex Lindqvist <hex@freenixos.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freenixos.com;
-	s=mail; t=1794096293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=LmZxkVpHpG5gwGpw1CjPnOAKtcfXo0x6WpaFvpVN4Lc=;
-	b=SY2u16Qif3NCKwyC/rOUUlvu5lrSx1etUWHWVVnAQsyKb/adNhX6vjgv2ES6iKzGwoGf9J
-	OMM3kqN+5RolkzNhcgrWP60GuZc+/pJZp0ZCH/l7CmqaKTfd/AmpBqMF4TL9aKCNNKxK+m
-	n6YTGMzRgHjHILOfJofX4sGzhyMxyPfxnuaiIS/u83eV4s3OV+10J27y5P70ynRQ/7rPqa
-	5aimE81XuTud2Nyz9e+OOk7RQuodKuPMRsFHK0SS+EDMRm+5M5gVZx7rOb/o+sOotiW4oe
-	ABzvdiuPZOdlTwCkbCdIYVHVVZuf3EC4/ILx4wuYCC3lKs7nIBa7RrTv1hsP/w==
-To: Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: qca: Disable SoC debug logging for WCN3990
-Date: Sat,  7 Nov 2026 16:04:49 -0800
-Message-ID: <20261108000449.2664455-1-hex@freenixos.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LH53hlK0
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-91b52ba422cso1298086d6.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Nov 2026 18:24:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794104697; x=1794709497; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=6VQSXMHBF/7d9l4hDf/IKRCi5MyedcgD0zyX09Drsbw=;
+        b=LH53hlK0y25t6RGBpZbm5NyXbKwdM3txSMC9usNJ/wCnt5wwC6l74Qu8KTXYf65THd
+         iCQqRV60EFmf2A1bim8AYO1/MvQku5Gv5m2AcYoEDNiRxboDKGnLUY9NzM5ecffZfKAv
+         5fGyDya1M01ZVYBEXUDuSuwgm62nFvCm8celNXcL7G1MwZSu+seOAmO3rfgMItTohUqy
+         Qh7rQ3xODsWUwP5zattZgx9fbaD2oW/SBacTi2SrEoxmYW3ZwI916n5wvKYeEza+CJE3
+         G2Ts9oaSA+AFVDNI+Ts0027AsR0mIzKvNNWdVVguzWH77b+gJrwkBYl7bmJ+i8c11s+U
+         mQXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794104697; x=1794709497;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=6VQSXMHBF/7d9l4hDf/IKRCi5MyedcgD0zyX09Drsbw=;
+        b=IdknQ6bsYh/v9bLMNjfjdm1Lp06Jzq4Reh/K6dqObwhwNWAFoFtK3wkn04cmD6pGYT
+         CdWGiz963eZDM/3SuZd6FT+LDwft6INvreuctV6vvrRJBVt2s3NaHlH3hr/XsWS9NHd3
+         b5cZNegOLuxNVsVsU1AlS0kOuxj8S4PNKeV+KBSrDUuLRh8peFhmuoXbwfK5auBEq+gj
+         eZCjWxgt7HX9Uwy0wmROcobgAjVkEoot2gk2M4DiSAtRlNE+Y0qf4u0VrYIjTux/NiD+
+         eEXHDXiL5gjNurK5rVsX3N2IFxFltbaYQ0w3D/8xSavNdMco+HaeY3Q/dTozIUdtjrnx
+         qZ8Q==
+X-Gm-Message-State: APuU4Z9ZrZFkSuKtPqReVakzfLwV4aER4EOKiGsXgU3SjoxGdTxpw3NP
+	JjPG6L9aN9B0nxclEc0S5J9dw3EDTHDO//ezo39oMOC+wX9yFX0rYxNHFgjiNA==
+X-Gm-Gg: AYBFou17jPmuDOGxiKwtn4Exol/jsdO6+Fh9Xf2RDZGrsSRZkh3KN3ZcAxIgWPdunfg
+	6viTTNmglECHs+bfeyRfmuVPuOr5ThIhZ38B70EX4d1oA0mTL7DxwqohgfoTgihNHN8a/9V8k47
+	uOkUkAyD7RLNmJKGhIidY8/Qr/9I5oid/Ybn8So2OQNRnkYxfOqnIuyEJ9meN2Ujd7xhhlUcsiu
+	BXjW/484Xza8BpQkuCnH0hk9WWpTIPNPKUDrAMuCujFSStL5DAXTfu/6gnlKDFX1xLwYWdsKKlL
+	sLo5AYSS6Ma5pUI91shGRlatAAjsWySiE3M4hUBhRolWnj1EHVmoJPY744/nKPHY9t6aDCYG74p
+	kvG+kk1Q2VxTaIFAXsaoQreADhKEmhoLimVOMXOEI8sB+gwU/hYc462r6D6dEF+4BrGextppysC
+	zhMkbjbo3Vj0ZM7Rhnud/KUuDjX/bY7UCFtVf6lXKjfB/HKzJW/6hXl5nv4+jOQGVIlWHMBRq4F
+	NvmhwFLUkEPE3Hv6mx1hhAOzr4wkAtgTo4eBERtK+ROqn1yi/vcJPrbyloT0hH0MQ==
+X-Received: by 2002:ad4:5f86:0:b0:91e:9230:6430 with SMTP id 6a1803df08f44-91ed24a02camr3235256d6.40.1794104697529;
+        Sat, 07 Nov 2026 18:24:57 -0800 (PST)
+Received: from [172.17.0.2] ([172.210.149.18])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ecee04e40sm7836766d6.23.2026.11.07.18.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Nov 2026 18:24:57 -0800 (PST)
+Message-ID: <6aefdd79.02abd67e.2423b1.fe94@mx.google.com>
+Date: Sat, 07 Nov 2026 18:24:57 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8387087403638203264=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -63,61 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hex@freenixos.com
+Subject: RE: [v2] Bluetooth: qca: Disable SoC debug logging for WCN3990
+In-Reply-To: <20261108000449.2664455-1-hex@freenixos.com>
+References: <20261108000449.2664455-1-hex@freenixos.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Unless the host turns it off, the WCN3990 firmware sends debug logs to
-the host as ACL packets on handle 0x2EDC. hci_qca passes them on as
-diagnostic packets, which the core copies to the monitor socket and then
-frees, so nothing appears in the kernel log. btmon shows them as:
+--===============8387087403638203264==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  = Vendor Diagnostic (len 492)                      [hci0] 0.761331
-          dc 2e e8 01 e4 01 03 00 0a ff 10 04 01 00 55 53
-  = Vendor Diagnostic (len 481)                     [hci0] 11.334015
-          dc 2e dd 01 d9 01 04 00 0a ff 10 04 01 00 51 d3
+This is automated email and please do not reply to this email!
 
-On a OnePlus 6T (SoC version 0x40010214, ROM version 0x0201) that is a
-packet of about 490 bytes every seven to ten seconds, for as long as the
-controller is up.
+Dear submitter,
 
-The driver already turns this logging off after the firmware download
-for WCN3950 and WCN3991. Do the same for WCN3990.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1205155/
 
-Tested on a OnePlus 6T with two builds of crbtfw21.tlv. With the one
-from the OnePlus firmware, BTFM.CHE.2.1.4.c2-00002-QCACHROMZ-2.184841.1,
-no diagnostic packets arrive any more. The one from linux-firmware,
-BTFM.CHE.2.1.3.c7-00024-QCACHROM-1, also accepts the command.
+---Test result---
 
-An AI assistant helped find and test this change and drafted this
-message.
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      23.24 seconds
+CheckAllWarning               PASS      26.59 seconds
+CheckSparse                   PASS      29.32 seconds
+BuildKernel32                 PASS      23.51 seconds
+CheckKernelLLVM               PASS      25.54 seconds
+TestRunnerSetup               PASS      547.27 seconds
+IncrementalBuild              PASS      21.75 seconds
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Signed-off-by: Hex Lindqvist <hex@freenixos.com>
+
+
+https://github.com/bluez/bluetooth-next/pull/1087
+
 ---
-Changes in v2:
-- Say that nothing is logged, add a btmon excerpt and name the two
-  crbtfw21.tlv builds (Paul)
-- Add Reviewed-by tags; no code change
+Regards,
+Linux Bluetooth
 
-v1: https://lore.kernel.org/r/20261105201952.1556185-1-hex@freenixos.com
 
- drivers/bluetooth/btqca.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 60735b70d89a..1db2cc626def 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -944,6 +944,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	case QCA_QCA2066:
- 	case QCA_QCA6390:
- 	case QCA_WCN3950:
-+	case QCA_WCN3990:
- 	case QCA_WCN3991:
- 	case QCA_WCN6750:
- 	case QCA_WCN6855:
-
-base-commit: ebdfe8561b5496b7eafedccd13a000a7261bc52b
--- 
-2.56.0
-
+--===============8387087403638203264==--
