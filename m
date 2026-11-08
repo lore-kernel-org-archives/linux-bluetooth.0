@@ -1,125 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794157159;
-	b=5FZVtDXnYGHLSTZieOam4bKznBv3UxPL00DlyWfPOD8jXil6TQOAa8yh0dVu5S3KRoBr
-	 RTzb1h4Qn/u52yGB9YysdsFNjA9ynHEQUJxgOUB5kiTBdUzEVcAmSLaNz+lYGD/cvcbkw
-	 MSp09v+nigeoj9JnDFp6EuVdBrhHScv6f7EFqJGR0D7Cfm8urp59vaohtMwiWfzwYXapa
-	 iVWUbqmaUrtBmM3MaoApP21Piz/RpscuYDOLJmQo4Mm0fb7syRQjg4L64Wtf47WzMPGdv
-	 EUzPE70gZqKFdUNH8IFcpMUQJlaAXhoUYDHGWN/X3p2LJZYLpxFZLEomjt62hCfpewA==
+	t=1794169321;
+	b=guvN+m41yVQRngVhlSK+H5ypkqW4CcVWv3yiMiOsuNZ2IpZtIvgZFouwtVpXKMTJvtfn
+	 TzCKHfUk4piBQqSQeT2EAsCeM6vi1ALdTlllqWkBSy3UrRqUhdzOZu9lejK68sDfpUw3W
+	 fh6ZoV/W8c93TV6jrAbpF1uZ0aFhm0SyJwAZYMk8C6Ed+IB9VlA3ZkCVc13Ytcv8ESVNY
+	 dY1M2M1BkY1aYVTEtLnb1eB4E3kO8u1LpZg9Oocc49/fD/IO58A5EmLlkBOme2TKbKTQK
+	 j5SfszDCzNEcdfrHjfWG+ATHOrr2ho30fphwUknflJsfus4Keb111qqc16FTIF9FZbg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794157159;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=lmwJQdwiPgvUanu0gwsKytij+Ict3+h8IPwu4vyFkUU=;
-	b=MxAK2vznZ/oJvri2BCZTQ+WYiYkSjtSemP87Omj0RT6kc9LSCPWn7V8RvWVkdLXqtTjE
-	 9CBVn2lQXslYnXiiwICGE9oIEvUkzEF9e+j/iRKPriVbz6dtr5fBo2BSh3GdPsXHalGZg
-	 d9/lM2/fqivGAP7IAFbneuOfYlF2gqNueBAsRAQA8Sk3hUkbTpqcKpsTUyjq+gbiC26Xi
-	 lQnFeVwOZmAKXlWuMEr4IUuhKZj6/vbskXVFSYB15d2J8GW0Y+gKeM0KcpbufqhK2+EPi
-	 tsLNp8/4/a1iXx+5CyVXnvgojYm6EwOyzJPHtRvP3UmHtNYhLUliX/2bHnub73oRUWw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794169321;
+	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
+	bh=CIpQDS/QI0NldxD0b0RG6RntnMFcBoGBcDWZDdh2VpQ=;
+	b=OoPpn3so8FQRbMjeiajg5HRIqEryTjeq3UaXWLKEAXs4qem/t08sK2ch+bIMPkxCzDNH
+	 u8VGEE34PtWSN4Y6TQtHRb0aLOa4WoXMXySlUYR/g/nOljkC0sAdyhcGH++QmsdzZ43cZ
+	 scFiD8Ase8PCWigVPbKW1Mje4pb9gWyGbP3cttcZUBYrEZA/OKREl8IJakOshPrj+gGz3
+	 ZB8FuhnbFbSWmcR9mbO4BJu9haJmdl79Tjtp911ozrrd6OmZnG+bdNsX3ffY5I+2i10Ra
+	 KIAusfDXCTt46hE2DfmdgDFTxrSMZ09RMk9oWVxz+0E9HnAMYN+Msh45K3pxcEuLNVA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=rowland.harvard.edu;
-	spf=fail smtp.mailfrom=g.harvard.edu;
-	arc=none smtp.remote-ip=209.85.219.51
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QpZ+AKby;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32DD606A32A
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 16:59:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F32DD606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-91ebf4cd218so2050736d6.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2026 08:59:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1794157158; x=1794761958; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=lmwJQdwiPgvUanu0gwsKytij+Ict3+h8IPwu4vyFkUU=;
-        b=vVWQLNs+Rnn6NOsMpjKSpUM9H3gRT4E/HZTt53PMAZ2SXIz+Low080hQm0r2oKAsG+
-         HZ5TLknOMUGXKR3KUCz20FyQXU1Y7n4k67s/O97MTY2HciAv7W5/XWWVJI3wnxiYTpJN
-         gDPuohXn6LbvsrECp0/Ji6cvN5My5wm8EgfEsTmjv66hd/4pZ3HhjPBADrWO+gshRLZX
-         1w4cJtE0RQlZSB1u8qCDumnVcL5w0oR/W9xf8l09re306PAWvYklsReVbujjFSq7ckfb
-         ysHxLPgUuyjzLYLRPYb0BIszOUV4j3JsJcseKz7sg4xVYz+KH4V8tOVQekOfo5kBRIRc
-         SzLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794157158; x=1794761958;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=lmwJQdwiPgvUanu0gwsKytij+Ict3+h8IPwu4vyFkUU=;
-        b=Z9KDqq8XaDga0X7CDfW5jHFjZV8Z176FubED9jAhZcjEB6+/CwK/TxUselRCkM4xzX
-         D04lgTL8RkkOqGM6YLM/hXicpiXs9PU0UD1GckwBv9PJCRc5rjapxKvgR+tgL8EuK6Tk
-         KrmL5Jz2z/3A6ozxFhWi+UCDNXFRkTq05/VSOS3XjkXbztwprtLYt7zQ2ciPuAolzZ3R
-         c0l/iVAS34MVnNZE90esj9Noa2DFcEAT0Fn4SaKqlDnTwqhGeWbYWMrwwdhXXsJ1t0UW
-         41Pj6JNgJhsGpHlR/VIXVBQqEb9wN2hh2yTs9wRgACaFIohp8zH52v8Ck17w9MbSVtps
-         pIsQ==
-X-Forwarded-Encrypted: i=1; AL+hErFbbMvIG6Fmr5Y5fzsqFpETYK3kbrS1pevAgYq0PsILdnUmvOiippKqBK0r+484tL7DW+GyDh9O0q5qIjXrRxI=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+TB+dRjcLQBgDCicxHsnra6cNfAVtxPO2yTLS6njU4tY5GRLcw
-	oscaIna0OSD0RRSRaE+nmvr1mLBatqTnpHnvcL1ncpkX3k2CQss2kfQ1E0WtgmW/WA==
-X-Gm-Gg: AYBFou2EH8mX2fVn5/lI4M3IYwvC/lTnl00lERuUN06060rl/XIw5s4ecMpWPe4TuHu
-	ZyKlmWA+SaW++7w1/U1AUNlDnLoQihm6n8hHHjLnoKmg3DULM6EgvKR7fijtV78K64Av9TSo5zi
-	iKmJxOVdUvDkFU+/hNLPPsQ/RcNGo2f4uJZvwXST6yiOE0OkiB3lbXLlcJmIwlZ597b6UMt4y5z
-	ldOLDr/B9gRX1rlAkodkPlVmHGPmcT9fZOy8++73dL5vts142mldB5NSbZLWxFs2SQnB/q/YulW
-	uJ2mdZZ3CopfZuvAbs+1PiKmKsUQbRktb5R/ZdxzA7b/3vp2CZP4/cBpdCzzH3Pq6Wogsdhrncp
-	DjsgXRl0/H+7LajDaX8tVmW7DyNk90HWaDuHK4O8xwJ4j5kgglxkDoenDJDk4X2pNJAISlRWbOt
-	HCtMrKINJANTE9rkE7GH/s3RzlAvHP6guLgy+H7UXXCK8CDDXOCGYRYRl1ADJjbpYiUrGVNdFJE
-	Z568rhFmNfRn6wwrlj27imQ88PbDuBCClBDJQTLHMGjjlXi9l/ENFqWxQmHg11wJ1GuMTWfyqMp
-	A3vIxCMs9+vrA/iTXYThl5WPN3jw
-X-Received: by 2002:ad4:5d62:0:b0:91e:9d64:3294 with SMTP id 6a1803df08f44-91ed240d34dmr24616736d6.30.1794157157397;
-        Sun, 08 Nov 2026 08:59:17 -0800 (PST)
-Received: from rowland.harvard.edu ([2601:19b:d01:d210::66b0])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ecedbefb2sm22431036d6.17.2026.11.08.08.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Nov 2026 08:59:16 -0800 (PST)
-Date: Sun, 8 Nov 2026 11:59:11 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH 05/17] USB: Lock registered interfaces during manual
- driver binding
-Message-ID: <647f3199-909d-425f-b485-b598a18844d1@rowland.harvard.edu>
-References: <20261105-device-trust-core-v1-0-1e536825b4eb@nvidia.com>
- <20261105-device-trust-core-v1-5-1e536825b4eb@nvidia.com>
- <bb83fe3c-cebb-4bc8-bfc9-24df1cf72b0b@rowland.harvard.edu>
- <20261105184442.GF8298@unreal>
- <bf756e50-c77e-40f2-916d-e88887426806@rowland.harvard.edu>
- <20261108110909.GA8635@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9038606D83F
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 20:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QpZ+AKby
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87CB61F00930
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 20:22:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794169320;
+	bh=CIpQDS/QI0NldxD0b0RG6RntnMFcBoGBcDWZDdh2VpQ=;
+	h=From:To:Subject:Date:In-Reply-To:References;
+	b=QpZ+AKbyxN7wfjaxbDAbHH2+KpnLUjGRAK0A/tqAJ0u8c9MvcudLqTkN8L86oV1lo
+	 6C4Fo1pHb749tsDGdqVKbIC/g42Tw4XZ+3PpqUM2SD2+RRNIEkloIeHq29/mAe681q
+	 QtM2qPSvIsVubNb/UmiOCRRF7wOZKMwvsK0ltCUAsLbMLdM0JfFLmw6ikC48HL+ZIP
+	 p20qw7xwtCzGqzTgbS9dM/e+WzxjzHhfuVL6iod5/01g87+EULWkIju2MDL2ep70UV
+	 P7MitzNUajIOpfsiuh6R14nYl7LnrqxLGbjiBkFxtnXbphkIok7RpEeYc8m+PPh9fL
+	 WrMbwn5G5nVmw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 80A55C41612; Sun,  8 Nov 2026 20:22:00 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 210141] Bluetooth device driven by rtw_8822ce is lost after
+ suspend to RAM
+Date: Sun, 08 Nov 2026 20:22:00 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: bgnytyt65@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-210141-62941-cRPY9b5klg@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210141-62941@https.bugzilla.kernel.org/>
+References: <bug-210141-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -129,48 +83,61 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261108110909.GA8635@unreal>
 
-On Sun, Nov 08, 2026 at 01:09:09PM +0200, Leon Romanovsky wrote:
-> On Thu, Nov 05, 2026 at 03:04:18PM -0500, Alan Stern wrote:
-> > >  it ensures that the lock is
-> > > acquired when the driver is bound.
-> > 
-> > That may have been your intention when the patch was created, but if you 
-> > read the patch you'll see that it includes a whole bunch of material 
-> > not related to locking during binding.  Namely, this part:
-> 
-> Once I added `device_lock()` to `bind`, I had to add it to `unbind` as well.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D210141
 
-Obviously I'm not making my points clear.  Let me try again.
+pseudo-mors (bgnytyt65@gmail.com) changed:
 
-The entire patch description, as you wrote it, is this:
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |bgnytyt65@gmail.com
 
-> Interface claims hold the USB device lock, but device_bind_driver()
-> requires the target interface lock. Without it, trust-policy writes  can
-> race admission.
+--- Comment #5 from pseudo-mors (bgnytyt65@gmail.com) ---
+Root cause found + workaround (HP 15s-fq1xxx, Realtek RTL8821CE, BT 0bda:b0=
+0a).
 
-This says nothing about holding the interface lock during unbinding.  In 
-other words, it isn't a complete description of the patch.  It implies 
-that the patch changes nothing outside the device_bind_driver() 
-function, which isn't true.
+Tested on: HP 15s-fq1120ur (SKU 286V9EA), DMI board 86C9, BIOS F.30, kernel
+7.2.11.
 
-Furthermore, the patch does not change any of the code in 
-usb_driver_release_interface(), which is where unbinding takes place, 
-because that routine already takes the interface lock.  So to say that 
-you had to add device_lock() to `unbind` is not accurate.
+Cause: this is a BIOS problem, not a btusb/firmware/USB problem. The Blueto=
+oth
+half of the M.2 card has its own enable line (W_DISABLE2# / BT_EN), driven =
+by a
+PCH GPIO pad. In the DSDT the BIOS sets this pad to 1 in only two places:
+  - at boot, in \_SB.WLBT._STA (HPQ6001): SGOV (0x06010012, One)
+  - on the airplane-mode key (EC query handler)
+Nothing sets it on resume from S3. After S3 the pad comes back as 0, the
+Bluetooth function stays powered off and drops off USB ("usb 1-10: USB
+disconnect" right after "Waking up from system sleep state S3"). Wi-Fi is on
+PCIe and on a different pad, so it comes back fine. This also explains why
+hibernation "fixes" it: resume from S4 goes through a full BIOS boot.
 
-Instead the patch adds a new usb_driver_release_refused_claim() routine, 
-plus code in usb_set_configuration() to call the new routine.  The patch 
-description says nothing about either of these things.  Not to mention 
-the fact that your other changes make it now possible for the driver 
-core to delete an interface claim when the interface is registered, 
-something which was not possible before.  This is another inadequacy in 
-the patch description.
+Proof: after a broken resume, \_SB.GGOV 0x06010012 returns 0x0. Setting it =
+to 1
+brings the adapter back on USB within 1 second, no reboot. USB/xHCI resets,=
+ PCI
+remove/rescan, secondary bus reset, link disable, driver reloads and
+btusb/rtw88 options all fail because none of them touch that line.
 
-I'm not saying that any of the code is wrong.  But the description does 
-a very bad job of explaining the new code.
+Workaround (acpi_call + systemd-sleep hook), with raw commands and a long
+warning first:
+https://github.com/k0kfjjfkdjf/hp-laptop-15s-fq1xxx-fq1120ur-icelake-realte=
+k-rtl8821c-rtl8821ce-bluetooth-after-suspend-fix#warning
 
-Alan Stern
+PLEASE read the warning before trying it. The pad number comes from this
+specific DSDT. On other models (14-dq1xxx, 17-by0xxx, ...) it may be a
+different pin, and writing to a wrong GPIO pad is not safe. Check board/BIOS
+first, read the pin before writing, and only continue if it reads exactly
+0x0 or 0x1. The README explains how to find the right pad in your own DSDT
+(look for the SGOV call in \_SB.WLBT._STA).
+
+A proper kernel fix would probably be for hp-wmi (or a DMI quirk) to restore
+the
+Bluetooth enable state on resume, similar to what toshiba_bluetooth does for
+Toshiba.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
