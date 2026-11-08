@@ -1,57 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.30
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794176935;
-	b=1ihjzD+lW1Sr+Bqp1gRKqXltITURlIgqVDAlWk2rCkBh1a1UjaIaqEVl2164h0mgZ00Q
-	 GUAYzuYFqrtxHnHnqAG3GCYcMxxezv4TeYfRwhRzrahlFCu1ThMcrrOc8GHPP29rnSFGe
-	 KBODRtfT4x5uHfziFEv7RB1aVT8endVoP/3CpreBbMwmR6WCfPEwvxOmpAi078AJoHtXv
-	 JbwbQoeTcwsn00KmuiS6pUuxGNHEEVrejQmCwsyGPdo9e6C8zm/8sxd0RAc91KeMgHcvt
-	 NCtBUSOOMtzZ9n4rnIR+9LXoAgT3ecbLRRwTguSWtqUDWMGp1nBmICtyWqDmEbPlzAQ==
+	t=1794177147;
+	b=T+aySpryi/6/YRLw66LLrtsBN+DFpYmbpJkl2/x1C6Qim7OIKpr6FhXzZitpREBZxuGl
+	 jhlciL67TpBcSHwDRtAhZKvlRHDA3nfuVPlTDeUHp09Eq0NhEOQaQ15IDwSqJnQ5LwovC
+	 5Ib5CcDfpmudxujGfI6jJLYPjNNQv1zVrTfv/JKPDcDVL8N79r3eld5F/BZKUsfg29tPg
+	 FT6JHpufBNVM+y8bu4mQshnRQ4NuaruYbIyV1c19EUvpsvA7ClpCjarQuZi0vdeZZluXe
+	 ob8Yc5JFQrmg2Be60n4VB7Q1+8JPdPjOhP2uuvqc7w31PHDdJyVee1XC7YuRNgV5X3w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794176935;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794177147;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
 	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=PFQGEO1y5qufB5/Wgn/+pIRnu5IaRaJltrUV4Z2YyZ4=;
-	b=gA1yyUgmFFrplCy6WoWAmlCafMzsXOI7RHF2AmXpZQ5Rz9ISevvz6fTcaFZAokwKcreY
-	 XRAPX0a/WOEqTxQilsd4RwK+mx/wNjnV7R7RoZGHygGG3puCQd/miRjezQ4gwWme1ph8W
-	 dZ9US5ONvYDsN/ZHIOcoZFd8Y3rntu5YRQTL3pEBpGAVDM3dk2IOr3G2rlSj/rmPCl2yc
-	 37Dh39+SHZPoYAjYV34N3J6eahBtb/xvNUxwcnN+I41T6VfZVMOHC0yV893XKNGd0+asy
-	 E8A6gbWAiqj+QbH+kC6qKVPqeU+xHVn5q8m5Htj+ucfEEBDD6LbIsF+wsmb+qkodvCQ==
+	bh=Juzz98ntU13CCp/TLaCHsvZ/8NK1KiioK2hi/YLHnQU=;
+	b=Ihj72zWwWh2rPDRlhCRrQirDzJwFHT/A4O2g7lDuK2WD+XPM5c9XSy20ZkIbAuEch4St
+	 C3hCSEFTq8LOlH5pokHQIKWuJBvTdnD15wP/Zutb1bVxvFMTHek4Q0eUNqVm9FBZvj+lu
+	 bmHDiXrtZRzcZT6r+XLZx9nx/hloA8t6vlkk1Jvv5qPX3q6uaIGnED5Ht4sIEMtXtQzDv
+	 /QnI28xGmmBqZb8oT0+m8z+S11UpakV4f+npBvQtg9nwyhUQ6kKHvslq2HnLPZK/m5rX3
+	 q0J0ZWnyIAKAMGuVUZOIPJbqIVVRcBH2hoP04UbqZlozYqCAeBOqEnT2sEdwvuKh6xw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=gATF4rjE;
-	arc=none smtp.remote-ip=185.70.43.100
-Received: from mail-43100.protonmail.ch (mail-43100.protonmail.ch [185.70.43.100])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=igly3tGh;
+	arc=none smtp.remote-ip=79.135.106.30
+Received: from mail-10630.protonmail.ch (mail-10630.protonmail.ch [79.135.106.30])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D240F606A326
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 22:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D240F606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4088606D80F
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 22:32:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E4088606D80F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=gATF4rjE
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=igly3tGh
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794176931; x=1794436131;
-	bh=PFQGEO1y5qufB5/Wgn/+pIRnu5IaRaJltrUV4Z2YyZ4=;
+	s=protonmail2; t=1794177144; x=1794436344;
+	bh=Juzz98ntU13CCp/TLaCHsvZ/8NK1KiioK2hi/YLHnQU=;
 	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
 	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=gATF4rjEkQJWpfjSb6AtyN6uIR43cuj/mNHjff9yXqXXfO5xL/NRYQ5ujPLqDW4PX
-	 tcZ2csd+h9dDqftCIc0cHyXiPHz0/rsedfgDjjSStecVJTNA/FSx/++eFGdQDR5l5a
-	 b960IzJgpf4UZQGMN0fPd5GUW5ASq5Os/JeoYthwmf1sD8OTyXQ3OQRx7IsXfUNbX2
-	 +qTxVGVuZW1MVy8+3/sFZOyyavHIR+yMyPE0512DFMk3SB/MaS/Nk6By10OiI4YoS4
-	 4RJQ9lkXFIVk5/SIW6uJfJuyBjM68/mg8HKy/1+TNrxorcyJdDNkTD22zRDUwtCIca
-	 400O88+Oa/YWw==
-Date: Sun, 08 Nov 2026 22:28:47 +0000
+	b=igly3tGhTru4U1tGL2mX8y4MzhLBR59dUXCio+68tVbJlBTn5MnnjrUOCq7+5W0ab
+	 22gBLcdfMRTEHiZD1mxnsMIPaOZtxQjXU3fvknS3WT2btWMiVGEF4WPz0Ttqh8X8BG
+	 9brZ9umM7HAQew7+6Bt9WuRt6y6gK7ZZWh1dczrvbZqTgJb5l1Mxzci8UPFXQfZYOk
+	 d8u7CSD5UPpGs1iURj+ChDvjwKEuBljGJp1i7CY35jSeOonAaG0GQ8XkpGPBHRPO4H
+	 Qy6AktRgUE7rWTM6TvBe6JV0IT1I7UrmjdzXKptFyqoRNCHZVu2yCsuDKE5ZsRgLfX
+	 NwKxp6SFBkoVw==
+Date: Sun, 08 Nov 2026 22:32:22 +0000
 To: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
 From: Noah Weinberger <NoahWeinberger2003@proton.me>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: validate retained LE Set Ext Adv Enable command length
-Message-ID: <DiB5DgYqITLLCcetFLdSxmGUcDfzozcvmS5i8Owo6GfN9hpcRbpu3W2uQPmg_oSz52yjRq9uh49bQtOFPli5RZf0_IrM_S4cqdRQhax-m8g=@proton.me>
+Subject: [PATCH] Bluetooth: btusb_qcom: check reassembly bounds and pull results
+Message-ID: <y1Xe58FtZGhXfycy9vp3QaGjUElg-vc5EA5FocwznmudOVTgFiYfbqilI4Lj0CRpayllrrY66pkMv9TlGOeq83VQIdL6PEjDbDIEwi28Yk8=@proton.me>
 Feedback-ID: 186545857:user:proton
-X-Pm-Message-ID: 529bcae06c65f5370e837ffaea1538d9b0f71b1f
+X-Pm-Message-ID: 0a6cde5d3810237058b2afa9034cd408b7162d2f
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -66,29 +66,30 @@ Content-Transfer-Encoding: quoted-printable
 
 Hello,
 
-hci_cc_le_set_ext_adv_enable() reads the retained LE Set Extended
-Advertising Enable command with hci_sent_cmd_data() and dereferences
-set->handle from cp->data whenever cp->num_of_sets !=3D 0, without
-checking the retained command's length - the same retained-command
-class that was fixed this window for LE Set CIG Parameters
-(ed4d302af7) and LE Create CIS (1eb52f35fc).
+Three hardening gaps in the new Qualcomm multi-subsystem transport, all
+of them patterns the sibling paths already handle:
 
-An injected short command via a raw HCI socket (CAP_NET_RAW) with a
-matching Command Complete reads one byte past the retained skb; the
-value only selects an advertising instance handle, so the impact is
-state confusion rather than memory corruption. The sibling handlers
-with the same shape and small fixed-field reads (pin code reply, read
-clock, set privacy mode, set per adv params) may deserve the same
-treatment.
+ 1. btusb_qcom_recv_intr() computes the expected payload length from
+    the device-supplied header and re-enters the fill loop without
+    checking it against the skb tailroom. The bulk path
+    (btusb_qcom_recv_bulk) rejects hci_skb_expect(skb) >
+    QPERI_MAX_FRAME_SIZE - skb->len; the interrupt path relies solely on
+    the u8 width of the two length fields and a three-byte margin.
+ 2. btqcom_recv_vendor_pkt() dereferences skb_pull_data(skb, 1)
+    without a NULL check.
+ 3. btusb_qcom_send_frame() does the same for vendor packets on the TX
+    path.
 
-The patch mirrors the hci_sent_cmd_data_len() + struct_size() pattern
-of the two merged fixes.
+None of these is reachable with the current in-tree producers (the
+empty-vendor-packet invariant is established several call-hops away),
+so this is regression protection for brand-new code rather than a live
+bug fix. The patch mirrors the bulk-path check and adds the NULL
+checks.
 
 Affected version/commit: mainline fa4ad798f6f681031775266044ba1b0cf3c670bd =
-(v7.4-rc1, 2026-11-07), net/bluetooth/hci_event.c:1669-1735 (hci_cc_le_set_=
-ext_adv_enable).
-Handler is longstanding; the fix class was established this window by ed4d3=
-02af7 (CIG params) and 1eb52f35fc (Create CIS).
+(v7.4-rc1, 2026-11-07), drivers/bluetooth/btusb_qcom.c:4387-4462 (recv_intr=
+), 2624-2628 (recv_vendor_pkt), 4258-4262 (send_frame).
+New driver merged in this window.
 
 This was found during an assisted (AI-supported) static source review of
 mainline fa4ad798f6f681031775266044ba1b0cf3c670bd (v7.4-rc1, 2026-11-07); e=
@@ -100,29 +101,57 @@ verification rather than a battle-tested fix.
 
 Reported-by: Noah Weinberger <noahweinberger2003@proton.me>
 ---
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a525740..7206f3e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1673,14 +1673,17 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_d=
-ev *hdev, void *data,
- =09struct hci_cp_ext_adv_set *set;
- =09struct adv_info *adv =3D NULL, *n;
- =09struct hci_ev_status *rp =3D data;
-+=09size_t len;
+diff --git a/drivers/bluetooth/btusb_qcom.c b/drivers/bluetooth/btusb_qcom.=
+c
+index cc4cfcd..3c41e60 100644
+--- a/drivers/bluetooth/btusb_qcom.c
++++ b/drivers/bluetooth/btusb_qcom.c
+@@ -2623,7 +2623,13 @@ out_free_skb:
+ /* Implements hdev->recv_vendor_pkt(). */
+ static void btqcom_recv_vendor_pkt(struct hci_dev *hdev, struct sk_buff *s=
+kb)
+ {
+-=09hci_skb_pkt_type(skb) =3D *(const u8 *)skb_pull_data(skb, 1);
++=09const u8 *pkt =3D skb_pull_data(skb, 1);
++
++=09if (!pkt) {
++=09=09kfree_skb(skb);
++=09=09return;
++=09}
++=09hci_skb_pkt_type(skb) =3D *pkt;
 =20
- =09bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+ =09switch (hci_skb_pkt_type(skb)) {
+ =09case QPERI_EVENT_PKT:
+@@ -4257,8 +4263,13 @@ int btusb_qcom_send_frame(struct hci_dev *hdev, stru=
+ct sk_buff *skb)
+ =09pkt_type =3D hci_skb_pkt_type(skb);
+ =09is_vendor =3D pkt_type =3D=3D HCI_VENDOR_PKT;
+ =09/* an empty vendor packet has no path to reach here */
+-=09if (is_vendor)
+-=09=09hci_skb_pkt_type(skb) =3D *(const u8 *)skb_pull_data(skb, 1);
++=09if (is_vendor) {
++=09=09const u8 *pkt =3D skb_pull_data(skb, 1);
++
++=09=09if (!pkt)
++=09=09=09return -EILSEQ;
++=09=09hci_skb_pkt_type(skb) =3D *pkt;
++=09}
 =20
- =09if (rp->status)
- =09=09return rp->status;
+ =09pkt_type =3D hci_skb_pkt_type(skb);
+ =09need_lock =3D pkt_type =3D=3D HCI_COMMAND_PKT ||
+@@ -4438,5 +4449,13 @@ struct sk_buff *btusb_qcom_recv_intr(struct hci_dev =
+*hdev, struct sk_buff *skb,
+ =09=09else if (pkt_type =3D=3D HCI_EVENT_PKT)
+ =09=09=09hci_skb_expect(skb) =3D hci_event_hdr(skb)->plen;
 =20
--=09cp =3D hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_ENABLE);
--=09if (!cp)
-+=09cp =3D hci_sent_cmd_data_len(hdev, HCI_OP_LE_SET_EXT_ADV_ENABLE, &len);
-+=09if (!cp || len < sizeof(*cp) ||
-+=09    (cp->num_of_sets &&
-+=09     len < struct_size(cp, data, cp->num_of_sets)))
- =09=09return rp->status;
-=20
- =09set =3D (void *)cp->data;
++=09=09if (hci_skb_expect(skb) >
++=09=09    QPERI_MAX_EVENT_SIZE - skb->len) {
++=09=09=09dev_kfree_skb_irq(skb);
++=09=09=09skb =3D NULL;
++=09=09=09*err =3D -EILSEQ;
++=09=09=09break;
++=09=09}
++
+ =09=09if (hci_skb_expect(skb))
+ =09=09=09continue;
 
