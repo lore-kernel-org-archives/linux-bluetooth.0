@@ -1,84 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794181631;
-	b=m4k2kTtuKHUaKXi/QMYj0lUo5i9zqI/QdAWSem7fo0gvg/JIcqsm6wBUQQwFHMEdPSUP
-	 pK/p1025yremZTCERUYDSUrWFwN3EM8o8wScAKZtvnw2/zkGQ/VmV1Lev6sjSont10A2a
-	 wzbOFqYFTrssTIAVc38ducYkB4rI6Da9mbVZqJwHKFYse5dnGWjcS4yiSlQ9aoCBQQOgV
-	 DTE5QFQqVeQH4UyM1RxljEKb/DMS4T93+B9/eNGOooxSVrkedyyJxgwpsk6GjJoAwNxoU
-	 penvntKEisvThNWNaWtgd67AOXMpkQcgwaQZJ7neCdIb2SN5ov7Ex3B1gdz/pZAEdLQ==
+	t=1794196718;
+	b=PZiO03GO2XfWy71Za9XBzlxoKcxIYH2VJ1DF/paEaKAjlGhSu7GHMVGH5AEtvg4b+C2k
+	 73QCfGeP/WkIvElFcbauclGllzwf0quSdA8MpUo5eLdi1Bj9opDQjGPeGFujIOZD6siyZ
+	 j2ulnCsPo5nHSkDwr5ujQTHS87Z3l2uz+iKdM+LiKD785dfBSGX0v5oFrLj8bvN1vHI2O
+	 k5u0mgC/2cimJ+dRJHEn0vyAaDp/phqECbh5ChHT5mtL0NwYyeE61MJjX/7WzdjCVLgEA
+	 U0IWzc/SXZ0FM9i5SNsgLABZs4+v2ldIZxqsThWcE2/4IAhEiEAfjUfsjZoQV20orZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794181631;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=p5VDpVNl2fFSJ7IHbmZPdOb1rRFliFUw0ohEoGRX+AY=;
-	b=HcNLHz83o4I7k0+C/bR4mbFVssk+gD93DySKMBn0Nuaq/R9TE5pldrvf/fTQzGUQ45+5
-	 nL8F9E0003e7WcO3zVbUA10WojACJB7GlPZA2Nt4aYntlZ6mVhjpVJ9gRTXI5kYiO0JAc
-	 FXzSpiTDAPpPqNUMQPpDculr22702NmyUwI7nB7YWkwDvaNuVBL/xL3mIMqwYg4CXMiAL
-	 zpYCVyKvNKmX44shkcdrSFlIKZb+C7eYccLO0Hy/YHbiKluxFU8jHJ+mB96DX6xn8nW8R
-	 lsHpEeWjOMLPNrQI6TiKCf6ZoCERJdnpAdeHBxkCsJNqUbbHVj9PD7tBeZXIKGp9DkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794196718;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
+	 Subject:From:To:Content-Type;
+	bh=FmcI/wMjxKRabbUMuhYcTv6IrsP0rncRUcBSJiu7240=;
+	b=F4Z1hENbCiT4RkvwZ80H/IuA6S7If1tGUmZilwpJWRX66PC9E9aQJviqCCIhQWa2mSqM
+	 VnBH6h57bgR8bYIr/QGiSyu7JAuR6S7/O2MOVCxGdF1zLXmoJQ4sc56/ADoT3josdpLom
+	 aMPmrnyt0Jv7Gq9SI5Qq5WBqIKQGNNfCJqkq/x13jnQlupX4ZClK5SethL3BYoX36X876
+	 hDNgxsq0Lej31dQj2Gx32luXpF5Mev9sdyJT2QDPJ7Jh+Y+AL2rU2JekcsmINmjA7Ofj1
+	 pwjQb99XEt4yrj2oGDgEMccgczxEAl8EuuyB0RPms9FzcBaJvJF3jgmApsrfygw9BZw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=So37GSnV;
-	arc=none smtp.remote-ip=209.85.167.181
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76821606A31C
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Nov 2026 23:47:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76821606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=So37GSnV
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-53ec92375d2so119542b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2026 15:47:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794181630; x=1794786430; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=p5VDpVNl2fFSJ7IHbmZPdOb1rRFliFUw0ohEoGRX+AY=;
-        b=So37GSnV6yu2bzUQW9v4NyvyRDlTwedFEe67pyU/AjGv9LLoxV0RSBgGoIezqvzs6N
-         EVD9oQzX+euNh7Zoy3thjGIcXugPJqtDKkXkYrJhTcXx68GmRNX8UFpCx0WVorVPXA+Q
-         xy4ixHa6s0Er7mnLUQHvU2VXyyKIeBXxx8qhD41pxTSRws/T3Mxk53VR7/5nao/GdpmY
-         S+enxO87taHY7tuQ8qrVuw8BK84EY0LvHVCqXLs5xAyaSCU1Th+BJ4iyjA8Bd28S6L9G
-         rJLyS9T1YauNFg4OGWHMYij3ryZvj+0upjpkXXLLuG97Mt4nvVlj28W2I4Kk3C3GZw3V
-         HyIw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F904606A321
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 03:58:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F904606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4dc57e2a3f2so726069b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Nov 2026 19:58:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794181630; x=1794786430;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=p5VDpVNl2fFSJ7IHbmZPdOb1rRFliFUw0ohEoGRX+AY=;
-        b=DY9YowyMWOXgwzXk3WHqt4c7MF2yXWH1RhyvgRQTCnmrOATyvuInPj01xL8gDywI7V
-         bkmoU3U4OK5pHyU47GfrkCmwWbdLmL1qM9SKWke0xBlanD3rMIgOgrlEJdADOT/bv4XL
-         LRKtc6Dqb5mi3ynQ3tgxf5yGWwoWDY07CLNHl+5YrmD5nVryiOPkqTtYDuOk+oLT5tY2
-         LCdq5Wz9VSfGFPqjAlgL4uhZiC6I3Lqth1dUfkwLx86jwsNmRilMec6R9PCjkf65ST+8
-         NTCgY0TEIkA+I/tOxhNq+rZzih6bxzoQhiXequJDGVm1ZUk75u0tesXfhsLgm4G53dJG
-         zZ0A==
-X-Gm-Message-State: APuU4Z/t/pf+HwWn11pCP2+UCGsNzdIZskP4NRUYZ9pRkxa6vv2OgT19
-	o4TRpIeeTri9qp1vjP9z3FD0MugS7Uv6fvH2LDEj7ILaBgf9f+v/2qIkYWGb7Q==
-X-Gm-Gg: AYBFou2rYtqm5FwcJBgmHkklVPLNLEQTNwrzcMiiA46I5xLmsEGOgN3hbxBXeZvyzWV
-	qDy/Ujk5SMqGVa0lHFpcU3yBKP9CKZ9ceV0nCeSFVIf3vM5ec4NMVB3kH7bShuxRngd/BwgV4yf
-	nGyhc3C8G5K/syh0nfP/9w17UF80TkmkCEQ0ThyB7IGUaedrGH4Bgp5S7bWC63kahbuod0ReTd6
-	5GOZ7601Bw3Hng6fJDCwIod2aiDN45fH4D8AvOLphNOKHsmpUyqaOotokSsbEAaxdjkIorpqFM7
-	wjcl7QmgZccqmq39G50MbvNUax5C/OS6xNSMTA8nsDWix9rfCRx4rx2WjGjIU0LDVjtghrlMc6K
-	GC88Ef7+8XEKXIzMIbbmU+KLFFjhD5mciXR6ByCb6DEBGDhjuifS4ZmAZZtrCYkDmE5DdCKNefh
-	T7t28WTTR4XCO0jrdBLRhUsg8zLcQuLNvZ9yC3+DJc0sVFgJUJsDBk+qrOcYzg6TAgEIz6UphFB
-	jeBev+LKQKlf+aygi17hH9guM2mLxX6o+mWGACDlW03ZonZT0ghau7RoY5tdIjD
-X-Received: by 2002:a05:6808:4f13:b0:4f5:eaac:517a with SMTP id 5614622812f47-5681406074cmr1779299b6e.1.1794181630316;
-        Sun, 08 Nov 2026 15:47:10 -0800 (PST)
-Received: from [172.17.0.2] ([135.232.193.39])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-56813ac62d0sm3094682b6e.2.2026.11.08.15.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Nov 2026 15:47:08 -0800 (PST)
-Message-ID: <6af109fc.31957b85.1984ae.4ea9@mx.google.com>
-Date: Sun, 08 Nov 2026 15:47:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0976951744007024277=="
+        d=1e100.net; s=20260707; t=1794196717; x=1794801517;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=FmcI/wMjxKRabbUMuhYcTv6IrsP0rncRUcBSJiu7240=;
+        b=1md4fY1AoZJ+srvvYGNz1w/+8RWuH3InPboKJf9oxyDrZiSDiBAoSbDK5lCRc3XAOz
+         3Bpf3OC2mftvRpF9Avf/6lScSDPPcDHk82ZOsxB14KsLBThzQPBOIFbPSStvEYVgyh21
+         BOBnUDDmbUfllHlLy8f/6D4gWkB2HpX4Emlr+nWoAy0Wrr1ld0VB/rhes2/h+8w+6Pnu
+         N8pVfsr3Ay7Y0+XetE6uclk9YcPnDBJu61Rb/ltKUXTRD1uIRWZQzqPJV2wmzYSUN48h
+         k3BPkMiONunW/vY6m19IrE61ehSUM/7t+FrS0l0pAaZtGLLLMMOnNpGOgj5xE89V1H56
+         MaOQ==
+X-Forwarded-Encrypted: i=1; AL+hErH+BpZsY2dnvLCtQ0G5LRwNn19pans+fqjvfzRLAibpuqnTAbvYnkG4OKi50pAfS1eHSOpHxvZNCBOy84JTPD0=@vger.kernel.org
+X-Gm-Message-State: APuU4Z983AcyFRDrHh38U+KjVqxTCtMN3N8+//vwfNrWbr2iF8ZFsLiT
+	r5tcJXw61hevBkk/0izn/qF6/EoPLOaveHoHvirxyLRXrB9tLNJt1nBqqftKr+1S8syPMEb+xXX
+	Ta87W0PCFw+fi3yRTCeqcIJoEyiSIGCs05tG8juVlTEgyJxPt1+gB5tJtNeQ=
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,105 +58,149 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, NoahWeinberger2003@proton.me
-Subject: RE: Bluetooth: validate retained LE Set Ext Adv Enable command length
-In-Reply-To: <DiB5DgYqITLLCcetFLdSxmGUcDfzozcvmS5i8Owo6GfN9hpcRbpu3W2uQPmg_oSz52yjRq9uh49bQtOFPli5RZf0_IrM_S4cqdRQhax-m8g=@proton.me>
-References: <DiB5DgYqITLLCcetFLdSxmGUcDfzozcvmS5i8Owo6GfN9hpcRbpu3W2uQPmg_oSz52yjRq9uh49bQtOFPli5RZf0_IrM_S4cqdRQhax-m8g=@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6808:318b:b0:4e6:9390:e153 with SMTP id
+ 5614622812f47-568145f2896mr2071786b6e.24.1794196717188; Sun, 08 Nov 2026
+ 19:58:37 -0800 (PST)
+Date: Sun, 08 Nov 2026 19:58:37 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6af144ed.f50b2b3a.2c0de7.0010.GAE@google.com>
+Subject: [syzbot] [mm?] [bluetooth?] BUG: unable to handle kernel NULL pointer
+ dereference in __refill_objects_node
+From: syzbot <syzbot+73e34786d639a8eb1324@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, bsegall@google.com, david@kernel.org, 
+	dietmar.eggemann@arm.com, juri.lelli@redhat.com, kees@kernel.org, 
+	kprateek.nayak@amd.com, liam@infradead.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, ljs@kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, mgorman@suse.de, mhocko@suse.com, 
+	mingo@redhat.com, peterz@infradead.org, rostedt@goodmis.org, rppt@kernel.org, 
+	surenb@google.com, syzkaller-bugs@googlegroups.com, vbabka@kernel.org, 
+	vincent.guittot@linaro.org, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============0976951744007024277==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    58c1eb84e977 arm64: sdei: Preserve the interrupted context..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=12d1d369580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a58b6b4d667e7a61
+dashboard link: https://syzkaller.appspot.com/bug?extid=73e34786d639a8eb1324
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1255c1a1580000
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1205518/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b1ec47537e12/disk-58c1eb84.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3bca0c2b1169/vmlinux-58c1eb84.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0a7c49594d5a/Image-58c1eb84.gz.xz
 
----Test result---
+AI-generated root cause summary:
+In mm/slub.c, __refill_objects_node() replenishes percpu sheaves by detaching a
+freelist from a partial slab via get_freelist_nofreeze() and iterating through
+the freelist pointers in a while (count && refilled < max) loop. Because the
+loop condition only checks count and refilled rather than validating that object
+is non-NULL, a prematurely terminated or corrupted freelist (where fewer objects
+are linked in slab->freelist than the expected count = slab->objects -
+slab->inuse) causes object to become NULL before count reaches zero. On the
+subsequent iteration, get_freepointer() dereferences NULL + s->offset (offset
+0x400 for kmalloc-2k), resulting in an immediate kernel NULL pointer dereference
+crash at address 0x0000000000000400.
 
-Test Summary:
-CheckPatch                    FAIL      2.91 seconds
-VerifyFixes                   PASS      0.11 seconds
-VerifySignedoff               PASS      0.11 seconds
-GitLint                       FAIL      0.30 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      30.86 seconds
-CheckAllWarning               PASS      35.34 seconds
-CheckSparse                   WARNING   37.92 seconds
-BuildKernel32                 PASS      30.57 seconds
-CheckKernelLLVM               PASS      34.85 seconds
-TestRunnerSetup               PASS      743.90 seconds
-TestRunner_l2cap-tester       PASS      12.91 seconds
-TestRunner_iso-tester         PASS      11.02 seconds
-TestRunner_bnep-tester        PASS      3.16 seconds
-TestRunner_mgmt-tester        PASS      88.84 seconds
-TestRunner_rfcomm-tester      PASS      14.90 seconds
-TestRunner_sco-tester         PASS      5.72 seconds
-TestRunner_ioctl-tester       PASS      4.72 seconds
-TestRunner_mesh-tester        PASS      5.60 seconds
-TestRunner_smp-tester         PASS      4.39 seconds
-TestRunner_userchan-tester    PASS      3.24 seconds
-TestRunner_6lowpan-tester     PASS      4.48 seconds
-IncrementalBuild              PASS      29.25 seconds
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=73e34786d639a8eb1324
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: validate retained LE Set Ext Adv Enable command length
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#103: 
-Affected version/commit: mainline fa4ad798f6f681031775266044ba1b0cf3c670bd (v7.4-rc1, 2026-11-07), net/bluetooth/hci_event.c:1669-1735 (hci_cc_le_set_ext_adv_enable).
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+73e34786d639a8eb1324@syzkaller.appspotmail.com
 
-WARNING: Reported-by: should be immediately followed by Closes: or Link: with a URL to the report
-#113: 
-Reported-by: Noah Weinberger <noahweinberger2003@proton.me>
+Unable to handle kernel NULL pointer dereference at virtual address 00000000000004e8
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0
+user pgtable: 4k pages, 48-bit VAs, pgdp=000000011857f000
+[00000000000004e8] pgd=080000011cba0403, p4d=080000011cba0403, pud=0000000000000000
+Internal error: Oops: 0000000096000005 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 4870 Comm: syz-executor Not tainted syzkaller #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : get_freepointer mm/slub.c:596 [inline]
+pc : __refill_objects_node+0x308/0x510 mm/slub.c:7413
+lr : get_freelist_nofreeze mm/slub.c:4494 [inline]
+lr : __refill_objects_node+0x2b8/0x510 mm/slub.c:7409
+sp : ffff800094587600
+x29: ffff800094587690 x28: 0000000000000000 x27: 0000000000000000
+x26: 0000000000000006 x25: fffffdffc3256e00 x24: 0000000000000003
+x23: 0000000000000006 x22: 000000000000000c x21: 0000000000000001
+x20: ffff0000c0022138 x19: 0000000000000004 x18: ffff800123625000
+x17: ffff0001ace953a6 x16: ffff0000db9cd894 x15: 00000000000c8000
+x14: 00000000005c615b x13: 0000000000000001 x12: 0000000000000003
+x11: 0000000000000000 x10: fffffdffc3256e20 x9 : ffff0000c0022120
+x8 : 00000000000004e8 x7 : 0000000000000000 x6 : 0000000000000000
+x5 : 0000000000000001 x4 : 0000000000000008 x3 : 00000002000c000c
+x2 : 0000000000000000 x1 : 00000002000c0003 x0 : 0000000000000001
+Call trace:
+ get_freepointer mm/slub.c:595 [inline] (P)
+ __refill_objects_node+0x308/0x510 mm/slub.c:7413 (P)
+ refill_objects+0x78/0x320 mm/slub.c:7526
+ refill_sheaf+0x44/0x6c mm/slub.c:2917
+ __pcs_replace_empty_main+0x22c/0x4f4 mm/slub.c:4811
+ alloc_from_pcs mm/slub.c:4887 [inline]
+ slab_alloc_node mm/slub.c:5021 [inline]
+ kmem_cache_alloc_noprof+0x35c/0x5d4 mm/slub.c:5047
+ dup_mm kernel/fork.c:1532 [inline]
+ copy_mm+0xb8/0x328 kernel/fork.c:1594
+ copy_process+0x1698/0x35a0 kernel/fork.c:2320
+ kernel_clone+0x234/0x8e8 kernel/fork.c:2790
+ __do_sys_clone kernel/fork.c:2932 [inline]
+ __se_sys_clone kernel/fork.c:2900 [inline]
+ __arm64_sys_clone+0x168/0x1d4 kernel/fork.c:2900
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
+ do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
+ el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
+ el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
+Code: f9401fe8 f900029b 2a1a03f7 b9402908 (f87b691c) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	f9401fe8 	ldr	x8, [sp, #56]
+   4:	f900029b 	str	x27, [x20]
+   8:	2a1a03f7 	mov	w23, w26
+   c:	b9402908 	ldr	w8, [x8, #40]
+* 10:	f87b691c 	ldr	x28, [x8, x27] <-- trapping instruction
 
-
-ERROR: Missing Signed-off-by: line(s)
-
-total: 1 errors, 2 warnings, 0 checks, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14962585.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: validate retained LE Set Ext Adv Enable command length
-
-1: CC1 Body does not contain a 'Signed-off-by' line
-23: B1 Line exceeds max length (166>80): "Affected version/commit: mainline fa4ad798f6f681031775266044ba1b0cf3c670bd (v7.4-rc1, 2026-11-07), net/bluetooth/hci_event.c:1669-1735 (hci_cc_le_set_ext_adv_enable)."
-24: B1 Line exceeds max length (122>80): "Handler is longstanding; the fix class was established this window by ed4d302af7 (CIG params) and 1eb52f35fc (Create CIS)."
-27: B1 Line exceeds max length (124>80): "mainline fa4ad798f6f681031775266044ba1b0cf3c670bd (v7.4-rc1, 2026-11-07); every code path cited below was re-verified by the"
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
-https://github.com/bluez/bluetooth-next/pull/1090
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
---===============0976951744007024277==--
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
