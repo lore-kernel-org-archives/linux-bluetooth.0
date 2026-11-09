@@ -1,102 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.174
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794245727;
-	b=sUfQRieOXYHEYDenykblxIPt3vSv0nGdDCUcc0c8Xsy1MVscFP0GhIIWHoY28dZsqT8B
-	 9bv78TQG4wqMdOZw5Q9sdcBbfIsEx5H72VFaKTSXeyRSvs62aVdiaS4/w3tcnrH7fd5ks
-	 2od4waAcvJSpDNVkjftq/tAyPEmRdkEtoJiN0kBAzXFONgKQElsRJmZVTRtqXZlaTxAro
-	 7hsKg7csR1ToWr+4TEZAHyQEb/rHCtOGiLWQKaDBWj/yukYJXbsiEKNwtFNUVWvj24zR2
-	 qa+LMFWT2/VzrTWcNh/QQCy+CLtLlDkLQoRRplVmAugWvffF5/+3u1A1Yod54x1NRIw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794245727;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
-	b=1EKCMAAJstLtJR92CT1c7wk4FepE8+nt7GGtkVdblwObDKVQWwwgj81mLvBqQWYcLC7h
-	 iYxiqTU9JW6FOmeTGU4fGsaPdxede0O2Bsqd5uf81nHckePmAaxayUAB0Cwlj0JX1jRNO
-	 ySV28QsFwdhxcCCBeYdL0no2j04rkwQ3kPbnPCDrc9086nKbTcchj3NL+MJqEwg7AVeJJ
-	 0j2jz9JxESG1AZ4QedaAivScwpwWAXB1FdGZa6PsZsqj5UEogZlpu1tctfO9WthSAPROw
-	 51xjSjJ+c/CMvUYXcFxXxPdeWQnlplxdej9XyAk2bed8sG4rJIytuCgLmxVPQKJYbIg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="cbZFyu/y";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.174
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.76.89
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794248926;
+	b=FCIhBekIStAA9Tngtu8IBTvme8YA2WCeQ6J00U5YC0xgGu+nP0CmRQ5FOJyckLaOQ8/B
+	 I6hHmMxKuOYK3yVehEiYSm9b+yYsXvlA1DmoJ3gZMIL2XJVFbOOY9KtltfpmNrCaBMWI6
+	 dUca0D8NPPq8ZXuDo89Ml/T8SUcgKwXVlTOzbb14YaRZESNr4O2R9pVhgNXliRx0FBHci
+	 AlzsERcj9+0QJVfeLicdiD5/S4v4O2yLqK9Kp5xD6PTO//nPY9FIOeWAq3cNPhj7ESSBX
+	 4wRUW7E6Y9myhcT6sxI/DLcswN1/65QyO1iTRVXSxaKuyrGUI7mn+ViU7wqGuHcyEng==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794248926;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Subject:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
+	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=xPQ/Cj17nrhVuMh+39TstPE7Sh6mqTJLTOgDPwxqJp0=;
+	b=zSK7FCLjDhQGtiKacQs0lx7P5jKU+wlUI7g7nFa8TFaWsQZDSZuaC22dMc16nd2EzMOx
+	 ZYOLGu0o12nMzROiOEV9poIfB3tFthyu87uVv+O0tHs0xIbkSSUTD1ZUiXzIz2PrksAyx
+	 xACFpPRtZjswqcMefLTgxUXYcc3wpIz935+5hV7cV5LLRg/NODxoMTO/Yn9Kmn0EGrvC2
+	 eGt7RfJ2afaabpTBfeaJKkg6O1LFkQd8uH89U18KvuAVKoeWui+rxxfCjol99+K1SspuQ
+	 IiaAb/oDfNPSMrAI5IwxgkQwjGFo5mZL4BK+HTYvUOwVdXqR1Oq+KdaG9Fu8SNTFxjA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=podgorny.cz;
+	spf=pass smtp.mailfrom=podgorny.cz;
+	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b="lZZrxPc/";
+	arc=none smtp.remote-ip=77.75.76.89
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FBA606A321
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 17:35:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2FBA606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698BF606AFD4;
+	Mon,  9 Nov 2026 18:28:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 698BF606AFD4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=cbZFyu/y
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-53ec92375d2so426277b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 09:35:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794245725; cv=none;
-        d=google.com; s=arc-20260327;
-        b=H+myG9EyyXUG/F879GdGrtNhICgjw/gB1dEOqCh2wpyb9kK82bs2V8SIaINIxh7OuG
-         5zSWlCdeytIk+cXfvPi//SaTwB9gFA9fUJ8fGfC9qMNgzIXk4akkeW1xrQsVSl0Lme6m
-         3JjPSKBIRrCI0d0o4nVEWooV7tY5hpvIAjVga4iiT5j2WYAP2dtRsKNKP/bc2NzYy6rj
-         hJL/czX6V4oGOtF0ZYEmdRgmJBCFbNnvHO2w7urTsCF9+eqKWdb/6DsiT29i30WzZ//M
-         KgRwvVk0d6bzIo8oZiDyrww/LjeETYpNemvhFdhWyyDO1x/uugsygWDrsjda6JLO5cnY
-         J+Sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
-        fh=kGj5RQNHM8t1Tv+xqwQdih4syLCOTZn88PwKG9KYmCQ=;
-        b=D1V4kdC14+yGaJOXBJjDc5FPp+XsqHqLKYel2ZjWYightzWy0eo7ImLeTMLKpsrqPJ
-         //CxTWDeHCWONXtqBSQIOH7h+jy7mbJQvRkduZSoGGGzwqy5qs3mGSKZ5zjLso5m2vdB
-         W0qDJaGecM7+axZeTQxU72HjfDhvxCVssqx7dj+/FuRRTDIajHldLfipZp9Wk1hFV6io
-         F2SYyLHDAB9UhEGU+KjBVoEAcf4HOptIdsI20BAxThXufhyWHdmLDN/4risSu2E2FCoq
-         a53fEquPTypcBolSzGKfE3pl3EDWI2+TgJCLfuFqZmO/g8zSfHyu0HgOj6TNG8yhEAdd
-         aK3g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794245725; x=1794850525; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
-        b=cbZFyu/ympslBuIh6poY9KgizLvO6DKdEPXkeitWX7ov3Kg0Xvt+1xuf9Scdzdj9B+
-         8Uu0LNK2toOcHGGI0rUbxA497Q4cfiM61anQzlSptrUhEiYbfiHdVPiSrn1fAYWM7gyv
-         htRSdojLNw6tC7b3uulCFaAuYEP9TupJnrP2kgBJVVH+ykuxv+pLc3Qm5LJhG5+J4/ac
-         NMZg3aL2rqnnq42zaNIdq0hABRZemd77f9NVA6g9hyAbg3bP/zEGajOmLHB1pIcC28ln
-         YzqWQWQh7xy2tcNi3zrmajgt9OwTm/9E/ox5mX21sFYf15dOgycdkH+CFal+g6C+rWjP
-         Ke7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794245725; x=1794850525;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
-        b=kmpSMAtTSQ0oAJjdEesgN9F36o8+kLLoJHARS5iqhuJXFyLzZMXHOdfu5NyqEIRgz6
-         wjRhIXa3bpOw27K0Pyewdbntd8kLtZCs+LpeHlQoDJSSwW/et06G6LfSp6tjGpSAtkug
-         IjuvMVwKTcvJJA7vWOWHfgpsVZnOpuXZt47jDQ+EnHkoxwTvLl6Da1opXME9EdERJ7ht
-         dNXWcHr7HnCBQbEdpVK5U4Hd0kRO0tJBsSp8SVokdpLWg78J1j0g8MoK1advtI38J1NV
-         p9qJgTHTi/5t/2O3pf82Svd5big7xLJYRMeSgox0umySSB3u1axwyHKjFsJ75T7h+/A4
-         fAng==
-X-Forwarded-Encrypted: i=1; AL+hErHh7V0GohqLCsSPa5qOT+Wg7qAu+qQuna2IH5kUSv3IDnl03UyVw/L5KFNLbDx1oz7axMF2HEyLUDCzfKDrG5I=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9Bb43UGniNaqUosf/BruwI7U5zyl0UAuxRMWBMxzJDvEjaBAJg
-	5RLEmQM5whFMVgsxsgIPwmGODyMWfSJ6B6AqGLWzt9HN54hrUofWr8rlqHOWp36bEk1cC49h8ct
-	7qUSn34dcr/aaSVdNF1qY4Fhscbycu63N8yjLu+ZH
-X-Gm-Gg: AYBFou35VM79CGIuFYdI4QyQvcFRQzdyEJf/aYaaZ0f/kDVC145ZgrAH828g3lzXUl+
-	4RUttVbiLmrONiQisV9vbN8N3F2kr5QCz6mpBtEG8PW6TSRLTCHTkmQlS6YHH9aC3hzZRfeVJ8U
-	ewORziShCNhvYnYxA+BgXYkwzmyhtXV6B6czyuY5lkguIKdpr1diTxL60b6Fsx3Ontf9pvDTcAk
-	lwqU7xjK0oKSs3z3kdDaRDwh25WUGyKzIBU75U7sB0WXn96PE1BMt6fQEhUV9SCbHIL8EWMthT8
-	gIXqtbVeMTwgVvVVopvSPBmQr5q7bzSyaweIy7t+4LZEMQwKuePU9buK5TikTBH763yX1sdIAbL
-	mrUTC8Y05aOIaWRnnZQG5c0+48B4TIiuV3jAS8M/N1vuNbFPWTm6MaR/0XGvaASaxtamG+BiBGp
-	AqYBetV1NN1IfZU8g3kg9dEA6C62/35fsO3FApPFyupVNnovVp8Tat5tYecYAa0GTN9WTpajPL1
-	uAI6ej6
-X-Received: by 2002:a05:6808:1829:b0:543:50ad:baae with SMTP id
- 5614622812f47-5683ce02157mr265411b6e.63.1794245725006; Mon, 09 Nov 2026
- 09:35:25 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=lZZrxPc/
+Received: from email.seznam.cz
+	by smtpc-mxb-5df7df959f-rrn6r
+	(smtpc-mxb-5df7df959f-rrn6r [2a02:598:128:8a00::1000:931])
+	id 1badb339ad971e201e22a971;
+	Mon, 09 Nov 2026 19:28:26 +0100 (CET)
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
+	t=1794248906; bh=xPQ/Cj17nrhVuMh+39TstPE7Sh6mqTJLTOgDPwxqJp0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:To:Cc;
+	b=lZZrxPc/tM/e/s1thsKb7FaUi7oo6e0MvkYz0AkGLulgb4/aJH2MUER5NXv7Fft0v
+	 DP5IHuH8zODzHaTAaud0bmtUWbTNFi+GIEiBIK9LFVpsBj59urvlBTU7HbqYrH/eyA
+	 LIk8otXsFz51ZdLXUK+gmeNJRciQEC96nHA0I32eDoCbbzCk4NeWP998vaaI/stjxY
+	 WZ1Wq9qag64VOuVhVvdP24XRR4S/fdBVjUZ0srjNgr/m/Q38APnpIggA2IPns7BKXf
+	 m5jPDAdppGXNe1AG8+q6jRyZ7BQMSmd9Gg1jSmv4wojssafiUULRl2O7GHed3J575g
+	 vtkJcxyKHeSGw==
+Received: from [192.168.31.57] ([2a01:9422:904:1ee:e65e:37ff:feee:e29c])
+	by smtpd-relay-58c9c5bf5f-hp4dt (szn-email-smtpd/2.0.93) with ESMTPA
+	id 178c6cae-1c84-4364-a643-41653bb12fe1;
+	Mon, 09 Nov 2026 19:28:08 +0100
+From: Radek Podgorny <radek@podgorny.cz>
+Date: Mon, 09 Nov 2026 19:28:07 +0100
+Subject: [PATCH v3] Bluetooth: find an RPA peer's connection parameters by
+ its identity
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -106,84 +65,292 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <6af144ed.f50b2b3a.2c0de7.0010.GAE@google.com> <20261108202849.2e5c40a630e66dd39334a915@linux-foundation.org>
-In-Reply-To: <20261108202849.2e5c40a630e66dd39334a915@linux-foundation.org>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Mon, 9 Nov 2026 18:35:13 +0100
-X-Gm-Features: AclHuK-hI9rJRz-mT5ngogTQCjiUzkrA1dTOphNK2ymjlIr9_nFY1-IjXf1wnBo
-Message-ID: <CANp29Y5m+47Y5n3Y8WvCEm2UgzGBOnpMK2eqY4aO1L+hQb1yNg@mail.gmail.com>
-Subject: Re: [syzbot] [mm?] [bluetooth?] BUG: unable to handle kernel NULL
- pointer dereference in __refill_objects_node
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: syzbot <syzbot+73e34786d639a8eb1324@syzkaller.appspotmail.com>, 
-	bsegall@google.com, david@kernel.org, dietmar.eggemann@arm.com, 
-	juri.lelli@redhat.com, kees@kernel.org, kprateek.nayak@amd.com, 
-	liam@infradead.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, ljs@kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, mgorman@suse.de, mhocko@suse.com, 
-	mingo@redhat.com, peterz@infradead.org, rostedt@goodmis.org, rppt@kernel.org, 
-	surenb@google.com, syzkaller-bugs@googlegroups.com, vbabka@kernel.org, 
-	vincent.guittot@linaro.org, vschneid@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261109-for-upstream-le-conn-params-rpa-v3-1-ad1225bb0b8f@podgorny.cz>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42OQVLDMAxFr9LxGpXIadKEFfdgWMiO0hga2yO7m
+ ZZO7k5cNrBj+TX/P727SiyOk3rZ3ZXw4pILfgv1007ZifyJwQ1bVrrSLWKFMAaBS0xZmGY4M9j
+ gPUQSmhNIJBh1XR9G0wwDHdVGicKjuz4+vL3/5HQxH2xzwZaGocRghLydyslk8HzNzzOlzFIKk
+ 0s5yO3huGAB/V9nQUDou67VPVW9sf1rDMMpiL/t7ZcqQov+TTygrrDu9ohtc8RmGwsN/Pl3ta7
+ rN1A9TQM5AQAA
+X-Change-ID: 20261101-for-upstream-le-conn-params-rpa-f2334fb5dda7
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Radek Podgorny <radek@podgorny.cz>
+X-Mailer: b4 0.15.2
 
-On Mon, Nov 9, 2026 at 5:28=E2=80=AFAM Andrew Morton <akpm@linux-foundation=
-.org> wrote:
->
-> On Sun, 08 Nov 2026 19:58:37 -0800 syzbot <syzbot+73e34786d639a8eb1324@sy=
-zkaller.appspotmail.com> wrote:
->
-> > syzbot found the following issue on:
-> > AI-generated root cause summary:
-> > In mm/slub.c, __refill_objects_node() replenishes percpu sheaves by det=
-aching a
-> > freelist from a partial slab via get_freelist_nofreeze() and iterating =
-through
-> > the freelist pointers in a while (count && refilled < max) loop. Becaus=
-e the
-> > loop condition only checks count and refilled rather than validating th=
-at object
-> > is non-NULL, a prematurely terminated or corrupted freelist (where fewe=
-r objects
-> > are linked in slab->freelist than the expected count =3D slab->objects =
--
-> > slab->inuse) causes object to become NULL before count reaches zero. On=
- the
-> > subsequent iteration, get_freepointer() dereferences NULL + s->offset (=
-offset
-> > 0x400 for kmalloc-2k), resulting in an immediate kernel NULL pointer de=
-reference
-> > crash at address 0x0000000000000400.
-> >
-> > full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=3D73e34=
-786d639a8eb1324
->
-> Thanks.
->
-> : This looks like a bad syzkaller test, not a Bluetooth bug. The
-> : reproducer runs as root, opens the active PCI device's resource0
-> : (mode 0600), and maps its register space writable. It then places
-> : syscall arguments inside that mapping. On this GCE VM,
-> : 0000:00:02.0 is the NVMe controller; its BAR contains live control
-> : registers and queue doorbells.
+A bonded peer's connection parameters are stored under its identity
+address, but hci_conn_params_lookup() matches only the exact address it
+is given, so a caller holding the peer's RPA misses the entry.
 
-Yeah, it's unfortunately a known problem.. Sorry for the noise.
+hci_le_create_conn_sync() is such a caller: hci_connect_le() puts the
+peer's cached RPA in conn->dst, and __hci_conn_add() no longer converts
+it back when the controller cannot translate an identity address. The
+connection is then created with the controller-wide defaults in hdev
+instead of the peer's interval, latency and supervision timeout.
 
-I've just sent a PR[1] to prevent syzkaller from manipulating those interfa=
-ces.
-[1] https://github.com/google/syzkaller/pull/8111
+Resolve an RPA to its identity in hci_conn_params_lookup(), so every
+caller finds the same entry whichever of the peer's addresses it holds.
+The identity is looked up instead of the RPA, not after it: Pair Device
+creates an entry under the RPA the peer had before bonding, and that
+entry stays behind with default parameters. Matching it first would hand
+it out for as long as the peer keeps that RPA. Such an entry is no
+longer reachable by its RPA once the IRK is known; it is cleared with
+the other disabled entries the next time all connection parameters are
+loaded. The IRK can be freed by SMP without hdev->lock, so its identity
+is copied out under rcu_read_lock().
 
-> :
-> : Both crash logs show NVMe completion ID and generation-counter
-> : errors immediately before the SLUB fault. During minimization, the
-> : same program produced crashes in several unrelated kernel paths,
-> : including runs without the Bluetooth operation. This points to
-> : disruption of the active NVMe device and subsequent corruption,
-> : rather than a demonstrated SLUB or Bluetooth defect.
-> :
-> : The logs do not show the precise MMIO access or establish how the
-> : freelist was damaged. Please rerun with the resource0 mapping
-> : removed and the read buffer in ordinary memory. If the SLUB fault
-> : persists without the NVMe errors, we can investigate it as a
-> : separate kernel bug.
->
+hci_conn_params_add() and hci_conn_params_del() go through the same
+lookup, so given a resolvable RPA they now act on the identity entry.
+hci_conn_params_add() also stores a new entry under the identity, or a
+later lookup by the identity or by a rotated RPA would miss it.
+
+The returned entry can therefore hold a different address type than
+the one the caller passed. load_conn_param() and load_conn_subrate()
+look up the connection by the entry's address with the caller's type;
+use the entry's type with it.
+
+A connect made to the peer's RPA, through hci_connect_le_scan() from
+Pair Device, an L2CAP socket or a CIS, now marks the identity entry for
+the explicit connect. When the peer advertises, check_pending_le_conn()
+calls hci_connect_le() with the resolved identity, but the scanning
+connection is still under the RPA, so the lookup by identity misses it
+and a second hci_conn is created. Look the scanning connection up by
+the peer's IRK instead, which also finds it after the peer has moved to
+a new RPA. Do so whether the host or the controller resolved the
+advertisement, and whether or not an RPA is cached for the peer: both
+lead to check_pending_le_conn() with the identity. The RPA dialled is
+copied out of the IRK under rcu_read_lock() for the same reason as
+above.
+
+Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Radek Podgorny <radek@podgorny.cz>
+---
+v3 addresses the issues Sashiko raised on v2:
+https://sashiko.dev/#/patchset/20261104120138.1165715-1-radek%40podgorny.cz
+
+Tested on v7.3.1 (the flags test needs &c->flags there) with a
+Raspberry Pi CYW43455 central and a peer on a resolvable private
+address whose parameters are loaded under its identity: 7 of 7
+connects, one Create Connection each to the RPA, each carrying the
+identity's parameters. Not exercised: an RPA rotation between
+attempts, and the controller-resolved and no-cached-RPA cases of the
+scanning-connection lookup, which this controller and peer cannot reach.
+
+Per Documentation/process/generated-content.rst: the patch and this
+message were done with the Claude coding assistant (model as in the
+Assisted-by trailer). The prompts asked it to fix the issues Sashiko
+raised on v2, then to review the result following Sashiko's published
+review prompts and fix what that turned up. The author directed the work
+and reviewed the result.
+---
+Changes in v3:
+- Look up the identity instead of the RPA, not after it, so an entry
+  left under the peer's pre-bonding RPA cannot shadow it
+- Copy the identity out of the IRK under rcu_read_lock(), since SMP can
+  free the IRK without hdev->lock
+- hci_conn_params_add() stores a new entry under the identity
+- load_conn_param() and load_conn_subrate(): look up the connection with
+  the entry's address type
+- hci_connect_le(): find the scanning connection of a connect made to
+  the peer's RPA by its IRK, so it is not duplicated once the identity
+  entry is pending, even after the peer has moved to a new RPA, and
+  also when the controller resolved the advertisement or no RPA is
+  cached for the peer. Kept in this patch, since on its own it would
+  leave a reference imbalance until the lookup is fixed
+- Rebased on bluetooth-next
+- Link to v2: https://patch.msgid.link/20261104120138.1165715-1-radek@podgorny.cz
+
+Changes in v2:
+- Resolve the RPA inside hci_conn_params_lookup() rather than at the
+  hci_le_create_conn_sync() call site, as Luiz suggested, so no other
+  caller can miss the entry
+- Rebased on bluetooth-next
+- Link to v1: https://patch.msgid.link/20261101-for-upstream-le-conn-params-rpa-v1-1-988629a09bc9@podgorny.cz
+---
+ net/bluetooth/hci_conn.c | 60 ++++++++++++++++++++++++++++++++++++++++--------
+ net/bluetooth/hci_core.c | 32 ++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c     |  4 ++--
+ 3 files changed, 84 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index eebd73988bf6..fddfeca9b02a 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1502,12 +1502,42 @@ u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
+ 	return 0;
+ }
+ 
++/* A connect made to one of the peer's RPAs leaves its scanning object under
++ * that RPA when the controller cannot resolve it, and the peer may have
++ * moved to a new RPA since. Match it by the peer's IRK instead of by address.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++static struct hci_conn *le_scanning_conn_by_irk(struct hci_dev *hdev,
++						const u8 irk_val[16])
++{
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn *c;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->type != LE_LINK ||
++		    !test_bit(HCI_CONN_SCANNING, c->flags) ||
++		    !hci_bdaddr_is_rpa(&c->dst, c->dst_type))
++			continue;
++
++		if (smp_irk_matches(hdev, irk_val, &c->dst)) {
++			rcu_read_unlock();
++			return c;
++		}
++	}
++	rcu_read_unlock();
++
++	return NULL;
++}
++
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, bool dst_resolved, u8 sec_level,
+ 				u16 conn_timeout, u8 role, u8 phy, u8 sec_phy)
+ {
+ 	struct hci_conn *conn;
+ 	struct smp_irk *irk;
++	bdaddr_t rpa;
+ 	int err;
+ 
+ 	/* Let's make sure that le is enabled.*/
+@@ -1533,25 +1563,35 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (conn && !test_bit(HCI_CONN_SCANNING, conn->flags))
+ 		return ERR_PTR(-EBUSY);
+ 
+-	/* Check if the destination address has been resolved by the controller
+-	 * since if it did then the identity address shall be used.
+-	 */
+-	if (!dst_resolved) {
+-		/* When given an identity address with existing identity
+-		 * resolving key, the connection needs to be established
+-		 * to a resolvable random address.
++	rcu_read_lock();
++	irk = hci_find_irk_by_addr(hdev, dst, dst_type);
++	if (irk) {
++		/* A connect made to one of the peer's RPAs is still scanning
++		 * under that RPA, whatever address the peer is seen on now.
++		 */
++		if (!conn)
++			conn = le_scanning_conn_by_irk(hdev, irk->val);
++
++		/* Check if the destination address has been resolved by the
++		 * controller since if it did then the identity address shall
++		 * be used.
++		 *
++		 * Otherwise, when given an identity address with existing
++		 * identity resolving key, the connection needs to be
++		 * established to a resolvable random address.
+ 		 *
+ 		 * Storing the resolvable random address is required here
+ 		 * to handle connection failures. The address will later
+ 		 * be resolved back into the original identity address
+ 		 * from the connect request.
+ 		 */
+-		irk = hci_find_irk_by_addr(hdev, dst, dst_type);
+-		if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
+-			dst = &irk->rpa;
++		if (!dst_resolved && bacmp(&irk->rpa, BDADDR_ANY)) {
++			bacpy(&rpa, &irk->rpa);
++			dst = &rpa;
+ 			dst_type = ADDR_LE_DEV_RANDOM;
+ 		}
+ 	}
++	rcu_read_unlock();
+ 
+ 	if (conn) {
+ 		/* dst may just have been swapped for the peer's RPA above, and
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index bfc5bdebc71a..c9f4f4038e0a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2285,11 +2285,37 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
++/* A peer's connection parameters are kept under its identity address, so
++ * point *addr and *addr_type at the identity behind an RPA we can resolve.
++ * SMP can free the IRK without hdev->lock, so the identity is copied to
++ * @id_addr before leaving the RCU read-side section.
++ */
++static void conn_params_resolve(struct hci_dev *hdev, bdaddr_t **addr,
++				u8 *addr_type, bdaddr_t *id_addr)
++{
++	struct smp_irk *irk;
++
++	if (!hci_bdaddr_is_rpa(*addr, *addr_type))
++		return;
++
++	rcu_read_lock();
++	irk = hci_find_irk_by_rpa(hdev, *addr);
++	if (irk) {
++		bacpy(id_addr, &irk->bdaddr);
++		*addr = id_addr;
++		*addr_type = irk->addr_type;
++	}
++	rcu_read_unlock();
++}
++
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
++	bdaddr_t id_addr;
++
++	conn_params_resolve(hdev, &addr, &addr_type, &id_addr);
+ 
+ 	list_for_each_entry(params, &hdev->le_conn_params, list) {
+ 		if (bacmp(&params->addr, addr) == 0 &&
+@@ -2345,6 +2371,12 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 					    bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
++	bdaddr_t id_addr;
++
++	/* Store a new entry under the identity too, or lookups by the
++	 * identity or a later RPA would miss it.
++	 */
++	conn_params_resolve(hdev, &addr, &addr_type, &id_addr);
+ 
+ 	params = hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (params)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 260ef2a45719..3bf62fa2e7c2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8265,7 +8265,7 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 * a connection update.
+ 			 */
+ 			conn = hci_conn_hash_lookup_le(hdev, &hci_param->addr,
+-						       addr_type);
++						       hci_param->addr_type);
+ 			if (conn && conn->role == HCI_ROLE_MASTER &&
+ 			    (conn->le_conn_min_interval != min ||
+ 			     conn->le_conn_max_interval != max ||
+@@ -8380,7 +8380,7 @@ static int load_conn_subrate(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 			conn = hci_conn_hash_lookup_le(hdev,
+ 						       &hci_param->addr,
+-						       addr_type);
++						       hci_param->addr_type);
+ 			if (conn && conn->state == BT_CONNECTED &&
+ 			    (conn->le_rate_interval < min ||
+ 			     conn->le_rate_interval > max ||
+
+---
+base-commit: 4c684359d8e17be11c7fdace223dd1801bd0f1b1
+change-id: 20261101-for-upstream-le-conn-params-rpa-f2334fb5dda7
+
+-- 
+Radek Podgorny <radek@podgorny.cz>
+
