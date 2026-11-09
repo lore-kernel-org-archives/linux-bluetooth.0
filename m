@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794239938;
-	b=F4T+tce0QiMT/TVtprkTLNrMmejKIjqgee4eTVCt72cFqhQDtUfs042qzw9gLAVA3lSk
-	 2ynXgsqIDWFLivE+5Q17Ae0aABJupi7QqJoOLYw3RZLag/tcT5juXj4fhXjTJF/V0hrHd
-	 V26M8V7cNa6jcOQ9/yLRE87V9DAKlkXTzISaIJqDyKqZvSMXW4ka6c2sp4qQpB9DNSwZa
-	 x6WmpXG7EcynNyrD8mStg+cLRyKMQO0Ed3JCOuvBLff4Uhr7ZtGupW98nRsrvarSM8wZr
-	 9JxXfZKFSl2JCrMTwtS6U9agw5ny8gnEO1M41dpDSDTGpbr1SpQCO0HM4571S+HiiXQ==
+	b=HGBr0TVOq1p3tYbwchJNQ1TZyJ+/lNJ8P/e9UxpzTUPBgbtQzKtcGqLKhFtXLxhJ5yKw
+	 ZTK6ZmTcEHQEzA7ynFypU8a5xSMUzH2BL3Gcbpd2Zu1mvu0+8Omj2FctpmuYB4WsDOh8l
+	 zPwluAtYCx1UdaVMnGiF9MAbE6rhPjJz1QH1C9cZJyHhgKs1lXDf45jvd9D1Em0L/61Ku
+	 e2l1OjZfpZ5x+HBrmfcwy4CFpE+YTr740ZYp9g8PZI4kWu/xEY1I/pYMEu2uZKDiODOHu
+	 SaiEdor9URlZaFZt/HgY2mA94q4ZdA+hDHQD+3eXBlZcPdqzWIVtgObc0VXeX6NKNtg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794239938;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=SfVZ94lYz1kb6hQSVXedmSyEIsjbUTmaOyXEsvWy2qw=;
-	b=ksUcyRG3UeAoa6Y93gRgUNwX49kDOLa798XOUx18LZ4xbhbLCNPnh4tusoY0ozh4BtBI
-	 uOiv3Z/P5JxD+cr7qAxIK+pISOkRjkzzTsz0AveRAwylUCnP8UYDh4ZSXFHWNTKn4twJp
-	 eWAEeO7TWjTZg2YDlmDrV/7ASlqZswszcYkvCLvVLuEA+ttTs2hDAbXbC0OydDZdJly3f
-	 jnS9s/YveQKEcPk7bGyeIfI3s1QhLuF8dkwl1RjzGygcHSnPrL33CCupLjEaMLQPm/s8C
-	 PuMIbbnGLkWWefcks8gAyTHaSwTjcqG+wCC8RVWV8t5XQu6kY0gZnx9fPnINJW1dVwA==
+	bh=uuC6wDvKvC9UPRzrKmnsdAzjdbEOaoXDpySTnK3OeFA=;
+	b=XNOfJl86Bq2W59E8edaUx9gfe5ekuDif8SikiR7Rs+B8uf7miX4t86lr1PxzQwGZ/hRR
+	 buA1MrnAqsGfRwArPNb7xjTOHGTlYe0hGIWU8CsVS7CIdm+6KqotUnvzj9Ey9rtYVjrK1
+	 aRa+cMRmnzs4HAbHSCN3pHD8BHWYeflnoeFOUFK5MBDZnsSH6vw4bPu56fOyAHw5ai/7I
+	 LByjKoBmFYqRSBgxx0/22wngitVzCDkDOCOX4btzqD/oCtZmawxjbZakUFsC83gGS4+t7
+	 k9xqPcdfE4hLUEUF4kkphSvWQLlPZ3NRC+hsmndAFmD1YMWMu3ZyQkNcKxwPg9O94Gg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AAMV6HvI;
-	arc=none smtp.remote-ip=209.85.222.43
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pi+cZ9qx;
+	arc=none smtp.remote-ip=209.85.221.178
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667F76082BD2
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 15:58:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 667F76082BD2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FECC6082BDF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 15:58:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4FECC6082BDF
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AAMV6HvI
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-99911ead46dso514592241.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 07:58:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pi+cZ9qx
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5ecda93627eso310831e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 07:58:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794239936; x=1794844736; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794239937; x=1794844737; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=SfVZ94lYz1kb6hQSVXedmSyEIsjbUTmaOyXEsvWy2qw=;
-        b=AAMV6HvIv8mcE1DWuM20sfO6IL9FQVh7rkUOiNPrG7XVyRHtdq86vzkTeP5IUVEXX4
-         Ifx1g+Xs3rG9ryj3+sCIiLaNSt5XEmprNEYqdKhDXsJZJsS8+NkHDKd2RIfFet9n2RAj
-         +U8ZFOQ4RLVPZD+25gsT1BVIJqfTc9lay+VDsnTxRl/mbAJ38ghwdg2OtWfS7eQTfaU7
-         lrpx9NSghza6sFpVA5+UpGnlhg8oSaxE7ivQyb9zX6jDVHHl3Y6MNZIvHrB5ajZeTSRq
-         ak06EB2IG9OeUTf7d5ciiYSxh2b7d2wL4edQZAvHBvy35G74JM+7hBAULolleaFqhj8v
-         fLMA==
+        bh=uuC6wDvKvC9UPRzrKmnsdAzjdbEOaoXDpySTnK3OeFA=;
+        b=pi+cZ9qxDELyJNmzLhdZg0Z3mx7VRhw6MpmvfHMoQSx+eBnmnG44huBNo+4633Uber
+         L3boLHS8kpqU1ThEbGK1kR3fnrhMd4j+kghi5IKT/Oov4yS+6aWpms7kxS5aPY1Me2Ol
+         t3O4QrdT6OUiku/ct5Ntau0XuiML2ra+xcpoCnZuIgXDRw//wYPo9rS8D3z4ndir5Hf5
+         M0wwcvMEGDgXWNuNIvQZYB61Yo3u/l9iYxi2gUEgkWSFh7yS1GujhcqMCFZ9Kys5l6xk
+         gNCBxbplbohqf4Mqvm7YSBMLaoqfYhFYO6PLRcRZPrzr/NavkIvvmFTG3CMdbxyiHC6Y
+         n9BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794239936; x=1794844736;
+        d=1e100.net; s=20260707; t=1794239937; x=1794844737;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=SfVZ94lYz1kb6hQSVXedmSyEIsjbUTmaOyXEsvWy2qw=;
-        b=Xhkc9AAGCimjpuLE626eZJMaVDvBJXo3p+g1nxRr9dwQ7lTulBOkkCjoTIphhFo5Dr
-         R6ZW4mvrh+0E8saRzyOTh9CXFH6JBT6QR43Kh6dzAhWYJRdNWnddiF3PJH5TxA+XAwzw
-         atOaSWivYyWWEh7hdVe8F8UZCQUdO9b70ktUyN1Nf08+u0hlebnWXN/gA5NBTjCBIAD0
-         fWfgxEnbxleBglEWpqNY3GEBrLYfTEtvV2sTnhBbGB51ET94BI33Wa55MrIHDN799e8G
-         m+V5q+wnLeFanaDb2dAyWOq6T87blFDjJMhzqmfYNhTUU3camAZhbjgFeeVwktO9NYhR
-         Yj5A==
-X-Gm-Message-State: APuU4Z8xK7h3jkDmQki9Fj0BdWBdHc6PA7MSKsOXKlidCBud2fmotxca
-	iUPP/0RWf3/j2f6KnUcl+Xqgi5+8tvd7BIQzR3Gj4g6rEZX1V3Ek6zLOksF6iQ==
-X-Gm-Gg: AYBFou0bPgNJNUAZIiSlhf7TbE9P/FLjC75H5LnHrUgzs3+RGU4WN80JW9OxsC5n4aY
-	vOvO+LdM5e6NoggMXgn7yy0MpIHTa2l+/uoqR/J/C2bbvKS8K/ZvQQnPg1zo5s97J/FcLDvlFrf
-	Exro7nDbhOw9kcaDCERiBP45n6G+2WV6rZ5+1Dizw8J/M0Tk8adE8DSEbGXdPWR5RMVy3Xj2Rge
-	lT6/8s/AD/fXpVqevMnuEQxNxptMtUOOiPJbJ488a3l0EJ8L96tqkdsl5zTLAWCZouDYBRV7S7J
-	/YQJzGWAGn5FDmK0F6dreKTaDaGLUz1Gk4a+N5P6/+OLF+KANN4SsrcDWKRWDYC/FC6Lg2scUMO
-	iBr3JpFRbxIMfA6sgpy+uF/wEp0SmCAOlNCa57N2HmMJb/OE3PGwu4fIEJRJKVrzALEVeF2IRAG
-	Wqpudju7CYITS8kDftOUa4BXRWksHPGZSIZMIraETJ8criy0+qTXveTyFD0ih49LDft/kqv1kOa
-	Y7QeIQIffZ0r4wtXHpDXoWUnsFEeVQvFUKbiQnWOSHWN864OBVtJBDf/pNNn5lbIwJDhM4MT4Ny
-	ih2HrGQ8nXO5nTuuEkTzNcVrjH3xtsOoaL+a/gR7wut7kClj2ZGOC7NKExA1eQPVshPaeZSVW2x
-	LRBPnmqqYBdY1KTavpnGHjnh66vxsv2Bq6NXv2GENM3wuFcCxxeUTwKEpKw/C2PAeFSmIf+4TL0
-	nCtvw=
-X-Received: by 2002:a05:6102:50a4:b0:7d2:c903:515d with SMTP id ada2fe7eead31-7d2db131419mr1452554137.7.1794239934950;
-        Mon, 09 Nov 2026 07:58:54 -0800 (PST)
+        bh=uuC6wDvKvC9UPRzrKmnsdAzjdbEOaoXDpySTnK3OeFA=;
+        b=H1vLtk4WICHp9KzHedkJK+ylUrDccCrD284mxoxSidos1fjTYAWjP2YV+nEw8jNmze
+         sF7DNMN+tsPfJeun8zophhv768TkSZ9bhSg3AvPMdRUYZqYSm7AoWYJg/Q/D0FctwLPn
+         iKucWwOksUCcQ/FkC6mwV+nmztg89jRvW+Hk1r2N1FopbQPjm/y19cPD5sCo3FHF4suv
+         WkS7hPjWUuQabEUP7kzvjVX3rRhr7n+B7R3dC30+0dg3b/iMS180+4Umgd1Df1U6PPuP
+         NTmDVT6nSkK3aWTLo1vDQc53LNNXYuX6rbBX+9jT0xHUcQuXUUcKLvdQMDSkrJTEokUq
+         bluQ==
+X-Gm-Message-State: APuU4Z+YC6nbdddj9xpcL96RqeXCgotOjmbbQf+3DfWFt8FfIENogX+R
+	F44wo+lOmqlITdynmHgSZNtHriFZTIF8MUkqn8o6tMevwUHEvsyfzbgnQI7VIQ==
+X-Gm-Gg: AYBFou0tbVV8XmYM3YoyNqfoMvst0TiofvK/iBaQ09DigBZlcA1EFGH2mUb4eyO9r9e
+	KPsdBd7wcNles5+xcALfuu9kGDGXr9HmGmBLT4eqLm//1UON3xuPQXKmVM4bxZMvOkybO4htnWj
+	B5HHj1djG8QH5+9FhWcnTQD4teKCb9WOst9VU3pzCP/5QIOkCH0J6dlgKTRRP7TWTj8q0+4Y+yn
+	n7Qraaq9velZ5NpicAvmHAZOXCREneEL5xcW2A3eCEZTPDIaxCNzITSpa2+h13P8p/uHk8RIfp7
+	TeJLnSjjwbbA6WnrGA/uHBnj3YtVCglNDkQtJNRrTuVDSFbd2RCxnhJOcacEv3XC2hKAKm6ViQw
+	tMOEqPOB59xhCXT2zTLHMadBuwwBlQsetdNipMRMsQmrFu0M5Ic0khndctmoFSd4gv4QaFx7g3+
+	RtEOIKSCHj7yLqJ96pgIHwKfrNdPLHFi6Gtwpz1daIuz8FBLjzGASfRkMV2MYHThpmrPCnaw6o7
+	ZY106Bp2iUm0+6huwtTONbZqQ7LoXs+6mG99DVD3EmUi0jb1yPnCIZMqiIncCTx2aWjVOVFSKJx
+	uY02V9reV8ASJhlcAPswad/llWBDSVHiGITOSnItxl5q/DFCfjVLtSKC00K/KUcLTsihKfrbfZC
+	RvNcwoUEhnNCTjtkpuaE4N0OoM7IN+9r3hLpGUspxxvvs4d0N3+FrsvTar4Tj0tQOqclGLjmZb7
+	OysK0=
+X-Received: by 2002:a05:6102:9d6:b0:7c8:1fd5:82b5 with SMTP id ada2fe7eead31-7d2db0c39a1mr1077059137.14.1794239936783;
+        Mon, 09 Nov 2026 07:58:56 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d2db605322sm4145103137.7.2026.11.09.07.58.54
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d2db605322sm4145103137.7.2026.11.09.07.58.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 07:58:54 -0800 (PST)
+        Mon, 09 Nov 2026 07:58:56 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v10 2/6] Bluetooth: ISO: Add extended QoS with the HDT rates
-Date: Mon,  9 Nov 2026 10:58:46 -0500
-Message-ID: <20261109155850.1394252-3-luiz.dentz@gmail.com>
+Subject: [PATCH v10 4/6] Bluetooth: L2CAP: Add MIC length validation for HDT PHY
+Date: Mon,  9 Nov 2026 10:58:48 -0500
+Message-ID: <20261109155850.1394252-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261109155850.1394252-1-luiz.dentz@gmail.com>
 References: <20261109155850.1394252-1-luiz.dentz@gmail.com>
@@ -101,927 +101,455 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add struct bt_iso_qos_ext, an extensible version of struct bt_iso_qos,
-so new QoS fields can be added without defining a new socket option or
-struct each time. It starts with two fields:
+Add a mic_len field to struct bt_security so userspace can require a
+minimum MIC length on an L2CAP channel with BT_SECURITY, and read the
+MIC length in use on the link back. The field is added at the end of
+the struct, so the shorter struct is still accepted by L2CAP and RFCOMM,
+leaving mic_len unset, and values other than 32, 64 and 128 bits are
+rejected.
 
- - version tells which fields are valid, so later versions can add
-   fields while applications built for an earlier version keep working.
- - type tells which member of the union is in use, unicast or
-   broadcast. The QoS is usually set before bind() or connect(), when
-   the socket can't tell which one it was given, so without type the
-   two could only grow together. With it, each can be extended on its
-   own by adding fields at its end, which is also why the union is the
-   last member.
+The MIC length a channel requires is requested on the connection on
+every path starting LE security, so LE Enable Encryption v2 asks for
+it, while the MIC length the controller reports with Encryption Change
+v3 and Encryption Key Refresh Complete v2 is kept separately, so a
+request never stands for what is in use. When a connection is
+encrypted on the LE HDT PHY with a MIC shorter than the channel
+requires, the LE Credit Based and Enhanced Credit Based connection
+requests are rejected with MIC Length Too Short.
 
-BT_ISO_QOS_ANY leaves the type to connect() or listen(), which set it.
-That works for version 1 since its unicast fields are a prefix of the
-broadcast ones, and is what struct bt_iso_qos uses. A type that doesn't
-match how the socket is used makes connect() or listen() fail with
--EINVAL, or setsockopt() on a socket that already has a connection,
-such as with deferred setup or a PA sync.
-
-Version 1 adds the rates of each direction, BT_ISO_HDT_RATE_*, so
-userspace can select the HDT rates of a CIS or BIS along with
-BT_ISO_PHY_HDT; 0 selects every rate the controller supports.
-
-BT_ISO_QOS accepts either struct: the length of struct bt_iso_qos
-selects it, as before, and any other length must carry struct
-bt_iso_qos_ext of a known version and type. The struct is copied field
-by field, so its padding is zeroed. Reading BT_ISO_QOS with a buffer
-shorter than struct bt_iso_qos_ext returns struct bt_iso_qos, so
-existing userspace is not affected; otherwise the version and type in
-use are reported, including for connections set up by the controller.
-
-The ISO sockets keep the extended form internally, so the rates are
-passed to LE Set CIG Parameters v2 and LE Create BIG v2, and reported
-back from LE CIS Established v3 and LE Create BIG Complete v2.
+The reported MIC length only applies on the LE HDT PHY, the MIC is
+always 32 bits on the GFSK PHYs, so hci_conn_mic_len() reports it as
+such both for the check and for BT_SECURITY.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |  83 ++++++++++
- include/net/bluetooth/hci_core.h  |  15 +-
- include/net/bluetooth/hci_sync.h  |   2 +-
- net/bluetooth/hci_conn.c          |  34 ++--
- net/bluetooth/hci_event.c         |  20 ++-
- net/bluetooth/hci_sync.c          |  32 ++--
- net/bluetooth/iso.c               | 262 ++++++++++++++++++++++++++++--
- 7 files changed, 393 insertions(+), 55 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ include/net/bluetooth/hci_core.h  | 14 +++++++
+ include/net/bluetooth/l2cap.h     |  9 +++++
+ net/bluetooth/hci_event.c         | 20 ++++++---
+ net/bluetooth/hci_sync.c          | 15 ++++++-
+ net/bluetooth/l2cap_core.c        | 67 ++++++++++++++++++++++++++++++-
+ net/bluetooth/l2cap_sock.c        | 27 +++++++++++--
+ net/bluetooth/rfcomm/sock.c       | 13 ++++--
+ 8 files changed, 152 insertions(+), 14 deletions(-)
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index fbedd1ebd051..d59407349b3e 100644
+index d59407349b3e..777bc1a0336b 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -235,6 +235,89 @@ struct bt_iso_qos {
- 	};
+@@ -66,6 +66,7 @@
+ struct bt_security {
+ 	__u8 level;
+ 	__u8 key_size;
++	__u8 mic_len;
  };
- 
-+/* Extended ISO QoS, set and read with BT_ISO_QOS.
-+ *
-+ * The option length tells it apart from struct bt_iso_qos, which is kept for
-+ * existing applications. New fields are added by extending this struct rather
-+ * than by adding new socket options or structs:
-+ *
-+ * - version tells which fields are valid, so later versions can add fields
-+ *   while older applications keep working with the fields they know.
-+ * - type tells which member of the union is in use. The QoS is usually set
-+ *   before bind() or connect(), so the socket can't tell unicast from
-+ *   broadcast at that point. With type, struct bt_iso_ucast_qos_ext and
-+ *   struct bt_iso_bcast_qos_ext can each grow on their own, by adding fields
-+ *   at their end, without the kernel having to guess which one it was given.
-+ *   For that the union shall remain the last member.
-+ *
-+ * BT_ISO_QOS_ANY leaves the type to be set by connect() or listen(), which is
-+ * possible with version 1 since its unicast fields are a prefix of the
-+ * broadcast ones. A type that doesn't match how the socket is used makes
-+ * connect() or listen() fail with -EINVAL, or setsockopt() on a socket that
-+ * already has a connection, such as with deferred setup. getsockopt() reports
-+ * the type in use once it is known.
-+ *
-+ * Version 1 adds the HDT rates of each direction, see BT_ISO_HDT_RATE_*, used
-+ * when the PHY is BT_ISO_PHY_HDT; 0 means every rate the controller supports.
-+ */
-+#define BT_ISO_QOS_VERSION_1	0x0001
-+
-+#define BT_ISO_QOS_ANY		0x0000
-+#define BT_ISO_QOS_UCAST	0x0001
-+#define BT_ISO_QOS_BCAST	0x0002
-+
-+#define BT_ISO_HDT_RATE_2M	BIT(0)
-+#define BT_ISO_HDT_RATE_3M	BIT(1)
-+#define BT_ISO_HDT_RATE_4M	BIT(2)
-+#define BT_ISO_HDT_RATE_6M	BIT(3)
-+#define BT_ISO_HDT_RATE_7_5M	BIT(4)
-+
-+struct bt_iso_io_qos_ext {
-+	__u32 interval;
-+	__u16 latency;
-+	__u16 sdu;
-+	__u8  phys;
-+	__u8  rtn;
-+	__u16 rates;
-+};
-+
-+struct bt_iso_ucast_qos_ext {
-+	__u8  cig;
-+	__u8  cis;
-+	__u8  sca;
-+	__u8  packing;
-+	__u8  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
-+};
-+
-+struct bt_iso_bcast_qos_ext {
-+	__u8  big;
-+	__u8  bis;
-+	__u8  sync_factor;
-+	__u8  packing;
-+	__u8  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
-+	__u8  encryption;
-+	__u8  bcode[16];
-+	__u8  options;
-+	__u16 skip;
-+	__u16 sync_timeout;
-+	__u8  sync_cte_type;
-+	__u8  mse;
-+	__u16 timeout;
-+};
-+
-+struct bt_iso_qos_ext {
-+	__u16 version;
-+	__u16 type;
-+	union {	/* Shall be the last member */
-+		struct bt_iso_ucast_qos_ext ucast;
-+		struct bt_iso_bcast_qos_ext bcast;
-+	};
-+};
-+
- #define BT_ISO_PHY_1M		BIT(0)
- #define BT_ISO_PHY_2M		BIT(1)
- #define BT_ISO_PHY_CODED	BIT(2)
+ #define BT_SECURITY_SDP		0
+ #define BT_SECURITY_LOW		1
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 689e2a1266b4..1158ec218e1a 100644
+index 7a4f87236854..d2435bf49c5e 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -797,7 +797,7 @@ struct hci_conn {
- 	__s8		rssi;
- 	__s8		tx_power;
- 	__s8		max_tx_power;
--	struct bt_iso_qos iso_qos;
-+	struct bt_iso_qos_ext iso_qos;
- 	__u8		num_bis;
- 	__u8		bis[HCI_MAX_ISO_BIS];
+@@ -765,6 +765,8 @@ struct hci_conn {
+ 	__u8		pending_sec_level;
+ 	__u8		pin_length;
+ 	__u8		enc_key_size;
++	__u8		mic_len;
++	__u8		req_mic_len;
+ 	__u8		io_capability;
+ 	__u32		passkey_notify;
+ 	__u8		passkey_entered;
+@@ -2178,6 +2180,18 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ 	(le_feature(dev, 1, 2) & HCI_LE_HDT_7_5_TX_FEATURE)
+ #define hdt_pf1_capable(dev) \
+ 	(le_feature(dev, 1, 2) & HCI_LE_HDT_PF_1)
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.24:
++ *
++ * The HDT_MIC_Length parameter indicates the MIC length to be used when the
++ * ACL connection is on LE HDT PHY.
++ *
++ * So the MIC length reported by the controller only applies on the LE HDT
++ * PHY, the MIC is 32 bits (0x00) on the GFSK PHYs.
++ */
++static inline __u8 hci_conn_mic_len(struct hci_conn *conn)
++{
++	return conn->le_rx_phy == 0x05 ? conn->mic_len : 0x00;
++}
+ #define eks_capable(dev) \
+ 	(le_feature(dev, 1, 1) & HCI_LE_EKS_FEATURE)
  
-@@ -1678,23 +1678,24 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting, struct bt_codec *codec,
- 				 u16 timeout);
- struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
--			      __u8 dst_type, struct bt_iso_qos *qos,
-+			      __u8 dst_type, struct bt_iso_qos_ext *qos,
- 			      u16 timeout);
- struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
--			      struct bt_iso_qos *qos,
-+			      struct bt_iso_qos_ext *qos,
- 			      __u8 base_len, __u8 *base, u16 timeout);
- int hci_past_bis(struct hci_conn *conn, bdaddr_t *dst, __u8 dst_type);
- struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
--				 __u8 dst_type, struct bt_iso_qos *qos,
-+				 __u8 dst_type, struct bt_iso_qos_ext *qos,
- 				 u16 timeout);
- struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				 __u8 dst_type, __u8 sid,
--				 struct bt_iso_qos *qos,
-+				 struct bt_iso_qos_ext *qos,
- 				 __u8 data_len, __u8 *data, u16 timeout);
- struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
--		       __u8 dst_type, __u8 sid, struct bt_iso_qos *qos);
-+				    __u8 dst_type, __u8 sid,
-+				    struct bt_iso_qos_ext *qos);
- int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
--			     struct bt_iso_qos *qos, __u16 sync_handle,
-+			     struct bt_iso_qos_ext *qos, __u16 sync_handle,
- 			     __u8 num_bis, __u8 bis[]);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index a24f6a84a447..aa12250eca52 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -195,5 +195,5 @@ int hci_le_read_remote_features(struct hci_conn *conn);
- int hci_acl_change_pkt_type(struct hci_conn *conn, u16 pkt_type);
- int hci_le_set_phy(struct hci_conn *conn, u8 tx_phys, u8 rx_phys, u16 phy_opts);
- int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id);
--int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos *qos,
-+int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
- 			   u8 num_bis);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 83aed078032d..64d4cb940aaa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1120,6 +1120,12 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
- 			conn->cleanup = cis_cleanup;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 54eddcdd341f..ff80238f3a51 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -285,6 +285,13 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CR_LE_SCID_IN_USE		0x000A
+ #define L2CAP_CR_LE_UNACCEPT_PARAMS	0x000B
+ #define L2CAP_CR_LE_INVALID_PARAMS	0x000C
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part A, Sections 4.23
++ * and 4.26: "Connection refused - MIC length too short" is 0x000C and "All
++ * connections refused - MIC length too short" is 0x0010. The LE Credit Based
++ * value is Invalid Parameters in the Enhanced Credit Based one.
++ */
++#define L2CAP_CR_LE_MIC_LEN_TOO_SHORT	0x000C
++#define L2CAP_CR_ECRED_MIC_LEN_TOO_SHORT	0x0010
  
- 		conn->mtu = hdev->iso_mtu;
-+
-+		/* Set for connections the controller sets up, such as an
-+		 * incoming CIS, sockets replace it with their own QoS.
-+		 */
-+		conn->iso_qos.version = BT_ISO_QOS_VERSION_1;
-+		conn->iso_qos.type = BT_ISO_QOS_UCAST;
- 		break;
- 	case PA_LINK:
- 	case BIS_LINK:
-@@ -1127,6 +1133,8 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
- 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
- 		conn->cleanup = bis_cleanup;
- 		conn->mtu = hdev->iso_mtu;
-+		conn->iso_qos.version = BT_ISO_QOS_VERSION_1;
-+		conn->iso_qos.type = BT_ISO_QOS_BCAST;
- 		break;
- 	case SCO_LINK:
- 		if (lmp_esco_capable(hdev))
-@@ -1637,7 +1645,7 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
- 	return 0;
- }
+ /* connect/create channel status */
+ #define L2CAP_CS_NO_INFO	0x0000
+@@ -533,6 +540,7 @@ struct l2cap_chan {
+ 	__u8		chan_policy;
  
--static int qos_set_big(struct hci_dev *hdev, struct bt_iso_qos *qos)
-+static int qos_set_big(struct hci_dev *hdev, struct bt_iso_qos_ext *qos)
- {
- 	struct hci_conn *conn;
- 	u8  big;
-@@ -1661,7 +1669,7 @@ static int qos_set_big(struct hci_dev *hdev, struct bt_iso_qos *qos)
- 	return 0;
- }
+ 	__u8		sec_level;
++	__u8		mic_len;
  
--static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
-+static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos_ext *qos)
- {
- 	struct hci_conn *conn;
- 	u8  bis;
-@@ -1703,7 +1711,7 @@ static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
+ 	__u8		ident;
  
- /* This function requires the caller holds hdev->lock */
- static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
--				    __u8 sid, struct bt_iso_qos *qos,
-+				    __u8 sid, struct bt_iso_qos_ext *qos,
- 				    __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
-@@ -1938,7 +1946,7 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	return sco;
- }
- 
--static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
-+static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos_ext *qos)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct iso_list_data data;
-@@ -1961,7 +1969,7 @@ static int set_cig_params_sync(struct hci_dev *hdev, void *data)
- 	return hci_le_set_cig_params_sync(hdev, cig_id);
- }
- 
--static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
-+static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos_ext *qos)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct iso_list_data data;
-@@ -2037,7 +2045,7 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
- }
- 
- struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
--			      __u8 dst_type, struct bt_iso_qos *qos,
-+			      __u8 dst_type, struct bt_iso_qos_ext *qos,
- 			      u16 timeout)
- {
- 	struct hci_conn *cis;
-@@ -2180,7 +2188,7 @@ int hci_le_create_cis_pending(struct hci_dev *hdev)
- }
- 
- static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
--			      struct bt_iso_io_qos *qos, __u8 phys)
-+			      struct bt_iso_io_qos_ext *qos, __u8 phys)
- {
- 	/* Only set MTU if PHY is enabled */
- 	if (!qos->sdu && qos->phys)
-@@ -2205,7 +2213,7 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
- static int create_big_sync(struct hci_dev *hdev, void *data)
- {
- 	struct hci_conn *conn = data;
--	struct bt_iso_qos *qos = &conn->iso_qos;
-+	struct bt_iso_qos_ext *qos = &conn->iso_qos;
- 	u16 interval, sync_interval = 0;
- 	u32 flags = 0;
- 	int err;
-@@ -2234,7 +2242,7 @@ static int create_big_sync(struct hci_dev *hdev, void *data)
- 
- struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- 				    __u8 dst_type, __u8 sid,
--				    struct bt_iso_qos *qos)
-+				    struct bt_iso_qos_ext *qos)
- {
- 	struct hci_conn *conn;
- 
-@@ -2257,7 +2265,7 @@ struct hci_conn *hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst,
- }
- 
- int hci_conn_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
--			     struct bt_iso_qos *qos, __u16 sync_handle,
-+			     struct bt_iso_qos_ext *qos, __u16 sync_handle,
- 			     __u8 num_bis, __u8 bis[])
- {
- 	int err;
-@@ -2308,7 +2316,7 @@ static void create_big_complete(struct hci_dev *hdev, void *data, int err)
- }
- 
- struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
--			      struct bt_iso_qos *qos,
-+			      struct bt_iso_qos_ext *qos,
- 			      __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
-@@ -2396,7 +2404,7 @@ static void bis_mark_per_adv(struct hci_conn *conn, void *data)
- 
- struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 				 __u8 dst_type, __u8 sid,
--				 struct bt_iso_qos *qos,
-+				 struct bt_iso_qos_ext *qos,
- 				 __u8 base_len, __u8 *base, u16 timeout)
- {
- 	struct hci_conn *conn;
-@@ -2447,7 +2455,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- }
- 
- struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
--				 __u8 dst_type, struct bt_iso_qos *qos,
-+				 __u8 dst_type, struct bt_iso_qos_ext *qos,
- 				 u16 timeout)
- {
- 	struct hci_conn *le;
+@@ -981,6 +989,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		    const struct sockcm_cookie *sockc);
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail);
++void l2cap_chan_req_mic_len(struct l2cap_chan *chan, struct hci_conn *hcon);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cdf010a2c37f..f7297179e69c 100644
+index ca4f9780beda..3e6a0e9f66fc 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -7389,7 +7389,7 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+@@ -3777,10 +3777,11 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
+ }
+ 
+ /* key_size is the encryption key size of an ACL link reported by the event,
+- * or 0 if it doesn't report it, in which case it is read.
++ * or 0 if it doesn't report it, in which case it is read. mic_len is the MIC
++ * length reported by the event, 0x00 (32 bits) if it doesn't report it.
+  */
+ static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt,
+-			       u8 key_size)
++			       u8 key_size, u8 mic_len)
  {
- 	struct hci_evt_le_cis_established *ev = data;
- 	struct hci_conn *conn;
--	struct bt_iso_qos *qos;
-+	struct bt_iso_qos_ext *qos;
- 	bool pending = false;
- 	u16 handle = __le16_to_cpu(ev->handle);
- 	u32 c_sdu_interval, p_sdu_interval;
-@@ -7415,6 +7415,10 @@ static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
+ 	struct hci_dev *hdev = conn->hdev;
  
- 	qos = &conn->iso_qos;
+@@ -3799,6 +3800,9 @@ static void hci_change_encrypt(struct hci_conn *conn, u8 status, u8 encrypt,
+ 			    conn->type == LE_LINK)
+ 				set_bit(HCI_CONN_AES_CCM, conn->flags);
  
-+	/* This version of the event doesn't report the HDT rates */
-+	qos->ucast.in.rates = 0x0000;
-+	qos->ucast.out.rates = 0x0000;
++			/* A 32-bit MIC is reported as 0x00 */
++			conn->mic_len = mic_len;
 +
- 	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, conn->flags);
+ 			/* For ACL links the encryption key size is still
+ 			 * validated below by hci_conn_enc_key_size_set(),
+ 			 * once known. It reports the final security level so
+@@ -3915,8 +3919,10 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
  
- 	/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 6, Part G
-@@ -7564,7 +7568,7 @@ static int hci_iso_term_big_sync(struct hci_dev *hdev, void *data)
+-	/* This version doesn't report the key size, so it is read */
+-	hci_change_encrypt(conn, ev->status, ev->encrypt, 0x00);
++	/* This version doesn't report the key size, so it is read, nor the
++	 * MIC length.
++	 */
++	hci_change_encrypt(conn, ev->status, ev->encrypt, 0x00, 0x00);
  
- static void hci_le_create_big_complete(struct hci_dev *hdev, u8 status,
- 				       u8 handle, u8 num_bis,
--				       const __le16 *bis_handle)
-+				       const __le16 *bis_handle, u16 rates)
- {
- 	struct hci_conn *conn;
- 	__u8 i = 0;
-@@ -7606,6 +7610,7 @@ static void hci_le_create_big_complete(struct hci_dev *hdev, u8 status,
- 		}
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -3955,7 +3961,7 @@ static void hci_encrypt_change_v3_evt(struct hci_dev *hdev, void *data,
+ 	    ev->key_size >= 0x07 && ev->key_size <= 0x10)
+ 		key_size = ev->key_size;
  
- 		conn->state = BT_CONNECTED;
-+		conn->iso_qos.bcast.out.rates = rates;
- 		set_bit(HCI_CONN_BIG_CREATED, conn->flags);
- 		hci_debugfs_create_conn(conn);
- 		hci_conn_add_sysfs(conn);
-@@ -7639,7 +7644,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- 		return;
+-	hci_change_encrypt(conn, ev->status, ev->mode, key_size);
++	hci_change_encrypt(conn, ev->status, ev->mode, key_size, ev->mic_len);
  
- 	hci_le_create_big_complete(hdev, ev->status, ev->handle, ev->num_bis,
--				   ev->bis_handle);
-+				   ev->bis_handle, 0x0000);
- }
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -5741,6 +5747,10 @@ static void hci_key_refresh_complete_v2_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
  
- static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
-@@ -7895,7 +7900,7 @@ static void hci_le_cis_established_evt_v3(struct hci_dev *hdev, void *data,
- {
- 	struct hci_evt_le_cis_established_v3 *ev = data;
- 	struct hci_conn *conn;
--	struct bt_iso_qos *qos;
-+	struct bt_iso_qos_ext *qos;
- 	bool pending = false;
- 	u16 handle = __le16_to_cpu(ev->handle);
- 	u32 c_sdu_interval, p_sdu_interval;
-@@ -7941,6 +7946,8 @@ static void hci_le_cis_established_evt_v3(struct hci_dev *hdev, void *data,
- 		qos->ucast.out.sdu = ev->p_bn ? le16_to_cpu(ev->p_sdu) : 0;
- 		qos->ucast.in.phys = le_phy_qos(ev->c_phy);
- 		qos->ucast.out.phys = le_phy_qos(ev->p_phy);
-+		qos->ucast.in.rates = le16_to_cpu(ev->c_rates);
-+		qos->ucast.out.rates = le16_to_cpu(ev->p_rates);
- 		break;
- 	case HCI_ROLE_MASTER:
- 		qos->ucast.in.interval = p_sdu_interval;
-@@ -7956,6 +7963,8 @@ static void hci_le_cis_established_evt_v3(struct hci_dev *hdev, void *data,
- 		qos->ucast.in.sdu = ev->p_bn ? le16_to_cpu(ev->p_sdu) : 0;
- 		qos->ucast.out.phys = le_phy_qos(ev->c_phy);
- 		qos->ucast.in.phys = le_phy_qos(ev->p_phy);
-+		qos->ucast.out.rates = le16_to_cpu(ev->c_rates);
-+		qos->ucast.in.rates = le16_to_cpu(ev->p_rates);
- 		break;
- 	}
++	/* The key refresh may change the MIC length */
++	if (!ev->status)
++		conn->mic_len = ev->mic_len;
++
+ 	hci_conn_refresh_key(conn, ev->status);
  
-@@ -7990,7 +7999,8 @@ static void hci_le_create_big_complete_v2_evt(struct hci_dev *hdev, void *data,
- 		return;
- 
- 	hci_le_create_big_complete(hdev, ev->status, ev->handle, ev->num_bis,
--				   ev->bis_handle);
-+				   ev->bis_handle,
-+				   le16_to_cpu(ev->rates));
- }
- 
- #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
+ unlock:
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 389a184591ac..57d30fd9afc0 100644
+index 06b54857fd91..b892aef12121 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -3187,7 +3187,7 @@ static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
- 			conn = hci_conn_hash_lookup_ba(hdev, PA_LINK,
- 						       &bdaddr);
- 			if (conn) {
--				struct bt_iso_qos *qos = &conn->iso_qos;
-+				struct bt_iso_qos_ext *qos = &conn->iso_qos;
- 
- 				if (qos->bcast.in.phys & BT_ISO_PHY_1M ||
- 				    qos->bcast.in.phys & BT_ISO_PHY_2M) {
-@@ -7893,7 +7893,7 @@ static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
- }
- 
- static int hci_le_past_params_sync(struct hci_dev *hdev, struct hci_conn *conn,
--				   u16 acl_handle, struct bt_iso_qos *qos)
-+				   u16 acl_handle, struct bt_iso_qos_ext *qos)
+@@ -8670,8 +8670,21 @@ static void le_enable_encrypt_failed(struct hci_dev *hdev, __le16 handle)
+ static int hci_le_enable_encrypt_v2_sync(struct hci_dev *hdev, void *data)
  {
- 	struct hci_cp_le_past_params cp;
- 	int err;
-@@ -7927,7 +7927,7 @@ static int hci_le_pa_create_sync(struct hci_dev *hdev, void *data)
- {
- 	struct hci_cp_le_pa_create_sync cp;
- 	struct hci_conn *conn = data, *le;
--	struct bt_iso_qos *qos = &conn->iso_qos;
-+	struct bt_iso_qos_ext *qos = &conn->iso_qos;
+ 	struct hci_cp_le_enable_encrypt_v2 *cp = data;
++	struct hci_conn *conn;
  	int err;
  
- 	if (!hci_conn_valid(hdev, conn))
-@@ -8068,7 +8068,7 @@ static int hci_le_big_create_sync(struct hci_dev *hdev, void *data)
- 	DEFINE_FLEX(struct hci_cp_le_big_create_sync, cp, bis, num_bis,
- 		    HCI_MAX_ISO_BIS);
- 	struct hci_conn *conn = data;
--	struct bt_iso_qos *qos = &conn->iso_qos;
-+	struct bt_iso_qos_ext *qos = &conn->iso_qos;
- 	int err;
- 
- 	if (!hci_conn_valid(hdev, conn))
-@@ -8429,7 +8429,7 @@ static int hci_le_set_cig_params_v2_sync(struct hci_dev *hdev, u8 cig_id)
- 	DEFINE_FLEX(struct hci_cp_le_set_cig_params_v2, pdu, cis, num_cis,
- 		    HCI_LE_CIG_PARAMS_V2_MAX_CIS);
- 	struct hci_conn *conn;
--	struct bt_iso_qos *qos;
-+	struct bt_iso_qos_ext *qos;
- 	u8 aux_num_cis = 0;
- 	u8 cis_id;
- 
-@@ -8476,11 +8476,16 @@ static int hci_le_set_cig_params_v2_sync(struct hci_dev *hdev, u8 cig_id)
- 		cis->c_rtn  = qos->ucast.out.rtn;
- 		cis->p_rtn  = qos->ucast.in.rtn;
- 
-+		/* Use the rates of each direction, or all the HDT rates the
-+		 * controller supports if none were set.
-+		 */
- 		if (cis->c_phys & HCI_LE_SET_PHY_HDT)
--			cis->c_hdt_rates = cpu_to_le16(hci_hdt_tx_rates(hdev));
-+			cis->c_hdt_rates = cpu_to_le16(qos->ucast.out.rates ? :
-+						       hci_hdt_tx_rates(hdev));
- 
- 		if (cis->p_phys & HCI_LE_SET_PHY_HDT)
--			cis->p_hdt_rates = cpu_to_le16(hci_hdt_rx_rates(hdev));
-+			cis->p_hdt_rates = cpu_to_le16(qos->ucast.in.rates ? :
-+						       hci_hdt_rx_rates(hdev));
- 	}
- 	pdu->num_cis = aux_num_cis;
- 
-@@ -8499,7 +8504,7 @@ int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id)
- {
- 	DEFINE_FLEX(struct hci_cp_le_set_cig_params, pdu, cis, num_cis, 0x1f);
- 	struct hci_conn *conn;
--	struct bt_iso_qos *qos;
-+	struct bt_iso_qos_ext *qos;
- 	u8 aux_num_cis = 0;
- 	u8 cis_id;
- 
-@@ -8562,7 +8567,7 @@ int hci_le_set_cig_params_sync(struct hci_dev *hdev, u8 cig_id)
- }
- 
- static int hci_le_create_big_v2_sync(struct hci_conn *conn,
--				     struct bt_iso_qos *qos, u8 num_bis)
-+				     struct bt_iso_qos_ext *qos, u8 num_bis)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_cp_le_create_big_v2 cp;
-@@ -8581,15 +8586,18 @@ static int hci_le_create_big_v2_sync(struct hci_conn *conn,
- 	cp.bis.encryption = qos->bcast.encryption;
- 	memcpy(cp.bis.bcode, qos->bcast.bcode, sizeof(cp.bis.bcode));
- 
--	/* Check if HDT PHY is set then enable HDT supported rates */
-+	/* Use the rates set, or all the HDT rates the controller supports if
-+	 * none were set.
++	/* Use the MIC length requested by the time the command is sent, as
++	 * channels may still raise it after it was queued, defaulting to 128
++	 * bits if unset.
 +	 */
- 	if (cp.bis.phys & HCI_LE_SET_PHY_HDT)
--		cp.bis.hdt_rates = cpu_to_le16(hci_hdt_tx_rates(hdev));
-+		cp.bis.hdt_rates = cpu_to_le16(qos->bcast.out.rates ? :
-+					       hci_hdt_tx_rates(hdev));
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG_V2,
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, le16_to_cpu(cp->handle));
++	if (conn)
++		cp->mic_len = conn->req_mic_len ? conn->req_mic_len : 0x02;
++
++	hci_dev_unlock(hdev);
++
+ 	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_ENABLE_ENCRYPT_V2,
+ 				    sizeof(*cp), cp, HCI_CMD_TIMEOUT);
+ 	if (err)
+@@ -8696,8 +8709,6 @@ static int hci_le_enable_encrypt_v2(struct hci_conn *conn, __le16 ediv,
+ 	cp->handle = cpu_to_le16(conn->handle);
+ 	cp->rand = rand;
+ 	cp->ediv = ediv;
+-	cp->mic_len = 0x02; /* Always prefer 128 bits? */
+-
+ 	/* The key is zero padded when shorter than 16 octets */
+ 	if (ltk) {
+ 		memcpy(cp->ltk, ltk, key_size);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 70ad30b091e4..d3b4153ee58e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -579,6 +579,7 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *pchan)
+ 		chan->tx_win = pchan->tx_win;
+ 		chan->tx_win_max = pchan->tx_win_max;
+ 		chan->sec_level = pchan->sec_level;
++		chan->mic_len = pchan->mic_len;
+ 		chan->conf_state = pchan->conf_state;
+ 		chan->flags = pchan->flags;
+ 		chan->tx_credits = pchan->tx_credits;
+@@ -1025,14 +1026,26 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
+ 	}
  }
  
--int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos *qos,
-+int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
- 			   u8 num_bis)
- {
- 	struct hci_dev *hdev = conn->hdev;
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index cc6c8b7ba027..e945bd2b33e5 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -75,7 +75,7 @@ struct iso_pinfo {
- 	__u8			bc_bis[ISO_MAX_NUM_BIS];
- 	__u16			sync_handle;
- 	unsigned long		flags;
--	struct bt_iso_qos	qos;
-+	struct bt_iso_qos_ext	qos;
- 	bool			qos_user_set;
- 	__u8			base_len;
- 	__u8			base[BASE_MAX_LENGTH];
-@@ -83,10 +83,23 @@ struct iso_pinfo {
- 	struct delayed_work	timeout_work;
- };
- 
--static struct bt_iso_qos default_qos;
-+static struct bt_iso_qos_ext default_qos;
-+
-+static bool check_ucast_qos(struct bt_iso_qos_ext *qos);
-+static bool check_bcast_qos(struct bt_iso_qos_ext *qos);
-+
-+/* The type is set by the first connect() or listen() if left as
-+ * BT_ISO_QOS_ANY, otherwise it has to match how the socket is used, see
-+ * struct bt_iso_qos_ext.
++/* Raise the MIC length requested for the connection to the one the channel
++ * requires, so the next time encryption is started it asks for it.
 + */
-+static bool iso_qos_check_type(struct bt_iso_qos_ext *qos, u16 type)
++void l2cap_chan_req_mic_len(struct l2cap_chan *chan, struct hci_conn *hcon)
 +{
-+	if (qos->type == BT_ISO_QOS_ANY)
-+		qos->type = type;
-+
-+	return qos->type == type;
++	if (chan->mic_len > hcon->req_mic_len)
++		hcon->req_mic_len = chan->mic_len;
 +}
++
+ /* Service level security */
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	__u8 auth_type;
  
--static bool check_ucast_qos(struct bt_iso_qos *qos);
--static bool check_bcast_qos(struct bt_iso_qos *qos);
- static bool iso_match_sid(struct sock *sk, void *data);
- static bool iso_match_sid_past(struct sock *sk, void *data);
- static bool iso_match_sync_handle(struct sock *sk, void *data);
-@@ -427,6 +440,12 @@ static int iso_connect_bis(struct sock *sk)
+-	if (conn->hcon->type == LE_LINK)
++	if (conn->hcon->type == LE_LINK) {
++		l2cap_chan_req_mic_len(chan, conn->hcon);
++
+ 		return smp_conn_security(conn->hcon, chan->sec_level);
++	}
+ 
+ 	auth_type = l2cap_get_auth_type(chan);
+ 
+@@ -1512,6 +1525,8 @@ static void l2cap_le_start(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 
++	l2cap_chan_req_mic_len(chan, conn->hcon);
++
+ 	if (!smp_conn_security(conn->hcon, chan->sec_level))
+ 		return;
+ 
+@@ -1579,6 +1594,18 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon,
+ 		hcon->enc_key_size >= min_key_size);
+ }
+ 
++static bool l2cap_check_mic_len(struct hci_conn *hcon, struct l2cap_chan *chan)
++{
++	/* If the channel has no MIC length requirement, skip check */
++	if (!chan->mic_len)
++		return true;
++
++	if (!test_bit(HCI_CONN_ENCRYPT, hcon->flags))
++		return true;
++
++	return hci_conn_mic_len(hcon) >= chan->mic_len;
++}
++
+ static void l2cap_do_start(struct l2cap_chan *chan)
+ 	__must_hold(&chan->lock)
+ 	__must_hold(&chan->conn->lock)
+@@ -5119,6 +5146,7 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
+ 		/* We'll need to send a new Connect Request */
+ 		clear_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags);
+ 
++		l2cap_chan_req_mic_len(chan, hcon);
+ 		smp_conn_security(hcon, chan->sec_level);
+ 		break;
+ 
+@@ -5268,6 +5296,11 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+ 
+ 	l2cap_chan_lock(pchan);
+ 
++	/* Record the MIC length the channel requires before checking the
++	 * security, so encryption started for it requests that.
++	 */
++	l2cap_chan_req_mic_len(pchan, conn->hcon);
++
+ 	if (!smp_sufficient_security(conn->hcon, pchan->sec_level,
+ 				     SMP_ALLOW_STK)) {
+ 		result = pchan->sec_level == BT_SECURITY_MEDIUM ?
+@@ -5283,6 +5316,20 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+ 		goto response_unlock;
+ 	}
+ 
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part A,
++	 * Section 10.1:
++	 *
++	 * If an L2CAP_LE_CREDIT_BASED_CONNECTION_REQ packet is received
++	 * and the encryption key size is long enough but the MIC length is
++	 * too short, then the connection shall be rejected with a result
++	 * value of "Connection refused - MIC length too short".
++	 */
++	if (!l2cap_check_mic_len(conn->hcon, pchan)) {
++		result = L2CAP_CR_LE_MIC_LEN_TOO_SHORT;
++		chan = NULL;
++		goto response_unlock;
++	}
++
+ 	/* Check for valid dynamic CID range */
+ 	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_LE_DYN_END) {
+ 		result = L2CAP_CR_LE_INVALID_SCID;
+@@ -5494,6 +5541,11 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
+ 
+ 	l2cap_chan_lock(pchan);
+ 
++	/* Record the MIC length the channel requires before checking the
++	 * security, so encryption started for it requests that.
++	 */
++	l2cap_chan_req_mic_len(pchan, conn->hcon);
++
+ 	if (!smp_sufficient_security(conn->hcon, pchan->sec_level,
+ 				     SMP_ALLOW_STK)) {
+ 		result = pchan->sec_level == BT_SECURITY_MEDIUM ?
+@@ -5501,6 +5553,18 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
  		goto unlock;
  	}
  
-+	/* Fail if the QoS was set for the other type */
-+	if (!iso_qos_check_type(&iso_pi(sk)->qos, BT_ISO_QOS_BCAST)) {
-+		err = -EINVAL;
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part A,
++	 * Section 10.2:
++	 *
++	 * If the encryption key size is long enough but the MIC length is
++	 * too short, then the connection shall be rejected with a result
++	 * value of "All connections refused - MIC length too short".
++	 */
++	if (!l2cap_check_mic_len(conn->hcon, pchan)) {
++		result = L2CAP_CR_ECRED_MIC_LEN_TOO_SHORT;
 +		goto unlock;
 +	}
 +
- 	/* Fail if user set invalid QoS */
- 	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
- 		iso_pi(sk)->qos = default_qos;
-@@ -531,6 +550,12 @@ static int iso_connect_cis(struct sock *sk)
- 		goto unlock;
- 	}
+ 	/* Check if the listening channel has set an output MTU then the
+ 	 * requested MTU shall be less than or equal to that value.
+ 	 */
+@@ -5697,6 +5761,7 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 			/* We'll need to send a new Connect Request */
+ 			clear_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags);
  
-+	/* Fail if the QoS was set for the other type */
-+	if (!iso_qos_check_type(&iso_pi(sk)->qos, BT_ISO_QOS_UCAST)) {
-+		err = -EINVAL;
-+		goto unlock;
-+	}
-+
- 	/* Fail if user set invalid QoS */
- 	if (iso_pi(sk)->qos_user_set && !check_ucast_qos(&iso_pi(sk)->qos)) {
- 		iso_pi(sk)->qos = default_qos;
-@@ -620,7 +645,7 @@ static int iso_connect_cis(struct sock *sk)
- 	return err;
- }
++			l2cap_chan_req_mic_len(chan, hcon);
+ 			smp_conn_security(hcon, chan->sec_level);
+ 			break;
  
--static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
-+static struct bt_iso_qos_ext *iso_sock_get_qos(struct sock *sk)
- {
- 	if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
- 		return &iso_pi(sk)->conn->hcon->iso_qos;
-@@ -628,11 +653,134 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
- 	return &iso_pi(sk)->qos;
- }
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 7a2551ef7f50..8609cde925b4 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -623,8 +623,10 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		if (conn) {
+ 			sec.level = conn->hcon->sec_level;
  
-+/* The unicast QoS is a prefix of the broadcast one, with the same fields at
-+ * the same offsets, in both struct bt_iso_qos and struct bt_iso_qos_ext, so
-+ * converting the broadcast view converts either.
-+ */
-+static void iso_io_qos_to_ext(const struct bt_iso_io_qos *io,
-+			      struct bt_iso_io_qos_ext *ext)
-+{
-+	ext->interval = io->interval;
-+	ext->latency = io->latency;
-+	ext->sdu = io->sdu;
-+	ext->phys = io->phys;
-+	ext->rtn = io->rtn;
-+	ext->rates = 0x0000;
-+}
-+
-+static void iso_io_qos_from_ext(const struct bt_iso_io_qos_ext *ext,
-+				struct bt_iso_io_qos *io)
-+{
-+	io->interval = ext->interval;
-+	io->latency = ext->latency;
-+	io->sdu = ext->sdu;
-+	io->phys = ext->phys;
-+	io->rtn = ext->rtn;
-+}
-+
-+static void iso_io_qos_ext_copy(const struct bt_iso_io_qos_ext *src,
-+				struct bt_iso_io_qos_ext *dst)
-+{
-+	dst->interval = src->interval;
-+	dst->latency = src->latency;
-+	dst->sdu = src->sdu;
-+	dst->phys = src->phys;
-+	dst->rtn = src->rtn;
-+	dst->rates = src->rates;
-+}
-+
-+/* Copy field by field so the padding, which the likes of hci_add_bis()
-+ * compare with memcmp(), is zeroed rather than copied from or to userspace.
-+ *
-+ * In version 1 the unicast fields are a prefix of the broadcast ones, so
-+ * copying the broadcast view copies either type. Fields added later to only
-+ * one of them will need copying according to type.
-+ */
-+static void iso_qos_ext_copy(const struct bt_iso_qos_ext *src,
-+			     struct bt_iso_qos_ext *dst)
-+{
-+	const struct bt_iso_bcast_qos_ext *s = &src->bcast;
-+	struct bt_iso_bcast_qos_ext *d = &dst->bcast;
-+
-+	memset(dst, 0, sizeof(*dst));
-+	dst->version = BT_ISO_QOS_VERSION_1;
-+	dst->type = src->type;
-+
-+	d->big = s->big;
-+	d->bis = s->bis;
-+	d->sync_factor = s->sync_factor;
-+	d->packing = s->packing;
-+	d->framing = s->framing;
-+	iso_io_qos_ext_copy(&s->in, &d->in);
-+	iso_io_qos_ext_copy(&s->out, &d->out);
-+	d->encryption = s->encryption;
-+	memcpy(d->bcode, s->bcode, sizeof(d->bcode));
-+	d->options = s->options;
-+	d->skip = s->skip;
-+	d->sync_timeout = s->sync_timeout;
-+	d->sync_cte_type = s->sync_cte_type;
-+	d->mse = s->mse;
-+	d->timeout = s->timeout;
-+}
-+
-+static void iso_qos_to_ext(const struct bt_iso_qos *qos,
-+			   struct bt_iso_qos_ext *ext)
-+{
-+	const struct bt_iso_bcast_qos *b = &qos->bcast;
-+	struct bt_iso_bcast_qos_ext *e = &ext->bcast;
-+
-+	memset(ext, 0, sizeof(*ext));
-+	ext->version = BT_ISO_QOS_VERSION_1;
-+	/* struct bt_iso_qos has no type, connect() or listen() sets it */
-+	ext->type = BT_ISO_QOS_ANY;
-+
-+	e->big = b->big;
-+	e->bis = b->bis;
-+	e->sync_factor = b->sync_factor;
-+	e->packing = b->packing;
-+	e->framing = b->framing;
-+	iso_io_qos_to_ext(&b->in, &e->in);
-+	iso_io_qos_to_ext(&b->out, &e->out);
-+	e->encryption = b->encryption;
-+	memcpy(e->bcode, b->bcode, sizeof(e->bcode));
-+	e->options = b->options;
-+	e->skip = b->skip;
-+	e->sync_timeout = b->sync_timeout;
-+	e->sync_cte_type = b->sync_cte_type;
-+	e->mse = b->mse;
-+	e->timeout = b->timeout;
-+}
-+
-+static void iso_qos_from_ext(const struct bt_iso_qos_ext *ext,
-+			     struct bt_iso_qos *qos)
-+{
-+	const struct bt_iso_bcast_qos_ext *e = &ext->bcast;
-+	struct bt_iso_bcast_qos *b = &qos->bcast;
-+
-+	memset(qos, 0, sizeof(*qos));
-+
-+	b->big = e->big;
-+	b->bis = e->bis;
-+	b->sync_factor = e->sync_factor;
-+	b->packing = e->packing;
-+	b->framing = e->framing;
-+	iso_io_qos_from_ext(&e->in, &b->in);
-+	iso_io_qos_from_ext(&e->out, &b->out);
-+	b->encryption = e->encryption;
-+	memcpy(b->bcode, e->bcode, sizeof(b->bcode));
-+	b->options = e->options;
-+	b->skip = e->skip;
-+	b->sync_timeout = e->sync_timeout;
-+	b->sync_cte_type = e->sync_cte_type;
-+	b->mse = e->mse;
-+	b->timeout = e->timeout;
-+}
-+
- static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
- 			  const struct sockcm_cookie *sockc)
- {
- 	struct iso_conn *conn = iso_pi(sk)->conn;
--	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
-+	struct bt_iso_qos_ext *qos = iso_sock_get_qos(sk);
- 	struct hci_iso_data_hdr *hdr;
- 	int len = 0;
- 
-@@ -1009,7 +1157,8 @@ static struct proto iso_proto = {
- 	.rtn		= 2u, \
- }
- 
--static struct bt_iso_qos default_qos = {
-+static struct bt_iso_qos_ext default_qos = {
-+	.version = BT_ISO_QOS_VERSION_1,
- 	.bcast = {
- 		.big			= BT_ISO_QOS_BIG_UNSET,
- 		.bis			= BT_ISO_QOS_BIS_UNSET,
-@@ -1375,6 +1524,12 @@ static int iso_listen_bis(struct sock *sk)
- 		goto unlock;
- 	}
- 
-+	/* Fail if the QoS was set for the other type */
-+	if (!iso_qos_check_type(&iso_pi(sk)->qos, BT_ISO_QOS_BCAST)) {
-+		err = -EINVAL;
-+		goto unlock;
-+	}
-+
- 	/* Fail if user set invalid QoS */
- 	if (iso_pi(sk)->qos_user_set && !check_bcast_qos(&iso_pi(sk)->qos)) {
- 		iso_pi(sk)->qos = default_qos;
-@@ -1417,6 +1572,10 @@ static int iso_listen_cis(struct sock *sk)
- 
- 	BT_DBG("%pMR", &iso_pi(sk)->src);
- 
-+	/* Fail if the QoS was set for the other type */
-+	if (!iso_qos_check_type(&iso_pi(sk)->qos, BT_ISO_QOS_UCAST))
-+		return -EINVAL;
-+
- 	write_lock(&iso_sk_list.lock);
- 
- 	if (__iso_get_sock_listen_by_addr(&iso_pi(sk)->src, &iso_pi(sk)->dst))
-@@ -1863,7 +2022,7 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return bt_sock_recvmsg(sock, msg, len, flags);
- }
- 
--static bool check_io_qos(struct bt_iso_io_qos *qos)
-+static bool check_io_qos(struct bt_iso_io_qos_ext *qos)
- {
- 	/* If no PHY is enable SDU must be 0 */
- 	if (!qos->phys && qos->sdu)
-@@ -1878,10 +2037,19 @@ static bool check_io_qos(struct bt_iso_io_qos *qos)
- 	if (qos->phys & ~(BT_ISO_PHY_ANY | BT_ISO_PHY_HDT))
- 		return false;
- 
-+	/* Rates only apply to the LE HDT PHY */
-+	if (qos->rates & ~(BT_ISO_HDT_RATE_2M | BT_ISO_HDT_RATE_3M |
-+			   BT_ISO_HDT_RATE_4M | BT_ISO_HDT_RATE_6M |
-+			   BT_ISO_HDT_RATE_7_5M))
-+		return false;
-+
-+	if (qos->rates && !(qos->phys & BT_ISO_PHY_HDT))
-+		return false;
-+
- 	return true;
- }
- 
--static bool check_ucast_qos(struct bt_iso_qos *qos)
-+static bool check_ucast_qos(struct bt_iso_qos_ext *qos)
- {
- 	if (qos->ucast.cig > 0xef && qos->ucast.cig != BT_ISO_QOS_CIG_UNSET)
- 		return false;
-@@ -1907,7 +2075,7 @@ static bool check_ucast_qos(struct bt_iso_qos *qos)
- 	return true;
- }
- 
--static bool check_bcast_qos(struct bt_iso_qos *qos)
-+static bool check_bcast_qos(struct bt_iso_qos_ext *qos)
- {
- 	if (!qos->bcast.sync_factor)
- 		qos->bcast.sync_factor = 0x01;
-@@ -1959,7 +2127,9 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
- {
- 	struct sock *sk = sock->sk;
- 	int err = 0;
--	struct bt_iso_qos qos = default_qos;
-+	struct bt_iso_qos_ext qos = default_qos;
-+	struct bt_iso_qos_ext qos_user;
-+	struct bt_iso_qos qos_old;
- 	u32 opt;
- 
- 	BT_DBG("sk %p", sk);
-@@ -2005,9 +2175,49 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
+-			if (sk->sk_state == BT_CONNECTED)
++			if (sk->sk_state == BT_CONNECTED) {
+ 				sec.key_size = conn->hcon->enc_key_size;
++				sec.mic_len = hci_conn_mic_len(conn->hcon);
++			}
+ 		} else {
+ 			sec.level = chan->sec_level;
+ 		}
+@@ -960,9 +962,16 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
  			break;
  		}
  
--		err = copy_safe_from_sockptr(&qos, sizeof(qos), optval, optlen);
--		if (err)
-+		/* The length of struct bt_iso_qos selects it, any other
-+		 * length is struct bt_iso_qos_ext of a known version.
+-		sec.level = BT_SECURITY_LOW;
++		/* mic_len was added at the end of struct bt_security, so
++		 * accept the shorter struct as well, leaving mic_len unset.
 +		 */
-+		if (optlen == sizeof(qos_old)) {
-+			err = copy_safe_from_sockptr(&qos_old, sizeof(qos_old),
-+						     optval, optlen);
-+			if (err)
-+				break;
-+
-+			iso_qos_to_ext(&qos_old, &qos);
-+		} else {
-+			if (optlen < sizeof(qos)) {
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			err = copy_struct_from_sockptr(&qos_user,
-+						       sizeof(qos_user),
-+						       optval, optlen);
-+			if (err)
-+				break;
-+
-+			if (qos_user.version != BT_ISO_QOS_VERSION_1 ||
-+			    qos_user.type > BT_ISO_QOS_BCAST) {
-+				err = -EINVAL;
-+				break;
-+			}
-+
-+			iso_qos_ext_copy(&qos_user, &qos);
-+		}
-+
-+		/* A socket that already has a connection, such as one with
-+		 * deferred setup or a PA sync, knows its type, so check it
-+		 * now as connect() or listen() won't.
-+		 */
-+		if (iso_pi(sk)->conn && iso_pi(sk)->conn->hcon &&
-+		    !iso_qos_check_type(&qos,
-+					iso_pi(sk)->conn->hcon->type ==
-+					CIS_LINK ? BT_ISO_QOS_UCAST :
-+					BT_ISO_QOS_BCAST)) {
++		if (optlen < offsetofend(struct bt_security, key_size)) {
 +			err = -EINVAL;
++			break;
++		}
+ 
+-		err = copy_safe_from_sockptr(&sec, sizeof(sec), optval, optlen);
++		err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
++					       optlen);
+ 		if (err)
  			break;
-+		}
  
- 		iso_pi(sk)->qos = qos;
- 		iso_pi(sk)->qos_user_set = true;
-@@ -2048,7 +2258,9 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 			       sockopt_t *opt)
- {
- 	struct sock *sk = sock->sk;
--	struct bt_iso_qos *qos;
-+	struct bt_iso_qos_ext *qos;
-+	struct bt_iso_qos_ext qos_ext;
-+	struct bt_iso_qos qos_old;
- 	int len, val, err = 0;
- 	u8 base_len;
- 	u8 *base;
-@@ -2083,9 +2295,25 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 	case BT_ISO_QOS:
- 		qos = iso_sock_get_qos(sk);
+@@ -972,7 +981,18 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
  
--		len = min_t(unsigned int, len, sizeof(*qos));
--		if (copy_to_iter(qos, len, &opt->iter_out) != len)
--			err = -EFAULT;
-+		/* A buffer too short for struct bt_iso_qos_ext gets
-+		 * struct bt_iso_qos, as it did before the extension.
++		/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4,
++		 * Part E, Section 7.7.8: MIC_Length 0x00 is 32 bits,
++		 * 0x01 is 64 bits and 0x02 is 128 bits; all other
++		 * values are reserved for future use.
 +		 */
-+		if (len < sizeof(*qos)) {
-+			iso_qos_from_ext(qos, &qos_old);
++		if (sec.mic_len > 0x02) {
++			err = -EINVAL;
++			break;
++		}
 +
-+			len = min_t(unsigned int, len, sizeof(qos_old));
-+			if (copy_to_iter(&qos_old, len, &opt->iter_out) != len)
-+				err = -EFAULT;
-+		} else {
-+			/* Report the version of this struct, with its padding
-+			 * zeroed.
-+			 */
-+			iso_qos_ext_copy(qos, &qos_ext);
-+
-+			len = sizeof(qos_ext);
-+			if (copy_to_iter(&qos_ext, len, &opt->iter_out) != len)
-+				err = -EFAULT;
+ 		chan->sec_level = sec.level;
++		chan->mic_len = sec.mic_len;
+ 
+ 		conn = l2cap_chan_conn(chan);
+ 		if (!conn)
+@@ -980,6 +1000,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		/* change security for LE channels */
+ 		if (chan->scid == L2CAP_CID_ATT) {
++			l2cap_chan_req_mic_len(chan, conn->hcon);
+ 			if (smp_conn_security(conn->hcon, sec.level)) {
+ 				err = -EINVAL;
+ 				break;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 3fb8b5474948..3ec2fb4ce580 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -700,9 +700,16 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		sec.level = BT_SECURITY_LOW;
++		/* mic_len was added at the end of struct bt_security, so
++		 * accept the shorter struct as well. RFCOMM ignores it.
++		 */
++		if (optlen < offsetofend(struct bt_security, key_size)) {
++			err = -EINVAL;
++			break;
 +		}
  
- 		break;
+-		err = copy_safe_from_sockptr(&sec, sizeof(sec), optval, optlen);
++		err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
++					       optlen);
+ 		if (err)
+ 			break;
  
+@@ -844,8 +851,8 @@ static int rfcomm_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
++		memset(&sec, 0, sizeof(sec));
+ 		sec.level = rfcomm_pi(sk)->sec_level;
+-		sec.key_size = 0;
+ 
+ 		len = min(len, sizeof(sec));
+ 		if (copy_to_iter(&sec, len, &sopt->iter_out) != len)
 -- 
 2.56.0
 
