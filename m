@@ -1,83 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.10
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794245529;
-	b=XvKjRgzNwzpQ6aTpkOKyRkzlpUZK6Bkde+FuEQ8tQ9+2U0xVduwTghwQukJL3Xlhu441
-	 dtNnXVcmGyWXp4GAD/8dAGnLOnVLxtALhUmFiK5tRUzAV9LzSd7OXZni4kUfJpSz6lBZJ
-	 pxvdrsCnOWinpZm9p8lnbUAn1R5sxUxH2aLURJB6vjqL5Ny4qAuPyNrkEEuPDHFpfdBiO
-	 nTbHm8nLowNbcgn0ErzmAxiFcJOCJkPInb7loSChlwHpAFa86CrPIRR/K1R51ZDvEVUWP
-	 cIBdwXjnrFFO2y+vxDoZEoOG5yZ/pLnYubVkBIC2oYtqgptqMBJrXKek5B7d1ADhtOA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794245529;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=laPTWEeOMkqqJhTVFNclKrXvQRYEuFctNHFtqsZtQ1E=;
-	b=Lg7pJ/eTE6hZwf1x/73kZF2eQKBzUMvrhmDIh7DLRfGwd5c99futMyhvbYXpwmg516E1
-	 B6FHJQ/qDklRDnaMNiYhoLLCxJ+zmTYtAX/GYhSkfVVFiXOKvwxNffu4OJ4Zym+pkHUsl
-	 27PWlf+lpA+IXf83LJIpB3VSO84JpLNnwmwXNpTFQp7VhMqUfuPG6j4/AEVkuPPYMSi2o
-	 j02rL37DSsU2wjTHvNwJuTigi5YPg2dVbfT9Hm/lzY5VRH2gSoA/LmIupgfLHJPBA6luw
-	 wX1gjHqf71hT0AC577bh8XKLhV4dOKwFwkI4tmMBxu0UoGEhPzz37KdWDhDXy067sfA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=USfmsDgn;
-	arc=none smtp.remote-ip=198.175.65.10
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.174
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794245727;
+	b=sUfQRieOXYHEYDenykblxIPt3vSv0nGdDCUcc0c8Xsy1MVscFP0GhIIWHoY28dZsqT8B
+	 9bv78TQG4wqMdOZw5Q9sdcBbfIsEx5H72VFaKTSXeyRSvs62aVdiaS4/w3tcnrH7fd5ks
+	 2od4waAcvJSpDNVkjftq/tAyPEmRdkEtoJiN0kBAzXFONgKQElsRJmZVTRtqXZlaTxAro
+	 7hsKg7csR1ToWr+4TEZAHyQEb/rHCtOGiLWQKaDBWj/yukYJXbsiEKNwtFNUVWvj24zR2
+	 qa+LMFWT2/VzrTWcNh/QQCy+CLtLlDkLQoRRplVmAugWvffF5/+3u1A1Yod54x1NRIw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794245727;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
+	b=1EKCMAAJstLtJR92CT1c7wk4FepE8+nt7GGtkVdblwObDKVQWwwgj81mLvBqQWYcLC7h
+	 iYxiqTU9JW6FOmeTGU4fGsaPdxede0O2Bsqd5uf81nHckePmAaxayUAB0Cwlj0JX1jRNO
+	 ySV28QsFwdhxcCCBeYdL0no2j04rkwQ3kPbnPCDrc9086nKbTcchj3NL+MJqEwg7AVeJJ
+	 0j2jz9JxESG1AZ4QedaAivScwpwWAXB1FdGZa6PsZsqj5UEogZlpu1tctfO9WthSAPROw
+	 51xjSjJ+c/CMvUYXcFxXxPdeWQnlplxdej9XyAk2bed8sG4rJIytuCgLmxVPQKJYbIg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="cbZFyu/y";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.174
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C537F606EE82;
-	Mon,  9 Nov 2026 17:32:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C537F606EE82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FBA606A321
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 17:35:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2FBA606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=USfmsDgn
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794245528; x=1825781528;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0qhldAf3Kz8tAv8CXuMf60nPqWBEcP1A+zW7wWEmvCo=;
-  b=USfmsDgn5e+SMrQAbajk7S/BG5l2ZNsMaYZaJrDIzSze4HSsfdbjhIOK
-   QB256gP+6FMFQPC6jeIKROSasRR1EKAJobRpBh0hfDIzSguhhvfYe67Hw
-   NlWl3+h5v2M7Le412LiQS5dLVt93RYlB2SD3b2ztdlDdDUXuA1we3am7J
-   GdHq3WhhxoDYWPeRaoZGilH8hL93h59OKWolcw35ieBX/AvF4bCt0Ycta
-   P7vArIaheOFS4UrRNVOxnMpFl9XYdlNOibjRt5Woi3bA0DCdUcSijwVyj
-   t2NViaAIQA6ahm03fCxB6jJv5R0JMKhLiiPGe4XCRrWY0q4X7xnsur+gG
-   w==;
-X-CSE-ConnectionGUID: OF+DHG4bTi6dqfXTb/etgA==
-X-CSE-MsgGUID: XfpSmtU6TpKswc736w1/KA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11961"; a="2876036"
-X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
-   d="scan'208";a="2876036"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2026 09:32:08 -0800
-X-CSE-ConnectionGUID: 32+QGz9EQvOWxu6dK+yJQg==
-X-CSE-MsgGUID: nV7pX+njRwOrl1wXb9n4Kw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
-   d="scan'208";a="7970224"
-Received: from unknown (HELO WEBAPTLH032.iind.intel.com) ([10.66.250.231])
-  by orviesa001.jf.intel.com with ESMTP; 09 Nov 2026 09:32:05 -0800
-From: Ajay KV <ajay.k.v@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	kiran.k@intel.com,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	stable@vger.kernel.org,
-	chethan.tumkur.narayan@intel.com,
-	lakshmipathi.k@intel.com,
-	Ajaykv <ajay.k.v@intel.com>
-Subject: [PATCH v1 2/3] Bluetooth: btintel_pcie: Add yoyo configuration for debug region
-Date: Mon,  9 Nov 2026 19:31:53 +0200
-Message-ID: <20261109173154.8576-2-ajay.k.v@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261109173154.8576-1-ajay.k.v@intel.com>
-References: <20261109173154.8576-1-ajay.k.v@intel.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=cbZFyu/y
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-53ec92375d2so426277b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 09:35:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794245725; cv=none;
+        d=google.com; s=arc-20260327;
+        b=H+myG9EyyXUG/F879GdGrtNhICgjw/gB1dEOqCh2wpyb9kK82bs2V8SIaINIxh7OuG
+         5zSWlCdeytIk+cXfvPi//SaTwB9gFA9fUJ8fGfC9qMNgzIXk4akkeW1xrQsVSl0Lme6m
+         3JjPSKBIRrCI0d0o4nVEWooV7tY5hpvIAjVga4iiT5j2WYAP2dtRsKNKP/bc2NzYy6rj
+         hJL/czX6V4oGOtF0ZYEmdRgmJBCFbNnvHO2w7urTsCF9+eqKWdb/6DsiT29i30WzZ//M
+         KgRwvVk0d6bzIo8oZiDyrww/LjeETYpNemvhFdhWyyDO1x/uugsygWDrsjda6JLO5cnY
+         J+Sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
+        fh=kGj5RQNHM8t1Tv+xqwQdih4syLCOTZn88PwKG9KYmCQ=;
+        b=D1V4kdC14+yGaJOXBJjDc5FPp+XsqHqLKYel2ZjWYightzWy0eo7ImLeTMLKpsrqPJ
+         //CxTWDeHCWONXtqBSQIOH7h+jy7mbJQvRkduZSoGGGzwqy5qs3mGSKZ5zjLso5m2vdB
+         W0qDJaGecM7+axZeTQxU72HjfDhvxCVssqx7dj+/FuRRTDIajHldLfipZp9Wk1hFV6io
+         F2SYyLHDAB9UhEGU+KjBVoEAcf4HOptIdsI20BAxThXufhyWHdmLDN/4risSu2E2FCoq
+         a53fEquPTypcBolSzGKfE3pl3EDWI2+TgJCLfuFqZmO/g8zSfHyu0HgOj6TNG8yhEAdd
+         aK3g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794245725; x=1794850525; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
+        b=cbZFyu/ympslBuIh6poY9KgizLvO6DKdEPXkeitWX7ov3Kg0Xvt+1xuf9Scdzdj9B+
+         8Uu0LNK2toOcHGGI0rUbxA497Q4cfiM61anQzlSptrUhEiYbfiHdVPiSrn1fAYWM7gyv
+         htRSdojLNw6tC7b3uulCFaAuYEP9TupJnrP2kgBJVVH+ykuxv+pLc3Qm5LJhG5+J4/ac
+         NMZg3aL2rqnnq42zaNIdq0hABRZemd77f9NVA6g9hyAbg3bP/zEGajOmLHB1pIcC28ln
+         YzqWQWQh7xy2tcNi3zrmajgt9OwTm/9E/ox5mX21sFYf15dOgycdkH+CFal+g6C+rWjP
+         Ke7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794245725; x=1794850525;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=l7ipEMJZfKt5QXH9IG6GaoWGg4lbzb6pAGJlboFPwcQ=;
+        b=kmpSMAtTSQ0oAJjdEesgN9F36o8+kLLoJHARS5iqhuJXFyLzZMXHOdfu5NyqEIRgz6
+         wjRhIXa3bpOw27K0Pyewdbntd8kLtZCs+LpeHlQoDJSSwW/et06G6LfSp6tjGpSAtkug
+         IjuvMVwKTcvJJA7vWOWHfgpsVZnOpuXZt47jDQ+EnHkoxwTvLl6Da1opXME9EdERJ7ht
+         dNXWcHr7HnCBQbEdpVK5U4Hd0kRO0tJBsSp8SVokdpLWg78J1j0g8MoK1advtI38J1NV
+         p9qJgTHTi/5t/2O3pf82Svd5big7xLJYRMeSgox0umySSB3u1axwyHKjFsJ75T7h+/A4
+         fAng==
+X-Forwarded-Encrypted: i=1; AL+hErHh7V0GohqLCsSPa5qOT+Wg7qAu+qQuna2IH5kUSv3IDnl03UyVw/L5KFNLbDx1oz7axMF2HEyLUDCzfKDrG5I=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9Bb43UGniNaqUosf/BruwI7U5zyl0UAuxRMWBMxzJDvEjaBAJg
+	5RLEmQM5whFMVgsxsgIPwmGODyMWfSJ6B6AqGLWzt9HN54hrUofWr8rlqHOWp36bEk1cC49h8ct
+	7qUSn34dcr/aaSVdNF1qY4Fhscbycu63N8yjLu+ZH
+X-Gm-Gg: AYBFou35VM79CGIuFYdI4QyQvcFRQzdyEJf/aYaaZ0f/kDVC145ZgrAH828g3lzXUl+
+	4RUttVbiLmrONiQisV9vbN8N3F2kr5QCz6mpBtEG8PW6TSRLTCHTkmQlS6YHH9aC3hzZRfeVJ8U
+	ewORziShCNhvYnYxA+BgXYkwzmyhtXV6B6czyuY5lkguIKdpr1diTxL60b6Fsx3Ontf9pvDTcAk
+	lwqU7xjK0oKSs3z3kdDaRDwh25WUGyKzIBU75U7sB0WXn96PE1BMt6fQEhUV9SCbHIL8EWMthT8
+	gIXqtbVeMTwgVvVVopvSPBmQr5q7bzSyaweIy7t+4LZEMQwKuePU9buK5TikTBH763yX1sdIAbL
+	mrUTC8Y05aOIaWRnnZQG5c0+48B4TIiuV3jAS8M/N1vuNbFPWTm6MaR/0XGvaASaxtamG+BiBGp
+	AqYBetV1NN1IfZU8g3kg9dEA6C62/35fsO3FApPFyupVNnovVp8Tat5tYecYAa0GTN9WTpajPL1
+	uAI6ej6
+X-Received: by 2002:a05:6808:1829:b0:543:50ad:baae with SMTP id
+ 5614622812f47-5683ce02157mr265411b6e.63.1794245725006; Mon, 09 Nov 2026
+ 09:35:25 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -87,377 +106,84 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <6af144ed.f50b2b3a.2c0de7.0010.GAE@google.com> <20261108202849.2e5c40a630e66dd39334a915@linux-foundation.org>
+In-Reply-To: <20261108202849.2e5c40a630e66dd39334a915@linux-foundation.org>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Mon, 9 Nov 2026 18:35:13 +0100
+X-Gm-Features: AclHuK-hI9rJRz-mT5ngogTQCjiUzkrA1dTOphNK2ymjlIr9_nFY1-IjXf1wnBo
+Message-ID: <CANp29Y5m+47Y5n3Y8WvCEm2UgzGBOnpMK2eqY4aO1L+hQb1yNg@mail.gmail.com>
+Subject: Re: [syzbot] [mm?] [bluetooth?] BUG: unable to handle kernel NULL
+ pointer dereference in __refill_objects_node
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: syzbot <syzbot+73e34786d639a8eb1324@syzkaller.appspotmail.com>, 
+	bsegall@google.com, david@kernel.org, dietmar.eggemann@arm.com, 
+	juri.lelli@redhat.com, kees@kernel.org, kprateek.nayak@amd.com, 
+	liam@infradead.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, ljs@kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, mgorman@suse.de, mhocko@suse.com, 
+	mingo@redhat.com, peterz@infradead.org, rostedt@goodmis.org, rppt@kernel.org, 
+	surenb@google.com, syzkaller-bugs@googlegroups.com, vbabka@kernel.org, 
+	vincent.guittot@linaro.org, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ajaykv <ajay.k.v@intel.com>
+On Mon, Nov 9, 2026 at 5:28=E2=80=AFAM Andrew Morton <akpm@linux-foundation=
+.org> wrote:
+>
+> On Sun, 08 Nov 2026 19:58:37 -0800 syzbot <syzbot+73e34786d639a8eb1324@sy=
+zkaller.appspotmail.com> wrote:
+>
+> > syzbot found the following issue on:
+> > AI-generated root cause summary:
+> > In mm/slub.c, __refill_objects_node() replenishes percpu sheaves by det=
+aching a
+> > freelist from a partial slab via get_freelist_nofreeze() and iterating =
+through
+> > the freelist pointers in a while (count && refilled < max) loop. Becaus=
+e the
+> > loop condition only checks count and refilled rather than validating th=
+at object
+> > is non-NULL, a prematurely terminated or corrupted freelist (where fewe=
+r objects
+> > are linked in slab->freelist than the expected count =3D slab->objects =
+-
+> > slab->inuse) causes object to become NULL before count reaches zero. On=
+ the
+> > subsequent iteration, get_freepointer() dereferences NULL + s->offset (=
+offset
+> > 0x400 for kmalloc-2k), resulting in an immediate kernel NULL pointer de=
+reference
+> > crash at address 0x0000000000000400.
+> >
+> > full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=3D73e34=
+786d639a8eb1324
+>
+> Thanks.
+>
+> : This looks like a bad syzkaller test, not a Bluetooth bug. The
+> : reproducer runs as root, opens the active PCI device's resource0
+> : (mode 0600), and maps its register space writable. It then places
+> : syscall arguments inside that mapping. On this GCE VM,
+> : 0000:00:02.0 is the NVMe controller; its BAR contains live control
+> : registers and queue doorbells.
 
-Add parsing of the YoYo DEBUG_REGION TLV. A region TLV defines
-a named, addressable debug region and registers it by region ID;
-it does not trigger a dump by itself. A later trigger TLV
-selects regions through a 64-bit region ID mask, and the dump
-for each selected region is dispatched based on its stored
-region type.
+Yeah, it's unfortunately a known problem.. Sorry for the noise.
 
-Each region TLV is validated for domain, version, region ID,
-region type, address list and size. Invalid entries are skipped
-with a warning. Valid regions are stored in the region list of
-the YoYo context, replacing any existing entry with the same
-region ID, and are freed when the YoYo context is cleaned up.
+I've just sent a PR[1] to prevent syzkaller from manipulating those interfa=
+ces.
+[1] https://github.com/google/syzkaller/pull/8111
 
-Signed-off-by: Ajaykv <ajay.k.v@intel.com>
----
- drivers/bluetooth/btintel_pcie_debug.c | 144 +++++++++++++++++++++++++
- drivers/bluetooth/btintel_pcie_debug.h | 133 +++++++++++++++++++++++
- 2 files changed, 277 insertions(+)
-
-diff --git a/drivers/bluetooth/btintel_pcie_debug.c b/drivers/bluetooth/btintel_pcie_debug.c
-index c52ef24dd0b0..d132214dcc8c 100644
---- a/drivers/bluetooth/btintel_pcie_debug.c
-+++ b/drivers/bluetooth/btintel_pcie_debug.c
-@@ -503,6 +503,140 @@ static int btintel_pcie_yoyo_parse_config_set(struct btintel_pcie_yoyo_ctx *ctx,
- 	return 0;
- }
- 
-+static int btintel_pcie_yoyo_parse_region(struct btintel_pcie_yoyo_ctx *ctx,
-+					  const struct btintel_pcie_tlv_region *tlv,
-+					  u32 len)
-+{
-+	struct btintel_pcie_yoyo_region *old_region, *region, *tmp;
-+	u32 addr_count = 0, addr_offset = 0, domain, version;
-+	u32 addr_bytes, alloc_id, size;
-+	u16 region_id;
-+
-+	if (len < sizeof(*tlv) - sizeof(struct btintel_pcie_tlv_hdr)) {
-+		BT_WARN("YoYo: region tlv is too short or Invalid");
-+		return -EBADMSG;
-+	}
-+
-+	domain = get_unaligned_le32(&tlv->dbg_hdr.domain);
-+	version = get_unaligned_le32(&tlv->dbg_hdr.tlv_data_version);
-+	if (domain != BTINTEL_PCIE_DOMAIN_BT ||
-+	    version != BTINTEL_PCIE_REGION_TLV_VERSION) {
-+		BT_WARN("YoYo: unsupported region domain/version (%u/%u), skipping",
-+			domain, version);
-+		return 0;
-+	}
-+
-+	region_id = get_unaligned_le16(&tlv->region_id);
-+	if (region_id > BTINTEL_PCIE_REGION_ID_MAX) {
-+		BT_WARN("YoYo: invalid region_id %u, skipping", region_id);
-+		return 0;
-+	}
-+
-+	if (tlv->region_type <= BTINTEL_PCIE_REGION_INVALID ||
-+	    tlv->region_type >= BTINTEL_PCIE_REGION_TYPE_MAX) {
-+		BT_WARN("YoYo: invalid region type %u, skipping", tlv->region_type);
-+		return 0;
-+	}
-+
-+	/* Any trailing bytes after the fixed region structure are an address
-+	 * list, regardless of region type, mirroring the reference parser.
-+	 */
-+	addr_offset = sizeof(*tlv) - sizeof(struct btintel_pcie_tlv_hdr);
-+	addr_bytes = len - addr_offset;
-+	if (addr_bytes % sizeof(__le32)) {
-+		BT_WARN("YoYo: invalid region addr_bytes length %u", addr_bytes);
-+		return 0;
-+	}
-+
-+	addr_count = addr_bytes / sizeof(__le32);
-+
-+	/* Types without a size field default to a valid dword size. */
-+	size = sizeof(u32);
-+	switch (tlv->region_type) {
-+	case BTINTEL_PCIE_REGION_DEVICE_MEM:
-+		size = get_unaligned_le32(&tlv->conf_params.dev_addr.size_bytes);
-+		fallthrough;
-+	case BTINTEL_PCIE_REGION_PERIPH_MAC:
-+	case BTINTEL_PCIE_REGION_CSR:
-+		if (!addr_count) {
-+			BT_WARN("YoYo: region id=%u type=%u has no addresses, skipping",
-+				region_id, tlv->region_type);
-+			return 0;
-+		}
-+		break;
-+	case BTINTEL_PCIE_REGION_DRAM_BUF:
-+		alloc_id = get_unaligned_le32(&tlv->conf_params.dram_alloc_id);
-+		if (alloc_id < BTINTEL_PCIE_ALLOC_ID_DBGC1 ||
-+		    alloc_id > BTINTEL_PCIE_ALLOC_ID_DBGC3) {
-+			BT_WARN("YoYo: region id=%u invalid dram alloc id %u, skipping",
-+				region_id, alloc_id);
-+			return 0;
-+		}
-+		break;
-+	case BTINTEL_PCIE_REGION_INTERNAL_BUF:
-+		size = get_unaligned_le32(&tlv->conf_params.internal_buf.size_bytes);
-+		break;
-+	case BTINTEL_PCIE_REGION_SPECIAL_DEV_MEM:
-+		size = get_unaligned_le32(&tlv->conf_params.special_dev_addr.size_bytes);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	if (!size || size % sizeof(u32)) {
-+		BT_WARN("YoYo: region id=%u type=%u invalid size %u, skipping",
-+			region_id, tlv->region_type, size);
-+		return 0;
-+	}
-+
-+	region = kzalloc(sizeof(*region), GFP_KERNEL);
-+	if (!region)
-+		return -ENOMEM;
-+
-+	region->region_id = region_id;
-+	region->dump_policy = get_unaligned_le16(&tlv->region_dump_policy);
-+	region->type = tlv->region_type;
-+	region->sub_type = tlv->region_sub_type;
-+	region->sub_type_ver = tlv->region_sub_type_ver;
-+	memcpy(region->name, tlv->region_name, BTINTEL_PCIE_REGION_NAME_LEN);
-+	memcpy(&region->conf, &tlv->conf_params, sizeof(region->conf));
-+
-+	if (addr_count) {
-+		const u8 *addr_data = (const u8 *)tlv +
-+				      sizeof(struct btintel_pcie_tlv_hdr) + addr_offset;
-+		u32 i;
-+
-+		region->addrs = kmalloc_array(addr_count, sizeof(*region->addrs),
-+					      GFP_KERNEL);
-+		if (!region->addrs) {
-+			kfree(region);
-+			return -ENOMEM;
-+		}
-+
-+		for (i = 0; i < addr_count; i++)
-+			region->addrs[i] = get_unaligned_le32(addr_data +
-+							     i * sizeof(__le32));
-+	}
-+	region->num_addrs = addr_count;
-+
-+	/* Swap into list if duplicate region_id exists, otherwise append */
-+	list_for_each_entry_safe(old_region, tmp, &ctx->region_list, list) {
-+		if (old_region->region_id == region_id) {
-+			list_replace(&old_region->list, &region->list);
-+			kfree(old_region->addrs);
-+			kfree(old_region);
-+			goto out;
-+		}
-+	}
-+
-+	list_add_tail(&region->list, &ctx->region_list);
-+
-+out:
-+	BT_DBG("YoYo: region id=%u type=%u name='%.32s'",
-+	       region->region_id, region->type, region->name);
-+	return 0;
-+}
-+
- /*
-  * Parse the optional YoYo firmware TLV stream and validate each record.
-  * This is the entry point for the runtime debug configuration payload.
-@@ -547,6 +681,8 @@ static int btintel_pcie_yoyo_parse_tlv_buffer(struct btintel_pcie_yoyo_ctx *ctx,
- 			ret = btintel_pcie_yoyo_parse_config_set(ctx, (const void *)tlv, len);
- 			break;
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_REGION:
-+			ret = btintel_pcie_yoyo_parse_region(ctx, (const void *)tlv, len);
-+			break;
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_TRIGGER:
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_HCMD:
- 		case BTINTEL_PCIE_TLV_TYPE_DBG_PRESET_OVERRIDE:
-@@ -611,6 +747,7 @@ EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_init);
- void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
- {
- 	struct btintel_pcie_yoyo_config_set *config_set, *config_tmp;
-+	struct btintel_pcie_yoyo_region *region, *region_tmp;
- 
- 	if (!ctx)
- 		return;
-@@ -627,6 +764,13 @@ void btintel_pcie_yoyo_cleanup(struct btintel_pcie_yoyo_ctx *ctx)
- 		kfree(config_set->pairs);
- 		kfree(config_set);
- 	}
-+
-+	list_for_each_entry_safe(region, region_tmp, &ctx->region_list, list) {
-+		list_del(&region->list);
-+		kfree(region->addrs);
-+		kfree(region);
-+	}
-+
- }
- EXPORT_SYMBOL_GPL(btintel_pcie_yoyo_cleanup);
- 
-diff --git a/drivers/bluetooth/btintel_pcie_debug.h b/drivers/bluetooth/btintel_pcie_debug.h
-index a9ecc7462d4e..f13107994fcf 100644
---- a/drivers/bluetooth/btintel_pcie_debug.h
-+++ b/drivers/bluetooth/btintel_pcie_debug.h
-@@ -60,6 +60,8 @@ bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data);
- #define BTINTEL_PCIE_DBG_INFO_TLV_VERSION	2
- #define BTINTEL_PCIE_BUF_ALLOC_TLV_VERSION	1
- #define BTINTEL_PCIE_CONFIG_SET_TLV_VERSION	1
-+#define BTINTEL_PCIE_REGION_TLV_VERSION		3
-+
- /* Debug Info TLV */
- #define BTINTEL_PCIE_CONFIG_NAME_LEN		64
- #define BTINTEL_PCIE_DOMAIN_BT			0
-@@ -69,6 +71,9 @@ bool btintel_pcie_fatal_err_testmode_active(struct btintel_pcie_data *data);
- #define BTINTEL_PCIE_MAX_BUF_FRAGS		16
- #define BTINTEL_PCIE_MIN_BUF_SIZE		(32 * 1024)
- #define BTINTEL_PCIE_MAX_BUF_SIZE		(4 * 1024 * 1024)
-+/* Region Tlv */
-+#define BTINTEL_PCIE_REGION_ID_MAX		63
-+#define BTINTEL_PCIE_REGION_NAME_LEN		32
- 
- enum btintel_pcie_image_tlv_type {
- 	BTINTEL_PCIE_IMAGE_TLV_TYPE_EXTERNAL	= 0x1,
-@@ -129,6 +134,42 @@ enum btintel_pcie_dbg_timepoint {
- 	BTINTEL_PCIE_TP_MAX_NUM,
- };
- 
-+/* Region types */
-+enum btintel_pcie_dbg_region_type {
-+	BTINTEL_PCIE_REGION_INVALID		= 0,
-+	BTINTEL_PCIE_REGION_TLV		= 1,
-+	BTINTEL_PCIE_REGION_INTERNAL_BUF	= 2,
-+	BTINTEL_PCIE_REGION_DRAM_BUF		= 3,
-+	BTINTEL_PCIE_REGION_DEVICE_TXFIFO	= 4,
-+	BTINTEL_PCIE_REGION_DEVICE_RXFIFO	= 5,
-+	BTINTEL_PCIE_REGION_LMAC_ERROR_TBL	= 6,
-+	BTINTEL_PCIE_REGION_UMAC_ERROR_TBL	= 7,
-+	BTINTEL_PCIE_REGION_FW_RSP_OR_NOTIF	= 8,
-+	BTINTEL_PCIE_REGION_DEVICE_MEM		= 9,
-+	BTINTEL_PCIE_REGION_PERIPH_MAC		= 10,
-+	BTINTEL_PCIE_REGION_PERIPH_PHY		= 11,
-+	BTINTEL_PCIE_REGION_PERIPH_AUX		= 12,
-+	BTINTEL_PCIE_REGION_VM			= 13,
-+	BTINTEL_PCIE_REGION_CSR			= 14,
-+	BTINTEL_PCIE_REGION_DRAM_IMR		= 15,
-+	BTINTEL_PCIE_REGION_PCI_IOSF_CFG	= 16,
-+	BTINTEL_PCIE_REGION_SPECIAL_DEV_MEM	= 17,
-+	BTINTEL_PCIE_REGION_DBGI_SRAM		= 18,
-+	BTINTEL_PCIE_REGION_TYPE_MAX
-+};
-+
-+/*
-+ * Region dump policy flags for OS dump-size limits.
-+ * @BTINTEL_PCIE_REGION_POLICY_NO_LIMIT: OS has no dump-size limit
-+ * @BTINTEL_PCIE_REGION_POLICY_MAX_600KB: Wi-Fi LKD dump request
-+ * @BTINTEL_PCIE_REGION_POLICY_MAX_5MB: Microsoft BSOD/LKD dump request
-+ */
-+enum btintel_pcie_dbg_region_policy {
-+	BTINTEL_PCIE_REGION_POLICY_NO_LIMIT	= BIT(0),
-+	BTINTEL_PCIE_REGION_POLICY_MAX_600KB	= BIT(1),
-+	BTINTEL_PCIE_REGION_POLICY_MAX_5MB	= BIT(2),
-+};
-+
- /* TLV header */
- struct btintel_pcie_tlv_hdr {
- 	__le32 type;
-@@ -209,6 +250,84 @@ struct btintel_pcie_tlv_config_set {
- 	struct btintel_pcie_addr_value addr_pair[];
- } __packed;
- 
-+/* Device address for region conf params */
-+struct btintel_pcie_tlv_dev_addr {
-+	__le32 size_bytes;
-+	__le32 addr_offset;
-+} __packed;
-+
-+/* Special device address */
-+struct btintel_pcie_tlv_special_dev_addr {
-+	__le16 special_addr_type;
-+	__le16 struct_version;
-+	__le32 base_addr;
-+	__le32 size_bytes;
-+	__le32 addr_offset;
-+} __packed;
-+
-+/* FIFOs */
-+struct btintel_pcie_tlv_fifos {
-+	__le32 fifo_ids[2];
-+	__le32 skip_data;
-+	__le32 addr_offset;
-+} __packed;
-+
-+/* Error table */
-+struct btintel_pcie_tlv_error_table {
-+	__le32 struct_version;
-+	__le32 base_addr;
-+	__le32 size_bytes;
-+	__le32 addr_offset;
-+} __packed;
-+
-+/* Internal buffer */
-+struct btintel_pcie_tlv_internal_buf {
-+	__le32 alloc_id;
-+	__le32 base_addr;
-+	__le32 size_bytes;
-+} __packed;
-+
-+/* Region conf params union */
-+union btintel_pcie_region_conf_params {
-+	struct btintel_pcie_tlv_dev_addr	dev_addr;
-+	struct btintel_pcie_tlv_special_dev_addr special_dev_addr;
-+	struct btintel_pcie_tlv_fifos	fifos;
-+	struct btintel_pcie_tlv_error_table	error_table;
-+	struct btintel_pcie_tlv_internal_buf internal_buf;
-+	__le32				dram_alloc_id;
-+	__le32				tlv_output_bitmask;
-+} __packed;
-+
-+/*
-+ * struct btintel_pcie_tlv_region - YoYo debug region TLV
-+ * @hdr: Common TLV type and payload length
-+ * @dbg_hdr: Debug TLV version and domain
-+ * @region_id: Identifier used to select this region for a trigger
-+ * @region_dump_policy: Policy flags controlling dump size limits
-+ * @region_type: Region storage or access type
-+ * @region_sub_type: Region-specific subtype
-+ * @region_sub_type_ver: Version of the region subtype data
-+ * @reserved: Reserved for future use
-+ * @region_name: Fixed-size region name
-+ * @conf_params: Type-specific fixed configuration parameters
-+ *
-+ * Describes a debug region in the packed firmware TLV. Address-based region
-+ * types may append a variable-length address array after @conf_params.
-+ * Multi-byte fields are stored in little-endian format.
-+ */
-+struct btintel_pcie_tlv_region {
-+	struct btintel_pcie_tlv_hdr hdr;
-+	struct btintel_pcie_dbg_hdr dbg_hdr;
-+	__le16 region_id;
-+	__le16 region_dump_policy;
-+	u8     region_type;
-+	u8     region_sub_type;
-+	u8     region_sub_type_ver;
-+	u8     reserved;
-+	u8     region_name[BTINTEL_PCIE_REGION_NAME_LEN];
-+	union  btintel_pcie_region_conf_params conf_params;
-+} __packed;
-+
- /* Parsed buffer allocation entry in the YoYo context */
- struct btintel_pcie_buf_alloc {
- 	u32	alloc_id;
-@@ -229,6 +348,20 @@ struct btintel_pcie_yoyo_config_set {
- 	struct btintel_pcie_addr_value	*pairs;
- };
- 
-+/* Parsed region entry */
-+struct btintel_pcie_yoyo_region {
-+	struct list_head	list;
-+	u16			region_id;
-+	u16			dump_policy;
-+	u8			type;
-+	u8			sub_type;
-+	u8			sub_type_ver;
-+	char		name[BTINTEL_PCIE_REGION_NAME_LEN];
-+	u32			num_addrs;
-+	u32			*addrs;
-+	union btintel_pcie_region_conf_params conf;
-+};
-+
- /*
-  * struct btintel_pcie_yoyo_ctx - Runtime state for YoYo debug configuration
-  * @enabled: Whether the loaded YoYo configuration passed validation
--- 
-2.53.0
-
+> :
+> : Both crash logs show NVMe completion ID and generation-counter
+> : errors immediately before the SLUB fault. During minimization, the
+> : same program produced crashes in several unrelated kernel paths,
+> : including runs without the Bluetooth operation. This points to
+> : disruption of the active NVMe device and subsequent corruption,
+> : rather than a demonstrated SLUB or Bluetooth defect.
+> :
+> : The logs do not show the precise MMIO access or establish how the
+> : freelist was damaged. Please rerun with the resource0 mapping
+> : removed and the read buffer in ordinary memory. If the SLUB fault
+> : persists without the NVMe errors, we can investigate it as a
+> : separate kernel bug.
+>
