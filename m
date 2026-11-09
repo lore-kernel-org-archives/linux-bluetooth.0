@@ -1,93 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794240978;
-	b=Z19IHddajztudCfMXaj6PJD5KeSsnO7uKnRI0DooSMbgZeXFsGP1kaVY8juLybGRhfYf
-	 Bh9rlXm1DdShQLYc3Rx5T9JxVmjxcXYqksLFeBB1XIsQUYvvFD8phSASGyclvMnFuv/Q/
-	 ywdtKqdkvevFJplk0c9UfwQwqTdKSV1i+Zgsx4gGObvg4dntZYZkir2cEvn+ibTwZwnQc
-	 PFLL/j0hQL0P3fEjU84yeLUQNggx/ePbkca5uS+768/3PxU1Ch2bKc0TYLX8HyHZ5BW4p
-	 lRPYD17/YY6XP0vV5YAn1J1nelvHnbyBUepJ253+VPQ9fa1QlzCVGDQ2xsDNaTFauag==
+	t=1794244053;
+	b=eh8qqWzIgfdxXzrjV/yUsG66Wk4Exrn7RlUvrMYUt8ZzLVFkpcJaWpcL7dJB58pmXuSs
+	 92ZBNa5VyCSF5dOCwsCvUOQHOv4j7YPaUyPNLfWpJoM26kl80NclnKl9TXNkoGTvDmAtL
+	 nt/Ij9Aj+hmMecsm8A5RtcFBWDqa7Hu66aOWKJr6P4kfBngXPMZWd01ILUu9UvKoac7rT
+	 voAOvXF+xHSgHZNVabmLfDUodkloLep4S3kLO4xHaQ0loUCZC6IaVEwl/WbEMNgT1jTp2
+	 /4eKjeBO1pyV/GkHmpiKk4lN2EGSCMsEYizAhbFWYVE9Ioi1pwUe8g25NK0fQCeHceg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794240978;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794244053;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
-	b=IqOOQI+XTADkcMARt6c2+aVkAkDxSra1JBXictY15pEsyM79aybszzVOav78A8tg7YyS
-	 BaViZiRKJ1Ss7zJPpx0acvEU/zMYA76ErRuYjoJyapSfZHSp8cjkzeR1aPMQRpGozYSHB
-	 Um2NLocR0R70Qyfy8TxFZQXnkLGqGLVa/ed6Q2tVCsyDL7F9H4OsbO9eM1/Zmkp72djta
-	 yz5qIV0Do7mjUw1LvgK9urczIuUC9GjYOLbQvuRasR6nG741qD8gbVWGVPwtyEHwRKaqO
-	 fkwUPkPlHRJ4C7//1a5iKNSribOQOXiSF/2XO1nr/LYKPU1q8zjgQA5WXywZqq8ZB8w==
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=8F0eszf/IkI61axTkbrA7E6sbto26+Q1QYwNRzlLyls=;
+	b=5oRZmAde7CikjrVLLH+Ew2hazjFBAb+giyCKWYKDfRCb3sWr4SKK7Ivj9jikPUMV2CdA
+	 xXSla/wMa+KgDKwslTxl3PFNMHRfe9qeowKW0CTds664DFvLTMEQu4QMIXEPdVwZTtRDA
+	 c6DzlnmcKyTgnGJwK7j/sDZvrnx9+GSB+8KYxQYf6VlGZSviOIGaYyhwpIkRN/XK5VXw/
+	 jjg8IiFuLRR68h7Y2lLxj22CGYn9QydhIJEEHaWY7nIP+I5paMGClFwap7qt4Aon3RD9z
+	 5Yj/b+OqpoqH6mKna9Cex35NZf3E99Vl93/sc/zSgV4GXKzvyefxuFJiVHCe8KMygEA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vVdUWtxh;
-	arc=none smtp.remote-ip=209.85.221.172
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vyja7jQx;
+	arc=none smtp.remote-ip=209.85.221.175
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D8C606A33D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 16:16:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 07D8C606A33D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C7C606A32A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 17:07:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1C7C606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vVdUWtxh
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5c9e7731b34so716382e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 08:16:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vyja7jQx
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5ecda93627eso345628e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 09:07:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794240977; x=1794845777; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
-        b=vVdUWtxheXZ/IOTRP09cukc4TEqi+HSXCS5UYgt8eVJC03xY6NLVgVCuw0tuZ7UBV3
-         kQ4KgC84XE2Z3NlMftGD9iZTvt/M3lyIGw+wbsfGgFWAXQVnMmuVW9JlSWuOzmg4rzsI
-         7OMSV64U6Uxr6wrnxFfM6sPBwoNn8DnyTvgFV/E2gpAblFAGU97x3yXao5tQIcKLt2SE
-         WRohaw1eZKfX/3w4KaR8PBSQTV5+RK/6OmF64yoYBKVyHZmGGtTt5eoTTjzKCedTBXwY
-         YT1aUP3eEkAbOXjSVXqCcRq/oh+jLBkP4dSyAeSh/JPSFpEgK8/czZbkkuvZjCzqs8/2
-         FnzA==
+        d=gmail.com; s=20260707; t=1794244051; x=1794848851; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8F0eszf/IkI61axTkbrA7E6sbto26+Q1QYwNRzlLyls=;
+        b=vyja7jQxIjzAtjp9iJc+1P1VxoOqBOGh9ipzvGxbRph0CTBWl97RbYfCg4JbTurSg8
+         0u9+DGls1yXEaMSLCOt9el9Zk0b4+G7lfloFxvDkMf3wZm71ozRBftGB8l6u6fn2iWYd
+         G2tM1Ns+u1V/jzPhafYPdfWpYN+mnTRT83iChrg6ygIkFZtUr55OkoA+B/aRygzgEzb2
+         LCGE3HKTWsFvLpVvK4PK70AH1lwdO0yifMUN9u9k0g7rZVFH5QNqBxowzopbrjzAI5Ik
+         mw5ZiOrmwvXY3X/Ww1UAakUbGWte6RJ7ZeI4xuCOiR4NfKr9OL8MSZYDe+9VBN3oZlTc
+         pTmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794240977; x=1794845777;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
-        b=ar+UJ5GOugv5+P6lZZcFnuDu59gkI+XvGv0ApvnFeYAqO5mVbfom1V2eSIrEfRhRT6
-         jG/S9iRvEt58gRNgEYgAYEd4wVl4SMINyD+gouA4O/TDcLXz+QTlOecxcHyeVxROQBRF
-         82OIrjjuhM8AD/jwYwry95XZ58JxZ1CyyzAEuQCjMvy+CNA2VTfW5Eaik3RmF15sGurj
-         u5MB2AwvfVAmsE4kiVFX8IZ1nOdMD4Lq7ettt0tW3F6IHneXDpufdRoKo/cyWwAa4VRs
-         CTxbmxArP4GQsbDSrATzbf/EhYQvjbTfdiKrLcX/ZOJJhJDGVDeTdRI8Insr+sUCmql5
-         we3w==
-X-Gm-Message-State: APuU4Z/C+I7rptlUw7n5uthUoeSpFAOQ8w70IQFYYh8K/wSOyJCa5f0J
-	MF4kfB65yXhNKtAt03dzX8d0ZYbkud2/LBqEIYPWd/ydJswSVOWQYtPIoSaUDw==
-X-Gm-Gg: AYBFou3qmfF6slDDao4wcS0FeSI6ebxk+/flYvxtq5moXEynsQ21vTTZuMU5IK55Ulw
-	M058sPKzUaukzAJmLD++ndGZXRhMcApPg0kgy6pmDXNXKaoVTnnSAcbFiVfBuMR2G5yw5MeNE+F
-	keJuPhjMIGARbn5pvjcL20iRMuQgh+VOJIyTY87KoqBm0H+rOG+d0h+wDu0+Bgk2o4QFAMjDzwk
-	4EBOo0s0hjDThp7rxyt0F9GKGgKMYRf4IvmGZnyjoAjwYFNB8Ah5NqbW3ThnpLACQ2O3fX29aeh
-	4J2MG/gQem7qlDpklwH7/OxfoOW/GyQ9uXYGlJL09GYmKiZMPLzV8Y02mYsYVYxmwdPzmL7mr7Y
-	3pbIcfAwbuNLpjBZMDN8vC2tkQOwuiXTqeJGopsgDhy4JIyatudX60I0zaPqHSlcnlpOd1fxzVu
-	T/6S/JNFAj/wK99E8JIVNG6BX5GPsGc8wxn49gaq7nhgNTd8vqxHKW9CCLkdtvZn4elL+y4hb/j
-	YiUBYQVgGSdH7TZxyGOrCqpbJGNg4LeXLEz+2TOPsBvq/sXrsDUdVp5tfMmrgVX6VdgOli10VD0
-	aWCRLapux7rtz5Pu4ZDWXPuLzWi0KmWTURcgIWZf3Yjsv7bzMEonKnyqTjH57K+UvxdK9VGua+q
-	Z/KB9oP6tR0Hi9dXpfb6EUDEzSa68LFUAPBt/QI53AmTI4W1M+nboXFv2uEpzRbNRgtANyLgfcV
-	YsYAw=
-X-Received: by 2002:a05:6122:786:b0:5ea:dc36:245b with SMTP id 71dfb90a1353d-5ece735529amr1709118e0c.18.1794240976593;
-        Mon, 09 Nov 2026 08:16:16 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794244051; x=1794848851;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8F0eszf/IkI61axTkbrA7E6sbto26+Q1QYwNRzlLyls=;
+        b=ruAO9SqJgPOGRVLm8juh71rVNGdLAHR/hnUnQcoNetX5EGkKYL39a/VFTeEYwCx6dW
+         GyZ6ftfbAVjMDjU1HhPSs4OnRbRxQ4y0H/MkfbcWqTb058kYuIdv4relziVkbCImgQvt
+         +Xrm5wyvlikymF4NntbpebiQXJxLDRwE86hwktYdC/dziZgNnDB2BxAY1bkJGL2HMvxW
+         IDoi52tXLQQIwWhweDY5e768WAsCLAe4Q+8oklqgkseN44fERqJZvNEQAtlU9x6lJncL
+         ZyM+XMEPvEbAdMS+KzXspjQQELVHwt+Af0ng9fZjgzTL3OkSEavanEVrzlybNNPHoGJ9
+         ZHLA==
+X-Gm-Message-State: APuU4Z/IHumg1wAwz+Vom7sgE9zG8T+m6QCh/nvK3ROgIN+7Rr4FmIkY
+	Rc2yWODne3u81l/twsVhCJ9MetJ/IWA7epnni2XNf6Iqs1wC/bpmpLvWA/4UeA==
+X-Gm-Gg: AYBFou21u5lFm9GsbmtqzRT/hfkL/zAZJSwv6b+wHnSIsdqMxWHb5aRfIhx7M3WqKH6
+	rlphGs700jQbBRo9P+CqRLcyxC1l8kqJ160ZgkE1KbjJbtpQZJF7IPqyhguegXCv1bu3PN7qG9X
+	we0wSUrnDfTil3DnWNq3I/wyAJi4G+5sUTcTz0rJGq2YIEpW9x11T2nwt/CAo1UiKcBaOk087Ee
+	CKyWgn8me9LJ1ld89oDpMpDTUR0f45mu/D2dwS3BFawQa3FryPmGJG0fGriuL/xoxZqQDPoKYKd
+	eZlq3DHjoQ4sHBZENVsRRYnaoGhs1CJojOURm7QmTeo1INPuVRnXeyIyZnS/uAjMyXfU9HMV3RI
+	19CNsPEkWHeC95yoG9N7SQNZvuys5fahmpQYeVhNVm4Z2Em/P7C3xnD/ZFNw1/Lx3s4Yy/Ydg1P
+	UOs+Krk+1xyMOu/4zfe8GgtXi75tHgSrHd40EaqVBubcrkRyi7MT7L13PVAMa9oVKcSI9vLL8mv
+	tyjT81cqusX4xHB/cMYaUvlB2YlW5MtNUumG22ajTzhapCMYgncA/Adg77OyYw/2m0kD6DL6cSL
+	1ZEhbAPfEVP6BQYxcSJiHvAdh8wme36Hw6qNVhSn/KEN0F5qY3mu8eujqWj+sjNKvUFwUhlLEzo
+	CXOvf49gs/FehGtnbREcAdlFyY8be7T3vVBJyc+/CNnDiRDyOR16QpHDlVtbsWGXQHtWGnA0qzG
+	OT9r4=
+X-Received: by 2002:a05:6122:6081:b0:5ea:c727:11fa with SMTP id 71dfb90a1353d-5ece700dbfcmr1607536e0c.0.1794244051143;
+        Mon, 09 Nov 2026 09:07:31 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece66b77a7sm4562733e0c.17.2026.11.09.08.16.13
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ece63fd624sm4750876e0c.11.2026.11.09.09.07.30
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 08:16:14 -0800 (PST)
+        Mon, 09 Nov 2026 09:07:30 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v7 11/11] l2test: Add HDT options
-Date: Mon,  9 Nov 2026 11:15:51 -0500
-Message-ID: <20261109161553.1506041-12-luiz.dentz@gmail.com>
+Subject: [PATCH v11 0/6] Bluetooth: Add support for HDT and EKS
+Date: Mon,  9 Nov 2026 12:07:23 -0500
+Message-ID: <20261109170729.1584072-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261109161553.1506041-1-luiz.dentz@gmail.com>
-References: <20261109161553.1506041-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,362 +97,217 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add options to select the PHY, including the HDT rates, and to request a
-MIC length through BT_SECURITY, documented in l2cap-protocol.rst.
----
- doc/l2cap-protocol.rst |  50 +++++++++++-
- tools/l2test.c         | 169 ++++++++++++++++++++++++++++++++++-------
- 2 files changed, 187 insertions(+), 32 deletions(-)
+This adds support for the LE High Data Throughput (HDT) PHY and the
+Encryption Key Schedule (EKS) introduced in Bluetooth Core 7.0:
 
-diff --git a/doc/l2cap-protocol.rst b/doc/l2cap-protocol.rst
-index d53438924448..c93e2f67abe0 100644
---- a/doc/l2cap-protocol.rst
-+++ b/doc/l2cap-protocol.rst
-@@ -76,7 +76,17 @@ with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
- BT_SECURITY (since Linux 2.6.30)
- --------------------------------
- 
--Channel security level, possible values:
-+Channel security level, set via ``struct bt_security``:
-+
-+.. code-block::
-+
-+    struct bt_security {
-+        uint8_t level;
-+        uint8_t key_size;
-+        uint8_t mic_len;
-+    };
-+
-+Possible values for ``level``:
- 
- .. csv-table::
-     :header: "Value", "Security Level", "Link Key Type", "Encryption"
-@@ -88,13 +98,45 @@ Channel security level, possible values:
-     **BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
-     **BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
- 
-+Possible values for ``mic_len`` (LE only):
-+
-+.. csv-table::
-+    :header: "Value", "MIC Length", "Description"
-+    :widths: auto
-+
-+    0x00, 32 bits, "Don't care (default; initiator requests the default MIC
-+    length)"
-+    0x01, 64 bits, Require at least 64-bit MIC
-+    0x02, 128 bits, Require 128-bit MIC
-+
-+When set on a **server** (listening) socket, incoming connection requests on
-+the LE HDT PHY are rejected if the connection's MIC length is shorter than the
-+required value, with the ``MIC Length Too Short`` result of each mode:
-+
-+.. csv-table::
-+    :header: "Mode", "Result"
-+    :widths: auto
-+
-+    LE Credit Based, 0x000C
-+    Enhanced Credit Based, 0x0010
-+
-+When set on a **client** (initiating) socket, the value is used in the
-+``LE Enable Encryption V2`` HCI command to request the specified MIC length
-+from the controller. A value of 0x00 is treated as "don't care" and requests
-+the default MIC length, 128 bits unless configured otherwise (see
-+``DefaultMICLength`` in the ``[HDT]`` section of main.conf).
-+
- Example:
- 
- .. code-block::
- 
--    int level = BT_SECURITY_HIGH;
--    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
--                         sizeof(level));
-+    struct bt_security sec = {0};
-+
-+    sec.level = BT_SECURITY_MEDIUM;
-+    sec.mic_len = 0x02; /* Require 128-bit MIC */
-+
-+    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &sec,
-+                         sizeof(sec));
-     if (err == -1) {
-         perror("setsockopt");
-         return 1;
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 2e2606db13b9..d7a52fe0dc41 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -122,8 +122,10 @@ static int timestamp = 0;
- static int defer_setup = 0;
- static int priority = -1;
- static int rcvbuf = 0;
--static int chan_policy = -1;
-+static int32_t phy = -1;
- static int bdaddr_type = 0;
-+/* Required MIC length, -1 if not set */
-+static int mic_len = -1;
- 
- struct lookup_table {
- 	const char *name;
-@@ -142,11 +144,33 @@ static struct lookup_table l2cap_modes[] = {
- 	{ 0 }
- };
- 
--static struct lookup_table chan_policies[] = {
--	{ "bredr",	BT_CHANNEL_POLICY_BREDR_ONLY		},
--	{ "bredr_pref",	BT_CHANNEL_POLICY_BREDR_PREFERRED	},
--	{ "amp_pref",	BT_CHANNEL_POLICY_AMP_PREFERRED		},
--	{ NULL,		0					},
-+static struct lookup_table phys[] = {
-+	{ "BR1M1SLOT", BT_PHY_BR_1M_1SLOT },
-+	{ "BR1M3SLOT", BT_PHY_BR_1M_3SLOT },
-+	{ "BR1M5SLOT", BT_PHY_BR_1M_5SLOT },
-+	{ "EDR2M1SLOT",	BT_PHY_EDR_2M_1SLOT },
-+	{ "EDR2M3SLOT",	BT_PHY_EDR_2M_3SLOT },
-+	{ "EDR2M5SLOT",	BT_PHY_EDR_2M_5SLOT },
-+	{ "EDR3M1SLOT", BT_PHY_EDR_3M_1SLOT },
-+	{ "EDR3M3SLOT", BT_PHY_EDR_3M_3SLOT },
-+	{ "EDR3M5SLOT", BT_PHY_EDR_3M_5SLOT },
-+	{ "LE1MTX", BT_PHY_LE_1M_TX },
-+	{ "LE1MRX", BT_PHY_LE_1M_RX },
-+	{ "LE2MTX", BT_PHY_LE_2M_TX },
-+	{ "LE2MRX", BT_PHY_LE_2M_RX },
-+	{ "LECODEDTX", BT_PHY_LE_CODED_TX },
-+	{ "LECODEDRX", BT_PHY_LE_CODED_RX },
-+	{ "HDT2MTX", BT_PHY_HDT_2M_TX },
-+	{ "HDT2MRX", BT_PHY_HDT_2M_RX },
-+	{ "HDT3MTX", BT_PHY_HDT_3M_TX },
-+	{ "HDT3MRX", BT_PHY_HDT_3M_RX },
-+	{ "HDT4MTX", BT_PHY_HDT_4M_TX },
-+	{ "HDT4MRX", BT_PHY_HDT_4M_RX },
-+	{ "HDT6MTX", BT_PHY_HDT_6M_TX },
-+	{ "HDT6MRX", BT_PHY_HDT_6M_RX },
-+	{ "HDT75MTX", BT_PHY_HDT_7_5M_TX },
-+	{ "HDT75MRX", BT_PHY_HDT_7_5M_RX },
-+	{ NULL,		0},
- };
- 
- static struct lookup_table bdaddr_types[] = {
-@@ -283,6 +307,36 @@ static void hexdump(unsigned char *s, unsigned long l)
- 	}
- }
- 
-+/* Require the MIC length, keeping the security level already set with
-+ * -A, -E or -S and only raising it to what encryption needs.
-+ */
-+static int set_mic_len(int sk)
-+{
-+	struct bt_security sec;
-+	socklen_t optlen = sizeof(sec);
-+
-+	memset(&sec, 0, sizeof(sec));
-+	if (getsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec, &optlen) < 0) {
-+		syslog(LOG_ERR, "Can't get security: %s (%d)",
-+						strerror(errno), errno);
-+		return -errno;
-+	}
-+
-+	if (sec.level < BT_SECURITY_MEDIUM)
-+		sec.level = BT_SECURITY_MEDIUM;
-+
-+	sec.mic_len = mic_len;
-+
-+	if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec,
-+							sizeof(sec)) < 0) {
-+		syslog(LOG_ERR, "Can't set security: %s (%d)",
-+						strerror(errno), errno);
-+		return -errno;
-+	}
-+
-+	return 0;
-+}
-+
- static int getopts(int sk, struct l2cap_options *opts, bool connected)
- {
- 	socklen_t optlen;
-@@ -360,16 +414,45 @@ static const struct bitfield_data phy_table[] = {
- 	{ 12, "LE2MRX" },
- 	{ 13, "LECODEDTX" },
- 	{ 14, "LECODEDRX" },
-+	{ 15, "HDT2MTX" },
-+	{ 16, "HDT2MRX" },
-+	{ 17, "HDT3MTX" },
-+	{ 18, "HDT3MRX" },
-+	{ 19, "HDT4MTX" },
-+	{ 20, "HDT4MRX" },
-+	{ 21, "HDT6MTX" },
-+	{ 22, "HDT6MRX" },
-+	{ 23, "HDT75MTX" },
-+	{ 24, "HDT75MRX" },
- 	{},
- };
- 
-+static void print_security(int sk)
-+{
-+	struct bt_security sec;
-+	socklen_t optlen = sizeof(sec);
-+
-+	memset(&sec, 0, sizeof(sec));
-+
-+	if (!getsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec, &optlen)) {
-+		if (optlen < sizeof(sec))
-+			syslog(LOG_INFO, "Security [level %d, key_size %d, "
-+				"mic_len not available]", sec.level,
-+				sec.key_size);
-+		else
-+			syslog(LOG_INFO, "Security [level %d, key_size %d, "
-+				"mic_len %d]", sec.level, sec.key_size,
-+					sec.mic_len);
-+	}
-+}
-+
- static int print_info(int sk, struct l2cap_options *opts)
- {
- 	struct sockaddr_l2 addr;
- 	socklen_t optlen;
-+	uint32_t cur_phy;
- 	struct l2cap_conninfo conn;
- 	int prio;
--	uint32_t phy;
- 	char ba[18];
- 
- 	/* Get connection information */
-@@ -425,13 +508,24 @@ static int print_info(int sk, struct l2cap_options *opts)
- 		conn.dev_class[0], prio, rcvbuf);
- 
- 
--	optlen = sizeof(phy);
--
--	if (!getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &phy, &optlen)) {
--		syslog(LOG_INFO, "Supported PHY: 0x%08x", phy);
--		print_bitfield(2, phy, phy_table);
-+	if (phy != -1) {
-+		syslog(LOG_INFO, "Setting PHY: 0x%08x", phy);
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_PHY, &phy,
-+				sizeof(phy)) < 0) {
-+			syslog(LOG_ERR, "setsockopt(BT_PHY): %s (%d)",
-+							strerror(errno), errno);
-+			return -errno;
-+		}
- 	}
- 
-+	optlen = sizeof(cur_phy);
-+	if (!getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &cur_phy, &optlen)) {
-+		syslog(LOG_INFO, "Supported PHY: 0x%08x", cur_phy);
-+		print_bitfield(2, cur_phy, phy_table);
-+	}
-+
-+	print_security(sk);
-+
- 	return 0;
- }
- 
-@@ -499,15 +593,6 @@ static int do_connect(char *svr)
- 	}
- #endif
- 
--	if (chan_policy != -1) {
--		if (setsockopt(sk, SOL_BLUETOOTH, BT_CHANNEL_POLICY,
--				&chan_policy, sizeof(chan_policy)) < 0) {
--			syslog(LOG_ERR, "Can't enable chan policy : %s (%d)",
--							strerror(errno), errno);
--			goto error;
--		}
--	}
--
- 	/* Enable SO_LINGER */
- 	if (linger) {
- 		struct linger l = { .l_onoff = 1, .l_linger = linger };
-@@ -538,6 +623,10 @@ static int do_connect(char *svr)
- 		goto error;
- 	}
- 
-+	/* Set BT_SECURITY with mic_len */
-+	if (mic_len >= 0 && set_mic_len(sk) < 0)
-+		goto error;
-+
- 	/* Set receive buffer size */
- 	if (rcvbuf && setsockopt(sk, SOL_SOCKET, SO_RCVBUF,
- 						&rcvbuf, sizeof(rcvbuf)) < 0) {
-@@ -641,6 +730,10 @@ static void do_listen(void (*handler)(int sk))
- 		goto error;
- 	}
- 
-+	/* Set BT_SECURITY with mic_len */
-+	if (mic_len >= 0 && set_mic_len(sk) < 0)
-+		goto error;
-+
- 	/* Get default options */
- 	if (getopts(sk, &opts, false) < 0) {
- 		syslog(LOG_ERR, "Can't get default L2CAP options: %s (%d)",
-@@ -1355,7 +1448,7 @@ static void usage(void)
- 		"\t[-K milliseconds] delay before receiving (default = 0)\n"
- 		"\t[-g milliseconds] delay before disconnecting (default = 0)\n"
- 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
--		"\t[-a policy] chan policy (help for list, default = bredr)\n"
-+		"\t[-a phy] select PHY (help for list, default = all)\n"
- 		"\t[-F fcs] use CRC16 check (default = 1, affects BR/EDR only)\n"
- 		"\t[-Q num] Max Transmit value (default = 3)\n"
- 		"\t[-Z size] Transmission Window size (default = 63)\n"
-@@ -1370,7 +1463,8 @@ static void usage(void)
- 		"\t[-M] become central\n"
- 		"\t[-T] enable timestamps\n"
- 		"\t[-V type] address type (help for list, default = bredr)\n"
--		"\t[-e seq] initial sequence value (default = 0)\n");
-+		"\t[-e seq] initial sequence value (default = 0)\n"
-+		"\t[-f mic_len] required MIC length (0=32bit, 1=64bit, 2=128bit)\n");
- }
- 
- int main(int argc, char *argv[])
-@@ -1380,7 +1474,7 @@ int main(int argc, char *argv[])
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt = getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
-+	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:mnpqrstuwxyz"
- 		"AB:C:D:EF:GH:I:J:K:L:MN:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
- 		switch (opt) {
- 		case 'r':
-@@ -1510,11 +1604,13 @@ int main(int argc, char *argv[])
- 			break;
- 
- 		case 'a':
--			chan_policy = get_lookup_flag(chan_policies, optarg);
-+			if (phy == -1)
-+				phy = get_lookup_flag(phys, optarg);
-+			else
-+				phy |= get_lookup_flag(phys, optarg);
- 
--			if (chan_policy == -1) {
--				print_lookup_values(chan_policies,
--						"List L2CAP chan policies:");
-+			if (phy == -1) {
-+				print_lookup_values(phys, "List L2CAP phys:");
- 				exit(1);
- 			}
- 
-@@ -1591,6 +1687,23 @@ int main(int argc, char *argv[])
- 			seq_start = atoi(optarg);
- 			break;
- 
-+		case 'f': {
-+			char *end;
-+			long val = strtol(optarg, &end, 0);
-+
-+			/* 0 is 32 bits, 1 is 64 bits and 2 is 128 bits */
-+			if (*optarg == '\0' || *end != '\0' || val < 0 ||
-+								val > 2) {
-+				fprintf(stderr, "Invalid MIC length: %s\n",
-+								optarg);
-+				usage();
-+				exit(1);
-+			}
-+
-+			mic_len = val;
-+			break;
-+		}
-+
- 		case 'g':
- 			disc_delay = atoi(optarg) * 1000;
- 			break;
+ - HDT PHY selection for ACL, CIS and BIS, the v2/v3 HCI commands and
+   events that carry the HDT rates, and the LE Set HDT Default
+   Parameters command.
+ - ISO sockets take an extended, versioned QoS (struct bt_iso_qos_ext)
+   through the existing BT_ISO_QOS option, carrying the HDT rates per
+   direction; the legacy struct bt_iso_qos keeps working.
+ - LE Enable Encryption v2 with the MIC length, Encryption Change v3
+   and Key Refresh Complete v2.
+ - L2CAP and BT_SECURITY gain a MIC length requirement; connections
+   whose MIC is too short are refused with the MIC Length Too Short
+   result.
+ - EKS opportunistic encryption, enabled with a new MGMT system
+   configuration parameter.
+
+This series depends on:
+ "Bluetooth: Fix not updating of hdev->commands[] after reset"
+
+Changes in v11:
+ - Fix the event codes and names in the comments of the Encryption
+   Change v3 and Encryption Key Refresh Complete v2 entries of the HCI
+   event table, which are 0x5a and 0x5b, and list them in code order.
+ - LE Set HDT Default Parameters is not sent with a packet format or
+   rates the controller would reject: Packet Format 1 is replaced by any
+   supported one if the controller doesn't support it, and if the rates
+   end up empty, being none preferred or only unsupported ones, all the
+   supported rates are preferred.
+
+Changes in v10:
+ - The MIC length, packet format and rates system configuration TLVs
+   (0x0021 to 0x0023) are rejected with Invalid Parameters if they have
+   a value LE Set HDT Default Parameters reserves: a MIC length other
+   than 64 or 128 bits, 32 bits being the one of the GFSK PHYs, a packet
+   format above 1 or a rate above HDT7.5. The controller would reject
+   them, failing the initialization.
+
+Changes in v9:
+ - The encryption key size Encryption Change v3 reports for BR/EDR is
+   used instead of reading it with HCI_Read_Encryption_Key_Size,
+   saving a round trip, and is validated the same way, in a helper
+   shared with the read's completion. As the spec says, it is ignored
+   for LE and when encryption is off, and a value outside the 0x07 to
+   0x10 range it allows is read instead.
+ - Quote the Core 7.0 specification where the code relies on it: the
+   event versions used, the data length limits, the mandatory HDT
+   rates, the MIC length values and where they apply, the MIC Length
+   Too Short results, LE Enable Encryption being only for the Central
+   and opportunistic encryption only for unencrypted links, what the
+   EKS mode reports, the security of an opportunistically encrypted
+   link and when LE Set Host Feature is disallowed.
+
+Changes in v8:
+ - The ISO QoS rates are validated: reserved bits, or rates without
+   BT_ISO_PHY_HDT, are rejected rather than passed to the controller.
+
+Changes in v7:
+ - The MIC length of LE Enable Encryption v2 is taken when the command
+   is sent, so channels raising it after it was queued are taken into
+   account, and incoming LE and Enhanced Credit Based connection
+   requests record the MIC length of the listening channel before
+   checking the security.
+ - A failed Key Refresh Complete reporting opportunistic encryption is
+   handled as any other failed refresh, disconnecting the link.
+
+Changes in v6:
+ - An encryption command that fails without a Command Status is
+   handled where it is sent, aborting the link with
+   hci_abort_conn_sync() without holding hdev->lock, rather than from
+   its completion callback, which could deadlock, also when canceled,
+   and drop the connection twice. LE Start Encryption's Command Status
+   error now clears the pending encryption too.
+ - Opportunistic encryption sends its command without that handling,
+   so its failure can't disconnect a link SMP is encrypting.
+ - SMP doesn't distribute keys on opportunistic encryption.
+ - An Encryption Change failure on an opportunistically encrypted link
+   is handled as for any encrypted link, clearing its encryption flags.
+
+Changes in v5:
+ - A CIS bound with BT_ISO_PHY_ANY keeps the GFSK PHYs of the ACL, as
+   HDT isn't part of it, so a deferred CIS setup matches its binding.
+ - LE Remote Features Complete clears HDT from the default PHYs, as
+   HDT is a feature of page 1 which it doesn't report.
+ - CIS Established v3 takes Max_SDU from its SDU fields rather than
+   Max_PDU.
+ - The default data length is only skipped if both its length and
+   time are already at their maximum.
+ - Encryption commands that fail without a Command Status clear the
+   pending encryption and disconnect, as a Command Status error does,
+   and are freed with kfree_sensitive() as they carry the key.
+ - SMP starts encryption after DHKey Check before adding the LTK, so a
+   failure doesn't remove a previously stored key.
+ - Encryption Change v3 reporting opportunistic encryption for a link
+   with a key from pairing disconnects it, as Key Refresh Complete
+   does, and only a failure is taken as the one of an opportunistic
+   encryption being started. A failed key refresh replacing the
+   opportunistic key no longer reports the link as encrypted.
+
+Changes in v4:
+ - LE Set CIG Parameters v2 is limited to the CIS that fit in the 255
+   octets of command parameters, and a CIS that would exceed that is
+   refused when it is bound to the CIG.
+ - setsockopt(BT_ISO_QOS) on a socket that already has a connection,
+   such as with deferred setup or a PA sync, checks the QoS type there,
+   since connect() or listen() won't.
+ - SMP marks the encryption started after DHKey Check as pending, as it
+   does after Random, so it isn't started a second time.
+ - A Key Refresh Complete reporting opportunistic encryption, such as
+   one changing the MIC length, keeps the link opportunistic, and
+   disconnects a link with a key from pairing since that would be a
+   downgrade. A key from pairing replacing the opportunistic one is
+   handled as Encryption Change is for an unencrypted link.
+ - Restore the lockdep_assert_held() before smp_pairing_in_progress(),
+   which context analysis needs to know conn->hdev->lock is held.
+
+Changes in v3:
+ - Opportunistic encryption sets HCI_CONN_ENCRYPT and HCI_CONN_AES_CCM
+   along with a new HCI_CONN_OPP_ENCRYPT flag, and the L2CAP key size
+   check is skipped for it since it has no key from pairing. Pairing
+   over such a link now completes: its Key Refresh Complete clears the
+   flag. A failure, or a command that can't be sent, leaves the link
+   unencrypted instead of disconnecting, and HCI_CONN_ENCRYPT_PEND is
+   no longer used for it so it doesn't block SMP. The MIC length is
+   taken right before the command is sent.
+ - Changing TLV 0x0024 while the controller is up updates the
+   Opportunistic Encryption host feature bit.
+ - SMP checks the result of hci_le_enable_encrypt().
+ - Set CIG Parameters v2 returns the failure of a response that doesn't
+   match the command, and fails the unbound CIS of the CIG it was sent
+   for.
+ - CIS Established v3 and Create BIG Complete v2 are only unmasked with
+   CIS and BIS support.
+ - BT_PHY rejects HDT6 and HDT7.5 rates the controller doesn't support
+   in that direction, and only reports supported ones.
+ - struct bt_iso_qos_ext replaces its rfu bytes with a 16-bit version
+   and a 16-bit type telling whether the unicast or broadcast member is
+   in use, so each can later grow on its own; the union is the last
+   member for that. BT_ISO_QOS_ANY, used for struct bt_iso_qos, leaves
+   the type to connect() or listen(), which fail with -EINVAL on a
+   mismatch. Connections set up by the controller get the version and
+   type, and BT_ISO_HDT_RATE_* name the rates bits.
+ - The extended ISO QoS is copied field by field, so padding is zeroed,
+   and the v1 CIS Established event clears the HDT rates.
+
+Changes in v2:
+ - Remove the values from drafts of the specification and use the ones
+   from Core 7.0: L2CAP MIC Length Too Short is 0x000C for LE Credit
+   Based and 0x0010 for Enhanced Credit Based, and LE feature page 0
+   bit 59 is no longer checked.
+ - A 64-bit MIC is only used when both sides prefer it, so downgrading
+   on re-encryption is no longer an error.
+ - The key size of Encryption Change v3 is ignored for LE as the spec
+   requires; hci_change_encrypt() no longer takes it.
+ - Rename struct bt_iso_qos_v2 to struct bt_iso_qos_ext with a version
+   field; the length passed to BT_ISO_QOS selects legacy or extended.
+   Convert field by field, which fixes an out-of-bounds copy and an
+   info leak through the legacy struct.
+ - HDT rates are little endian and kept per direction.
+ - HDT PHY selection is gated on hdt_capable(); mixed LE and HDT PHY
+   masks are accepted; phy_opts is initialized.
+ - Create BIG Complete v1/v2 share one bounds-checked handler; Set CIG
+   Parameters v2 response is validated like v1; Create CIS waits for
+   CIS Established v3.
+ - Drop the unused LE Set Data Length v2 command and the unhandled
+   Data Length Change v2 event mask bit.
+ - EKS: copy the LTK under RCU and encrypt after unlocking, zero-pad
+   the key for v1 and copy key_size bytes for v2, free the command
+   when queueing fails, and handle the Command Status of LE Enable
+   Encryption v2.
+ - L2CAP: keep the requested MIC length separate from the negotiated
+   one, take the negotiated one from Encryption Change v3 and Key
+   Refresh Complete v2, propagate the channel MIC length on every LE
+   security path and reject values above 0x02.
+ - RFCOMM BT_SECURITY accepts the 2-byte struct and zeroes the struct
+   returned by getsockopt.
+ - One hci_le_set_hdt_params_sync() is shared by init and MGMT, and the
+   defaults are resent when changed while the controller is up.
+ - Opportunistic encryption requires eks_capable() and its TLV
+   (0x0024) is validated as u8. Encryption Change v3 for it still only
+   clears ENCRYPT_PEND: the key size is 0, so setting ENCRYPT would make
+   the key size check refuse every L2CAP channel.
+
+Luiz Augusto von Dentz (6):
+  Bluetooth: Add initial support for HDT PHY
+  Bluetooth: ISO: Add extended QoS with the HDT rates
+  Bluetooth: Add initial support for EKS
+  Bluetooth: L2CAP: Add MIC length validation for HDT PHY
+  Bluetooth: Add HCI_OP_LE_SET_HDT_DEFAULT_PARAMS support
+  Bluetooth: Add EKS Opportunistic Encryption support
+
+ include/net/bluetooth/bluetooth.h | 102 ++++
+ include/net/bluetooth/hci.h       | 216 +++++++-
+ include/net/bluetooth/hci_core.h  |  71 ++-
+ include/net/bluetooth/hci_sync.h  |  12 +-
+ include/net/bluetooth/l2cap.h     |   9 +
+ include/net/bluetooth/mgmt.h      |   1 +
+ net/bluetooth/hci_conn.c          | 281 ++++++-----
+ net/bluetooth/hci_core.c          |   4 +
+ net/bluetooth/hci_event.c         | 806 ++++++++++++++++++++++++++----
+ net/bluetooth/hci_sync.c          | 732 ++++++++++++++++++++++++++-
+ net/bluetooth/iso.c               | 264 +++++++++-
+ net/bluetooth/l2cap_core.c        |  74 ++-
+ net/bluetooth/l2cap_sock.c        |  27 +-
+ net/bluetooth/mgmt.c              |   6 +
+ net/bluetooth/mgmt_config.c       | 105 ++++
+ net/bluetooth/rfcomm/sock.c       |  13 +-
+ net/bluetooth/smp.c               |  96 +++-
+ net/bluetooth/smp.h               |   2 +
+ 18 files changed, 2541 insertions(+), 280 deletions(-)
+
 -- 
 2.56.0
 
