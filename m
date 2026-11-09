@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794240009;
-	b=at0Oey3HS8HRUo8f5JsecoRkc22tvFEw6y0ke5vzh3+fJK1BhBoGKnWM2SLX/LQH9A3h
-	 IVmcfTMnq5odUvH0ATeqshOKXuvWjE/PUWCfdstTJI2pNwcemGrxuiuklXXxjuP/9XSsM
-	 jzJeRctAyckUQrkWuzgxCHm0trYQEeWqSP+UqutYl81I6UzIqu7NCfLeTxY2cZVsE8ZDr
-	 42Ec1QFw5x59qyMtGAuy9DyTvG/p6PlwXNr84WSlapTypxzkoy56BejjsFeQRbNooxesS
-	 RHz9FvMEa/vejwvIttAnibm4QJCn3+Mu4CCuY4/ASFw0h7GVL/fZRY3iCT1/NiMzjzA==
+	t=1794240036;
+	b=mtKaOZtohSfFHa58yvSiVpBHz5gB/uiNbDRhoGD0sqZ2NRgCi+CBJ3bJIuw9EkmQUXRg
+	 JcFXIcxfhe/z7lK4JGPoMaglDCHUUU6ppmYeIgErj9qnFptvT0EaEuP4XRz9l8XLF38hj
+	 tpWRVvf6Z+QJNgiW+zc0algTF2hewcNEnfP0X/vHZ1dk4KcHFNheOjTBqfhN0P05lSfAF
+	 yJUbsE1B2/Gtq7PjLu6JfxrE5QpjNOPL9iTkFZd061o4uZiRlHQwrhVNokDSo7x9IMuSp
+	 EbivKwpLwNp77qJEogxHQTLbMitijA3IjnOgLnmwhpeC4rdW66NweoQtgcpBtPAuRhg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794240009;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794240036;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=xNRqjObeTp/7I6It829IcrazYn0krY0ldw7Pv0J8uis=;
-	b=wNMAf1NGr9CBw6aDY3GVRT3SUAfC35th1dZzf//sh65Hoceqr4+GwPla9ynd6n8ktZBu
-	 Eo5bZWAoSAWSTiFEPBZgjezKveUjInsmeFVW08YHKEQgMxXJOp/cvyXT3qyKD/ybevPxo
-	 HZ40Seecbu+pDElsjSrzZVnqL6VfH8S9hyqr1VC0IqNSIld4xYvY16Gti5w08mWX9IYwH
-	 cS1mwL7yP9YbMdKog2N1/IYeLMI6YknXnsFVDHPudOxshYFWMorVnAKiHc+A5+MTx/0xf
-	 ppRDXLxDoT3gZXs4EiSNApFkB9P9duK6GRLsWQvRo9SvmKEB6yds4s5Hxzb4AKGmBBQ==
+	bh=d7OGiecdcd4pje9XNxp/AEns3J55ShoAjvRMG26vN/Y=;
+	b=nrCvR1efg6N1CgeyuM+f03gKFGeKvk/dVVdU6Din0HQTCScO4qZc/GuwgaiMObR0L3YG
+	 qw3YcyVGlGiHdHS+ll9Beu62bsw5Ny1FnWaI6mmOYd2WES0aBfm/8URyNS7zWNSfwLpLF
+	 8TAU9XWYaAa5FK5gBI/1S1T0H9ubB2rRC4PWE6d7wU7pnJBXWgVGc7jC1nVoaBr5/7qkg
+	 IoVwgEO7smkM5JXD4j8seMdqjlJ6OWmG9tpQbNt+hOOPycLkv9F4TCKhFHENMcl8OWmvJ
+	 8gjUO75P3UCNKqp50jltxIrdnZTSjSfFKV9HgcJUsSppU2dh0IzeZpo5TZYOwd3NBJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EmkIBnEt;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="kZg5m/W5";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6FE608360B;
-	Mon,  9 Nov 2026 16:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4882606EEA3
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 16:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EmkIBnEt
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A96D51F0089F;
-	Mon,  9 Nov 2026 16:00:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kZg5m/W5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A58C1F0089F;
+	Mon,  9 Nov 2026 16:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794240008;
-	bh=xNRqjObeTp/7I6It829IcrazYn0krY0ldw7Pv0J8uis=;
+	s=k20260515; t=1794240035;
+	bh=d7OGiecdcd4pje9XNxp/AEns3J55ShoAjvRMG26vN/Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=EmkIBnEtPmN6EZlZAKHCQH0YJ+c8zy7rgvPBbi1ARu814PcUS3NdAAzJAHPmgK0wn
-	 HCrCiNxxm9+VVOGwAPJmOxEPQTky9SPmtcH3vNgvj9y4gPwYE89mkFVv0Z4qyV4x0S
-	 ObcOHm0Wfw2rVnlF+4v43ZHbSQh0hQZQE0Txef41gm76BT1BY9bXJtE8m1b/1qHbLC
-	 fFKuBWKDlqiHhXx4mrSXL1bT6QPJW3+YJnBQpbxhdB9Xq5TxzWVOPPh+akYbzvIScN
-	 yAKJCxeYbj2sGxPEVOw1A3bz8dsNVu9q2ufOmGUZ1qvoMMY0W5EGDC/lmWK8nzuBAD
-	 AQZgSKhaNwW3g==
+	b=kZg5m/W5iaj3s5PtegQatBOFkj9FHvMubqskubTSEuLxUd+xHlFGQEDPiF47u49PD
+	 I+K1UOtnSjUUsInTAVcp4DaXI7LroinE/wsLcNAhMnpSRXfcSCpOu/ct94v8xwV8E6
+	 mxt7dZ8vs3fLU0gux919zwSWrrccB5bdKhKvPtBvVVSH/UusIrjLPwYN3hVZ9k5KG7
+	 ACfJMW2JMPg7Q3f/Mp1B/UElh+4hY23gdCAcDxoFLL6LDYx9XdsrhCsnwUECJkEBCE
+	 S5e6Cltu2RJQh+xtFkMD0TUKtaXORbaMu2WlCe47CHGMcmJcsLp0YHMFN3ZWdH5kdb
+	 06y0HlR2zZYdA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B23D3805CCC;
-	Mon,  9 Nov 2026 16:00:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5E36E3805CCC;
+	Mon,  9 Nov 2026 16:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,38 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: qca: Disable SoC debug logging for WCN3990
+Subject: Re: [PATCH BlueZ 0/2] bearer: Fix auto-connect handling of LE Connect
+ and
+ Disconnect
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179424000705.3335769.610567076772554344.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Nov 2026 16:00:07 +0000
-References: <20261108000449.2664455-1-hex@freenixos.com>
-In-Reply-To: <20261108000449.2664455-1-hex@freenixos.com>
-To: Hex Lindqvist <hex@freenixos.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- pmenzel@molgen.mpg.de, linux-bluetooth@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+ <179424003399.3335769.13828179370784941457.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Nov 2026 16:00:33 +0000
+References: <20261107015649.84892-1-kevin@simpleble.org>
+In-Reply-To: <20261107015649.84892-1-kevin@simpleble.org>
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat,  7 Nov 2026 16:04:49 -0800 you wrote:
-> Unless the host turns it off, the WCN3990 firmware sends debug logs to
-> the host as ACL packets on handle 0x2EDC. hci_qca passes them on as
-> diagnostic packets, which the core copies to the monitor socket and then
-> frees, so nothing appears in the kernel log. btmon shows them as:
-> 
->   = Vendor Diagnostic (len 492)                      [hci0] 0.761331
->           dc 2e e8 01 e4 01 03 00 0a ff 10 04 01 00 55 53
->   = Vendor Diagnostic (len 481)                     [hci0] 11.334015
->           dc 2e dd 01 d9 01 04 00 0a ff 10 04 01 00 51 d3
+On Fri,  6 Nov 2026 17:56:47 -0800 you wrote:
+> org.bluez.Bearer.LE1.Disconnect is documented, like
+> org.bluez.Device1.Disconnect, to disable incoming connections of a
+> device that is not trusted until Connect is called again. Device1 does
+> this by taking the device out of the auto-connect list, but the LE
+> bearer does not: a paired HID device that is not trusted and keeps
+> advertising is connected back right after Bearer.LE1.Disconnect.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: qca: Disable SoC debug logging for WCN3990
-    https://git.kernel.org/bluetooth/bluetooth-next/c/530e411a49f3
+  - [BlueZ,1/2] device: Add functions to pause and resume auto-connect
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=00a473e0ada7
+  - [BlueZ,2/2] bearer: Fix LE Connect and Disconnect ignoring auto-connect
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=77afa9ee44ed
 
 You are awesome, thank you!
 -- 
