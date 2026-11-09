@@ -1,90 +1,90 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794239110;
-	b=yhTCQKRvowZY0zbPkoN7nd9L+XEL+6geQoQD5t/1llWt92WF/Ac1udvatQ/6a9mE0AAD
-	 s7ZUqIdUfFiQmjjGXpLrpJ79jWKOcMc0eHKlm69zp5w1YuunoRu3UxHPCcPujg0bQbwDz
-	 WGNGvgBNLbe6hvLDY6HfD/YcAbZE+x2Md09ErKftIpWCoSXOMYe/6Ax3Yen1LyL3w2DAK
-	 sLGaOmHAG3Enyaas/CEaLIZXrF+96T+GRK8+81qDQzspDxUtQ+Rov0ehEerFvo713xntG
-	 CGVHiB8kNCM+g9o3SNMMG+PKhTRu07qU2NqRhI9LBnMtMxFWVHt1fbH2w/0MM60DWGg==
+	t=1794239111;
+	b=N7Kb6M/2WZu1wz3Dw/AhcRJQdJTpcaOIutkdGCjRxxIQOO1biECffGLGa7B9tYNueSdD
+	 pgPDmEkZKyA0qEmqhCoTgdXBkGWlHTz93AIUdh414Wi2vbPrZQNX94KXTxB36mOQ/oq74
+	 khZoI7ac7pa/fr6SWrZsKssvpTvsSmD7Zpqb+4ESND4EjHHuMiqLceHQSX9mTBB3FV28U
+	 jJdOCruqCTVUGO0SwaJYu9ctKXdIdRypcxUT3FneRhdwXwmCcm6iCdo41BfM+Mz+RxFox
+	 8ayHHTJHHzih9L4Fkn5IQR+yMtOwYyYYX2KQzLVp1ptRHPojY/Qqw0V1tGWN+6iPK9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794239110;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794239111;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=e8NUlUCZtgMyj5zmfD4IvdtHvsUHwHOEX9khVD0ox/o=;
-	b=qzdAvYht35Jd/YrU8nkyFWgUXy9Ti1i4PUAPdqs2ok5b8Fp3ixjE670sdNeQRp1uq8oM
-	 RbZzFSvqqlxRy6YCH1YEjHPQLfznG+Y9QRxYNQEpI9uNT7PEqoiB9K0yw6nJjanQ50hJ4
-	 va2/WRn+FUH/yob8dM/8JAdgXQdmENN7LNzCp2wkBMdz8TMqHyItN2vNpv/RE+dE0KRIl
-	 tWnUqWwQEWqJ77NVkeJdIDQblyiwwClJG2El2rr5Hnoq0BKkH2Bqopxxg52UnEdjWVAu0
-	 DRmvhQ7X+pxXvIi2L+0whOrVYzb9r75pGtSzDFu6DxHXVw9y641OiTZDYe6flFhHrKQ==
+	bh=p6GpstJKGdUSihOi0IVinZjGy6xPwWTbwsHkjyuEDhI=;
+	b=AKPXF78swftjCceODG5rOMuVFoiGVVJUvjwkNh2sDNGugqaY08Zhm/e+adhjD5y/zqxB
+	 9bo5GPBBKBV8Dh3PVi1fogfmPM9yNWZ6t5TVEK014wG+k4T+3TmT31zPwAlgKpLK9CMfD
+	 qXWqBz2Y/z6VYvFMhvkq+Tv6fuSqgE6+3os7H2YGZB4MYzgyvlSFChc45Lw8FBExhzrWL
+	 Agukgy8qxxHaZuvwA7ep6GL+AasMCCIV/tAaVCE3LRkEG3UE/vSUeAbTUbWal5L0FymTj
+	 nREmoTHZ0OjiWeyplMFl3zxo64MV+k9sMGiwqoPabLKGCLJCbo8cR0L/TKcU3X3Kxcg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wvf51Y0C;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Lg2ib6UE;
 	arc=none smtp.remote-ip=209.85.217.46
 Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEA6606EEA4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 15:45:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7DEA6606EEA4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D47B606EEAF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Nov 2026 15:45:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D47B606EEAF
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wvf51Y0C
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7d2bf046ceaso511898137.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 07:45:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Lg2ib6UE
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7a6e560f580so705897137.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 07:45:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794239109; x=1794843909; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794239110; x=1794843910; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=e8NUlUCZtgMyj5zmfD4IvdtHvsUHwHOEX9khVD0ox/o=;
-        b=Wvf51Y0C/zdsvY73XNJ9ygYrCith1WpzyF3yMPoQyshro9iDCB4tlvTcztWOHOL4MT
-         nG8e2OTTPkkk/dnLMJyGnRKN13tnxMkFa+UciMBhWlwp1MNtgDPyhMBjCr7eCwS77obG
-         JWPQj2nydrnxeiyTLRlow2Pj3XgHLiHw4Ud7pMGs5u3cTnBaB+Pq9f7VpJlzTuCMhH9B
-         SnthM34zJNo4l3S2mK6zLTpk19F9IJtV7lsXyv1are/G6pm3QRC8DrmugObb0jtrSjTx
-         y/xZ8tQZHAOiVphBg5oBuAjLM2IA1cKqRcdKefjGHyLg7++uTT37x3V08b4VxepiwCJ1
-         H8eQ==
+        bh=p6GpstJKGdUSihOi0IVinZjGy6xPwWTbwsHkjyuEDhI=;
+        b=Lg2ib6UEqzA+FlaxufCwa+AURdQ8IzM5J53FAuqcwyMucOVOfucjRJaG98WtfEaWzI
+         nab0thfwntL7G0jbuAhA9x4rPdJir2sdp174sdlbcKylDJldoF0hsUeZ97kCzddDqvqo
+         DJOj4q2G1JGXFykAD/1rCs8CR6JIE2bMfxtFdYUjI/yJpQHaOjHbB6sayJWn4vn8XNKl
+         ii3AdQRCNgArsDOXCVNlEqW5lTt6NtyTq2Pwfqu8S9YzCoFQHgVOR+cBaYw2wy9z/YSs
+         65ywYnxTDDfCjD5PFP4J277rRxVxkEgFGHAUEXtc5MOEDOHop4+uGXjMFyx2WoEh+FTn
+         StGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794239109; x=1794843909;
+        d=1e100.net; s=20260707; t=1794239110; x=1794843910;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=e8NUlUCZtgMyj5zmfD4IvdtHvsUHwHOEX9khVD0ox/o=;
-        b=1Jg8j6Y+HByYKluS8moZRRuoEupxEHxryFOBIzNadJggzQtDpK7qAVzCtNAGl0vs1v
-         DPLaSk/hFQ5At1SWfRav6lBKhy5qw5W9jthbDkwvu+gfFAfa5vxvofekAo5isAMibPJt
-         9qJGVXnkniwTCyAiFH+8FpkQm2blFFlRB2zhQCMZc2+JPLRXBksSa/82H/qfP2aSPEwG
-         o1ePqRt2EfxBvB7ok68asJORCgk7CsV13EVTFFFL/um0Fo96WwDHu0sjlbQ1NsQ7MYbf
-         5iYmSJTvlILsQ8r1M1LSj3QqK2Y+GjFDzXWaYjPyUo/ZL2ReUp1FXiIoKFMvyPa7gJuU
-         UXBg==
-X-Gm-Message-State: APuU4Z9aEun7qafmigMzUfVEQIp5ljwB7vPPcpK3Eot8UmycDUuuq8Yk
-	pPsauGniGJcXqJqLcxWDqm7VV38FHOq8BOvJaHCx/RrNqhk0hn9Z2SZSK9kUMw==
-X-Gm-Gg: AYBFou27/tUHUGrHb8q2aZ0mGr+RScmfTuBXdpEutD1+BkguaZR/pBWt4QW9KbG78st
-	JdCBWqcO0IEnQyW0k/5apRoPMTXSbx6VHGZGFPb4kXhNXvIgEVKBYL1ZlH03Fm2M8V2RN3M0JXA
-	J9ISUU4SBNFef18SRHOqB7Yjp7MV545woUbWygGR3MhIKpy2Jfm9Sldr8J2m+SiA1e694zg9P5f
-	gLf1U+8lwK1jHUgdqY20W+16GOGHSUAilxAfpr3wewXXidzOkhCgY2bz8Bq6IEQAKQxnhyu5c37
-	QaQC+tulURpQavnt5qqUGpxcEFHBo0cpqjT3JwvcG6KGbHCc/DZAwKPUxPCyiFmbUdWCS/EaNOp
-	hjVV3Zb+04CjFuivsifvMexmydrcf4YldR3rb5QAWRT2EnfuRl0/R/d78x6/HsQaplXVIIOz04w
-	U4RU5L1UK9rveQ9fe5alQN7C298CLU3Y6jBsIfpQQok3W7lyUZqRTkXLt4+BOH/ebyY4Xza89Av
-	QBW9Rs6II2DB2P2HSqMXhcUV8ZOlv7+30cB8gw74epEE9xoWTO7dsC6YuWs7GG99D1e1aLeYsf4
-	WhCAM0iMBzsvNRg02k3hwUz9bIeE1eQGxZvIK9XfdfclGO4X25xgUJ68Nh+BybBFDU7ZVZSZzao
-	es9NMphwZIiBGVcMMm9MpJT5gUaK1ziJiwYgDWdFAq+Ar6mt+RosZAgqwVyGzfg/eTho6ghiDId
-	04D+M=
-X-Received: by 2002:a05:6102:84c2:b0:7a7:b6a:b022 with SMTP id ada2fe7eead31-7d2db21312emr1243290137.22.1794239109434;
-        Mon, 09 Nov 2026 07:45:09 -0800 (PST)
+        bh=p6GpstJKGdUSihOi0IVinZjGy6xPwWTbwsHkjyuEDhI=;
+        b=LrHmyEaxLie6wGdOItamR9qLmhE/ryttoKdBDM5N6hkSwAqLuqQSK5WDiCBIqmT/11
+         ut5aW6EVzJEvF50fZ3C2aj/NETvQrSfkLdcn5NiK3lAxLJ9OLzNaD8Zao8Fg7gs3ille
+         zbLw6MzWyXqaH1yUWUp3QFuBZXizgnSFETTuhZBOJ0iKiRMvZ+5+c7Qa0O7CviWZZMp1
+         JFYdRUWaTDy7aK29L0UFxVezUPMzJj9fFX6UmTiPOI6HTPxJSJWs8HVexeb6OmmSzYZh
+         i2yT0VDRzjGtm4mA4BCFb49TvOPEQmfK3KU1hbqXXTPytjaHKHoVs/5jjIXuVDxaeOg3
+         4dFg==
+X-Gm-Message-State: APuU4Z97iJZZCyPKj9Cqnl9IrRYBS/53eWzseVQjipolCiHtn6Sk7nlq
+	NcFGtL7ne0o3sgKAPFNBFyRo76COZaDb8vp4tJw/Gmc7/1PIjhCrIbDyGj+rhA==
+X-Gm-Gg: AYBFou3FM4DhqO3sUhSHfC0JAZ8OoIF1MdBbAdaw+L5kyu+KOwKC1U/ijSE15q/teyi
+	3UjRKdC5nDQlWlbZ1SGR6KaKEfYzeydFGkH9W//H2ZqKsUxi8R2EYjIV2tiXS8fxKrpFxodYV2X
+	rsmXR6zxE0SVVnidyUs+yKT0zCNOlbWp6uBWjCC4iUp36+Y9hk8VZ8dnl7N7hScE1gh+JqBhKmu
+	SOhV1WSTzQBJLHUPgJ1w4uitf2juLbHGHh4PrJlu/E022Hqd4pxhFWq+Nn0wA0ly7gUbqi1+ufk
+	nrGQxoOFuhfmIGQOXo6lJQ5XPsxlUaZKhMEerYwz77rIHvoD2ynSLZUQo2NBcQM2MRLNJ3MObQK
+	V1G8GA+XQDtotGahsRRSnxg0vFvcgoLh72IQ/h/S7ZpsauLkjVUien9s/5DlS9DSZMIxBlWwzWs
+	zm8dnXZkt748DYJu8k+yOPKUsWRCOb0hd0OZ9eBD1ZvN99+FiqeuXkFlUbaB1zDjmlOZt9d9jRJ
+	DhFgiynsYmwMJfcEehQTxkW3j3hCDqCk7WgSNgrOeuta0OWZsbWVVucRE6w2LS6i+6OhpYytskm
+	8Q6n9tm++a4dn5/zfxYOAoJB0R3O3Kj3ATB9MhOm5f6u3bNSdIXwyszSl7lrv0IUOKiXbrcYMBP
+	XHQTvgi1p8pFy9HPZWqU+qZLcAdwvnsvIx/U3r8zkjOZdorKK/9woCR3py9bknpPPF+lqNglwyG
+	rWzcE=
+X-Received: by 2002:a05:6102:644e:b0:7b3:4199:2dd4 with SMTP id ada2fe7eead31-7d2db102581mr1589321137.20.1794239110252;
+        Mon, 09 Nov 2026 07:45:10 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c02a60a83sm4097474241.10.2026.11.09.07.45.08
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c02a60a83sm4097474241.10.2026.11.09.07.45.09
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 09 Nov 2026 07:45:09 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 06/10] shared/gatt-server: Fix authorize callback getting handle 0 on write
-Date: Mon,  9 Nov 2026 10:44:57 -0500
-Message-ID: <20261109154501.1362649-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 07/10] shared/gatt-server: Fix double response on prepare write failure
+Date: Mon,  9 Nov 2026 10:44:58 -0500
+Message-ID: <20261109154501.1362649-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261109154501.1362649-1-luiz.dentz@gmail.com>
 References: <20261109154501.1362649-1-luiz.dentz@gmail.com>
@@ -101,108 +101,40 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-write_cb called authorize_req before decoding the handle from the PDU,
-so the authorize callback always saw handle 0 for Write Request, Write
-Command and Signed Write Command.
+When storing the prepared data fails, prep_write_complete_cb sent an
+error response and then also the Prepare Write Response. The error
+response also used the response opcode instead of the request opcode.
 
-Decode the handle first and add a test checking the handle that is
-passed to the callback.
+Send only the error response, with the request opcode.
 
-Fixes: 291e9a0d8e6e ("shared/gatt-server: Add bt_gatt_server_set_authorize")
+Fixes: 1ebfc68f ("shared/gatt-server: Request authorization for prepare writes")
 Assisted-by: OpenCode:claude-sonnet-5.5
 ---
- src/shared/gatt-server.c |  4 +---
- unit/test-gatt.c         | 39 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 4 deletions(-)
+ src/shared/gatt-server.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 6796817bf324..b63745c4df2e 100644
+index b63745c4df2e..4a6bdb4677ab 100644
 --- a/src/shared/gatt-server.c
 +++ b/src/shared/gatt-server.c
-@@ -838,7 +838,7 @@ static void write_cb(struct bt_att_chan *chan, uint16_t mtu, uint8_t opcode,
- 	struct async_write_op *op = NULL;
- 	uint8_t ecode;
- 
--	if (iov.iov_len < sizeof(handle)) {
-+	if (!util_iov_pull_le16(&iov, &handle)) {
- 		ecode = BT_ATT_ERROR_INVALID_PDU;
- 		goto error;
+@@ -1310,10 +1310,15 @@ static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
  	}
-@@ -847,8 +847,6 @@ static void write_cb(struct bt_att_chan *chan, uint16_t mtu, uint8_t opcode,
- 	if (ecode)
- 		goto error;
  
--	util_iov_pull_le16(&iov, &handle);
--
- 	attr = gatt_db_get_attribute(server->db, handle);
- 	if (!attr) {
- 		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index ad8e95453be2..bf60741077c5 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -2008,7 +2008,7 @@ static void test_client(gconstpointer data)
- 	create_context(512, data);
- }
+ 	if (!store_prep_data(pwcd->server, handle, offset, iov.iov_len,
+-							iov.iov_base))
+-		bt_att_chan_send_error_rsp(pwcd->chan, BT_ATT_OP_PREP_WRITE_RSP,
++							iov.iov_base)) {
++		bt_att_chan_send_error_rsp(pwcd->chan, BT_ATT_OP_PREP_WRITE_REQ,
+ 					handle,
+ 					BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
++		free(pwcd->pdu);
++		free(pwcd);
++
++		return;
++	}
  
--static void test_server(gconstpointer data)
-+static struct context *create_server_context(gconstpointer data)
- {
- 	struct context *context = create_context(512, data);
- 	ssize_t len;
-@@ -2021,8 +2021,38 @@ static void test_server(gconstpointer data)
- 	tester_monitor('<', 0x0004, 0x0000, pdu.data, len);
- 
- 	g_free(pdu.data);
-+
-+	return context;
-+}
-+
-+static void test_server(gconstpointer data)
-+{
-+	create_server_context(data);
- }
- 
-+static uint8_t server_authorize_cb(struct bt_att *att, uint8_t opcode,
-+					uint16_t handle, void *user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_step *step = context->data->step;
-+
-+	g_assert_cmpint(handle, ==, step->handle);
-+
-+	return 0;
-+}
-+
-+static void test_server_authorize(gconstpointer data)
-+{
-+	struct context *context = create_server_context(data);
-+
-+	g_assert(bt_gatt_server_set_authorize(context->server,
-+						server_authorize_cb, context));
-+}
-+
-+static const struct test_step test_server_authorize_1 = {
-+	.handle = 0x0004,
-+};
-+
- static void test_search_primary(gconstpointer data)
- {
- 	struct context *context = create_context(512, data);
-@@ -5038,6 +5068,13 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x23, 0x03, 0x00, 0x09, 0x00, 0x01, 0x02,
- 				0x03));
- 
-+	define_test_server("/robustness/write-authorize-handle",
-+			test_server_authorize, ts_small_db,
-+			&test_server_authorize_1,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
-+			raw_pdu(0x13));
-+
- 	define_test_server("/robustness/read-by-grp-type-malformed",
- 			test_server, ts_small_db, NULL,
- 			raw_pdu(0x03, 0x00, 0x02),
+ 	bt_att_chan_send_rsp(pwcd->chan, BT_ATT_OP_PREP_WRITE_RSP, pwcd->pdu,
+ 								pwcd->length);
 -- 
 2.56.0
 
