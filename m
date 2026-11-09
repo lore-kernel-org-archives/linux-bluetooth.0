@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794209666;
-	b=bcrxhVhM5WhBflfMC8r9th2vmRYt9ndIZH5gsIboviwBHhrBU/hmkZhiKfGEyY/jSPLQ
-	 px+wHXUA2dythwZTgRdLKx0v5hk3gzrP2df4Nb00SrwRchki9qwKY+azW4c56b0cGsKhk
-	 qQnOtSPQGkZOy4qtZktO0jKgel4YOk/ZSH++ZlK9C/maF9FhuGAeymdGtKnkd6iYjuZ3J
-	 ssJxNme44aE6RJ1VrUcRA/bwm0fYjv1Z41MChpnjez9VA+TkZl7Ad93aageGDp3CUrTTe
-	 M1Q31QsudmA/Shc7LEFB/DX6VlsOA7sL6N4AQBTsn025eMlGQIZ4rtQV9QePoJrNeeg==
+	t=1794209683;
+	b=Y1Mpyyu/18XzItb0KBe1OmtIPfmqf62NNGBN32vETTb+ZXvqW5bwJ8qIC9TOpgSb1pN4
+	 L/M6th77zj83FdwBGgjdQOkhY/aKAODw6VvupkwHDIN+IIusjpR4FNSlz6RMxEHOYAIm1
+	 xu/UBeq81LxRadteuC29vCwVPIKFPpXDhaF2p2H0zWjgu5zxkrxzJtDGsXut4NTnaK5hD
+	 XX5fnmCMNw0f3IgJ+610R1tdCAHjpf5dVDSQfFdVF30OhVyX6SVTru30WMCaDkj3E16nr
+	 Vzrb+oonmQl7+m2hwJJa0HotFbvGgVFUSW4xvBIYjUs3nZZS1M6eLlFDnx4GPZrrY3g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794209666;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794209683;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=17G9DyFZAfFH8GPfbZpTsBWMIRvPnSGk4HUp+ACrROo=;
-	b=LOyKpItrmNg58MRReXmhaVkERXQBWah0V0pNsKEtQT+bPEvBdKLd5ku/z7Vmd1gkVa/B
-	 0nAgeNTEPEaUh+9Z0jIdDbyx2ug1m6MkbO6rVNoJkfBrDmH/CWD9msgDToo5V7CCXlpFR
-	 OjziO1au26IzT43DEoAo8WpEutz2zSpjQQF+iNIgmnpajPSuMJaNgi1pv40OyuHCjYd5Q
-	 zO5KgPjtOOE2EfhOSIB+PTSU8ZsjBSt854JmYIIsseQLym/zk7hDTJpu17IW1gy4E/RB8
-	 hxLODMu520L7c+9daTBQSBdnntmqJWAn0HTHHaTAFn+3kxmq53qEpTg4W86TqmPq1kw==
+	bh=MpimnCg02HZciFk2g0S8/wZfNZukhRQXczEg3LroMuI=;
+	b=MQZ8IN8nL8er0qkiGpObIn1danznM2igVNBoi6zxn8kAx05lGpyPhvyiBYGY9wd2TiKk
+	 z85ctYbFIG/jXVJvAg7uxAmhsOavVvlDdZO172GlBhI5Cloj0xkgCR1U1K+vp0goO8PW/
+	 4LhSuw6iTVPTtsEWjIQLH9YMQFeoBm1dRoLW9lKSqLzFUCh1X8h15kwQ+hJPMG4ThxisT
+	 9Sq+pbKiWx7yMFq7qLLhAY7HQjvcar6EZZHia3H+ywPpzdRzcDmp0jsDXpQjlc/KccSSt
+	 UqBcioA4TRFUpxyJMQzk3cQmiuhxY41Zl6W4nsXUBiT3TwbFK31NofVTIwzsj+yhyFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QvvEjfNi;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MKr63xQC;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886756083623;
-	Mon,  9 Nov 2026 07:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2972A60A6F7E;
+	Mon,  9 Nov 2026 07:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QvvEjfNi
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E721F008A2;
-	Mon,  9 Nov 2026 07:34:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MKr63xQC
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0FD71F008A5;
+	Mon,  9 Nov 2026 07:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794209666;
-	bh=17G9DyFZAfFH8GPfbZpTsBWMIRvPnSGk4HUp+ACrROo=;
+	s=k20260515; t=1794209682;
+	bh=MpimnCg02HZciFk2g0S8/wZfNZukhRQXczEg3LroMuI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QvvEjfNis/KFwU9vzGAN8pvLgr0fjdkgdejTc8BPExlNctb8aqJEdc1YUwPCMEieC
-	 zepVu8tmJY11WUNpUij3xiIsi9aPDztCQ7qoGN1Qag3KKiWeeh8n56QAK+8zw63iQi
-	 e8siadnuZ5lGPjVShUaXOWy8Hs3qDf8JV57dNDZaKm/42XtntE9dewOyaueFtSzVzP
-	 /BFAxu0AHtcl9i/soVQSIT9Q5G1vqeS9V6AVj4PDJGh3xJf/4CQBQd0aVqqtoNTb2u
-	 vH7TDY8saDgHRYN3AXmY8qAZsHOsbFzKz1pajC9vKykthSAG2ZZG3k8g6Pwl+6SFwj
-	 SS/4zRJ2ly1jg==
+	b=MKr63xQCZG0Kx/uDf562/8osJmX+c3VIP3ZLP2fy+N3p2uMLmr261yWJN04SAid33
+	 4qJxdMBJEuJjdAYJgwhRUQoVw6QBjlAGGjoc7Y54KLCCEhufLWIW048UgQ4IzodCVv
+	 wU6UbWG/JabptBOI2k3O1pXRAAZc3jfaVJ1HMHVghqwOsOIlcicfIxkciYOpZyn3mj
+	 QotY5+kzCshox9OAqzDTEATR1ApsmuZxkEzUdHzUfiOkCIjb/ySQqk81vs6EyoFaZo
+	 bdSaWl9jfQIvtVJDkJZBmj4xW209iqY7h7Bs68bjZ6U9e2NDfpuBJWxUOIjNVD6CXx
+	 F0QG94RhDBeWw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -82,9 +82,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-pci@vger.kernel.org,
 	iommu@lists.linux.dev,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v2 03/19] USB: Lock registered interfaces during manual driver binding
-Date: Mon,  9 Nov 2026 09:33:33 +0200
-Message-ID: <20261109-device-trust-core-v2-3-3b12d9a9f861@nvidia.com>
+Subject: [PATCH v2 08/19] driver core: Add a compatibility API for manual driver attachment
+Date: Mon,  9 Nov 2026 09:33:38 +0200
+Message-ID: <20261109-device-trust-core-v2-8-3b12d9a9f861@nvidia.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
 References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
@@ -103,107 +103,132 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Interface claims hold the USB device lock, but device_bind_driver()
-requires the target interface lock. Without it, trust-policy writes can
-race admission. The MediaTek btusb setup path instead holds the target
-interface lock and would deadlock if the claim took it again.
+Existing manual binding paths probe drivers under subsystem locks before
+publishing their bindings. Normal attachment would add device locking to
+these paths.
 
-Lock registered interfaces around binding. Change btusb setup to hold the
-USB device lock with a PM reference and disconnect-aware acquisition,
-because disconnect waits for this work while holding that lock. Publish
-the claim state before releasing the lock.
+Add device_driver_attach_full() to preserve their serialization while
+centralizing probe and binding cleanup. This compatibility API must not
+be used in any new code: it prevents devices from using the device trust
+authorization infrastructure. New code must use device_driver_attach().
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/bluetooth/btusb_main.c | 42 ++++++++++++++++++++++++++++++------------
- drivers/usb/core/driver.c      |  5 ++++-
- 2 files changed, 34 insertions(+), 13 deletions(-)
+ drivers/base/dd.c      | 74 +++++++++++++++++++++++++++++++++++++++++++++-----
+ include/linux/device.h |  2 ++
+ 2 files changed, 69 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index 92a78a7e60396..8fe6bd1bff906 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -2993,10 +2993,13 @@ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *skb)
- 	return hci_recv_frame(hdev, skb);
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index 52123251965de..0f56c3d825731 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -526,6 +526,21 @@ static void driver_sysfs_remove(struct device *dev)
+ 	}
  }
  
-+/* usb_lock_device_for_reset() gives up after one second of contention */
-+#define BTUSB_MTK_ISO_LOCK_TRIES	5
++static int __device_bind_driver(struct device *dev)
++{
++	int ret;
 +
- static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
++	ret = driver_sysfs_add(dev);
++	if (ret) {
++		bus_notify(dev, BUS_NOTIFY_DRIVER_NOT_BOUND);
++		return ret;
++	}
++
++	device_links_force_bind(dev);
++	driver_bound(dev);
++	return 0;
++}
++
+ /**
+  * device_bind_driver - bind a driver to one device.
+  * @dev: device.
+@@ -542,19 +557,64 @@ static void driver_sysfs_remove(struct device *dev)
+  * Callers should prefer to use device_driver_attach() instead.
+  */
+ int device_bind_driver(struct device *dev)
++{
++	return __device_bind_driver(dev);
++}
++EXPORT_SYMBOL_GPL(device_bind_driver);
++
++/**
++ * device_driver_attach_full - attach a driver using subsystem serialization
++ * @drv: driver to attach
++ * @dev: device to attach it to
++ *
++ * This compatibility API must not be used in any new code. It prevents
++ * devices from using the device trust authorization infrastructure.
++ * New code must use device_driver_attach().
++ *
++ * Callers must serialize attachment and removal using their subsystem's
++ * existing locks. This function does not acquire the device or parent lock.
++ * It calls the bus or driver probe callback and publishes the binding without
++ * performing the normal driver-core DMA, pinctrl or power-domain setup.
++ *
++ * Return: 0 on success, or a negative error before binding.
++ */
++int device_driver_attach_full(const struct device_driver *drv, struct device *dev)
  {
- 	struct btmtk_data *btmtk_data;
--	int err;
-+	int err, i;
+ 	int ret;
  
- 	if (!data->hdev)
- 		return;
-@@ -3011,22 +3014,37 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
- 	}
- 
- 	/*
--	 * The function usb_driver_claim_interface() is documented to need
--	 * locks held if it's not called from a probe routine. The code here
--	 * is called from the hci_power_on workqueue, so grab the lock.
-+	 * Disconnect holds the device lock while draining this setup work, so
-+	 * the lock must be taken with disconnect-aware acquisition. Hold a PM
-+	 * reference so the device cannot suspend first. A slow interface
-+	 * registration can keep the lock past the one-second limit of a single
-+	 * attempt, so retry a few times, but not without bound: a teardown
-+	 * that holds the lock may be waiting for this work.
- 	 */
--	device_lock(&btmtk_data->isopkt_intf->dev);
--	err = usb_driver_claim_interface(&btusb_driver,
--					 btmtk_data->isopkt_intf, data);
--	device_unlock(&btmtk_data->isopkt_intf->dev);
-+	err = usb_autopm_get_interface(data->intf);
-+	if (!err) {
-+		for (i = 0; i < BTUSB_MTK_ISO_LOCK_TRIES; i++) {
-+			err = usb_lock_device_for_reset(data->udev, data->intf);
-+			if (err != -EBUSY)
-+				break;
-+		}
-+		if (!err) {
-+			err = usb_driver_claim_interface(&btusb_driver,
-+							 btmtk_data->isopkt_intf,
-+							 data);
-+			if (!err) {
-+				init_usb_anchor(&btmtk_data->isopkt_anchor);
-+				set_bit(BTMTK_ISOPKT_OVER_INTR,
-+					&btmtk_data->flags);
-+			}
-+			usb_unlock_device(data->udev);
-+		}
-+		usb_autopm_put_interface(data->intf);
-+	}
- 	if (err < 0) {
- 		btmtk_data->isopkt_intf = NULL;
- 		bt_dev_err(data->hdev, "Failed to claim iso interface: %d", err);
--		return;
- 	}
--
--	set_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
--	init_usb_anchor(&btmtk_data->isopkt_anchor);
+-	ret = driver_sysfs_add(dev);
+-	if (!ret) {
+-		device_links_force_bind(dev);
+-		driver_bound(dev);
+-	}
++	if (!device_is_registered(dev) || dev->p->dead)
++		return -ENODEV;
++	if (dev->driver)
++		return -EBUSY;
++
++	device_set_driver(dev, drv);
++	if (dev->bus->probe)
++		ret = dev->bus->probe(dev);
+ 	else
+-		bus_notify(dev, BUS_NOTIFY_DRIVER_NOT_BOUND);
++		ret = drv->probe(dev);
++	if (ret)
++		goto clear_driver;
++
++	ret = __device_bind_driver(dev);
++	if (ret)
++		goto bus_remove;
++
++	return 0;
++
++bus_remove:
++	if (dev->bus->remove)
++		dev->bus->remove(dev);
++	else
++		drv->remove(dev);
++clear_driver:
++	devres_release_all(dev);
++	device_set_driver(dev, NULL);
++	dev_set_drvdata(dev, NULL);
++	if (ret == -EPROBE_DEFER)
++		return -EAGAIN;
+ 	return ret;
  }
+-EXPORT_SYMBOL_GPL(device_bind_driver);
++EXPORT_SYMBOL_GPL(device_driver_attach_full);
  
- static void btusb_mtk_release_iso_intf(struct hci_dev *hdev)
-diff --git a/drivers/usb/core/driver.c b/drivers/usb/core/driver.c
-index d3a61ebc6afb0..ad5d9d5fc7598 100644
---- a/drivers/usb/core/driver.c
-+++ b/drivers/usb/core/driver.c
-@@ -584,8 +584,11 @@ int usb_driver_claim_interface(struct usb_driver *driver,
- 	/* if interface was already added, bind now; else let
- 	 * the future device_add() bind it, bypassing probe()
- 	 */
--	if (device_is_registered(dev))
-+	if (device_is_registered(dev)) {
-+		device_lock(dev);
- 		retval = device_bind_driver(dev);
-+		device_unlock(dev);
-+	}
- 
- 	if (retval) {
- 		dev->driver = NULL;
+ static atomic_t probe_count = ATOMIC_INIT(0);
+ static DECLARE_WAIT_QUEUE_HEAD(probe_waitqueue);
+diff --git a/include/linux/device.h b/include/linux/device.h
+index 429e39f647cf9..42e966ebaa2d3 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -1314,6 +1314,8 @@ static inline void *dev_get_platdata(const struct device *dev)
+  */
+ int __must_check device_driver_attach(const struct device_driver *drv,
+ 				      struct device *dev);
++int __must_check device_driver_attach_full(const struct device_driver *drv,
++					  struct device *dev);
+ int __must_check device_bind_driver(struct device *dev);
+ void device_release_driver(struct device *dev);
+ int  __must_check device_attach(struct device *dev);
 
 -- 
 2.56.0
