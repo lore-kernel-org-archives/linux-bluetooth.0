@@ -1,56 +1,130 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794318723;
-	b=YRYRaAs2WTKm1p5cpRKNkectPqVcCmD46Mmp25fe9dHWTT4ErMMbajt2qer3PPk+MtOD
-	 LRKy65tAoqEyUAaqB2g9RaWyW2/CYPy8Rucs0yIzSbOXGCnUfUDZO+X1/2IUIqi2ptYpo
-	 mFKxMsvygmG0p9WqVRn6y0DAxUYCs0MkEqevJOJInlUDTRd7gFMnDHWl4KRLUS3IKUnfN
-	 0uON0X/X2Pyh20xbxHmoLfWo37j17P+XIp4hZ06qISWW2/OJ3zePlLf7akAP75G/hXJLH
-	 eI1oFgSMc8WXJ4DwUw84st88LZvWESY+cU0fy3lDpZhGIzS4FIJanhnz+Ehqy62cMbw==
+	t=1794320737;
+	b=WmjMhOiOJ/HQrz0Lx3SZnoxerEBaBv1XdnhzQMYabFOR8Ui6OUcCazT+nSieFcehLFNe
+	 5n/mmUk08yvm2/z4bG3dl1qeEsC1TcBt13zoaVyMgpnNMiMUgjBaXsKecrkY2mpm56N4I
+	 tR88LHQkGUZsIK0ei7iF+z6VMmTt087JBYj/Q7IcliM+X+VACARDWQbk5GeOVKIbKc6rs
+	 //RlW4xfQgmIHjsHW/nRwjpH9aVaF8fG/vRv8yBYmCex2CkOCK1NQTZLzwlGlCzhgxY8J
+	 jMFjmlioPxNuFcKDBoySMwMghCuTRx4WrJldw+ONRJnsCZ3hIUltuXNziGUcPuSc/+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794318723;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=OwiHixbB0gSoUHwpEoRYDWh04tLZK7JEhgg1SVZOTIY=;
-	b=Aq7MIBQ7RxFai70+8Xa2fuMTP1a3yl2ZiEkTNXW5z6IbGRNryDH4P6y+q4c8Bu3RnJK+
-	 Gs7m5VhuXa8GbCs72+aikVZ4s27PdKKv6+1KI5kdlas7WsLGFc819rbguhiSPxNEuAM1y
-	 cOfhiNqhUf8HtSsIbgnnuPxsI/Oo9UXQgoebvc1n0rmbyHYySt1C3YwqYSLKUyjKtkXG/
-	 y847c5DzyXRn9AnRLSEu/PR0BUA4IqmciybrIZfvYGbAuAMaSAiXNQGyVPWC13c+FwZwu
-	 JDRbBk9ZnwN4Zn9HtO8S9Z18Ql4dIzsaF3798BIIlB/FrwBcLt0B+wXIbyqec6IAWLw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794320737;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=lkAP1m7U86A6D3jq5FI3LtbBiJBALHf/XTrdqm7iRv0=;
+	b=hcjCMBAyMaZ9R16pmYE6So5aV62mWGlHRk4uxrp9b/NXRHj671l0apGjL50vF7/kvfn8
+	 zo0xd5KfeypyzumC2ta6XZ5p9mKRtK5SnZoBOUkT+tfuECROY9FgGW1m3LQP+9rDsm6jC
+	 nyZv0/UmVDZA8X69z11vfZAIRLToEQic32BsXprNo2RDlfdaJKvCywKc7jvlTsAS67ErU
+	 BDqquP7MEJfIWbcacuxOvOFYHeAGdh7K/rwPY1AAVUIHVBhlbVPkV4eHfvBr8GCvKjaZZ
+	 Jq305rrosezBYZcZtkdNvi0dQdrHEVCrxxbAYk0W215xg2VP3+yQC2FEJZooPG/8LMw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mo68Yo2i;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=ziepe.ca;
+	spf=pass smtp.mailfrom=ziepe.ca;
+	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=YHCNwWvx;
+	arc=none smtp.remote-ip=209.85.219.51
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 45B4C606A31C;
-	Tue, 10 Nov 2026 13:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA391606A9BA
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EA391606A9BA
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mo68Yo2i
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4A4581F0089F;
-	Tue, 10 Nov 2026 13:52:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794318722;
-	bh=OwiHixbB0gSoUHwpEoRYDWh04tLZK7JEhgg1SVZOTIY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Mo68Yo2iJODpDfXBnYKhRBOdMiSz8coFRoLz7fubBoCMzqD+jj8CWCQKN0dgYlwN2
-	 F9MIepRTrEIAU9p/ePaT26uNcU2bH+MovxbGJehKmbqeUyKRMfdzev77F8XK5BW1JS
-	 2VTIs4KT44WcseUlDdCuFsBdsMYYZeaPMOEU36IZRSv/8LQL5ZUE7MmLd81rEoY2DW
-	 kHChPadgHruwMn8tBqdMKgmUG/nVROjWUDmha3b9gUzYDgna3nZ8Raspa4XE3d1B+t
-	 jGJ8jOBgpwmO/qAuk3aojWhBZutJpRKD7BsTgQNOr++bJ21S1jCFHSSKk11NzVCN7X
-	 SzFJ3hUq4SjaQ==
-Date: Tue, 10 Nov 2026 14:52:00 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com, xiuzhuo.shang@oss.qualcomm.com, 
-	wei.deng@oss.qualcomm.com, jinwang.li@oss.qualcomm.com
-Subject: Re: [PATCH v4 1/2] Bluetooth: hci_qca: Reopen the UART after
- enabling QCA2066
-Message-ID: <au5qgd73yj54e4xvesadruebszqujclc7ltv4ikrzcbppnbakv@lld7zw5aug3z>
-References: <20261110092929.234617-1-shuai.zhang@oss.qualcomm.com>
- <20261110092929.234617-2-shuai.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=YHCNwWvx
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-91c11468b5fso18427636d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 06:25:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1794320736; x=1794925536; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=lkAP1m7U86A6D3jq5FI3LtbBiJBALHf/XTrdqm7iRv0=;
+        b=YHCNwWvxZ2i5OqHQ+YUqQLCC1rzv2GgovdQMVYEwKh33tRosyn7GSIJuDa41qmh/kW
+         zi7LyeKhFQOPYEl+gUniDWgNdaawKzYRwoS7Dq0Cx9eafD18pzSWOBgk0COIE+DG118i
+         S5bwR2UJTtx2uoqYAeHAyK/dxjo4bAnlVjVlKAp5uCve1qemG+leX9AgPW5FTMSGevza
+         aK8L0rcHuwhC3z9DNrC7UjQwC0QG7d3DQfBuriogPZkFVd264tz+6Hml+iB06xl4HH1G
+         y8/vRZyBHrGKwiKkupF3SKK0bECjiQV15fzHQ3Z56gBpctujXKC1iL8VZGRRSe6K9b4t
+         6xPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794320736; x=1794925536;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lkAP1m7U86A6D3jq5FI3LtbBiJBALHf/XTrdqm7iRv0=;
+        b=Aaz8CxsQuOtGt0GTOVFjBMmK1T10Bt5kJQTTXfqhGiv+VsicpLl87TxBqOxKIf7zuP
+         /Ch4o+iBGQpIZaiA+UZl9zGZ/dzUI0bg1GyKtlP7hTKBhUaHAWsqVnSsIUT2hmty1Hnw
+         zx3M/heTaoZnsREN2jWyb//kdA8Dt0YMBQ+q0+7JaJBu4lyrUtCWj5HSgYUYsKJ7mUxc
+         ap9u5+/CARvUgVAk3GzdSo+y3g2WuD2pysVOD2cK2a38Wzq32ilAXZ+0YClf+lnG2pQA
+         pozM5zYZUcEyfiZa48+1TzUTji2WqaYe3CBZWYO/vTwBet8Yf2E8cSFQwkNsMiHrhWw7
+         nIug==
+X-Forwarded-Encrypted: i=1; AL+hErGwcnYRi8vQIpOk1uQ47T2QuVGZARSsq/53W+YFmDPuhFQpNzcGH0QBUDGpFc4v2y0x13PZpnJeQw5xsFDV5FI=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/StvBvVdAJvqwx0Hwg33Aq9uRxX9KRc1flbI/D2SkybMYAuumT
+	oXzCfIKVPiXoZwOxvxycSvxQ8ToYqmE3tE99IOozT6Cd2ilFiAijxut0w07Jrmvb8ws=
+X-Gm-Gg: AYBFou1K2n7GYB8zDxZWOu7J5NOzYRvH+4HaYMK72mfZJhtkhlmj/JC3HhZC4vnqffL
+	vZLdYggcLECIpTJvQg2xzxUaNaCHDdisDmjQltG5zS1IHXE8/wNXSAPMppDMri7LpCVlBB9O94E
+	qManoRuzQ5xUnahaseUHTQIoKiFXC26La2zEQ3VAz05e9//yEe4MM16nYcE59JPVdj9f+JtDRNx
+	JpPXrVNpGeddpZi3HPoG4BUiuG8EYZkF9DpyAb4LWiJmr4MMEvrQVbc2m9bgM8bq2BbMByehYaX
+	e8X8eCwK/01nBrr/ai0zVLcPvmhvtl1VjxAEUr/us9n8an/usYC6gbNyZ1N8KINfs3+lsLMPOnf
+	l8pbS0QH3jsTKDyhcvMvKV5Xajbh3ORzCE/6Z2GS4rSL1ulcS8p6gj+wFiTkGx1wsOuiVq2jqOB
+	oYFs77bhOXkiPlrjOQSj3ddpXYu2MRgFlpj2Gwtz33ZkAhi7nIcNDfQH84OUK5L6Mm8ebRiqPt5
+	04IZ1TI9ezRKdtQZN1g89kNKOT2ttCgQcll1/kCa+2X18RwQp2+qu7RWD+KcCi/ujAG7x5Qg+Tf
+	T/MdOBC1Bbq/hndiCd/5lCjAfbOzf9pgs+mopz+s/eFzzlBtPpl5ZZ2vv6z1qlBZbNK0jl24ot6
+	gz3kTZ/R87xmM
+X-Received: by 2002:a05:6214:5281:b0:91b:87cc:6d3e with SMTP id 6a1803df08f44-91eef628900mr47274136d6.1.1794320735682;
+        Tue, 10 Nov 2026 06:25:35 -0800 (PST)
+Received: from ziepe.ca (hlfxns010zw-159-2-239-150.pppoe-dynamic.high-speed.ns.bellaliant.net. [159.2.239.150])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91ef0501c1csm21854426d6.30.2026.11.10.06.25.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2026 06:25:35 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1xQmn0-00000005tbF-1WYc;
+	Tue, 10 Nov 2026 10:25:34 -0400
+Date: Tue, 10 Nov 2026 10:25:34 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Robin Murphy <robin.murphy@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+	linux-input@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
+	iommu@lists.linux.dev
+Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
+Message-ID: <20261110142534.GY663069@ziepe.ca>
+References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
+ <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
+ <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com>
+ <20261110122237.GG8635@unreal>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -62,26 +136,94 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261110092929.234617-2-shuai.zhang@oss.qualcomm.com>
+In-Reply-To: <20261110122237.GG8635@unreal>
 
-On Tue, Nov 10, 2026 at 05:29:28PM +0800, Shuai Zhang wrote:
-> QCA2066 does not reopen the UART after the controller is enabled, which
-> causes RX/TX out-of-sync errors. The UART has to be reopened once the
-> controller is powered on.
+On Tue, Nov 10, 2026 at 02:22:37PM +0200, Leon Romanovsky wrote:
+> On Mon, Nov 09, 2026 at 01:53:02PM +0000, Robin Murphy wrote:
+> > On 09/11/2026 7:33 am, Leon Romanovsky wrote:
+> > [...]
+> > > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > > index b486b8bbd1fcd..8be2a246d4903 100644
+> > > --- a/drivers/iommu/iommu.c
+> > > +++ b/drivers/iommu/iommu.c
+> > > @@ -1879,7 +1879,7 @@ static int iommu_get_def_domain_type(struct iommu_group *group,
+> > >   static int iommu_get_default_domain_type(struct iommu_group *group,
+> > >   					 int target_type)
+> > >   {
+> > > -	struct device *untrusted = NULL;
+> > > +	struct device *restricted = NULL;
+> > >   	struct group_device *gdev;
+> > >   	int driver_type = 0;
+> > > @@ -1901,14 +1901,15 @@ static int iommu_get_default_domain_type(struct iommu_group *group,
+> > >   		driver_type = iommu_get_def_domain_type(group, gdev->dev,
+> > >   							driver_type);
+> > > -		if (dev_is_pci(gdev->dev) && to_pci_dev(gdev->dev)->untrusted) {
+> > > +		if (dev_is_pci(gdev->dev) &&
+> > > +		    pci_dev_default_is_restricted(to_pci_dev(gdev->dev))) {
+> > 
+> > I think this should be the generic device_is_adversarial(gdev->dev) now - in
+> > fact probably all the dev_is_pci()/to_pci_dev() stanzas aren't conceptually
+> > PCI-specific, just an artefact of the current "untrusted" flag being so.
 > 
-> qca_regulator_init() already enables the controller and then reopens the
-> UART, but QCA2066 does not go through it. QCA2066 was added with its own
-> SoC type and handled in the default case.
+> I wanted to do the same, but iommu_get_default_domain_type() may be called
+> before the PCI device's trust level has been set. At that point, we are
+> still in "disabled" mode, whereas device_is_adversarial() checks for
+> "adversarial" mode.
 > 
-> Let QCA2066 go through qca_regulator_init() as well, and handle it in the
-> other places that check the SoC type in the same way. This also applies
-> the baudrate switching, flow control, shutdown and probe handling of
-> those chips to QCA2066. btqca.c checks the SoC type in the same way, so
-> the firmware version is also shown in the log.
+> The below is from AI, I asked to present me the path for that:
+> --------------------------------------------------------------------------------
+> For a newly discovered PCI device with an available IOMMU and a new IOMMU group:
+> pci_scan_single_device()
+>   pci_device_add()
+>     device_add()
+>       bus_notify(dev, BUS_NOTIFY_ADD_DEVICE)
+>         blocking_notifier_call_chain()
+>           notifier_call_chain()
+>             iommu_bus_notifier()
+>               iommu_probe_device(dev)
+>                 __iommu_probe_device(dev, NULL)
+>                   iommu_setup_default_domain(group, 0)
+>                     iommu_get_default_domain_type(group, 0)
 > 
-> Signed-off-by: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-> ---
+> For a device whose initial policy is adversary, its state during that call is:
+> dev->trust_policy          = DEVICE_TRUST_POLICY_ADVERSARY
+> dev->trust_level           = DEVICE_TRUST_DISABLED
+> dev->trust_committed_level = DEVICE_TRUST_DISABLED
+> dev->driver               = NULL
+> 
+> device_is_adversarial(dev) = false
+> 
+> The active level changes later, during binding:
+> really_probe()
+>   device_trust_prepare()
+>     __device_trust_prepare()
+>       WRITE_ONCE(dev->trust_level, DEVICE_TRUST_ADVERSARY)
+>   dev->bus->dma_configure()
+>   call_driver_probe()
 
-As suggested by sashiko:
+The ordering here is wrong, this is a consequence of splitting this
+into different series. I don't think we need to fix it in this series,
+but as a followup. For now I would aim to make 'no functional change'
+and still follow the ACPI selection during default domain creation.
 
-Fixes: a7f8dedb4be2 ("Bluetooth: qca: add support for QCA2066")
+The long term goal is to detect that the trust level is disabled
+during iommu_probe_device() (ie we are running in a secure booting
+mode), attach the device to BLOCKED (which should be a NOP) and defer
+allocating the default domain.
+
+This would preserve the DRTM iommu & ATS blocked behavior through
+until driver binding, giving userspace a chance to do an attestation,
+turn on link ide and so on before exposing the system to DMA from the
+device.
+
+Once userspace sets the trust level and binds a driver then we can
+allocate a default domain using the user set trust level and avoid the
+above problem.
+
+For the CC VM use case today there won't be a vIOMMU, and there is an
+indepenent control for DMA ENABLE in the TSM driver so this doesn't
+matter right now for CC.
+
+Probably put this detail in the commit message
+
+Jason
