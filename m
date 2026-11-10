@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794327017;
-	b=XpxcHYcae4JpjVm8SGmVuUlGQdoqUOULD7vz67nyco4U94ZTEfhkj6g77rdRFosEqrTI
-	 cXbcbkNLqmyOnbgYMyHbgwppoRJTogq83pEskXrhPbm1NQ9sRi7YW//Xg1bK25PFbATHm
-	 W7X6IT+FKnhW9e7GDAc8gnv448OwgHB2NV/1IY5S9SvRZFM/lhHAXKXv4n3TfZfebhEzz
-	 htcz5DzjS5PrLmxTVhh2fmobj5APo7ngj+E77wHTEGeeS37/KaVtVweKfwzCs8jNmuhKr
-	 H/GSTylFx828hUG0fugVGrAQL9O9TcuMQ5I4Z0Kwbk/OfUYuQJ6II5DH7hXgKjK92Gw==
+	t=1794327019;
+	b=TvQlQ2uTOtQUfOhQhU/ROYTnfhMaWSS9JG2NeoMOWIZv8yBY0NUTQf/HtxGjZMg6Lv26
+	 JBVkfMb8Ih8i/3sBA+GjpP50buZW0ePCRcKOm/CnpkBfMViwLFXyfv3eel1VWUTySpXIa
+	 ZhF6meLsCW1WUxiADrXu6qB5wDSzmSeO9ckUFGZPxlUp5j61PX/SSWlcC31ndKOVS/3OX
+	 i+7+T5AVSogqq96BUvwGGZO/nGmmpMyzWXdVqbsCWyBpWtggfHvx6H5On1K8Wl1JQQiDF
+	 TrplPJOAL+7fRegt6zP7Afhs/oMw4gIe+J0Lfktq5JofiX2D55lYVElaDJuzjdPpTMQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794327017;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794327019;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=3eZdXLlFwJzXpS1qIaDjxF033ww2XL0YZWUeFSyjE9A=;
-	b=ujxMUymYdQVEZKwOUEwUGj4DcDoFdxg1khwLyzklpQi9RBKJMDpH7aLNcbYp5vGP0ujX
-	 s+Di2hwb5n6pPnB/3tKpIESj19mQMt73Oexxj+PSa6mHKNA2u+xYOTY5ElYtTb9pqe37/
-	 9BqmZFCTuL4jSB4O9AsGSVKpRhZE4r36I6ARUdviu+mqbZHPfz9xqZ4JKxUi8JVIhu9yN
-	 Qd1s9vWwi0abKnDHUUlG4wI3+bKXbZ3us6d7PUtXMFxuMO4iNlVCDALsUC/sWhCGhR7M6
-	 AUJ4OkAPgFC4o7PDkm+ZUEQPzdiEixtCv9yjpYbnPt0YYKhgGZvjV5rXDyB98iBkOyg==
+	bh=FtgSy50ncFX8mtmhpa8fDaaHWvyfYPmRejYYMo9Zq54=;
+	b=a18OaAyqDxn3SNtjaFVvjzisUfM72vUzCZ/BkTHphn3ERb/SowZoNrj+866kaQrrG46M
+	 PKEZSfDmtBYwoZq/lCDaniilfwQ4IEFsYyXFNMKPK/piKr+TRCRNj5xVXXjhCffopn+JG
+	 dEDieRzEXYRgaAMQdee57zI9kfYUW9cVs0m3DM/PPq18dePBu7AyKzp2kV1x/OnnoT/eN
+	 tCDeNweZYwawXNHu8/Hk90MQkSP24mgYf7rz1Co6tXb7FS7N6H1X7klz0dUKhMMZ1Bxq/
+	 fbm3TFO7sXw5pNS6y3pHLn1go3KkSPPS1vYMv1rzE6bmch8SAs/G0sGgjXL2/yBv/Gw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SLXZ5auM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAHfvYZE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDB060A3811;
-	Tue, 10 Nov 2026 16:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0975D606A332;
+	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SLXZ5auM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC191F00902;
-	Tue, 10 Nov 2026 16:10:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAHfvYZE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A59201F008A1;
+	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794327017;
-	bh=3eZdXLlFwJzXpS1qIaDjxF033ww2XL0YZWUeFSyjE9A=;
+	s=k20260515; t=1794327018;
+	bh=FtgSy50ncFX8mtmhpa8fDaaHWvyfYPmRejYYMo9Zq54=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=SLXZ5auMw+RqIz6ZqPs8URzYf+7gSFioN+/dBzFgFmu/ZUVzUbVeX8zqUnn8SlFH2
-	 ss8bv1Vk40by6Wp5rBmpkYmLmpRjrUgzjXtt1t6gR0DRNikH7KbeFiRqClGJKFMpJr
-	 E5A9Qzw/43q8hBS+zHhoQQNgMW7B9LrzXFFAt+e8MqRqSiatNiQYWmGkUj8/+TFogC
-	 CsMp1182F2U9apcn7z35L2eIYZOKXj3ztLchoCZyTR8a3JtP4gvdtoWashmsB4ur/C
-	 jVeSxOeI+UqpqiGHFCvcI4fx8Y0dRxHGgnDdslBRXAfeWrhSubtCl2HESmQ4gqiXxW
-	 mIlbBJlvB1QSA==
+	b=FAHfvYZEgvnG2OTMz/gTJHhj2QEtGKpZItyvU8aYui3AdU8f5mHsnwNhhilfvzK/Z
+	 Af4vt4rPu3fyk1Kuw9Mwe0UFvCMxkhIo8Dm4vzNSz+EvSRPd7c0ICiyfG+EjuoGWZh
+	 i6mIziLWHNqMe9WRUND9rOmHSStfs2pEbmUriyZ/GSKsj6/CUjaovOtbWbmNuQoMZg
+	 2L3/0Nwzyir1P1jQ/N29fDX5UVUcrFGSJ47vfNH5toFN+tJVoZ71d6W/J8pOjpTmHZ
+	 UVYoI2viqsHzEX0oG277p6cvLrBGN1nkWTsRv9UXs6wihgGLGMI+krtilAqG3dAwPd
+	 mQ04JI0kWI/dQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 20F8F39D267B;
-	Tue, 10 Nov 2026 16:10:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B07339D267B;
+	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,43 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: vhci: Flush suspend work after removing
- debugfs
+Subject: Re: [PATCH] Bluetooth: hci_qca: clear qca_memdump when discarding
+ dump
+ packets
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179432701567.4062787.206480705237565419.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Nov 2026 16:10:15 +0000
-References: 
- <pm-bluetooth-objects-candidate-0146-v7-4a901c7fb65111f006fe@gmail.com>
-In-Reply-To: 
- <pm-bluetooth-objects-candidate-0146-v7-4a901c7fb65111f006fe@gmail.com>
-To: Cen Zhang <zzzccc427@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- baijiaju1990@gmail.com, jjzuming@gmail.com
+ <179432701717.4062787.5293659281594260012.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Nov 2026 16:10:17 +0000
+References: <20261110-hci-qca-memdump-v1-1-239974fc4944@gmail.com>
+In-Reply-To: <20261110-hci-qca-memdump-v1-1-239974fc4944@gmail.com>
+To: Joas Antonio dos Santos <joasantonio108@gmail.com>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org, brgl@kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 25 Oct 2026 00:15:17 +0800 you wrote:
-> The VHCI controller must remain alive until suspend_work finishes.
-> vhci_release() flushes the work before removing the force_suspend
-> debugfs entry, so an active writer can queue work after that flush.
+On Tue, 10 Nov 2026 03:55:41 +0000 you wrote:
+> From: Joas Antonio dos Santos <joasantonio108@gmail.com>
 > 
-> A force_suspend write changing the suspend state can overlap the last
-> close of /dev/vhci as follows:
+> qca_controller_memdump() frees qca_memdump when a memdump packet with a
+> non-zero sequence number arrives while QCA_MEMDUMP_COLLECTION is not
+> set, but leaves qca->qca_memdump pointing at the freed object.
+> 
+> The next run of the work reads the stale pointer into its local
+> variable, skips the allocation and uses the freed memory.  Another
+> packet with a non-zero sequence number frees it a second time, and a
+> packet with sequence number 0 writes ram_dump_size, current_seq_no and
+> received_dump into it.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: vhci: Flush suspend work after removing debugfs
-    https://git.kernel.org/bluetooth/bluetooth-next/c/58d8a0955065
+  - Bluetooth: hci_qca: clear qca_memdump when discarding dump packets
+    https://git.kernel.org/bluetooth/bluetooth-next/c/45a25a1bfd26
 
 You are awesome, thank you!
 -- 
