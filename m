@@ -1,62 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=194.199.235.221
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794296833;
-	b=Oz38uiOgUxwK/TgB+aFsIbDizigkQRSvVRzAptjW8pF75N/CI1LMavizQGATpDiLzzBt
-	 usYEGedo+GgyTctA2H449FS+Ijeft6sZ3W8c5wBWj5aLdzNbA/IN7S90RT3UwjcK1USpD
-	 ZZ/47aeTvr4IiIYT8bD3dhZbawDom4mRrOVKqr9c7qelnj/avedqJO+a5J3SXwxvaDoBR
-	 cebwUNsARXAi2RRytEx4jUHmpTPmS2UHIAOOYM5y8O22+sdMHd5XqNFH2+2GF26Q7hzh7
-	 xoJT3NEpB3AHV8cmH7SrNueQmiCvDn+r7dvKFjHg8/KCtNTZbaZx3Hk1RLxXOiSPHLg==
+	t=1794296839;
+	b=Swb0vtF3Cl/ldnWNo3QeJMOtuZQ5FMs+PdSMMBEwQIg0gFKtYV9ukXOQqArXaJqAWpNf
+	 MDyuZV05fULn0FgGAaX3280/PONg3iXloscRsXlyF91n11rN8DaFuF6blVcPvSbPo2OAi
+	 XR0HnYUFJZRkBkvsNka9zgQTYLp5mEMjx2Ez2wXQBcutIEjw1ZwNC7G0XbcfCMYRBL2oX
+	 3LbuflOkYjpjU0VxV4W2KxWCmINASQaOV9qWsG7HHTBMHMaEDxL3VkAFoAeTErtudBAi5
+	 YNU1i/fTkg1Y3312DzPnGfvtyz4COWFzLMIHf+X0+XUCVl876jHllaqNdD7nMlUliSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794296833;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794296839;
 	h=DMARC-Filter:Received:Received:DKIM-Filter:DKIM-Signature:
 	 X-Virus-Scanned:Received:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=mfTY212zApa5ehOLo+920M5IDmH72kkgNtIxDrvSizo=;
-	b=te+fSz7Gh7BCoIniW0GoUdZh9MrC7MhWflmecoOwuQi4w9soIGo7fWSHXO6yxjTcfx4L
-	 RaB2v9Exk0yeiQbVv4nzp8/iK0SkJJw9W4G2By8YOsK22f4M6jHnYzTgxP/U4cg2Hkouc
-	 ZC8wXxhEoSSMUVyl7AR6Y4CC+97hFg7mPHXYBxsYBeYcXsAWHA547k3YotG0bLtlRIhYx
-	 hOn7jolxgWAlq91AiidsD3W+2li4m8+Y3zRGk2vSqRalNRLy6Vu2e86Tv/uh8oetNnZGE
-	 1DlyIsXFsrCM8zaT4KUHqHbR9XL+0lk/ea5DuAALSJSVCqj9FGK6kwreljRz8WNgarg==
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=1baqYX7J86dweMCkPQfESiLRzdTWwZDtqPYe1PsN2XM=;
+	b=5X5bV4I+hHazMq0vJZQKIabqOstXCjX1IW6pO9U/gL7mxzgwdifDE8hmfI2OIH6auCSE
+	 zU1ExkPC/AukGgyTUrc1EXM5+NRz7HlVo4bFd0/GjiwA3mnrB32K3j4C9wNhhN3CwV9Rv
+	 zz7NtHoUt2xSgY6yAbmp/n0AOe9sgaBYYMwSGtlwQPHtDB6xC3SQn36PcPXBPOUwN1DL1
+	 FDYVM5pqQ+9MaxhL8T+bnKPuzRtogcdOSdD5TaFyml9MaM+2a4bgakozdgUcD0GRhaWkO
+	 wMEE4tngK4gYj9REIJ1w/PKIi/7qYRAdb75EQLu2OCsr75qfXCydEaRVphxlivQD1Tg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=cirad.fr;
 	spf=pass smtp.mailfrom=cirad.fr;
-	dkim=pass header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=c3QPy4YH;
+	dkim=pass header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=BA+bFgOL;
 	arc=none smtp.remote-ip=194.199.235.221
 Received: from retz.cirad.fr (retz.cirad.fr [194.199.235.221])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED502606A339;
-	Tue, 10 Nov 2026 07:47:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED502606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98F6606A331;
+	Tue, 10 Nov 2026 07:47:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A98F6606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cirad.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cirad.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=c3QPy4YH
+	dkim=pass (2048-bit key) header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=BA+bFgOL
 Received: from retz.cirad.fr (localhost [127.0.0.1])
-	by retz.cirad.fr (Postfix) with ESMTPS id E98E320D78F8;
-	Tue, 10 Nov 2026 08:47:09 +0100 (CET)
+	by retz.cirad.fr (Postfix) with ESMTPS id 2431620D4CA9;
+	Tue, 10 Nov 2026 08:47:17 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by retz.cirad.fr (Postfix) with ESMTP id C9D7620D7CF7;
-	Tue, 10 Nov 2026 08:47:09 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 retz.cirad.fr C9D7620D7CF7
+	by retz.cirad.fr (Postfix) with ESMTP id 00D2320D4CB1;
+	Tue, 10 Nov 2026 08:47:16 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 retz.cirad.fr 00D2320D4CB1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirad.fr;
-	s=573E3878-7916-11F1-BF4B-F68474317960; t=1794296829;
-	bh=mfTY212zApa5ehOLo+920M5IDmH72kkgNtIxDrvSizo=;
+	s=573E3878-7916-11F1-BF4B-F68474317960; t=1794296837;
+	bh=1baqYX7J86dweMCkPQfESiLRzdTWwZDtqPYe1PsN2XM=;
 	h=From:To:Date:Message-ID:MIME-Version;
-	b=c3QPy4YHf6uoEBpjCpO2aq4SeEQklbaMPaB1SxoJmL2pfYAxXnHOmBbM8Ce/6SjZe
-	 KzQr3/RswObM+fKbEg9CRG3nMVtl0fCbdx8QkkbAxwUc/ZfK7TwVgb6tzDXr+PyTwq
-	 h5uqtUMtjamdqozSHKzmxJRYVIp5e30Hievr6oF4i5fhN6YyEHhl2dPQ9fGuFtm8sg
-	 VGEQKHGWArHOp6vUQTfeGshTf4A/puahEadfkW98UJT6W0tSFHLMnp5x8spZLQekWn
-	 uWkI4lm4Lt+t5ILJZ1bSeClwARJOapjSZkEzWs61hSsb2Er55ggiaOJxd2EdEthyj0
-	 mFFmgwD4T564g==
+	b=BA+bFgOL5chCN83DvWwCtjB8Z/AMp/wJolkNGrtjSp1z2whP/uU++tMBmDXuEBLMN
+	 ZyQsQbooCG7bDpGwD1c/vV3ifVnw0/7F2B7oAIzUd75Zwg9GvVwyYYpxcn8R0GCU24
+	 kQ2gnKIi/lAIkb+e6viQUw1/g801FLVpiEllrrjaStvqkVkHBqlLTm3VGEQpq9VU04
+	 4+dFqejklQanlpnsfjZtDFEPwlBUIgIOtDw0mb1x6qIj7rGWzirkV7G8CetzYukF6n
+	 M2QS8C40UoO0LKYHiVuR94I3PW2iDjJaMRrdFlLi9RXWHp0t6h7uh/gw99yk3iGpmR
+	 Aqmk4ayc8cetQ==
 X-Virus-Scanned: amavis at retz.cirad.fr
 Received: from retz.cirad.fr ([127.0.0.1])
  by localhost (retz.cirad.fr [127.0.0.1]) (amavis, port 10026) with ESMTP
- id QGSqc_bMMjO0; Tue, 10 Nov 2026 08:47:09 +0100 (CET)
+ id m0-m20SpvJkb; Tue, 10 Nov 2026 08:47:16 +0100 (CET)
 Received: from localhost.localdomain (78-196-243-100.subs.proxad.net [78.196.243.100])
-	by retz.cirad.fr (Postfix) with ESMTPSA id CF35F20D78F8;
-	Tue, 10 Nov 2026 08:47:08 +0100 (CET)
+	by retz.cirad.fr (Postfix) with ESMTPSA id 045BD20D7CF7;
+	Tue, 10 Nov 2026 08:47:15 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -77,10 +78,12 @@ Cc: Vasily Khoruzhick <anarsoul@gmail.com>,
 	spacemit@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
-Subject: [PATCH 0/2] Bluetooth for the RTL8852BS on BPI-F3
-Date: Tue, 10 Nov 2026 08:46:05 +0100
-Message-ID: <20261110074607.363918-1-frederic.mahe@cirad.fr>
+Subject: [PATCH 1/2] dt-bindings: net: bluetooth: realtek: Add RTL8852BS
+Date: Tue, 10 Nov 2026 08:46:06 +0100
+Message-ID: <20261110074607.363918-2-frederic.mahe@cirad.fr>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261110074607.363918-1-frederic.mahe@cirad.fr>
+References: <20261110074607.363918-1-frederic.mahe@cirad.fr>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,28 +96,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-The BPI-F3 (SpacemiT K1) carries an RTL8852BS Wi-Fi + Bluetooth module.
-Wi-Fi (SDIO) has no upstream driver, but Bluetooth on UART works with
-the existing hci_h5/btrtl code and linux-firmware's rtl8852bs files.
+The RTL8852BS is a Wi-Fi 6 + Bluetooth 5.2 chip with Wi-Fi on SDIO
+and Bluetooth on UART (H5). Its Bluetooth part works with the
+RTL8822CS driver data, so use realtek,rtl8822cs-bt as fallback.
 
-Patch 1 documents the compatible, with rtl8822cs-bt as fallback, so no
-driver change is needed. Patch 2 enables it on the BPI-F3.
+This patch was prepared with the help of an AI assistant (Claude),
+which also ran the tests.
 
-GPIO usage was tested one line at a time: GPIO 63 is the power/enable
-line and GPIO 64 the device wake line. The vendor DT also drives
-GPIO 65 and GPIO 67; Bluetooth works without them (and RSSI is the
-same with GPIO 67 high or low), so they are left out.
+Signed-off-by: Fr=C3=A9d=C3=A9ric Mah=C3=A9 <frederic.mahe@cirad.fr>
+---
+ .../bindings/net/bluetooth/realtek,bluetooth.yaml     | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Fr=C3=A9d=C3=A9ric Mah=C3=A9 (2):
-  dt-bindings: net: bluetooth: realtek: Add RTL8852BS
-  riscv: dts: spacemit: enable Bluetooth on BPI-F3
-
- .../bindings/net/bluetooth/realtek,bluetooth.yaml | 11 +++++++----
- arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts   | 15 +++++++++++++++
- 2 files changed, 22 insertions(+), 4 deletions(-)
-
-
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/realtek,blue=
+tooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/realtek,blue=
+tooth.yaml
+index 7d567122b..ffdf13b05 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.y=
+aml
++++ b/Documentation/devicetree/bindings/net/bluetooth/realtek,bluetooth.y=
+aml
+@@ -4,16 +4,16 @@
+ $id: http://devicetree.org/schemas/net/bluetooth/realtek,bluetooth.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+=20
+-title: RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS Bluetooth
++title: RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS/RTL8852BS Bluetooth
+=20
+ maintainers:
+   - Vasily Khoruzhick <anarsoul@gmail.com>
+   - Alistair Francis <alistair@alistair23.me>
+=20
+ description:
+-  RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS is a WiFi + BT chip. WiFi part
+-  is connected over SDIO, while BT is connected over serial. It speaks
+-  H5 protocol with few extra commands to upload firmware and change
++  RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS/RTL8852BS is a WiFi + BT chip.
++  WiFi part is connected over SDIO, while BT is connected over serial. I=
+t
++  speaks H5 protocol with few extra commands to upload firmware and chan=
+ge
+   module speed.
+=20
+ properties:
+@@ -28,6 +28,9 @@ properties:
+           - enum:
+               - realtek,rtl8821cs-bt
+           - const: realtek,rtl8723bs-bt
++      - items:
++          - const: realtek,rtl8852bs-bt
++          - const: realtek,rtl8822cs-bt
+=20
+   device-wake-gpios:
+     maxItems: 1
 --=20
 2.47.3
 
