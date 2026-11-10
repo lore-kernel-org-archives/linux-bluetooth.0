@@ -1,53 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=52.59.177.22
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794299020;
-	b=06EPMQljPOCRXP8GpjEDtkmZoGrq5GBehzCTugNBtyEyvpsQscvmebqiTYGXvsrS1RXy
-	 axgsXDGuFtdEE69Hh6ejzGx1cv48pEjswr46/aFJ1Z8n0BHNQxVrwPdFOKfZlbFepidpO
-	 FtLEEpld8oAbh+OdF1Jt5ocUGo+47azBTf3onkFM9Uro+FuN5nUlGHK2b2lHEL3RBUfm0
-	 1pyCgd6DFuObgy5QW1SJeiF4rSOc+tpRUH1p9ywiku1s/uv9I/AzGC25uiNAoHHMBC8Zz
-	 RKI5UOENVxcAlmEu2RAoW0DPChLyUz5/mC5j3FHEE9MjQkew47mz4aUEFQJdaQdSo5g==
+	t=1794300335;
+	b=erovdncVcgMZRp0QvPv77WpRuejG1qVscQwyqNyoymY/oM7zoojUEK2/+bX72r1WB1wh
+	 1u+jjWkz5+51Hqc5g57yCUqTQlD0P0IOsHMVLMe0YRuDe6injZRAhHqJ3GI0gWL3CB8k7
+	 UODuWmAM77BaIx3BSYrUQQdgFS4NjHN9q/oQK2YqZ1aYbf02AirRtB4xkM5fF90I6pk5J
+	 pYH7jpDL+gskKS1yZMj+/8hfSikjBXL77PYPziispRlyESneHhUfwMe4QRDD+JyQr2H2t
+	 dY3UYGJK9ySn9lrpmHgPnoCxwnu948w+3thnIE0I8hTYafrBFYBNmWERfe6f47O03pw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794299020;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 MIME-Version:X-Received:Date:X-Google-Appengine-App-Id:
-	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
-	 Content-Type;
-	bh=C+lLx34DtFR+icpIrkFESZORb4whxR56bE4IISsmaT0=;
-	b=WJ0idFFgb4BnzNH9/M8gey8CiwxPtCmLIKl4UWeEkpvdpJ4DN/WI1Kp0f1WYRI4H+4uP
-	 fV7Gt/L/3iPV+/diRl4LQpYUlZhCf484pfZ/fUzxqmJ4makcIkEO2lJqGKG0IQGojQQoE
-	 8SNYdJ5SfdrykNitntnk0VC97uNJCAo1mh6z7EFOf1v3ZgORV1k74xnkIuxjJ07Yi7TMG
-	 Z0zcn8IQRLT6m9UG3YPVUw+69kpUHs0RbznJKhEIU4TYCLCDpfvPVQnHoBUCydj5aW6qR
-	 zR1zZEmd0N8J3H5Tt1EfEy2Sc4Kyz9grZFGtTW5TzPhucC1KQv89B272jcPaNMaCBGw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794300335;
+	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
+	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:Mime-Version:
+	 Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 Content-Transfer-Encoding:In-Reply-To:References:X-QQ-SENDSIZE:
+	 Feedback-ID:X-QQ-XMAILINFO:X-QQ-XMRINFO:X-QQ-RECHKSPAM;
+	bh=sUto69GneM3/21N1G4JPtL94JDaDhP2/KjnoIeniECk=;
+	b=HHMgpDwqUcAJ+E5aPOvvTGPqFc4dDBwfcczxfo9dFCq6ogwjHwhXwQZ2A9XzOhZp9FbW
+	 NUR3fkikgtMZvJa7ZuJRTyEwluhjzzR73/DN2GlEggB3uZvSw1O6WSrA6jQq26wDhf0G5
+	 GwMz9Y2/k+gnMsqf/R4l+UUHwHwpvXO0g4QlpbtoRDK1iHusNaEurwa70m+3mB6cCVkGa
+	 bFvQW94HkDfDc/r3z47wX+qxXn3y7ihdLFPL/EyTuCneu5IdW4ubWA+altkVXBwiyDGzZ
+	 +jwHevwv9S1/C1/qqXjK4lSCKuKAschpYDRclweg2Lv+s6ZWCLONuQFhdXOpeykZgsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.199
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=none header.from=linux.spacemit.com;
+	spf=none smtp.mailfrom=linux.spacemit.com;
+	dkim=pass header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=Pmrp1zLQ;
+	arc=none smtp.remote-ip=52.59.177.22
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563A7606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 08:23:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 563A7606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4ab260600easo2707715b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 00:23:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794299019; x=1794903819;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=C+lLx34DtFR+icpIrkFESZORb4whxR56bE4IISsmaT0=;
-        b=o11qDU30RSWm4Wjbl7ob1TSAVf7k0JJas0jnH5BoIf639QWBdk79JoTqT4kItHoWQF
-         0n6mKSjMj2rKpvwP2ex5BK8V5Qu9rvBgECgAOw6Joyi/RGgOPVO0qbwT2zfYZu5a7TKx
-         UVjudfLKHWX1kEcl7AYAWvF7CmQn2fvvxb8DsirH5ElxKaRsPyhfD+Dh9hMGF+SItfSs
-         PUIwz5SoTS2A7HTJ/rYD7EayehUEkYXtVprRBEMynDvWlXxX2oP59uCd5UnFezKhDHl8
-         G9ku3IPqJkFM99pVvhdpGx1tUjpLOR94jRYX4/xPKOvVU6ZHmHykCgjwXNAPiCb9MWpY
-         u4Qg==
-X-Gm-Message-State: APuU4Z9aueat+HnPUQSizDimGo2Rqaof0nht57fn4wBFr7g1ttxxsNGl
-	xvLvV49/nAx+SII30SVSI1haXuKKYibwNRDT5Y3tYAZzQxMZBg/uib6ILfpaADm6+frjVlMTcHv
-	pJdOTXxRRWCZs8tnJFU2UcOos673NF5GyXVcmZ3OSh0KwqIJZDyF+n91WC3M=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA352606A31C;
+	Tue, 10 Nov 2026 08:45:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA352606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=Pmrp1zLQ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
+	s=mxsw2412; t=1794300281;
+	bh=sUto69GneM3/21N1G4JPtL94JDaDhP2/KjnoIeniECk=;
+	h=Mime-Version:Date:Message-Id:From:To:Subject;
+	b=Pmrp1zLQtx/5nIr+Y5iQ2mlQeMA1CYwGweLyEYJAh7qy5//x4lI597D4KpAhYE8R9
+	 JYWJDdpP5cWGd++UMpi1H7c4UCla7UMwVQRmY4nP/MysInDHirSrCzz2nWdqGU1Hw9
+	 Z16dzNPqvJF7dDxht4xbY3dBQJyEr70QYZWWPM18=
+X-QQ-mid: esmtpsz16t1794300279t7e784a46
+X-QQ-Originating-IP: RZyIr1RkrL/Ze4oQ+7VPt95YCi+emVuRwyceRtOz8jI=
+Received: from = ( [183.48.247.17])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 10 Nov 2026 16:44:37 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 8600440983646492188
+EX-QQ-RecipientCnt: 19
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -56,129 +58,107 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:c1fc:b0:4d6:9133:cfeb with SMTP id
- 5614622812f47-568813b3f76mr846681b6e.48.1794299019256; Tue, 10 Nov 2026
- 00:23:39 -0800 (PST)
-Date: Tue, 10 Nov 2026 00:23:39 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6af2d48b.4dd4714a.f8d02.0024.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in disable_delayed_work_sync
-From: syzbot <syzbot+b1146b58a9d6d90e0eb4@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=18f11060a803f47ff361742ba8691daff4c6fbfbe03e1b9c377f4db00c26;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Tue, 10 Nov 2026 08:44:36 +0000
+Message-Id: <DMRED3CXA5IJ.3FLQ7UFUTN0R9@linux.spacemit.com>
+From: "Troy Mitchell" <troy.mitchell@linux.spacemit.com>
+To: =?utf-8?q?Fr=C3=A9d=C3=A9ric_Mah=C3=A9?= <frederic.mahe@cirad.fr>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
+ <luiz.dentz@gmail.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Yixun Lan" <dlan@kernel.org>, "Vasily Khoruzhick" <anarsoul@gmail.com>,
+ "Alistair Francis" <alistair@alistair23.me>, "Paul Walmsley"
+ <pjw@kernel.org>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou"
+ <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>, "Troy Mitchell"
+ <troy.mitchell@linux.spacemit.com>, <linux-bluetooth@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <spacemit@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20261110074607.363918-3-frederic.mahe@cirad.fr>
+References: <20261110074607.363918-1-frederic.mahe@cirad.fr>
+	<20261110074607.363918-3-frederic.mahe@cirad.fr>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:linux.spacemit.com:qybglogicsvrgz:qybglogicsvrgz3a-0
+X-QQ-XMAILINFO: MShfLn39PbN2APgg9dvNoZD0mnyzgy9+pWI3O+qvUle3b+72Hb0DW5jh
+	+1gCDbjd+J6Io1XLGyUL13hxdi0ki1gq0pJ+KDFHfB/PxOpOwYu8ItIbIcCW+oH/XS3N/8S
+	3frioK4ctTvZZ1UX8eLcegFjaLe/mfvqvycD1gu8jSaRR2aFiO5BRdO9lzjxgHppMC+uAD7
+	ziP8QK5WcvnB7tTI3bvuspACf89XB65k2y7PIR1pThs9AkArppm5KfHtyBtVclpsdmmuDsU
+	VfyfZ+CrsJ5HFDQSvsOwGPr0SC7Cx8kD5cirKakzwiqSbJJz/bXQC7S1ux7M6IYiJDppUXG
+	ANqtTgZ4YadObYvv31A9sYRFxhk+xkksh1ydebGUTEx5tCTACBQfky8uSnAk4g4mb3ECQ7Z
+	Wfcn+blF/AKUNaMCwoltRdF4AVbMwLdC+Y9A0czXxiroI062FNF25SVEzkburqCPIZ0rb1Y
+	SDvnNcQXsZfqEcJfQZqNsofkskEnK0+QA9BoY5PXDDnQ2M1gJIxz6rz6hy3MNJ9IdxIqIVt
+	qvtjCNE5yX45Y5n1adxttOhK0tdUexuAyG5kuwwKqNOiNWEj9UCzSfvKHOh4VBrGwaBK45w
+	JJc0NSCtAriyyptUxrqLDP2f7imKpUM87cTaRcYv3hpFELUtMh5lFYzom+Os9jSh7yPahpC
+	HUz4apRyc+iXTQXIWNZX5dwahwEi5dUN2OzsuSP+1uWt0tIDSnOXO6q3b+64VEvbjUVj3fW
+	0Ukh+Fl7gJ6EBPBGyklAxHR47iHcGAwQb0ICJvb9+FKk9wpOGy9zJ7SkugIabFPSxaZCIpO
+	yjY7F7HylA1FHqWzHNGlo44pMZXU6yETsISwUYavcdmGFtI3gvaAygBRxgOm/t9fCTenvUw
+	zJw6SMh1JcNDXBKxlkTJFbV7B0wdAT5yeclqbUebsCH6Gg1y7KwgUIvumPMGAvxL/p4p3n4
+	5iGR/MjDrnIEsmc1kLO7ofIJbFK878qTg+DGkYl7oOEXlktShgdkvraqlyL+Vm7P1ltc1XP
+	qg8khqNHQFfsQQaP5ApNt4X6v0rK51vqbawxm53SB0KH1rquATxoPaiZmCIwiDZbMRWh7jm
+	mpasRtzGCriChpZJ5QTUcw=
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
 
-Hello,
+--18f11060a803f47ff361742ba8691daff4c6fbfbe03e1b9c377f4db00c26
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-syzbot found the following issue on:
+On Tue, 10 Nov 2026 08:46:07 +0100, Fr=C3=A9d=C3=A9ric Mah=C3=A9 wrote:
+> The BPI-F3 has an RTL8852BS module whose Bluetooth part is on UART2,
+> with hardware flow control. GPIO 63 powers Bluetooth on and GPIO 64
+> is the device wake line.
+>
+> The firmware config switches the UART to 1.5 Mbaud, so take the UART2
+> clock from the 48 MHz slow_uart2 clock.
+slow_uart2 is a programmable divider (MPMU_SUCCR_1), not a fixed
+48 MHz clock. Its rate is whatever the bootloader left there.
 
-HEAD commit:    58c1eb84e977 arm64: sdei: Preserve the interrupted context..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1070f24e580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a58b6b4d667e7a61
-dashboard link: https://syzkaller.appspot.com/bug?extid=b1146b58a9d6d90e0eb4
-compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12869155580000
+[...]
+> diff --git a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts b/arch/riscv=
+/boot/dts/spacemit/k1-bananapi-f3.dts
+> index 58035d886..280adc9dc 100644
+> --- a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
+> +++ b/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
+> @@ -383,6 +383,21 @@ &uart0 {
+>  	status =3D "okay";
+>  };
+> =20
+> +&uart2 {
+> +	assigned-clocks =3D <&syscon_apbc CLK_UART2>;
+> +	assigned-clock-parents =3D <&syscon_mpmu CLK_SLOW_UART2>;
+Please add CLK_SLOW_UART2 to assigned-clocks and set it explicitly:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b1ec47537e12/disk-58c1eb84.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3bca0c2b1169/vmlinux-58c1eb84.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a7c49594d5a/Image-58c1eb84.gz.xz
+	assigned-clock-rates =3D <0>, <48000000>;
 
-AI-generated root cause summary:
-When shutting down a Bluetooth HCI device (e.g., via vhci_release() during
-process exit), hci_dev_close_sync() calls hci_conn_hash_flush() to iterate and
-delete all active connections on hdev->conn_hash.list via hci_conn_del(). In
-hci_conn_del(), disable_delayed_work_sync(&conn->disc_work) invokes
-__flush_work(), which triggers WARN_ON(!work->func) because
-conn->disc_work.work.func is NULL. This occurs because the connection entry on
-conn_hash.list either suffered an in-place memory corruption overwriting
-disc_work or remained linked after an unbalanced hci_conn_put() dropped its
-refcount to zero without deleting it from the connection hash table.
+> +	pinctrl-names =3D "default";
+> +	pinctrl-0 =3D <&uart2_0_cfg>, <&uart2_0_cts_rts_cfg>;
+> +	uart-has-rtscts;
+> +	status =3D "okay";
+> +
+> +	bluetooth {
+> +		compatible =3D "realtek,rtl8852bs-bt", "realtek,rtl8822cs-bt";
+> +		enable-gpios =3D <&gpio K1_GPIO(63) GPIO_ACTIVE_HIGH>;
+> +		device-wake-gpios =3D <&gpio K1_GPIO(64) GPIO_ACTIVE_HIGH>;
+> +	};
+> +};
 
-full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=b1146b58a9d6d90e0eb4
+--=20
+Troy Mitchell
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b1146b58a9d6d90e0eb4@syzkaller.appspotmail.com
+--18f11060a803f47ff361742ba8691daff4c6fbfbe03e1b9c377f4db00c26
+Content-Type: application/pgp-signature; name="signature.asc"
 
-------------[ cut here ]------------
-WARNING: kernel/workqueue.c:4570 at __flush_work+0x988/0xa90 kernel/workqueue.c:-1, CPU#0: syz-executor/4881
-Modules linked in:
-CPU: 0 UID: 0 PID: 4881 Comm: syz-executor Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
-pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : __flush_work+0x988/0xa90 kernel/workqueue.c:-1
-lr : __flush_work+0x984/0xa90 kernel/workqueue.c:4570
-sp : ffff80009c5c7540
-x29: ffff80009c5c76b0 x28: ffff7000138b8eac x27: 1fffe0001913694d
-x26: ffff0000c89b4a68 x25: 0000000000000001 x24: dfff800000000000
-x23: 0000000000000040 x22: dfff800000000000 x21: dfff800000000000
-x20: ffff0000c89b4a50 x19: ffff80009c5c7580 x18: 00000000ffffffff
-x17: 0000000000000003 x16: ffff8000898b7000 x15: ffff80008b586000
-x14: 0000000000000000 x13: 0000000000000005 x12: 0000000000000000
-x11: ffff7000138b8ec5 x10: 0000000000000000 x9 : 0000000000000000
-x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000000000000003f
-x5 : 0000000000000040 x4 : 0000000000000000 x3 : 0000000000000020
-x2 : 0000000000000008 x1 : ffff0000c8350000 x0 : 0000000000000000
-Call trace:
- __flush_work+0x988/0xa90 kernel/workqueue.c:-1 (P)
- __cancel_work_sync+0xc8/0x144 kernel/workqueue.c:4729
- disable_delayed_work_sync+0x24/0x38 kernel/workqueue.c:4892
- hci_conn_del+0x6c/0xfcc net/bluetooth/hci_conn.c:1300
- hci_conn_hash_flush+0x17c/0x238 net/bluetooth/hci_conn.c:2814
- hci_dev_close_sync+0x5d4/0xd00 net/bluetooth/hci_sync.c:5681
- hci_dev_do_close+0x34/0xbc net/bluetooth/hci_core.c:502
- hci_unregister_dev+0x204/0x4c4 net/bluetooth/hci_core.c:2694
- vhci_release+0x12c/0x17c drivers/bluetooth/hci_vhci.c:704
- __fput+0x338/0x74c fs/file_table.c:512
- fput_close_sync+0x10c/0x278 fs/file_table.c:618
- filp_close_sync+0x7c/0xb4 fs/open.c:1573
- close_files fs/file.c:572 [inline]
- put_files_struct+0x1a4/0x2e8 fs/file.c:584
- switch_files_struct+0x60/0x74 fs/file.c:598
- exit_files+0x50/0x68 fs/file.c:604
- do_exit+0x55c/0x1a64 kernel/exit.c:977
- do_group_exit+0x198/0x238 kernel/exit.c:1123
- __do_sys_exit_group kernel/exit.c:1134 [inline]
- __se_sys_exit_group kernel/exit.c:1132 [inline]
- pid_child_should_wake+0x0/0x104 kernel/exit.c:1132
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x244 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0xec/0x23c arch/arm64/kernel/syscall.c:121
- do_el0_svc+0x4c/0x5c arch/arm64/kernel/syscall.c:140
- el0_svc+0x60/0x1d8 arch/arm64/kernel/entry-common.c:797
- el0t_64_sync_handler+0x44/0x104 arch/arm64/kernel/entry-common.c:816
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:606
-irq event stamp: 175128
-hardirqs last  enabled at (175127): [<ffff80008036fa20>] __cancel_work+0xf4/0x1a4 kernel/workqueue.c:4709
-hardirqs last disabled at (175128): [<ffff800086953878>] el1_brk64+0x20/0x54 arch/arm64/kernel/entry-common.c:484
-softirqs last  enabled at (173918): [<ffff8000800204f4>] __do_softirq+0x14/0x20 kernel/softirq.c:703
+-----BEGIN PGP SIGNATURE-----
 
+iJcEABYKAD8WIQSL4Ay2cExaPXAQcU2YCe+A+TM0LwUCavLZdCEcdHJveS5taXRj
+aGVsbEBsaW51eC5zcGFjZW1pdC5jb20ACgkQmAnvgPkzNC9shwD/ctzYIBUZsuLe
+dMFLfduAxPc7n4ySob06tzWvF4yFEtYBAO20Qqsvk4E1YLuWVcrPvgvy6Z/0EImi
+egn5XeWhGVkK
+=3dgM
+-----END PGP SIGNATURE-----
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--18f11060a803f47ff361742ba8691daff4c6fbfbe03e1b9c377f4db00c26--
