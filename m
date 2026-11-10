@@ -1,60 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.25
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794308591;
-	b=KM5Sx8u5NO/VbJQV9pgXVyqHD12CT8pz843zlCamHkSfvfYBFmUuyr5Ltq7LQt4ovvAu
-	 qJKZaF44KR57zR2Zi4L4GqPfqdwqVkVa2uo9CcC4w8dc5z9Kxa/IVmsUN7gjYD7qlkKB6
-	 +SkVU7lDto7WKvVLF/l7Dqt0HnpblCBa/R3vrW2b8a/qSVldPHn4378aYGoGAT0pdxKf2
-	 +b8PuRAVI74y/vwDErMiesvgLF2Z3R8AK1lsDJDAx11U3nHPz4Tzmc40idQ/qWiYdEwqK
-	 wvDuTvwEzH/pe8vwT09Zw1TevObHJ0IJBrQ/Bk9mNzH1EkysPsjRUlILRzHHxQGqx2g==
+	t=1794309174;
+	b=0Pt13/5suau6iOlwj1vpDQVtZ4prySgVoliG7PkRbtoY3jCzBAKUrKL0UlBH7fX5vROv
+	 mPRGtQEcTiMSODSobOsqZCZNZ3HXU1UWy6UNqwB8bm93Qb6wp2MTsK1T6y/XiZOaA0ImI
+	 tltiCIQMfr/TP7/J6HNu4WoTikVVA9jSasQO5ralGfCajr9Ybj/PpXXd5ylGg5xkKTLU/
+	 JaGFDVE5FAddKzo7q0h8OxVY54Nf9uboZGAkdtHjxHJaocuJ0BFBu2/Ee6y5znQFx9pLQ
+	 16KCfbsCWUqgJ+IHYVaJHGlJZeh8ABxL76h3IH92+gdMikr9D06k6BG5nQQIFIay+qQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794308591;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=BZRqNPkVHbDtKON6wv6OQaO7er0kYUMxGcWb88xBRWU=;
-	b=yCDb+STFWXf/9eHndLRYtUDwNhNfmD8MLdaRldvzgJ1kTXpHZooGQiJhRM9MmhlSBmwc
-	 k1Q/o7RSlaaM+5kZ3eUxGNH05DIpHjKfYOdqe6F0JPJACkaJcWp/6bvhwJa7FFt03DMTg
-	 X0neG+JlfoPIOzCHkaYzvqPy97Ocb8dCzRvTopalfLuuqB2l8kkAxpglOjugqCEJY2FXP
-	 HH7ktrx0EeslcCDodd6YEOtplJXm+fYvb2vQZWxJ+tbxmq3x/wK/wW9X6LYkeJV2CmblP
-	 YYfzQ1PUNlUrsHabYlaoiGp6nT2fTAaqCU++wW1yq5782k+KonOGpNZqLGWRc32Eg3A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794309174;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=8v0BUCWmA/IL2caTcqInIIIAoTr1kMPjQ+8LYQT6wNY=;
+	b=pKmSKB+qpmZU/i2NPXgWxjrpq3hynApL8o+wxQxF8UjOaIOSEBRwchTAnQsSgLtMJEgz
+	 cV2LJFmFxhgxBaesZShb0pIvB5tNcgetKdjaJLtAbKAMDC2nMqocfpqRbbBK7/JnLxQKz
+	 KLIgYJ5yEPuTckKUTWtdGMtJ1zWwvNXQ6NFaAyVPekOlAu8xjnJXRd4tQndyNPNfbPr5O
+	 gRGWIyXeglAc33bu5o6CPSu9R59V9xAvCJJsQnrt1qeH+BEe5KucvINuL7WU8iIM+bZh4
+	 pc1bO/yTDiVN7tGA4C6LRJUbx1LwHXcYBGGrfWzFePrioVeiqWRKqvH1cRy53U+B9Gg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=modelmiser.com;
-	spf=pass smtp.mailfrom=modelmiser.com;
-	dkim=pass header.d=modelmiser.com header.i=@modelmiser.com header.a=rsa-sha256 header.s=protonmail header.b=Wf3JovIS;
-	arc=none smtp.remote-ip=79.135.106.25
-Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="EzFxT/IT";
+	arc=none smtp.remote-ip=209.85.210.44
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F4A606A325
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 11:03:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71F4A606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=modelmiser.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=modelmiser.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E6A606A325
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 11:12:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70E6A606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=modelmiser.com header.i=@modelmiser.com header.a=rsa-sha256 header.s=protonmail header.b=Wf3JovIS
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=modelmiser.com;
-	s=protonmail; t=1794308588; x=1794567788;
-	bh=BZRqNPkVHbDtKON6wv6OQaO7er0kYUMxGcWb88xBRWU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=Wf3JovISJQKvxIHhu4gnnOUOlHwAjFvXnojjbYOeSYw01J5lrYINFyJ+RxZ2KD1OC
-	 k2YkS30LrYMAIWavXGmgHc9cz2HsIyG/zE9d9KI1qFGaKD+1YPBfEkpAD3FoLMu71p
-	 aUgE7KtGlriELzcJMLE2tuwxwBrzrfTJOKMDFSE2IpSkJzud18e2+UVmQVgYDZRN/L
-	 G7JcMBTbxM5V9usJrC4weOlRyErtjCD6YWvHhj7Ciev3LtvdMJ9ry0k5xZ7ejoihp0
-	 zbTVa4wTEWVD190XyKFEm6yU1Jha9hUR2DlxR6RDOmFCnn1roHFMYfGAvRRbJehZSz
-	 6Ss0tkRHhxQzA==
-Date: Tue, 10 Nov 2026 11:03:01 +0000
-To: Cen Zhang <zzzccc427@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: Chad Aldreda <ca@modelmiser.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, jjzuming@gmail.com
-Subject: Re: [PATCH] Bluetooth: vhci: Flush suspend work after removing debugfs
-Message-ID: <20261110110253.1118214-2-ca@modelmiser.com>
-In-Reply-To: <pm-bluetooth-objects-candidate-0146-v7-4a901c7fb65111f006fe@gmail.com>
-References: <pm-bluetooth-objects-candidate-0146-v7-4a901c7fb65111f006fe@gmail.com>
-Feedback-ID: 232753253:user:proton
-X-Pm-Message-ID: d83fc3b1e44738560cbe08a5fe327f6227997fd9
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EzFxT/IT
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7f84a55cc06so1083315a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 03:12:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794309173; x=1794913973; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8v0BUCWmA/IL2caTcqInIIIAoTr1kMPjQ+8LYQT6wNY=;
+        b=EzFxT/IT8TIGiuUrybzphRQJidkySRGvSsqsQRc+Q6JmObkD0mEgdg3AtmFNyDDZ1Z
+         5ZRaXOox/FqRUsrKi5H1AEgWejQ9ZUkLCT+ajmf0ondzfPo82o0Ckv4PTJZt5vlJugZf
+         KjKSfo0wjTt8H531ynz8OeIDN0HWIARKMyycIQR0qSI08HYbTtOSzRTfMBfSDIKG+YSG
+         PJN23V6X0Ba2wvFaReiJGoR6uadBhg2sbSBhhHRJmvI7Xth3DD0J+G+mQsZcIdw7Oksp
+         ysxCC8rniK6ZLI48QnKOOiJxggkP6UP+uZpliBDzGROtT4CNwF60S5D+CEwRafX/+AfX
+         Lu1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794309173; x=1794913973;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=8v0BUCWmA/IL2caTcqInIIIAoTr1kMPjQ+8LYQT6wNY=;
+        b=t6ijlTKw50QP94CQyTZItkgfOI0n7ge4ZerFnSYx6VOBYzgPQ0pFwvXOgm8WYkGvUe
+         2hh/HWES29d72Vv/NWnpODv6WZ26bz2shbooOd4qyWyNkOCTt4gk7D1IAz3qdLe4hFSi
+         ZiqCOtJZUrx/jek3LoSN97KGFr0IMROM0JxUdMsZ4SxFplpbtNngKHPv60hrAtwy3Ulc
+         oXvPxVy13oXa8iH1CXZZB2pGis4lgAL1cWuVkHWWeHV06cQp2OIDgd3FYyFqyLXbPNyC
+         PjDAHBWSN1PymLUtRasO/rS1MLEbrWyYTAAkA7DnqxEvkEx/Wt02X1Z1wdW/1sz1apcj
+         M3Bw==
+X-Gm-Message-State: APuU4Z9bl62fdMDgdyu4kwZpoff+2x1lqzK4ZQwUwTzjxeYJ46Vp1Cjq
+	mHhZeHZNU2q1/SWlwan8gLli46dYLxJK59OdygHpGoHXZZUYoPgpKO5WRgET9A==
+X-Gm-Gg: AYBFou1+Dl9UwZMUmoMi/Xyh64wRP8WxAtvWzIaexcZ5XTEKiMs9OLv6+qeYG3JYoTf
+	fS1est/DVHKb6Syolnq/4Kmk/5jo2+1IBLin0dgdtLgF0sm8hTwVTBgHa/te2GprJjK1SJYyRFt
+	QUeKrKBOwSVUcrQvNTRkdBytetT7ncPtFkuvjLPRGe8eWN8dsYiEgrZZ2lEhMpR9Awxw8peeTbF
+	48B0KVX6rqyoLV1t85FaS/ENFG5tkP90Leo6ir53+h0AKCpYmv2dHzJYf8ckOl8VX16FXUU87J7
+	66xTulf2vv58bfeA0ELhu1Bc+8AeG6vM09SZeJpO3XcDXUE5ZxCwWoK5u82qnFG82hgCq0QowU/
+	B02TpfWN5kNnc9HrkTfir9w9nhIwlhkAayAMURUCvMujKUi5qDDkIHkun2/VuvRE2N+PQac7Hls
+	fZIhW76nwqXGUBPwQ2YN6nCK8jtFvpGaRirCAKMd0W25KLbLrQu2l3Zf+bC4Jmo83g9f5xzSI8x
+	O5+M+brNlIMJTsZVXum/L8jdlQpuIR66FmA5AAwpmB9YxGdfCb9Yt7ymsMT3cxT
+X-Received: by 2002:a05:6830:2e01:b0:822:b69c:ff69 with SMTP id 46e09a7af769-860dc7ce7d0mr1322074a34.21.1794309173239;
+        Tue, 10 Nov 2026 03:12:53 -0800 (PST)
+Received: from [172.17.0.2] ([132.196.19.236])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-860e5978892sm552839a34.12.2026.11.10.03.12.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2026 03:12:52 -0800 (PST)
+Message-ID: <6af2fc34.0f7f97e5.769f1.dc94@mx.google.com>
+Date: Tue, 10 Nov 2026 03:12:52 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1529055453794787439=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,71 +88,67 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.mahe@cirad.fr
+Subject: RE: Bluetooth for the RTL8852BS on BPI-F3
+In-Reply-To: <20261110074607.363918-2-frederic.mahe@cirad.fr>
+References: <20261110074607.363918-2-frederic.mahe@cirad.fr>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Sun, 25 Oct 2026, Cen Zhang wrote:
-> Runtime testing of this change was not performed.
+--===============1529055453794787439==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The use-after-free in your report reproduces on mainline with the two
-test-only delays below, and your patch removes it.
+This is automated email and please do not reply to this email!
 
-Tested on mainline d48723711bae (v7.4-rc1-672), whose hci_vhci.c and
-hci_sync.c match bluetooth-next at 983f3fcb1282 (hci_core.c differs
-only in rfkill handling), on x86_64 in QEMU (4 vCPUs) with KASAN,
-lockdep, DEBUG_LIST, kmemleak and hung-task detection. A test program
-opens /dev/vhci, answers every HCI command with a Command Complete,
-brings the controller up with HCIDEVUP, then closes /dev/vhci while
-another thread keeps toggling force_suspend in debugfs. One mode keeps
-answering commands until close() returns; the other stops answering
-before close().
+Dear submitter,
 
-Unaided the window is too narrow: 300 cycles in the answering mode on
-the unpatched kernel gave no reports. Both kernels therefore carried
-two test-only delays, not for merging:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1206953/
 
-  vhci_release():
-  =09cancel_delayed_work_sync(&data->open_timeout);
-  =09flush_work(&data->suspend_work);
-  +=09msleep(50);
+---Test result---
 
-  hci_suspend_dev():
-  =09hci_req_sync_unlock(hdev);
-  +=09msleep(200);
-  =09hci_clear_wake_reason(hdev);
+Test Summary:
+CheckPatch                    PASS      1.06 seconds
+VerifyFixes                   PASS      0.10 seconds
+VerifySignedoff               PASS      0.11 seconds
+GitLint                       PASS      0.51 seconds
+SubjectPrefix                 FAIL      0.21 seconds
+BuildKernel                   PASS      17.46 seconds
+CheckAllWarning               PASS      20.54 seconds
+CheckSparse                   PASS      22.27 seconds
+BuildKernel32                 PASS      18.16 seconds
+CheckKernelLLVM               PASS      18.28 seconds
+TestRunnerSetup               PASS      420.43 seconds
+TestRunner_l2cap-tester       PASS      12.59 seconds
+TestRunner_iso-tester         PASS      8.89 seconds
+TestRunner_bnep-tester        PASS      2.75 seconds
+TestRunner_mgmt-tester        PASS      81.37 seconds
+TestRunner_rfcomm-tester      PASS      3.96 seconds
+TestRunner_sco-tester         PASS      4.94 seconds
+TestRunner_ioctl-tester       PASS      4.21 seconds
+TestRunner_mesh-tester        PASS      5.13 seconds
+TestRunner_smp-tester         PASS      3.91 seconds
+TestRunner_userchan-tester    PASS      2.82 seconds
+TestRunner_6lowpan-tester     PASS      3.94 seconds
+IncrementalBuild              PASS      19.36 seconds
 
-With the delays and without your patch, 30 cycles in each mode gave
-834 and 621 KASAN reports (kasan_multi_shot, so one bad close gives
-many). Two objects are hit. The hci_dev is accessed after free from
-hci_suspend_dev(), including the __mutex_lock() site in your report; it
-is page-backed, so KASAN shows no free stack, and once the page is
-reused the same accesses show up as slab-out-of-bounds against
-unrelated slab objects. The vhci_data (kmalloc in vhci_open(), kfree in
-vhci_release()) is read by vhci_suspend_work() and read and written by
-process_one_work() after free, because suspend_work is embedded in it.
-hci_resume_dev() was also reached, with an hdev pointer read from the
-freed vhci_data, so it dereferenced an unrelated address.
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
 
-With the delays and your patch, 160 cycles (130 answering, 30 not) had
-no KASAN, lockdep, DEBUG_LIST, kmemleak or hung-task reports. Without
-the delays, 150 cycles with the patch (answering mode) were also
-clean; since the unpatched kernel was clean without them too, that run
-only shows no regression. As expected, release can now also wait for
-suspend or resume work that is already running, including an HCI
-command timeout inside it, as the existing first flush_work() already
-can.
 
-Not tested: suspend with force_wakeup set, with connections, or with
-scanning, advertising or discovery active (the controller was brought
-up with HCIDEVUP and no bluetoothd, so hci_suspend_sync() had nothing
-to pause), mgmt, real controllers or btvirt, module unload (Bluetooth
-was built in), other architectures, and a build of bluetooth-next
-itself (compared at source level only).
+https://github.com/bluez/bluetooth-next/pull/1102
 
-The harness and this report were produced with an AI assistant (Claude
-Opus 5.5), which also did the earlier runs, including the unpatched
-comparison. I ran the final version on the patched kernel myself and
-got the same results. The harness is available on request.
+---
+Regards,
+Linux Bluetooth
 
-Tested-by: Chad Aldreda <ca@modelmiser.com>
 
+--===============1529055453794787439==--
