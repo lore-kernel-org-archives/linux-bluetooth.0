@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794327019;
-	b=TvQlQ2uTOtQUfOhQhU/ROYTnfhMaWSS9JG2NeoMOWIZv8yBY0NUTQf/HtxGjZMg6Lv26
-	 JBVkfMb8Ih8i/3sBA+GjpP50buZW0ePCRcKOm/CnpkBfMViwLFXyfv3eel1VWUTySpXIa
-	 ZhF6meLsCW1WUxiADrXu6qB5wDSzmSeO9ckUFGZPxlUp5j61PX/SSWlcC31ndKOVS/3OX
-	 i+7+T5AVSogqq96BUvwGGZO/nGmmpMyzWXdVqbsCWyBpWtggfHvx6H5On1K8Wl1JQQiDF
-	 TrplPJOAL+7fRegt6zP7Afhs/oMw4gIe+J0Lfktq5JofiX2D55lYVElaDJuzjdPpTMQ==
+	t=1794327016;
+	b=JvodxueyqPYAm9n+YemF30YvBfG05DgdqT/lkbks44OmrSj6IgYPrIeM+8S9GjCCyDjq
+	 bklyn8uKgVOtMLkuJ1vH7A6P21/bcDacE4EnZWuVoToh3yCREjtHO/1lnKebeAWsJO1Su
+	 2UOb6wb3TPMbej52aRlsfxYigpH524lHDBuSLfQYJYfg125+G86WJfZ0+A50IwPFHFmUm
+	 aGl6Lhvi7PbW0aj9Y5yE1zVn7SaYhYHmUIEn3mrLRZ6y6NlrU9WoQ2B9pkN6X7j471aWv
+	 wIc4pQnncWWGB+J+3hInPpDMyJDerUZaFgCCU7r1ig/J3xMVp7rH0gpr0J+hbgWuS0Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794327019;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794327016;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=FtgSy50ncFX8mtmhpa8fDaaHWvyfYPmRejYYMo9Zq54=;
-	b=a18OaAyqDxn3SNtjaFVvjzisUfM72vUzCZ/BkTHphn3ERb/SowZoNrj+866kaQrrG46M
-	 PKEZSfDmtBYwoZq/lCDaniilfwQ4IEFsYyXFNMKPK/piKr+TRCRNj5xVXXjhCffopn+JG
-	 dEDieRzEXYRgaAMQdee57zI9kfYUW9cVs0m3DM/PPq18dePBu7AyKzp2kV1x/OnnoT/eN
-	 tCDeNweZYwawXNHu8/Hk90MQkSP24mgYf7rz1Co6tXb7FS7N6H1X7klz0dUKhMMZ1Bxq/
-	 fbm3TFO7sXw5pNS6y3pHLn1go3KkSPPS1vYMv1rzE6bmch8SAs/G0sGgjXL2/yBv/Gw==
+	bh=h8UAtxnGnSHqo8kwEhuArMQx5yI4oacoTVisDIKfIZQ=;
+	b=yJyzcISIK5lQrzkwePC81m4neTHIIxHaHZtSgYs467dtLe+KY8fAOJTt6Tj1DDqlQZRV
+	 W97l1/G6SiOvn3sSqtb0L0jfl+XPW2YsdHx/SADQgVoYmXD34VD8sYt0dGLfpTMeEibc3
+	 eX7lPsO+IcXO9MIij/y+v4/lIrA26clzUpamxIGNktdoDO6XyzDqTGMpQ+EFzZWcQ4dOX
+	 5VW1QEbxoBZqVN8VjqJrkpHaFz0HI3/8FK4unw9BMOFXm573A+4PBlTLXGVlbFycOPezW
+	 vEdv5eTOUAchXAxQBhqCwF2MFB7gOTT/bESSbKDAi+EU4F7EYhcKsUUpEqfBVVnJNrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAHfvYZE;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jNECkWYj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0975D606A332;
-	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3D660A260F;
+	Tue, 10 Nov 2026 16:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAHfvYZE
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A59201F008A1;
-	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jNECkWYj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A458E1F008A6;
+	Tue, 10 Nov 2026 16:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794327018;
-	bh=FtgSy50ncFX8mtmhpa8fDaaHWvyfYPmRejYYMo9Zq54=;
+	s=k20260515; t=1794327015;
+	bh=h8UAtxnGnSHqo8kwEhuArMQx5yI4oacoTVisDIKfIZQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=FAHfvYZEgvnG2OTMz/gTJHhj2QEtGKpZItyvU8aYui3AdU8f5mHsnwNhhilfvzK/Z
-	 Af4vt4rPu3fyk1Kuw9Mwe0UFvCMxkhIo8Dm4vzNSz+EvSRPd7c0ICiyfG+EjuoGWZh
-	 i6mIziLWHNqMe9WRUND9rOmHSStfs2pEbmUriyZ/GSKsj6/CUjaovOtbWbmNuQoMZg
-	 2L3/0Nwzyir1P1jQ/N29fDX5UVUcrFGSJ47vfNH5toFN+tJVoZ71d6W/J8pOjpTmHZ
-	 UVYoI2viqsHzEX0oG277p6cvLrBGN1nkWTsRv9UXs6wihgGLGMI+krtilAqG3dAwPd
-	 mQ04JI0kWI/dQ==
+	b=jNECkWYjtMde9OR4Cb+tJdiNcgS54JN0cljmlhpwlqfOLoS46oj2kY1HBSjAX3qPC
+	 ZQWWfn3oxosxCa8hFwyfsu/amUopOYOZYrCTBWNn2BGKYGGIvSM1rBjslaAD2MBPxW
+	 LAPcpskD7mHnjScrGdrYstuw4NdvYdMkZOLG41vgQE+ttBVHLvPAGHUTDiVSZnzQf8
+	 ZQI9YFURKJUrHzSpZVIgd1Z6g3OgkwDO1NLTva7zE0Eq8C+D8A4WtdTIX/1KjfIkL9
+	 k+5VXr9H2w+gQcUl1eYYQoeIBnky+XHDdYuGBlYeKSZ//jviKKsa+m9/eMWl1Oghc2
+	 SXXIIcARYOPSw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B07339D267B;
-	Tue, 10 Nov 2026 16:10:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B0CA39D267B;
+	Tue, 10 Nov 2026 16:10:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,43 +54,39 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_qca: clear qca_memdump when discarding
- dump
- packets
+Subject: Re: [PATCH] Bluetooth: hci_conn: Initialize the device before hash
+ insertion
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179432701717.4062787.5293659281594260012.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Nov 2026 16:10:17 +0000
-References: <20261110-hci-qca-memdump-v1-1-239974fc4944@gmail.com>
-In-Reply-To: <20261110-hci-qca-memdump-v1-1-239974fc4944@gmail.com>
-To: Joas Antonio dos Santos <joasantonio108@gmail.com>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org, brgl@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <179432701417.4062787.3646978877662971174.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Nov 2026 16:10:14 +0000
+References: 
+ <pm-bluetooth-objects-candidate-0086-v6-dcaf08c3bc9952d7022d@gmail.com>
+In-Reply-To: 
+ <pm-bluetooth-objects-candidate-0086-v6-dcaf08c3bc9952d7022d@gmail.com>
+To: Cen Zhang <zzzccc427@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ baijiaju1990@gmail.com, jjzuming@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 10 Nov 2026 03:55:41 +0000 you wrote:
-> From: Joas Antonio dos Santos <joasantonio108@gmail.com>
-> 
-> qca_controller_memdump() frees qca_memdump when a memdump packet with a
-> non-zero sequence number arrives while QCA_MEMDUMP_COLLECTION is not
-> set, but leaves qca->qca_memdump pointing at the freed object.
-> 
-> The next run of the work reads the stale pointer into its local
-> variable, skips the allocation and uses the freed memory.  Another
-> packet with a non-zero sequence number frees it a second time, and a
-> packet with sequence number 0 writes ram_dump_size, current_seq_no and
-> received_dump into it.
+On Sat, 24 Oct 2026 23:27:49 +0800 you wrote:
+> An hci_conn must have an initialized embedded device before an RCU
+> reader can acquire a reference to it. __hci_conn_add() instead adds
+> the connection to conn_hash before hci_conn_init_sysfs() calls
+> device_initialize(). Holding hdev->lock during creation does not
+> exclude hci_disconnect_all_sync(), which looks up the connection and
+> calls hci_conn_get() under RCU without that lock.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_qca: clear qca_memdump when discarding dump packets
-    https://git.kernel.org/bluetooth/bluetooth-next/c/45a25a1bfd26
+  - Bluetooth: hci_conn: Initialize the device before hash insertion
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d9a1bd14caf5
 
 You are awesome, thank you!
 -- 
