@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794346532;
-	b=VSevxH0gW82PgLqJ4aL+O1cuj03EBMFQdVspoWsJp0tyhMHPQE9H8pjvhbT7xuVLnduE
-	 +xtjOKxmPeeKWgSg2UAIqzUAKIVanMaOmyCFt7h2zcpxr6HIDyCx5fXA6y9sAMTxV+4So
-	 QIAMbpLKRfmzum9QkJueHb1SpsNuyriUEdojf6rl8KBFykGpmmUM+Gdsyhh39X8CK1oSm
-	 SSmCvMeuwDSVlRkUIHyX/izvJeBT8Siiq2x7nbNP91awfRuokCTnCUWHNQcPfuuyvTKMJ
-	 7v4YDACUAvPdw7ZbQAVWWL/HNaRC4ga2+XjZCcQAzLdOlYR06W2b2xEG2H421oJw0ew==
+	t=1794346533;
+	b=e4fvKXzp/OIrrfCJUkKJ3nbdUgN67t34z0HN7ITLXaFmdNhbDE2mmBYyrILEn0jz1Ykx
+	 VazNcmhqZhYysFtC7DAKd1iBWsWIs4ZuKEtjaOMAeUibHGpOJA1sdgiZIQI1xyanvNfUw
+	 4hsyg/YpIgZzwKKSiYpz0Ip8Qlgg7UYFwC2mc6MxLCCyICtcPnXuyZiUn3xS/MxCpo6lR
+	 Y6aFbBC21p6H+3V/nH7FXpY0QnG+0TdzjPADPJSyM1hggQmfqZrpL6TeKe3tnibccoGBX
+	 syZnvI6aud26o5k6WRSyNMZcn4+orLGf9hTPFDYrZ2AL97+hjUTvOH26jzt5pA9z9Dg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794346532;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794346533;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=H9Brfz8k7TKgPnr3sZqZNB69i8pBO+z/vJ0OnzZLXfo=;
-	b=KRNSUDNfy3qpHd/GYj3U+5fGaNKsDve29NJngnxGIfiAk1M0RqQehCAQtj0YX8LAMAg1
-	 5a8Hcb7umu8E3Oahd23J+duJnkcGgyKB0UvRxpnrvPotaHDbR1YmPVtmRvA4LUv47nwO0
-	 9M4H4SiH9nVIvRsgjz4uoR3KYw7wkYOCPS0q0y+Gkfhosx0Cz6kkoIEIt9JsyYvAoxnaV
-	 SZ6U4fDZ4PZLQ/gw6SHOF0X0BxXKN3HfrRNugxb9KzWIzEMn3jU3O/PdvMPWY3xoQCHkq
-	 47NvYK+K7W9j4zhNmtevNd7fkg9YuX+UD4AYl62qXSHcR8cuQL0xcuJsbKX3/2i5ceg==
+	bh=cRu86cbbp78Atizqq5ggRsbZJFjI2Eu7oH8XJQQzxrY=;
+	b=gUl0bdz/SuecWAfuyXn+dTKy5toa/zJLoHEfdoJ76getSzCexz8kLc3ASntG3WHd3SFp
+	 VBCbIWgOwa5f+0lLhGXIYa9vmHICGdQjjRuP7lPkxkxZqsC6r38ullfGzeYTs+Ol3zCqY
+	 ldHoKe/udedR63NU8jdsSTv4c1R/DU88hHXXkgSCdSrC9cTUU8g8UoiEdHP7ptTZWBp4d
+	 xshCO2sXyzS+CDNqsnUGK2VMV9Fip6c7KWF6VRRunzE2/RVCzjwLeP7Vv+MOsfra58mN+
+	 89iqZ5rsWk0cbj0deJKlQtpBAVc1mRokPq02zCBa9a4LvtGyvoIHg4iVU7WGJQzwyXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZRzHnyML;
-	arc=none smtp.remote-ip=209.85.221.180
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pU8f6DEb;
+	arc=none smtp.remote-ip=209.85.222.49
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F250606A327
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 21:35:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F250606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CFF60A2603
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 21:35:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44CFF60A2603
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZRzHnyML
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5edf97136aaso1309572e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 13:35:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pU8f6DEb
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-9906034086cso611343241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 13:35:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794346531; x=1794951331; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794346532; x=1794951332; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=H9Brfz8k7TKgPnr3sZqZNB69i8pBO+z/vJ0OnzZLXfo=;
-        b=ZRzHnyMLfbvZyw3591+rMybvMC74jIIPEC5JBZU9fJjBsxmVAC95+oL3ThxjJs6nym
-         4VPj7r7Wgj/bx1wsWwKXWEs2ENbpX6x/biE9SbYG4kz/2mDyArVXIvn9bTGKYiMw55tj
-         luWyqeIWIL2SEcaiyg2eHvslx65r1WuCHN2wmiD0n6/Ifk0l3XgjH7OZ1CUxlr1K4ZgT
-         M6bagBJbYA3QsXrliqBRGu5gQ+BiZTDuU9noS+C8/Rh5zNiEnNpjneKSpBO2V3ixkuwR
-         ydtMw7bqA1DAU1hoKeSpwKyWxuHUwtf3MxpThj+JNM5e1fe2NLtOCvEO9AsueNdhH+o3
-         841A==
+        bh=cRu86cbbp78Atizqq5ggRsbZJFjI2Eu7oH8XJQQzxrY=;
+        b=pU8f6DEbah6/pN3Ir5pNfFenp7pm8uKq8ha7usVOFjPTczGYN0WXG1/cde6uuJGbB3
+         cHRSS10s2OkM0kyUr/pevjON+p2BSyyB6Qs/UklnA/LP9bmkGdkBsjDrIFrFfpKy/cyo
+         YD3DLeszoi+3mmlXBVLlMllU5gJjPKAE7RV5Csw2ztMcCH76fb3VBK/y1QES/vz8i9cT
+         xtjNyBmEwcRr3vTAKHwqkIftFB8/MN1zcEkc3ybw7WSRImOr6UswQXnHwAVWGKO+gMY1
+         ZsSLx09UOT3/RWZbcC14PC+syO4deG5nS6lhVRdf/UkwdSXxvnBO/b2JZrpIc6ZaxAEB
+         aWIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794346531; x=1794951331;
+        d=1e100.net; s=20260707; t=1794346532; x=1794951332;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=H9Brfz8k7TKgPnr3sZqZNB69i8pBO+z/vJ0OnzZLXfo=;
-        b=NBWzr/AHRfA6EfHYRRg84MA+fuy7OE43sJQRjpi3tpk8dfAcxyXbUn3wDcKD60cqrh
-         gZXXJwXFygLITOm0WWNUALNOpL0J8mvbduBO4HtOmesyNKFv2sSr65Bm7U2o6NPbvX58
-         izxqMpH0rSd1IHqRVOWXL87SUwmX/9FU1GrnPxqMADngPpd3xc1+96jH1wlVH0AqbYxP
-         1jhKBHZ8l5Ps/hA+yXX/qa8+ufJ0SFjsJhLTJfNHDDZQ9O6NbI7/+XAro/IS3A/27qPq
-         qz4Bfkxg6JvUjv8F9X/dzNqwkAH0BPBr7wnIOvsi4p3DazVjTG96+dZM/utZI+rbuByR
-         YCSg==
-X-Gm-Message-State: APuU4Z9mQbR25KZwP+Tu9Poer5b4njUtlc1UjW1u7zFEKSc+irwwN+V+
-	z8nK4ycTJqtetEfMptFF0mcHnYOQqDGAc/Njlat3+MZljHNJBijJoVnwP1Kw+Q==
-X-Gm-Gg: AYBFou0tCMnLOkO20AB38QCAI0WM4qvU/WcBQ+S90XDPMupZ+LPIxUCKyc1FXw2BJHN
-	cp+RKhAiT8+kvqNQvLYMR9Lb7tg2IHYd5Y7pPDt9q//JzjOtzMpjqXghQZj4tkd5nhfTooxuSzv
-	X2ZX0tBV6Fwy3mhIpADzEdq40tYkmiSG3+3Rd944mmyZVUpCJMvNPOEVAORzByzoGKRPLdd1fWd
-	K0OaZw1c+Mfq5v6pKR/ZhDGpM1srCGSN3yvHs58m/I7HxqpQRUmKm4QXjmOy6RTPyCftlalROQZ
-	CEBFtJED9QGOlf9XJgqeIt3CRai4mQqSwwMh8PO2A2ss2cgpPY2U6c6BO3dgIqFI8J0U9pqSXm1
-	kghJUCNF6ObGEtkX14arxT5gN/o4MjaWsdw5Tda9F8zA8LLogtZk+DQKYsV1etZDS/wjk7U+lhs
-	cqFmCq2pi10l1gx/gfZLQfpy0IHlIA2M8h4EBWULhNJfzKGX1S6UQrxN94WC/RJvgx0FSvW4IRL
-	534vs5+inmaBwIKUbUYno6qNd5JVP9+3TofckEAEVfp8zJImmfb2cK7GZWGaOTIz8DoA4y0k+J4
-	rLS72pf6mmSpw0fFzsGGSOi1ZzEeTXId4lGHPtvEtnzpwi3kdA9/khTH/7Oinbl5ob+4nZAADog
-	72q6KitvpOcGwp0+ZjlVpr09+aw7p2m3f4Xp1CGrPhPENi2PK9erfrchhpWih6OLw0wMKCRZi0Z
-	HEmlU=
-X-Received: by 2002:a05:6122:3488:b0:5de:ee96:75b with SMTP id 71dfb90a1353d-5ee1c426b9cmr76019e0c.12.1794346531192;
-        Tue, 10 Nov 2026 13:35:31 -0800 (PST)
+        bh=cRu86cbbp78Atizqq5ggRsbZJFjI2Eu7oH8XJQQzxrY=;
+        b=M49YYbWYsZWsQWho3m1Y+WsILwEd9wQCHE4rpr+bFnsBtVg8PXO6z+VfzTHC3CCreA
+         jPQra1rf6kZxJ626RIQWtodjmrStnoBLPaoY09BQ3b2bZOuir73aRPEmyvtAfTpK2lhv
+         23pxCM/ry955d04fzdrHDJXRptfX0buKOKzW1yX6A7GdZ+hJ9xFOUqs85Nb+8K4uUbQM
+         PP9MFggei0yO/qXQ1awj2oNU7eaa2BahVFRbYzQoSh1cjTBUCRd8ksYHL29m0wkxivew
+         QiUEahqU0j/rIEuJwpItPpOmEPq3Aq6dwXajcDkvvl6+f0EdPKeu80KdZtBeQF8l3Wmq
+         1wCg==
+X-Gm-Message-State: APuU4Z8PiOAK+R+nemnT+RoipQQjNxhPlolkI9w8jpBlPnqz8AI8HkNi
+	amQaqtlW3R9mKad+5IHE0YJ/nzvFoPj5GRPZzNAs32B4sIqhdLV2HdYMbArd4w==
+X-Gm-Gg: AYBFou2TOROWdhNX7jMo93+A2zg+3hukETEb6KYIZCcP1ke06u7ezufyGBT7GydxyW5
+	Jm39YK94C8NrSTzowJFBafanvYWySOD/QR7uQ+v+s/rcoo06OlaGEcplqIKQvrL3SeCGeKMeLPa
+	NBVwS8arp5eyFc78P5PQ7TUwJqtdgV/S85jpG2pf0KiNV8zfrSFdxPVfaCWYpxHeuYVpmRsPbrv
+	gl5/YlLioCNFJO3vIoVSYs/nnLc6+JJnVb771cRNE6oN3KCi++4dRTLthdM7f54LHZuw4piSYI7
+	+YZAWU73E7pQOvR6wa3KqG01XSUPw5HLHXRaGG6rZu8acQMeqRW2agO3Uz4b4RfVvg/+Q6owvF8
+	fOj0Gb1ajxRwBPJM17zK6uh4Ohuea856HZc++mgdsSkBpqOdenDtV3g9xmA0rV4+xX2wWy8Bj2x
+	+RqzeSbKEZzSP8RgO96UaRsgK+cD6ylAf1tnQifeC43aVEQyzC44kkRuA+XcaOmO/l9J3i923BK
+	4/YpPLTrugnQtqOy0rmdL1LL1k3EY47CgedcBxDHy7QCzKqGP5aW8WdS7ygu2NJTnJu7g+PVvAn
+	xLN63+pnPER4D8Tqmgobk9mkN9M8C9DiSew6fIQ4czBNW3fAlSAR2M18jtH1pk5n/fcNjVvYbWP
+	v6kMb5vQWqdUFdJv7Rq2uzx8xUwtYytDq3JtewJPYyEq5ZutjRCxz0x7VGl+FdCCnCuYCOgjdrK
+	LgxRv8NOtnfKeQKoPw7uCmnyUd7w==
+X-Received: by 2002:a05:6102:5125:b0:7cc:b246:31e2 with SMTP id ada2fe7eead31-7d4fb2c9173mr100911137.22.1794346532101;
+        Tue, 10 Nov 2026 13:35:32 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c614572sm2482189e0c.17.2026.11.10.13.35.30
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c614572sm2482189e0c.17.2026.11.10.13.35.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 13:35:30 -0800 (PST)
+        Tue, 10 Nov 2026 13:35:31 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/5] shared/asha: Use util_iov helpers to parse characteristic values
-Date: Tue, 10 Nov 2026 16:35:23 -0500
-Message-ID: <20261110213525.2942339-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 4/5] shared/micp: Fix reading Mute State from an empty notification
+Date: Tue, 10 Nov 2026 16:35:24 -0500
+Message-ID: <20261110213525.2942339-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261110213525.2942339-1-luiz.dentz@gmail.com>
 References: <20261110213525.2942339-1-luiz.dentz@gmail.com>
@@ -101,116 +101,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Parse the Read Only Properties and PSM values with util_iov_pull_*
-instead of indexing the value at fixed offsets.
+micp_mute_state_notify copied one byte from the notification value
+without checking its length, so a notification with no value made it
+read past the value.
 
+Pull the byte from the value instead and ignore the notification if it
+is missing.
+
+Fixes: 5c788b73 ("src/shared/micp.c: To implement MICP profile MICS service")
 Assisted-by: OpenCode:claude-sonnet-5.5
 ---
- src/shared/asha.c | 52 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 36 insertions(+), 16 deletions(-)
+ src/shared/micp.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index 79bb29bf9a0b..8fe83348da96 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -365,19 +365,18 @@ static void read_psm(bool success,
- 			void *user_data)
+diff --git a/src/shared/micp.c b/src/shared/micp.c
+index 98baff689fcc..7df8f8346f55 100644
+--- a/src/shared/micp.c
++++ b/src/shared/micp.c
+@@ -717,9 +717,16 @@ static void micp_mute_state_notify(struct bt_micp *micp, uint16_t value_handle,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
  {
- 	struct bt_asha *asha = user_data;
-+	struct iovec iov = { (void *)value, length };
++	struct iovec iov = {
++		.iov_base = (void *)value,
++		.iov_len = length,
++	};
+ 	uint8_t mute_state;
  
- 	if (!success) {
- 		DBG("Reading PSM failed with ATT error: %u", att_ecode);
- 		return;
- 	}
+-	memcpy(&mute_state, value, sizeof(mute_state));
++	if (!util_iov_pull_u8(&iov, &mute_state)) {
++		DBG(micp, "Unable to get Mute state");
++		return;
++	}
  
--	if (length != 2) {
-+	if (length != 2 || !util_iov_pull_le16(&iov, &asha->psm)) {
- 		DBG("Reading PSM failed: unexpected length %u", length);
- 		return;
- 	}
- 
--	asha->psm = get_le16(value);
--
- 	DBG("Got PSM: %u", asha->psm);
- 
- 	check_probe_done(asha);
-@@ -390,41 +389,62 @@ static void read_rops(bool success,
- 			void *user_data)
- {
- 	struct bt_asha *asha = user_data;
-+	struct iovec iov = { (void *)value, length };
-+	uint8_t version, caps, features;
-+	uint16_t render_delay, codec_ids;
-+	uint8_t *hisyncid;
- 
- 	if (!success) {
- 		DBG("Reading ROPs failed with ATT error: %u", att_ecode);
- 		return;
- 	}
- 
--	if (length != 17) {
--		DBG("Reading ROPs failed: unexpected length %u", length);
--		return;
--	}
-+	if (length != 17)
-+		goto invalid;
-+
-+	if (!util_iov_pull_u8(&iov, &version) ||
-+			!util_iov_pull_u8(&iov, &caps))
-+		goto invalid;
- 
--	if (value[0] != 0x01) {
--		DBG("Unexpected ASHA version: %u", value[0]);
-+	hisyncid = util_iov_pull_mem(&iov, 8);
-+	if (!hisyncid)
-+		goto invalid;
-+
-+	if (!util_iov_pull_u8(&iov, &features) ||
-+			!util_iov_pull_le16(&iov, &render_delay) ||
-+			!util_iov_pull(&iov, 2) ||
-+			!util_iov_pull_le16(&iov, &codec_ids))
-+		goto invalid;
-+
-+	if (version != 0x01) {
-+		DBG("Unexpected ASHA version: %u", version);
- 		return;
- 	}
- 
- 	/* Device Capabilities */
--	asha->right_side = (value[1] & 0x1) != 0;
--	asha->binaural = (value[1] & 0x2) != 0;
--	asha->csis_supported = (value[1] & 0x4) != 0;
-+	asha->right_side = (caps & 0x1) != 0;
-+	asha->binaural = (caps & 0x2) != 0;
-+	asha->csis_supported = (caps & 0x4) != 0;
- 	/* HiSyncId: 2 byte company id, 6 byte ID shared by left and right */
--	memcpy(asha->hisyncid, &value[2], 8);
-+	memcpy(asha->hisyncid, hisyncid, 8);
- 	/* FeatureMap */
--	asha->coc_streaming_supported = (value[10] & 0x1) != 0;
-+	asha->coc_streaming_supported = (features & 0x1) != 0;
- 	/* RenderDelay */
--	asha->render_delay = get_le16(&value[11]);
-+	asha->render_delay = render_delay;
- 	/* byte 13 & 14 are reserved */
- 	/* Codec IDs */
--	asha->codec_ids = get_le16(&value[15]);
-+	asha->codec_ids = codec_ids;
- 
- 	DBG("Got ROPS: side %u, binaural %u, csis: %u, delay %u, codecs: %u",
- 			asha->right_side, asha->binaural, asha->csis_supported,
- 			asha->render_delay, asha->codec_ids);
- 
- 	check_probe_done(asha);
-+
-+	return;
-+
-+invalid:
-+	DBG("Reading ROPs failed: unexpected length %u", length);
+ 	DBG(micp, "Mute state: 0x%x", mute_state);
  }
- 
- static void audio_status_register(uint16_t att_ecode, void *user_data)
 -- 
 2.56.0
 
