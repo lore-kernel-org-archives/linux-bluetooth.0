@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794327008;
-	b=gS3T7rJRzgf75ZJ+VYHWD7ASbVtmW0qciTKZk85a+X2b0Ah524B2PinxSMjj4Ct35+UU
-	 KX+glJZHFZAUl8UMMfGtV3YK3qMg6ywmxCvs3B5RAgP1DUHsFfOuP0Cfn5HkKYKVDS4GU
-	 uNXfeGaRv7YQX1oQNt6OG0CI9GTuru+eoqPAcJR3Op2vcgbknlB+N8NmhSbvlTTqqyKvr
-	 5oEufY2JCtJLOa6utU0hlkcA60yyFCZSVYVVWuLy09ENp6zzQjc7++fsDo6bjVDiXV++v
-	 DbvB0eCE8lPRnmyW5BR/tD2ZwFSV+7irLKR1TjbT73BDSCGVYa7rhEilULRh9A6xr0w==
+	t=1794327014;
+	b=iiwJ5G0YfeBLhL70fK1zpbsxWXeufH9aY+Jc2qMYKL6IR4aAXj2nvpNLmD4bUXpMutP4
+	 5QKQ+T+O0zK6mRLbkQiFsJu1eEJBn1u8i+Or9XBIxg9pLa1HycwAVHh+Nu0Sh3Bm5OTa8
+	 Rwt2Hs+Kq76Hg/rSaCWhYNwYK0B4R9EnbESFv7QyHqUwYm+GVUL1Lxm6syHAt9EJKFc/I
+	 3R1Q+eA4YXpT6PXAeG78p+Lwn9JFIsMs8o8L63PUQMhrwmCasiHVMq7ChwXlfHmhpa0dT
+	 b9ibPVRPhAx/qiuq1F66x7o0tTvwlSXWBTnDdXG1YYTmJ2kypok8oo3p7HWQIH082yg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794327008;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794327014;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=QE0akMupOU6kvmoPQWpMe8qJ3jt3YgwRHPsEPnaHOYo=;
-	b=oePZIss+TdZ4FtiM6QeScdU6I+alUwiT5Q7Ilk24UsgDBGwc4VWD1pZIWwZ274XXj7HC
-	 OLU32kEcOPwyg3yAzor5ZUfX/ImLgzQ4GPZgmU99jJlQvMtp7XkUUITFb+eBRXuvnA7yy
-	 85Bh9MUbSaGaMOsYqwFIv2lhN13PgpcwUZBW9GLbBufbwIcUc3zPh0yZt0YOdFhem/yXt
-	 97bHMm0TQ6Y2QP1+4af3GFJNO2lwdwAaBrf0U0vJg/0Ns4kfUejqzwMqaq8mkW7djiLPc
-	 RmnyhqWz28XvZKav81IHOF6n0j3fZ1KelMadTg446Ex77hZCZcaqFvRQowoSEeNPZdg==
+	bh=sW/+AZKOnfFUykr1vqtqOVrmPX3C/zFqJBALS7Am6x0=;
+	b=hxwlhMoxnaJrzBGuCRkO4A5jIqkPngfaVerpd6oFcNLcJyIOhOmWVE8mpKSqC0Knq+iW
+	 YWVvn6tPJkX0dWzblubSB76ooRxg0lndDzszqzPqeRbWlLPsNeA3MTguWABaHl2GxsGPL
+	 yYa2WuWM2y79U8rEa8mI/5q8BCPEv7/liZM60/woHjzFggXglNUKKD+tbSBdVjP7ARUcu
+	 +g1hkpcz7JG8wMsH6nODuk84SXyRGbqMemEIA0aiy2LBmi6RL92FAS6h3pC3G7gRH5TUn
+	 c3uut28puElDZPffqrHmkAyFuKIPg8ftDapKKqhG+uZUe4w20nnR1FuWEyAkjtk2Q6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RVnxVKX7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NSd4SjEr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B4F606A31C;
-	Tue, 10 Nov 2026 16:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A0360A2617;
+	Tue, 10 Nov 2026 16:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RVnxVKX7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 310671F0089F;
-	Tue, 10 Nov 2026 16:10:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NSd4SjEr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4E51F008BC;
+	Tue, 10 Nov 2026 16:10:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794327008;
-	bh=QE0akMupOU6kvmoPQWpMe8qJ3jt3YgwRHPsEPnaHOYo=;
+	s=k20260515; t=1794327014;
+	bh=sW/+AZKOnfFUykr1vqtqOVrmPX3C/zFqJBALS7Am6x0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RVnxVKX7TB0CtmbUpXpo/tpUsnICUXHpTwg/EVcRkpLdfLrNo7m2S+WpLS4C7uCQF
-	 Q/XJ7uenR6n2ho+HvSI9+y2R049tUNAd7kvlTO1sN8cBIpTbg1ol9ialWKbk+ob+Fs
-	 08shlqJKnCmHZ6SG+S8iv3uKh7NgGSHBEz6FB3/VqZGxi8+9eWss7XklH9s/KJ/can
-	 h7/IBe3uScmw8V56GxoaewtXMgRMfalQ4kvSjkAYaUqecpNp86Q1AgG3dZzVXML+va
-	 lL770Pa9ebXbKzMzMokOnKxGPFuiIpl8jGSkcoM/6HRmscTfMPirRReOc6Ge3tOYse
-	 uCN8pTHCogHQQ==
+	b=NSd4SjErwghoktD6+63RlnMQSLJzpRbb7QfF4iWGdNQCY67WmM4rELpejgjWwE8Dx
+	 Kkied1JdmsTaHRf2797F6PoCw4E08eaNEvwkLcBL7+P+v9ueiaLWAHc1r3m2vunI3O
+	 ytcd1ACdOYdHi21FZUsJTIXn12eK8zM4T8H1gxMe/S38bWTnmeLrYxWHAZS4ks7//d
+	 /bUmhzx4nKrxcJf9f+rj7zZYEkU50BKUd9RH6ycRcu+Gdy8xlWr1IUruFWm1d6F3NS
+	 k5YD0rJea9xysBkt6KgSjinZHIwb2ylMFybK7aSXm3+cdykcOkOeG38tUCJrAomspP
+	 b5QfP9F2lZ1aQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 2102839D267B;
-	Tue, 10 Nov 2026 16:10:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 213B939D267B;
+	Tue, 10 Nov 2026 16:10:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,43 +54,37 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] Bluetooth: hci_qca: Reopen port after power on for
- QCA2066
+Subject: Re: [PATCH bluetooth-next v2] Bluetooth: L2CAP: validate MPS and MTU
+ in ECRED connection response
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179432700692.4062787.5940023737695374841.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Nov 2026 16:10:06 +0000
-References: <20261028111839.2148515-1-shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <20261028111839.2148515-1-shuai.zhang@oss.qualcomm.com>
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, chejiang@qti.qualcomm.com,
- quic_chezhou@quicinc.com, wei.deng@oss.qualcomm.com,
- jinwang.li@oss.qualcomm.com, mengshi.wu@oss.qualcomm.com
+ <179432701267.4062787.11305401861516612930.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Nov 2026 16:10:12 +0000
+References: <20261110-bt-ecred-mps-fix-v2-1-48c5ee28fd8a@gmail.com>
+In-Reply-To: <20261110-bt-ecred-mps-fix-v2-1-48c5ee28fd8a@gmail.com>
+To: Joas Antonio dos Santos <joasantonio108@gmail.com>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 28 Oct 2026 19:18:37 +0800 you wrote:
-> QCA2066 needs the serial port reopened after the controller is powered
-> on, otherwise the host and the controller run into RTS/CTS
-> synchronization issues.
+On Tue, 10 Nov 2026 03:26:03 +0000 you wrote:
+> From: Joas Antonio dos Santos <joasantonio108@gmail.com>
 > 
-> Patch 1 reopens the port in qca_power_on() for QCA2066, as in v2.
-> 
-> Patch 2 keeps HCI_UART_PROTO_READY in sync with the port state, so that a
-> port which failed to reopen is not closed or flushed again.
+> l2cap_ecred_conn_rsp() stores the MTU and MPS from the peer without
+> checking them against the minimums required for enhanced credit based
+> channels.  The other LE and ECRED handlers (l2cap_le_connect_req(),
+> l2cap_le_connect_rsp(), l2cap_ecred_conn_req(), l2cap_ecred_reconf_req())
+> all reject values below the minimum.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/2] Bluetooth: hci_qca: Reopen port after power on for QCA2066
-    (no matching commit)
-  - [v3,2/2] Bluetooth: hci_qca: Don't use the serdev port after a failed reopen
-    https://git.kernel.org/bluetooth/bluetooth-next/c/45e28b01e4d0
+  - [bluetooth-next,v2] Bluetooth: L2CAP: validate MPS and MTU in ECRED connection response
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1645edfa8c29
 
 You are awesome, thank you!
 -- 
