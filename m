@@ -1,90 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794349523;
-	b=N+juhcxu/ddChzwl0PDkY9XkpJkU+tlK9uWKteoBqtuTB/LY8q24QeliizPPpSUsIrdf
-	 zmY19NqDFLVYfekV0i91Tyvq2iK3ovcp3io3D2uy+oRvPgEWIAOgsxbOw3sfnEFHM2FyQ
-	 eiONASacX2nDEYTErgBIje83jinxclrK9/J2ArpRheGOaxA9yzoeCU9GLMgboWyYPn503
-	 lXHAIeVlDtKTkkogj63aj630n+QqEMIIhu/jSgkMcGBnK9VWS4h43qlFOsPKiFoT2hz8W
-	 IKT5iiTOZd84jkSUGt7y5RNROCSFb6rY5U16/4QgxXHpM5U632GEk7FZE1/DtjTJunw==
+	b=0uaKRQWFVk8WzUcaWcyJqqNce3c1KtHSVvEwKa2ymFUq8ClC0wG7f7qxg/be1qR9YBX/
+	 OORa4DvAfFt2ZU9QXmFobb65fOgGrPkfHEgvtXcIpKSf8PkQHIh4odKVkoiJu/ucQ6sff
+	 /XxMx/DJT6uqU8uN+1av/To3e29Uu7zsmRxYT2TA+mPCCIoWg3y2wGWjGqzjvwcj3uZAN
+	 ix38UpEUbzlJ6mar4gx/J6IHdxo4qjFOrQ8RcJMa3vS5KoPqVK7a/59ylGliZkCRTfUsu
+	 He/cnBwtOIaneV2zu6vC81M0vrEaA5ZrYM6KfvOhd+NiDiMtL+HmFO7ueb3bitKw+yg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794349523;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=DmTem4XXNW7KoCwmaH98aOX+dBkWC7aChEUbVcYzw8k=;
-	b=NXcxUAgrZmZVT+/OfPjGFLENjo1y0rF898MrHF8f4I2BuUxbIjpOpyRAOZA8yb9J6m+0
-	 ib6OY+6eAuc5UpfUjWBPDMBgn8v/nd6nCbve0ySS4DKqSMITB7+hoRkAZpTMUGOmzXN3H
-	 EJDUCYdnIPP7u1m5gibz2ztYsqtddjwJ4Gr9k2PNaRIMiZxvBCtb1pRO4nDERazvTev/D
-	 JNUYJhTUyEfzSrB8pIB1zr5lzuZvIig4PypUbevFMK4/hQPSfui3L0nH52+4JF2rhHx2z
-	 s8LCFe2E8sWIn54FVPuELkQ+x9yCwAuRNSTDSdLHbO0uLrxsIMntogHvf5nxMc7Yh7w==
+	bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
+	b=d9qPgdhWV3/YE5sGe7a12P/B1oTN4U+vB0FHZj2Xs9O4jP0ZWN/XDU3zqkMHek6e0Tnk
+	 E+aJdm1orjegATX7w1ggQGpqs4yu7FyMUnMqmhFTqBqh790qDFzEGx1hdD6xcLiuONQC7
+	 ZdSIVJbyZ+qRm/C9RnO7dR79mewTnGmUHAl9La6kPzTH1/dUGjhxFT/GcdEW2anKgmARz
+	 Chl0tMW8R9c4QLoKeQfQvuBfp2Ub1GM4Z2rD8h8muB9ihpZSZ+W9VSdWkF9l6pyc/MRkh
+	 lI1IDeD9Sj76K2LL4etC4aSUj8c8iFq5LFUQhRu55dMCBH5Hm59nYybRUDzBuUrT2Ew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k9PdsTPj;
-	arc=none smtp.remote-ip=209.85.222.46
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PG1xN8Fo;
+	arc=none smtp.remote-ip=209.85.217.42
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F969606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE88606A326
 	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:25:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0F969606A330
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CEE88606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k9PdsTPj
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-9905d61449cso748321241.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PG1xN8Fo
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-7cc013095d4so975720137.2
         for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1794349522; x=1794954322; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=DmTem4XXNW7KoCwmaH98aOX+dBkWC7aChEUbVcYzw8k=;
-        b=k9PdsTPj8i/kbVEnJzGQAaHfG1+PLMBKvcpXN/iZCOgsI1IkY5opGj6NIOfY/61RgB
-         5EFw4mWCOTsdoFK53m2c+B3vrTi/fnJuRXsuC/VkYw0b23ouzIkr4BcElL4O/rrRmGbN
-         GEbG3EGlqr2vEJ/qZJe0A1HVr0xSDnnEuk1B+zHzB4JsRUKJYgqDVeECDHN8qi+H7Veh
-         CJRRWMgAahL9wLS5ir8LIW8+SeC0vYHKBxfIEsWgK8YzXNXJsBH2Z4ZwYMxUXeUn3MnC
-         S09DNhetWwZQHheMtZX+wNmGHn6ki3TjTbihxlwOXA5PKIw323rJ6LKFk+jeY7RSnhdY
-         2cfA==
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
+        b=PG1xN8Fo7UsH6pBPYa5x9iLyVtmuqktdAAiBFA/qocuaBQto2YuG6xppJ9m53onQhU
+         BLIzkqQ/KtiDt/OyW9Zz5n16WT+TOzvj6wXZFY9ZZ6sGWCmjcCe78NKAcaoMWNa97wtV
+         EDWc0JOrdIAEYzdhpQ0gOh4myIROMggu8Prf4SqZ+vklWI/YzzQfq0lhaoMWHsn7Q/AR
+         BCxuhh4O0l1iVTf0e10yGp/wCGyZwVRYppjvK5gUHDXVlw6crkqTqp/vrQwj/M5YRT/R
+         jHVgSUI78b7JNt/zn7XJQST05yU8mOfPJEflxCB9JCsdtQAFyyaqat7qnZLqjvj1NEDW
+         nheA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1794349522; x=1794954322;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=DmTem4XXNW7KoCwmaH98aOX+dBkWC7aChEUbVcYzw8k=;
-        b=IL0E0tCrsJnfVMKhvFbD38oeEax6NzLJFNOi0HoHzr4X1d9JqP1lRRRlWrhroh1zkj
-         FdmM+7K9FvSQp+9Pjz5IYgmMDFk/+56E/SuS4B7C0atj4H9GcdIj+6fMMEbEspPkeXYA
-         lTsAj5y3JLzSC6b1kZQrHzEZueDxGtFzXCxLPX7GVYRDVIJUd5N8be0jNo/WErb2DcJj
-         +NGf5vw6UCkN1mQDlrzCucogxZCRzHW2fxrIMGpGt4jsudbW9AYieGzUXIlaDkEfy574
-         8djaKCHo3svDUDA9XcEfd1flKLbyf2GfRAJjKgTW7qaB/G6x6DGAkFBYr6qxVAhIObgv
-         gWDg==
-X-Gm-Message-State: APuU4Z+k3cU6nSZh1W5oabyOCW3UTRsRMyRCVbStE8Zwx9xO8zeMz/VS
-	KIrNRD5fwjtPDCwj3w7MVXXbbkuPcxvBw8BfnhIDUada+aJ9UztnIHQ1zNNqdg==
-X-Gm-Gg: AYBFou10XuAn6neCi+j15fY6iGbXpIqkKJotWuM2f0esS3ogrR8oBEne8VeyXLYsZkC
-	NyzQ+8xEZYtp1z/hYYJZ6TdRH/E80p7CbrfLYWwGstsHrk0+9Bwqcl0QHHA1cLZa32ev783Tolu
-	BCk0CQevwsFPtc6JGyLx2LdmeCrxjlKSbsYH4iPMWklaRe67MhSSrUDLlI4Q104U+EE38U8VBKo
-	6shRTnFOd7dWjmkm4GwCs7UR6N0CD17r+GvvyLuqt9rjuPIiN8kAAOCYMeWCSRrugoyB6e9qpYb
-	H/XB6SicinxfWzA6D2aKHYZkk3lJTF4TqdWIfNRrMn6ao28gKwUYWoFHVGoKdKBLFNBykJZIyvF
-	wdPCn9zCxUaQHb/lnyPr6S54HEO3jviSABds3fjtqAavYlwFS+DbfY23BOsk+Dtjrrg9TGkOSU1
-	Nt56ZUXHlpoNJ2LQK1OPmLm6oWSY7nfBT9k4iMBmO80KBAg8skTrb3s2wljBeVJZxxDrnw5Zv6e
-	+SF851bsaR8JQxY4aQi5A4pMEme4tJIjD563aoFO7zJZOUeMCFVejmSSOhafPftHHV3yn/7HZW6
-	XwLohNzsP1OsGVTsGcmTw4mUk+1+IB88pNh4RXEx/vnhm+cgqY0WBov8+k9E1l6chIUAtivNJKl
-	kSQeOJyuL85FHVCbm/ne2z4S0y8sWEh9fsgfs/IEyUuUlRvSHoYdxwXHSXz6vAxhGKQRhp6SJh2
-	6Cbyc=
-X-Received: by 2002:a05:6102:418c:b0:7b5:4700:3a58 with SMTP id ada2fe7eead31-7d506119adcmr156356137.31.1794349521818;
-        Tue, 10 Nov 2026 14:25:21 -0800 (PST)
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
+        b=SalDYk33gnDB4kkqtTyZ9NOrvDI11FP2oZNzjKVTVc3t+IKbD2eWNpoK4aq8xPst4/
+         lbemWZ6Z0Yqll5eUguLAg+dgs0BMKPlZLKoX3BvU0zICDKvIrkIWnk+D9hvoOLWmfkS7
+         7vS3yPjm0G6JEvWVxE0/OfhXi4dCwoVEONMmdLmpfyjDEGC6IUb7qWqYRKZ0ImlDN4Ld
+         6snmuu2CLaAejGPOIkx7PNYOdQRokKiJCx3Eoo6pWxhIdDJMj9KWSww2SepaifeIZULl
+         A35Rt64JB1yp8MIG/ZOSIxwluEbjJXEkKjMeXZBuIR/4b7b12YniAN3VNiwTw1BSgOse
+         H9aQ==
+X-Gm-Message-State: APuU4Z+mFbOn2Ywe/rm0P6NbWnW3Rdg5dDmAco9pFceZIYreanKMbdUx
+	mEB1+LZkKOlwiUMWfV4+Ir0GvH881cgQJzTwlWWhWHmjqwl1O+bQ4FUJAqyPQw==
+X-Gm-Gg: AYBFou2o0FYtOcDEyKAkuuEImnRFxtknhP5Pv4stMnyPeXEJowAN0Ke430mwOnyvxYK
+	umgpQhpA54creXdbDfcNUL2EWp6cnD+7t+lglg4okPMYPtWykE2Ww+DEeyXGgl3lXkR6aNnxnUg
+	+qB+5IDlZturI+Z+bFFWII+3K17Mkxk/s/NGppv6ShH00v4niLzmd4vgUDFVTtLLW9n2dW/Tyxs
+	h16F1HN7bavSQAsrRH6r5Zyke+cEurlwDiMeLCumwmThjJqB25tlAZTqLjLnEzOEEqSQBYsDyGl
+	lDHXqg+nC0fPrgBR8trszrbzDXWMboYnauVglYcm3gEySJwZQSxoIjtxjegXjtqtyv+nIPI1esU
+	bpQzJDpxgHODF8n0JTwmHDX6HCwdRo9KuSQARcy/hXq3YNM5fsVL2A7oocuJcehM1aZokdauufc
+	QhrVm5wDcmFPIhqvMjIpYRr4oIFQUzqIFf2FuJj3vwTMGTHIDxzdRhEUych+92L/YEmWe01NWVb
+	kvISz4Vplnrv7NwQyiSnOmU/860AyuVUaON/dgXnXZZTUcPTOYxaDSyxBirBbwhxDPGeilU0eV4
+	s4PTRYe+X4i133SMvDJQQ9TUis8dOU8M5IhYliDZbjg2JDGN+kpE3eUbVEV3y/9mL/Gt1CNpd0s
+	icswEY1oz0QxpRRoifBPRtyec/34uDYmGmvurZvowflwUPOfNLlkkpA16SLnVDyOd9imlrWou3F
+	XnZOg=
+X-Received: by 2002:a05:6102:5798:b0:7c3:881f:b620 with SMTP id ada2fe7eead31-7d5060e293emr132382137.21.1794349520876;
+        Tue, 10 Nov 2026 14:25:20 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30223977dsm2609190137.1.2026.11.10.14.25.21
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30223977dsm2609190137.1.2026.11.10.14.25.19
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 14:25:21 -0800 (PST)
+        Tue, 10 Nov 2026 14:25:20 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v8 07/11] emulator: Add HDT support to bthost
-Date: Tue, 10 Nov 2026 17:25:06 -0500
-Message-ID: <20261110222511.3011494-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v8 06/11] emulator: Add HDT support to btdev
+Date: Tue, 10 Nov 2026 17:25:05 -0500
+Message-ID: <20261110222511.3011494-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261110222511.3011494-1-luiz.dentz@gmail.com>
 References: <20261110222511.3011494-1-luiz.dentz@gmail.com>
@@ -97,242 +98,1497 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add helpers to set the PHY of a connection, including the HDT rates,
-and to start encryption with a given MIC length through LE Enable
-Encryption v2, so testers can exercise HDT and MIC length checks from
-the remote side.
----
- emulator/bthost.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++
- emulator/bthost.h |  14 +++++
- 2 files changed, 145 insertions(+)
+Add a Bluetooth 7.0 controller type, BTDEV_TYPE_BREDRLE70, which
+advertises the HDT and EKS feature bits and supported commands and
+implements the HDT commands and events: LE Enable Encryption v2 with
+MIC length negotiation, Read/Write Suggested Default Data Length v2,
+Read Maximum Data Length v2, Set Data Length v2, Set CIG Parameters v2,
+Create BIG v2, Set HDT Default Parameters, CIS Established v3, Create BIG
+Complete v2 and the EKS Opportunistic Encryption host feature. Make it
+the default for btvirt.
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 0c669f92efc4..58f820aa80e1 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -277,6 +277,10 @@ struct bthost {
- 	bool conn_init;
- 	bool le;
- 	bool sc;
-+	uint8_t mic_len;
-+
-+	bthost_encrypt_cb encrypt_cb;
-+	void *encrypt_cb_data;
+Assisted-by: OpenCode:claude-opus-5
+---
+ emulator/btdev.c  | 1086 +++++++++++++++++++++++++++++++++++++++++----
+ emulator/btdev.h  |    1 +
+ emulator/hciemu.c |    3 +
+ emulator/hciemu.h |    1 +
+ emulator/main.c   |    5 +-
+ 5 files changed, 1015 insertions(+), 81 deletions(-)
+
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 2fe593ac4959..9448fd5e2533 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -84,10 +84,15 @@ struct hook {
+ struct btdev_conn {
+ 	uint16_t handle;
+ 	uint8_t  type;
++	uint8_t  tx_phy;
++	uint8_t  rx_phy;
++	uint8_t  mic_len;
+ 	uint8_t  past_mode;
++	bool     encrypted;
+ 	struct btdev *dev;
+ 	struct btdev_conn *link;
+ 	struct queue *links;
++	size_t data_len;
+ 	void *data;
+ };
  
- 	struct queue *le_ext_adv;
+@@ -143,7 +148,11 @@ struct le_big {
  
-@@ -1605,6 +1609,34 @@ static void evt_encrypt_change(struct bthost *bthost, const void *data,
+ struct le_cig {
+ 	struct bt_hci_cmd_le_set_cig_params params;
+-	struct bt_hci_cis_params cis[CIS_SIZE];
++	union {
++		struct bt_hci_cis_params cis_v1[CIS_SIZE];
++		struct bt_hci_cis_params_v2 cis_v2[CIS_SIZE];
++	};
++	uint8_t version;
+ 	bool activated;
+ } __packed;
  
- 	if (conn->smp_data)
- 		smp_conn_encrypted(conn->smp_data, conn->encr_mode);
-+
-+	if (ev->encr_mode && bthost->encrypt_cb)
-+		bthost->encrypt_cb(handle, bthost->encrypt_cb_data);
-+}
-+
-+/* A key refresh, such as pairing over a link that is already encrypted,
-+ * completes encryption with the new key as Encryption Change does.
+@@ -258,8 +267,13 @@ struct btdev {
+ 	uint8_t  le_pa_data_len;
+ 	uint8_t  le_pa_data[MAX_PA_DATA_LEN];
+ 	uint8_t  le_ltk[16];
++	uint8_t  hdt_def_mic_len;
++	uint8_t  hdt_def_format;
++	uint16_t hdt_def_rates;
+ 	struct le_cig le_cig[CIG_SIZE];
+ 	uint8_t  le_iso_path[2];
++	uint8_t  le_def_tx_phys;
++	uint8_t  le_def_rx_phys;
+ 
+ 	uint8_t  le_rl_enable;
+ 
+@@ -1263,7 +1277,7 @@ static struct btdev_conn *conn_add_cis(struct btdev_conn *acl, uint16_t handle)
+ }
+ 
+ static struct btdev_conn *conn_add_bis(struct btdev *dev, uint16_t handle,
+-						const struct bt_hci_bis *bis)
++						const void *bis, size_t len)
+ {
+ 	struct btdev_conn *conn;
+ 
+@@ -1271,7 +1285,8 @@ static struct btdev_conn *conn_add_bis(struct btdev *dev, uint16_t handle,
+ 	if (!conn)
+ 		return conn;
+ 
+-	conn->data = util_memdup(bis, sizeof(*bis));
++	conn->data_len = len;
++	conn->data = util_memdup(bis, len);
+ 
+ 	return conn;
+ }
+@@ -1309,7 +1324,7 @@ static struct btdev_conn *conn_link_bis(struct btdev *dev, struct btdev *remote,
+ 	if (!bis)
+ 		return NULL;
+ 
+-	conn = conn_add_bis(dev, BIS_HANDLE, bis->data);
++	conn = conn_add_bis(dev, BIS_HANDLE, bis->data, bis->data_len);
+ 	if (!conn)
+ 		return NULL;
+ 
+@@ -2057,14 +2072,116 @@ static int cmd_set_conn_encrypt(struct btdev *dev, const void *data,
+ 	return 0;
+ }
+ 
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++ * Section 5.1.3.1.2:
++ *
++ * If the connection is on a GFSK PHY, then it shall use a 32-bit MIC after
++ * encryption is started. If the connection is on the LE HDT PHY and both the
++ * Flags_P and Flags_C are set to allow a 64-bit MIC, then the connection shall
++ * use a 64-bit MIC. Otherwise, the connection shall use a 128-bit MIC.
++ *
++ * So the MIC length negotiated only applies on the LE HDT PHY, which is the
++ * PHY of both directions or of none (Vol 6, Part B, Section 2.4.2.23).
 + */
-+static void evt_key_refresh_complete(struct bthost *bthost, const void *data,
-+								uint8_t len)
++static uint8_t conn_mic_len(struct btdev_conn *conn)
 +{
-+	const struct bt_hci_evt_encrypt_key_refresh_complete *ev = data;
-+	struct btconn *conn;
-+	uint16_t handle;
++	if (conn->tx_phy != 0x05 || conn->rx_phy != 0x05)
++		return 0x00;
 +
-+	if (len < sizeof(*ev))
-+		return;
-+
-+	handle = acl_handle(le16_to_cpu(ev->handle));
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn || ev->status)
-+		return;
-+
-+	if (conn->smp_data)
-+		smp_conn_encrypted(conn->smp_data, conn->encr_mode);
-+
-+	if (conn->encr_mode && bthost->encrypt_cb)
-+		bthost->encrypt_cb(handle, bthost->encrypt_cb_data);
- }
- 
- static void evt_io_cap_response(struct bthost *bthost, const void *data,
-@@ -1946,6 +1978,18 @@ static void evt_le_big_info_adv_report(struct bthost *bthost,
- 	send_command(bthost, BT_HCI_CMD_LE_BIG_CREATE_SYNC, &cmd, sizeof(cmd));
- }
- 
-+static void evt_le_cis_established_v3(struct bthost *bthost, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_evt_le_cis_established_v3 *ev = data;
-+
-+	if (ev->status)
-+		return;
-+
-+	init_iso(bthost, le16_to_cpu(ev->conn_handle), BDADDR_ANY->b,
-+							BDADDR_LE_PUBLIC);
++	return conn->mic_len;
 +}
 +
- static void evt_le_meta_event(struct bthost *bthost, const void *data,
- 								uint8_t len)
- {
-@@ -1994,6 +2038,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
- 	case BT_HCI_EVT_LE_CONN_RATE_CHANGE:
- 		evt_le_conn_rate_change(bthost, evt_data, len - 1);
- 		break;
-+	case BT_HCI_EVT_LE_CIS_ESTABLISHED_V3:
-+		evt_le_cis_established_v3(bthost, evt_data, len - 1);
-+		break;
- 	default:
- 		bthost_debug(bthost, "Unsupported LE Meta event 0x%2.2x",
- 								*event);
-@@ -2065,6 +2112,12 @@ static void process_evt(struct bthost *bthost, const void *data, uint16_t len)
- 		evt_encrypt_change(bthost, param, hdr->plen);
- 		break;
- 
-+	/* Both versions start with the fields used */
-+	case BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE:
-+	case BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2:
-+		evt_key_refresh_complete(bthost, param, hdr->plen);
-+		break;
++static void encrypt_change_v3(struct btdev_conn *conn, uint8_t mode,
++				uint8_t eks_mode, uint8_t status)
++{
++	struct bt_hci_evt_encrypt_change_v3 ev;
 +
- 	case BT_HCI_EVT_IO_CAPABILITY_RESPONSE:
- 		evt_io_cap_response(bthost, param, hdr->plen);
- 		break;
-@@ -4030,6 +4083,12 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
- {
- 	struct bt_hci_cmd_le_start_encrypt cmd;
- 
-+	if (bthost->mic_len) {
-+		bthost_le_start_encrypt_v2(bthost, handle, ltk,
-+							bthost->mic_len);
++	if (!conn)
++		return;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.status = status;
++	ev.handle = cpu_to_le16(conn->handle);
++	ev.mode = mode;
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
++	 * Section 7.7.8:
++	 *
++	 * Encryption_Key_Size: Encryption key size in octets. This
++	 * parameter shall be ignored for LE connections and shall be
++	 * ignored when Link Level Encryption is OFF. Range: 0x07 to 0x10
++	 * Key_Schedule_Enabled: 0x00 Encryption Key Schedule based
++	 * encryption is not used for LE. 0x01 Encryption Key Schedule based
++	 * encryption is used with AES-CCM for LE. 0x02 Encryption Key
++	 * Schedule based opportunistic encryption is used with AES-CCM for
++	 * LE.
++	 *
++	 * So the key size isn't meaningful for LE, and 0 is what an
++	 * opportunistic encryption, which has no key from pairing, reports.
++	 */
++	switch (eks_mode) {
++	case 0x00: /* EKS disabled */
++	case 0x01: /* EKS enabled */
++		ev.key_size = 16;
++		break;
++	case 0x02: /* EKS opportunistic */
++		ev.key_size = 0;
++		break;
++	}
++
++	ev.eks_mode = eks_mode;
++	ev.mic_len = conn_mic_len(conn);
++
++	send_event(conn->dev, BT_HCI_EVT_ENCRYPT_CHANGE_V3, &ev, sizeof(ev));
++}
++
++static void key_refresh_complete(struct btdev_conn *conn, uint8_t status)
++{
++	struct bt_hci_evt_encrypt_key_refresh_complete_v2 ev;
++
++	if (!conn)
++		return;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.status = status;
++	ev.handle = cpu_to_le16(conn->handle);
++
++	/* Check if BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2 has been enabled
++	 * in the event mask page 2.
++	 */
++	if (!(conn->dev->event_mask_page2[3] & BIT(3))) {
++		send_event(conn->dev, BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE,
++				&ev, sizeof(struct
++				bt_hci_evt_encrypt_key_refresh_complete));
 +		return;
 +	}
 +
- 	memset(&cmd, 0, sizeof(cmd));
- 	cmd.handle = htobs(handle);
- 	memcpy(cmd.ltk, ltk, 16);
-@@ -4055,6 +4114,36 @@ void bthost_le_conn_rate(struct bthost *bthost, uint16_t handle,
- 	send_command(bthost, BT_HCI_CMD_LE_CONN_RATE, &cmd, sizeof(cmd));
++	ev.mic_len = conn_mic_len(conn);
++	ev.eks_mode = 0x01;
++
++	send_event(conn->dev, BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2, &ev,
++							sizeof(ev));
++}
++
+ static void encrypt_change(struct btdev_conn *conn, uint8_t mode,
+-					uint8_t status)
++				uint8_t eks_mode, uint8_t status)
+ {
+ 	struct bt_hci_evt_encrypt_change ev;
+ 
+ 	if (!conn)
+ 		return;
+ 
++	if (!status)
++		conn->encrypted = !!mode;
++
++	/* Check if BT_HCI_EVT_ENCRYPT_CHANGE_V3 has been enabled in the event
++	 * mask page 2.
++	 */
++	if (conn->dev->event_mask_page2[3] & BIT(2))
++		return encrypt_change_v3(conn, mode, eks_mode, status);
++
+ 	memset(&ev, 0, sizeof(ev));
+ 
+ 	ev.status = status;
+@@ -2094,8 +2211,8 @@ static int cmd_set_conn_encrypt_complete(struct btdev *dev, const void *data,
+ 	else
+ 		mode = 0x01;
+ 
+-	encrypt_change(conn, mode, BT_HCI_ERR_SUCCESS);
+-	encrypt_change(conn->link, mode, BT_HCI_ERR_SUCCESS);
++	encrypt_change(conn, mode, 0x00, BT_HCI_ERR_SUCCESS);
++	encrypt_change(conn->link, mode, 0x00, BT_HCI_ERR_SUCCESS);
+ 
+ 	return 0;
+ }
+@@ -4874,8 +4991,27 @@ static int cmd_ltk_reply(struct btdev *dev, const void *data, uint8_t len)
+ 		mode = 0x01;
+ 	}
+ 
+-	encrypt_change(conn, mode, status);
+-	encrypt_change(conn->link, mode, status);
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
++	 * Section 7.7.39:
++	 *
++	 * This event is used to indicate to the Host that the encryption
++	 * key was refreshed on the given Connection_Handle any time
++	 * encryption is paused and then resumed.
++	 *
++	 * So encrypting a link that is already encrypted, such as one with
++	 * opportunistic encryption, refreshes its key.
++	 */
++	if (!status && conn->encrypted) {
++		key_refresh_complete(conn, status);
++		key_refresh_complete(conn->link, status);
++		return 0;
++	}
++
++	/* Pass eks_mode as 0x01 for EKS enabled since only in case of V3 being
++	 * enabled it will get used.
++	 */
++	encrypt_change(conn, mode, 0x01, status);
++	encrypt_change(conn->link, mode, 0x01, status);
+ 
+ 	return 0;
+ }
+@@ -4900,7 +5036,7 @@ static int cmd_ltk_neg_reply(struct btdev *dev, const void *data, uint8_t len)
+ 	rp.status = BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(dev, BT_HCI_CMD_LE_LTK_REQ_NEG_REPLY, &rp, sizeof(rp));
+ 
+-	encrypt_change(conn->link, 0x00, BT_HCI_ERR_PIN_OR_KEY_MISSING);
++	encrypt_change(conn->link, 0x00, 0x00, BT_HCI_ERR_PIN_OR_KEY_MISSING);
+ 
+ 	return 0;
+ }
+@@ -5000,6 +5136,34 @@ static int cmd_conn_param_neg_reply_complete(struct btdev *dev,
+ 	return 0;
  }
  
-+void bthost_le_start_encrypt_v2(struct bthost *bthost, uint16_t handle,
-+					const uint8_t ltk[16], uint8_t mic_len)
++static int cmd_le_read_def_data_len(struct btdev *dev, const void *data,
++						uint8_t len)
 +{
-+	struct bt_hci_cmd_le_enable_encrypt_v2 cmd;
++	struct bt_hci_rsp_le_read_default_data_length rsp;
 +
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.handle = htobs(handle);
-+	memcpy(cmd.ltk, ltk, 16);
-+	cmd.mic_len = mic_len;
++	memset(&rsp, 0, sizeof(rsp));
 +
-+	send_command(bthost, BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2, &cmd,
-+							sizeof(cmd));
++	rsp.status = BT_HCI_ERR_SUCCESS;
++	rsp.tx_len = cpu_to_le16(0x001b);
++	rsp.tx_time = cpu_to_le16(0x0148);
++
++	cmd_complete(dev, BT_HCI_CMD_LE_READ_DEFAULT_DATA_LENGTH, &rsp,
++						sizeof(rsp));
++
++	return 0;
 +}
 +
-+void bthost_le_reencrypt(struct bthost *bthost, uint16_t handle,
-+							uint8_t mic_len)
++static int cmd_le_write_def_data_len(struct btdev *dev, const void *data,
++						uint8_t len)
 +{
-+	struct btconn *conn;
-+	uint8_t ltk[16];
++	uint8_t status = BT_HCI_ERR_SUCCESS;
 +
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn || !conn->smp_data)
-+		return;
++	cmd_complete(dev, BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH, &status,
++						sizeof(status));
 +
-+	if (smp_get_ltk(conn->smp_data, 0, 0, ltk) < 0)
-+		return;
-+
-+	bthost_le_start_encrypt_v2(bthost, handle, ltk, mic_len);
++	return 0;
 +}
 +
- uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
+ static int cmd_read_local_pk256(struct btdev *dev, const void *data,
+ 						uint8_t len)
  {
- 	struct btconn *conn;
-@@ -4113,6 +4202,48 @@ void bthost_set_sc_support(struct bthost *bthost, bool enable)
- 							&cmd, sizeof(cmd));
+@@ -5011,6 +5175,24 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
+ 	return -ENOTSUP;
  }
  
-+void bthost_set_mic_len(struct bthost *bthost, uint8_t mic_len)
++static int cmd_le_read_max_data_len(struct btdev *dev, const void *data,
++						uint8_t len)
 +{
-+	bthost->mic_len = mic_len;
++	struct bt_hci_rsp_le_read_max_data_length rsp;
++
++	memset(&rsp, 0, sizeof(rsp));
++	rsp.status = BT_HCI_ERR_SUCCESS;
++	rsp.max_tx_len = cpu_to_le16(0x00fb);
++	rsp.max_tx_time = cpu_to_le16(0x4290);
++	rsp.max_rx_len = cpu_to_le16(0x00fb);
++	rsp.max_rx_time = cpu_to_le16(0x4290);
++
++	cmd_complete(dev, BT_HCI_CMD_LE_READ_MAX_DATA_LENGTH, &rsp,
++						sizeof(rsp));
++
++	return 0;
 +}
 +
-+uint8_t bthost_get_mic_len(struct bthost *bthost)
-+{
-+	return bthost->mic_len;
-+}
-+
-+void bthost_set_default_phy(struct bthost *bthost, uint8_t tx_phys,
-+							uint8_t rx_phys)
-+{
-+	struct bt_hci_cmd_le_set_default_phy cmd;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.tx_phys = tx_phys;
-+	cmd.rx_phys = rx_phys;
-+
-+	send_command(bthost, BT_HCI_CMD_LE_SET_DEFAULT_PHY, &cmd, sizeof(cmd));
-+}
-+
-+void bthost_le_set_phy(struct bthost *bthost, uint16_t handle,
-+					uint8_t tx_phys, uint8_t rx_phys)
-+{
-+	struct bt_hci_cmd_le_set_phy cmd;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.handle = htobs(handle);
-+	cmd.tx_phys = tx_phys;
-+	cmd.rx_phys = rx_phys;
-+
-+	send_command(bthost, BT_HCI_CMD_LE_SET_PHY, &cmd, sizeof(cmd));
-+}
-+
-+void bthost_set_encrypt_cb(struct bthost *bthost, bthost_encrypt_cb cb,
-+							void *user_data)
-+{
-+	bthost->encrypt_cb = cb;
-+	bthost->encrypt_cb_data = user_data;
-+}
-+
- void bthost_set_pin_code(struct bthost *bthost, const uint8_t *pin,
- 							uint8_t pin_len)
+ #define CMD_LE \
+ 	CMD(BT_HCI_CMD_READ_LE_HOST_SUPPORTED, cmd_read_le_host_supported, \
+ 					NULL), \
+@@ -5055,6 +5237,10 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
+ 					cmd_conn_param_reply_complete), \
+ 	CMD(BT_HCI_CMD_LE_CONN_PARAM_REQ_NEG_REPLY, cmd_conn_param_neg_reply, \
+ 					cmd_conn_param_neg_reply_complete), \
++	CMD(BT_HCI_CMD_LE_READ_DEFAULT_DATA_LENGTH, cmd_le_read_def_data_len, \
++					NULL), \
++	CMD(BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH, \
++					cmd_le_write_def_data_len, NULL), \
+ 	CMD(BT_HCI_CMD_LE_READ_LOCAL_PK256, cmd_read_local_pk256, NULL), \
+ 	CMD(BT_HCI_CMD_LE_GENERATE_DHKEY, cmd_gen_dhkey, NULL), \
+ 	CMD(BT_HCI_CMD_LE_ADD_TO_RESOLV_LIST, cmd_add_rl,  NULL), \
+@@ -5065,7 +5251,9 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
+ 	CMD(BT_HCI_CMD_LE_READ_LOCAL_RESOLV_ADDR, cmd_read_local_rl_addr, \
+ 					NULL), \
+ 	CMD(BT_HCI_CMD_LE_SET_RESOLV_ENABLE, cmd_set_rl_enable, NULL), \
+-	CMD(BT_HCI_CMD_LE_SET_RESOLV_TIMEOUT, cmd_set_rl_timeout, NULL)
++	CMD(BT_HCI_CMD_LE_SET_RESOLV_TIMEOUT, cmd_set_rl_timeout, NULL), \
++	CMD(BT_HCI_CMD_LE_READ_MAX_DATA_LENGTH, cmd_le_read_max_data_len, \
++					NULL) \
+ 
+ static const struct btdev_cmd cmd_bredr_le[] = {
+ 	CMD_COMMON_ALL,
+@@ -5096,16 +5284,20 @@ static int cmd_set_default_phy(struct btdev *dev, const void *data,
+ 							uint8_t len)
  {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index ed924eb99630..b3e18114638a 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -169,6 +169,10 @@ void bthost_request_auth(struct bthost *bthost, uint16_t handle);
+ 	const struct bt_hci_cmd_le_set_default_phy *cmd = data;
+-	uint8_t status;
++	uint8_t status = BT_HCI_ERR_SUCCESS;
  
- void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
- 							const uint8_t ltk[16]);
-+void bthost_le_start_encrypt_v2(struct bthost *bthost, uint16_t handle,
-+					const uint8_t ltk[16], uint8_t mic_len);
-+void bthost_le_reencrypt(struct bthost *bthost, uint16_t handle,
-+							uint8_t mic_len);
- typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
- 							void *user_data);
- typedef void (*bthost_l2cap_disconnect_cb) (uint16_t handle, uint16_t cid,
-@@ -185,6 +189,16 @@ void bthost_add_l2cap_server_custom(struct bthost *bthost, uint16_t psm,
- 				void *user_data);
+ 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
+-			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
++			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
+ 			(!(cmd->all_phys & 0x02) &&
+-			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
++			(!cmd->rx_phys || (cmd->rx_phys & ~0x17)))) {
+ 		status = BT_HCI_ERR_INVALID_PARAMETERS;
+-	else
+-		status = BT_HCI_ERR_SUCCESS;
++		goto done;
++	}
  
- void bthost_set_sc_support(struct bthost *bthost, bool enable);
-+void bthost_set_mic_len(struct bthost *bthost, uint8_t mic_len);
-+uint8_t bthost_get_mic_len(struct bthost *bthost);
-+void bthost_set_default_phy(struct bthost *bthost, uint8_t tx_phys,
-+							uint8_t rx_phys);
-+void bthost_le_set_phy(struct bthost *bthost, uint16_t handle,
-+					uint8_t tx_phys, uint8_t rx_phys);
++	dev->le_def_tx_phys = cmd->tx_phys;
++	dev->le_def_rx_phys = cmd->rx_phys;
 +
-+typedef void (*bthost_encrypt_cb)(uint16_t handle, void *user_data);
-+void bthost_set_encrypt_cb(struct bthost *bthost, bthost_encrypt_cb cb,
-+							void *user_data);
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_SET_DEFAULT_PHY, &status,
+ 					sizeof(status));
  
- void bthost_set_pin_code(struct bthost *bthost, const uint8_t *pin,
- 							uint8_t pin_len);
+@@ -5127,9 +5319,9 @@ static int cmd_le_set_phy(struct btdev *dev, const void *data,
+ 	}
+ 
+ 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
+-			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
++			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
+ 			(!(cmd->all_phys & 0x02) &&
+-			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
++			(!cmd->rx_phys || (cmd->rx_phys & ~0x17))))
+ 		status = BT_HCI_ERR_INVALID_PARAMETERS;
+ 	else
+ 		status = BT_HCI_ERR_SUCCESS;
+@@ -5140,6 +5332,36 @@ done:
+ 	return 0;
+ }
+ 
++/* Highest PHY of the ones set in phys: LE 1M, LE 2M, LE Coded then HDT */
++static uint8_t phy_highest(uint8_t phys)
++{
++	if (phys & BIT(4))
++		return 0x05; /* HDT PHY */
++
++	if (phys & BIT(2))
++		return 0x03; /* LE CODED PHY */
++
++	if (phys & BIT(1))
++		return 0x02; /* LE 2M PHY */
++
++	if (phys & BIT(0))
++		return 0x01; /* LE 1M PHY */
++
++	return 0x00;
++}
++
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++ * Section 2.4.2.23:
++ *
++ * If a PHY is changing, then both fields shall be set to the LE HDT PHY or
++ * both shall be set to a GFSK PHY (which may be a different PHY in each
++ * direction).
++ */
++static bool le_phy_pair_valid(uint8_t tx_phy, uint8_t rx_phy)
++{
++	return (tx_phy == 0x05) == (rx_phy == 0x05);
++}
++
+ static int cmd_le_set_phy_complete(struct btdev *dev, const void *data,
+ 							uint8_t len)
+ {
+@@ -5153,35 +5375,51 @@ static int cmd_le_set_phy_complete(struct btdev *dev, const void *data,
+ 		return 0;
+ 
+ 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
+-			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
++			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
+ 			(!(cmd->all_phys & 0x02) &&
+-			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
++			(!cmd->rx_phys || (cmd->rx_phys & ~0x17))))
+ 		return 0;
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.handle = cmd->handle;
+ 
+-	/* Use the highest PHY possible */
+-	if (cmd->tx_phys & BIT(0))
+-		ev.tx_phy = 0x01; /* LE 1M PHY */
++	ev.tx_phy = phy_highest(cmd->tx_phys);
++	ev.rx_phy = phy_highest(cmd->rx_phys);
+ 
+-	if (cmd->rx_phys & BIT(0))
+-		ev.rx_phy = 0x01; /* LE 1M PHY */
++	/* HDT has to be the PHY of both directions or of none, so if only one
++	 * direction got it choose both again without it.
++	 */
++	if (!le_phy_pair_valid(ev.tx_phy, ev.rx_phy)) {
++		ev.tx_phy = phy_highest(cmd->tx_phys & ~BIT(4));
++		ev.rx_phy = phy_highest(cmd->rx_phys & ~BIT(4));
++	}
+ 
+-	if (cmd->tx_phys & BIT(1))
+-		ev.tx_phy |= 0x02; /* LE 2M PHY */
+-
+-	if (cmd->rx_phys & BIT(1))
+-		ev.rx_phy |= 0x02; /* LE 2M PHY */
+-
+-	if (cmd->tx_phys & BIT(2))
+-		ev.tx_phy |= 0x03; /* LE CODED PHY */
+-
+-	if (cmd->rx_phys & BIT(2))
+-		ev.rx_phy |= 0x03; /* LE CODED PHY */
++	if (ev.tx_phy)
++		conn->tx_phy = ev.tx_phy;
++	if (ev.rx_phy)
++		conn->rx_phy = ev.rx_phy;
+ 
+ 	le_meta_event(dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE, &ev, sizeof(ev));
+ 
++	/* The peer receives on the PHY this side transmits on and the other
++	 * way around.
++	 */
++	if (conn->link) {
++		uint8_t tx_phy = ev.tx_phy;
++
++		if (ev.rx_phy)
++			conn->link->tx_phy = ev.rx_phy;
++		if (tx_phy)
++			conn->link->rx_phy = tx_phy;
++
++		ev.handle = cpu_to_le16(conn->link->handle);
++		ev.tx_phy = ev.rx_phy;
++		ev.rx_phy = tx_phy;
++		le_meta_event(conn->link->dev,
++				BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE, &ev,
++				sizeof(ev));
++	}
++
+ 	return 0;
+ }
+ 
+@@ -5814,7 +6052,9 @@ static uint8_t bits_to_phy(uint8_t bits)
+ {
+ 	uint8_t phy = 0x00;
+ 
+-	/* Convert PHY bits to PHY values on a ascending order. */
++	/* Convert PHY bits to PHY values on a ascending order so if HDT bit is
++	 * set it takes precedence over LE 2M and LE 1M.
++	 */
+ 	if (bits & BIT(0))
+ 		phy = 0x01; /* LE 1M */
+ 
+@@ -5824,6 +6064,9 @@ static uint8_t bits_to_phy(uint8_t bits)
+ 	if (bits & BIT(2))
+ 		phy = 0x03; /* LE Coded */
+ 
++	if (bits & BIT(4))
++		phy = 0x05; /* HDT */
++
+ 	return phy;
+ }
+ 
+@@ -6155,6 +6398,82 @@ static void ext_adv_term(void *data, void *user_data)
+ 	}
+ }
+ 
++static void le_phy_update_event(struct btdev_conn *conn, uint8_t tx_phy,
++							uint8_t rx_phy)
++{
++	struct bt_hci_evt_le_phy_update_complete ev;
++
++	if (!conn || !tx_phy || !rx_phy)
++		return;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.handle = cpu_to_le16(conn->handle);
++	ev.tx_phy = tx_phy;
++	ev.rx_phy = rx_phy;
++
++	conn->tx_phy = tx_phy;
++	conn->rx_phy = rx_phy;
++	conn->link->tx_phy = rx_phy;
++	conn->link->rx_phy = tx_phy;
++
++	le_meta_event(conn->dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE,
++					&ev, sizeof(ev));
++
++	/* The peer receives on the PHY this side transmits on and the other
++	 * way around.
++	 */
++	ev.handle = cpu_to_le16(conn->link->handle);
++	ev.tx_phy = rx_phy;
++	ev.rx_phy = tx_phy;
++	le_meta_event(conn->link->dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE,
++					&ev, sizeof(ev));
++}
++
++/* Highest PHY both sides prefer: HDT, then LE 2M, then LE 1M */
++static uint8_t le_phy_select(uint8_t local, uint8_t remote)
++{
++	uint8_t phys = local & remote;
++
++	if (phys & BIT(4))
++		return 0x05; /* HDT */
++
++	if (phys & BIT(1))
++		return 0x02; /* LE 2M */
++
++	/* LE 1M, unless LE Coded is the only one both sides prefer */
++	if (!(phys & BIT(0)) && (phys & BIT(2)))
++		return 0x03; /* LE Coded */
++
++	return 0x01; /* LE 1M */
++}
++
++static void le_phy_update(struct btdev_conn *conn)
++{
++	uint8_t tx_phy, rx_phy;
++
++	/* Each direction is transmitted by one side and received by the
++	 * other.
++	 */
++	tx_phy = le_phy_select(conn->dev->le_def_tx_phys,
++					conn->link->dev->le_def_rx_phys);
++	rx_phy = le_phy_select(conn->dev->le_def_rx_phys,
++					conn->link->dev->le_def_tx_phys);
++
++	/* HDT has to be the PHY of both directions or of none, so if only one
++	 * direction got it select both again without it, see
++	 * le_phy_pair_valid().
++	 */
++	if (!le_phy_pair_valid(tx_phy, rx_phy)) {
++		tx_phy = le_phy_select(conn->dev->le_def_tx_phys & ~BIT(4),
++				conn->link->dev->le_def_rx_phys & ~BIT(4));
++		rx_phy = le_phy_select(conn->dev->le_def_rx_phys & ~BIT(4),
++				conn->link->dev->le_def_tx_phys & ~BIT(4));
++	}
++
++	le_phy_update_event(conn, tx_phy, rx_phy);
++}
++
+ static void le_ext_conn_complete(struct btdev *btdev,
+ 			const struct bt_hci_cmd_le_ext_create_conn *cmd,
+ 			struct le_ext_adv *ext_adv,
+@@ -6220,9 +6539,11 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 	le_meta_event(btdev, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &ev,
+ 						sizeof(ev));
+ 
+-	/* Disable EXT ADV */
+-	if (conn)
++	/* Disable EXT ADV and update PHY */
++	if (conn) {
+ 		queue_foreach(btdev->le_ext_adv, ext_adv_term, conn);
++		le_phy_update(conn);
++	}
+ }
+ 
+ static int cmd_ext_create_conn_complete(struct btdev *dev, const void *data,
+@@ -6861,7 +7182,7 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
+ 
+ 	rsp.params.cig_id = cmd->cig_id;
+ 
+-	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis)) {
++	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis_v1)) {
+ 		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
+ 		goto done;
+ 	}
+@@ -6938,6 +7259,7 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
+ 	}
+ 
+ 	memcpy(&dev->le_cig[cig_idx], data, len);
++	dev->le_cig[cig_idx].version = 1;
+ 
+ done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_SET_CIG_PARAMS, &rsp,
+@@ -7010,10 +7332,100 @@ static uint32_t le_cis_latecy(uint8_t ft, uint8_t iso_interval,
+ 	return latency >= interval ? latency : interval;
+ }
+ 
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E, Section 4.8.2:
++ *
++ * If an event has more than one version and the event is generated, then
++ * the Controller shall use the latest version that is both supported and
++ * enabled ("unmasked") in the relevant event mask.
++ *
++ * LE CIS Established v1 is a prefix of v3, and v3 is LE event mask bit 57.
++ */
++static void le_cis_estabilished_send(struct btdev *btdev,
++				struct bt_hci_evt_le_cis_established_v3 *evt)
++{
++	if (btdev->le_event_mask[7] & BIT(1))
++		le_meta_event(btdev, BT_HCI_EVT_LE_CIS_ESTABLISHED_V3, evt,
++							sizeof(*evt));
++	else
++		le_meta_event(btdev, BT_HCI_EVT_LE_CIS_ESTABLISHED, evt,
++				sizeof(struct bt_hci_evt_le_cis_established));
++}
++
++static void le_cis_estabilished_fill(
++				struct bt_hci_evt_le_cis_established_v3 *evt,
++				struct le_cig *le_cig, int cis_idx)
++{
++	uint8_t c_phys, p_phys;
++
++	if (le_cig->version == 2) {
++		struct bt_hci_cis_params_v2 *cis = &le_cig->cis_v2[cis_idx];
++
++		c_phys = cis->c_phy;
++		p_phys = cis->p_phy;
++		evt->c_mtu = cis->c_sdu;
++		evt->p_mtu = cis->p_sdu;
++		evt->mic_len = cis->mic_len;
++		evt->c_phy = bits_to_phy(c_phys);
++		evt->p_phy = bits_to_phy(p_phys);
++
++		switch (evt->c_phy) {
++		case 0x03:
++			evt->c_rates = cpu_to_le16(cis->c_coded_rates);
++			break;
++		case 0x05:
++			evt->c_rates = cis->c_hdt_rates;
++			break;
++		}
++
++		switch (evt->p_phy) {
++		case 0x03:
++			evt->p_rates = cpu_to_le16(cis->p_coded_rates);
++			break;
++		case 0x05:
++			evt->p_rates = cis->p_hdt_rates;
++			break;
++		}
++	} else {
++		struct bt_hci_cis_params *cis = &le_cig->cis_v1[cis_idx];
++
++		evt->c_phy = bits_to_phy(cis->c_phys);
++		evt->p_phy = bits_to_phy(cis->p_phys);
++		evt->c_mtu = cis->c_sdu;
++		evt->p_mtu = cis->p_sdu;
++	}
++
++	evt->nse = 0x01;
++	evt->c_bn = 0x01;
++	evt->p_bn = 0x01;
++	evt->c_ft = 0x02;
++	evt->p_ft = 0x02;
++	evt->interval = le_cis_interval(le_cig->params.c_interval);
++	evt->c_sdu = evt->c_mtu;
++	evt->p_sdu = evt->p_mtu;
++	memcpy(evt->c_sdu_interval, le_cig->params.c_interval,
++					sizeof(evt->c_sdu_interval));
++	memcpy(evt->p_sdu_interval, le_cig->params.p_interval,
++					sizeof(evt->p_sdu_interval));
++	evt->framing = le_cig->params.framing;
++
++	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
++	 * page 3050:
++	 *
++	 * Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
++	 * ISO_Interval - SDU_Interval_C_To_P
++	 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
++	 * ISO_Interval - SDU_Interval_P_To_C
++	 */
++	put_le24(le_cis_latecy(evt->c_ft, evt->interval,
++				le_cig->params.c_interval), evt->c_latency);
++	put_le24(le_cis_latecy(evt->p_ft, evt->interval,
++				le_cig->params.p_interval), evt->p_latency);
++}
++
+ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
+ 						uint8_t status)
+ {
+-	struct bt_hci_evt_le_cis_established evt;
++	struct bt_hci_evt_le_cis_established_v3 evt;
+ 	int cig_idx, cis_idx = -1;
+ 
+ 	memset(&evt, 0, sizeof(evt));
+@@ -7025,44 +7437,19 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
+ 	if (cig_idx < 0 && !evt.status)
+ 		evt.status = BT_HCI_ERR_UNSPECIFIED_ERROR;
+ 
+-	if (!evt.status) {
+-		struct btdev *remote = conn->link->dev;
+-		struct le_cig *le_cig = &remote->le_cig[cig_idx];
++	if (!evt.status)
++		le_cis_estabilished_fill(&evt,
++					&conn->link->dev->le_cig[cig_idx],
++					cis_idx);
+ 
+-		memset(evt.cig_sync_delay, 0, sizeof(evt.cig_sync_delay));
+-		memset(evt.cis_sync_delay, 0, sizeof(evt.cis_sync_delay));
+-
+-		evt.c_phy = bits_to_phy(le_cig->cis[cis_idx].c_phys);
+-		evt.p_phy = bits_to_phy(le_cig->cis[cis_idx].p_phys);
+-		evt.nse = 0x01;
+-		evt.c_bn = 0x01;
+-		evt.p_bn = 0x01;
+-		evt.c_ft = 0x02;
+-		evt.p_ft = 0x02;
+-		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
+-		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
+-		evt.interval = le_cis_interval(le_cig->params.c_interval);
+-
+-		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
+-		 * page 3050:
+-		 *
+-		 * Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
+-		 * ISO_Interval - SDU_Interval_C_To_P
+-		 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
+-		 * ISO_Interval - SDU_Interval_P_To_C
+-		 */
+-		put_le24(le_cis_latecy(evt.c_ft, evt.interval,
+-				le_cig->params.c_interval), evt.c_latency);
+-		put_le24(le_cis_latecy(evt.p_ft, evt.interval,
+-				le_cig->params.p_interval), evt.p_latency);
+-	}
+-
+-	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
++	le_cis_estabilished_send(dev, &evt);
+ 
++	/* Each device assigns its own handles, so the event of the
++	 * receiving side carries its handle.
++	 */
+ 	if (conn) {
+ 		evt.conn_handle = cpu_to_le16(conn->link->handle);
+-		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CIS_ESTABLISHED,
+-						&evt, sizeof(evt));
++		le_cis_estabilished_send(conn->link->dev, &evt);
+ 	}
+ }
+ 
+@@ -7108,13 +7495,22 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
+ 			}
+ 		}
+ 
++		memset(&evt, 0, sizeof(evt));
+ 		/* Each device assigns its own handles, so the event of
+ 		 * the receiving side carries its handles.
+ 		 */
+ 		evt.acl_handle = cpu_to_le16(acl->link->handle);
+ 		evt.cis_handle = cpu_to_le16(iso->link->handle);
+ 		evt.cig_id = le_cig->params.cig_id;
+-		evt.cis_id = le_cig->cis[cis_idx].cis_id;
++
++		switch (le_cig->version) {
++		case 0x01:
++			evt.cis_id = le_cig->cis_v1[cis_idx].cis_id;
++			break;
++		case 0x02:
++			evt.cis_id = le_cig->cis_v2[cis_idx].cis_id;
++			break;
++		}
+ 
+ 		le_cig->activated = true;
+ 
+@@ -7284,7 +7680,7 @@ static int cmd_create_big_complete(struct btdev *dev, const void *data,
+ 	for (i = 0; i < cmd->num_bis; i++) {
+ 		struct btdev_conn *conn;
+ 
+-		conn = conn_add_bis(dev, BIS_HANDLE + i, bis);
++		conn = conn_add_bis(dev, BIS_HANDLE + i, bis, sizeof(*bis));
+ 		if (!conn) {
+ 			queue_remove(dev->le_big, big);
+ 			le_big_free(big);
+@@ -7898,8 +8294,8 @@ static int cmd_le_read_all_remote_features(struct btdev *dev, const void *data,
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.status = BT_HCI_ERR_SUCCESS;
+ 	ev.handle = cpu_to_le16(conn->handle);
+-	ev.max_pages = 1;
+-	ev.valid_pages = 1;
++	ev.max_pages = 10;
++	ev.valid_pages = 10;
+ 	memcpy(ev.features, conn->link->dev->le_features, 248);
+ 
+ 	le_meta_event(dev, BT_HCI_EVT_LE_READ_ALL_REMOTE_FEATURES_COMPLETE, &ev,
+@@ -8082,6 +8478,501 @@ static void set_le_62_commands(struct btdev *btdev)
+ 	btdev->cmds = cmd_le_6_2;
+ }
+ 
++static int cmd_set_data_len_v2(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_le_set_data_len_v2 *cmd = data;
++	struct bt_hci_rsp_le_set_data_len_v2 rsp;
++	struct btdev_conn *conn;
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	conn = queue_find(dev->conns, match_handle,
++				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
++	if (!conn)
++		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
++	else
++		rsp.handle = cpu_to_le16(conn->handle);
++
++	cmd_complete(dev, BT_HCI_CMD_LE_SET_DATA_LEN_V2, &rsp, sizeof(rsp));
++
++	return 0;
++}
++
++static int cmd_read_max_data_len_v2(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_le_read_data_len_v2 *cmd = data;
++	struct bt_hci_rsp_le_read_data_len_v2 rsp;
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	switch (cmd->phy) {
++	case 0x00: /* No PHY */
++	case 0x01: /* LE 1M */
++	case 0x02: /* LE 2M */
++	case 0x03: /* LE Coded */
++		rsp.max_tx_len = cpu_to_le16(0x00fb);
++		rsp.max_tx_time = cpu_to_le16(0x0148);
++		rsp.max_rx_len = cpu_to_le16(0x00fb);
++		rsp.max_rx_time = cpu_to_le16(0x0148);
++		rsp.max_tx_win = 0x01;
++		rsp.max_rx_win = 0x01;
++		rsp.max_rx_packet = cpu_to_le16(0x00fb);
++		break;
++	case 0x05: /* LE HDT */
++		rsp.max_tx_len = cpu_to_le16(0x1fef);
++		rsp.max_tx_time = cpu_to_le16(0x148);
++		rsp.max_rx_len = cpu_to_le16(0x1fef);
++		rsp.max_rx_time = cpu_to_le16(0x148);
++		rsp.max_tx_win = 0x04;
++		rsp.max_rx_win = 0x04;
++		rsp.max_rx_packet = cpu_to_le16(0x1fef);
++		break;
++	default:
++		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		break;
++	}
++
++	cmd_complete(dev, BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2, &rsp,
++				sizeof(rsp));
++
++	return 0;
++}
++
++static int cmd_set_cig_params_v2(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_le_set_cig_params_v2 *cmd = data;
++	struct lescp {
++		struct bt_hci_rsp_le_set_cig_params_v2 params;
++		uint16_t handle[CIS_SIZE];
++	} __packed rsp;
++	int i = 0;
++	int cig_idx;
++	uint32_t interval;
++	uint16_t latency;
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	rsp.params.cig_id = cmd->cig_id;
++
++	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis_v2)) {
++		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
++	}
++
++	if (cmd->cig_id > 0xef) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	interval = get_le24(cmd->c_interval);
++	if (interval < 0x0000ff || interval > 0x0fffff) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	interval = get_le24(cmd->p_interval);
++	if (interval < 0x0000ff || interval > 0x0fffff) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (cmd->sca > 0x07) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (cmd->packing > 0x01) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (cmd->framing > 0x01) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	latency = cpu_to_le16(cmd->c_latency);
++	if (latency < 0x0005 || latency > 0x0fa0) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	latency = cpu_to_le16(cmd->p_latency);
++	if (latency < 0x0005 || latency > 0x0fa0) {
++		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	cig_idx = find_cig(dev, cmd->cig_id);
++	if (cig_idx < 0)
++		cig_idx = find_cig(dev, 0xff);
++	if (cig_idx < 0) {
++		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
++	}
++
++	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
++	 * page 2553
++	 *
++	 * If the Host issues this command when the CIG is not in the
++	 * configurable state, the Controller shall return the error
++	 * code Command Disallowed (0x0C).
++	 */
++	if (dev->le_cig[cig_idx].activated) {
++		rsp.params.status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
++
++	rsp.params.status = BT_HCI_ERR_SUCCESS;
++
++	for (i = 0; i < cmd->num_cis; i++) {
++		rsp.params.num_handles++;
++		rsp.handle[i] = cpu_to_le16(make_cis_handle(cig_idx, i));
++	}
++
++	memcpy(&dev->le_cig[cig_idx], data, len);
++	dev->le_cig[cig_idx].version = 2;
++
++done:
++	cmd_complete(dev, BT_HCI_CMD_LE_SET_CIG_PARAMS_V2, &rsp,
++				sizeof(rsp.params) + (i * sizeof(uint16_t)));
++
++	return 0;
++}
++
++static int cmd_create_big_v2(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_le_create_big_v2 *cmd = data;
++	uint8_t status = BT_HCI_ERR_SUCCESS;
++
++	/* If the Advertising_Handle does not identify a periodic advertising
++	 * train,, the Controller shall return the error code Unknown
++	 * Advertising Identifier (0x42).
++	 */
++	/* Num_BIS ranges from 0x01 to 0x1F */
++	if (!cmd->num_bis || cmd->num_bis > 0x1f) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (!dev->le_pa_enable) {
++		status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
++		goto done;
++	}
++
++	/* If the Host sends this command with a BIG_Handle that is already
++	 * allocated, the Controller shall return the error code Command
++	 * Disallowed (0x0C).
++	 */
++	if (queue_find(dev->le_big, match_big_handle,
++				UINT_TO_PTR(cmd->handle))) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
++
++done:
++	cmd_status(dev, status, BT_HCI_CMD_LE_CREATE_BIG_V2);
++
++	/* Only complete the command if it was accepted */
++	return status ? -EALREADY : 0;
++}
++
++static int cmd_create_big_v2_complete(struct btdev *dev, const void *data,
++							uint8_t len)
++{
++	const struct bt_hci_cmd_le_create_big_v2 *cmd = data;
++	const struct bt_hci_bis_v2 *bis = &cmd->bis;
++	struct le_big *big;
++	int i;
++	struct bt_hci_evt_le_big_complete_v2 evt;
++	uint16_t *bis_handle;
++	uint8_t *pdu;
++	size_t pdu_len;
++
++	memset(&evt, 0, sizeof(evt));
++
++	pdu_len = sizeof(evt) + cmd->num_bis * sizeof(*bis_handle);
++
++	pdu = malloc(pdu_len);
++	if (!pdu)
++		return -ENOMEM;
++
++	/* If the Controller cannot create all BISes of the BIG or if Num_BIS
++	 * exceeds the maximum value supported by the Controller, then it shall
++	 * return the error code Rejected due to Limited Resources (0x0D).
++	 */
++	big = le_big_new(dev, cmd->handle);
++	if (!big) {
++		evt.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
++	}
++
++	bis_handle = (uint16_t *)(pdu + sizeof(evt));
++
++	for (i = 0; i < cmd->num_bis; i++) {
++		struct btdev_conn *conn;
++
++		conn = conn_add_bis(dev, BIS_HANDLE + i, bis, sizeof(*bis));
++		if (!conn) {
++			queue_remove(dev->le_big, big);
++			le_big_free(big);
++			evt.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++			goto done;
++		}
++
++		queue_push_tail(big->bis, conn);
++		*bis_handle = cpu_to_le16(conn->handle);
++		bis_handle++;
++	}
++
++	evt.handle = cmd->handle;
++	/* The same stream send_biginfo() reports */
++	evt.nse = 0x01;
++	evt.bn = 0x01;
++	evt.irc = 0x01;
++	evt.phy = bits_to_phy(bis->phy);
++	evt.max_pdu = bis->sdu;
++	memcpy(evt.sync_delay, bis->sdu_interval, 3);
++	memcpy(evt.latency, bis->sdu_interval, 3);
++	/* ISO_Interval is in units of 1.25 ms and Max_Transport_Latency
++	 * in ms.
++	 */
++	evt.interval = cpu_to_le16(le16_to_cpu(bis->latency) * 4 / 5);
++
++	switch (evt.phy) {
++	case 0x03:
++		evt.rates = cpu_to_le16(bis->coded_rates);
++		break;
++	case 0x05:
++		evt.rates = bis->hdt_rates;
++		break;
++	}
++
++	evt.encryption = bis->encryption;
++	evt.mic_len = bis->mic_len;
++	evt.num_bis = cmd->num_bis;
++
++done:
++	memcpy(pdu, &evt, sizeof(evt));
++
++	le_meta_event(dev, BT_HCI_EVT_LE_BIG_COMPLETE_V2, pdu, pdu_len);
++
++	free(pdu);
++
++	return 0;
++}
++
++static int cmd_set_hdt_default_params(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_le_hdt_set_default_params *cmd = data;
++	uint16_t valid_rates = BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4);
++	uint8_t status;
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
++	 * Section 7.8.159:
++	 *
++	 * Preferred_MIC_Length: 0x01 Preferred MIC length is 64 bits.
++	 * 0x02 MIC length is 128 bits (default). All other values Reserved
++	 * for future use.
++	 * Preferred_Packet_Format: 0x00, 0x01 and 0x02. All other values
++	 * Reserved for future use.
++	 * Preferred_ACL_Rates: bits 0 to 4. All other bits Reserved for
++	 * future use.
++	 */
++	if (cmd->mic_len < 0x01 || cmd->mic_len > 0x02) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (cmd->format > 0x02) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	if (le16_to_cpu(cmd->rates) & ~valid_rates) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
++
++	dev->hdt_def_mic_len = cmd->mic_len;
++	dev->hdt_def_format = cmd->format;
++	dev->hdt_def_rates = le16_to_cpu(cmd->rates);
++	status = BT_HCI_ERR_SUCCESS;
++
++done:
++	cmd_complete(dev, BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS, &status,
++					sizeof(status));
++	return 0;
++}
++
++static int cmd_le_write_def_data_len_v2(struct btdev *dev, const void *data,
++						uint8_t len)
++{
++	uint8_t status = BT_HCI_ERR_SUCCESS;
++
++	cmd_complete(dev, BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2, &status,
++						sizeof(status));
++
++	return 0;
++}
++
++static int cmd_le_read_def_data_len_v2(struct btdev *dev, const void *data,
++						uint8_t len)
++{
++	const struct bt_hci_cmd_le_read_def_data_len_v2 *cmd = data;
++	struct bt_hci_rsp_le_read_default_data_length rsp;
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	switch (cmd->phys) {
++	case 0x00: /* All GFSK PHYs  */
++		rsp.status = BT_HCI_ERR_SUCCESS;
++		rsp.tx_len = cpu_to_le16(0x001b);
++		rsp.tx_time = cpu_to_le16(0x0148);
++		break;
++	case 0x01: /* HDT PHY */
++		rsp.status = BT_HCI_ERR_SUCCESS;
++		rsp.tx_len = cpu_to_le16(0x001b);
++		rsp.tx_time = cpu_to_le16(0x0148);
++		break;
++	default:
++		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
++	}
++
++	cmd_complete(dev, BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2, &rsp,
++						sizeof(rsp));
++
++	return 0;
++}
++
++#define CMD_HDT \
++	CMD(BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2, \
++					cmd_le_write_def_data_len_v2, NULL), \
++	CMD(BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2, cmd_le_read_def_data_len_v2, \
++					NULL), \
++	CMD(BT_HCI_CMD_LE_SET_DATA_LEN_V2, cmd_set_data_len_v2, NULL), \
++	CMD(BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2, cmd_read_max_data_len_v2, \
++			NULL), \
++	CMD(BT_HCI_CMD_LE_SET_CIG_PARAMS_V2, cmd_set_cig_params_v2, NULL), \
++	CMD(BT_HCI_CMD_LE_CREATE_BIG_V2, cmd_create_big_v2, \
++			cmd_create_big_v2_complete), \
++	CMD(BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS, cmd_set_hdt_default_params, \
++					NULL)
++
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++ * Section 5.1.3.1.2:
++ *
++ * If the connection is on the LE HDT PHY and both the Flags_P and Flags_C
++ * are set to allow a 64-bit MIC, then the connection shall use a 64-bit MIC.
++ * Otherwise, the connection shall use a 128-bit MIC.
++ *
++ * The peer's preference is its LE Set HDT Default Parameters.
++ */
++static uint8_t le_mic_len(struct btdev_conn *conn, uint8_t mic_len)
++{
++	if (mic_len == 0x01 && conn->link &&
++				conn->link->dev->hdt_def_mic_len != 0x01)
++		return 0x02;
++
++	return mic_len;
++}
++
++static int cmd_le_enable_encrypt_v2(struct btdev *dev, const void *data,
++						uint8_t len)
++{
++	const struct bt_hci_cmd_le_enable_encrypt_v2 *cmd = data;
++	struct bt_hci_evt_le_long_term_key_request ev;
++	struct btdev_conn *conn;
++
++	conn = queue_find(dev->conns, match_handle,
++				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
++	if (!conn) {
++		cmd_status(dev, BT_HCI_ERR_UNKNOWN_CONN_ID,
++				BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
++		return 0;
++	}
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
++	 * Section 7.8.24:
++	 *
++	 * When the Encryption_Type parameter is set to 0x01 (use opportunistic
++	 * encryption with Encryption Key Schedule), the command shall be only
++	 * used for unencrypted connections and the Long_Term_Key parameter
++	 * shall be ignored by the Controller.
++	 *
++	 * So refuse it for an encrypted connection, and otherwise skip the LTK
++	 * request and proceed directly.
++	 */
++	if (cmd->encryption == 0x01 && conn->encrypted) {
++		cmd_status(dev, BT_HCI_ERR_COMMAND_DISALLOWED,
++				BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
++		return 0;
++	}
++
++	cmd_status(dev, BT_HCI_ERR_SUCCESS, BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
++
++	if (cmd->encryption == 0x01) {
++		conn->mic_len = le_mic_len(conn, cmd->mic_len);
++		if (conn->link)
++			conn->link->mic_len = conn->mic_len;
++		encrypt_change(conn, 0x01, 0x02, BT_HCI_ERR_SUCCESS);
++		encrypt_change(conn->link, 0x01, 0x02, BT_HCI_ERR_SUCCESS);
++		return 0;
++	}
++
++	memcpy(dev->le_ltk, cmd->ltk, 16);
++
++	conn->mic_len = le_mic_len(conn, cmd->mic_len);
++	if (conn->link)
++		conn->link->mic_len = conn->mic_len;
++
++	ev.handle = cpu_to_le16(conn->link->handle);
++	ev.ediv = cmd->ediv;
++	ev.rand = cmd->rand;
++
++	le_meta_event(conn->link->dev, BT_HCI_EVT_LE_LONG_TERM_KEY_REQUEST, &ev,
++					sizeof(ev));
++
++	return 0;
++}
++
++#define CMD_EKS \
++	CMD(BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2, cmd_le_enable_encrypt_v2, NULL)
++
++static const struct btdev_cmd cmd_hdt[] = {
++	CMD_COMMON_ALL,
++	CMD_COMMON_BREDR_LE,
++	CMD_COMMON_BREDR_20,
++	CMD_COMMON_BREDR_LE_40,
++	CMD_BREDR,
++	CMD_LE,
++	CMD_LE_50,
++	CMD_LE_52,
++	CMD_LE_60,
++	CMD_LE_62,
++	CMD_HDT,
++	CMD_EKS,
++	{}
++};
++
++static void set_hdt_commands(struct btdev *btdev)
++{
++	btdev->commands[50] |= BIT(6);	/* LE Read Default Data Length V2 */
++	btdev->commands[50] |= BIT(7);	/* LE Write Default Data Length V2 */
++	btdev->commands[50] |= BIT(4);	/* LE Enable Encryption v2 */
++	btdev->commands[50] |= BIT(5);	/* LE Read Maximum Data Length v2 */
++	btdev->commands[52] |= BIT(3);	/* LE Set Data Length v2 */
++	btdev->commands[51] |= BIT(0);	/* LE Set CIG Parameters v2 */
++	btdev->commands[51] |= BIT(3);	/* LE Create BIG v2 */
++	btdev->commands[52] |= BIT(1);	/* LE Set HDT Default Parameters */
++	btdev->cmds = cmd_hdt;
++}
++
+ static void set_le_commands(struct btdev *btdev)
+ {
+ 	set_common_commands_all(btdev);
+@@ -8123,6 +9014,8 @@ static void set_le_commands(struct btdev *btdev)
+ 	btdev->commands[33] |= 0x20;	/* LE Remote Conn Param Req Neg Reply */
+ 
+ 	/* Extra LE commands for >= 4.2 adapters */
++	btdev->commands[33] |= BIT(7);	/* LE Read Default Data Length */
++	btdev->commands[34] |= BIT(0);	/* LE Write Default Data Length */
+ 	btdev->commands[34] |= 0x02;	/* LE Read Local P-256 Public Key */
+ 	btdev->commands[34] |= 0x04;	/* LE Generate DHKey */
+ 	btdev->commands[34] |= 0x08;	/* LE Add Device To Resolving List */
+@@ -8133,6 +9026,7 @@ static void set_le_commands(struct btdev *btdev)
+ 	btdev->commands[35] |= 0x01;	/* LE Read Local Resolvable Address */
+ 	btdev->commands[35] |= 0x02;	/* LE Set Address Resolution Enable */
+ 	btdev->commands[35] |= 0x04;	/* LE Set RPA Timeout */
++	btdev->commands[35] |= BIT(3);	/* LE Read Maximum Data Length */
+ 
+ 	btdev->cmds = cmd_le;
+ 
+@@ -8162,6 +9056,12 @@ static void set_le_commands(struct btdev *btdev)
+ 		set_le_62_commands(btdev);
+ 		btdev->cmds = cmd_le_6_2;
+ 	}
++
++	/* Extra HDT commands for >= 7.0 adapters */
++	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
++		set_hdt_commands(btdev);
++		btdev->cmds = cmd_hdt;
++	}
+ }
+ 
+ static void set_bredrle_commands(struct btdev *btdev)
+@@ -8244,6 +9144,25 @@ static void set_bredrle_features(struct btdev *btdev)
+ 		btdev->le_features[9] |= BIT(1);
+ 	}
+ 
++	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
++		uint8_t *page_1 = &btdev->le_features[8];
++
++		btdev->version = 0x10;
++
++		/* The data length commands of 7.0 are the ones emulated */
++		btdev->le_features[0] |= BIT(5); /* LE Data Length Extension */
++
++		page_1[1] |= BIT(4); /* Encryption Key Schedule */
++		page_1[1] |= BIT(5); /* High Data Throughput */
++		page_1[1] |= BIT(6); /* Receive HDT6 Rate */
++		page_1[1] |= BIT(7); /* Transmit HDT6 Rate */
++		page_1[2] |= BIT(0); /* Receive HDT7.5 Rate */
++		page_1[2] |= BIT(1); /* Transmit HDT7.5 Rate */
++		page_1[2] |= BIT(2); /* HDT Packet Format 1 */
++		page_1[2] |= BIT(3); /* Link Quality Feedback */
++		page_1[3] |= BIT(2); /* Opportunistic Encryption (Host) */
++	}
++
+ 	btdev->feat_page_2[0] |= 0x01;	/* CPB - Central Operation */
+ 	btdev->feat_page_2[0] |= 0x02;	/* CPB - Peripheral Operation */
+ 	btdev->feat_page_2[0] |= 0x04;	/* Synchronization Train */
+@@ -8350,6 +9269,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
+ 	case BTDEV_TYPE_BREDRLE62:
++	case BTDEV_TYPE_BREDRLE70:
+ 		btdev->crypto = bt_crypto_new();
+ 		if (!btdev->crypto) {
+ 			free(btdev);
+@@ -8369,6 +9289,12 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+ 	btdev->revision = 0x0000;
+ 
+ 	switch (btdev->type) {
++	case BTDEV_TYPE_BREDRLE70:
++		btdev->version = 0x0e;
++		set_bredrle_features(btdev);
++		set_bredrle_commands(btdev);
++		set_le_states(btdev);
++		break;
+ 	case BTDEV_TYPE_BREDRLE:
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+@@ -9094,6 +10020,7 @@ int btdev_set_msft_opcode(struct btdev *btdev, uint16_t opcode)
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
+ 	case BTDEV_TYPE_BREDRLE62:
++	case BTDEV_TYPE_BREDRLE70:
+ 		btdev->msft_opcode = opcode;
+ 		btdev->msft_cmds = cmd_msft;
+ 		return 0;
+@@ -9153,6 +10080,7 @@ int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode)
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
+ 	case BTDEV_TYPE_BREDRLE62:
++	case BTDEV_TYPE_BREDRLE70:
+ 		btdev->emu_opcode = opcode;
+ 		btdev->emu_cmds = cmd_emu;
+ 		return 0;
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index aa04ca611ab5..0e7ed8639568 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -54,6 +54,7 @@ enum btdev_type {
+ 	BTDEV_TYPE_BREDRLE52,
+ 	BTDEV_TYPE_BREDRLE60,
+ 	BTDEV_TYPE_BREDRLE62,
++	BTDEV_TYPE_BREDRLE70,
+ };
+ 
+ enum btdev_hook_type {
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index 2f544f319bf2..897402fa58dc 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -409,6 +409,9 @@ struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
+ 	case HCIEMU_TYPE_BREDRLE62:
+ 		hciemu->btdev_type = BTDEV_TYPE_BREDRLE62;
+ 		break;
++	case HCIEMU_TYPE_BREDRLE70:
++		hciemu->btdev_type = BTDEV_TYPE_BREDRLE70;
++		break;
+ 	default:
+ 		return NULL;
+ 	}
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index cdf1ebe16752..34ab3af44ab7 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -23,6 +23,7 @@ enum hciemu_type {
+ 	HCIEMU_TYPE_BREDRLE52,
+ 	HCIEMU_TYPE_BREDRLE60,
+ 	HCIEMU_TYPE_BREDRLE62,
++	HCIEMU_TYPE_BREDRLE70,
+ };
+ 
+ enum hciemu_hook_type {
+diff --git a/emulator/main.c b/emulator/main.c
+index 794d381764b5..7be303716ca4 100644
+--- a/emulator/main.c
++++ b/emulator/main.c
+@@ -73,7 +73,7 @@ static void usage(void)
+ 		"\t-C, --core=<version>  Core Specification version of the\n"
+ 		"\t                      BR/EDR/LE controllers created with\n"
+ 		"\t                      -l, -s, -t and -V:\n"
+-		"\t                      5.0, 5.2, 6.0 or 6.2 (default)\n"
++		"\t                      5.0, 5.2, 6.0, 6.2 or 7.0 (default)\n"
+ 		"\t-h, --help            Show help options\n");
+ }
+ 
+@@ -106,6 +106,7 @@ static const struct {
+ 	{ "5.2", BTDEV_TYPE_BREDRLE52 },
+ 	{ "6.0", BTDEV_TYPE_BREDRLE60 },
+ 	{ "6.2", BTDEV_TYPE_BREDRLE62 },
++	{ "7.0", BTDEV_TYPE_BREDRLE70 },
+ };
+ 
+ static bool parse_core_version(const char *version, enum btdev_type *type)
+@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
+ 	int letest_count = 0;
+ 	int vhci_count = 0;
+ 	/* Default to the latest version supported by the emulator */
+-	enum btdev_type bredrle_type = BTDEV_TYPE_BREDRLE62;
++	enum btdev_type bredrle_type = BTDEV_TYPE_BREDRLE70;
+ 	enum btdev_type type;
+ 	bool type_set = false;
+ 	int i;
 -- 
 2.56.0
 
