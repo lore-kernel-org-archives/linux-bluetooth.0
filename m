@@ -1,63 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=194.199.235.221
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794296843;
-	b=tKCdgSTa+QySNQgcw1HInqTxJuWYjbU/2Ys5k+5OEaAPw+BSBYbxWGUQLwPeqy33pgrA
-	 6AuiIRjmzDPPJjl3RA8XHYe8NceRB3SGR4t8AQwzlFrWzNsR+pbWBULs4sHQ+IABnvOHo
-	 4xZYurnkpuQWpX8i9ABvVWKWUxJYQ+EFc2uIImK6YMx/tF4vwEg9JrJyT2Pum37FaG3SP
-	 QNT8IH3DNhnmVnxDs/arClxV0MM/LLjO7/deCFC/deQYyZ5G6E2qziuJEleKQFyIancL7
-	 yukSnhTZ9Ucriff+UqYhm5/MhI03/FHsBxi4U30rFShtec77yhJHfujBKPbRtCHmtcQ==
+	t=1794296833;
+	b=Oz38uiOgUxwK/TgB+aFsIbDizigkQRSvVRzAptjW8pF75N/CI1LMavizQGATpDiLzzBt
+	 usYEGedo+GgyTctA2H449FS+Ijeft6sZ3W8c5wBWj5aLdzNbA/IN7S90RT3UwjcK1USpD
+	 ZZ/47aeTvr4IiIYT8bD3dhZbawDom4mRrOVKqr9c7qelnj/avedqJO+a5J3SXwxvaDoBR
+	 cebwUNsARXAi2RRytEx4jUHmpTPmS2UHIAOOYM5y8O22+sdMHd5XqNFH2+2GF26Q7hzh7
+	 xoJT3NEpB3AHV8cmH7SrNueQmiCvDn+r7dvKFjHg8/KCtNTZbaZx3Hk1RLxXOiSPHLg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794296843;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794296833;
 	h=DMARC-Filter:Received:Received:DKIM-Filter:DKIM-Signature:
 	 X-Virus-Scanned:Received:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=fNjwcRc0c7K0kuYsP00sMd8rDcxP9awGrVpi2PrAeZ8=;
-	b=C5GVIIw1y8PR4HQEHlu1eUlrox3wtDG7ZuQ9eABWLvVCuLIv3LFktIZZwuR2D69yX2uD
-	 fwilsgFlezLHGDgG0axyXmNy+crh0VvkhHvbotOP/E9cHFPQZ/wWkNcE3mNtq1r5SewRd
-	 UW+g3AvSc2zaQPeawtNFsTRdfgOVnaumVdOk3lLf06giTC55y9P44akwHeKpIDJFZsfoJ
-	 W3Mc9TSqT9Ajfb6915FJKpdgzY/phrUOCgXuRgxug/djIN1erXKGcKeowGtl3mwx167O7
-	 HR6j1kdDgoREWvzk/YdCDJYY42BF3DPcI1I1KaFsbk0Y8+Au1T4BzlY7VL22bqSafCA==
+	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=mfTY212zApa5ehOLo+920M5IDmH72kkgNtIxDrvSizo=;
+	b=te+fSz7Gh7BCoIniW0GoUdZh9MrC7MhWflmecoOwuQi4w9soIGo7fWSHXO6yxjTcfx4L
+	 RaB2v9Exk0yeiQbVv4nzp8/iK0SkJJw9W4G2By8YOsK22f4M6jHnYzTgxP/U4cg2Hkouc
+	 ZC8wXxhEoSSMUVyl7AR6Y4CC+97hFg7mPHXYBxsYBeYcXsAWHA547k3YotG0bLtlRIhYx
+	 hOn7jolxgWAlq91AiidsD3W+2li4m8+Y3zRGk2vSqRalNRLy6Vu2e86Tv/uh8oetNnZGE
+	 1DlyIsXFsrCM8zaT4KUHqHbR9XL+0lk/ea5DuAALSJSVCqj9FGK6kwreljRz8WNgarg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=cirad.fr;
 	spf=pass smtp.mailfrom=cirad.fr;
-	dkim=pass header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=DFsUbzxp;
+	dkim=pass header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=c3QPy4YH;
 	arc=none smtp.remote-ip=194.199.235.221
 Received: from retz.cirad.fr (retz.cirad.fr [194.199.235.221])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B92606A969;
-	Tue, 10 Nov 2026 07:47:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05B92606A969
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED502606A339;
+	Tue, 10 Nov 2026 07:47:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED502606A339
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cirad.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cirad.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=DFsUbzxp
+	dkim=pass (2048-bit key) header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=c3QPy4YH
 Received: from retz.cirad.fr (localhost [127.0.0.1])
-	by retz.cirad.fr (Postfix) with ESMTPS id 240EF20D4CAD;
-	Tue, 10 Nov 2026 08:47:20 +0100 (CET)
+	by retz.cirad.fr (Postfix) with ESMTPS id E98E320D78F8;
+	Tue, 10 Nov 2026 08:47:09 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by retz.cirad.fr (Postfix) with ESMTP id 0151420DB5DB;
-	Tue, 10 Nov 2026 08:47:20 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 retz.cirad.fr 0151420DB5DB
+	by retz.cirad.fr (Postfix) with ESMTP id C9D7620D7CF7;
+	Tue, 10 Nov 2026 08:47:09 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 retz.cirad.fr C9D7620D7CF7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirad.fr;
-	s=573E3878-7916-11F1-BF4B-F68474317960; t=1794296840;
-	bh=fNjwcRc0c7K0kuYsP00sMd8rDcxP9awGrVpi2PrAeZ8=;
+	s=573E3878-7916-11F1-BF4B-F68474317960; t=1794296829;
+	bh=mfTY212zApa5ehOLo+920M5IDmH72kkgNtIxDrvSizo=;
 	h=From:To:Date:Message-ID:MIME-Version;
-	b=DFsUbzxpxrZA/nv5eV6lqXYNzSYWT/6fvJ1DRQvL07nMNckxwsNyvD3jRPLClFCL5
-	 LKx3YTToHkHBdyDjLTwtF5gb4AfleHGlbq+Otoh5NaLNyk5R6Vb948bpq2u25VQ8e6
-	 QtjA1iAZqbSJyGwyPHpBzZESAZvO4nl8+YEYER5mpahFHWHio97im6yP4JCrQLXJSr
-	 cfQGzurLptBRuCS3kprx++ppRmkUolZz52tDYzl/LDcnjmQzRPmDUrrm/Nyz/Fynzy
-	 y+dXrQwZIjqVnR7cKGBjSbxNjUZEfMLPizSKCi6Ram+Bjt4MlDZu1SRs8Tzmu90wk5
-	 cz7xI74oQOGIA==
+	b=c3QPy4YHf6uoEBpjCpO2aq4SeEQklbaMPaB1SxoJmL2pfYAxXnHOmBbM8Ce/6SjZe
+	 KzQr3/RswObM+fKbEg9CRG3nMVtl0fCbdx8QkkbAxwUc/ZfK7TwVgb6tzDXr+PyTwq
+	 h5uqtUMtjamdqozSHKzmxJRYVIp5e30Hievr6oF4i5fhN6YyEHhl2dPQ9fGuFtm8sg
+	 VGEQKHGWArHOp6vUQTfeGshTf4A/puahEadfkW98UJT6W0tSFHLMnp5x8spZLQekWn
+	 uWkI4lm4Lt+t5ILJZ1bSeClwARJOapjSZkEzWs61hSsb2Er55ggiaOJxd2EdEthyj0
+	 mFFmgwD4T564g==
 X-Virus-Scanned: amavis at retz.cirad.fr
 Received: from retz.cirad.fr ([127.0.0.1])
  by localhost (retz.cirad.fr [127.0.0.1]) (amavis, port 10026) with ESMTP
- id WAM_3Wb2AiA5; Tue, 10 Nov 2026 08:47:19 +0100 (CET)
+ id QGSqc_bMMjO0; Tue, 10 Nov 2026 08:47:09 +0100 (CET)
 Received: from localhost.localdomain (78-196-243-100.subs.proxad.net [78.196.243.100])
-	by retz.cirad.fr (Postfix) with ESMTPSA id 04DD820D4CAD;
-	Tue, 10 Nov 2026 08:47:18 +0100 (CET)
+	by retz.cirad.fr (Postfix) with ESMTPSA id CF35F20D78F8;
+	Tue, 10 Nov 2026 08:47:08 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -78,12 +77,10 @@ Cc: Vasily Khoruzhick <anarsoul@gmail.com>,
 	spacemit@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
-Subject: [PATCH 2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
-Date: Tue, 10 Nov 2026 08:46:07 +0100
-Message-ID: <20261110074607.363918-3-frederic.mahe@cirad.fr>
+Subject: [PATCH 0/2] Bluetooth for the RTL8852BS on BPI-F3
+Date: Tue, 10 Nov 2026 08:46:05 +0100
+Message-ID: <20261110074607.363918-1-frederic.mahe@cirad.fr>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261110074607.363918-1-frederic.mahe@cirad.fr>
-References: <20261110074607.363918-1-frederic.mahe@cirad.fr>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,52 +93,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-The BPI-F3 has an RTL8852BS module whose Bluetooth part is on UART2,
-with hardware flow control. GPIO 63 powers Bluetooth on and GPIO 64
-is the device wake line.
+The BPI-F3 (SpacemiT K1) carries an RTL8852BS Wi-Fi + Bluetooth module.
+Wi-Fi (SDIO) has no upstream driver, but Bluetooth on UART works with
+the existing hci_h5/btrtl code and linux-firmware's rtl8852bs files.
 
-The firmware config switches the UART to 1.5 Mbaud, so take the UART2
-clock from the 48 MHz slow_uart2 clock.
+Patch 1 documents the compatible, with rtl8822cs-bt as fallback, so no
+driver change is needed. Patch 2 enables it on the BPI-F3.
 
-Tested with a laptop: scan, pairing, and l2ping in both directions,
-including incoming connections while the UART is runtime suspended.
-An 8-hour soak (an HCI command every 20 s) showed no errors.
+GPIO usage was tested one line at a time: GPIO 63 is the power/enable
+line and GPIO 64 the device wake line. The vendor DT also drives
+GPIO 65 and GPIO 67; Bluetooth works without them (and RSSI is the
+same with GPIO 67 high or low), so they are left out.
 
-This patch was prepared with the help of an AI assistant (Claude),
-which also ran the tests.
+Fr=C3=A9d=C3=A9ric Mah=C3=A9 (2):
+  dt-bindings: net: bluetooth: realtek: Add RTL8852BS
+  riscv: dts: spacemit: enable Bluetooth on BPI-F3
 
-Signed-off-by: Fr=C3=A9d=C3=A9ric Mah=C3=A9 <frederic.mahe@cirad.fr>
----
- arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ .../bindings/net/bluetooth/realtek,bluetooth.yaml | 11 +++++++----
+ arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts   | 15 +++++++++++++++
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts b/arch/riscv=
-/boot/dts/spacemit/k1-bananapi-f3.dts
-index 58035d886..280adc9dc 100644
---- a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
-+++ b/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
-@@ -383,6 +383,21 @@ &uart0 {
- 	status =3D "okay";
- };
-=20
-+&uart2 {
-+	assigned-clocks =3D <&syscon_apbc CLK_UART2>;
-+	assigned-clock-parents =3D <&syscon_mpmu CLK_SLOW_UART2>;
-+	pinctrl-names =3D "default";
-+	pinctrl-0 =3D <&uart2_0_cfg>, <&uart2_0_cts_rts_cfg>;
-+	uart-has-rtscts;
-+	status =3D "okay";
-+
-+	bluetooth {
-+		compatible =3D "realtek,rtl8852bs-bt", "realtek,rtl8822cs-bt";
-+		enable-gpios =3D <&gpio K1_GPIO(63) GPIO_ACTIVE_HIGH>;
-+		device-wake-gpios =3D <&gpio K1_GPIO(64) GPIO_ACTIVE_HIGH>;
-+	};
-+};
-+
- &usbphy2 {
- 	status =3D "okay";
- };
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
 --=20
 2.47.3
 
