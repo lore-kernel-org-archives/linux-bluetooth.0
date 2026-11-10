@@ -1,84 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794293366;
-	b=YD2dD+2FUBQowzAke9O+gJUnosrlOX3svn7b1Mooq3YPXNe5+FQ2mrlTnwly1tM55Dwc
-	 XXPbeXjsHFklyPP8ls6FtpC47zkKH9LSheUGKZmHGF976NCVwe1yI/dRfmSaao9m2M2wy
-	 QdYkrN1PBnwsc9FCzTr/28biRIJUUEOusW3Wst9w0a18186/yJPJwayiNaLKUQ/lrkMJQ
-	 44ShWYIfDxn4Fqks58gJ/I7l1pMEb5C2IFd/6ot0nG9GuVTee9z4/YAW/dB3AZARzVVd4
-	 Kxh4CUpkCAYWXVxRKnDKjdYBAdbrbMVJRjc1OF2n74446Em8tFI5O269o3OM8ldC9EA==
+	t=1794293771;
+	b=g9jnyOElOaKCsopyM38GePY5QjOdjhXJ7+HrMZlmkRc617kznaydz/WnIeoH59R28AnN
+	 i8riiBOtDCJyaATQBkQUw2rJt9tYwM/Yzj19GfJPsq0lLBLplwa2nkIq1DuFON0CFdjPF
+	 +oamCkRrEZVxhbBUPW+EQwCYbunibnpA3e/Ck9KJfvp4mniS5K2ymLYRZWODmBJ/4Gpp5
+	 vxtR4qL/UQVTzXhNKiybVKmDl4P4H+c9M7gWTWvt20kCQ/tyXFYJyWC0tyfm8BZPyWz5U
+	 bw4p3n4CPr65OvlzRRmYeUNCTZGcOCBiuwXXl2CH6px4PKZK0F2tlPsnzeJgnEYrrSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794293366;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794293771;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=p+8Ji2JYNACErRQ3lfiQAGMbv+eVTqOTDGIlo5zDkBc=;
-	b=OFMHzPv5SVgeVrxb41F9oHweeYfgKMqD578gjrNM4HTvHwa+m8HQvimGVVjibtw/T/oe
-	 bZ26xfwSDNZsqybKG18Qeak9Qq+xTFaNXlEBnd7JNwnsOAfOK71tGjAKBeukh4ln8ngWe
-	 n1HzuasLraF+cLmF08F0BdanrpTW30jleXouXazM3ibHhM/BjP/KgfiOgSPJr+1t7QQM5
-	 4EjKWCEy3wHbR8VMq742FygXROQyEC6QcSw8/p0JCjRAPsCfD4x6wRVg3Fq4BUcg79zO7
-	 qlemU2dnzHKxvu7lVMtasVemc0joAJC/BoW5ppr/UD1TWepJ1VYnAru63jDLJ3gIwVw==
+	bh=/2SGROlLQXbFDFOZPJ/n6cQcntRrzlhyA0Clu/IS+7A=;
+	b=kK5sDyWLdrf356c0Xsz7ID2AJVQE1i9VejXw4gtMR/6KwDeTJIUjsqQoqgOZFWVZkVXR
+	 62hvqlTZT22NE7TSJrn+AlzcjkCZU6eJ8R/MGC9D7gl5lHk+gNb6hGifztHSjhh0uig8G
+	 FxH6fdxY5bbPEpiauVlzEF/PF8XS1lt1jrDpApKhn2Djn4UTnczXziGcQFDExBpHLJsWd
+	 TciMpKMhvLIcwv/pJKQIl+kK+4DamVelaFLnwVpNAc4qgOypguulEgvEcpgHeDAG6bu7o
+	 gosrR1WElVty+jI+ihg6ILjXPqpplioyFXNQy4ldEMY/ZN2i8hwa6rM1gl+V72kU2ew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Iv5aN6Rk;
-	arc=none smtp.remote-ip=209.85.167.176
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NuC1L+Qz;
+	arc=none smtp.remote-ip=209.85.216.49
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF68606A31C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 06:49:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BEF68606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2699606A31C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 06:56:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2699606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Iv5aN6Rk
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-55651e7de9bso833200b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 22:49:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NuC1L+Qz
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3b08a162d4bso968769a91.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Nov 2026 22:56:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794293365; x=1794898165; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794293769; x=1794898569; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=p+8Ji2JYNACErRQ3lfiQAGMbv+eVTqOTDGIlo5zDkBc=;
-        b=Iv5aN6RklNB9pRrlagpPgZdEyrVe29jdmHGhTDbIgur19yLNNQYlJFx5dvBwT+0i6s
-         KgWtZCfKI/NqNTuE/vS0vtJ1NaafmmSs6gpcj7D5hScz5aZGAMp3JX4r2mJpa95+/rjN
-         10SY6NaE11l5VB5bm/Qp8xnQX1SxxTnLdK4A/LQjd2j6vmixCxdh31TSy7N4OX95xeED
-         VfsSWgdjfaoDZgFtfE3G+AGNZDxF03vp+6GPEAjR1Te6D+Hl9BG8GJNBn1WeQXLGXSil
-         YPazsoG8mMUHbmzxjUIrKOJqJv5Yn4Z+k/ifpENp6EU/ivEd3T5eNMYnbRIjZ3j8A79t
-         +y1A==
+        bh=/2SGROlLQXbFDFOZPJ/n6cQcntRrzlhyA0Clu/IS+7A=;
+        b=NuC1L+QzldkUtvEvgsr35DtLOutWhxWlOUGGcsdQjqA8qCg/ubjZ16KrmKb9m03VqP
+         mymtnn3mWUa/F0bWwySALHOLBRlRxxLC6YTbZ70Pj/f9A0GlOxNRBtwsJNGAvQhoQdyN
+         GPAOA+6M2N8zlsG4erq310dYxlp195LHv8x3Og169+nSkTzTr0PKT9oXArLHNR4c+0di
+         BnwrTlbCpO8z0ik5jKwh3q29R42I6EUD8S0vVTbmziApPtOWcru6gCWMhVNhpT23w2FJ
+         r9omeFwQI77CaheriVCm3v8ZVpr69rVVA1e0eqwfS5KXHwQEETXQd4LzT0XPm1ZOBXnX
+         314Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794293365; x=1794898165;
+        d=1e100.net; s=20260707; t=1794293769; x=1794898569;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=p+8Ji2JYNACErRQ3lfiQAGMbv+eVTqOTDGIlo5zDkBc=;
-        b=Eelye4Su5GjxcoToBmAItk8U2cZaTwMhvyi242kEy2KzYv8HScjjI9oO/iX6VQ1DcV
-         b6JvliUEP8hWB0OZkA9IoVRlWj4xwjtVRAHuXHHtFp1zFcN83AHXbgXueIkTsYyxPMcY
-         plxdtquEQxSh3xeAzvnaGdGhvlcAwD/a/ynW7stFlB1hbJ/Y9KZ+P1J0dFCViqJxjLJq
-         Ot5Vac15OC2CfbQAAXDGPBoOauADhQU0szVkqQ3DFP6BCyuGvpRCapoKcqOyRexAEz+v
-         pGpiH1bvcUcAEci/9t6gKfZfX572igi/ojFzEO5sIbt7h+V/qzp2d/J4ME7wfAzW37Y7
-         5DKQ==
-X-Gm-Message-State: APuU4Z9sxSnZ376gselTjfgnwejNHFUwrm5lEzQ1Rq7WOxZFiBtfzJnD
-	4TjUPzSGksgV9q9XV8+aWfZx/VuTYTD6/0nnw+fBpepJiBhlnh2LkNYNJJVmaw==
-X-Gm-Gg: AYBFou3LM8LnJqp0HSV52k0dQrDd8FQ0qPPfGcw+bHGWjPduemmVK54TSyMYZbdf6em
-	+BHQoKx673G8H3GoYU0pr/0klXNITHK5TUcMTh9T8znKalUOgITbQwkWIdO8LStFKrRstDZ9+Er
-	S5PbtGOBjvirC1zaJDj1iLsvUEUbP3DBNJxveyuMJTMzyPFnlLyi2rDyayex641CsSrs10lsHCg
-	+I9TZobCx6ehJtcvecPVYzdVH2C/MD+x36pae27nLt8R9olK1K9LghctvLsvOAzhi0oHVcDxTBG
-	kcar6nXC+WNc3T62BN241F9NS+AjX+4H+Wk9dwrA5h9pB6ujhcvLAanm20t0EmHj+Pae5PJRaSU
-	tiu06lFwYZkl9HpW5kiXWtHp1OtQo63TX90JDqxTK9a8K7eSj2k/aAeMJH1SMI4uxPkYZHL4he+
-	z0ErOAWIw/I3ju6V5rFA/8WKcKoxvMLoK9V1upT2j7Xp+Dt4JoiruDbIEURkdlGJJM6Cp73OXM3
-	XGPV6xfB5u1bhbdtmvMMxfj3xqPScprTZ4q1ym0DkFvVtxGhXdiR+2cKPafNt4=
-X-Received: by 2002:a05:6808:181f:b0:564:4f93:707f with SMTP id 5614622812f47-5683cc58113mr1322499b6e.24.1794293364538;
-        Mon, 09 Nov 2026 22:49:24 -0800 (PST)
-Received: from [172.17.0.2] ([52.173.181.16])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-56905f39c60sm1365171b6e.14.2026.11.09.22.49.23
+        bh=/2SGROlLQXbFDFOZPJ/n6cQcntRrzlhyA0Clu/IS+7A=;
+        b=LtaB4lMrGMjF1+iQhJP4OSiMCizfAJsVLs9Y+BzovwVdD0wFHBrDzMVXXCdPpovG+Q
+         m6IwKT26UVDjoC/N0GbBk0sK7meQIHK5MO9v1j0I8SOuvxxp/1AlQTHPXVCsp8xjW+nX
+         SmzUYM+TK8jIKg2bCsw2RnZ2CCJEPULmzfEkjuOHbthLVhdLOowlt/pU/x7Wv7ODbUNK
+         RldsJtizqolwSyZwmtoTQx9Scpx6sQdBHgqNAPOIfqyoCbfsq6UCrPNoym5V6jw3NI9k
+         7LkHpeMjwusgFX0vwp2xRw4DgwsTOlplLvqSszMO2B3dA1dZyPGfeuAaSUNR25nnh/79
+         pCuw==
+X-Gm-Message-State: APuU4Z/ZG0jtZ+89jKmoLWbwlddPpzbuqzaOGkIf/ieYhGmMfkZBqCaR
+	gni+FJponp0uGjVT3yQE1QpT1HBl+FNE0fnLTV4f06pKyz8CbQySfgUjDhy1HA==
+X-Gm-Gg: AYBFou3ofyLegcKKfuWAllOWvAGoFgtSGys4wVqY1TxzsTh/TwHpQfNKqR31gFI/3N9
+	lZ453zzWmw4erdmdq01BUZwqB15B3Nk9Kr42h1GztacpV6cXxMDkVpIlhXrcI9a6o3vk3iyc9Jx
+	eTUL2KjZTjVoKC7D5NzRilCiamiqChmwNKbn8vCLRAJkFzSNGutMiNizykUS+WFrJMX0jQxF2W1
+	mO8kOQHPEM/xnQ0iEmdAw1HaghaPszRit+Dvj+yOq8h+HMRnxIWrCMPquZTT4x3B4wNkXP+IZ4L
+	5NOzo0iodIysEl289v0Y4dGbYHCfNfJeKj4pimcnb7qGGgcfGs+6pVLx03xjnor9H00j1cVzapx
+	EHM0FR8ApsKVpzisW3S4PB2xejWF6t2QHGR6XzIj0lCPk/Kh/tmmwExQyZ6YszBcLm/HeXVk2Z0
+	eFEFC+kPRT4hHQrWa3BqznZbT98ez7/ZebEODOO04pO9TZSSo1UVjBRO6JzQC1DNVyRb/VC5J/R
+	xU8kV0nofN59/egl7w8z67ChvHPbZBCS0Y577rfPbnK7qd4G1YDa+X3ozFUczY8svFor2EnxJV+
+	4YV8wOwS
+X-Received: by 2002:a17:90b:48d0:b0:3aa:ff61:9504 with SMTP id 98e67ed59e1d1-3b166cd721fmr2024211a91.20.1794293769067;
+        Mon, 09 Nov 2026 22:56:09 -0800 (PST)
+Received: from [172.17.0.2] ([4.246.63.104])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b16fea4243sm652006a91.14.2026.11.09.22.56.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 22:49:23 -0800 (PST)
-Message-ID: <6af2be73.321a4155.1f6b35.bb5d@mx.google.com>
-Date: Mon, 09 Nov 2026 22:49:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7908886471083049624=="
+        Mon, 09 Nov 2026 22:56:08 -0800 (PST)
+Message-ID: <6af2c008.7e41ea6f.194a88.db71@mx.google.com>
+Date: Mon, 09 Nov 2026 22:56:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============9036769215135602605=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,12 +91,12 @@ Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: shared/gatt: Use util_iov helpers for PDU handling
-In-Reply-To: <20261109154501.1362649-2-luiz.dentz@gmail.com>
-References: <20261109154501.1362649-2-luiz.dentz@gmail.com>
+Subject: RE: Add support for HDT and EKS
+In-Reply-To: <20261109161553.1506041-2-luiz.dentz@gmail.com>
+References: <20261109161553.1506041-2-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============7908886471083049624==
+--===============9036769215135602605==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -106,40 +107,40 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1206169/
+PW Link:https://patchwork.kernel.org/series/1206205/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      5.99 seconds
-GitLint                       FAIL      3.11 seconds
-BuildEll                      PASS      20.46 seconds
-BluezMake                     PASS      305.14 seconds
-MakeCheck                     PASS      14.46 seconds
-MakeDistcheck                 PASS      146.01 seconds
-CheckValgrind                 PASS      347.67 seconds
-CheckSmatch                   WARNING   305.29 seconds
-bluezmakeextell               PASS      99.48 seconds
-TestFunctional                FAIL      3266.47 seconds
-IncrementalBuild              PASS      451.97 seconds
-ScanBuild                     PASS      1167.97 seconds
+CheckPatch                    FAIL      8.39 seconds
+GitLint                       PASS      2.41 seconds
+BuildEll                      PASS      20.11 seconds
+BluezMake                     PASS      314.44 seconds
+MakeCheck                     PASS      14.30 seconds
+MakeDistcheck                 PASS      145.47 seconds
+CheckValgrind                 PASS      347.18 seconds
+CheckSmatch                   WARNING   310.86 seconds
+bluezmakeextell               PASS      98.13 seconds
+TestFunctional                FAIL      3266.44 seconds
+IncrementalBuild              PASS      802.39 seconds
+ScanBuild                     PASS      1195.05 seconds
 
 Details
 ##############################
 Test: CheckPatch - FAIL
 Desc: Run checkpatch.pl script
 Output:
-[BlueZ,v1,07/10] shared/gatt-server: Fix double response on prepare write failure
-WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12+ chars of sha1> ("<title line>")' - ie: 'Fixes: 1ebfc68ff53e ("shared/gatt-server: Request authorization for prepare writes")'
-#128: 
-Fixes: 1ebfc68f ("shared/gatt-server: Request authorization for prepare writes")
+[BlueZ,v7,01/11] monitor: Use __packed in bt.h and its users
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#229: FILE: monitor/bt.h:16:
++#define __packed __attribute__((packed))
 
-/home/runner/work/bluez/bluez/src/patch/14964768.patch total: 0 errors, 1 warnings, 17 lines checked
+/home/runner/work/bluez/bluez/src/patch/14964912.patch total: 0 errors, 1 warnings, 4719 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
 
-/home/runner/work/bluez/bluez/src/patch/14964768.patch has style problems, please review.
+/home/runner/work/bluez/bluez/src/patch/14964912.patch has style problems, please review.
 
 NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
@@ -147,17 +148,52 @@ NOTE: If any of the errors are false positives, please report
       them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-[BlueZ,v1,08/10] shared/gatt-server: Fix return value of handler registration
-WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12+ chars of sha1> ("<title line>")' - ie: 'Fixes: b3e2fa94b26b ("shared/gatt-server: Implement "Execute Write" request.")'
-#125: 
-Fixes: b3e2fa94 ("shared/gatt-server: Implement "Execute Write" request.")
+[BlueZ,v7,10/11] l2cap-tester, iso-tester, mgmt-tester: Add HDT tests
+WARNING:MACRO_ARG_UNUSED: Argument 'name' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
 
-/home/runner/work/bluez/bluez/src/patch/14964769.patch total: 0 errors, 1 warnings, 8 lines checked
+WARNING:MACRO_ARG_UNUSED: Argument 'setup' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+WARNING:MACRO_ARG_UNUSED: Argument 'func' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+/home/runner/work/bluez/bluez/src/patch/14964920.patch total: 0 errors, 3 warnings, 3018 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
 
-/home/runner/work/bluez/bluez/src/patch/14964769.patch has style problems, please review.
+/home/runner/work/bluez/bluez/src/patch/14964920.patch has style problems, please review.
 
 NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
@@ -165,69 +201,11 @@ NOTE: If any of the errors are false positives, please report
       them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-[BlueZ,v1,09/10] shared/att: Fix reference leak on signature verification failure
-WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12+ chars of sha1> ("<title line>")' - ie: 'Fixes: 051a525c4a44 ("shared/att.c: Add server signing key support")'
-#126: 
-Fixes: 051a525c ("shared/att.c: Add server signing key support")
-
-/home/runner/work/bluez/bluez/src/patch/14964772.patch total: 0 errors, 1 warnings, 11 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14964772.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,v1,10/10] shared/att: Fix signature length subtracted once per handler
-WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12+ chars of sha1> ("<title line>")' - ie: 'Fixes: 051a525c4a44 ("shared/att.c: Add server signing key support")'
-#129: 
-Fixes: 051a525c ("shared/att.c: Add server signing key support")
-
-/home/runner/work/bluez/bluez/src/patch/14964774.patch total: 0 errors, 1 warnings, 23 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14964774.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1,02/10] shared/gatt-server: Use util_iov helpers to build and parse PDUs
-
-1: T1 Title exceeds max length (81>80): "[BlueZ,v1,02/10] shared/gatt-server: Use util_iov helpers to build and parse PDUs"
-[BlueZ,v1,03/10] shared/gatt-helpers: Use util_iov helpers to build and parse PDUs
-
-1: T1 Title exceeds max length (82>80): "[BlueZ,v1,03/10] shared/gatt-helpers: Use util_iov helpers to build and parse PDUs"
-[BlueZ,v1,04/10] shared/gatt-client: Use util_iov helpers to build and parse PDUs
-
-1: T1 Title exceeds max length (81>80): "[BlueZ,v1,04/10] shared/gatt-client: Use util_iov helpers to build and parse PDUs"
-[BlueZ,v1,06/10] shared/gatt-server: Fix authorize callback getting handle 0 on write
-
-1: T1 Title exceeds max length (85>80): "[BlueZ,v1,06/10] shared/gatt-server: Fix authorize callback getting handle 0 on write"
-[BlueZ,v1,07/10] shared/gatt-server: Fix double response on prepare write failure
-
-1: T1 Title exceeds max length (81>80): "[BlueZ,v1,07/10] shared/gatt-server: Fix double response on prepare write failure"
-[BlueZ,v1,09/10] shared/att: Fix reference leak on signature verification failure
-
-1: T1 Title exceeds max length (81>80): "[BlueZ,v1,09/10] shared/att: Fix reference leak on signature verification failure"
 ##############################
 Test: CheckSmatch - WARNING
 Desc: Run smatch tool with source
 Output:
-src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1494:23: warning: Variable length array is used.src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1494:23: warning: Variable length array is used.src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1494:23: warning: Variable length array is used.
+emulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.monitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresemulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
 ##############################
 Test: TestFunctional - FAIL
 Desc: Run test-functional
@@ -644,11 +622,11 @@ FAIL functional.test_mpris_proxy::test_mpris_proxy_track_control[le-vm2]: failed
         RuntimeError: load failed"
 
 
-https://github.com/bluez/bluez/pull/2783
+https://github.com/bluez/bluez/pull/2784
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============7908886471083049624==--
+--===============9036769215135602605==--
