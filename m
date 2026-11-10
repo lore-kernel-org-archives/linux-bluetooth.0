@@ -1,85 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=194.199.235.221
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794296364;
-	b=amEIUw5xTzTzxpFNvYfyF2pPAlcInmfsFMcVeeX6dTG3KrElCUDY/4GOh5+CudDgpiHK
-	 fwl987UaynHn1ChnyJzMXgsBmOSPzw0YSzKd9JosEDUiLHSQqD5c8m/3dxg1bxwe+tuFL
-	 9nI+8fuho4UjOwZFIKzhpAwhqgUOnhMd9Ppfu/kc1aZ6N0I2UyvACFq1y26p/Jd9FxlmV
-	 yAWSv0QkIKvnlbU3PL1scefQP4ZWl44gChBcHnhmxAXXz3X+0ag91ny2l2Dw4HG6rPfYo
-	 LCLFp7qpkCzQDmL+TN9CHZiZai944MnPIfUkMeUoWwd1R2NbfgwWfHJJqbgrITyNkgg==
+	t=1794296843;
+	b=tKCdgSTa+QySNQgcw1HInqTxJuWYjbU/2Ys5k+5OEaAPw+BSBYbxWGUQLwPeqy33pgrA
+	 6AuiIRjmzDPPJjl3RA8XHYe8NceRB3SGR4t8AQwzlFrWzNsR+pbWBULs4sHQ+IABnvOHo
+	 4xZYurnkpuQWpX8i9ABvVWKWUxJYQ+EFc2uIImK6YMx/tF4vwEg9JrJyT2Pum37FaG3SP
+	 QNT8IH3DNhnmVnxDs/arClxV0MM/LLjO7/deCFC/deQYyZ5G6E2qziuJEleKQFyIancL7
+	 yukSnhTZ9Ucriff+UqYhm5/MhI03/FHsBxi4U30rFShtec77yhJHfujBKPbRtCHmtcQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794296364;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=DSBlFGn4E205gXuccBzZwAAPl+yDbfuCcd3h0VNHPkE=;
-	b=Ye92w12yqLwPR0BzL7dvlJW1tsryX5c/jTvgNuJfrT/WDNXA+PYHusOvKFMhiVZh63qv
-	 s84dQNdF51lq4ULHOS9Z2i6gQP+wmCeuUglK8R/D4Pw0RKwongEnPfN+rIke8OkVkc2PF
-	 JfPbaCvff5VlaAT1uZ4rz3NFbvxXWOhtNSR96jPUebHNwWWYN3Sm0q1Zgy60s/Z2Zp8eh
-	 0E9C3xaMa9WbMxBME/QGhDTIgzjTmxz/v+7+/nfw7l/IQW1zyu2eS9SEIG9DaLQ/P4ydi
-	 G8jEw9ovVkjBO00FQTHoZSTcHY90uWdtjBdpONnLvnTb752othy8JRdc9qUvlRVEA4w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794296843;
+	h=DMARC-Filter:Received:Received:DKIM-Filter:DKIM-Signature:
+	 X-Virus-Scanned:Received:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=fNjwcRc0c7K0kuYsP00sMd8rDcxP9awGrVpi2PrAeZ8=;
+	b=C5GVIIw1y8PR4HQEHlu1eUlrox3wtDG7ZuQ9eABWLvVCuLIv3LFktIZZwuR2D69yX2uD
+	 fwilsgFlezLHGDgG0axyXmNy+crh0VvkhHvbotOP/E9cHFPQZ/wWkNcE3mNtq1r5SewRd
+	 UW+g3AvSc2zaQPeawtNFsTRdfgOVnaumVdOk3lLf06giTC55y9P44akwHeKpIDJFZsfoJ
+	 W3Mc9TSqT9Ajfb6915FJKpdgzY/phrUOCgXuRgxug/djIN1erXKGcKeowGtl3mwx167O7
+	 HR6j1kdDgoREWvzk/YdCDJYY42BF3DPcI1I1KaFsbk0Y8+Au1T4BzlY7VL22bqSafCA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cua8L9GY;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=cirad.fr;
+	spf=pass smtp.mailfrom=cirad.fr;
+	dkim=pass header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=DFsUbzxp;
+	arc=none smtp.remote-ip=194.199.235.221
+Received: from retz.cirad.fr (retz.cirad.fr [194.199.235.221])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E2F606A31C;
-	Tue, 10 Nov 2026 07:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B92606A969;
+	Tue, 10 Nov 2026 07:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05B92606A969
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cirad.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cirad.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cua8L9GY
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC1DB1F0089F;
-	Tue, 10 Nov 2026 07:39:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794296363;
-	bh=DSBlFGn4E205gXuccBzZwAAPl+yDbfuCcd3h0VNHPkE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Cua8L9GY35tzd1wvxIkoHZWoj4b+Jnc4MmmXSS4xz1DMOhF7fnMzyvLCmrsGBqGj1
-	 Jb3832ICvaaSkhpxHKzVktwY0VN55YFhe3ayOJkh72n1kK3xADULAH5Ox4aWZpDvso
-	 SSbBNIbDYBnbE0pl1xpHF+Szz6q8g2PUN/I44F2G4akFrGsrJgkxavsbYV78rdzpjx
-	 zQNz+Gl7ioYOpICsUTt7r4k8bgeTs/LlSH/W8tT7ufcmOxtPXhedsyuDUNY/5l3SKw
-	 qP4k1ZQswUJUdtBBrFidqv9eamm01YnDLo/xUXPHRAgRbSU5FtK+emGYhLCVNfCVFg
-	 cz+s7VuHGQF/w==
-Date: Tue, 10 Nov 2026 09:39:19 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
+	dkim=pass (2048-bit key) header.d=cirad.fr header.i=@cirad.fr header.a=rsa-sha256 header.s=573E3878-7916-11F1-BF4B-F68474317960 header.b=DFsUbzxp
+Received: from retz.cirad.fr (localhost [127.0.0.1])
+	by retz.cirad.fr (Postfix) with ESMTPS id 240EF20D4CAD;
+	Tue, 10 Nov 2026 08:47:20 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by retz.cirad.fr (Postfix) with ESMTP id 0151420DB5DB;
+	Tue, 10 Nov 2026 08:47:20 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 retz.cirad.fr 0151420DB5DB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirad.fr;
+	s=573E3878-7916-11F1-BF4B-F68474317960; t=1794296840;
+	bh=fNjwcRc0c7K0kuYsP00sMd8rDcxP9awGrVpi2PrAeZ8=;
+	h=From:To:Date:Message-ID:MIME-Version;
+	b=DFsUbzxpxrZA/nv5eV6lqXYNzSYWT/6fvJ1DRQvL07nMNckxwsNyvD3jRPLClFCL5
+	 LKx3YTToHkHBdyDjLTwtF5gb4AfleHGlbq+Otoh5NaLNyk5R6Vb948bpq2u25VQ8e6
+	 QtjA1iAZqbSJyGwyPHpBzZESAZvO4nl8+YEYER5mpahFHWHio97im6yP4JCrQLXJSr
+	 cfQGzurLptBRuCS3kprx++ppRmkUolZz52tDYzl/LDcnjmQzRPmDUrrm/Nyz/Fynzy
+	 y+dXrQwZIjqVnR7cKGBjSbxNjUZEfMLPizSKCi6Ram+Bjt4MlDZu1SRs8Tzmu90wk5
+	 cz7xI74oQOGIA==
+X-Virus-Scanned: amavis at retz.cirad.fr
+Received: from retz.cirad.fr ([127.0.0.1])
+ by localhost (retz.cirad.fr [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id WAM_3Wb2AiA5; Tue, 10 Nov 2026 08:47:19 +0100 (CET)
+Received: from localhost.localdomain (78-196-243-100.subs.proxad.net [78.196.243.100])
+	by retz.cirad.fr (Postfix) with ESMTPSA id 04DD820D4CAD;
+	Tue, 10 Nov 2026 08:47:18 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
+To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 10/19] net: phy: Use the compatibility driver
- attachment API
-Message-ID: <20261110073919.GF8635@unreal>
-References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
- <20261109-device-trust-core-v2-10-3b12d9a9f861@nvidia.com>
- <ab062469-ece0-495e-8486-78404c580cdb@lunn.ch>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Yixun Lan <dlan@kernel.org>
+Cc: Vasily Khoruzhick <anarsoul@gmail.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	linux-bluetooth@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Mah=C3=A9?= <frederic.mahe@cirad.fr>
+Subject: [PATCH 2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
+Date: Tue, 10 Nov 2026 08:46:07 +0100
+Message-ID: <20261110074607.363918-3-frederic.mahe@cirad.fr>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261110074607.363918-1-frederic.mahe@cirad.fr>
+References: <20261110074607.363918-1-frederic.mahe@cirad.fr>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,41 +93,55 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ab062469-ece0-495e-8486-78404c580cdb@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 09, 2026 at 02:45:35PM +0100, Andrew Lunn wrote:
-> > @@ -1956,11 +1958,10 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
-> >  	}
-> >  	phydev->drv_owner = drv_owner;
-> >  
-> > -	if (phydev->is_genphy_driven) {
-> > -		err = d->driver->probe(d);
-> > -		if (err >= 0)
-> > -			err = device_bind_driver(d);
-> > -
-> > +	if (bind_genphy) {
-> > +		err = device_driver_attach_full(drv, d);
-> > +		if (err == -EBUSY)
-> > +			irq = phydev->irq;
-> 
-> Just looking at this, it is not clear where the EBUSY can from? 
+The BPI-F3 has an RTL8852BS module whose Bluetooth part is on UART2,
+with hardware flow control. GPIO 63 powers Bluetooth on and GPIO 64
+is the device wake line.
 
-I relied on the comment above: “Assume that if there is no driver, ...”.
-Since PHYs do not use the standard automatic probing mechanism, I have no
-way to tell whether a driver is already bound.
+The firmware config switches the UART to 1.5 Mbaud, so take the UART2
+clock from the 48 MHz slow_uart2 clock.
 
-> And why set irq to phydev->irq?
+Tested with a laptop: scan, pairing, and l2ping in both directions,
+including incoming connections while the UART is runtime suspended.
+An 8-hour soak (an HCI command every 20 s) showed no errors.
 
-If the above operation can fail with -EBUSY, the wrong IRQ was restored.
+This patch was prepared with the help of an AI assistant (Claude),
+which also ran the tests.
 
-I checked this with AI, which says that -EBUSY can originate deep in the
-driver core. It may be better to remove this special case and rely on the
-PHY's guarantee that no driver can be bound concurrently.
+Signed-off-by: Fr=C3=A9d=C3=A9ric Mah=C3=A9 <frederic.mahe@cirad.fr>
+---
+ arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Thanks
+diff --git a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts b/arch/riscv=
+/boot/dts/spacemit/k1-bananapi-f3.dts
+index 58035d886..280adc9dc 100644
+--- a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
++++ b/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
+@@ -383,6 +383,21 @@ &uart0 {
+ 	status =3D "okay";
+ };
+=20
++&uart2 {
++	assigned-clocks =3D <&syscon_apbc CLK_UART2>;
++	assigned-clock-parents =3D <&syscon_mpmu CLK_SLOW_UART2>;
++	pinctrl-names =3D "default";
++	pinctrl-0 =3D <&uart2_0_cfg>, <&uart2_0_cts_rts_cfg>;
++	uart-has-rtscts;
++	status =3D "okay";
++
++	bluetooth {
++		compatible =3D "realtek,rtl8852bs-bt", "realtek,rtl8822cs-bt";
++		enable-gpios =3D <&gpio K1_GPIO(63) GPIO_ACTIVE_HIGH>;
++		device-wake-gpios =3D <&gpio K1_GPIO(64) GPIO_ACTIVE_HIGH>;
++	};
++};
++
+ &usbphy2 {
+ 	status =3D "okay";
+ };
+--=20
+2.47.3
 
-> 
->     Andrew
