@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794327010;
-	b=i5y62gKAvCem6nGCSqyEC5QRLflKKMVCOs1OGaskIjrNRCs0fA1Eo/fQvccIThx/Ilv1
-	 0m+5jRLbvNrSm22VsQ2Hxx58qTk46+htsTZFmKEQVG+gApW+KpVOrDrLQmsIpu5E4YoqR
-	 jFqL/M7j3f4jBOdYqAW3DoZ0nEn3YTc5G2BPOux7Flpk77ojnKlfRObmHNRVldfVqoMMh
-	 iZPD0HjbL1ysXLv2c6QgpoEYaf8SBhR8Qe24Vog4IBHdwKDj8deAnbJkVIk8jBTyPay0o
-	 WuX92rVWybom0gsVSFFcWZuvhoLOJMk24L3B0mNwlmq3FDscgn82GhrbtePQSrwJ3Zg==
+	t=1794327011;
+	b=28QMwzg8n8VwbRxlCbMAOQc7AC/3OjCTwQ96kraV/OE5Y+B8sk9EytiX9zISpBOIELtI
+	 HFOzjj+Aaj5O/5GM21A1bz1vscedxlif+FomqmtOnpcffm0v3mvr4PYK5VOzL7IJD1fJo
+	 s1tnihpqoXxEAwwRa4M9X/YEr2GJ7CLF1rCTWQFhX/nNb+fU5K5ei6UHu7OFgHybb+llu
+	 9K/N4n3S1yNkwWALtljXYjvLwyRYDOdl2UmgdQSDXKcV6ZqsIsfGrNNokOg16WVWMzT8s
+	 Tk2qKfLsMUO8q+AFSGNhh95Bttwa+wqexiSVhvghanRl7ZsM30nE1gIs4zF/bVNMDBw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794327010;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794327011;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=LvtwQ3qjKJ7hJQFkAMWUe7ov+nTg/5q48Rt8Dv4swxM=;
-	b=Wv1Y5uh+ZYnDkyqNHfQCvvg6KE9ISkNgCbgRqu1K+z1NdlDZmaaNc9WkqFYeanLd9NIy
-	 2jrbEvFru++Iv6hKG1TExITr4sLp22jWECTc0czkJ1M4u5GUYDLEcbnvYKcasU/2LQs1O
-	 tUuRJjK8RaAuFjHelHatQNfx0PMUOTTXshiOGUZ8VMmWo0kh5Sd7/vvUt4FV58hxoB8cg
-	 4a/wh0jsVPnFJFFHI89M6cLkaMK0ZT8GKJ5vqrvgH84Z7VOEpWSW1tcYQ7aIxYMAG444J
-	 PHvAnjPNH05LKx/cIXX4HDKYRW8SknnTyE8oI2j3YobZBZHupOBEyKRHziEBkmYKomw==
+	bh=3AVhLi3JdPRht/cpEJYLixagKRvqBQRXjmvgnpxDuxw=;
+	b=r+ZyFG+z4j6lBcAp8DA+I0cuGQFWiGYGWdSvzvdDY5AgXGBYnA62bTYgKWIFNkvI2rbk
+	 WKaU8AxQ1hx7SviBgl9a1gDp/9s0yVHjU57SFHIf8l31ROsxIbws0mXg0Yl1ZNRGGnOWz
+	 eTLl6mioRBoVm7hARRx/OV2FSH+f05GzLiOo++C7940JVwk4nFEuc7pcTLUoTrdXLwZDv
+	 CnE5MsVQWvJjEyL1Dz76b2+nzZ6Df8YHbsXSB7KWtROBtPylCus6Pnye4R0fxr1CCinax
+	 SEUEwnNIN5khciE9Eh9raSvQ0H5rUz8wzT3NbnMV4qwvQ8rKf7+wVfAsUbhNfzsubdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nsLpCg6I;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VFLzpzzJ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE73606A32D;
-	Tue, 10 Nov 2026 16:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3C9606A32E;
+	Tue, 10 Nov 2026 16:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nsLpCg6I
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5FB61F0089F;
-	Tue, 10 Nov 2026 16:10:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VFLzpzzJ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 295601F008A1;
+	Tue, 10 Nov 2026 16:10:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794327009;
-	bh=LvtwQ3qjKJ7hJQFkAMWUe7ov+nTg/5q48Rt8Dv4swxM=;
+	s=k20260515; t=1794327011;
+	bh=3AVhLi3JdPRht/cpEJYLixagKRvqBQRXjmvgnpxDuxw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=nsLpCg6IV6ACWUe83fTmTFplzjWgz6295EAsfXCpVABpXdS+To9gs6GKalR8DEcHG
-	 BOM4zko5TaVgIRlBc+L1RLkGQEmiab4uGFM/3XLpqeTD8JjhhERvpV022/qZ4nsjX/
-	 myyEQa5WmrPAtZBYLaR28EFTzKHOmRd180WBS6jF1iMvLXyzhbFZauJ3wakdY5CtNe
-	 x54mZJqZAbhLUgXhhRYWAuZyfPBUwmNJ2jvdydPIbEOrjPa8kLe26XD2FtRl2XzNOH
-	 nJ0yJHDpk5jcCUIf8nPaNcJi5jNSDKvR0AskAkCJ6dhzC00a6czanoKilQy0fMU6pg
-	 Ro3raEWLO+mLw==
+	b=VFLzpzzJvSBELNeU6bPURuIKEhFaHqaLTU65y9/jZXrOnHBH+aaDtYa9opmiLC9PK
+	 YRZfwLAN9aGEkjqI32Ui0LX4SNA+vKx7skikcKyKw8HxB2CuzfyL8Ycw2pwQmprh3U
+	 l4BLRHLr0Jv5GUyIGvomG7EvxZsxjXCmQbjP2ue91aI8LD9awc4fRlelv30RLGfCxE
+	 tlVnreMnBf4NsrTgNNnwh7aL0ZVyMWn1bTed85DDghNMzxDMO+f2l4dt+YVUn/pZWo
+	 4L4zISdFR9yJhvhUq6cdFUsQsqoeH2xOtm1AP2fkxQoRbv0MPBd+izE0eeG1OGgfTO
+	 cVUN1IaaiMp0g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B0AF39D267B;
-	Tue, 10 Nov 2026 16:10:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 210AD39D267B;
+	Tue, 10 Nov 2026 16:10:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,42 +54,42 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/2] Bluetooth: hci_qca: Reopen the UART after enabling
- QCA2066
+Subject: Re: [PATCH] Bluetooth: vhci: Serialize packet reception with device
+ creation
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179432700817.4062787.1917987587860059113.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Nov 2026 16:10:08 +0000
-References: <20261110092929.234617-1-shuai.zhang@oss.qualcomm.com>
-In-Reply-To: <20261110092929.234617-1-shuai.zhang@oss.qualcomm.com>
-To: Shuai Zhang <shuai.zhang@oss.qualcomm.com>
-Cc: brgl@kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
- xiuzhuo.shang@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
- jinwang.li@oss.qualcomm.com
+ <179432700967.4062787.5840471471606584903.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Nov 2026 16:10:09 +0000
+References: 
+ <pm-bluetooth-objects-candidate-0253-v6-ffe55995e8c517fb1d86@gmail.com>
+In-Reply-To: 
+ <pm-bluetooth-objects-candidate-0253-v6-ffe55995e8c517fb1d86@gmail.com>
+To: Cen Zhang <zzzccc427@gmail.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ baijiaju1990@gmail.com, jjzuming@gmail.com
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 10 Nov 2026 17:29:27 +0800 you wrote:
-> QCA2066 does not reopen the UART after the controller is enabled, which
-> causes RX/TX out-of-sync errors. The UART has to be reopened once the
-> controller is powered on.
+On Sat, 24 Oct 2026 23:28:23 +0800 you wrote:
+> The hci_dev passed to hci_recv_frame() must stay alive until the receive
+> operation finishes. __vhci_create_device() stores data->hdev before
+> hci_register_dev() and frees the device if registration fails.
+> vhci_get_user() checks and uses that pointer without taking the
+> open_mutex held by the creator or a device reference.
 > 
-> qca_regulator_init() already enables the controller and then reopens the
-> UART, but QCA2066 does not go through it. QCA2066 was added with its own
-> SoC type and handled in the default case.
+> An incoming packet write can overlap the delayed default-create work
+> scheduled by vhci_open(). If registration fails before acquiring the
+> registration reference, the following order is possible:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,1/2] Bluetooth: hci_qca: Reopen the UART after enabling QCA2066
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a57a255ce204
-  - [v4,2/2] Bluetooth: hci_qca: Don't use the serdev port after a failed reopen
-    https://git.kernel.org/bluetooth/bluetooth-next/c/45e28b01e4d0
+  - Bluetooth: vhci: Serialize packet reception with device creation
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f8ba3e2e82f0
 
 You are awesome, thank you!
 -- 
