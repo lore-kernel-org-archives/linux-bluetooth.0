@@ -1,99 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.41
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794334698;
-	b=mR37JyWo7Ra3Yo5WF/Pkap3UI9EPl4YoZ7kfFn7sx1fmfAxE1ULNUWmlyMELImknyl7b
-	 /bfzmYP+TMKEPcVlbJ/VypgImBQNCi/0waNq5++ayQG/n2IktCan16DrQTVbBYul4Yal5
-	 ZXGsMUndc65bi4/MT7NAgkz7wvHRhBQRx3YhIYAoByRQZ8UHO/JW0zFH0jn92BsIhWtJp
-	 xLH/c5OPHoB9T4Ma2Om/ZPr156g2S//Kf/6COTS1xfnw8yzCKJuwwo70dQSywTjTKLDqn
-	 k7HuhquJvzxGoJymJyZpUCPl2Qff1Aw5OHYpbs5qJDxZVF4HLQjqpQMTBYG+cWep5lw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794334698;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.41
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794335791;
+	b=jbtp9/cTXO4+Xc4f9TL4mSw3xs2KL22+PFaw4bpl6cKPJymwbRDMXucfG980PA5JPgJp
+	 o0P8UAO9JuV87bD6F7zJUOsOTbCcygn4ebpcXAtiV++iFLjvzFv/vgqiNq7BCtW+F8Gl3
+	 cQ+D7mTayG2Pz4k6fmRchKVQlnrVAR4YZphkyuMD6CwXfNwlPm1K2OLX5K5tyeqV+h7yn
+	 KYBderzGOipXYv2wGGDacERczBFs7eDzTLmHnwdhEN3BgzG7ib6WpzG0iVS1J4z9CYV0g
+	 7kNkMYQyewxO6Bt/GXwGMoYzm7Q9MrbR3Yw2Mb1F0oFDhoKQm8H01mpG36e3X6JSa0w==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794335791;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=80LZM7vxA2rau/UmsJfrKvz5NtsF8B/PIiFDePQDDVI=;
-	b=OywjH/4YBtVshGN97CzgO4DM8XnLqPRYjNaqnhh3K/TvcJ2G5itCYAI6Rq5abm2Ts7OE
-	 0Kqe5QEJLHEMqAUoIZbyfJAMkllCCJxSk4CnGDlxLJOiVpLhz0riJOBfjNLX4Z1zIqbSS
-	 29D5VB/AfGGbGQgbR54AstUB+Njg31DS1kHUJthr936vrPnYKiP3cXebDqbSB/87d5aMa
-	 Sri+Ket+YJUauHj5wwSVfoE5AQ8RYOgP0TUVVOMOUh9NG2V+IFxiIDIcw0BLvk3TLUWvg
-	 hibJQRK5fwj0U8vf5SIM5X2DlE5KbBOY85fQqJFe6DmFeG7YODHMVHelg5nUL4L0svA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=iiitd.ac.in;
-	spf=pass smtp.mailfrom=iiitd.ac.in;
-	dkim=pass header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=Y7M5Lxs2;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=Ou4jNGWuFZmwkjtdmIumJGCXqgh1SdfiKkd1sof2u/o=;
+	b=WGdhvrL5clPs2DuoCwMvonu4yemiwVZN56kIE0j9yvqgg79fS1bOzKG3EKcG/9zXvsuA
+	 WybpCqoKXab0ThJQ1VdBb9P5xBsRZWG0a8gr9TbjvxlinLIxo/SejU64o6E1IDFQ51fN4
+	 e3IOJZtVDuXVTEyJg4PydN7W6LuU1RwOw5ZihbKw7XghOKjNOAPJv7gQZoBSERAX2w4jo
+	 BrgK2dqM9x7TNG5YxY2bdEaVWiTAIBApwnnq8LzWDsRnQVrwjINjV/tCX5F/dFkruTPjt
+	 Uh02b7MHZ+nca8FgdLd2z2Jw4LzypCP6lpxnZuMZbjMfGv5V0ukba6R/I5A1h5seD/w==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WdPLSnaJ;
+	arc=none smtp.remote-ip=209.85.219.41
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205E9606A320
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 18:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 205E9606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF78606A333
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 18:36:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2AF78606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=Y7M5Lxs2
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b577addee9so3254770a12.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 10:18:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794334694; cv=none;
-        d=google.com; s=arc-20260327;
-        b=P1ktkTHM0TB9nlSkeJxbOVl8w1I2hkl7WBLzqV7OU8U2ns8AjzVGfIUhvOCawGvzsB
-         b2+4edHdWFhRLz/e1BkXD3jr6tvQuHxYwnkoiPbDII2MQYbXRaRCQ1rto9ne/io0ja+6
-         T3pA/1bOyHzXD2151sABfUJpUB7LG5tu4h+YS/AzxDVjHBfNGvb+G0lQ9e4byirLBF9I
-         bZ/qQIWfm34gz0uAlZ0X1iJ1U50Fm+vwek0E8cZbdWMo9iKR33EGGAHD0KawO/YQUbRo
-         38cDK/l41tX68hYLT4lPdb0UzwY8xEiZsHVD9lTPSRax7zhTzYKZr9MZunnViMJ575Bh
-         LdSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=80LZM7vxA2rau/UmsJfrKvz5NtsF8B/PIiFDePQDDVI=;
-        fh=MQ3fIGNOcEnWxkEV/4zG699KKHD3edIJINkuwCUoIxU=;
-        b=RbgHMU6uSy8UGx4nLDMYKVkRKThqtnsQESHXYDU295R1i0DOB6+dE4VU12uTqiF99O
-         tZMT/s5UeHUEpHnLrKANVXQo61mdAEC/JqJQr0KAtCk0DwQFAOjkW6KxUTWYjyVDs1xu
-         YsAmpAsxq/0EqMra7OCERHv+uBPlFvFFztGzaaKz7Ff3rhnm8Y0Tux9qgXO/fWzrc1Tn
-         q4d8LLiX9RBogPebdZNTiFRJdq2Ot6JLOTCfgtVc0bEh8OKibzhfFubT26B3ORrV22Au
-         gs/r9XsGS7coP6FcmxxBdfyR/LsqkDDIr3lLKp9u2JOYHjdsdPWRLvzSubYjX2TF1+nc
-         YIQA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WdPLSnaJ
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-91eb5559b34so17942016d6.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 10:36:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iiitd.ac.in; s=google; t=1794334694; x=1794939494; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=80LZM7vxA2rau/UmsJfrKvz5NtsF8B/PIiFDePQDDVI=;
-        b=Y7M5Lxs2TuWQ+gyJvw4GYS02oviT+iOC7pbyCxdE9TEDOV4CW+fGbhifuD0yfgmkdw
-         yjCqIxNrFVTWQb4govlTxDZrHRf9UUFXnOTx+SueCCABFNUsAbTsyRNaWEE7Zy5apRBE
-         AjNgvhPwnEVBjPA82DT2rhUPM9hgcgyhHkEtc=
+        d=gmail.com; s=20260707; t=1794335790; x=1794940590; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Ou4jNGWuFZmwkjtdmIumJGCXqgh1SdfiKkd1sof2u/o=;
+        b=WdPLSnaJ/1CTSWtclKd1a4SjaTfQAmJUV+9D0ciUDVBtFuZJAPKI4sy189qSbpxD2d
+         5dl+O8nyiIwbnDbz2gyfsLWUNqcycOaZFV+JtUwDAuliokNMy6tVZmw69OD8GE5XGSlX
+         XbmKsIykAg/hcfX/cEEgrO5u0YThOFCZ8nhzrh+sfD4mRRBsbBqTv3ewJa7kBGwSnZdZ
+         r5YJarSpXHZun9COc3JGUrXp1Ob5E4pQn2n2JmUGf3/D20GOgKqjDc7oeB1eqHFy9gPx
+         YRHJFm4Ni/JLJi0jKOYmckKcpUR2VYMiZhEp2OsVpTtPegUPM03YgocaXOBJZrxwpuBN
+         xGxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794334694; x=1794939494;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=80LZM7vxA2rau/UmsJfrKvz5NtsF8B/PIiFDePQDDVI=;
-        b=Lle6rB/uJNYha3MmWU8Qgp8kw5C22krhQfjdplSvAaW3ELc4fdrjs79olPiDHlD7Tm
-         3YsOukF88JDAOI2w07dJE0ul4CfsGBLNajoRAP2m/SZRKhWxedI94eHBPYj2a2ptIap/
-         ftiO7eJI2QceF37sSS4bm+/9VxvRo+BP5wP6qr7Z79XOZjHSMmYQhTf44xCZhC14wf/j
-         LLfbsSEdlHhEeniG727BmvlJaJr8XI1TUNT+kCTy+GWF/wDKe3Rjc72kCr777nMHrEj/
-         8Z5VqHZYAruYYlQ59zxg5hrvTwV63loyILN+kmK9PA/aAkQD5GufYKpjhQZqMaIYPx3D
-         X3OQ==
-X-Forwarded-Encrypted: i=1; AL+hErGxcAPoPL+a/KQKU4U/smqJpeKk8MINx2Pl5HCmfBYyBob/wlymTyWDzOTSlPdsprQiQNfUXHoU5UGpRYe5+4U=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8ShK0SdU8xBmqgR12CWm2yFVK38I9/ex0Z3h9f/6A19/YpuH9h
-	1vIuGlyaF/KSmLiGojfsBypGGrtk8h55GJgfAQcCO6nhVekshNURlsogeUVQkIbX1KJb80xyVl2
-	4rYhh+UNBYzb0fo7iZESMqERLlN3nuNNigvdMvNsDGg==
-X-Gm-Gg: AYBFou1fB7+wQG74yWNsdhZR2ekMmv7PQ/8W9ow7VVYCwForAEqY0+XDAu7ouytYcVl
-	bJ20IVeLtp9hqI3wNN5/Wo54O8lVTXMPu2IRNtyEBT54RmwoP4e72oGgQeizO7dt5bhQQqJbvvy
-	R6QuuzWFcZZEDp+eyRHNAAVJIQngnnmLCoX3WRJ9nBR4PQaXZ19u/CT240SO8hQlKqmf+oHsd0L
-	U3eAqEXBFg7K6LZNAl0EJfTtMg1zCbP0rwkFmR+rKJYr6bQLZWWH0ws8DNtdaHw3ZYoiHofD3D7
-	QF3y97xoow/iZiXctBd4F+ufT6qBIkoqil4NORcxPsK8/HTs8Hbe1nUPliqiGPn9ht5zzZ2L4+i
-	2xfiO4wSpYDEHIz9gtHzfjAbCUig8cTAuMy7ZyRzH565b91xOoroxB6lpvLkaGBS6hqn+KBMaGy
-	96NawNEEccnOJ06nVMpCz/0UwALL/lJ4VwsPnSerprxr8Jh0t42WVaYqvLd13BCKqz0leeDU75q
-	yG9
-X-Received: by 2002:a05:6402:1818:b0:6b4:1916:965c with SMTP id
- 4fb4d7f45d1cf-6b7773f2f89mr52010a12.18.1794334694406; Tue, 10 Nov 2026
- 10:18:14 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794335790; x=1794940590;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Ou4jNGWuFZmwkjtdmIumJGCXqgh1SdfiKkd1sof2u/o=;
+        b=PdKA5Mu0yuwfrDueYefRIMam+98Ef6RChYDupqnsIosB28Fb720Be2CdP9I4ac74oV
+         PSQAkJlOEktaTjWz6EsHU2TccIxJvqSHYXnlhUdbsd9ktc0JKb8A50bxiXdMD8aftPLH
+         9PXgwV6i6VQ52m4FlOV+XvUA0XZlCZpw8hg1oeZdrd3YZvvzN1IGZu93A4qFCDQriHF/
+         76OUpRV5dwEeXeuTfGIgq9Oy5UrKkugXzXOnU1OKomfNBIOMn5w2iLG5iDAwmKGrlU30
+         pqiXwIMOkIUuFRmP9XoqllqpJ/2nUF787RwGqUCk/b4oj1pjZWzgR1Kxli4c4Ws/AQl2
+         5h/w==
+X-Gm-Message-State: APuU4Z+ia8Rb5arwx9PD6oUZHww8ReDifESBM/giSrFkRP3Qmokav4m2
+	29ncb1RBZpUxKFgPtf1IIH4MXBniqJVm8hPUa+DCbTvXL1HR50/YyF1bba4yXQ==
+X-Gm-Gg: AYBFou2Kky8QB1HKIbaw8eyfMjbmN89qtDUzE3dTSOnAONrv60HCZkLh1ZsBNuZdFjL
+	A4s3T6Tx+qB605Dm3j+Qkzpz18iOzkRLnB1h/djRqFp9CUaD/FMydbfD9onO255vgmIy/svNqOE
+	hO48uD3stuliO7mM9HFwcFU/4m8zLJxJ73vaOOTYsNwisbhZkak95DMEXjrhPm0gpwMX4QsZ/7p
+	EtxKAk21WRu2kEN/fk18B4/yUhwY5QdR/lmozZxspLMwnLYN+w2P1J8THyLyoX0xdBIA/oKRKJw
+	IVSLxsgwzSxi+/sVW/Gjf09tV1kfitNCRFUhygEHDzthZxuym5Jc/FQ3S0r3x5v49rP91VH9AL7
+	0IFZnDx6go3T/3OsnmTGP6vFMEGbggDxb0L06lGCkvfSaAhC5LTCTCvEomKeWN6E0uyqkgbgMRj
+	88+egulOOBWy+IUx7/CnzjKDKxfDAmANPRy1fWd8uET4RSk858x+JBXdbhc1JruxdLMDPIrc17K
+	wo0syjGSuuKPps+e03+xmdg+oy9IRSHsGB7zK2QeHods3J/1pE+yGBofTwGJhla
+X-Received: by 2002:ad4:5fca:0:b0:914:cdbf:b68 with SMTP id 6a1803df08f44-91f0402b201mr2483146d6.20.1794335789851;
+        Tue, 10 Nov 2026 10:36:29 -0800 (PST)
+Received: from [172.17.0.2] ([68.220.171.206])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91f0199c41bsm5079936d6.34.2026.11.10.10.36.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2026 10:36:28 -0800 (PST)
+Message-ID: <6af3642c.40ce7c98.1cebca.b4bd@mx.google.com>
+Date: Tue, 10 Nov 2026 10:36:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1112232234647364128=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -103,220 +88,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CADq=QSxw-5LstC5McTqfsp9NaVrsUcemepw2g_TJXNrdpgFdRQ@mail.gmail.com>
- <CABBYNZJ2zD42-szQ5KWExOVkSLPmO8AH-FNyO2Eq3V4bfSrVxg@mail.gmail.com>
-In-Reply-To: <CABBYNZJ2zD42-szQ5KWExOVkSLPmO8AH-FNyO2Eq3V4bfSrVxg@mail.gmail.com>
-From: Piyus Kedia <piyus@iiitd.ac.in>
-Date: Tue, 10 Nov 2026 23:48:03 +0530
-X-Gm-Features: AclHuK9-UryAyf0oDUb3G0rqiUwWeIMBeAgKdlv4az6FLANmzXLCKZjrp5TQw14
-Message-ID: <CADq=QSzm_pb0pKT-T3Tm_P1fhE3XfK6iT1PETChLBB4-857Afw@mail.gmail.com>
-Subject: Re: [BUG] Bluetooth: stack out-of-bounds write in eir_create_adv_data()
- and eir_create_scan_rsp() when a controller stops reporting LE Extended
- Advertising (seen on 7.3.1)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kapil Vaswani <kapil@presceralabs.ai>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jinwang.li@oss.qualcomm.com
+Subject: RE: obexd/pbap: Report NewMissedCalls for mch
+In-Reply-To: <20261026131504.1016687-2-jinwang.li@oss.qualcomm.com>
+References: <20261026131504.1016687-2-jinwang.li@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============1112232234647364128==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thanks for the review. v2 is on the list, doing what you suggested:
-unregistering the oversized instances at power-on rather than bounding
-the copy in eir.c, with MGMT_EV_ADVERTISING_REMOVED so userspace is
-told. It is also sent as a proper patch this time, with a Fixes: tag,
-and verified at runtime.
+This is an automated email and please do not reply to this email.
 
+Dear Submitter,
 
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
+   Series:       obexd/pbap: Report NewMissedCalls for mch
+   Pull Request: https://github.com/bluez/bluez/pull/2713
+   Created:      2026-10-26 14:06:58+00:00
 
-https://lore.kernel.org/linux-bluetooth/20261110175334.676816-1-piyus@iiitd=
-.ac.in/T/#t
+The pull request has been closed and no further action is taken on this
+series.
 
-On the security@kernel.org point: you are right, and I withdraw the
-claim. Posting it to the public list ended any embargo, so this is an
-ordinary bug report and should be handled as one. I have not copied
-security@kernel.org on v2 and will not pursue it there.
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
-Thanks and regards,
-Piyus Kedia
-Kapil Vaswani
+---
+Regards,
+Linux Bluetooth
 
-
-On Tue, Nov 10, 2026 at 8:41=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Piyus,
->
-> On Mon, Nov 9, 2026 at 11:57=E2=80=AFPM Piyus Kedia <piyus@iiitd.ac.in> w=
-rote:
-> > diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-> >
-> > --- a/net/bluetooth/eir.c
-> >
-> > +++ b/net/bluetooth/eir.c
-> >
-> > @@ -300,6 +300,16 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 in=
-stance, u8 *ptr, u8 size)
-> >
-> >
-> >
-> >  skip_flags:
-> >
-> >      if (adv) {
-> >
-> > +        /* The instance's length was validated against max_adv_len()
-> >
-> > +         * when it was set, and max_adv_len() depends on a controller
-> >
-> > +         * capability that is re-read on every bring-up - so by now it
-> >
-> > +         * can be larger than the caller's buffer. Refuse rather than
-> >
-> > +         * overflow; a truncated AD structure would not be parseable
-> >
-> > +         * by a peer anyway.
-> >
-> > +         */
-> >
-> > +        if (ad_len + adv->adv_data_len > size)
-> >
-> > +            return 0;
-> >
-> > +
->
-> We probably need to unregister the advertising instances if the
-> controller changes its max size.
->
-> >          memcpy(ptr, adv->adv_data, adv->adv_data_len);
-> >
-> >          ad_len +=3D adv->adv_data_len;
-> >
-> >          ptr +=3D adv->adv_data_len;
-> >
-> > @@ -342,7 +352,7 @@ static u8 create_default_scan_rsp(struct hci_dev *h=
-dev, u8 *ptr)
-> >
-> >      return eir_append_local_name(hdev, ptr, scan_rsp_len);
-> >
-> >  }
-> >
-> >
-> >
-> > -u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
-> >
-> > +u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 =
-size)
-> >
-> >  {
-> >
-> >      struct adv_info *adv;
-> >
-> >      u8 scan_rsp_len =3D 0;
-> >
-> > @@ -357,6 +367,10 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 in=
-stance, u8 *ptr)
-> >
-> >      if ((adv->flags & MGMT_ADV_FLAG_APPEARANCE) && hdev->appearance)
-> >
-> >          scan_rsp_len =3D eir_append_appearance(hdev, ptr, scan_rsp_len=
-);
-> >
-> >
-> >
-> > +    /* See the matching check in eir_create_adv_data(). */
-> >
-> > +    if (scan_rsp_len + adv->scan_rsp_len > size)
-> >
-> > +        return 0;
-> >
-> > +
-> >
-> >      memcpy(&ptr[scan_rsp_len], adv->scan_rsp_data, adv->scan_rsp_len);
-> >
-> >
-> >
-> >      scan_rsp_len +=3D adv->scan_rsp_len;
-> >
-> > diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
-> >
-> > --- a/net/bluetooth/eir.h
-> >
-> > +++ b/net/bluetooth/eir.h
-> >
-> > @@ -10,7 +10,7 @@
-> >
-> >  void eir_create(struct hci_dev *hdev, u8 *data);
-> >
-> >
-> >
-> >  u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 =
-size);
-> >
-> > -u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
-> >
-> > +u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 =
-size);
-> >
-> >  u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)=
-;
-> >
-> >
-> >
-> >  u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
-> >
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> >
-> > --- a/net/bluetooth/hci_sync.c
-> >
-> > +++ b/net/bluetooth/hci_sync.c
-> >
-> > @@ -1563,7 +1563,8 @@ static int hci_set_ext_scan_rsp_data_sync(struct =
-hci_dev *hdev, u8 instance)
-> >
-> >          }
-> >
-> >      }
-> >
-> >
-> >
-> > -    len =3D eir_create_scan_rsp(hdev, instance, pdu->data);
-> >
-> > +    len =3D eir_create_scan_rsp(hdev, instance, pdu->data,
-> >
-> > +                  HCI_MAX_EXT_AD_LENGTH);
->
-> Ditto
->
-> >
-> >
-> >      pdu->handle =3D adv ? adv->handle : instance;
-> >
-> >      pdu->length =3D len;
-> >
-> > @@ -1609,7 +1610,7 @@ static int __hci_set_scan_rsp_data_sync(struct hc=
-i_dev *hdev, u8 instance)
-> >
-> >      if (instance)
-> >
-> >          hci_dev_lock(hdev);
-> >
-> >
-> >
-> > -    len =3D eir_create_scan_rsp(hdev, instance, cp.data);
-> >
-> > +    len =3D eir_create_scan_rsp(hdev, instance, cp.data, sizeof(cp.dat=
-a));
->
-> Ditto.
->
-> >
-> >
-> >      if (instance)
-> >
-> >          hci_dev_unlock(hdev);
->
-> Next time, send it as a proper patch, so CI can pick it up and Sashiko
-> can analyze the changes. Also, and also address the claims about it
-> being material to security@kernel.org don't hold anymore since you
-> just published it to linux-bluetooth.
+--===============1112232234647364128==--
