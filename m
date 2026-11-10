@@ -1,93 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794349166;
-	b=E/c/7LUbrTQMTUjvz5NGBW2OSmJ3l95ahfL/MSGaZxv/gJPNlxhVVsJxb3S2DHs9kWYb
-	 JwFCLfKxgRLr+/SEcTdvUHD0Pk++SsO/ixaieydMrsLWq1klPDWoJpzhHAKAZOQLyH0Yu
-	 F+QCp1KG7q/mrhsxNRXnTesjOa/X2clAS1sn5Rc4vzP5FNYUQw+7KyDMLn40JnRGaaU0t
-	 +B6f47NRSzjFlQfbe6rW+/kWewjzYYYxtYzJw/Bw0IuoQRCVI3yJxlc7vkq/FRSzRuFki
-	 3Nbi1itpXCzjkao3DuemAdCx9CuwfEDSkcCB4TEUo6M2OrapSAw5jFwaYCskD5JHBQg==
+	t=1794349167;
+	b=LTAC8TamA88WZ20sOHTL6n3jbGgkDVXl10PLFoYialWCiG0AdomuyeuWCrvB3bhiMgco
+	 HxLQGJIlGAtpURv+0TqCLBYvsQOkIbUjiKEIrMTsdJFU9Bu4dzHKns8B92V8C6zkLz/DG
+	 uvr5XvVdv7sMGlJz3YlAXx7EHU+njMQwTBDT7/acJ4PXHKRnqVhRVdasOowxkjFteH0QK
+	 TtuvCvxD2tgsKuJ2yDlrGZ7tjp3r000mf9e5StJcKcgJepscGqioPzhg615GcraEtZOe6
+	 tTNYO6bUiYFzMSepH/erMFcr9vMF+P1XQRBgzysjO05s15Pz37Ae7VwlisU8w04iDvw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794349166;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794349167;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=08CwCbf9/THY3i/DgQM7S1iCC/l+BcUDsAYDbJe7e6A=;
-	b=nIJkVK1s2ylcRa6FnJ6PdC0U+qxK80zcO/ZSvebXulq7+eMBSYMEdZU/NIYZVb+tDajO
-	 YvCVgc1GtB2ahBP+clbPZ84jGis3+LgQc6ARR91f8/1Qa0itmdMktJB2v3JvGfDvMSx7y
-	 Pr7sYL60RKkPKvC/BjFirxvtlFgZJjPrkyY8FNXk4CgBjylyeQ08ZAhKXTzothqzHN0uW
-	 qmLCVkAzZsabfqdEdOBenV5kM3VawS2AxodP3ErEXgaKGeSgjqU13/gcxS9McfJ5XB2B0
-	 gfanJ32TE0WsWFQqTABwgFw7fxuWmaCeoxmB/P72Ld3P4xV1h+IczrGcTiWW6KXmPvA==
+	bh=5V07kZtTPYabGRmB0J7JQ2iH4jJxJYzlNAm5oMkeypE=;
+	b=QpCU/hJKxo6DaOVGUo8JH6ZtuR1dkGuyK11L6kHz5ftr2f9LKhpy5FsM0/xiZQlFPO4N
+	 k+eBONFIavKtKq2HqweQVdpEpJe+63HVJHzzsK/vDzXUvmWjTY/xK/xhdESASey4PmZwB
+	 73arKlp9Yn3Fi6qzPL+eHBxvwyZmzn2oBOWoAiIErHmTcCEjnjJTsppKQ9dQ1u0/iooNX
+	 aX1l6e84sbVW3B82JLqWVOPVGDduY1Xc00yu1FTmzf8XhFnBXSHHiv/Bx6sUL1mfA0v31
+	 t4FYjpXclXOODPzkTXaDzqg/sQvtxD7XkIM8AU41m0fXQX2qccXSSbxh/46e6VQOCOQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nJAfcoD2;
-	arc=none smtp.remote-ip=209.85.221.170
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dLMIXuCN;
+	arc=none smtp.remote-ip=209.85.217.47
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5580E606A32E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:19:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5580E606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856B1606A325
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:19:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 856B1606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nJAfcoD2
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5eaf169fe3dso764601e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:19:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dLMIXuCN
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7d2db1b9bf2so847986137.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:19:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794349165; x=1794953965; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794349166; x=1794953966; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=08CwCbf9/THY3i/DgQM7S1iCC/l+BcUDsAYDbJe7e6A=;
-        b=nJAfcoD2erhGSzRObSpo/yiFuluhaOfMMIcYpMlxa9sTxHEtgOhQh5cuiQ7Uj565b2
-         znjf66LtTO2Z+jQhkdhSk4bc/xWxwrm3qfONFYY+cgDQIHXlF4qLjVWlGWQuMCPOZyme
-         +sMlGv3Dex7D8HYBJcra1Nb4no7gE1n33l7LUSbgsBNqMMj2AN2+XnCMnVkTpawIt2vS
-         ogrqKE58fV+/o2LADsOg0gsxDjfPJHLh0vl/eeD0OBdfDlom69bENmFO5kUCRNzgjOAP
-         HItBpvAistl7+DxbGowO2jRfO4zkyfCNeQT33EFy+FhWCAQTkJjGFmXvhzLPq4imc0sQ
-         ZffQ==
+        bh=5V07kZtTPYabGRmB0J7JQ2iH4jJxJYzlNAm5oMkeypE=;
+        b=dLMIXuCNfBqlQiIQZ16bUef8D1+aeRyOcyvHc6+mPLiWIUzkL+361QtIfscI1EJpe1
+         1eoGejwpNXDsnxpihdqx8c2R3bxAn+LEktJPcUwW9YCY+vyssZWVbd7s/5bfTPNi1daO
+         BNHd+yHBgqf899gJtB7N6tyX8WCcsgLoAlCeWVQC1UhugPq1v/r9SDqiiknL963qtaty
+         EMXXICc/HM/d39s3NMjgDnAFAjEVYcDPX4etQLe6gAFb79Q2ZqC1lKy3q68FWDbkxcbv
+         m7dQdzTPQw7uT5R3pK7EAkOlYuY/t5T4N54mvES6FZI1/u914oUGb3DxaS3NBudsU+Mu
+         4D4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794349165; x=1794953965;
+        d=1e100.net; s=20260707; t=1794349166; x=1794953966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=08CwCbf9/THY3i/DgQM7S1iCC/l+BcUDsAYDbJe7e6A=;
-        b=CWK9vJdLS2jBJFLCDzbpqjgFFGo/rn3785kYx+Hxdnwf6vcAtNNIHIivvTdIkoW/5k
-         V8OU2+RfBhVfV9UMEutzMYFVnDfefntbFhp/gN6Ykpgr/+UGrtMHXPI4eGp3EayhscBY
-         6Z0c3M2/QBPLqgndvV6Wy189nSB3dMkH/l38A6MDYdM9kPO0q+1lT2gxSpzkcECuqq5N
-         hZIfyClweNAZgAQwyOxx0spqJ8xXa4gM9Qqse5C5AuY3SDpx5bmiOXfYAn/5I2RON2qj
-         Ua2Z1v1X3Q26BR56RW4MLCTr07FKvRC+N7lHBwaP1OXzdmIMrODr8q6h+Ve7EkqTTvks
-         Z3Wg==
-X-Gm-Message-State: APuU4Z/AvjNh5ROP+ttPdkmtrQ6AwUAGpPgJBZ6pUCA0CBvTxQkWjJDt
-	0rpkkLERUkApxTPxmrNBnq2M9VIAEGUjTLLPKcbd6MSdqlc9PyVoD7LcMEijyQ==
-X-Gm-Gg: AYBFou0DxnxfF/U9W0yvUZ8dz2ZuC0WDZYxjzAm4zs9OYaSTPp5W/e/7iBBVlL2Wxci
-	JdRbnq4eHAaMCedT5Qd2DxcQmaq8bYy2vjxcH7IHNy2bhcxHuDvBU+U8lAvYLIub/L+lVviDR6M
-	GE1DnrdFgoCqTxOXwmQHqTpDb4LtkS0G+iXu/PlkI6p9xZGU1MRK+ODqVv45fex+6hFiiA6YtGj
-	DeJJeDhzCmLAkck/m0tK5AN6StoEYC3d38iqjWJD9W+pHW0TjniW265DLD4NDak+LMJ8WNt/4EO
-	CxSD+nmekelSLG+5Lh0MW130jXAyGoPsqT3Yedd1l6DFeQ24nTDqVdlvjDmM7PEpV0sDjIcUajn
-	xoYLXhOk5RTMRbJfdPeYl/Zo/Gg9vjrtWaAR7BUSTHmRhjLQJPzuUeR0ZZHm64glrKaKWG7ncJy
-	TeI/Kl55lQIG0EpQPAyb+bxjq4fDrbvc1v+mVRZm5hl6F8VjaIKKG08o1WWMQXNjHJgNkkPzZFy
-	L2bGJ0GbrYk2ludVe/hZCuD3yQUaNepmpWhrJv/FC6l03aSd8QaT1gKQpVoi7ri2xoATi9KBF1C
-	qkuzw/OryAmrhFOV9517TEgJLZTE8PAo6F/p1D+tUcJk3LaORBJowBEv4yci/nvflj43hCy486/
-	8uHUU+KmCmgNYvbE6Yhz2XNrb3lj+qWo/DHJ8dP+dX5SBnxkNHcyfBSrEa39zka6S3GSuu4EHu6
-	uxgCs=
-X-Received: by 2002:a05:6122:c94:b0:5ec:e6b8:eb94 with SMTP id 71dfb90a1353d-5ee1c4358damr116500e0c.12.1794349165203;
-        Tue, 10 Nov 2026 14:19:25 -0800 (PST)
+        bh=5V07kZtTPYabGRmB0J7JQ2iH4jJxJYzlNAm5oMkeypE=;
+        b=MOhpBvi9lBRDEX5l3s8PyMVtHwcFejMpopFStgSK1l18hbeG41hhWzirXXhLKn5/9y
+         9HgGSoOuJpHm5vOrK2eApGSRSnw0rXx/cr6yq7cdtIfx5KniK6yDw/H3aNEQ/mfluKw5
+         OukzOkEcc0sPfBXfrBSUBpPbYdAyBKdDYvK7bm0hVjf9vuVHCerOlJlryuuqSY+M/ENB
+         oJuX6C+grRO4ZHL2mxeBKqcHKaTQvUu+U7Oa+sREGbDMzgP04ZIMP+kJZ34l3NrRdHlV
+         ohhcDP7y+z5sceAl2hdB5jzN//8tM85pSTFh/wdg/cu200iej2zBTRormZCIjK6OkELB
+         lViw==
+X-Gm-Message-State: APuU4Z/rf2M47Qb+IxOXFUlMRmmKgqvEBjyoybwv9fWdlXzst7szfm7c
+	7MbDuyfQXWv4788rQlgAgCksBFeG4FT/vIbLjId7caBdb/TdeyFjpCVkgH9CKg==
+X-Gm-Gg: AYBFou2RpK067QfUQKlm4LITwDTKAmiZBxbvDXq5yc9UqfpnrwsS1NL96y6OCOQ08Gw
+	R0icsrJN+9sOJQWesutvbRY/GYhZttuVBgfoQhgwbalKYl6kQUqkaXGKWQJDP7xNNQhi+JslSj0
+	Vcn2UXgMU/GkuPLcuc9EEr9oTAnS2sVDxDIDryFEzGsVtTL1hxskACujf7wyV1AwbXNeCpvrzv0
+	/SD2HHy77pMdd1YGSPhXabLcRFw286Yb0qs8s7uKlEIzyEVsUl9sXbfZU8RTR9yVeWFYfkzVFWI
+	3JloZN/RYXd4dKPK7Mr1gm75z8y1Y1f2tEras/5YDvUE8aWbejP+TQW/Kiz+jPJUrGLl6bpVvZ3
+	pcEmO+HGYMrilsguQYaemt5xcLmJc6TOfcaVhZbATS2SbefeEGZzZXewc9AmslhovXQdsY8nhd2
+	gayKg4rsXaehDU6AcJOGApZX5mCUPAqFevwpkJ7rfjEnazv55AEPPml3uFQM9A4oNetmp6SldFP
+	JX7qJSU0XjhzP7nAdOk+oG3JINPAIZLHUlNaHk0jXPmq4GNA7s9u6gERO4wZ6harcamnAkoa87m
+	97yxWYsjpmJIQFCP9NRvS2+pPgfbfPPsEWQyYKTgGh6QkILPu8e+Er4QjcMZdKdHZQdGIzFBz/9
+	y0PyQfJ+eCRqv3YRE89hAC6nPVSdeYLxBVP2ndcHWxDbpKQ67auTl847m9jjkvHdgLqXlLzxS1k
+	tNBFM=
+X-Received: by 2002:a05:6102:54a1:b0:7d0:6db8:dc43 with SMTP id ada2fe7eead31-7d506157ee1mr115936137.24.1794349166371;
+        Tue, 10 Nov 2026 14:19:26 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c58ed55sm2605244e0c.5.2026.11.10.14.19.24
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c58ed55sm2605244e0c.5.2026.11.10.14.19.25
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 14:19:24 -0800 (PST)
+        Tue, 10 Nov 2026 14:19:25 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 0/5] bap: Release cached ASEs on ClearConfiguration
-Date: Tue, 10 Nov 2026 17:19:03 -0500
-Message-ID: <cover.1794348982.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v1 1/5] shared/bap: Add bt_bap_foreach_stream and bt_bap_stream_get_rpac
+Date: Tue, 10 Nov 2026 17:19:04 -0500
+Message-ID: <f5fd668c6dc3b7a9044f218935da759b862e54f6.1794348982.git.luiz.von.dentz@intel.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <cover.1794349049.git.luiz.von.dentz@intel.com>
-References: <cover.1794349049.git.luiz.von.dentz@intel.com>
+In-Reply-To: <cover.1794348982.git.luiz.von.dentz@intel.com>
+References: <cover.1794348982.git.luiz.von.dentz@intel.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,32 +101,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-An acceptor may keep an ASE in Codec Configured, caching its codec
-configuration, once the initiator removes the transport. The initiator
-then has no way to get rid of it, as it no longer has a transport to
-release.
+Allow iterating over the streams of a session and getting the remote
+PAC of a stream, so streams can be found by their remote endpoint.
 
-Release such cached ASEs on ClearConfiguration of an endpoint, and add
-endpoint.clear to bluetoothctl to exercise it, with a functional test.
+Assisted-by: Claude:claude-opus-5-5
+---
+ src/shared/bap.c | 31 +++++++++++++++++++++++++++++++
+ src/shared/bap.h |  8 ++++++++
+ 2 files changed, 39 insertions(+)
 
-This series is independent of the other two.
-
-Luiz Augusto von Dentz (5):
-  shared/bap: Add bt_bap_foreach_stream and bt_bap_stream_get_rpac
-  bap: Release cached ASEs on ClearConfiguration of an endpoint
-  client/player: Add endpoint.clear command
-  doc/functional-bap: Document clearing a cached configuration
-  test: functional: Cover clearing a cached configuration
-
- client/player.c               | 52 +++++++++++++++++++++++++++++++++++
- doc/bluetoothctl-endpoint.rst | 20 ++++++++++++++
- doc/functional-bap.rst        | 24 ++++++++++++++++
- profiles/audio/bap.c          | 25 +++++++++++++++++
- src/shared/bap.c              | 31 +++++++++++++++++++++
- src/shared/bap.h              |  8 ++++++
- test/functional/test_bap.py   | 23 ++++++++++++++++
- 7 files changed, 183 insertions(+)
-
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8cb7fb40f16c..e45d12144acb 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -4740,6 +4740,14 @@ bool bt_bap_stream_is_client(struct bt_bap_stream *stream)
+ 	return stream->client;
+ }
+ 
++struct bt_bap_pac *bt_bap_stream_get_rpac(struct bt_bap_stream *stream)
++{
++	if (!stream)
++		return NULL;
++
++	return stream->rpac;
++}
++
+ uint8_t bt_bap_stream_get_type(struct bt_bap_stream *stream)
+ {
+ 	if (!stream)
+@@ -7020,6 +7028,29 @@ struct bt_bap *bt_bap_stream_get_session(struct bt_bap_stream *stream)
+ 	return stream->bap;
+ }
+ 
++struct stream_foreach_data {
++	bt_bap_stream_foreach_t func;
++	void *user_data;
++};
++
++static void stream_foreach(void *data, void *user_data)
++{
++	struct stream_foreach_data *d = user_data;
++
++	d->func(data, d->user_data);
++}
++
++void bt_bap_foreach_stream(struct bt_bap *bap, bt_bap_stream_foreach_t func,
++							void *user_data)
++{
++	struct stream_foreach_data d = { func, user_data };
++
++	if (!bap || !func)
++		return;
++
++	queue_foreach(bap->streams, stream_foreach, &d);
++}
++
+ uint8_t bt_bap_stream_get_state(struct bt_bap_stream *stream)
+ {
+ 	if (!stream)
+diff --git a/src/shared/bap.h b/src/shared/bap.h
+index 242bfbb39b30..00b74de0f272 100644
+--- a/src/shared/bap.h
++++ b/src/shared/bap.h
+@@ -124,6 +124,8 @@ uint8_t bt_bap_stream_get_type(struct bt_bap_stream *stream);
+ 
+ bool bt_bap_stream_is_client(struct bt_bap_stream *stream);
+ 
++struct bt_bap_pac *bt_bap_stream_get_rpac(struct bt_bap_stream *stream);
++
+ struct bt_bap_stream *bt_bap_pac_get_stream(struct bt_bap_pac *pac);
+ 
+ /* Session related function */
+@@ -172,6 +174,12 @@ const char *bt_bap_stream_statestr(uint8_t state);
+ void bt_bap_foreach_pac(struct bt_bap *bap, uint8_t type,
+ 			bt_bap_pac_foreach_t func, void *user_data);
+ 
++typedef void (*bt_bap_stream_foreach_t)(struct bt_bap_stream *stream,
++							void *user_data);
++
++void bt_bap_foreach_stream(struct bt_bap *bap, bt_bap_stream_foreach_t func,
++							void *user_data);
++
+ int bt_bap_pac_get_vendor_codec(struct bt_bap_pac *pac, uint8_t *id,
+ 				uint16_t *cid, uint16_t *vid,
+ 				struct iovec **data, struct iovec **metadata);
 -- 
 2.56.0
 
