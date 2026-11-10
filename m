@@ -1,13 +1,13 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794351197;
-	b=NtxsfYGS6ANeyUXMdHXh8dDt/F4uxBLJscrshGNUqnHXOENumuxhpLRKN6l8sJzqkNRL
-	 wgRXD03KG3RSz4AE8ztY6JBhwI9WyAvihF9UVnWE+HhE1xClX0ts45g9q2a0fawLS0RlG
-	 rctInwsbdOu4Dg7DjTbMKQk98ZM1MZFQIPmVyD/nEb2bNuNQawPGk7cgAeDQUnTMnQbEc
-	 5S2jCXQj4Bg94rCMV1nlcHy7+53Y8HHYXUBFYTGiX2UNd0+GVF/jXMJ87FYki325sL3if
-	 EcvqUDKDjlv1LB9QyN7htS9249uEq7ZA7gRXMoGhZsu1Pl9QtRI1aM95nqwh6WRWWQw==
+	t=1794353589;
+	b=pTzAFoBVf/bF+dJmfubrq3KK9jyf/pIfAxWzfc6iUjtwlyyM4ZnFqwKxyBIPtzku6cnv
+	 1CWsXINBt3nZARzrRHLGeNf/3lSH716L9uukIfsF/fQUCdiJMiDuYysIUfPN4i0IMIwjG
+	 ko9E0UHTqMpbbqbmaM2XzuIaE1HWpNSGp96s3aB+KPyZ0yeu+XDYXuHbMUZlnj5EjvZu+
+	 QLpKMAeLRmvr8P6U4QCqo1fxWXHlzDzpARHk1/SqMOBZC3ygXil8gUwcwp7vTp4U9Lgg5
+	 k0PY30qjwZHYTCvT/UJuxoTvdDJnb31V2xC24YLxjxXNoi408W5qRmFysVMQAlvhghg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794351197;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794353589;
 	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
 	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
 	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
@@ -16,41 +16,41 @@ ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
 	 Message-ID:In-Reply-To:References:Content-Type:
 	 Content-Transfer-Encoding:X-Bugzilla-URL:Auto-Submitted:MIME-Version;
-	bh=8KU5SsZJFzaiqiddNwWrBmquzlTf9ZMJFkcHJPAMSZo=;
-	b=j8LCBSfDfaXvFMpSV5V/TmZjCoBM8Lae0NLbdZHKDlEKQgmgp/bZDM9pcogLx8P9czwG
-	 OSt5XyB4/EjjhsuURKi0zx6ke3iSFwpuE2pBOcKmHap7S+APFwZETg0yug20P2kNcrS8U
-	 H74yP7NPq0W4N5MWhs/raLxH4rkyUGHImM4u7aiU8vB/koIeZvlDdWKgqBI977zzGpfUF
-	 PWZEVaXsBGh67s8ljUO3XbzR2gaRxBQVh2J4OijqGObk5uGufrqyGaEWNmiOFANJ/8B0Z
-	 2Jt6eqQ42LNA+2dam3tkEAaORp4FxETBbS8+ptRy5f7FduWetI27ybxkQQKe+eS9K2Q==
+	bh=A7vcxkVLoIHMa1dXe3HbX0AAwg4gDa1Fm8IU9Pt6u6w=;
+	b=C8fUkzhJSmkRIGwZFsTpxLayI/mFSk/hUQrkyuuBjf7n2qAMCmdmchqfEy4ACWMG7EuV
+	 cDZ5q2EyBhgpcEKbBdmNMAkg9z6yH5hFRLFrhgxSzvIWuei6e4ryTofQUwiS93739GN5F
+	 eisVbQcdpq8fwsOZD9cCzK089t4rVq09gJAyutL5S85WXN6GNqVzmfAcDx05UsM27qetn
+	 aTxIUeSthuF4ChPTdIG3T8QLlAOpjCipTW0qsZevS++1niowJrYFNzERSBod0NLh0jzWt
+	 xuoe+RbzO8DgEZ7LziFncPPsQ++x74bw5nqBr/6ul0jyZV4I+6cwM9bPFCj6UUY5VKQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SYC3m0dW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BEdDrvzR;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED80606A31C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8189B606A31C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 23:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SYC3m0dW
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F03F31F0093D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:53:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BEdDrvzR
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5DD0B1F0093D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 23:33:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794351197;
-	bh=8KU5SsZJFzaiqiddNwWrBmquzlTf9ZMJFkcHJPAMSZo=;
+	s=k20260515; t=1794353589;
+	bh=A7vcxkVLoIHMa1dXe3HbX0AAwg4gDa1Fm8IU9Pt6u6w=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=SYC3m0dWPZgCIMUErtBxfi4kBdwHwbJqSUDUeOqRR04OnSprq9eypHOQ+cMGQ/pHV
-	 ULZz+azYfRG1SYzwfIw2Xnxb8SvAEdPKvytpJdUrC2vxCY4BUOfytunb3GDgu7yS5o
-	 8iREPQH7cW0fSPENJ6auuhOedOdBBpRVhWOFkNgAoR7uYxSIVJTxVVNZmjBFazJtxr
-	 PxfPOMVB6cxc5a4oj1wq1Q/zmeZzPCZyYZBnzIn/NODK3SIplJO2kwHZxaP7cjfthb
-	 os98mx7L7+PfJGa8uWOxlkz/Me8fc4qSHSO3pJR/AM8AQvdObfxoCDTJCLoFFOHrRq
-	 JrbJ5x/kwVKow==
+	b=BEdDrvzRiw8gW3acKKV1BmmNu+dEB93pNTAoWLZ9Me8asPQyxt8OLzFCQnRFoiDC2
+	 h/naJWV7/j11CFClv9f/ovA3YIApWdYfci+RmGbJQWbSm8TByVe89kvSHX7UFT2j5w
+	 AQwiASTgWcBHR7YAkCNi0yJiNHzufShMxrX6M4Q9wbwOORwhMiIgcAHMzMYFz34AuH
+	 tPKkZinmt1jI7EBuJBMlqxY6RF8kzdALBaPljqzbWWnmG00wFd2xN0ALyOaWXjKBF1
+	 pKCPYRfXsAaJVsaqGO2meg5qi0BHY6p/0obuc+psmNOtsg9tYVmxPVTC1ZyHQf3bJa
+	 aQrX93aLOKRhg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id EB5E5C41613; Tue, 10 Nov 2026 22:53:16 +0000 (UTC)
+	id 50730C41612; Tue, 10 Nov 2026 23:33:09 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 222250] v7.4-rc2: Bluetooth: hci0: Opcode 0x041a failed: -22
-Date: Tue, 10 Nov 2026 22:53:16 +0000
+Date: Tue, 10 Nov 2026 23:33:09 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -60,13 +60,13 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
 X-Bugzilla-Who: fgbreel@posteo.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: DUPLICATE
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_bisect_commit
-Message-ID: <bug-222250-62941-xiaGJU0qke@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-222250-62941-FqAvjjGiMF@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-222250-62941@https.bugzilla.kernel.org/>
 References: <bug-222250-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -89,8 +89,20 @@ Gabriel Francisco (fgbreel@posteo.com) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
- Bisected commit-id|                            |4dd10fbbeb9c33709edc89916e1
-                   |                            |9c03c780a0751
+             Status|NEEDINFO                    |RESOLVED
+         Resolution|---                         |DUPLICATE
+
+--- Comment #3 from Gabriel Francisco (fgbreel@posteo.com) ---
+The patch mentioned in https://bugzilla.kernel.org/show_bug.cgi?id=3D222249=
+#c1
+does solve this bug.
+
+Marking this one as duplicate.
+
+Thanks,
+Gabriel
+
+*** This bug has been marked as a duplicate of bug 222249 ***
 
 --=20
 You may reply to this email to add a comment.
