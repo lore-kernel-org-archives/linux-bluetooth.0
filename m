@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794349177;
-	b=ix7KlvJ5Igu+WdBhki81+jqRKO+xFOlQWrF9mt+Fk2HiXAdZgzK3xb3slwcsdmhb2Wlr
-	 IOlMoAy8J9KIgTEs6UX+9Ekj5qUCvIVG2zethdzhy5X/w63UcuXnMsbx21DzxEjyxnt4p
-	 0z7HtPGaTBOqf6kRCsqAS+0dQkulwTFTtu7uUGmMw0rMijpEtMz++Uh1aozxK8sgw/Wjl
-	 y4hzfH1pO/+1vdV7IYtJfvqdXWucqkAiu5BPREbEOen0R824Kc99mkRmdXFpNBWmkzCut
-	 DaOXMXxvzUVs9alzDarZn46zAI9VQ3NUsW7YsJHDQaw72E3dQ+sT/UK539IxgHm1EJg==
+	t=1794349178;
+	b=q6askzC9lAILjm6qg+NBrHDpwL48fVH0pF6H6af6auN5SBu0jjHfWRumd54zhHol6U8m
+	 QXF7m8fMT1OW8/RDNyWbQ/yQhtHOgzXzHve04FutNS1G2PAroLlcwKaIOPLhsP0T3sC6o
+	 b1wjqtWXyEkgzpTm6X4wJ3K8oN06KtJ8h3MLS/Bqv1rGWX5d5/o5KePkMYHALTnXZjIL3
+	 eOaCGqkFQO7nYPzJ6VAUfU5kVBcUWU1orAsLYqCdf9wscyaBK7B05qPalfaYpF8yJp1h5
+	 XsNLM8Wjm5GIV3MVBJYh/QAZxTq9cq4ZphhQv5E3C3CTBoFgT5K1U9XxqPwmEjZktyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794349177;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794349178;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=nCvzT7O/3sgUBYkfrLguYiL2PInBAxUjdDi7PU7hQSQ=;
-	b=0t4Ttu/lsG6CBYJf4MpG/PhWZ85lzpLNVTxHtZxexrGvNF7qy0CwXa8A3nsQbvV6AKzG
-	 tjzp2Jjk7PwFMww8x3SH0Bv5Ujo79CzYIith9ZU4wm1HD+waHEpuy0/advnY5a/BqYL3z
-	 DcVjYygCpuuEnZbsUpyfZ3nCwJjX1cft+G24DexAnML/rS39Cngl1K1ndzwoPL7yNx7dn
-	 VEOEjJ0gAl8ZYo1Y6F6ERkqf6hPC6tzHZSmDrao567F50+znSvmVYBqERzku9xwr9GwJP
-	 SlFupMQDmkY15JwqzqRFVQfIoKtktM3yfoWCPRVladvEA0d2x9lqtL98GQ/76+x0bjg==
+	bh=y7tpnFce4GX5SpYT8cVXdDC5JhckczvpoB16GQlqxEs=;
+	b=aH4zUN5e7dSriWejrM9SW7Xx1E63OCa7O4DAdTPRk5QiUAWsi0ydYxj42K96mwTCyt3c
+	 sFieofKH941W1AI5LAUt9FXcCh5VklGxOx7ZdTjBuGULIUn/UpeLFngIKJXKec/u/zgxQ
+	 7+OOaNtveQlhaGIlmuuQD2LcNx+IHwdNqs3RoQ7P18dEn120siM5RlSITiwxb/SzlFPnZ
+	 w+0jIrkRO6R5lEBNyGBMFa8gwK3+ujh1zGtg+p+Vf4+P0cJUiDVfcTZjGZBrd3CnoYp/8
+	 JIkeuTcr2/zbRHTBK58pGwUrlDPEIG4plxgaip9VMhZTs66ADdc2wWKHieWqmx23cTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=llDeST+p;
-	arc=none smtp.remote-ip=209.85.221.179
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FgxdRAwy;
+	arc=none smtp.remote-ip=209.85.221.180
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF11606A31C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:19:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CF11606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4423C606A320
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 22:19:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4423C606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=llDeST+p
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5ec3561b07dso1797222e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:19:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FgxdRAwy
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5eaefe5b523so1681518e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 14:19:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794349176; x=1794953976; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794349177; x=1794953977; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=nCvzT7O/3sgUBYkfrLguYiL2PInBAxUjdDi7PU7hQSQ=;
-        b=llDeST+ppxfMZARsnsl21zu4qY+mAGHY2hnTeF6y3Nmqp5wyYUmSNnJowq9jugwjw3
-         XYc6szRWC8Wv6MmMwis0REtBftbcaOLoc8TuWuZlmMXLB6AW9XcLObGqhxK8MYpyAczP
-         ql+SmBN+CrX2GC4Ti6T/x/Xm3Ghqsk9/tVoaIN3D9m4AQQM2IV+kgfni5MBH07x+DXGt
-         VMM2r0dSJmbh76CwS2QKZwmDujNNKZE7oAIW0oKlozCDhOBVqD1LLRy/AgNQY4j+8YG6
-         oRP0HbD2nfbsAbohBAv1NxQEl5TPXgpK4twXM/WaLrIFZkvPSlO1noX0iBCwOY9+vBR1
-         usGw==
+        bh=y7tpnFce4GX5SpYT8cVXdDC5JhckczvpoB16GQlqxEs=;
+        b=FgxdRAwy5psRSn6EuWbODuuLTAhTsUnu3YEZpMjlVs8njVZ3infPh+n8DmyS7Zz6Js
+         T6+3n+VqJN6WfpP25UuxKmqTEyfZAev8iJN7/ndkGU8xf8SBeEn+liEG2f7BPY2sAxmL
+         09W0FtBUlhWrUcSE+4JlC1VTvuG72WpO4b+G3NA3Nu5AenBa9BdtFJVEKObYIhZ0zvrU
+         aGV4FNB6//wYgC2zVFB71EHos6a+4ozOuw9AN2l+3z/oBY8G9Y/zl+0/k8YX14qd0ZF6
+         TzxhIccvx+3AT2F+3RE12hgAkNdsTS9L1VcV7+D6RH2l+hoZIEASVNbXZpt34HD+5OLj
+         7aQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794349176; x=1794953976;
+        d=1e100.net; s=20260707; t=1794349177; x=1794953977;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=nCvzT7O/3sgUBYkfrLguYiL2PInBAxUjdDi7PU7hQSQ=;
-        b=nkKlyCUJjci8l7Etoo3656koGP8aVwzmYk1QY1DwqM4vgDln7CoOakYyhPjTchAFxg
-         kFD3N6d7q5mS/0tJxvtlyXN8LrXvIZiL99OmYrp92cXa9+eIxUnk11+ge4dnRAW5y6/7
-         9oDWhLmWFL6RnLQWRc2ooGWtFbfOJkqnZZY4RPpAWwo5AO99gEpysHxrYD/hIAG5qnO+
-         gbifdT+/gYAs8A9i/gDiI+07PC3G8iQprTDMRPdsgmCCtxOSWV4FcX3cpZ6N8b/LxOjN
-         LH6nqf+MlxgYfH2Bece8glA6cvMUvAPtaGgAl4E+fCgXODvTKQVR7K4pnJlepWadhAYC
-         KVLQ==
-X-Gm-Message-State: APuU4Z8y/CiJCahENwFg53DMbC/5XbvKcMxnH8i7eD8EP16/tbGI5ue2
-	bVXixxY3EuNBChsXNIz+kRQwJN6sjRfhc8hX5KPj4elkoipG5cSQlsl3rR7TZg==
-X-Gm-Gg: AYBFou0o6w0EB8/8vbWgKGiOkgXFevZaC56hRfARoDpw/B7TyPrfHcse5oMBd3nA9CM
-	wZcmpZKuBnzwvpaMY9Pt8yc4fNgboF2Dd3qrXH49CERsMdL7fDERKbRm954/rvasquqMNoXWurz
-	AFKRAft7HFVfqxyDMwOCB099YGxgTefS8xwjpA0/YbkEukgNq3hMqPdHMaWeKdhstePUHtIHYY9
-	32n2YzvAq4HOEVwG48DmH7MigWUCtW7yWdw4lbE235YtRKBAk9wIw8j34ZN1NHsh1WEBy0avIqO
-	JdUEYT402F0Es67EmFGLdlAxnqfBGcxKSf08P/kZr679BgZ/Kf0NplygDO4g2rJEAWyUApOHrrn
-	W91Vm32ehCP2prk4sfDGA8WZTizkPf6Fo7SxAWpifhFisGT/iEKxvLe+nxJqsJqFV+fOpsDqTGS
-	WLi4UnKg1Zkr+5eVVKaPIis7EnfmZiNK+G5eVcwT8hTNCvNcVIx38vVEBqVVnavkedj83aJPiuT
-	SPuxx30ZdL8QnVFhcvW1izzsRYAijtSXuX86v+MmGZRRJ9HFQU+POsuHAzYUyRjUGaPZVsU+oHI
-	DWbDQPX8c8Yvh7b2Q8ctI3bOD7DccuWcmX8IWpG7IsQt99RQwJTt/DGQoAdGyyeRSHYXaL4MKM5
-	0+CcSJ/J/cKg58YCC9BgySSaqgkRzQijYujtkj2aPYUNzAovVGcnnUoENMvvVYrZlBr0USkstGe
-	xxyNk=
-X-Received: by 2002:ac5:c919:0:b0:5ed:e8fc:b13c with SMTP id 71dfb90a1353d-5ee1af56c87mr192403e0c.8.1794349176094;
-        Tue, 10 Nov 2026 14:19:36 -0800 (PST)
+        bh=y7tpnFce4GX5SpYT8cVXdDC5JhckczvpoB16GQlqxEs=;
+        b=PsSVO6EPW9cLniJ2aB2C5ApGm11KCQqL9CrUXWwDDUNAL6Bxe33NYFBoPP8AZwm3mc
+         HusRAaAe7Q9hEhfgmLYV5FdkVcPMFYq725B8CoBFP7PdV05yLISiR5zckb86qmLItHEn
+         iQ5937X0+5/hYxI4J7TFIbKmb5UwGTi8LWWDpnFsjmXw2LDCf4MihE7EktrO/H340E+Q
+         707W2qchS+wg/yWpqdOIoEwT1LXVxvILVlu2zV53tHiuF81uP1FFIt9moLMO+lrwRR9+
+         9ntq/r+uLCm7lqWHbw2rTA3zXyROCweuSdUQ1wDTsGfXNe0Hr59cn7Egp2FFRndrGlgV
+         D0aA==
+X-Gm-Message-State: APuU4Z8UluVZ0ft+efLw+C//07V4rr03bOiSw5SCitKs+77DLLTBwR+O
+	ZFSCJBw4jWF+Lt5y+FTgPZDSg8nyfEM4WU7WLXRjanjE2We+Fg2OUzx9oDg87g==
+X-Gm-Gg: AYBFou2eyp0AI9GQX48J0HJScItPF1ZD1YxaxV2rOVxi2hTQ4fbza5DNXOnw1v1E5F7
+	/jTEwxgqZ7TThX5tXlFPrZFHXho/ziBHXjJyjA5DmaT64lFrmJp5zi0dfzgf05XvHDhiWQDGdZg
+	fLQpaodmwdi1ka+kbsyCWN5XBAnWtR4tjYnRHVsTZr1bm3GSt9OzM0A+ljvaMsjTqPYZ//AP6B2
+	8Leyp+TNOUaBesBrJgpA/oaY2hwAYtDSrjrZXVO1xDDx5qORbd4MUa+Ky/i3iohcvv3MPza+2hJ
+	UkvcUyWMl5VpCnDugUjU26H1q1hWY7XhY8u8kClz47d7lgYSzZpFp7wSugUfnl0pydJS7eWtAsV
+	ZRVk0yEHw2fESAgSnhkcknss5QBhDM6UPNZxNa6EqfmXP86mxrukkI7oP7V0TYutyncdXiCO/7u
+	wjfGrF6lWDTHmkc2wy/M/fSjOZh5Cjd7FeDT79waOzPOsiqjRz1TrceUdpfd+glTu8BZSFkz3o0
+	1bIn3hmvqTSERaMH1nlNPntWXSqNgLeI9fgQ87nNA9dEzkwgE4mAYBPIlIzkSV3oM6R1wHaK6bR
+	M5Z2/409lQ/bltw8v/cqFn/dfzYxRJaGyw2PkU3xXqAwEnFTzGbrdgUhDpn/4fPTK+gOwnhzIKE
+	j23xG0SNIjcEaFnaOJq1Ga3lEjaHtmKdw0dMaBJqo2tFEvSJ0ugn99p5Qd+F4VYI+6GAMiAjxYE
+	1e7ZU=
+X-Received: by 2002:a05:6123:110:b0:5ee:19bb:f8ad with SMTP id 71dfb90a1353d-5ee1c427773mr133449e0c.17.1794349177137;
+        Tue, 10 Nov 2026 14:19:37 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c58ed55sm2605244e0c.5.2026.11.10.14.19.34
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c58ed55sm2605244e0c.5.2026.11.10.14.19.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 14:19:35 -0800 (PST)
+        Tue, 10 Nov 2026 14:19:36 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 4/8] transport: Don't hand the owner over while releasing
-Date: Tue, 10 Nov 2026 17:19:13 -0500
-Message-ID: <08b31b48642208e419dc10f83f6fad0712ad0579.1794349049.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v1 5/8] doc/functional-bap: Document disabling one ASE of a shared owner
+Date: Tue, 10 Nov 2026 17:19:14 -0500
+Message-ID: <1e077d5b0c04600ac6ec91ff45a3b3b97f0c7187.1794349049.git.luiz.von.dentz@intel.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <cover.1794349049.git.luiz.von.dentz@intel.com>
 References: <cover.1794349049.git.luiz.von.dentz@intel.com>
@@ -101,47 +101,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-As a server, handing the owner over to a link still streaming also
-happened when the audio server released the transport. Release sets the
-transport to suspending before disabling its ASE, and disabling a Sink
-ASE reaches the handover synchronously, before the request of Release
-is installed. The handover cleared the owner of the transport, so the
-removal of the owner by Release did nothing, and the link, which kept
-the owner, was left owned and never moved to idle:
-
-  transport_set_state() fd0: ACTIVE -> SUSPENDING
-  bap_handover_owner() fd1 Owner :1.2 handed over to fd0
-  transport_set_state() fd1: SUSPENDING -> IDLE
-
-Don't hand the owner over when the transport is being released, as
-Release removes the owner itself, nor when the owner has a request
-pending, as it would stay with the link although it was made through
-the transport, which is the one that completes it.
+Describe the test where the audio server of the acceptor acquires one
+transport of a bidirectional CIS, its link sharing the owner, and the
+initiator then disables only the Source ASE.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/transport.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ doc/functional-bap.rst | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index d3aac8ca66bd..f8aba2bc58ff 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -2457,8 +2457,12 @@ static bool bap_handover_owner(struct media_transport *transport)
- 	struct bt_bap_stream *stream;
- 	struct media_transport *link;
+diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
+index 8f3f8e62cd4a..453458feff4d 100644
+--- a/doc/functional-bap.rst
++++ b/doc/functional-bap.rst
+@@ -306,6 +306,39 @@ test_bap_unicast_duplex_switch
+ 	seen by the controller of the acceptor, recorded with `btmon`,
+ 	rather than by the states of the transports.
  
--	if (!owner || !owner->watch || !bap->linked || bap->desync ||
--				bt_bap_stream_is_client(bap->stream))
-+	/* A pending request is answered through its transport, and a transport
-+	 * being released has its owner removed by Release itself.
-+	 */
-+	if (!owner || owner->pending || !owner->watch || !bap->linked ||
-+			bap->desync || bt_bap_stream_is_client(bap->stream) ||
-+			transport->state == TRANSPORT_STATE_SUSPENDING)
- 		return false;
++test_bap_unicast_duplex_disable_one
++-----------------------------------
++
++:Setup: As above, with both transports created and linked.
++
++:Steps:
++	1. Initiator: ``transport.acquire <source transport>``, without
++	   desynchronizing, so both ASEs are enabled together.
++	2. Initiator: ``transport.desync <source transport> on``, then
++	   ``transport.release <source transport>``.
++	3. Acceptor: ``transport.show <sink transport>``.
++
++:Expected:
++	1. ``Acquire successful: fd <fd> MTU <read>:<write>`` on both hosts,
++	   and both transports of the acceptor move to ``State: active``:
++	   `bluetoothctl` acquires one of them as an audio server would,
++	   and its link shares the owner.
++	2. ``Release successful``, and the transport of the Source ASE moves
++	   to ``State: idle`` on both hosts.
++	3. The transport of the Sink ASE is still ``State: active``.
++
++:Notes: Reproduces a remote initiator, e.g. a phone ending a call,
++	disabling the Source ASE of a headset while the Sink ASE keeps
++	receiving media. The transport of the Source ASE leaving streaming
++	used to take the owner, and so the state, of its link with it: the
++	audio server stopped the stream of the Sink ASE, which kept
++	receiving data, and acquired it again on its next update.
++
++	The initiator has to acquire the transport without having set
++	``Desynchronized``, as that is what makes the acceptor share the
++	owner between the two transports, and set it only to disable the
++	ASEs one at a time.
++
+ BROADCAST
+ =========
  
- 	stream = queue_find(bt_bap_stream_io_get_links(bap->stream),
 -- 
 2.56.0
 
