@@ -1,68 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.204.34.129
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794280112;
-	b=YnXhL2tDwiE/A6PtyLtseY8q1CV4hFDvSbyPSeRpvzPd1sH/35bCeSdfbG8o30yzzR2R
-	 SSIa9MqCbILHuWiZs6fpPjO0ynK8L9Lc+Kzxm0Gy76la8X6YLIvtxI7/6YNve9t9vgwvo
-	 nVjqrkWhqhavrpHZWPiPae5j1je/wfE0/qfaF9Nb43KCAWh2R5reZAHZDXvpI5SJnVBpV
-	 bLC/z5uuGIEFLRu8fU2FzlNwKXKFiMLocjMjxg7+4Ql7H6kiTnL5Mmf199209lsoqxGIE
-	 Y8kUeLmVwL6Mu2aJeM/JMjnpkA3p8AiRS8ArX1cNn80f2Q0XKhTeq2H3tBV+9eWVzBg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794280112;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
-	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=YYQn8S88z+ExXDKace3bLF4UdwK6mqRHP5p/PKHKID0=;
-	b=Glghx6vsIpfVEjEYakLv//j1T6SZevM3nKtaxnqLcazFp2/BWpmwq36ZAA+v1EshHWHY
-	 QK4En3WZ8KSBxOkDcFXRPO9PwsWIfl/ewJ39R4NOfYfFASa63zkHdv+kZ6x0YYWEza/9+
-	 fdY5UUWNs72VfdI0Yay3LvBXAN7W7Wl2x3FitMiJN7blOI1jna1MSDG1U+yBL2They7wS
-	 EaktK1oSueklYE9RavmBl0xresl+U/F38lMBij8lrbWyuC8ELxjd7uHjVVHWPYiBpAOqp
-	 2D2xjFsfahpKQ9Co6taKCdQn0oqMChXZG4yHrrPv/J0BBmDOZ1Ah8egUFgCwxoorUSg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=uniontech.com;
-	spf=pass smtp.mailfrom=uniontech.com;
-	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=f6l8Ug57;
-	arc=none smtp.remote-ip=54.204.34.129
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794281164;
+	b=UJFaFhxajuMfJBMVMaLV5nBroifqi+CBzIfXEBqEoYKYTFi+lGJRtsDIlYdoQg6/mZMR
+	 YvS+qf9pFWRku50w4kx7J+DESYc7h2OhkZheFX7iycYt4OkxNXgSPYJycbkzXMUOSkpTq
+	 43iZDuIwGU67Nslt4Kpg/XQtyoPCocGYGmTN5i+lmCG5NfllmhVCPcmsujVgH0Qu5jd/i
+	 2nNLD/FOJk57HioJtOZFftwesqrfs5GVb1PpMWysNuKHnPZe1vNy494xicyq8dWKsCZ0G
+	 bhxtv31f0WMpfGxJ9sK8OKG+m/jYnWxd1VsM0lOy+9ktRanTZa9lUp+UyvSuePBN9BQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794281164;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=4HI+KyCMEDjW9zsyCeezglOrOMW4ap3W/K4vONE6ztA=;
+	b=MGWNoKTpDkMMgAecw02v4KOkexpAOr6bTWQRVylJ0A5yrqXXqygPxaIyKRRcZ9dYb7IC
+	 KMc6OVuXBW63ycS8g8ZO+aj8LS1afpZ5WvzVW787dWla3nc5aYt9p3ltxmFLBPK/Ud0Fm
+	 IQkhcnWY6pb7uYsR+N0irOzxGf84AsSRiJ2oss9otlOWgpUEfq1LN0n9zAGCyw2Y31m3o
+	 BWvG4YbsNvp9cOyemF7iN8gQHDsyXbX+r9D4CDikaXVAmWeuKI4V9YzixbO5kCP/aVtts
+	 ZzueXDVMyb6oOKsQzGQZTG/b1DMsqcIVeTYmWoQmCU/v8LcVl04X5d1h3sm+mroQSGQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EcT+Yz4T;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893FD606A31C;
-	Tue, 10 Nov 2026 03:08:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 893FD606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62ABD606A330;
+	Tue, 10 Nov 2026 03:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=f6l8Ug57
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1794280086;
-	bh=YYQn8S88z+ExXDKace3bLF4UdwK6mqRHP5p/PKHKID0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=f6l8Ug57LFStNNLXkc6miIHKMiDF86r21Fzz6rU6WI9e257m1tdKMD8M+1Z06M09c
-	 WGbiE7QoI5EtumpCuj7cvVBmEV0Nd+R+vfZ7J2TKh28GmAQU93hPgqQU8FcjpNzMwG
-	 jCn448fqdh/3Wkdx+i1xx3W3qFPCbFme5d/Fejmc=
-X-QQ-mid: zesmtpsz2t1794280080t47be1536
-X-QQ-Originating-IP: X5KzAynenyWeiju9eohUWvuC29q2V9Z+8Bbn5yn/y7o=
-Received: from PEN202512010004 ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 10 Nov 2026 11:07:58 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 9820339102061776409
-EX-QQ-RecipientCnt: 8
-From: raoxu <raoxu@uniontech.com>
-To: marcel@holtmann.org
-Cc: luiz.dentz@gmail.com,
-	johan.hedberg@intel.com,
-	alainm@chromium.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	raoxu@uniontech.com,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: MGMT: Fix runtime config status opcode
-Date: Tue, 10 Nov 2026 11:07:56 +0800
-Message-ID: <3B679DA76E38DD0F+20261110030756.214083-1-raoxu@uniontech.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EcT+Yz4T
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1794281164;
+	b=vonfAwBXSXDIRgPdbBIC/monLynYsIsMs77/44x7N93eBstujZlBwlpWgnZmSp2d2PkX
+	 ONlLazOtxjiTmQ8kbJCbGJxidGV88dNEKhDAI8kehT8ltddsimlJjiNA6Zj9FWFQd8HrM
+	 Y8puVD1PCh/sCib4RFWtAlwbVQ5WpR9P7BEmaqZhtUu0u41LmWYjjACOmnoOh2xFDBFtn
+	 Fk574ZUjzUoSeywvaVMfxF9u0Y4sKx5VRnReRlxjaXnlewaRRaAsjg0mrAnc0Z/9xtQG4
+	 w3NtjSfML5SuiIwCxW1LlL82YZQMUbi1uLy4/1ID6jR5zN5qCcfQogequAFur41nWew==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1794281164;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:To:Cc:X-Mailer:X-Developer-Signature:
+	 X-Developer-Key:X-Endpoint-Received:X-Original-From:Reply-To:
+	 Content-Transfer-Encoding;
+	bh=4HI+KyCMEDjW9zsyCeezglOrOMW4ap3W/K4vONE6ztA=;
+	b=vCRAbr36WfqRN6Mh77RkrMv1FVbHYK3nDDxyTrSoaj1Sj9qVB5KTbJv7xaOydakR9InW
+	 SJoYOc0FDfg/RM1dTzC1wHc3wmIjbPa2G0E9vFbV94ToAzUat0TcXDx25XBiUhaOgnq6A
+	 MJjS1uNc8hvMfd+7HoWu+FyC6xAFgO42IyU2xgxc4Ir2LVgnNwNUBfbJBEn78Nk991Mj4
+	 2xO72ywpNUAlKrX3zXjNPJOR90w/PkRnlrwWyCbSA+xVuaHoXXnOO5ARi8ykSqeDF09sg
+	 ZX7vs42g9shpaZUIKzE+QmAkEKg/i+486dlCeZlEL/0ry4o/3hV33nZ9t3TuVOb0q8Q==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 809141F0089F;
+	Tue, 10 Nov 2026 03:26:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794281164;
+	bh=4HI+KyCMEDjW9zsyCeezglOrOMW4ap3W/K4vONE6ztA=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=EcT+Yz4TuO9gk77/dP1DTYZWrsqLa6q3eyCZpGxAD1rxCaM0tGtIyW2pL0R/UxqFu
+	 HRDg1O5wKM+q6bl81/MhRXs6rqtAMJKxrH0LLyT2KAdH5alpOTqNw7lAd3/nKNIjQ8
+	 Ncy7tjs3t22RQiGKdGL5tKeOi1mr+x7oOlGWwfGyXHIexA67k/Lz0xdT22ExVUZ7Ez
+	 dyk3jOTasQj9CEQ5RdJAH3AaSMEDsqowdnxkZuszQzZYdKwtPI9Rh78uxnRiJMer1k
+	 sxkn4bmvKi18ucfoGS2omZeUbmGadk9HRyNu7rixCUNU+Zs/K3mNk7r3yqqi9Kyztk
+	 OT+/3gNHVVBJg==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id D6AD6487AB;
+	Tue, 10 Nov 2026 03:26:02 +0000 (UTC)
+From: Joas Antonio dos Santos via B4 Relay <devnull+joasantonio108.gmail.com@kernel.org>
+Date: Tue, 10 Nov 2026 03:26:03 +0000
+Subject: [PATCH bluetooth-next v2] Bluetooth: L2CAP: validate MPS and MTU
+ in ECRED connection response
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -72,61 +83,102 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: OROlIQ8AXA3lB/Maq0nByFyUxNwFDDSjiZPIQcjhlfFx2AQSV31tGY8e
-	VLS1de761Xr5UfX+AaBTLToXpFJipbtaMpCiarYTPyCER2pjs5YQWYm+zD4+TMLhklFFLvT
-	g5DndqAJdgZmbnuD/in0oZr2msHSHYPRA7VY0KW+HP/hARa19rlS2LPDSfx0mq9Nj5ZBb/o
-	hvjVKMvyXlyr9vNfSXgNVaJINZdxIzjEqfONJKLpYphlBcuhOQfPh0zZu4m9c1amDBNz6ry
-	mX9sJ1q4HjLOG81xiQFzBYFjAg4uVh3aBacgSeFqgodCYfV0a7WW3rC+wHCIUrKq90Qq1Zi
-	iyVHBxtb+v4k6qNCsBkDYg2Xl7GZJziN4/P0JoHzyoeicf9bfC8Q7uT7yLWyY+dZRG811mn
-	xG8f7/QalSxC3YTlCornOjREkoxfRqJNtSSCk5bmApgRePqJD18lmSB7PQ2suAxQGhGlDu8
-	8S9B9xY5xHCkADP6gLTdxlYJKQDyJwVeOeLhz1XdrEZ7VP9U8HVk85GR9vXMQnIHm6GA46j
-	ZKmBiDVUJSs/PYky1CHRjbtadvm0Z/2Ti9KliVDnqJLc+YQVESX7QbQqUOIz9bAwhZgguGj
-	4CHytT+5nrqYa4NSC8D8TG4fLBmqNIUBSPQQdGW+9iqAJdIuFs9ZkXEqPbcQYwRX8PEnCzc
-	DXR5fXvzPnrzD0izAUvmZ35a6/dNjIvwikrPU7uTL03IxcJXY0ba+Avt8++VdJHjgDSc55m
-	B5OpHj4RT0mZiLNXGm3vtb4EjsTQBDj0y57CMWR8L+EPe3/Q/TAc8ml8ZyK0paWcg6GvPwy
-	z4HUKmVswROevZ3292ZCQMynU6I/KfbrqDFMcKmjty9GhV9F1vJE/C16zD6CWo8eZ65/iE1
-	2Z0UQoxWs0FgkwOR/kUXg9lWgsD4rYUH+GlagKy6swnYOjxjj6+up8i1RW4H9umMSiWyMtK
-	AjZn/D0sq+Tc9umUwuRFtoQ9vB0iyL/w1DC3RgtaS5qritoPQHscw8CdNZ7TMubERT91DcO
-	0GOmjwafJScBK7/iR9BucfRVtVkq0=
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261110-bt-ecred-mps-fix-v2-1-48c5ee28fd8a@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAMqO8moC/3WNTQ6CMBCFr0Jm7RimCoIr72FYQJnCJEBJWwmG9
+ O427F2+v+8d4NkJe3hmBzjexItdklCXDPTYLgOj9EmDylVJlFfYBWTtuMd59Whkx7YwVPU6L2+
+ qhjRbHSf7RL6hmz4crA0jLrwHaFI+ig/Wfc/Hjc7Wf/hGSMiPO9WdMSVz8RrmVqartjM0McYft
+ ExJTMAAAAA=
+To: joasantonio108@gmail.com, luiz.dentz@gmail.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794281162; l=2807;
+ i=joasantonio108@gmail.com; s=20261031; h=from:subject:message-id;
+ bh=41c1pMO3EYoT9jgOM2ha+yJ4QeOIoB1nBmapQHpxbjA=;
+ b=xcFp+YVZoXkpoInhPt0D+YQxpcGwAPodG0vle5zTsQrrORzV6s5BVdGGGhmGYgWTTTk/n7iKM
+ K+yAGwUSaLbBPEG1F6Bin5TDOEr/ynsOMcViu1mRKVLWjl9SaXZxJVF
+X-Developer-Key: i=joasantonio108@gmail.com; a=ed25519;
+ pk=ZxAznJT/FcPPdzLrDDFJQm4LLjjHVGBBqDSG3TXS23w=
+X-Endpoint-Received: by B4 Relay for joasantonio108@gmail.com/20261031 with
+ auth_id=1371
+X-Original-From: Joas Antonio dos Santos <joasantonio108@gmail.com>
+Reply-To: joasantonio108@gmail.com
+Content-Transfer-Encoding: 7bit
 
-From: Xu Rao <raoxu@uniontech.com>
+From: Joas Antonio dos Santos <joasantonio108@gmail.com>
 
-The Set Default Runtime Configuration command uses opcode 0x004e,
-but set_def_runtime_config() reports its invalid-parameter status with
-the Set Default System Configuration opcode, 0x004c.
+l2cap_ecred_conn_rsp() stores the MTU and MPS from the peer without
+checking them against the minimums required for enhanced credit based
+channels.  The other LE and ECRED handlers (l2cap_le_connect_req(),
+l2cap_le_connect_rsp(), l2cap_ecred_conn_req(), l2cap_ecred_reconf_req())
+all reject values below the minimum.
 
-A management client that matches Command Status events to its pending
-request by opcode therefore cannot associate the response with the
-request it sent. Runtime configuration parameters are not implemented,
-so the command still returns MGMT_STATUS_INVALID_PARAMS.
+With an MPS below L2CAP_SDULEN_SIZE, the pdu_len computation in
+l2cap_segment_le_sdu() wraps:
 
-Use MGMT_OP_SET_DEF_RUNTIME_CONFIG for the status event so the response
-identifies the command that was actually handled.
+	pdu_len = chan->remote_mps - L2CAP_SDULEN_SIZE;
 
-Fixes: aececa645dc7 ("Bluetooth: mgmt: Add commands for runtime configuration")
-Signed-off-by: Xu Rao <raoxu@uniontech.com>
-Cc: stable@vger.kernel.org
+pdu_len is then clamped to the SDU length, which l2cap_chan_send() has
+already limited to chan->omtu, so nothing is over-allocated and there is
+no memory safety issue.  The result is that the whole SDU is sent as a
+single PDU, larger than the MPS the peer announced, and a channel is
+established with parameters the specification does not allow.
+
+Apply the same L2CAP_ECRED_MIN_MTU / L2CAP_ECRED_MIN_MPS checks that
+l2cap_ecred_conn_req() uses and drop the channel when the response
+carries smaller values.
+
+Found by LLM-assisted manual code review.
+
+Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
+Signed-off-by: Joas Antonio dos Santos <joasantonio108@gmail.com>
 ---
- net/bluetooth/mgmt_config.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v1 claimed that a peer-supplied MPS of 0 leads to an oversized skb
+allocation and potential memory corruption.  That was wrong, and I
+apologize for the noise: in l2cap_segment_le_sdu() the wrapped pdu_len
+is clamped to the SDU length, which l2cap_chan_send() has already
+limited to chan->omtu, so there is no memory safety impact.  The
+remaining problem is conformance only (PDUs larger than the MPS the
+peer announced, and inconsistency with the other LE/ECRED handlers).
+---
+Changes in v2:
+- Correct the commit message: no memory safety impact, drop the
+  overstated claim from v1
+- No code change
+- Cc linux-bluetooth, which v1 missed
+- Link to v1: https://lore.kernel.org/r/20261108-bt-ecred-mps-fix-v1-1-e7419bff6ee5@gmail.com
+---
+ net/bluetooth/l2cap_core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/bluetooth/mgmt_config.c b/net/bluetooth/mgmt_config.c
-index fdcc752c6f13..6a617656bfbe 100644
---- a/net/bluetooth/mgmt_config.c
-+++ b/net/bluetooth/mgmt_config.c
-@@ -362,6 +362,6 @@ int set_def_runtime_config(struct sock *sk, struct hci_dev *hdev, void *data,
- {
- 	bt_dev_dbg(hdev, "sock %p", sk);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4dd56e007..c3b8f0f46 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5711,6 +5711,16 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+ 				break;
+ 			}
+ 
++			/*
++			 * Validate MPS and MTU per BT Core Spec
++			 * Vol 3 Part A Sec 10.2
++			 */
++			if (mtu < L2CAP_ECRED_MIN_MTU ||
++			    mps < L2CAP_ECRED_MIN_MPS) {
++				l2cap_chan_del(chan, ECONNREFUSED);
++				break;
++			}
++
+ 			chan->ident = 0;
+ 			chan->dcid = dcid;
+ 			chan->omtu = mtu;
 
--	return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_DEF_SYSTEM_CONFIG,
-+	return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_DEF_RUNTIME_CONFIG,
- 			       MGMT_STATUS_INVALID_PARAMS);
- }
---
-2.50.1
+---
+base-commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d
+change-id: 20261108-bt-ecred-mps-fix-a5f18dc06329
+
+Best regards,
+-- 
+Joas Antonio dos Santos <joasantonio108@gmail.com>
+
 
