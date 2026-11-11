@@ -1,93 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794429486;
-	b=NyiW8upuoGG3xq6WDyXNBsDGPG1TpLAuSpLyXGXw0OJg6kmePLeCjD/hNK4kKL7QiMjx
-	 8I1nBowwyqVUYAiWkiibJyx6iwkin63+ii6Okgm7qk8GdO4cvksK2caEdXd4lCkTsou4l
-	 STJoh72bvCyY94D21cvNlQ2WReaZE2daNiopGYyilpRbDmyu9D3DvHmOMkqV8UAd3Fw/J
-	 725PqksZUTQ1WGhyZGj+/2y45ot7ehVeu+UdI356BoAtgHKA2xGO7eDz4AD6MHnMJddBr
-	 8gAFs0+/BoX/hhubj2DA5xMu5hnFq7qKL4t+7GQTaxij8YNM2lF9xe9dNJP2JQeyf7A==
+	t=1794429593;
+	b=RM2FMV5htZmwmOWrQq4vxwz5K+sdtQlb0LHsxdoW3TJWJG4AJvdV5izad1YdxJL3zad4
+	 FBm7jE/s2LdVmVLoTyhlpr6kuhBmkxEQd3mqqH3cOzTLsWwYV7Qkn4jzMT14lcULz3KMt
+	 wYu71wu1ZYohkiSkaD2VWpTfKtK3M72llBbSYiPoGKR3EgvB0fi5pyGMldc2HcGucx0hB
+	 tSpA9lY47rIz4m+PgPxyo0EeP23BJHJq+ay/NHQtob7oW/duG6X09Uv4aJL8OE2bgQlx4
+	 ykhZB8inEqi+37OsNvjik0o3WoRQPXWUk20poRkuDxUXPc26qq2sutjybhlfrcCJAzA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794429486;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794429593;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=k4vpl5CIWPRR3McGqf24wqAb3Ni8sas+WF1OQebhfYE=;
-	b=JCUxiyjikAvJCKNXVJhuwHdC0KvG3tfbgv/OJ/Kp/kLv+qoNYNXIhSb53AvRcf9Fvh3l
-	 +IReQtGcvm2stRFaCL6hj+AL5vQxjLMDW2WexdYI5Jd2MXMAkrQ6xOOZUEAAga8/YSXdS
-	 DtBJ8BTRLC5lxP5P0xBlDf9z0RRc4mkzeohq2N1AQULQ8mZncvcx07KvBa4YFzDcpzIv5
-	 voKmhva6Wa+q3CG0OnVhRc41hgvbMewrC9YzRybZOrGQ41ElCkfku76dRSnEiYm2TKy8o
-	 QBkSf31ianTPkoYCY970ueqLakPZuLLXzZIF8uP3vEMF34uX0d1OzSn7piqb5275aLg==
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=T8A4Oz+ebjHFVfrYj/KfS1gh+w0OUIWnXvWEvBvOy/o=;
+	b=q9l+7BynVD3QK6Z7cn2uihtPDAPd98dU3w5ICYWLlAbEVpATS8n1VfOuOg6vz/IGIn7B
+	 OqXtfWuQEkXbAvSlZCHBOe4x6TDfheIcDoPGGpVumcJOCpMxjA++mCZDLYNreYVhLICLO
+	 eGPOo/FofahiXrlzgaLGS3PycpGJbszV95d7mxbdpjx1ErlvVBy/BMGCLLdDmFe6PiOFo
+	 X5JFTYQuicJUS3KFuvlC+S8MIw8buwlroTbKML3YKvu/LC2yjP7EEBk+eMFsLRFHbztHW
+	 CeSQiUcYi6Fe5FzDEcoC8/wZsSsF7ohx+NeL2cjUT8fwjKr0buSbjDDiqAf/OzzWYUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YargjPSp;
-	arc=none smtp.remote-ip=209.85.217.44
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=snXaSYSn;
+	arc=none smtp.remote-ip=209.85.221.174
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B10B60A3809
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:38:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B10B60A3809
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6972606A32E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:39:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6972606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YargjPSp
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-7d2dc9a7b52so1990476137.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:38:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=snXaSYSn
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5eabf243d05so1200249e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:39:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794429485; x=1795034285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=k4vpl5CIWPRR3McGqf24wqAb3Ni8sas+WF1OQebhfYE=;
-        b=YargjPSpW4qniW8OsWdpFaAx/gkw5dR7q2INpMjbgC2KNATzQmSinrAhzYdB549cmh
-         AruyrEuQKwRbOGxa7s0QG5rUNfaL3u316mYr+QdfHAjt3D0nXwpAPMowaQJGpyeTbiFB
-         Z1kl+EwJCQ78kPOzgNj6TSYUy4DD6eFFLCFdWw8QlZqD7tTbzUeIPBvru8HBlV+gV6uB
-         u0jGmEAOWYavpt5NwCp2MpGAS9RjurBRreRc+ZHWR1Dg88Rau/NkA0C72uXsxWMHXBUE
-         8h7rq7letIZwGqUV3xCShhlnaIdssxymwsQgcq0zqLpUvq74EbmTPbTcLppKvUm7Xgey
-         SJEA==
+        d=gmail.com; s=20260707; t=1794429592; x=1795034392; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=T8A4Oz+ebjHFVfrYj/KfS1gh+w0OUIWnXvWEvBvOy/o=;
+        b=snXaSYSnhcpcbOGsz6HbaEAq+Rejuvi45xsYXF8aS/z/VYSIa0QW5rWhCjazPNjRlz
+         9k5P7rUOUBeq3In28sQPjGcgYCMpL+EBf/RGXa1iyC/I9vBm2DArL+FXgiwywMVTixhJ
+         C0ZW3E5qgknX+RWv2ow5iggtFSoCOHQKdH/0MuQ2/mZW7rMGNM+DhdGi90KAfRI4byiS
+         6xNby9U1JVI9dRV6QFtF3hMQG+2GvX1uRo79D5Rcw77ZXNGEf5ITtf7IMXFTHCrelgm3
+         ZNmzJOlxILm9my4wY+ZOuj4qGEgpk3FZxXZmSoCpQIbjwb2GgJTMBBajckz1EVEEPl/s
+         ELkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794429485; x=1795034285;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=k4vpl5CIWPRR3McGqf24wqAb3Ni8sas+WF1OQebhfYE=;
-        b=SMwIUlX0CKOMeUAXTAsApWmgaE8+JcQO+C3OK39FyiwTknWE/OG9zEz8uEIXTYzhpd
-         v0ehAvs0DODcHXYGz7xxAlTtuu1AldOhf425O6zck0kIKkSDdptiuQep4gj8u8JS5RVO
-         NWgaju1TcdTL1OBqTpoIWB572Nd6timFzF5vW0WhcYnvLworC70R9YPQFjz+8Re5bE3a
-         Rsf5N+ZlXnURV395rDKReZpbls5N1L1iAntxhD3HgB7ZsJGijlUK6PnW6PGWR5CkZyxl
-         xSr0AT1IyFhgT9kTtCRuzp6W/mLRuW4yIks6q1G3VCy5X85OMuJjv61GR5xeZH15DtMd
-         ofUw==
-X-Gm-Message-State: APuU4Z92RyCTq6o03P+eMtF+pw0Dr79kmEF6gteNb7UdZyk8CPvQQXXB
-	DbuUTNtPxwcPGIGYV2ZPrsgIZ0Ck/rnsvPJ/QKI+NgPDIYEuxe2h3fQG9RjiRA==
-X-Gm-Gg: AYBFou3HUnLzzEOJ0VybQCYigulneHjSI2s1sI2CM09XWYWEIiQqDLa7P9PStN2MDHu
-	qj9f+426GAOrhXWhjeoGoRubGmmlPXbCHdbiJXyzBmuxU/NfWoIkW+0qk51B59826gWAHbYtKZM
-	U1+EZMXi6v6rsCl/gWeXlJBfw5NQfKxRxlIGgfdkhEuZpFvNUBrdvmXJf5YZedKt3+zuTmTbCAY
-	wQ7uvFsEYuIp5DWa4kffqg+pmJ2jwmBSgzzjhLv5Uq0NX69vte9tnhaUIRbq9nhB7K2a4KzshD4
-	yUdXjEfJ8KizdDmYwxC72utJjHHtYf216qlSLM8e1j69qJXubLWzR6I3KSjFg9HexsD0w1JEsp9
-	0CpqD4Jt+3DPBYtVadEvvtR6Rk9Z7TIt/V8FXHMOXMPxt1+0pORFhN8tbg0UoqMhcIPWAtneCee
-	eije9CBkcJR4OB884EeaR/c8jLnzCVRzY5GnzadUzG+kjlUTn6/K60irm4vf5rufZEN67j4wQKQ
-	Oo9VcSV1+adBiFa3gto8MXqqXnw3PxGyoe79Itd7jn1ecbHnsm3o1dKrUUlePI8b+8rLHyT/kIU
-	hQQyH9O/bYs9LD9ZIvERrpIzS2tc3Fg2p89cRPufLcLBwd9bB7QsXJyKDrhOCK3harfsxw4W61C
-	HDJeJ+ShQYIJQqNmC8a9oQ275tCQ7o8Z1gFzL/9vRr71/XBtYyeJq9OF7tovGkz2H6hY0yuPQyr
-	WI1+8=
-X-Received: by 2002:a05:6102:c13:b0:7d2:cbb5:71f9 with SMTP id ada2fe7eead31-7d4fb255e87mr1649973137.7.1794429484822;
-        Wed, 11 Nov 2026 12:38:04 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794429592; x=1795034392;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=T8A4Oz+ebjHFVfrYj/KfS1gh+w0OUIWnXvWEvBvOy/o=;
+        b=AIL7jBXB00JmiUxg0o6/UWgimmCIu9WsghO0cn7K7+kBZ8rJyM+qrr+JutLXnvTR7+
+         55hermPqdehlveGLBiqHZ7nzyNJwuQL5dj0ZkS0C0SM/9jo8bP5FIIop92Fb2LkSa1yu
+         /c/MttupzvqzB+sTdiCHkhQQBOK669ev1rntX8kE3oSv5OeW+BDoOqagjxkwFm+tVPqZ
+         qmBLjOC04syuiWMNZgLU3Rg2lx3fz/6uTUrpZo9dPTsw3IsU4VdYVmVrKXfMEX612f8G
+         CUPSvX4O/NJYwIzToVkKshrP8t7Ps9Bsgo4m/uDAI18ZoYiTRlQFDqCmCjxVDNGOK0pp
+         GLzQ==
+X-Gm-Message-State: APuU4Z810WO0UV7BqF1vFUSYENvcm0uw5vo23gpvHGvtXNTg+jiVLfPk
+	2PspYC+lB3cbvw8RKapJlxV3y+y3iHx3ZzZy3HIV/xfgUFnysgiIkVD69yahPQ==
+X-Gm-Gg: AYBFou2UUtcJI8ssP6TwkVc50c3EsijEO+m540Gmo4aHVEy8fWIDQ9kJ0+Jrpuci6tT
+	QEbpRmozQSkAGvdc98RQhR3Gr7X0h2AV160fkri7Bzv/MxoYMiksZQKpPyU9a43G4Ej87zS3+4R
+	rVA5hP2LVmZC9xvcHvH9thbr13ZnklJLqRyIq000egrIF/UWQkPBs1yUbBb9YKBTeokRXrJnSYM
+	FfW+UCTaf4PaMnALsmhcFkCY4g363dnGhGZ+zrSOcZUuPjcebuJ3SDOfAOelAbBpbTmDJtDkrIF
+	BZpS3lgT5kV4vuVh7/Fx51YTSpU5hg24p+J/f93Bz9RjW3+Ziy3sTGXXTI0wUIm4Vrrb53QxH3S
+	iPcBPAmEukK78uAMhqw3JF+OxPrrZCCXIVRtBY+aEs/jy3oATY74U2G5dLlEmaMrbSdyNDXuv+Q
+	Ut5byf0fuIvMwfjJ2tH7ZmpiV9d9D8ocM3omLX52BXNnWNH20ntZ20Ls1sMsRVPQxmXMiWfCcch
+	SElij/iMAmUqXACF7kPJTvuupQyWAa7kBmSoaFUGoLIzuVzQc1yk1YqgvrI1dZunpH3JZMN26Kn
+	qv236fyCz6NmCxLKGOMzJ6DvuxfGFKlBHt0qv+ZCeQ3mvQQgxi7uZz1xRk6On/usBkMseoRKzPA
+	ldkvhUO1gbZbZRdVyU6qH01XS56IDBrctIy74Zsh7zVO4BaNlsW0/J+qL2Id9df+fLgWxel1vm4
+	yI8a8=
+X-Received: by 2002:a05:6122:e444:b0:5ea:e7aa:acb9 with SMTP id 71dfb90a1353d-5ee1c3cb4camr1311127e0c.6.1794429591732;
+        Wed, 11 Nov 2026 12:39:51 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d302359221sm4762571137.6.2026.11.11.12.38.04
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c2f3bfasm4301380e0c.0.2026.11.11.12.39.50
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 12:38:04 -0800 (PST)
+        Wed, 11 Nov 2026 12:39:51 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 8/8] test: functional: Cover releasing a shared owner
-Date: Wed, 11 Nov 2026 15:37:42 -0500
-Message-ID: <538e5b07cb02dc132e90dbee0a2e48c4abe1ebb8.1794428234.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v2 0/5] shared: Use util_iov helpers in gatt-db, hog, asha and micp
+Date: Wed, 11 Nov 2026 15:39:44 -0500
+Message-ID: <20261111203949.3874673-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <cover.1794428234.git.luiz.von.dentz@intel.com>
-References: <cover.1794428234.git.luiz.von.dentz@intel.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,60 +97,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Have the initiator acquire the transport of the Sink ASE without
-desynchronizing, so both ASEs are enabled together and bluetoothctl on
-the acceptor acquires its transport, as an audio server would, its link
-sharing the owner, then release it and check that both transports move
-to idle.
+This continues the conversion of the GATT code in src/shared to the
+util_iov_pull_* and util_iov_push_* helpers, so that the bounds check is
+part of the access, now for gatt-db and the HoG, ASHA and MICP profiles.
 
-Assisted-by: Claude:claude-opus-5-5
----
- test/functional/test_bap.py | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+The conversions are meant to be behavior preserving and are covered by
+the existing unit tests (test-gatt, test-hog, test-micp). The existing
+code already checked the lengths in the HoG and ASHA readers, so no new
+tests were added for them.
 
-diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-index 13e969a4a845..09bcfe9436ee 100644
---- a/test/functional/test_bap.py
-+++ b/test/functional/test_bap.py
-@@ -853,6 +853,38 @@ def test_bap_unicast_duplex_disable_one(duplex_hosts):
-     assert state == "active", f"{sink} {state} while its ASE keeps streaming"
- 
- 
-+@duplex_host_config
-+def test_bap_unicast_duplex_release_shared(duplex_hosts):
-+    initiator, acceptor, to_sink, from_source, sink, source = duplex_hosts
-+
-+    # Acquire the transport of the Sink ASE without desynchronizing, so both
-+    # ASEs are enabled together and bluetoothctl on the acceptor, as an
-+    # audio server would, acquires the Sink ASE transport, its link sharing
-+    # the owner
-+    initiator.send(f"transport.acquire {to_sink}\n")
-+    expect_all(initiator, [ACQUIRED, f"Transport {to_sink} State: active"])
-+    expect_all(
-+        acceptor,
-+        [
-+            ACQUIRED,
-+            f"Transport {source} State: active",
-+            f"Transport {sink} State: active",
-+        ],
-+    )
-+
-+    # Release the transport it acquired: its link shares the owner, so it
-+    # has to be released along with it
-+    acceptor.send(f"transport.release {sink}\n")
-+    expect_all(
-+        acceptor,
-+        [
-+            "Release successful",
-+            f"Transport {sink} State: idle",
-+            f"Transport {source} State: idle",
-+        ],
-+    )
-+
-+
- # Broadcast code used by the broadcast scripts, see BCAST_CODE in
- # client/player.c
- BCAST_CODE = (
+The one bug found is in micp: a Mute State notification with no value
+made micp_mute_state_notify read a byte past the value. It is fixed, but
+there is no test for it since the scripted test-micp client flow does
+not deliver a notification to that handler, so it could not be
+reproduced.
+
+bap, rap and the remaining profiles will follow in separate series.
+
+v2:
+ - gatt-db: don't update the database hash from incomplete input when
+   allocating a hash entry fails, keep the current hash and retry the
+   update later (review feedback on v1).
+
+Luiz Augusto von Dentz (5):
+  shared/gatt-db: Use util_iov helpers to build and parse values
+  shared/hog: Use util_iov helpers to parse characteristic values
+  shared/asha: Use util_iov helpers to parse characteristic values
+  shared/micp: Fix reading Mute State from an empty notification
+  shared/micp: Use util_iov_pull_mem instead of a local helper
+
+ src/shared/asha.c    |  52 +++++++----
+ src/shared/gatt-db.c | 215 ++++++++++++++++++++++++++-----------------
+ src/shared/hog.c     |  62 +++++++------
+ src/shared/micp.c    |  28 +++---
+ 4 files changed, 211 insertions(+), 146 deletions(-)
+
 -- 
 2.56.0
 
