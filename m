@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794429467;
-	b=X+wEai/m3Q5WkUvkoNWsFXnesQV9CZ7ijiZlfXAab2XNTAWyb8OouKrQadXGesFZa8hi
-	 VqP7KW7EowwfoHBztXCz0dzcdDQ2h/o8iaZpOKHta23Cc7nqwdPJAe5kPEk5T9BgPHyP0
-	 v6OLa0gsFUZKWDxspcuq1Fd8uwP9vD3HNXI9Ccl6ZAJQUndh1My2cB6GtGmpMRiDCbjWy
-	 6CdmA/KDW3kRV1f/eWv5w6RX7eHVPhSY4RwCmSioqnx/nw4koOHlwhs74qbfZztwCw0nm
-	 rgDI2MqbI1iZOUa7mXuZMrFENOAOTlLcH1OoiNsYfIAdC70gX60ckqWEdeP/2Rz0TDA==
+	t=1794429468;
+	b=T3rs6R81uSrFu7c5JtGlWA4/vOJAyop6K/1QU3FIPQokCfY7tkDqXVMXEPVD1GOHl71B
+	 h++UOrFp6yIdglgRgeZnFdcfmRw0SvsKMRr8XXnubd5/p4/GsB+wchDZbmWUVXaXy1OKo
+	 Bu40vgeSHuh0ZZLO2Iqr/NOs0YtRUTcnFPFgkuf6HynGyMwDGrgMqragXiAZ51R0KYug0
+	 f8W6QcJpeJp5E473jn0esYFhm3/KQN+9wl9DFo/8fsGSFcYA8inzJpYQiKvi0RFbihIQ3
+	 Ws+dQllhCDanF2w/2cSTW+0+ob2Hzg5jsr0VlOmVCeMkVCDrhqsjKdGFPxSaEj753Rw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794429467;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794429468;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=XFD9KGI8cw6W7ce/Gvc6DTc1chENiY3sdh6ryJGko38=;
-	b=LypifkADeHo2wr9cIl5zWQ8wXiPoZnGbSzW3EVREFx4FZhVI9ftm0AqsN28xjh1Ipzq9
-	 ERyPoJiRo8a3NGD70LMKnRxrX3MaTaRqBMPneFJfx+meNaLI4NZ32/lw5Qv0vX+z8ePnt
-	 X/4bJULiV5qrGgwFWVpISiv/f11WLC0ToNtRU39Pdi8pymPuYGZfiFDLEomv4u3zQMA48
-	 09okmx9AYKNiEt0wmXiC6fBdu56SJfaPxuuz+b48DOxrHpmuy/V0SJ9c+/tAXJTeYX9hD
-	 aUvIWk5FoxkpcD83HhNKyKwVBWI5tB6gStoL3zoai4B/yQNcJ85qHEKMV1keuNP3RmA==
+	bh=o9qmg2RqYElBRu3JKpcJe0VP5NQ1tOZdw77hufv8gfo=;
+	b=hh3koIyYz6isCV4JLL1acQK3r4FiukXIJLSwfjgj1dyAlaugPv3kn5dBwpH7bfFKH32Z
+	 BPWAZaGyrJquZe+rb/qtKT7yzb3gVbiAbV5PlcoMkyroFZj1FWK4zIMw1aqLUWhCmjgIT
+	 4AWHzPgoIpBXmfW+0AB52VdMSo9oSCuZa3nC/g+U1TaRU/8QPnpy9DVWafipTc/5fztdM
+	 pcorIDONN8FW1Sb0x4oVXMEmCmhnGur4yS3pOvOr0BtwNXJVzWXjTLcIsuOOp2MU0bWl5
+	 JgZwA5q9gQM6r3MYm5vAsHImxpyGaofrbDypkpHaan/IdLJPtnImilamgpR0hKt/C2A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Xt/KxyL3";
-	arc=none smtp.remote-ip=209.85.217.47
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WhUSjFKB;
+	arc=none smtp.remote-ip=209.85.222.49
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09426606A8B2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:37:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09426606A8B2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE647606A8B1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE647606A8B1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Xt/KxyL3
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7cc1cf48a39so1389228137.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:37:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WhUSjFKB
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-9903fde8db8so955582241.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:37:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1794429466; x=1795034266; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=XFD9KGI8cw6W7ce/Gvc6DTc1chENiY3sdh6ryJGko38=;
-        b=Xt/KxyL3w5KgD5gaqq2y3h6Ej6zKduvJdG3LvJPOlR77HSkyu4KrmuYihPAqE6zOKC
-         AZrC1LCil2dzZ0GYKRxxesTauoD27dkeIOqZ6oLSFZ06x/ZMlZ49E0Z8gCwj+zJcXY9Q
-         H3SPBZCc9tgkXSUm2lsFzPuu9rnVdUj9XlbXz/n/olwk7RVAbujMeiEFy8qHaohwhpsJ
-         nlMc6z6IdVnNfgElmJ03+c9tE1/pQTKWAU+LdUhpen5O6cQAHYSCg4yijpm35tEAyMv9
-         etzf57R50Ih469ioSJlyI95msmphrY2C8zBf/Awkebi5v8+OY4fbOrATEVUZbeKoNw4t
-         H0Hg==
+        bh=o9qmg2RqYElBRu3JKpcJe0VP5NQ1tOZdw77hufv8gfo=;
+        b=WhUSjFKBKSRkQuxtYorPS2AqwZR5gNy0QzL2cEIUX9KbCh3EOG4kcLPRkJhqFiiRUy
+         HYuNVnKOrKn0Xjf4sKZ7/1z1kiUKyKtyIHNN/UoPsIkKEcXFUlDvUB5xhLGnotTyZ09+
+         rL+d9X5doS/g+1FYvAqqBgbn9k7Eu5dWWr2wiILBKiEzeqXHmrtiHHmR/3wY8lxo72wb
+         LavX94Nk90ll3+sWf/U4mvDcRjd4jsbERi82AUZWqKWbHQmW+1So1zN0tN/PeKMuo31/
+         L8OnDWxXw51kJWhLQoSOTi03nyIeHEFmyDSRD3ENttvyere11+qi7OehZV3KfCy+5KKA
+         Tk1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1794429466; x=1795034266;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=XFD9KGI8cw6W7ce/Gvc6DTc1chENiY3sdh6ryJGko38=;
-        b=CScmmSzEVfmEqwOLUINeSSrPPl2vTpsuBN88KqjS7oTUwpw4nTE7lM1yRW6HpMKBzR
-         OXns3h6F+o1G6WUyF4yr9erC2P+NWgKJYL3NK+LlGTDx+TBt23yeBvoN2RJglZ6WQY5v
-         29LW2VH0+hbrxWmFQLR73UW/OBC49I3S57UOltErmRmvtJafvhzCKHW1n/c6mTaTjjDN
-         LTdH1y6DjDb5IC6keoKiu3YZfp0h8Mftjk30gLkYt3iiSWCXCfJS06505JjhOwgZzFKf
-         PzaLXP4AZ+qnbdV9YqhJ4lzOxjctg8G+TSmcm6NVNyn3b29E9SFomopNPydVGI1pEDOR
-         EVxw==
-X-Gm-Message-State: APuU4Z+BPA/agFe7A/NzY4xgN0EcE9IZhSh7tx1vCdL2zSlWx7yMSBNE
-	O19+xJ5zCQETCzJQPyYJnFneCkFZvgI3GhQQjTBGzls49BoftlaEmW5eKE4CLw==
-X-Gm-Gg: AYBFou352bEOdN5HC3qgqnJKo4QK+7zlU6DUHHST1IRh3kt6atG2OI4kiN71B6J7OkZ
-	pigbEi5BIZOlAeGm3k+4OHKmCrGYohcwfLXSFwrMy9VMTnhC46+320JDv9ioUpQwMEPr4UtJTyA
-	0gKWcmk7b1Cv2JGrBF85E/49fePsfrNNwskaw4RN+IwtlPe5Kd/7dkobrywwHKICdzw24xcPQNj
-	b3yrDjwzZtGcW4sRe300T9CmlZIIQ9uDTlxGqKpBO8UBSFpcwQ4udSTQ0deKKn99SJhQsn9wVuM
-	hl2Km10gbsqPysnbxKt954ObaUW/n2CN26RFkz1YbLGpaJz4BLbJY6YpEc5NUarXAw9Y6uydjhd
-	Cbf9iKncdVyoh3NlVZR3l3b/V1W6iWz9MweC6kI7eg8UlL15aeX1u+Dn5idVdml+4A0yP7V7m07
-	lHc4lML4lFtNqPQSh6YFZbMKcGxbpmB+Ey0EqbXEbFTv4X2zKfO4C5wCr6veStTeEwOO6BaggV7
-	0WbkK0c0SecII34Z7muKlE4K7vOg9X0rglzigkwdXn8d9bVmBCV37FNp6J3MV7PBWok7HzNx0Ev
-	l0vj+TmpeNLBtiF4mF7cEQJoHZUwgn+PQV7X4F1yBjRsX8PLavPU2E+W/VOZLMCm7cwl2Pu50aC
-	sFR8QoTBWDfbVq78u04QAleusGEwin6V9CgpO4a4W4+GujkdGa+zs2YK9DGtatfF5TdPCrSB8m4
-	XvaBc=
-X-Received: by 2002:a05:6102:374b:b0:7d0:3da9:3e16 with SMTP id ada2fe7eead31-7d4edd09970mr1148220137.3.1794429465787;
-        Wed, 11 Nov 2026 12:37:45 -0800 (PST)
+        bh=o9qmg2RqYElBRu3JKpcJe0VP5NQ1tOZdw77hufv8gfo=;
+        b=R1Cb8KSqJIzGq7l8xg/DOXVJTKQN/9E0+oMPgu7aHVBMLVT8F/Vqr3I71ZO/zJDX1C
+         BP4noepr0Llg5yz2CcUx03ziIm65benhHdxT+dRLYwXZws/vQd8xvCMhxGnj5wZQ+DB0
+         u3oZVZsxWjdkfahg/6vUmLZLtbpq4ln0wrBVDltb0I3qD+j3S3mJOn4mxIKaDVeOjZvp
+         mVV1onspMq29lFpk3vM+7pb/ZnAS/uhWtbQqmRVqAPz/L57Ni6LnMDm/g0nybEb7xCp0
+         jZt68f4onMCoFOjegxEdGho8m9eaJuBfrsfeqXkOSHh5TCqAYwtCf6udNuPips4PacVh
+         EsMg==
+X-Gm-Message-State: APuU4Z9HMuujrrSe49m0DL5sasWDgstlyWhRV2+KYilj0ctf6bpV9vx1
+	mSFBCfHmjEt7elz+Av1kol1JLcUZ58TpMaJ4RXNbkBGId37WiQvGZ1UXCf7h+Q==
+X-Gm-Gg: AYBFou1th1pGfVVl1SyplQuvGkFP96BXCBh9dg033etZRLGzgHfSwQEKFWXTms1HXCx
+	iqc+DVc9gM0RfC5PvYBym9sqWPrQSDbqbgm0H4W3i5SyIyoUXgiXxz4MQ9ij9pXdL5+U/jPyIyL
+	/CGsqjIUxVSFkmHsAlotONWzwV3NGg4TZFMLoPCO33QPW8ZD8SrohbPK/s/j7al3GbJ4iFLxPSq
+	CM+yKjSgBlRqle25d5hAKLjUATxq/U9wAx01noi37ahYGpFBkhWevwdsqg+EfZXcIOBdpIZITm4
+	2G6oTRfvfDhVwwMe638E3kyiVjai1ijGZ9iNLfSKzXk1YIf/Ah6WEKW+VFuH/upaMeLt+SrKKZR
+	i6uhkAqyacMzgNsZyMkFNrke8Ah88tu0K0rxcqdoKs8UcTSfH3SoZXmWSyemUU4+huthiRXgUbS
+	lQVDbm+I3cy7bfaLCZkN3Rub6lIGOoH/+2RAD9VDjHE3Ey7JKZ7Y77+E/TAZtS+5/ViP1DdrLiV
+	W9epC80Mgkw7WztkKS7BRsc8bt56eeJFJGTJTqHwl9+6q40+2zRshtJxsSv9W0abtGqwI99iGBa
+	YZaLOrxEO5Fb/jh4NDYNCrWehNJ3NZ1x4tDemI7QnrEDsNGknm04NSl3Z5R1UYzJEb5IomM0SUO
+	HHtCt+0gsCPmmh0SE7cgBAPywGcJ2HpAzs8e8rTfk7lGpBBJZIp0RT0w28iZ74P1DKK3/U8a1UH
+	3UW/s=
+X-Received: by 2002:a05:6102:8097:b0:7bf:74c1:b606 with SMTP id ada2fe7eead31-7d50613ab82mr1432911137.34.1794429466595;
+        Wed, 11 Nov 2026 12:37:46 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d302359221sm4762571137.6.2026.11.11.12.37.44
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d302359221sm4762571137.6.2026.11.11.12.37.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 12:37:45 -0800 (PST)
+        Wed, 11 Nov 2026 12:37:46 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/5] shared/bap: Don't disconnect a CIS still configured for a link
-Date: Wed, 11 Nov 2026 15:37:22 -0500
-Message-ID: <af87abeff291ce358c4f4414c3b1aff9565f0bf2.1794428234.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v3 2/5] shared/bap: Hold the IO of a link when using it
+Date: Wed, 11 Nov 2026 15:37:23 -0500
+Message-ID: <545f614066bde3e411f796df3f4ff3f14119da9b.1794428234.git.luiz.von.dentz@intel.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <cover.1794428234.git.luiz.von.dentz@intel.com>
 References: <cover.1794428234.git.luiz.von.dentz@intel.com>
@@ -101,177 +101,32 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When a stream was detached from its CIS, its link was detached as well
-if in QoS Configured state, which disconnected the CIS. As a server,
-this happened as soon as the client disabled the Source ASE of a
-bidirectional CIS, while it may enable the Sink ASE right after over
-the same CIS, e.g. when a phone switches a headset from its microphone
-to its speaker in a voice call:
+An ASE enabled again over the CIS its link kept uses the IO of the link
+without holding a reference of its own, so disabling the link, its last
+other user, freed the CIS while the ASE was still streaming over it.
+Hold the IO when taking it from a link.
 
-  > LE-ACL: Handle 2048 flags 0x02 dlen 10       #1155 18:59:04.179316
-        ATT: Write Command (0x52) len 5
-          Opcode: Disable (0x05)
-            ASE ID: 0x03
-  < HCI Command: Disconnect (0x01|0x0006) plen 3 #1157 18:59:04.179773
-        Handle: 2304 (LE-CIS)
-        Reason: Remote User Terminated Connection (0x13)
-  > LE-ACL: Handle 2048 flags 0x02 dlen 17       #1164 18:59:04.201326
-        ATT: Write Command (0x52) len 12
-          Opcode: Enable (0x03)
-            ASE ID: 0x01
-
-The client does not establish the CIS again, so the Sink ASE stayed in
-Enabling without a CIS and its transport never became pending, leaving
-the speaker silent.
-
-Leave the link attached, so the CIS is only disconnected once no
-stream uses it anymore, by the client, or when it is released.
-
-As the IO may then outlive the stream it was created for, its
-disconnect handler no longer keeps a pointer to that stream, which may
-have been freed, but cleans up every stream using the IO, e.g. moving a
-Source ASE releasing to Codec Configured although the Sink ASE also
-using the CIS was found first, holding a reference to each of them.
-
-Fixes: b798cec4ca62 ("shared/bap: Add initial code for handling BAP")
 Assisted-by: Claude:claude-opus-5-5
 ---
- src/shared/bap.c | 84 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 59 insertions(+), 25 deletions(-)
+ src/shared/bap.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 8cb7fb40f16c..37d14bd77c90 100644
+index 37d14bd77c90..5b892f370936 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -1564,20 +1564,8 @@ static void bap_stream_update_io_links(struct bt_bap_stream *stream)
- 	queue_find(bap->streams, bap_stream_io_link, stream);
- }
+@@ -2794,6 +2794,13 @@ static struct bt_bap_stream_io *bap_ucast_get_io(struct bt_bap_stream *stream)
  
--static bool match_stream_io(const void *data, const void *user_data)
--{
--	const struct bt_bap_stream *stream = data;
--	const struct bt_bap_stream_io *io = user_data;
--
--	if (!stream->io)
--		return false;
--
--	return stream->io == io;
--}
--
- static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- {
--	struct bt_bap_stream *link;
- 	struct bt_bap_stream_io *io;
+ 	queue_foreach(stream->links, stream_find_io, &io);
  
- 	if (!stream->io)
-@@ -1588,13 +1576,10 @@ static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- 	io = stream->io;
- 	stream->io = NULL;
- 
--	link = queue_find(stream->links, match_stream_io, io);
--	if (link) {
--		/* Detach link if in QoS state */
--		if (link->ep->state == BT_ASCS_ASE_STATE_QOS)
--			bap_stream_io_detach(link);
--	}
--
-+	/* A link keeps the CIS, even in QoS state, as it may be enabled
-+	 * next over the same CIS: it is detached in turn when it is
-+	 * disabled, released or the CIS is disconnected.
++	/* The stream uses the IO of its link, e.g. when enabled again over the
++	 * CIS its link kept, so it has to hold it as well, as the link may be
++	 * its last other user.
 +	 */
- 	stream_io_unref(io);
- 
- 	return true;
-@@ -3215,7 +3200,10 @@ static bool bap_stream_io_attach(struct bt_bap_stream *stream, int fd,
- 
- 	io->connecting = connecting;
- 	stream->io = io;
--	io_set_disconnect_handler(io->io, stream_io_disconnected, stream, NULL);
-+	/* The IO may outlive the stream it was created for, as long as a
-+	 * link uses it, so the handler looks up the stream using it.
-+	 */
-+	io_set_disconnect_handler(io->io, stream_io_disconnected, io, NULL);
- 
- 	return true;
- }
-@@ -7279,9 +7267,21 @@ bool bt_bap_match_bcast_sink_stream(const void *data, const void *user_data)
- 	return stream->lpac->type == BT_BAP_BCAST_SINK;
- }
- 
--static bool stream_io_disconnected(struct io *io, void *user_data)
-+static void stream_io_collect(void *data, void *user_data)
- {
--	struct bt_bap_stream *stream = user_data;
-+	struct bt_bap_stream *stream = data;
-+	void **args = user_data;
++	if (io)
++		stream->io = stream_io_ref(io);
 +
-+	if (stream_get_io(stream) == args[0])
-+		queue_push_tail(args[1], bt_bap_stream_ref(stream));
-+}
-+
-+static void stream_io_lost(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+
-+	if (!bap_stream_valid(stream))
-+		return;
- 
- 	DBG(stream->bap, "stream %p io disconnected", stream);
- 
-@@ -7289,9 +7289,9 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 	 * and PA Sync have been lost so switch to idle state to cleanup the
- 	 * stream.
- 	 */
--	if (stream->lpac->type == BT_BAP_BCAST_SINK) {
-+	if (stream->lpac && stream->lpac->type == BT_BAP_BCAST_SINK) {
- 		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
--		return false;
-+		return;
- 	}
- 
- 	switch (stream->ep->state) {
-@@ -7304,8 +7304,42 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
- 		break;
- 	}
-+}
-+
-+static void stream_io_clear(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+
-+	if (bap_stream_valid(stream))
-+		bt_bap_stream_set_io(stream, -1);
-+}
-+
-+static bool stream_io_disconnected(struct io *io, void *user_data)
-+{
-+	struct bt_bap_stream_io *sio = user_data;
-+	struct bt_bap *bap;
-+	struct queue *streams;
-+	void *args[2];
-+
-+	bap = bt_bap_ref_safe(sio->bap);
-+	if (!bap)
-+		return false;
-+
-+	/* Every stream using the CIS, e.g. a Sink and a Source ASE sharing
-+	 * it, has to be cleaned up, and their state callbacks may release
-+	 * them or change their links, so hold a reference to each of them.
-+	 */
-+	streams = queue_new();
-+	args[0] = sio;
-+	args[1] = streams;
-+	queue_foreach(bap->streams, stream_io_collect, args);
-+
-+	queue_foreach(streams, stream_io_lost, NULL);
-+	queue_foreach(streams, stream_io_clear, NULL);
-+
-+	queue_destroy(streams, bt_bap_stream_unref);
-+	bt_bap_unref(bap);
- 
--	bt_bap_stream_set_io(stream, -1);
- 	return false;
+ 	return io;
  }
  
 -- 
