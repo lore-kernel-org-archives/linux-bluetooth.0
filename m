@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794427632;
-	b=H/iPxy9uEnWFD3qBqdktjiUS2//a7GpqG++cO7Iw2iFWYfeOu8WYgkQeGMlZ3lbbWnQr
-	 +23qzrg6ysnpYm35iKPu4CHB/lIoEgeMtgYHxgt1Xi08H3wSE4+gN9P7Pm7qEZ0qXvoLg
-	 Q/2xZY1O9XPI/EqHIMsYevcvMtVrNQ4dg0rHZLXfBt3Pe0P/STZsKlNylMaGmNuN+UcMt
-	 1lF+oQDjnwxvf6/RNgeRIWd6JlQ8fLxq5hqAfW6s7/+lHrgtYOwdHaBc4v8fUFn2xOCuC
-	 b0iwjhVnndc1o/zzAz2dHMT91I37vbUxmIHI19vh+BoexyPpe9XIhf/iBaZLspzHo8w==
+	b=DyYZJTYgQPa6EZUia6+BAxkxTsQ1HucOnV5oEpWibEEGbbE/HrWUxYn0WLWa8FUrIG1y
+	 j9wgI6rmhi5gsaaxm00/F8P6Uzvd5a2USIcuR3DPDbZtflCu4HQVZ8IF2hxG1A3w1Ul/K
+	 /mFza6/N8yn1jd9Q4WTuanWdzyDlL7uaKqL9n6i1gdmE0uuLK1WiseZWtWhhER7rdECg5
+	 naJ+lrttC5jAH572pAxcPu4+Y9lgYb04rc74QdGD4BGxA7k0DWVA3khLDl5ogOmVpVrYq
+	 VE/RXcj9zReKPjlOUR7wE/b9nGRuUAfGpJ0GNexxhUlKnhDFiQ3WGgbHgrCZ3P5Ks4g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794427632;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
-	b=GxMdDmEl6ERC42XoZlfIjuNiGJpYbPQSZ+D7O3zBp79TLIhC7LTQ6dR5q2AR8zFB+pLa
-	 ecVwPdOdCVSSGPEcRtpXkNyCzoz4Sfk3vHPnvOVeq/BT5EIduzyg2t2fv8bqGuVR41Xwa
-	 tsTTKlQ0mNBU/zXB0IrCx0YLnqkwm+FHTzmxwMDjUaxFzDor0YY0h/AEXIKem5Vr62/iW
-	 qikVgfijOE6pBkgtJtDnL9+UE72WhTmtZyi0qVyhzzL6zEkPUj+fHC/xGjt6Q8yhwKUz/
-	 VI8ypV5VmIQxj8wpfbjNJ7dHFIxSAXHM14VYDC5ItB6rbdjZ7GOHW6AqgwRqOslG9gw==
+	bh=mXuBDqXYFekIMnZ/s4W0ulTP+MzS9DTQLSUo8AX/8bM=;
+	b=0K/JIJJQi4pxwAOMyHTpgqiKvzWPrk6dTM8Ocp3XviGTlIueS8H/jSOTRbc7uD1YcrGM
+	 bRYeuJDCcy9/hODvC9OwDBZt17/fymPiA6IdEeqdRGIwssxzuyZ8g98NdI9W+tLXgZih/
+	 jja5f5DllDdi0x4EFzDuXK84FARjWwUpcXrysxzA/z6cpJoPnstXrFjeYDLiYwp1PLH/P
+	 5dOQ7bbxPtTFT6pvH/4WPln68fL9SqDBwj/ijaioAnIQ5IGqwGHx4obZpiDU64mrZVkaA
+	 +Rpn0mEjj1kglzpsgn1FB0LQh3R8nazxY2Q4JtwYMh/JIGWyFczTlWOfbPmE7r7sVbQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AZxL6Yf7;
-	arc=none smtp.remote-ip=209.85.217.47
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="iT9h/wJg";
+	arc=none smtp.remote-ip=209.85.217.52
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18331606A32D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:07:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18331606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B5F606A332
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:07:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36B5F606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AZxL6Yf7
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7cc3eb09dd2so1154133137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:07:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=iT9h/wJg
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7cc0ccc2fddso1167952137.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:07:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794427630; x=1795032430; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794427631; x=1795032431; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
-        b=AZxL6Yf7P7qWZd6pFBGn57rA0jqjm9dja+F+ZCJkeUXUoc9XN4ZyNQQHeyZN5obV4l
-         beynUFDESDf8HJkN5v17VkLPdkEODFroF3+Yydq2hLjsUsDyFZzlot22CvevxOhskTAT
-         ZqqMjcDXi1DJrftYRoFtSkLcr3FoLfuDaEvK/UPOqNKCQwYu8//JuRMdNMZ6+qgHcCYV
-         1Ell2Q3cvU8Pgw2DJQDElze2d+7xFYQIJY7q08dj/7R4j11rjNACJiWfhAOI2k9ucrHX
-         fCTZ6B0gy7XTP5PQyzZ3jHgdB2IgTbLj4exM9hPqHscQQ8duFbKPoIum+OX07dUt5tJu
-         1BDA==
+        bh=mXuBDqXYFekIMnZ/s4W0ulTP+MzS9DTQLSUo8AX/8bM=;
+        b=iT9h/wJg4OXpn5p2ibNxbUwOww2HcFkZBjTS99RklBx82T9UevwqRlO5xsw56ftLsk
+         QKRvi4uC3I9cmSNrBUXMt6vHSmp6+0lHsGj04gxPWTOuYIreSVkgNiZD+2uU2OlHzb93
+         bLkSQdRZO2JILkssbrrovAnQwBEkTfi0WT/8MMICceGqXPsYskD6Jx/thBeCN7P1gJnz
+         U3A8elKNT31IJnsbkKjElp4s6gzwyX718LDh1BMcDao65Jhr3F8sDNifMZmSUj/gjw+s
+         FTITXEbOAuuiIiF+ir8vP9d4NeHVoWtiX2OX4VOjQFeo9M340FXWY6kVubknRzdN5HNv
+         cq5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794427630; x=1795032430;
+        d=1e100.net; s=20260707; t=1794427631; x=1795032431;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=q7MbMV1rz4ncyD+3tsgr32JQ+dFMLevhy58tHK7aWOk=;
-        b=TZ3AvfiP/ot+6KTmRJqJ+9ZrnWrNV4TE+eynJIJorboCv98Y78uqj4i39wgiNDGqdm
-         slv01i0wP1ZzjbZLu1+dkcR2vYPMEN/Z8hEnY504cwLQvx7LVV/ODlG+7mfWw5WkP+EZ
-         SEOA9fYnvTEJ2DyuG/UbIgCyAThX+V6kuFNT1avOTjvLHogPP7hEHH4+naqM5vNgKWkZ
-         rpwidVoa8FQy5VrCmUyECNkSsWM2mmpNc/WDdbIykj7NfT//LppntzvBe2XbHRTtCOk5
-         KPo+5kVuoG5LMJ4IZrAdbH3PdYbiZiyYNyHTexxF/lvKusXE/nXZGJwOwMk3fcwwoGcu
-         cB/Q==
-X-Gm-Message-State: APuU4Z9zaVCOPadL8KIX0G0F14xTKK1n5ljLSMT349FSr1SvA+vP0crn
-	f9rf55xlBcWhjg+7yKmX8HnmfGr7gt8eduXqCJolv4aWtpvNzq5qnZSaVlZAJA==
-X-Gm-Gg: AYBFou23Dvvhxbqogkv0ArHczpOr7vOR2rlBLkiKGjpzcsLQqB2BoLIgfMhVn/oZ1JD
-	qisY9yBBW/0q9oCNIZPbPofi/V++T3ppAIi3kxUHaO3IfyskKCP4IQUJqMhtPVIXsLy0vXEEQey
-	oihEJnjTwf5UXHSTVBss/wvaLdWav9OHc607fWUJx4lzfPYv2GQFzoyC7NljwL84xO5i7wXLI5C
-	yF/ECNRiRCqt4LJ3wIKnQXaXzSGzh6/CLyuGk8DpWkYakukEnZ83wwxZMLzuMxKqWgktmKCrB5p
-	T5EB51r6TUQVu6LmGt2tyqbH6rJNZ+3R76LkmQTQdfAbbPlHZ37o/eRc9EFJzYqwIYqN+35kaIo
-	CtLP4vNtyJ//mLoZ+Wkyztgg5qahaHc8nlaLOOx3cAREy983eXs2bJLRCdSapXoLPJOvSwnGy85
-	zSxig38JVNwUl4thr9biOvid+VIafUNEsC3kczkdS9fJbWokA9e+MoCnqlzEoGe/EEOeMOk3NQA
-	ZJNqGB+W1DOG7A1wFQd8Z0d1vJW6GhN1Ya5DQEOn8jDbecZ4XiDG/mc2zDOiS55UBk9IbaBo6sZ
-	4ah0ercMXYStzNgdwngegD/Q8tTqIyVbZFq6CYjA1rLz2QFieelZ2DycN7Xig85wkh+LyFhxYJx
-	Z6iRbBCxUDtXqCM6Yof84PuIKEO4L1fxd4hsinCQGsrtpdMjOcusl7clRv336/4UEexa7m3GxJd
-	x9BUZpGppHxyjksQpFP4LrRHRc
-X-Received: by 2002:a05:6102:54aa:b0:7d2:7c63:5a0a with SMTP id ada2fe7eead31-7d4fb2d462dmr1167563137.23.1794427630052;
-        Wed, 11 Nov 2026 12:07:10 -0800 (PST)
+        bh=mXuBDqXYFekIMnZ/s4W0ulTP+MzS9DTQLSUo8AX/8bM=;
+        b=FTPndP+qx4tqz+Kf9ZYn+bJM7Uc67KJgDdwcd1CFqoiaD3rfrihrGXn96YcEVkpHvJ
+         1BNsqHlthG66zeKVQ4z0xto+SAT3yNOD5cvwHGZO+ojGUGzH0msK1JkRDIfKFt+c7cqr
+         S5oIyunHFMJo7tdwsqm1nFFeGc95U2cv05UjHuvZFXwz+1kEPd6J+/CX5oXKoBIQETRv
+         U6Gur1caasA+doq42410iS14uKHqJ0JlLlWENvcmyQGNuNp6gn46iScFj7h/y0M/B0TK
+         M9yCakVpzcuUVyzFGgUkPbl0wX+c6uQU2fUz4plQIhGYhJuFSdITmPaYd/q2h1agnOMM
+         EBWw==
+X-Gm-Message-State: APuU4Z/P5YQbmM8AJp2E56TeapMbcETKyM18Qct8yr6hrCm88aGkl6mi
+	8cFHKtn5EUAi7fvUSekLhTZAjcdw8ImOIH2KZ17NJ7nAH5CsuTYVIMESuytzfQ==
+X-Gm-Gg: AYBFou13vOz20SLh1EOv9ljF4oi9aWesBdwmKaBZfuf3PtaqCE09by6pmSytCd9DzYI
+	Yrf4x73MEMZcSq6R1RdqDzWPzB39t2X8scJIeKitsmcXYiKSGuR6W4Wv7n/nnXuDn6nsz4vY3iw
+	FufWEYwdgb4ESzin//f1DBSNrbYaK/T07L7mO8RmzXBlc9CvNg+OwYH8o9fiCY0lP099B2UVVSA
+	a8A4G2nOLC29kmtMOxuxEnutjp4If/eKtcnT9ah9RvhruFp+MCNfeDBPV+rak7YsUNBi7nKVk/2
+	57aASYfAZE9GAS5XATVB5PsHktTuKVnEU+CA07cAnK5k9fYAnGu58VoFTYtK5r8Vd7gLlopJuQJ
+	SYs4RKuqNkUr7X27mCO5vIyXFKb65Pz8JVZHatU/xXp8M6o/Ezwzuozr+M4QekJohGjJ6TlHmyv
+	3Sls+7+JEAGTbDdcVmpiP72VDlsKhI69eTfExspMfNmQDcz7yiu+ZpDmlTb0PrtEdW9lXgshW8b
+	BAib6U5BEkFjKAbKgydRzbL1LW+w1RRK2aiil97ku9Nm1rQO5XtB58mXsNF1aaWrmXfCWO71PvL
+	4aUQn8H41Ym9nvXwl0Gyo6b8OYhUEOgQQabPerAOdNDzkqzHtTLp8sNCwCG5+mIiz0h7F7V8DIy
+	cIpH7anuYJ4irEkE/qE0OYiR3f/sCQhfuYjryYgsDErGYlV1WQpepklRLhsQCAFr2ympum4fPwm
+	Hw7kx708h7DiIO5XPLY8FI9JD5
+X-Received: by 2002:a05:6102:f9c:b0:7d2:d45e:5c9d with SMTP id ada2fe7eead31-7d4fb257b3cmr1315630137.13.1794427631022;
+        Wed, 11 Nov 2026 12:07:11 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30209ff97sm4954449137.0.2026.11.11.12.07.09
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30209ff97sm4954449137.0.2026.11.11.12.07.10
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 12:07:09 -0800 (PST)
+        Wed, 11 Nov 2026 12:07:10 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v10 02/11] lib: Add HDT definitions
-Date: Wed, 11 Nov 2026 15:06:55 -0500
-Message-ID: <20261111200705.3802779-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v10 03/11] doc/iso-protocol: Document BT_ISO_QOS
+Date: Wed, 11 Nov 2026 15:06:56 -0500
+Message-ID: <20261111200705.3802779-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261111200705.3802779-1-luiz.dentz@gmail.com>
 References: <20261111200705.3802779-1-luiz.dentz@gmail.com>
@@ -101,178 +101,232 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add the socket API needed for the LE HDT PHY:
-
-- BT_PHY bits for the HDT2, HDT3, HDT4, HDT6 and HDT7.5 rates in each
-  direction.
-- bt_security.mic_len to request and read the MIC length of a link.
-- struct bt_iso_qos_ext, an extensible ISO QoS passed with BT_ISO_QOS
-  and told apart from struct bt_iso_qos by its length, along with the
-  BT_ISO_PHY_* values and BT_ISO_HDT_RATE_* for its rates field.
-
-struct bt_iso_qos_ext is meant to grow rather than adding new socket
-options or structs, which is what its first two fields are for:
-
-- version tells which fields are valid, so later versions can add
-  fields while applications built for an earlier version keep working.
-  Version 1 adds the HDT rates of each direction.
-- type tells which member of the union is in use, unicast or
-  broadcast. The QoS is usually set before bind() or connect(), when
-  the kernel can't tell which one it was given, so with type each can
-  grow on its own by adding fields at its end, which is also why the
-  union is the last member. BT_ISO_QOS_ANY leaves it to connect() or
-  listen().
+Document BT_ISO_QOS with struct bt_iso_qos_ext, its version and type
+fields and why they exist, the PHY values and the HDT rates, with
+examples for unicast and broadcast with the LE HDT PHY and reading the
+QoS in use.
 ---
- lib/bluetooth/bluetooth.h | 119 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ doc/iso-protocol.rst | 207 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 207 insertions(+)
 
-diff --git a/lib/bluetooth/bluetooth.h b/lib/bluetooth/bluetooth.h
-index f9f22c3f7523..58bb65d7b1d3 100644
---- a/lib/bluetooth/bluetooth.h
-+++ b/lib/bluetooth/bluetooth.h
-@@ -50,9 +50,17 @@ extern "C" {
- #endif
+diff --git a/doc/iso-protocol.rst b/doc/iso-protocol.rst
+index 4d315132f911..8d8aebc3af2f 100644
+--- a/doc/iso-protocol.rst
++++ b/doc/iso-protocol.rst
+@@ -241,6 +241,213 @@ Example:
+         }
+     }
  
- #define BT_SECURITY	4
-+/* mic_len is the MIC length required of the link on the LE HDT PHY when set,
-+ * and the one in use when read. BLUETOOTH CORE SPECIFICATION Version 7.0 |
-+ * Vol 4, Part E, Section 7.7.8, MIC_Length: 0x00 MIC length is 32 bits, 0x01
-+ * MIC length is 64 bits, 0x02 MIC length is 128 bits, all other values
-+ * Reserved for future use. The 32 bits are those of the GFSK PHYs, so on the
-+ * LE HDT PHY 0x00 means no requirement.
-+ */
- struct bt_security {
- 	uint8_t level;
- 	uint8_t key_size;
-+	uint8_t mic_len;
- };
- #define BT_SECURITY_SDP		0
- #define BT_SECURITY_LOW		1
-@@ -130,6 +138,16 @@ struct bt_voice {
- #define BT_PHY_LE_2M_RX		0x00001000
- #define BT_PHY_LE_CODED_TX	0x00002000
- #define BT_PHY_LE_CODED_RX	0x00004000
-+#define BT_PHY_HDT_2M_TX	0x00008000
-+#define BT_PHY_HDT_2M_RX	0x00010000
-+#define BT_PHY_HDT_3M_TX	0x00020000
-+#define BT_PHY_HDT_3M_RX	0x00040000
-+#define BT_PHY_HDT_4M_TX	0x00080000
-+#define BT_PHY_HDT_4M_RX	0x00100000
-+#define BT_PHY_HDT_6M_TX	0x00200000
-+#define BT_PHY_HDT_6M_RX	0x00400000
-+#define BT_PHY_HDT_7_5M_TX	0x00800000
-+#define BT_PHY_HDT_7_5M_RX	0x01000000
++BT_ISO_QOS
++----------
++
++Isochronous channel QoS, used by **connect(2)** and **listen(2)** to set up a
++CIS (unicast) or BIS (broadcast). It is read back with **getsockopt(2)**, which
++reports the parameters in use once the channel is connected. Two forms are
++accepted, told apart by the option length:
++
++- ``struct bt_iso_qos``: the original form, kept for existing applications.
++- ``struct bt_iso_qos_ext``: the extended form, required
++  for the fields added after the original one, such as the HDT rates.
++
++.. code-block::
++
++    struct bt_iso_io_qos_ext {
++        uint32_t interval;
++        uint16_t latency;
++        uint16_t sdu;
++        uint8_t  phys;
++        uint8_t  rtn;
++        uint16_t rates;     /* Version 1 */
++    };
++
++    struct bt_iso_ucast_qos_ext {
++        uint8_t  cig;
++        uint8_t  cis;
++        uint8_t  sca;
++        uint8_t  packing;
++        uint8_t  framing;
++        struct bt_iso_io_qos_ext in;
++        struct bt_iso_io_qos_ext out;
++    };
++
++    struct bt_iso_bcast_qos_ext {
++        uint8_t  big;
++        uint8_t  bis;
++        uint8_t  sync_factor;
++        uint8_t  packing;
++        uint8_t  framing;
++        struct bt_iso_io_qos_ext in;
++        struct bt_iso_io_qos_ext out;
++        uint8_t  encryption;
++        uint8_t  bcode[16];
++        uint8_t  options;
++        uint16_t skip;
++        uint16_t sync_timeout;
++        uint8_t  sync_cte_type;
++        uint8_t  mse;
++        uint16_t timeout;
++    };
++
++    struct bt_iso_qos_ext {
++        uint16_t version;
++        uint16_t type;
++        union {         /* Shall be the last member */
++            struct bt_iso_ucast_qos_ext ucast;
++            struct bt_iso_bcast_qos_ext bcast;
++        };
++    };
++
++``struct bt_iso_qos`` has the same fields without ``version``, ``type`` and
++``rates``.
++
++The extended form is meant to grow, by extending it rather than adding new
++socket options or structs, which is what its first two fields are for:
++
++- ``version`` tells which fields are valid. Later versions add fields, while
++  applications built for an earlier version keep working with the fields
++  they know.
++- ``type`` tells which member of the union is in use. The QoS is usually set
++  before **bind(2)** or **connect(2)**, when the socket can't tell unicast
++  from broadcast, so with ``type`` ``ucast`` and ``bcast`` can each grow on
++  their own, by adding fields at their end, without the kernel having to
++  guess which one it was given. That is also why the union is the last
++  member.
++
++version:
++
++.. csv-table::
++    :header: "Value", "Description"
++    :widths: auto
++
++    **BT_ISO_QOS_VERSION_1 (0x0001)**, Adds ``rates`` to each direction
++
++type:
++
++.. csv-table::
++    :header: "Value", "Description"
++    :widths: auto
++
++    **BT_ISO_QOS_ANY (0x0000)**, "Set by **connect(2)** or **listen(2)**,
++    possible with version 1 fields since the unicast ones are a prefix of the
++    broadcast ones"
++    **BT_ISO_QOS_UCAST (0x0001)**, Unicast (CIS) uses ``ucast``
++    **BT_ISO_QOS_BCAST (0x0002)**, Broadcast (BIS) uses ``bcast``
++
++**setsockopt(2)** fails with ``EINVAL`` for an unknown ``version`` or
++``type``, and **connect(2)** or **listen(2)** fail with ``EINVAL`` if
++``type`` doesn't match how the socket is used. A socket that already has a
++connection, such as an accepted one with ``BT_DEFER_SETUP`` or a PA sync,
++knows its type, so there **setsockopt(2)** fails instead. **getsockopt(2)** returns
++``struct bt_iso_qos`` if the buffer is shorter than ``struct bt_iso_qos_ext``,
++otherwise ``struct bt_iso_qos_ext`` with the version and, once known, the type
++in use.
++
++phys, in each direction:
++
++.. csv-table::
++    :header: "Value", "Description"
++    :widths: auto
++
++    **BT_ISO_PHY_1M (0x01)**, LE 1M
++    **BT_ISO_PHY_2M (0x02)**, LE 2M
++    **BT_ISO_PHY_CODED (0x04)**, LE Coded
++    **BT_ISO_PHY_HDT (0x10)**, "LE HDT, if supported by the controller, using
++    ``rates``"
++
++rates, in each direction, used with ``BT_ISO_PHY_HDT``; 0 selects every rate
++the controller supports:
++
++.. csv-table::
++    :header: "Value", "Description"
++    :widths: auto
++
++    **BT_ISO_HDT_RATE_2M (0x0001)**, HDT 2M
++    **BT_ISO_HDT_RATE_3M (0x0002)**, HDT 3M
++    **BT_ISO_HDT_RATE_4M (0x0004)**, HDT 4M
++    **BT_ISO_HDT_RATE_6M (0x0008)**, "HDT 6M, if supported in that direction"
++    **BT_ISO_HDT_RATE_7_5M (0x0010)**, "HDT 7.5M, if supported in that
++    direction"
++
++Example (Unicast with the LE HDT PHY):
++
++.. code-block::
++
++    struct bt_iso_qos_ext qos;
++
++    memset(&qos, 0, sizeof(qos));
++    qos.version = BT_ISO_QOS_VERSION_1;
++    qos.type = BT_ISO_QOS_UCAST;
++    qos.ucast.cig = BT_ISO_QOS_CIG_UNSET;
++    qos.ucast.cis = BT_ISO_QOS_CIS_UNSET;
++
++    qos.ucast.out.interval = 10000;
++    qos.ucast.out.latency = 10;
++    qos.ucast.out.sdu = 40;
++    qos.ucast.out.phys = BT_ISO_PHY_HDT;
++    qos.ucast.out.rtn = 2;
++    qos.ucast.out.rates = BT_ISO_HDT_RATE_4M | BT_ISO_HDT_RATE_6M;
++
++    /* The input direction uses the same settings */
++    qos.ucast.in = qos.ucast.out;
++
++    err = setsockopt(iso_socket, SOL_BLUETOOTH, BT_ISO_QOS, &qos,
++                     sizeof(qos));
++    if (err == -1) {
++        perror("setsockopt");
++        return err;
++    }
++
++    /* connect(2) sets up the CIS */
++
++Example (Broadcast with the LE HDT PHY at any supported rate):
++
++.. code-block::
++
++    struct bt_iso_qos_ext qos;
++
++    memset(&qos, 0, sizeof(qos));
++    qos.version = BT_ISO_QOS_VERSION_1;
++    qos.type = BT_ISO_QOS_BCAST;
++    qos.bcast.big = BT_ISO_QOS_BIG_UNSET;
++    qos.bcast.bis = BT_ISO_QOS_BIS_UNSET;
++    qos.bcast.sync_factor = 0x01;
++    qos.bcast.sync_timeout = BT_ISO_SYNC_TIMEOUT;
++    qos.bcast.timeout = BT_ISO_SYNC_TIMEOUT;
++
++    qos.bcast.out.interval = 10000;
++    qos.bcast.out.latency = 10;
++    qos.bcast.out.sdu = 40;
++    qos.bcast.out.phys = BT_ISO_PHY_HDT;
++    qos.bcast.out.rtn = 2;
++    qos.bcast.out.rates = 0; /* Every rate the controller supports */
++
++    err = setsockopt(iso_socket, SOL_BLUETOOTH, BT_ISO_QOS, &qos,
++                     sizeof(qos));
++
++Example (Read the QoS in use, including the rates selected):
++
++.. code-block::
++
++    struct bt_iso_qos_ext qos;
++    socklen_t len = sizeof(qos);
++
++    err = getsockopt(iso_socket, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len);
++    if (err == -1) {
++        perror("getsockopt");
++        return err;
++    }
++
++    if (len < sizeof(qos)) {
++        /* Older kernel, only struct bt_iso_qos was returned */
++    } else if (qos.type == BT_ISO_QOS_UCAST &&
++               qos.ucast.out.phys == BT_ISO_PHY_HDT) {
++        printf("Output HDT rates 0x%4.4x\n", qos.ucast.out.rates);
++    }
++
+ BT_PKT_STATUS
+ -------------
  
- #define BT_MODE			15
- 
-@@ -219,6 +237,107 @@ struct bt_iso_qos {
- 	};
- };
- 
-+/* Extended ISO QoS, set and read with BT_ISO_QOS.
-+ *
-+ * The option length tells it apart from struct bt_iso_qos, which is kept for
-+ * existing applications. New fields are added by extending this struct rather
-+ * than by adding new socket options or structs:
-+ *
-+ * - version tells which fields are valid, so later versions can add fields
-+ *   while older applications keep working with the fields they know.
-+ * - type tells which member of the union is in use. The QoS is usually set
-+ *   before bind() or connect(), so the socket can't tell unicast from
-+ *   broadcast at that point. With type, struct bt_iso_ucast_qos_ext and
-+ *   struct bt_iso_bcast_qos_ext can each grow on their own, by adding fields
-+ *   at their end, without the kernel having to guess which one it was given.
-+ *   For that the union shall remain the last member.
-+ *
-+ * BT_ISO_QOS_ANY leaves the type to be set by connect() or listen(), which is
-+ * possible with version 1 since its unicast fields are a prefix of the
-+ * broadcast ones. A type that doesn't match how the socket is used makes
-+ * connect() or listen() fail with -EINVAL, or setsockopt() on a socket that
-+ * already has a connection, such as with deferred setup. getsockopt() reports
-+ * the type in use once it is known.
-+ *
-+ * Version 1 adds the HDT rates of each direction, see BT_ISO_HDT_RATE_*, used
-+ * when the PHY is BT_ISO_PHY_HDT; 0 means every rate the controller supports.
-+ */
-+#define BT_ISO_QOS_VERSION_1	0x0001
-+
-+#define BT_ISO_QOS_ANY		0x0000
-+#define BT_ISO_QOS_UCAST	0x0001
-+#define BT_ISO_QOS_BCAST	0x0002
-+
-+/* The HDT rates are those of the HDT_Rates parameters: BLUETOOTH CORE
-+ * SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.97:
-+ * HDT_Rates_C_To_P[i] bits 0 to 4 are the HDT2, HDT3, HDT4, HDT6 and HDT7.5
-+ * rates of the LE HDT PHY "(possibly among others)", all other bits are
-+ * Reserved for future use.
-+ */
-+#define BT_ISO_HDT_RATE_2M	0x0001
-+#define BT_ISO_HDT_RATE_3M	0x0002
-+#define BT_ISO_HDT_RATE_4M	0x0004
-+#define BT_ISO_HDT_RATE_6M	0x0008
-+#define BT_ISO_HDT_RATE_7_5M	0x0010
-+
-+/* The PHYs are the bits of PHY_C_To_P[i] and PHY_P_To_C[i], BLUETOOTH CORE
-+ * SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.97: bit 0 is LE 1M,
-+ * bit 1 is LE 2M, bit 2 is LE Coded, bit 4 is LE HDT and all other bits are
-+ * Reserved for future use.
-+ */
-+#define BT_ISO_PHY_1M		0x01
-+#define BT_ISO_PHY_2M		0x02
-+#define BT_ISO_PHY_CODED	0x04
-+#define BT_ISO_PHY_HDT		0x10
-+#define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
-+				 BT_ISO_PHY_CODED)
-+
-+struct bt_iso_io_qos_ext {
-+	uint32_t interval;
-+	uint16_t latency;
-+	uint16_t sdu;
-+	uint8_t  phys;
-+	uint8_t  rtn;
-+	uint16_t rates;
-+};
-+
-+struct bt_iso_ucast_qos_ext {
-+	uint8_t  cig;
-+	uint8_t  cis;
-+	uint8_t  sca;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
-+};
-+
-+struct bt_iso_bcast_qos_ext {
-+	uint8_t  big;
-+	uint8_t  bis;
-+	uint8_t  sync_factor;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos_ext in;
-+	struct bt_iso_io_qos_ext out;
-+	uint8_t  encryption;
-+	uint8_t  bcode[16];
-+	uint8_t  options;
-+	uint16_t skip;
-+	uint16_t sync_timeout;
-+	uint8_t  sync_cte_type;
-+	uint8_t  mse;
-+	uint16_t timeout;
-+};
-+
-+struct bt_iso_qos_ext {
-+	uint16_t version;
-+	uint16_t type;
-+	union {	/* Shall be the last member */
-+		struct bt_iso_ucast_qos_ext ucast;
-+		struct bt_iso_bcast_qos_ext bcast;
-+	};
-+};
-+
- #define BT_CODEC		19
- struct bt_codec {
- 	uint8_t id;
 -- 
 2.56.0
 
