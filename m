@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794414484;
-	b=BoGPKpU/ROzD9s1FdcGDbCs/IBD6XwZ00L2aVB440QfoHEAaS3GJaNhAUFBehc/Y1DHU
-	 NokCRqXZwDojz3+gFfaTHigR6ZeW4QoGgSRFcv0eA8Wj5YbT0T5f4+3R/De21wfBQRVCP
-	 tIc/9JarDd8g3xBaLR3mTDWOODD1iS7RplDzbd+ie78E6Jdfx3lRmaaDKB4rOLikqT2ym
-	 RVvaujysQP43uzt1CvvV6AeBd/xDShpigrKOgy+TUtqoCcHUcHGVSUsPTb6iDZ0RLNDps
-	 IE3gUfya0z8z5f1Tce46ILyeymcnkcEqMAuHvWdqEqpZLv3QGhXzKLS9EuHPf0CsSmg==
+	b=pW7tzzLMdcIDcFGC939K8vXi8sbjC+f2QiLEbFswjDhKe/Ga7IwfhPuE5mfnsG94Jk2c
+	 f6aV08gWfgiDtZreXca/k8OpwJu0FQkm8B4Vso7ZUhswLW7XwxZwfFkdtLbCTEblQe8zs
+	 lNa0D9SwqUSSPNSoyra6PcIvyhl/YCA4/JvLwyZin+HfpRBkrDann9VKoivzEtnDdm021
+	 vTUeMHwqZkSKlMoIuqNmfdbq5Tr6nXCI8emoSfiDqOF4TX9HTNUHekb0rXQy9MXlItG6R
+	 o830fzoTRvmIdvSaYQzRUFo9PBVd954upQ1N7WGJU2dy62eoHCgttvcM8i8vmFm/qrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794414484;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=mOvwqxfuZQ/LCU9F1/HNhjpi7YdR5nJdCNuJZnfK1pY=;
-	b=rZUruoFcWIfRgpCMjpVfosteqzz8Dz5MOPAzdg2H3H4cghaa8rmV8RIRQXYuGPr5DgPv
-	 Z2/mY2/xsBi6GY/RI4RwiSwX+bz6+1Jr/3mPm/WUBAJkkdzR0DMEUyZSEndydXDtwqnFf
-	 XOTfFbYoHtgMrUVUzRysPCLczVeDe5o/UfysYGLsUIv/gf+mo6Nl/ioJxXgsxXp+CSwtJ
-	 qfCOuEPirXD4vxcwAPXLP+RZSbpLPAC9AtSBVQdx8MZU8ZSjFRidc4g1dXsykiLuooQeH
-	 LFvtTLPfMeimhCdDCEEBK5lzlnnSNFd0cAVT1NuM31vrg5IxrO9hwEnpBZ1sVuQkq2w==
+	bh=/FfwQCH4i0+38v+P30L2QteJvs1CJcxhJQN+M1Ui0Ck=;
+	b=4d+3XBRPQlMwk6a/sCMKrAheteScDEvnXaLvK+zZgmbFmxBJ5J+O5kvGAdUiG5jXjfBm
+	 eIiMrFcrw6fu+5TOj0mfBYLR5pncJw2+10BUYNrpO71B/HzmCKbMpWkEsmoi3JWUjcKGo
+	 zzZlKol1PGT+N4iTtOjwlV81sE+xH+7vba3MaSNw2IeDhT9FML9PuuO4dhNGBIG4z0wuE
+	 S5l0eekxg3TW4k9csLbAtKn4WxSnMQB+5Wy8fSXJm6S1LEK0JQjMaevrxdzN8X8Jz39lm
+	 nZ/GuYJO6SbAkfm2xw6IMQQJybdczJF/A8xJdPFGq59j2gylh7KmKdImi8bqucuRTmg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wrA4MX5Q;
-	arc=none smtp.remote-ip=209.85.221.182
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WuSA4lCI;
+	arc=none smtp.remote-ip=209.85.221.179
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67329606A335
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:28:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67329606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF97606A326
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:28:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2EF97606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wrA4MX5Q
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5eaeb7fdda2so2015992e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:28:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WuSA4lCI
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5e9528732b4so2005775e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:28:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794414482; x=1795019282; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794414483; x=1795019283; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=mOvwqxfuZQ/LCU9F1/HNhjpi7YdR5nJdCNuJZnfK1pY=;
-        b=wrA4MX5QDGW6sF+RzyAIbrMr4/1GLKStY+AotDa1sLi8JepgWsgafQ/Qz4+KMKgvIg
-         3eg0b55uPyr+Urk8rrIoALajQUJmmVwnkLFbzEQpxjJfoYzMSoN9/GRu+p2VfWbSKljc
-         UCk+nQrA2lYNfQpJqDu5Udwh8EFpSla2jLtdXNdRXlfXg2W7GLsFG/f3r/hpWG9qe9BX
-         CQ5rqlsmZLFSOavr7I5TDqdeCWMm1tseNEEDXv1qvo/aM8S+5tnPNrTBrQrkbbWrSQAi
-         TFi09vYC9+xpd+000irWjBFWihTIlHD98ba8Uo61+FvTKHkZpL0CU5AMuVDjGw1UfZ+6
-         naMQ==
+        bh=/FfwQCH4i0+38v+P30L2QteJvs1CJcxhJQN+M1Ui0Ck=;
+        b=WuSA4lCIxRtAXdRN8lqebP0WPsxV8QjBHnFzJ5SP4uFOVQUzwp/VIHMq6J0cIDuVhK
+         oqk3o+ySSsLKMMn5qX7vwEZFoK3//yIJMPjYCpEeGynuR1rAJlqWNMzgn059c8RUhkQe
+         QyNJNlYGo9IriZKATpx5zbd222gLHxe7GVuWXvp2dLDQd6JAEors/iulv6lU9jeBYbV9
+         sTl3Ccb31jFxcNF6Gon+5PRA4ww0h+k55O/qEyPCY0MZNp/qOoD1gLEtDF9DT2GnMxjQ
+         COZnVhWrumHRBBBym8pB3waxsROFP8SGbdJUpHFu3QJrkP2hbDr0EJCTiAkC+i3jA99A
+         hbkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794414482; x=1795019282;
+        d=1e100.net; s=20260707; t=1794414483; x=1795019283;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=mOvwqxfuZQ/LCU9F1/HNhjpi7YdR5nJdCNuJZnfK1pY=;
-        b=r7wzCLeIbod4mvKb+bcFry8RqiJ1cYgDlmVgxe0s1KxvzkdqIanYTtKm/meSWzgpgW
-         U9DPjqU9niKVgII6GMcGPuDwmP9V1iGSzqF384HC9Igusplv8Ws586Y/YO76jltiL71L
-         dUJKo292sYkSPfrElahnEwmO93hxmOaJb4xJhd6TsK7tiKu6shJ8ODeoL3ohMmoFJ35Q
-         aO2FcXZ6MSfH5NQsaxuLTM9iL5YyQLURukGkTubOFYk6y2zZz+aMmTt6KAUKE1kZC7IO
-         qE00cTq7VsFC26w2SGcDjDAusbHH0/uJOVYwNa82zX7i0x18+yCl3g4Q4wJZ5mseZjBe
-         UgdQ==
-X-Gm-Message-State: APuU4Z8UXrdsafuXBJmZosk37XRFhKpsQJfMHwlOAANwqNFm01SVjaYn
-	R3zD66+vaW8/KooZTpvFl424e8o8LOp/oEiK2zpQjfkF8GtmLiDnbAb5l2YhXA==
-X-Gm-Gg: AYBFou3ypTCOiBFO00NIeBtbYdShLXRdaTvHN7cgizjny1vfYsxMqmlXBZW0BCi5rH/
-	sloTDwjLJwE+0MBi/1RIsCaAcTqbEOxBPkNcTnQK45WNJoOGbO5pbw7k6dE9lEslEKMoFJ0hhtM
-	mxs6gU2PU92ir24ZdDqpzWYKt/4dyt7LstvgXG7pypWNU0/JIPzfyzcsJkCaMfB7/Qwp0hliBzU
-	m3lqiLF3tFs6SwmfLk2WzbHEuYzgH4c3pVrZASb4RK2RRqbm/78FYYGyRi/X1aJO7wsCjhgT6fV
-	QPZdADinSBvoAaGJCZ4mRw3P43q2RjE2coIixf3o3PrhpgivY66j5B8LqBCRfRYBnOV8TIvYKVN
-	v2FT2IB5dVmkDAItbrr7DCmPhTWlVy7+i04Xjn6ZCOL5WHccLpfn4qP3ddYSHT32bs77u+pGznT
-	8H88yfvxH6Xq5D+fjQo/LVRzk1F4qDnbpoX7kbu5S3QKbRvdONwK5EjPFI1xceifb+uCcczPeuw
-	lFBZjYabQeG72uboNQn0dUww8X7w5yBnGshew+Ff8XOOiDJwNp9fTWxK+AsI34YwGuFcWzWVRs1
-	6zfrjhayuqhYiLOsx5JRrLUgotB9JJCxlap3j30IiBJ5LxfIi0UaWewuxpcORG7M04voOi8Sqkh
-	IyeZnRQJDn3fJPA28h3hu3Enqw+OQWE5o7RBAdw7Nz5CLJ+JU8mcfEU4D3EM3c387D2L0bX3YKa
-	yNBRI=
-X-Received: by 2002:a05:6122:46a7:b0:5ea:ddfd:3e99 with SMTP id 71dfb90a1353d-5ee1c42d4e7mr1203515e0c.10.1794414481595;
-        Wed, 11 Nov 2026 08:28:01 -0800 (PST)
+        bh=/FfwQCH4i0+38v+P30L2QteJvs1CJcxhJQN+M1Ui0Ck=;
+        b=T1qWntQdzEdpDyyYcNC2ULxSphGu/BRFyBiFdK85hgDLPiPvOYRZCDwHJr6SR3iNbN
+         WwuInaIEtWQQF1LqNqX1VMOUgPQUd/EeZx08Kpg14Lgm/vdiIsjC0ie28k1sz1bj+91J
+         K1kKwQ7rRUVSaD7CfoGrwrCpQF23JzXJ4IlST0WLZ6NKwzzCe8is4LMj2yCRjUW7Fc35
+         1ABT6qxfvcDiRNFOPIILbyIa7dNXZJrW//O2Z+AOCIgjn94lu5vcxt/NEGJS5JV52s3c
+         SWAi0NaBgB1aaZb0MLmFQTyTZgrJAyynIpww8RguV0suM117qVHoIgLFuOLBa6l6Hi3r
+         cemA==
+X-Gm-Message-State: APuU4Z8smvjH+/TI2TSY2w5QiZhUwD01ZjAANof7+7QlCiOTr8klpKTe
+	Io6hB61cXS9sSxss8nX/JOsizLfsQQ3y/zMNJL2XwLr303Ipm5siOXIotGf1mQ==
+X-Gm-Gg: AYBFou0xa2z5oCSUGISZRnPFXsuwGxtD+3n4GNsYrQPjJIFkCIF0QcG0H15Onz6tAlB
+	9EOYGbFn6v0Im1X+VxBTRD8Cnmd1oDA/X5ZPCMCaVWGu2Z4Kd/8sjUpWsNPRsfX//J2IhBEkp6z
+	CGJhB26Mk8ldKg31B5jO3kEWnUDSsa1VvGUEqDoqE68K/HvAkJ4jCuXUoK714D4QsgYxEjevQRx
+	41DCiWSFIrlEo5m88LlCir+WkF8T8CHCziLZ2S3QtQ4KCHMouHr6ThcavLbN4KOJb+pwDl7BFhk
+	7iLPu35YekoCislQc4YrFXCRy8nbaorC7wijMbS7yjTDIwtiDukfKV+ewd48qrj9kTyIjIw2h9a
+	EU/LI/4Bg4DbhEmuntnjx4lmq9By/Bh7Ol7o6okr84MO4H9zSMCdVuxWPRH2sk5EH9z0mCDnlW8
+	7XHQQt9MxL7I+3TxdmZesItBrC3v/3FCaSRvHFUov+ylwJEGRBGxrj8PVINhMu9LjnHUD/obrIO
+	x/RR3oFE4BFyhUi1pBnU2WST9pUpFBZ4uvLCDriSW+kViObloaehhqjtZFvsvpQ47YKZ+mTit+E
+	Go3LZkuxIbg4i88l8aoLNE7/+wVtudYgZ3dx4LpmziM9Ak1ufdrMTJdkU85PkuH/2LP7rlgkIca
+	CLtAalIJOnD6jQqi2URF1ePBIP2yEybTiR+dEvEzA6MnNUe1L8ilATLIx1TOht3Bg4MYKhqnMj2
+	APIqQ=
+X-Received: by 2002:a05:6122:512:b0:5ea:e052:2ef0 with SMTP id 71dfb90a1353d-5ee1c3ff521mr1124734e0c.9.1794414482815;
+        Wed, 11 Nov 2026 08:28:02 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5ab918sm4007081e0c.7.2026.11.11.08.28.00
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5ab918sm4007081e0c.7.2026.11.11.08.28.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 11 Nov 2026 08:28:01 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v9 04/11] monitor: Add HCI decoding for HDT
-Date: Wed, 11 Nov 2026 11:27:47 -0500
-Message-ID: <20261111162755.3506226-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v9 05/11] monitor: Add LL decoding for HDT
+Date: Wed, 11 Nov 2026 11:27:48 -0500
+Message-ID: <20261111162755.3506226-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261111162755.3506226-1-luiz.dentz@gmail.com>
 References: <20261111162755.3506226-1-luiz.dentz@gmail.com>
@@ -101,537 +101,20 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Decode the HCI commands, events, feature bits and supported commands
-bits introduced by High Data Throughput (HDT) and Encryption Key Schedule
-(EKS) in Bluetooth 7.0, along with the MIC Length Too Short error codes
-of L2CAP and ATT, the HDT MGMT setting and the HDT default parameters
-and EKS Opportunistic Encryption system configuration TLVs.
+Decode the LL_ENC_ECDH_REQ/RSP, LL_HDT_CONFIG_REQ/RSP and
+LL_HDT_LQF_REPORTING_IND Link Layer PDUs introduced by HDT and EKS.
 
-PHY_Options is decoded as the spec defines it: the LE Coded coding and the
-HDT packet format are values, not bits, and the preference for a 64-bit MIC
-and the forced key refresh have their own bits.
-
-Assisted-by: OpenCode:claude-opus-5
+The payload window sizes of these PDUs are encoded as one less than the
+size, so the size is printed along with the value in the PDU.
 ---
- monitor/att.c    |   3 +
- monitor/bt.h     | 378 +++++++++++++++++++
- monitor/l2cap.c  |   6 +
- monitor/packet.c | 935 ++++++++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 1310 insertions(+), 12 deletions(-)
+ monitor/ll.c | 278 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 273 insertions(+), 5 deletions(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index a35198949e3d..1d16ae21dadf 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -364,6 +364,9 @@ static void att_error_response(const struct l2cap_frame *frame)
- 	case 0x13:
- 		str = "Value Not Allowed";
- 		break;
-+	case 0x14:
-+		str = "MIC Length Too Short";
-+		break;
- 	case 0xfd:
- 		str = "CCC Improperly Configured";
- 		break;
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 1a4aa394182d..59bc90ccd30d 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -257,6 +257,68 @@ struct bt_ll_feature_ext_rsp {
- 	uint8_t  features[24];
- } __packed;
- 
-+/* Fields added at the end of LL_PHY_REQ and LL_PHY_RSP [v2] */
-+struct bt_ll_phy_v2 {
-+	uint8_t  flags;
-+} __packed;
-+
-+/* Fields added at the end of LL_PHY_UPDATE_IND [v2] */
-+struct bt_ll_phy_update_ind_v2 {
-+	uint8_t  address[5];
-+	uint8_t  flags;
-+} __packed;
-+
-+/* Fields added at the end of LL_CIS_REQ [v2] */
-+struct bt_ll_cis_req_v2 {
-+	uint16_t c_rates;
-+	uint16_t p_rates;
-+	uint8_t  config_id;
-+	uint8_t  tl_group_id;
-+	uint8_t  flags;
-+	uint8_t  se_length[3];
-+} __packed;
-+
-+/* Fields added at the end of LL_CIS_IND [v2] */
-+struct bt_ll_cis_ind_v2 {
-+	uint8_t  pca_h;
-+} __packed;
-+
-+#define BT_LL_ENC_ECDH_RSP	0x41
-+struct bt_ll_enc_ecdh_rsp {
-+	uint8_t flags;
-+	uint8_t rand[16];
-+	uint8_t key_type;
-+	uint8_t pubkey[64];
-+} __packed;
-+
-+#define BT_LL_ENC_ECDH_REQ	0x40
-+struct bt_ll_enc_ecdh_req {
-+	uint8_t flags;
-+	uint8_t rand[16];
-+	uint8_t key_type;
-+	uint8_t pubkey[64];
-+} __packed;
-+
-+#define BT_LL_HDT_CONFIG_RSP	0x43
-+struct bt_ll_hdt_config_rsp {
-+	uint8_t  wincfg;
-+	uint16_t acl_rx_rates;
-+	uint16_t acl_rx_mtu;
-+} __packed;
-+
-+#define BT_LL_HDT_CONFIG_REQ	0x42
-+struct bt_ll_hdt_config_req {
-+	uint8_t  wincfg;
-+	uint16_t acl_rx_rates;
-+	uint16_t acl_rx_mtu;
-+} __packed;
-+
-+#define BT_LL_HDT_LQF_REPORTING_IND 0x44
-+struct bt_ll_hdt_lqf_ind {
-+	uint8_t  transport;
-+} __packed;
-+
-+
- #define LMP_ESC4(x) ((127 << 8) | (x))
- 
- #define BT_LMP_NAME_REQ			1
-@@ -3251,6 +3313,235 @@ struct bt_hci_rsp_le_read_conn_interval {
- 	struct bt_hci_le_conn_interval_group grps[0];
- } __packed;
- 
-+#define BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2	0x20b2
-+#define BT_HCI_BIT_LE_WRITE_DEF_DATA_LEN_V2	BT_HCI_CMD_BIT(50, 7)
-+struct bt_hci_cmd_le_write_def_data_len_v2 {
-+	uint16_t tx_len;
-+	uint16_t tx_time;
-+	uint8_t  phys;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2	0x20b1
-+#define BT_HCI_BIT_LE_READ_DEF_DATA_LEN_V2	BT_HCI_CMD_BIT(50, 6)
-+struct bt_hci_cmd_le_read_def_data_len_v2 {
-+	uint8_t  phys;
-+} __packed;
-+
-+struct bt_hci_rsp_le_read_def_data_len_v2 {
-+	uint8_t  status;
-+	uint16_t tx_len;
-+	uint16_t tx_time;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2		0x20af
-+#define BT_HCI_BIT_LE_ENABLE_ENCRYPT_V2		BT_HCI_CMD_BIT(50, 4)
-+struct bt_hci_cmd_le_enable_encrypt_v2 {
-+	uint16_t handle;
-+	uint64_t rand;
-+	uint16_t ediv;
-+	uint8_t  ltk[16];
-+	uint8_t  mic_len;
-+	uint8_t  encryption;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2	0x20b0
-+#define BT_HCI_BIT_LE_READ_MAX_DATA_LEN_V2	BT_HCI_CMD_BIT(50, 5)
-+struct bt_hci_cmd_le_read_data_len_v2 {
-+	uint8_t  phy;
-+} __packed;
-+
-+struct bt_hci_rsp_le_read_data_len_v2 {
-+	uint8_t  status;
-+	uint16_t max_tx_len;
-+	uint16_t max_tx_time;
-+	uint16_t max_rx_len;
-+	uint16_t max_rx_time;
-+	uint8_t  max_tx_win;
-+	uint8_t  max_rx_win;
-+	uint16_t max_rx_packet;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_DATA_LEN_V2	0x20aa
-+#define BT_HCI_BIT_LE_SET_DATA_LEN_V2	BT_HCI_CMD_BIT(52, 3)
-+struct bt_hci_cmd_le_set_data_len_v2 {
-+	uint16_t handle;
-+	uint16_t tx_len;
-+	uint16_t tx_time;
-+	uint8_t  phys;
-+} __packed;
-+
-+struct bt_hci_rsp_le_set_data_len_v2 {
-+	uint8_t  status;
-+	uint16_t handle;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_CIG_PARAMS_V2		0x20b3
-+#define BT_HCI_BIT_LE_SET_CIG_PARAMS_V2		BT_HCI_CMD_BIT(51, 0)
-+struct bt_hci_cis_params_v2 {
-+	uint8_t  cis_id;
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint8_t  c_rtn;
-+	uint8_t  p_rtn;
-+	uint8_t  c_coded_rates;
-+	uint8_t  p_coded_rates;
-+	uint16_t c_hdt_rates;
-+	uint16_t p_hdt_rates;
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+} __packed;
-+
-+struct bt_hci_cmd_le_set_cig_params_v2 {
-+	uint8_t  cig_id;
-+	uint8_t  c_interval[3];
-+	uint8_t  p_interval[3];
-+	uint8_t  sca;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	uint16_t c_latency;
-+	uint16_t p_latency;
-+	uint8_t  num_cis;
-+	struct bt_hci_cis_params_v2 cis[];
-+} __packed;
-+
-+struct bt_hci_rsp_le_set_cig_params_v2 {
-+	uint8_t  status;
-+	uint8_t  cig_id;
-+	uint8_t  num_handles;
-+	uint16_t handle[];
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_CIG_PARAMS_TEST_V2	0x20b4
-+#define BT_HCI_BIT_LE_SET_CIG_PARAMS_TEST_V2	BT_HCI_CMD_BIT(51, 1)
-+struct bt_hci_cis_params_test_v2 {
-+	uint8_t  cis_id;
-+	uint8_t  nse;
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint16_t c_pdu;
-+	uint16_t p_pdu;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint8_t  c_bn;
-+	uint8_t  p_bn;
-+	uint8_t  c_coded_rates;
-+	uint8_t  p_coded_rates;
-+	uint16_t c_hdt_rates;
-+	uint16_t p_hdt_rates;
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+	uint8_t  c_win;
-+	uint8_t  p_win;
-+} __packed;
-+
-+struct bt_hci_cmd_le_set_cig_params_test_v2 {
-+	uint8_t  cig_id;
-+	uint8_t  c_interval[3];
-+	uint8_t  p_interval[3];
-+	uint8_t  c_ft;
-+	uint8_t  p_ft;
-+	uint16_t iso_interval;
-+	uint8_t  sca;
-+	uint16_t anchor_update;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	uint8_t  num_cis;
-+	struct bt_hci_cis_params_test_v2 cis[];
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_CREATE_BIG_V2		0x20b6
-+#define BT_HCI_BIT_LE_CREATE_BIG_V2		BT_HCI_CMD_BIT(51, 3)
-+struct bt_hci_bis_v2 {
-+	uint8_t  sdu_interval[3];
-+	uint16_t sdu;
-+	uint16_t latency;
-+	uint8_t  rtn;
-+	uint8_t  phy;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	uint8_t  encryption;
-+	uint8_t  bcode[16];
-+	uint8_t  coded_rates;
-+	uint16_t hdt_rates;
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+} __packed;
-+
-+struct bt_hci_cmd_le_create_big_v2 {
-+	uint8_t  handle;
-+	uint8_t  adv_handle;
-+	uint8_t  num_bis;
-+	struct bt_hci_bis_v2 bis;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_CREATE_BIG_TEST_V2	0x20b7
-+#define BT_HCI_BIT_LE_CREATE_BIG_TEST_V2	BT_HCI_CMD_BIT(51, 4)
-+struct bt_hci_bis_test_v2 {
-+	uint8_t  sdu_interval[3];
-+	uint16_t iso_interval;
-+	uint8_t  nse;
-+	uint16_t sdu;
-+	uint16_t pdu;
-+	uint8_t  phy;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	uint8_t  bn;
-+	uint8_t  irc;
-+	uint8_t  pto;
-+	uint8_t  encryption;
-+	uint8_t  bcode[16];
-+	uint8_t  coded_rates;
-+	uint16_t hdt_rates;
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+	uint8_t  blocks;
-+} __packed;
-+
-+struct bt_hci_cmd_le_create_big_test_v2 {
-+	uint8_t  big_handle;
-+	uint8_t  adv_handle;
-+	uint8_t  num_bis;
-+	struct bt_hci_bis_test_v2 bis[];
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS	0x20bc
-+#define BT_HCI_BIT_LE_SET_HDT_DEFAULT_PARAMS	BT_HCI_CMD_BIT(52, 1)
-+struct bt_hci_cmd_le_hdt_set_default_params {
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+	uint16_t rates;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_HDT_PARAMS_TEST	0x20bd
-+#define BT_HCI_BIT_LE_SET_HDT_PARAMS_TEST	BT_HCI_CMD_BIT(52, 2)
-+struct bt_hci_cmd_le_hdt_set_params_test {
-+	uint16_t handle;
-+	uint8_t  mic_len;
-+	uint8_t  format;
-+	uint8_t  blocks;
-+	uint16_t tx_rates;
-+} __packed;
-+
-+struct bt_hci_rsp_le_hdt_set_params_test {
-+	uint8_t  status;
-+	uint16_t handle;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_READ_EKS_DEBUG_MODE	0x20b8
-+#define BT_HCI_BIT_LE_READ_EKS_DEBUG_MODE	BT_HCI_CMD_BIT(51, 5)
-+struct bt_hci_rsp_le_read_eks_debug_mode {
-+	uint8_t  status;
-+	uint8_t  mode;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_WRITE_EKS_DEBUG_MODE	0x20b9
-+#define BT_HCI_BIT_LE_WRITE_EKS_DEBUG_MODE	BT_HCI_CMD_BIT(51, 6)
-+struct bt_hci_cmd_le_write_eks_debug_mode {
-+	uint8_t  mode;
-+} __packed;
-+
- #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
- struct bt_hci_evt_inquiry_complete {
- 	uint8_t  status;
-@@ -4228,6 +4519,93 @@ struct bt_hci_evt_le_conn_rate_change {
- 	uint16_t supv_timeout;
- } __packed;
- 
-+#define BT_HCI_EVT_ENCRYPT_CHANGE_V3		0x5a
-+#define BT_HCI_BIT_ENCRYPT_CHANGE_V3		26
-+struct bt_hci_evt_encrypt_change_v3 {
-+	uint8_t  status;
-+	uint16_t handle;
-+	uint8_t  mode;
-+	uint8_t  key_size;
-+	uint8_t  mic_len;
-+	uint8_t  eks_mode;
-+	uint8_t  eks_debug;
-+} __packed;
-+
-+#define BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2 0x5b
-+#define BT_HCI_BIT_ENCRYPT_KEY_REFRESH_COMPLETE_V2 27
-+struct bt_hci_evt_encrypt_key_refresh_complete_v2 {
-+	uint8_t  status;
-+	uint16_t handle;
-+	uint8_t  mic_len;
-+	uint8_t  eks_mode;
-+	uint8_t  eks_debug;
-+} __packed;
-+
-+#define BT_HCI_EVT_LE_DATA_LENGTH_CHANGE_V2	0x39
-+#define BT_HCI_BIT_LE_DATA_LENGTH_CHANGE_V2	56
-+struct bt_hci_evt_le_data_length_change_v2 {
-+	uint16_t handle;
-+	uint16_t max_tx_len;
-+	uint16_t max_tx_time;
-+	uint16_t max_rx_len;
-+	uint16_t max_rx_time;
-+	uint8_t  phys;
-+} __packed;
-+
-+#define BT_HCI_EVT_LE_CIS_ESTABLISHED_V3	0x3a
-+#define BT_HCI_BIT_LE_CIS_ESTABLISHED_V3	57
-+struct bt_hci_evt_le_cis_established_v3 {
-+	uint8_t  status;
-+	uint16_t conn_handle;
-+	uint8_t  cig_sync_delay[3];
-+	uint8_t  cis_sync_delay[3];
-+	uint8_t  c_latency[3];
-+	uint8_t  p_latency[3];
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint8_t  nse;
-+	uint8_t  c_bn;
-+	uint8_t  p_bn;
-+	uint8_t  c_ft;
-+	uint8_t  p_ft;
-+	uint16_t c_mtu;
-+	uint16_t p_mtu;
-+	uint16_t interval;
-+	uint8_t  sub_interval[3];
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint8_t  c_sdu_interval[3];
-+	uint8_t  p_sdu_interval[3];
-+	uint8_t  framing;
-+	uint16_t c_rates;
-+	uint16_t p_rates;
-+	uint8_t  config_id;
-+	uint8_t  group_id;
-+	uint8_t  encryption;
-+	uint8_t  mic_len;
-+} __packed;
-+
-+#define BT_HCI_EVT_LE_BIG_COMPLETE_V2		0x3b
-+#define BT_HCI_BIT_LE_BIG_COMPLETE_V2		58
-+struct bt_hci_evt_le_big_complete_v2 {
-+	uint8_t  status;
-+	uint8_t  handle;
-+	uint8_t  sync_delay[3];
-+	uint8_t  latency[3];
-+	uint8_t  phy;
-+	uint8_t  nse;
-+	uint8_t  bn;
-+	uint8_t  pto;
-+	uint8_t  irc;
-+	uint16_t max_pdu;
-+	uint16_t interval;
-+	uint16_t rates;
-+	uint8_t  encryption;
-+	uint8_t  mic_len;
-+	uint8_t  num_bis;
-+	uint16_t bis_handle[];
-+} __packed;
-+
- #define BT_HCI_ERR_SUCCESS			0x00
- #define BT_HCI_ERR_UNKNOWN_COMMAND		0x01
- #define BT_HCI_ERR_UNKNOWN_CONN_ID		0x02
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index d94d996010ff..ddc2388d55b8 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -633,6 +633,9 @@ static void print_le_conn_result(uint16_t result)
- 	case 0x000b:
- 		str = "Connection refused - unacceptable parameters";
- 		break;
-+	case 0x000c:
-+		str = "Connection refused - MIC length too short";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
-@@ -1440,6 +1443,9 @@ static void print_ecred_conn_result(uint16_t result)
- 	case 0x000b:
- 		str = "All Connections refused - unacceptable parameters";
- 		break;
-+	case 0x0010:
-+		str = "All Connections refused - MIC length too short";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 9162b41f72ed..f8d53c580be6 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -1004,6 +1004,9 @@ static const struct {
- 	{ 0x43, "Limit Reached"						},
- 	{ 0x44, "Operation Cancelled by Host"				},
- 	{ 0x45, "Packet Too Long"					},
-+	{ 0x49, "Invalid Packet Format"					},
-+	{ 0x4a, "Invalid Public Key"					},
-+	{ 0x4b, "Debug Key Not Allowed"					},
- 	{ }
- };
- 
-@@ -3227,6 +3230,15 @@ static const struct bitfield_data features_le_1[] = {
- 	{  9, "Shorter Connection Intervals (Host Support)"	},
- 	{ 10, "LE Flushable ACL Data"				},
- 	{ 11, "Channel Sounding Enhancement #1"			},
-+	{ 12, "Encryption Key Schedule"				},
-+	{ 13, "High Data Throughput"				},
-+	{ 14, "Receive HDT6 Rate"				},
-+	{ 15, "Transmit HDT6 Rate"				},
-+	{ 16, "Receive HDT7.5 Rate"				},
-+	{ 17, "Transmit HDT7.5 Rate"				},
-+	{ 18, "HDT Packet Format 1"				},
-+	{ 19, "Link Quality Feedback"				},
-+	{ 26, "Opportunistic Encryption (Host Support)"		},
- 	{ }
- };
- 
-@@ -3302,6 +3314,7 @@ static void print_features(uint8_t page, const uint8_t *features_array,
- 			break;
- 		case 1:
- 			features_table = features_le_1;
-+			break;
- 		}
- 		break;
- 	case 0xf0:
-@@ -3615,9 +3628,11 @@ static const struct bitfield_data events_page2_table[] = {
- 	{ 23, "Authenticated Payload Timeout Expired"			},
- 	{ 24, "SAM Status Change"					},
- 	{ 25, "Encryption Change [v2]"					},
-+	{ 26, "Encryption Change [v3]"					},
-+	{ 27, "Encryption Key Refresh Complete [v2]"			},
-+	{ 28, "Encryption Key Debug Report"				},
- 	{ }
- };
--
- static const struct bitfield_data events_le_table[] = {
- 	{  0, "LE Connection Complete"					},
- 	{  1, "LE Advertising Report"					},
-@@ -3675,6 +3690,9 @@ static const struct bitfield_data events_le_table[] = {
- 	{ 53, "LE UTP Received"						},
- 	{ 54, "LE Connection Rate Change"				},
- 	{ 55, "LE CS Read Remote Supported Capabilities Complete [v2]"	},
-+	{ 56, "LE Data Length Change [v2]"				},
-+	{ 57, "LE CIS Established [v3]"				},
-+	{ 58, "LE Create BIG Complete [v2]"				},
- 	{ }
- };
- 
-@@ -8168,6 +8186,9 @@ static void print_le_phy(const char *prefix, uint8_t phy)
- 	case 0x03:
- 		str = "LE Coded";
- 		break;
-+	case 0x05:
-+		str = "LE HDT";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
-@@ -8190,6 +8211,7 @@ static const struct bitfield_data le_phys[] = {
+diff --git a/monitor/ll.c b/monitor/ll.c
+index 6c0f67b5dcae..c1c68d35ba3c 100644
+--- a/monitor/ll.c
++++ b/monitor/ll.c
+@@ -538,9 +538,18 @@ static const struct bitfield_data le_phys[] = {
  	{  0, "LE 1M"	},
  	{  1, "LE 2M"	},
  	{  2, "LE Coded"},
@@ -639,291 +122,79 @@ index 9162b41f72ed..f8d53c580be6 100644
  	{ }
  };
  
-@@ -8235,26 +8257,82 @@ static void le_set_default_phy_cmd(uint16_t index, const void *data,
- 	print_le_phys_preference(cmd->all_phys, cmd->tx_phys, cmd->rx_phys);
- }
- 
--static void le_set_phy_cmd(uint16_t index, const void *data, uint8_t size)
--{
--	const struct bt_hci_cmd_le_set_phy *cmd = data;
--	const char *str;
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.49:
-+ *
-+ * PHY_Options, bits 0 to 1: 0 = the Host has no preferred coding when
-+ * transmitting on the LE Coded PHY, 1 = the Host prefers that S=2 coding be
-+ * used, 2 = the Host prefers that S=8 coding be used, 3 = Reserved for future
-+ * use. Bits 2 to 6 are the HDT rates, bit 7 is the preference for a 64-bit
-+ * MIC length on the LE HDT PHY, bits 8 to 9 are the preferred packet format
-+ * (0 = no preference, 1 = packet format 0, 2 = packet format 1, 3 = Reserved
-+ * for future use) and bit 10 forces the key to be refreshed if the connection
-+ * is encrypted using EKS. All other bits are Reserved for future use.
++/* The payload window sizes of the HDT PDUs are encoded as one less than the
++ * size, print the size and the value as it is in the PDU.
 + */
-+static const struct bitfield_data hdt_phy_opts[] = {
-+	{ 2, "HDT 2M" },
-+	{ 3, "HDT 3M" },
-+	{ 4, "HDT 4M" },
-+	{ 5, "HDT 6M" },
-+	{ 6, "HDT 7.5M" },
-+	{ 7, "Prefer 64-bit MIC" },
-+	{ 10, "Force key refresh" },
-+	{ }
-+};
- 
--	print_handle(cmd->handle);
--	print_le_phys_preference(cmd->all_phys, cmd->tx_phys, cmd->rx_phys);
--	switch (le16_to_cpu(cmd->phy_opts)) {
-+static void print_le_phy_options(const char *label, uint16_t opts)
++static void print_payload_window(const char *prefix, uint8_t val)
 +{
-+	const char *str;
-+	uint16_t mask;
-+
-+	print_field("%s: 0x%4.4x", label, opts);
-+
-+	switch (opts & 0x0003) {
-+	case 0x0000:
-+		str = "No preferred coding";
-+		break;
- 	case 0x0001:
--		str = "S2 coding";
-+		str = "Prefer S=2 coding";
- 		break;
- 	case 0x0002:
--		str = "S8 coding";
-+		str = "Prefer S=8 coding";
- 		break;
- 	default:
- 		str = "Reserved";
- 		break;
- 	}
- 
--	print_field("PHY options preference: %s (0x%4.4x)", str, cmd->phy_opts);
-+	print_field("  LE Coded: %s (%u)", str, opts & 0x0003);
-+
-+	switch ((opts >> 8) & 0x0003) {
-+	case 0x0000:
-+		str = "No preferred packet format";
-+		break;
-+	case 0x0001:
-+		str = "Prefer packet format 0";
-+		break;
-+	case 0x0002:
-+		str = "Prefer packet format 1";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+
-+	print_field("  LE HDT: %s (%u)", str, (opts >> 8) & 0x0003);
-+
-+	mask = print_bitfield(4, opts & ~0x0303, hdt_phy_opts);
-+	if (mask)
-+		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
-+							" (0x%4.4x)", mask);
++	print_field("%s: %u (0x%2.2x)", prefix, val + 1, val);
 +}
 +
-+static void le_set_phy_cmd(uint16_t index, const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_phy *cmd = data;
+ static void phy_req_rsp(const void *data, uint8_t size)
+ {
+ 	const struct bt_ll_phy *pdu = data;
+@@ -558,6 +567,24 @@ static void phy_req_rsp(const void *data, uint8_t size)
+ 	if (mask)
+ 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
+ 							" (0x%2.2x)", mask);
 +
-+	print_handle(cmd->handle);
-+	print_le_phys_preference(cmd->all_phys, cmd->tx_phys, cmd->rx_phys);
-+	print_le_phy_options("PHY Options", le16_to_cpu(cmd->phy_opts));
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++	 * Section 2.4.2.22:
++	 *
++	 * Refresh shall be set to 1 to require a key refresh. If the field
++	 * is not included, then the value is 0.
++	 * MIC_Length shall be set to 1 to request that the MIC_Length on the
++	 * LE HDT PHY is 64 bits. If the field is not included, then the
++	 * value is 0 (128 bits).
++	 */
++	if (size >= sizeof(*pdu) + sizeof(struct bt_ll_phy_v2)) {
++		const struct bt_ll_phy_v2 *v2 = (const void *) (pdu + 1);
++
++		print_field("Refresh: %u", v2->flags & 0x01);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x02 ? "64 bits" : "128 bits",
++				(v2->flags >> 1) & 0x01);
++	}
  }
  
- static void le_enhanced_receiver_test_cmd(uint16_t index, const void *data,
-@@ -9211,7 +9289,7 @@ static void print_framing(uint8_t value)
- 		print_field("Framing: Framed (0x%2.2x)", value);
- 		return;
- 	default:
--		print_field("Packing: Reserved (0x%2.2x)", value);
-+		print_field("Framing: Reserved (0x%2.2x)", value);
- 	}
+ static void phy_update_ind(const void *data, uint8_t size)
+@@ -580,6 +607,32 @@ static void phy_update_ind(const void *data, uint8_t size)
+ 							" (0x%2.2x)", mask);
+ 
+ 	print_field("Instant: 0x%4.4x", pdu->instant);
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++	 * Section 2.4.2.23:
++	 *
++	 * Address shall be set to the Physical Channel Address for the PHY
++	 * that will be used after the instant on the ACL (with the most
++	 * significant octet set to 0x00 if the PCA is only 4 octets).
++	 * Refresh shall be set to 1 if the encryption key will be refreshed.
++	 * MIC_Length shall be set to 1 if the encryption key will be
++	 * refreshed and the new key uses a 64-bit MIC. If the MIC_Length
++	 * field is not included, then the value is 0 (128 bits).
++	 */
++	if (size >= sizeof(*pdu) + sizeof(struct bt_ll_phy_update_ind_v2)) {
++		const struct bt_ll_phy_update_ind_v2 *v2;
++
++		v2 = (const void *) (pdu + 1);
++
++		print_field("Address: %2.2x%2.2x%2.2x%2.2x%2.2x",
++				v2->address[4], v2->address[3],
++				v2->address[2], v2->address[1],
++				v2->address[0]);
++		print_field("Refresh: %u", v2->flags & 0x01);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x02 ? "64 bits" : "128 bits",
++				(v2->flags >> 1) & 0x01);
++	}
  }
  
-@@ -10305,6 +10383,541 @@ static void le_read_conn_interval_rsp(uint16_t index, const void *data,
- 	}
+ static void min_used_channels(const void *data, uint8_t size)
+@@ -648,6 +701,53 @@ static void clock_acc_req_rsp(const void *data, uint8_t size)
+ 	print_field("SCA: 0x%2.2x", pdu->sca);
  }
  
-+static void print_le_def_phys(uint8_t phys)
-+{
-+	const char *str;
-+
-+	switch (phys) {
-+	case 0x00:
-+		str = "All GFSK";
-+		break;
-+	case 0x01:
-+		str = "HDT";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("PHYs: %s (0x%2.2x)", str, phys);
-+}
-+
-+static void le_write_def_data_len_v2(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_write_def_data_len_v2 *cmd = data;
-+
-+	print_field("TX octets: %d", le16_to_cpu(cmd->tx_len));
-+	print_field("TX time: %d", le16_to_cpu(cmd->tx_time));
-+	print_le_def_phys(cmd->phys);
-+}
-+
-+static void le_read_def_data_len_v2(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_read_def_data_len_v2 *cmd = data;
-+
-+	print_le_def_phys(cmd->phys);
-+}
-+
-+static void le_read_def_data_len_v2_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_read_def_data_len_v2 *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_field("TX octets: %d", le16_to_cpu(rsp->tx_len));
-+	print_field("TX time: %d", le16_to_cpu(rsp->tx_time));
-+}
-+
-+static void print_prefer_mic_len(uint8_t mic_len)
-+{
-+	const char *str;
-+
-+	switch (mic_len) {
-+	case 0x01:
-+		str = "Prefer 64 bits";
-+		break;
-+	case 0x02:
-+		str = "128 bits";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("MIC Length: %s (0x%2.2x)", str, mic_len);
-+}
-+
-+static void print_enable_encrypt(uint8_t encrypt)
-+{
-+	const char *str;
-+
-+	switch (encrypt) {
-+	case 0x00:
-+		str = "LTK";
-+		break;
-+	case 0x01:
-+		str = "Opportunistic with Key Schedule";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("Encryption: %s (0x%2.2x)", str, encrypt);
-+}
-+
-+static void le_enable_encrypt_v2(uint16_t index, const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_enable_encrypt_v2 *cmd = data;
-+
-+	print_handle(cmd->handle);
-+	print_random_number(cmd->rand);
-+	print_encrypted_diversifier(cmd->ediv);
-+	print_key("Long term key", cmd->ltk);
-+	print_prefer_mic_len(cmd->mic_len);
-+	print_enable_encrypt(cmd->encryption);
-+}
-+
-+static void print_set_le_phy(const char *prefix, uint8_t phy)
-+{
-+	if (phy)
-+		return print_le_phy(prefix, phy);
-+
-+	print_field("%s: No PHY (0x%2.2x)", prefix, phy);
-+}
-+
-+static void le_read_max_data_len_v2(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_read_data_len_v2 *cmd = data;
-+
-+	print_set_le_phy("PHY", cmd->phy);
-+}
-+
-+static void le_read_max_data_len_v2_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_read_data_len_v2 *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_field("Max TX octets: %d", le16_to_cpu(rsp->max_tx_len));
-+	print_field("Max TX time: %d", le16_to_cpu(rsp->max_tx_time));
-+	print_field("Max RX octets: %d", le16_to_cpu(rsp->max_rx_len));
-+	print_field("Max RX time: %d", le16_to_cpu(rsp->max_rx_time));
-+	print_field("Max TX Payload Window size: %d", rsp->max_tx_win);
-+	print_field("Max RX Payload Window size: %d", rsp->max_rx_win);
-+	print_field("Max RX Payload Packet size: %d",
-+			le16_to_cpu(rsp->max_rx_packet));
-+}
-+
-+static void print_phys(uint8_t phys)
-+{
-+	const char *str;
-+
-+	switch (phys) {
-+	case 0x00:
-+		str = "GFSK";
-+		break;
-+	case 0x01:
-+		str = "HDT";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("PHYs: %s (0x%2.2x)", str, phys);
-+}
-+
-+static void le_set_data_len_v2(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_data_len_v2 *cmd = data;
-+
-+	print_handle(cmd->handle);
-+	print_field("TX octets: %d", le16_to_cpu(cmd->tx_len));
-+	print_field("TX time: %d", le16_to_cpu(cmd->tx_time));
-+	print_phys(cmd->phys);
-+}
-+
-+static void le_set_data_len_v2_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_data_len_v2 *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_handle(rsp->handle);
-+}
-+
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E, Section 7.8.97:
-+ *
-+ * Coded_Rates_C_To_P[i]: bit 0 is "For LE Coded PHY, the Host prefers to use
-+ * the S=8 coding (possibly among others)", bit 1 is the same for the S=2
-+ * coding. HDT_Rates_C_To_P[i]: bits 0 to 4 are the HDT2, HDT3, HDT4, HDT6 and
-+ * HDT7.5 rates of the LE HDT PHY. All other bits are Reserved for future use,
-+ * and each is ignored unless its PHY is in PHY_C_To_P[i].
-+ *
-+ * The same bits are used for the P_To_C direction and, in the events, for the
-+ * rates in use.
-+ */
 +static const struct bitfield_data coded_rates[] = {
 +	{ 0, "CODED S=8" },
 +	{ 1, "CODED S=2" },
@@ -939,23 +210,26 @@ index 9162b41f72ed..f8d53c580be6 100644
 +	{ }
 +};
 +
-+static void print_rates(const char *prefix, uint8_t phy, uint16_t rates)
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B, Table 2.27:
++ *
++ * Bit 0: For the LE Coded PHY, indicates use of the S=8 coding (possibly among
++ * others). For the LE HDT PHY, indicates use of the HDT2 rate (possibly among
++ * others). Otherwise, the bit is ignored.
++ * Bit 1: For the LE Coded PHY, indicates use of the S=2 coding (possibly among
++ * others). For the LE HDT PHY, indicates use of the HDT3 rate (possibly among
++ * others). Otherwise, the bit is ignored.
++ * Bits 2 to 4: For the LE HDT PHY, the HDT4, HDT6 and HDT7.5 rates.
++ *
++ * So the rates are those of the PHY set in phys, as defined in Table 2.24.
++ */
++static void print_rates(const char *prefix, uint8_t phys, uint16_t rates)
 +{
 +	const struct bitfield_data *fields = NULL;
 +
-+	switch (phy) {
-+	case 0x01:
-+	case 0x02:
-+		break;
-+	case 0x03:
-+		fields = coded_rates;
-+		break;
-+	case 0x05:
++	if (phys & BIT(4))
 +		fields = hdt_rates;
-+		break;
-+	default:
-+		break;
-+	}
++	else if (phys & BIT(2))
++		fields = coded_rates;
 +
 +	print_field("%s: 0x%4.4x", prefix, rates);
 +
@@ -968,660 +242,236 @@ index 9162b41f72ed..f8d53c580be6 100644
 +	}
 +}
 +
-+static void print_packet_format(uint8_t format)
-+{
-+	const char *str;
-+
-+	switch (format) {
-+	case 0x00:
-+		str = "No preffered format";
-+		break;
-+	case 0x01:
-+		str = "Packet Format 0";
-+		break;
-+	case 0x02:
-+		str = "Packet Format 1";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("Packet Format: %s (0x%2.2x)", str, format);
-+}
-+
-+static void print_cis_params_v2(const void *data, int i)
-+{
-+	const struct bt_hci_cis_params_v2 *cis = data;
-+
-+	print_field("CIS ID: 0x%2.2x", cis->cis_id);
-+	print_field("Central to Peripheral Maximum SDU Size: %u",
-+						le16_to_cpu(cis->c_sdu));
-+	print_field("Peripheral to Central Maximum SDU Size: %u",
-+						le16_to_cpu(cis->p_sdu));
-+	print_le_phys("Central to Peripheral PHY", cis->c_phy);
-+	print_le_phys("Peripheral to Central PHY", cis->p_phy);
-+	print_field("Central to Peripheral Retransmission attempts: 0x%2.2x",
-+							cis->c_rtn);
-+	print_field("Peripheral to Central Retransmission attempts: 0x%2.2x",
-+							cis->p_rtn);
-+	print_rates("Central to Peripheral Coded Rates", 0x03,
-+			cis->c_coded_rates);
-+	print_rates("Peripheral to Central Coded Rates", 0x03,
-+			cis->p_coded_rates);
-+	print_rates("Central to Peripheral HDT Rates", 0x05,
-+			le16_to_cpu(cis->c_hdt_rates));
-+	print_rates("Peripheral to Central HDT Rates", 0x05,
-+			le16_to_cpu(cis->p_hdt_rates));
-+	print_prefer_mic_len(cis->mic_len);
-+	print_packet_format(cis->format);
-+}
-+
-+static void le_set_cig_params_v2(uint16_t index, const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_cig_params_v2 *cmd = data;
-+
-+	print_field("CIG ID: 0x%2.2x", cmd->cig_id);
-+	print_usec_interval("Central to Peripheral SDU Interval",
-+							cmd->c_interval);
-+	print_usec_interval("Peripheral to Central SDU Interval",
-+							cmd->p_interval);
-+	print_sca(cmd->sca);
-+	print_packing(cmd->packing);
-+	print_framing(cmd->framing);
-+	print_field("Central to Peripheral Maximum Latency: %d ms (0x%4.4x)",
-+		le16_to_cpu(cmd->c_latency), le16_to_cpu(cmd->c_latency));
-+	print_field("Peripheral to Central Maximum Latency: %d ms (0x%4.4x)",
-+		le16_to_cpu(cmd->p_latency), le16_to_cpu(cmd->p_latency));
-+	print_field("Number of CIS: %u", cmd->num_cis);
-+
-+	size -= sizeof(*cmd);
-+
-+	print_list(cmd->cis, size, cmd->num_cis, sizeof(*cmd->cis),
-+						print_cis_params_v2);
-+}
-+
-+static void le_set_cig_params_v2_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_cig_params *rsp = data;
-+
-+	print_status(rsp->status);
-+
-+	if (size == 1)
-+		return;
-+
-+	print_field("CIG ID: 0x%2.2x", rsp->cig_id);
-+	print_field("Number of Handles: %u", rsp->num_handles);
-+
-+	size -= sizeof(*rsp);
-+
-+	print_list(rsp->handle, size, rsp->num_handles, sizeof(*rsp->handle),
-+						print_cig_handle);
-+}
-+
-+static void print_cis_params_test_v2(const void *data, int i)
-+{
-+	const struct bt_hci_cis_params_test_v2 *cis = data;
-+
-+	print_field("CIS ID: 0x%2.2x", cis->cis_id);
-+	print_field("NSE: 0x%2.2x", cis->nse);
-+	print_field("Central to Peripheral Maximum SDU: 0x%4.4x",
-+						le16_to_cpu(cis->c_sdu));
-+	print_field("Peripheral to Central Maximum SDU: 0x%4.4x",
-+						le16_to_cpu(cis->p_sdu));
-+	print_field("Central to Peripheral Maximum PDU: 0x%4.4x",
-+						le16_to_cpu(cis->c_pdu));
-+	print_field("Peripheral to Central Maximum PDU: 0x%4.4x",
-+						le16_to_cpu(cis->p_pdu));
-+	print_le_phys("Central to Peripheral PHY", cis->c_phy);
-+	print_le_phys("Peripheral to Central PHY", cis->p_phy);
-+	print_field("Central to Peripheral Burst Number: 0x%2.2x", cis->c_bn);
-+	print_field("Peripheral to Central Burst Number: 0x%2.2x", cis->p_bn);
-+	print_rates("Central to Peripheral Coded Rates", 0x03,
-+			cis->c_coded_rates);
-+	print_rates("Peripheral to Central Coded Rates", 0x03,
-+			cis->p_coded_rates);
-+	print_rates("Central to Peripheral HDT Rates", 0x05,
-+			le16_to_cpu(cis->c_hdt_rates));
-+	print_rates("Peripheral to Central HDT Rates", 0x05,
-+			le16_to_cpu(cis->p_hdt_rates));
-+	print_prefer_mic_len(cis->mic_len);
-+	print_packet_format(cis->format);
-+	print_field("Central to Peripheral Payload Window size: %d",
-+			cis->c_win);
-+	print_field("Peripheral to Central Payload Window size: %d",
-+			cis->p_win);
-+}
-+
-+static void le_set_cig_params_test_v2(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_cig_params_test_v2 *cmd = data;
-+
-+	print_field("CIG ID: 0x%2.2x", cmd->cig_id);
-+	print_usec_interval("Central to Peripheral SDU Interval",
-+							cmd->c_interval);
-+	print_usec_interval("Peripheral to Central SDU Interval",
-+							cmd->p_interval);
-+	print_field("Central to Peripheral Flush Timeout: 0x%2.2x", cmd->c_ft);
-+	print_field("Peripheral to Central Flush Timeout: 0x%2.2x", cmd->p_ft);
-+	print_field("ISO Interval: %.2f ms (0x%4.4x)",
-+				le16_to_cpu(cmd->iso_interval) * 1.25,
-+				le16_to_cpu(cmd->iso_interval));
-+	print_sca(cmd->sca);
-+	print_field("Anchor Update Buffer Time: %u us",
-+					le16_to_cpu(cmd->anchor_update));
-+	print_packing(cmd->packing);
-+	print_framing(cmd->framing);
-+	print_field("Number of CIS: %u", cmd->num_cis);
-+
-+	size -= sizeof(*cmd);
-+
-+	print_list(cmd->cis, size, cmd->num_cis, sizeof(*cmd->cis),
-+						print_cis_params_test_v2);
-+}
-+
-+static void le_set_cig_params_test_v2_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_cig_params_v2 *rsp = data;
-+
-+	print_status(rsp->status);
-+
-+	if (size == 1)
-+		return;
-+
-+	print_field("CIG ID: 0x%2.2x", rsp->cig_id);
-+	print_field("Number of Handles: %u", rsp->num_handles);
-+
-+	size -= sizeof(*rsp);
-+
-+	print_list(rsp->handle, size, rsp->num_handles, sizeof(*rsp->handle),
-+						print_cig_handle);
-+}
-+
-+static void print_bis_v2(const struct bt_hci_bis_v2 *bis)
-+{
-+	print_usec_interval("SDU Interval", bis->sdu_interval);
-+	print_field("Maximum SDU size: %u", le16_to_cpu(bis->sdu));
-+	print_field("Maximum Latency: %u ms (0x%4.4x)",
-+			le16_to_cpu(bis->latency), le16_to_cpu(bis->latency));
-+	print_field("RTN: 0x%2.2x", bis->rtn);
-+	print_le_phys("PHY", bis->phy);
-+	print_packing(bis->packing);
-+	print_framing(bis->framing);
-+	print_field("Encryption: 0x%2.2x", bis->encryption);
-+	print_hex_field("Broadcast Code", bis->bcode, 16);
-+	print_rates("Coded Rates", 0x03, bis->coded_rates);
-+	print_rates("HDT Rates", 0x05, le16_to_cpu(bis->hdt_rates));
-+	print_prefer_mic_len(bis->mic_len);
-+	print_packet_format(bis->format);
-+}
-+
-+static void le_create_big_v2(uint16_t index, const void *data, uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_create_big_v2 *cmd = data;
-+
-+	print_field("Handle: 0x%2.2x", cmd->handle);
-+	print_field("Advertising Handle: 0x%2.2x", cmd->adv_handle);
-+	print_field("Number of BIS: %u", cmd->num_bis);
-+	print_bis_v2(&cmd->bis);
-+}
-+
-+static void print_bis_test_v2(const void *data, int i)
-+{
-+	const struct bt_hci_bis_test_v2 *bis = data;
-+
-+	print_usec_interval("SDU Interval", bis->sdu_interval);
-+	print_field("ISO Interval: %.2f ms (0x%4.4x)",
-+				le16_to_cpu(bis->iso_interval) * 1.25,
-+				le16_to_cpu(bis->iso_interval));
-+	print_field("Number of Subevents: %u", bis->nse);
-+	print_field("Maximum SDU: %u", le16_to_cpu(bis->sdu));
-+	print_field("Maximum PDU: %u", le16_to_cpu(bis->pdu));
-+	print_packing(bis->packing);
-+	print_framing(bis->framing);
-+	print_le_phy("PHY", bis->phy);
-+	print_field("Burst Number: %u", bis->bn);
-+	print_field("Immediate Repetition Count: %u", bis->irc);
-+	print_field("Pre Transmission Offset: 0x%2.2x", bis->pto);
-+	print_field("Encryption: 0x%2.2x", bis->encryption);
-+	print_hex_field("Broadcast Code", bis->bcode, 16);
-+	print_rates("Coded Rates", 0x03, bis->coded_rates);
-+	print_rates("HDT Rates", 0x05, le16_to_cpu(bis->hdt_rates));
-+	print_prefer_mic_len(bis->mic_len);
-+	print_packet_format(bis->format);
-+	print_field("Blocks per Payload: %u", bis->blocks);
-+}
-+
-+static void le_create_big_test_v2(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_create_big_test_v2 *cmd = data;
-+
-+	print_field("BIG Handle: 0x%2.2x", cmd->big_handle);
-+	print_field("Advertising Handle: 0x%2.2x", cmd->adv_handle);
-+	print_field("Number of BIS: %u", cmd->num_bis);
-+
-+	size -= sizeof(*cmd);
-+
-+	print_list(cmd->bis, size, cmd->num_bis, sizeof(*cmd->bis),
-+						print_bis_test_v2);
-+}
-+
-+static void le_set_hdt_default_params(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_hdt_set_default_params *cmd = data;
-+
-+	print_prefer_mic_len(cmd->mic_len);
-+	print_packet_format(cmd->format);
-+	print_rates("ACL Rates", 0x05, le16_to_cpu(cmd->rates));
-+}
-+
-+static void le_set_hdt_params_test(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_hdt_set_params_test *cmd = data;
-+
-+	print_handle(cmd->handle);
-+	print_prefer_mic_len(cmd->mic_len);
-+	print_packet_format(cmd->format);
-+	print_field("Blocks per Payload: %u", cmd->blocks);
-+	print_rates("TX Rates", 0x05, le16_to_cpu(cmd->tx_rates));
-+}
-+
-+static void le_set_hdt_params_test_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_hdt_set_params_test *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_handle(rsp->handle);
-+}
-+
-+static void print_eks_debug_mode(uint8_t mode)
-+{
-+	const char *str;
-+
-+	switch (mode) {
-+	case 0x00:
-+		str = "Disable";
-+		break;
-+	case 0x01:
-+		str = "Accept";
-+		break;
-+	case 0x02:
-+		str = "Enable";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+
-+	print_field("Debug Mode: %s (0x%2.2x)", str, mode);
-+}
-+
-+static void le_read_eks_debug_mode_rsp(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_read_eks_debug_mode *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_eks_debug_mode(rsp->mode);
-+}
-+
-+static void le_write_eks_debug_mode(uint16_t index, const void *data,
-+					uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_write_eks_debug_mode *cmd = data;
-+
-+	print_eks_debug_mode(cmd->mode);
-+}
-+
- struct opcode_data {
- 	uint16_t opcode;
- 	int bit;
-@@ -11435,6 +12048,87 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x20a6, 395, "LE CS Write Cached Remote Supported Capabilities [v2]" },
- 	{ 0x20a7, 396, "LE CS Set Security Requirements" },
- 	{ 0x20a8, 397, "LE CS Set Default Security Requirements" },
-+	{ BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2,
-+			BT_HCI_BIT_LE_WRITE_DEF_DATA_LEN_V2,
-+			"LE Write Suggested Default Data Length V2",
-+			le_write_def_data_len_v2,
-+			sizeof(struct bt_hci_cmd_le_write_def_data_len_v2),
-+			true, status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2,
-+			BT_HCI_BIT_LE_READ_DEF_DATA_LEN_V2,
-+			"LE Read Suggested Default Data Length v2",
-+			le_read_def_data_len_v2,
-+			sizeof(struct bt_hci_cmd_le_read_def_data_len_v2),
-+			true, le_read_def_data_len_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_read_def_data_len_v2),
-+			true },
-+	{ BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2, BT_HCI_BIT_LE_ENABLE_ENCRYPT_V2,
-+				"LE Enable Encryption v2", le_enable_encrypt_v2,
-+				sizeof(struct bt_hci_cmd_le_enable_encrypt_v2),
-+				true, status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2,
-+			BT_HCI_BIT_LE_READ_MAX_DATA_LEN_V2,
-+			"LE Read Max Data Length v2", le_read_max_data_len_v2,
-+			sizeof(struct bt_hci_cmd_le_read_data_len_v2),
-+			true, le_read_max_data_len_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_read_data_len_v2),
-+			true },
-+	{ BT_HCI_CMD_LE_SET_DATA_LEN_V2, BT_HCI_BIT_LE_SET_DATA_LEN_V2,
-+			"LE Set Data Length v2", le_set_data_len_v2,
-+			sizeof(struct bt_hci_cmd_le_set_data_len_v2),
-+			true, le_set_data_len_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_data_len_v2),
-+			true },
-+	{ BT_HCI_CMD_LE_SET_CIG_PARAMS_V2, BT_HCI_BIT_LE_SET_CIG_PARAMS_V2,
-+			"LE Set Connected Isochronous Group Parameters v2",
-+			le_set_cig_params_v2,
-+			sizeof(struct bt_hci_cmd_le_set_cig_params_v2),
-+			false, le_set_cig_params_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_cig_params_v2),
-+			false },
-+	{ BT_HCI_CMD_LE_SET_CIG_PARAMS_TEST_V2,
-+			BT_HCI_BIT_LE_SET_CIG_PARAMS_TEST_V2,
-+			"LE Set Connected Isochronous Group Parameters Test v2",
-+			le_set_cig_params_test_v2,
-+			sizeof(struct bt_hci_cmd_le_set_cig_params_test_v2),
-+			false, le_set_cig_params_test_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_cig_params_v2),
-+			false },
-+	{ BT_HCI_CMD_LE_CREATE_BIG_V2, BT_HCI_BIT_LE_CREATE_BIG_V2,
-+				"LE Create Broadcast Isochronous Group v2",
-+				le_create_big_v2,
-+				sizeof(struct bt_hci_cmd_le_create_big_v2),
-+				true, status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_CREATE_BIG_TEST_V2, BT_HCI_BIT_LE_CREATE_BIG_TEST_V2,
-+				"LE Create Broadcast Isochronous Group Test v2",
-+				le_create_big_test_v2,
-+				sizeof(struct bt_hci_cmd_le_create_big_test_v2),
-+				false, status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS,
-+			BT_HCI_BIT_LE_SET_HDT_DEFAULT_PARAMS,
-+			"LE Set HDT Default Parameters",
-+			le_set_hdt_default_params,
-+			sizeof(struct bt_hci_cmd_le_hdt_set_default_params),
-+			true, status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_SET_HDT_PARAMS_TEST, BT_HCI_BIT_LE_SET_HDT_PARAMS_TEST,
-+			"LE Set HDT Parameters Test",
-+			le_set_hdt_params_test,
-+			sizeof(struct bt_hci_cmd_le_hdt_set_params_test), true,
-+			le_set_hdt_params_test_rsp,
-+			sizeof(struct bt_hci_rsp_le_hdt_set_params_test),
-+			true },
-+	{ BT_HCI_CMD_LE_READ_EKS_DEBUG_MODE, BT_HCI_BIT_LE_READ_EKS_DEBUG_MODE,
-+			"LE Read Encryption Key Schedule Debug Mode",
-+			null_cmd, 0, true,
-+			le_read_eks_debug_mode_rsp,
-+			sizeof(struct bt_hci_rsp_le_read_eks_debug_mode),
-+			true },
-+	{ BT_HCI_CMD_LE_WRITE_EKS_DEBUG_MODE,
-+			BT_HCI_BIT_LE_WRITE_EKS_DEBUG_MODE,
-+			"LE Write Encryption Key Schedule Debug Mode",
-+			le_write_eks_debug_mode,
-+			sizeof(struct bt_hci_cmd_le_write_eks_debug_mode),
-+			true },
- 	{ }
- };
+ static void cis_req(const void *data, uint8_t size)
+ {
+ 	const struct bt_ll_cis_req *cmd = data;
+@@ -699,6 +799,38 @@ static void cis_req(const void *data, uint8_t size)
+ 	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
  
-@@ -14182,6 +14876,197 @@ static void le_conn_rate_change_evt(struct timeval *tv, uint16_t index,
- 					le16_to_cpu(evt->supv_timeout));
+ 	print_field("Connection Event Count: %u", cmd->conn_event_count);
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++	 * Section 2.4.2.29:
++	 *
++	 * Rates_C_To_P and Rates_P_To_C are the bitmap of allowed contiguous
++	 * rates, as specified in Table 2.27, of the PHY of that direction.
++	 * Payload_Window_Size_C_To_P shall be set to one less than the size
++	 * of the payload window.
++	 * If the CIS is on the LE HDT PHY and encrypted and a 64-bit MIC is
++	 * to be used, then MIC_Length shall be set to 1. Otherwise,
++	 * MIC_Length shall be set to 0 (128 bits).
++	 * SE_Length shall be set to the time, in microseconds, that needs to
++	 * be reserved for the subevent.
++	 */
++	if (size >= sizeof(*cmd) + sizeof(struct bt_ll_cis_req_v2)) {
++		const struct bt_ll_cis_req_v2 *v2 = (const void *) (cmd + 1);
++
++		print_rates("Central to Peripheral Rates", cmd->c_phys,
++						le16_to_cpu(v2->c_rates));
++		print_rates("Peripheral To Central Rates", cmd->p_phys,
++						le16_to_cpu(v2->p_rates));
++		print_field("Config ID: %u", v2->config_id);
++		print_field("TL Group ID: %u", v2->tl_group_id & 0x1f);
++		print_payload_window("Central to Peripheral Payload Window",
++						v2->flags & 0x03);
++		print_payload_window("Peripheral to Central Payload Window",
++						(v2->flags >> 2) & 0x03);
++		print_field("MIC Length: %s (%u)",
++				v2->flags & 0x10 ? "64 bits" : "128 bits",
++				(v2->flags >> 4) & 0x01);
++		print_field("SE Length: %u us", get_le24(v2->se_length));
++	}
  }
  
-+static void print_mic_len(uint8_t value)
-+{
-+	const char *str;
+ static void cis_rsp(const void *data, uint8_t size)
+@@ -730,6 +862,13 @@ static void cis_ind(const void *data, uint8_t size)
+ 	print_field("CIS Synchronization Delay: %u us",
+ 					le32_to_cpu(interval));
+ 	print_field("Connection Event Count: %u", ind->conn_event_count);
 +
-+	switch (value) {
++	/* [v2] */
++	if (size >= sizeof(*ind) + sizeof(struct bt_ll_cis_ind_v2)) {
++		const struct bt_ll_cis_ind_v2 *v2 = (const void *) (ind + 1);
++
++		print_field("PCA-H: 0x%2.2x", v2->pca_h);
++	}
+ }
+ 
+ static void cis_term_ind(const void *data, uint8_t size)
+@@ -759,6 +898,118 @@ static void feature_ext_rsp(const void *data, uint8_t size)
+ 	packet_print_features_ext_ll(rsp->page, rsp->features);
+ }
+ 
++static const struct bitfield_data lqf_transports[] = {
++	{ 0, "ACL" },
++	{ 1, "CIS" },
++	{ }
++};
++
++static void hdt_lqf_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_lqf_ind *pdu = data;
++	uint8_t mask;
++
++	print_field("Transport: 0x%2.2x", pdu->transport);
++
++	mask = print_bitfield(2, pdu->transport, lqf_transports);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++}
++
++/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
++ * Section 2.4.2.61:
++ *
++ * ACL_RX_Payload_Window_Size shall be set to one less than the value of
++ * PayloadWindowSize that will be used on the ACL connection in the direction
++ * received by the device sending this PDU. Max_CIS_TX_Payload_Window_Size and
++ * Max_CIS_RX_Payload_Window_Size shall be set to one less than the maximum
++ * payload window size that can be supported by the device on an associated CIS
++ * in the transmit and receive direction. ACL_RX_Rates shall be set to a bitmap
++ * of rates (as specified in Table 2.27) that the Controller is allowed to
++ * receive from the remote Controller on the ACL connection. A value of zero
++ * indicates all supported rates are allowed.
++ */
++static void hdt_config_req(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_config_req *pdu = data;
++
++	print_payload_window("ACL RX Payload Window Size", pdu->wincfg & 0x03);
++	print_payload_window("Max CIS TX Payload Window Size",
++					(pdu->wincfg >> 2) & 0x03);
++	print_payload_window("Max CIS RX Payload Window Size",
++					(pdu->wincfg >> 4) & 0x03);
++	print_rates("ACL RX Rates", BIT(4), le16_to_cpu(pdu->acl_rx_rates));
++	print_field("Max ACL RX Packet Size: %u",
++					le16_to_cpu(pdu->acl_rx_mtu));
++}
++
++static void hdt_config_rsp(const void *data, uint8_t size)
++{
++	const struct bt_ll_hdt_config_rsp *pdu = data;
++
++	print_payload_window("ACL RX Payload Window Size", pdu->wincfg & 0x03);
++	print_payload_window("Max CIS TX Payload Window Size",
++					(pdu->wincfg >> 2) & 0x03);
++	print_payload_window("Max CIS RX Payload Window Size",
++					(pdu->wincfg >> 4) & 0x03);
++	print_rates("ACL RX Rates", BIT(4), le16_to_cpu(pdu->acl_rx_rates));
++	print_field("Max ACL RX Packet Size: %u",
++					le16_to_cpu(pdu->acl_rx_mtu));
++}
++
++static const struct bitfield_data ecdh_flags[] = {
++	{ 0, "Allow 64-bit MIC length" },
++	{ 1, "Opportunistic encryption" },
++	{ }
++};
++
++static void print_key_type(const char *str, uint8_t type)
++{
++	switch (type) {
 +	case 0x00:
-+		str = "32 bits";
-+		break;
-+	case 0x01:
-+		str = "64 bits";
-+		break;
-+	case 0x02:
-+		str = "128 bits";
++		print_field("%s: Public key P-256 (0x00)", str);
 +		break;
 +	default:
-+		str = "RFU";
-+	}
-+
-+	print_field("MIC length: %s (0x%2.2x)", str, value);
-+}
-+
-+static void print_eks_mode(uint8_t mode)
-+{
-+	const char *str;
-+
-+	switch (mode) {
-+	case 0x00:
-+		str = "off";
-+		break;
-+	case 0x01:
-+		str = "AES-CCM";
-+		break;
-+	case 0x02:
-+		str = "opportunistic ASE-CCM";
-+		break;
-+	default:
-+		str = "RFU";
++		print_field("%s: Reserved (0x%2.2x)", str, type);
 +		break;
 +	}
-+
-+	print_field("Key Schedule: %s (%d)", str, mode);
 +}
 +
-+static void encrypt_change_v3_evt(struct timeval *tv, uint16_t index,
-+					const void *data, uint8_t size)
++static void enc_ecdh_req(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_evt_encrypt_change_v3 *evt = data;
++	const struct bt_ll_enc_ecdh_req *cmd = data;
++	uint8_t mask;
 +
-+	print_status(evt->status);
-+	print_handle(evt->handle);
-+	print_encr_mode_change(evt->mode, evt->handle);
-+	print_field("Key size: %u", evt->key_size);
-+	print_mic_len(evt->mic_len);
-+	print_eks_mode(evt->eks_mode);
-+	print_field("EKS Debug: %s (0x%2.2x)",
-+		    evt->eks_debug ? "Enabled" : "Disabled", evt->eks_debug);
++	print_field("Flags: 0x%2.2x", cmd->flags);
++
++	mask = print_bitfield(2, cmd->flags, ecdh_flags);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_hex_field("Rand", cmd->rand, 16);
++	print_key_type("Key Type", cmd->key_type);
++	print_hex_field("Public Key", cmd->pubkey, 64);
 +}
 +
-+static void encrypt_key_refresh_complete_v2_evt(struct timeval *tv,
-+						uint16_t index,
-+						const void *data, uint8_t size)
++static void enc_ecdh_rsp(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_evt_encrypt_key_refresh_complete_v2 *evt = data;
++	const struct bt_ll_enc_ecdh_rsp *rsp = data;
++	uint8_t mask;
 +
-+	print_status(evt->status);
-+	print_handle(evt->handle);
-+	print_mic_len(evt->mic_len);
-+	print_eks_mode(evt->eks_mode);
-+	print_field("EKS Debug: %s (0x%2.2x)",
-+		    evt->eks_debug ? "Enabled" : "Disabled", evt->eks_debug);
++	print_field("Flags: 0x%2.2x", rsp->flags);
++
++	mask = print_bitfield(2, rsp->flags, ecdh_flags);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_hex_field("Rand", rsp->rand, 16);
++	print_key_type("Key Type", rsp->key_type);
++	print_hex_field("Public Key", rsp->pubkey, 64);
 +}
 +
-+static void le_data_len_change_v2_evt(struct timeval *tv, uint16_t index,
-+						const void *data, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_data_length_change_v2 *evt = data;
-+
-+	print_handle(evt->handle);
-+	print_field("Max TX octets: %d", le16_to_cpu(evt->max_tx_len));
-+	print_field("Max TX time: %d", le16_to_cpu(evt->max_tx_time));
-+	print_field("Max RX octets: %d", le16_to_cpu(evt->max_rx_len));
-+	print_field("Max RX time: %d", le16_to_cpu(evt->max_rx_time));
-+	print_phys(evt->phys);
-+}
-+
-+static void print_cis_encryption(uint8_t encryption)
-+{
-+	const char *str;
-+
-+	switch (encryption) {
-+	case 0x00:
-+		str = "Disabled";
-+		break;
-+	case 0x01:
-+		str = "Enabled";
-+		break;
-+	case 0x02:
-+		str = "Key Schedule";
-+		break;
-+	case 0x03:
-+		str = "Opportunistic and Key Schedule";
-+		break;
-+	default:
-+		str = "RFU";
-+		break;
-+	}
-+
-+	print_field("Encryption: %s (%d)", str, encryption);
-+}
-+
-+static void le_cis_estabilished_v3_evt(struct timeval *tv, uint16_t index,
-+						const void *data, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_cis_established_v3 *evt = data;
-+
-+	print_status(evt->status);
-+	print_field("Connection Handle: %d", le16_to_cpu(evt->conn_handle));
-+	print_usec_interval("CIG Synchronization Delay", evt->cig_sync_delay);
-+	print_usec_interval("CIS Synchronization Delay", evt->cis_sync_delay);
-+	print_usec_interval("Central to Peripheral Latency", evt->c_latency);
-+	print_usec_interval("Peripheral to Central Latency", evt->p_latency);
-+	print_le_phy("Central to Peripheral PHY", evt->c_phy);
-+	print_le_phy("Peripheral to Central PHY", evt->p_phy);
-+	print_field("Number of Subevents: %u", evt->nse);
-+	print_field("Central to Peripheral Burst Number: %u", evt->c_bn);
-+	print_field("Peripheral to Central Burst Number: %u", evt->p_bn);
-+	print_field("Central to Peripheral Flush Timeout: %u", evt->c_ft);
-+	print_field("Peripheral to Central Flush Timeout: %u", evt->p_ft);
-+	print_field("Central to Peripheral MTU: %u", le16_to_cpu(evt->c_mtu));
-+	print_field("Peripheral to Central MTU: %u", le16_to_cpu(evt->p_mtu));
-+	print_slot_125("ISO Interval", evt->interval);
-+	print_usec_interval("ISO Sub-Interval", evt->sub_interval);
-+	print_field("Central to Peripheral SDU: %u", le16_to_cpu(evt->c_sdu));
-+	print_field("Peripheral to Central SDU: %u", le16_to_cpu(evt->p_sdu));
-+	print_usec_interval("Central to Peripheral SDU Interval",
-+				evt->c_sdu_interval);
-+	print_usec_interval("Peripheral to Central SDU Interval",
-+				evt->p_sdu_interval);
-+	print_framing(evt->framing);
-+	print_rates("Central to Peripheral Rates", evt->c_phy,
-+			le16_to_cpu(evt->c_rates));
-+	print_rates("Peripheral to Central Rates", evt->p_phy,
-+			le16_to_cpu(evt->p_rates));
-+	print_field("Config ID: %u", evt->config_id);
-+	print_field("Group ID: %u", evt->group_id);
-+	print_cis_encryption(evt->encryption);
-+	print_mic_len(evt->mic_len);
-+
-+	if (!evt->status)
-+		assign_handle(index, le16_to_cpu(evt->conn_handle), 0x05,
-+					NULL, BDADDR_LE_PUBLIC);
-+}
-+
-+static void le_big_complete_v2_evt(struct timeval *tv, uint16_t index,
-+						const void *data, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_big_complete_v2 *evt = data;
-+
-+	print_status(evt->status);
-+	print_field("Handle: 0x%2.2x", evt->handle);
-+	print_usec_interval("BIG Synchronization Delay", evt->sync_delay);
-+	print_usec_interval("Transport Latency", evt->latency);
-+	print_le_phy("PHY", evt->phy);
-+	print_field("NSE: %u", evt->nse);
-+	print_field("BN: %u", evt->bn);
-+	print_field("PTO: %u", evt->pto);
-+	print_field("IRC: %u", evt->irc);
-+	print_field("Maximum PDU: %u", le16_to_cpu(evt->max_pdu));
-+	print_slot_125("ISO Interval", evt->interval);
-+	print_rates("Rates", evt->phy, le16_to_cpu(evt->rates));
-+	print_field("Encryption: %s (0x%2.2x)",
-+			evt->encryption ? "Encrypted" : "Unencrypted",
-+			evt->encryption);
-+	print_mic_len(evt->mic_len);
-+
-+	/* Only the handles the event has room for */
-+	size -= sizeof(*evt);
-+
-+	print_list(evt->bis_handle, size, evt->num_bis,
-+				sizeof(*evt->bis_handle), print_bis_handle);
-+
-+	if (!evt->status) {
-+		int max = size / sizeof(*evt->bis_handle);
-+		int i;
-+
-+		for (i = 0; i < evt->num_bis && i < max; i++)
-+			assign_handle(index, le16_to_cpu(evt->bis_handle[i]),
-+					0x05, NULL, BDADDR_LE_PUBLIC);
-+	}
-+}
-+
- struct subevent_data {
- 	uint8_t subevent;
+ struct llcp_data {
+ 	uint8_t opcode;
  	const char *str;
-@@ -14356,6 +15241,18 @@ static const struct subevent_data le_meta_event_table[] = {
- 		"LE Connection Rate Change",
- 		le_conn_rate_change_evt,
- 		sizeof(struct bt_hci_evt_le_conn_rate_change) },
-+	{ BT_HCI_EVT_LE_DATA_LENGTH_CHANGE_V2,
-+		"LE Data Length Change v2",
-+		le_data_len_change_v2_evt,
-+		sizeof(struct bt_hci_evt_le_data_length_change_v2) },
-+	{ BT_HCI_EVT_LE_CIS_ESTABLISHED_V3,
-+		"LE Connected Isochronous Stream Established v3",
-+		le_cis_estabilished_v3_evt,
-+		sizeof(struct bt_hci_evt_le_cis_established_v3) },
-+	{ BT_HCI_EVT_LE_BIG_COMPLETE_V2,
-+		"LE Broadcast Isochronous Group Complete v2",
-+		le_big_complete_v2_evt,
-+		sizeof(struct bt_hci_evt_le_big_complete_v2) },
- 	{ }
+@@ -767,6 +1018,12 @@ struct llcp_data {
+ 	bool fixed;
  };
  
-@@ -14586,8 +15483,17 @@ static const struct event_data event_table[] = {
- 	{ 0x57, "Authenticated Payload Timeout Expired",
- 				auth_payload_timeout_expired_evt, 2, true },
- 	{ 0x58, "SAM Status Change" },
++#define LLCP_OP_VL(_op, _str, _func, _type) \
++	{ _op, _str, _func, sizeof(_type), false }
 +
- 	{ 0x59, "Encryption Change v2",
- 				encrypt_change_evt_v2, 5, true },
-+	{ BT_HCI_EVT_ENCRYPT_CHANGE_V3, "Encrypt Change V3",
-+				encrypt_change_v3_evt,
-+				sizeof(struct bt_hci_evt_encrypt_change_v3),
-+				true },
-+	{ BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2,
-+		"Encrypt Key Refresh Complete v2",
-+		encrypt_key_refresh_complete_v2_evt,
-+		sizeof(struct bt_hci_evt_encrypt_key_refresh_complete_v2) },
- 	{ 0xfe, "Testing" },
- 	{ 0xff, "Vendor", evt_vendor, 0, false },
- 	{ }
-@@ -15613,6 +16519,7 @@ static const struct bitfield_data mgmt_settings_table[] = {
- 	{ 23, "PAST Sender"		},
- 	{ 24, "PAST Receiver"		},
- 	{ 25, "Shorter Connection Interval"	},
-+	{ 26, "HDT"			},
- 	{}
- };
- 
-@@ -17107,6 +18014,10 @@ static const struct {
- 	{0x001e, "LE No Filter Scanning Duration for adv monitoring"  },
- 	{0x001f, "LE Enable Interleave Scan for adv monitoring"       },
- 	{0x0020, "BR/EDR Connection Idle Timeout"                     },
-+	{0x0021, "LE HDT Default MIC Length"                          },
-+	{0x0022, "LE HDT Default Packet Format"                      },
-+	{0x0023, "LE HDT Default Rates"                              },
-+	{0x0024, "LE Opportunistic Encryption"                        },
++#define LLCP_OP(_op, _str, _func, _type) \
++	{ _op, _str, _func, sizeof(_type), true }
++
+ static const struct llcp_data llcp_table[] = {
+ 	{ 0x00, "LL_CONNECTION_UPDATE_REQ", conn_update_req,   11, true },
+ 	{ 0x01, "LL_CHANNEL_MAP_REQ",       channel_map_req,    7, true },
+@@ -790,9 +1047,9 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x13, "LL_PING_RSP",              null_pdu,           0, true },
+ 	{ 0x14, "LL_LENGTH_REQ",            length_req_rsp,     8, true },
+ 	{ 0x15, "LL_LENGTH_RSP",            length_req_rsp,     8, true },
+-	{ 0x16, "LL_PHY_REQ",               phy_req_rsp,        2, true },
+-	{ 0x17, "LL_PHY_RSP",               phy_req_rsp,        2, true },
+-	{ 0x18, "LL_PHY_UPDATE_IND",        phy_update_ind,     4, true },
++	{ 0x16, "LL_PHY_REQ",               phy_req_rsp,        2, false },
++	{ 0x17, "LL_PHY_RSP",               phy_req_rsp,        2, false },
++	{ 0x18, "LL_PHY_UPDATE_IND",        phy_update_ind,     4, false },
+ 	{ 0x19, "LL_MIN_USED_CHANNELS_IND", min_used_channels,  2, true },
+ 	{ 0x1a, "LL_CTE_REQ",               cte_req,            1, true },
+ 	{ 0x1b, "LL_CTE_RSP",               null_pdu,           0, true },
+@@ -800,11 +1057,11 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x1d, "LL_CLOCK_ACCURACY_REQ",    clock_acc_req_rsp,  1, true },
+ 	{ 0x1e, "LL_CLOCK_ACCURACY_RSP",    clock_acc_req_rsp,  1, true },
+ 	{ BT_LL_CIS_REQ, "LL_CIS_REQ",      cis_req,
+-					sizeof(struct bt_ll_cis_req), true },
++					sizeof(struct bt_ll_cis_req), false },
+ 	{ BT_LL_CIS_RSP, "LL_CIS_RSP",      cis_rsp,
+ 					sizeof(struct bt_ll_cis_rsp), true },
+ 	{ BT_LL_CIS_IND, "LL_CIS_IND",      cis_ind,
+-					sizeof(struct bt_ll_cis_ind), true },
++					sizeof(struct bt_ll_cis_ind), false },
+ 	{ BT_LL_CIS_TERMINATE_IND, "LL_CIS_TERMINATE_IND", cis_term_ind,
+ 					sizeof(struct bt_ll_cis_term_ind),
+ 					true },
+@@ -814,6 +1071,17 @@ static const struct llcp_data llcp_table[] = {
+ 	{ BT_LL_CIS_RSP, "LL_FEATURE_EXT_RSP", feature_ext_rsp,
+ 					sizeof(struct bt_ll_feature_ext_rsp),
+ 					true },
++	/* HDT LLCP commands */
++	LLCP_OP(BT_LL_HDT_LQF_REPORTING_IND, "LL_HDT_LQF_REPORTING_IND",
++					hdt_lqf_ind, struct bt_ll_hdt_lqf_ind),
++	LLCP_OP(BT_LL_HDT_CONFIG_REQ, "LL_HDT_CONFIG_REQ", hdt_config_req,
++					struct bt_ll_hdt_config_req),
++	LLCP_OP(BT_LL_HDT_CONFIG_RSP, "LL_HDT_CONFIG_RSP", hdt_config_rsp,
++					struct bt_ll_hdt_config_rsp),
++	LLCP_OP(BT_LL_ENC_ECDH_REQ, "LL_ENC_ECDH_REQ", enc_ecdh_req,
++					struct bt_ll_enc_ecdh_req),
++	LLCP_OP(BT_LL_ENC_ECDH_RSP, "LL_ENC_ECDH_RSP", enc_ecdh_rsp,
++					struct bt_ll_enc_ecdh_rsp),
  	{ }
  };
  
