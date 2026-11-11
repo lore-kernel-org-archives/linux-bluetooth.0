@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794414340;
-	b=nfCSoVYFiJ/5KHnOMmIwiaJzVvhVNXuZJoSTuDqeBy3cozqJY5QLnXpdPlu30D2vDSSL
-	 SBbe4ByVoKEI/k4811NhWMgUiUDZxlCSKsPAN/WuriVrnMMbfdmdjuysM6nX6DKWbqBLb
-	 z+i9sUc1o9DuI1S3DgDbPq39wZddyCxNVULfft0+1kkywq6xFXXjhTIhVsSKpOdzxVMpc
-	 WmuzJzmjpPOICrRhLl/b+V/ojquBi4LcwCr7pKkZzbKwYMr4JaG56Y57NJlRlusF7bCCJ
-	 7gZiG8HgF1YR/yijb7IdluyHveJ3/mTJD1y2wKAi8lgc7AKhwEH05tc+9NT+KRxVE2g==
+	t=1794414341;
+	b=g1S+LMxBqeuHiGZURsAKW1DXZUF6ItRcaYyX721vfW0rv9Lbbo5KxwsfAQ4MVe92hwGD
+	 a1id045ws6HUIP8KQVwxWBcSVtDpIHbAHKeSecflX2LNLgFCtdT/VxUi5Lk2ZUWMvlRAL
+	 ukanf8o3vUc3SnwghybOVHp3FYnupFnLtANhFGr4DO8dpZ3tGDO2Dw6c+EnjP1OkOXKoM
+	 oU34RieT4btU0Q6ZtALll57s6d+QMJzkKZ5gvTO/hc3dt17Hs4EwUyhU/WyI6fUr9dXK/
+	 yTciDM0sXI1hhuKyFRaaovyzLJXr6RpgLmZ5qqCAuCyUBiChO3gMxQDwHgw8hS1Wh5w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794414340;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794414341;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=VQ9XIKkCNk3fozE5f1r68DOd14g401yrqdbfdhrwG8o=;
-	b=Vthc5AMinS9uCmMwum1WgPpMTJ0LZLeewHQ+dY5cGPkPqqkPmaLMvSA6ru23XBw4fv+n
-	 IoSBuaTqo/6s1lAFnGnS09pJVQzhzaNkl773yPEmPY5DGvM5p2T2xQcu/W3ifx4LCbVjA
-	 gm8wJS9Kq7Ib5x4aB90P3q/G08aB78KhYnBmF5xyaMQx2OTHTb8aQHpRWI6eWgKZlz8uS
-	 I/I0W04yuGlYYLW4cBoufh16EHi40cAf4y45UvLxSUZuBVIwlpo6osfUe2ZfA1eqw7qbb
-	 Bjrr2VGB3FTWTRhV45Kz8+FIXE0LJXSHdgzxZLR2cALTvTNjO4GmyBLWPPxZGjxNcHg==
+	bh=cjLn7M5ieXvAfZ8y4igCxY981YEzQBuP4NVgfX0xC5Y=;
+	b=YErdEWR1UCH8ymRM7O97v5yFmXAW+k+mp5Ek2e/cYfION8UXP+3UOGn+n9njaX3t9AXm
+	 L++duddxfyMDa4PxvC12vH0JoqXggw/ETVGR9dvWqe1H1/8iW/YIj+bieMdTXoqnVds3s
+	 TDOKjgKB94ZS9wdPXoD6QcYqyTEfVtPp839jpe6ahQIpjYV59BXMIflhevGbrMq/ZOz94
+	 LRIEtGEqDJMrYCRYekumlHHR64zlBu4qxJq0xVujBWrdIJIhhrmWSKEtewfOsBCNh8e84
+	 6susEY7N3EEDkAZ889WOyCNBmMywXG0CCy6oDeKxG31swOHLLi1kj1eHoTB+fnkOxfA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dd3F+C4k;
-	arc=none smtp.remote-ip=209.85.217.46
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=x6W8+4QA;
+	arc=none smtp.remote-ip=209.85.221.170
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561F6606A33F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:25:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 561F6606A33F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E04606A33B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:25:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30E04606A33B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dd3F+C4k
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-78fb1fb9508so2359224137.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:25:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=x6W8+4QA
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5eafaeb8684so1106374e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:25:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794414339; x=1795019139; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794414340; x=1795019140; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=VQ9XIKkCNk3fozE5f1r68DOd14g401yrqdbfdhrwG8o=;
-        b=Dd3F+C4kBCeLujFLLAq5srpjPVF6OANrBsSpa1Rxwo2w4lTsvsyVzEYbqQDj99bDVJ
-         5VPDr1QGbftWRp6m81vAOgfdzL7VM4KSZ0ttB9woatEs+q6rGR3tQ7DHM7T9Of5RqNvG
-         y00EWJ/SBeIrB4jzwU8e9d0W4Kbi8zE9yspkRn0i+7PoGhenfkATjlYt1VYWhN3PZUXR
-         ixFuDreHqQVbPIoV8mzEpxncAg+t3ec/9RpxWRf68t+0DNMOmMpIDT0ZLDMITF7bOVMg
-         1fUXvoMIp8N/Qy1U9uQASfjA6mzw16huzv/hLwhrUsd75OllTuVsJDBX4FvPdDWvzCGQ
-         1xfg==
+        bh=cjLn7M5ieXvAfZ8y4igCxY981YEzQBuP4NVgfX0xC5Y=;
+        b=x6W8+4QAtMM/Ou7l/9bwoTE/rOONGH1UDSjNN8yTtQv+DqYzKUk9xOfeIPfJi0YPBD
+         MbXMkwv+PhBqr4cZaaq7R151REsGjQroSad04xhTsTWYQ8JURJkq/LLsKPn9uDUa2Z1/
+         5Z6QA5fcAH8wx0x/En2p+ap7zvMaQMC01EnnhhLvSJ5JWCrVIGiGelZrVpcMqsC9sJMG
+         80jUu/Ky7lPavTVHEQmnn+E2/DMZdeWffQjXFXf6c6x8EJn+pwXtGS4EqamG/PsK0Dew
+         OWuJ8i9FJ/29KhaS3whN9mXFVCgMljNFFO0g793tUGGSud+3dW57M9wo/O9e5ny19+Bi
+         uCjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794414339; x=1795019139;
+        d=1e100.net; s=20260707; t=1794414340; x=1795019140;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=VQ9XIKkCNk3fozE5f1r68DOd14g401yrqdbfdhrwG8o=;
-        b=hs7x67rDtkkwnZ57eJWBXAwLLGSB8BdTzX1nMWGrJwjVZejCJdkhWPSf5CBKY3CnqW
-         kkFGZbnEh3hRemPnst9RxdgEyaGH8tPLdK/w5TmQhoL5vRNzDR17GmmEQaNdyCE3i4S7
-         NZRYUB837UPvw+I1W6H3nL8Uy6yaOQ1NnuVkQwPwwmO2v/ndEW5XdCD57WLLEcu85Z1R
-         OKyiZNuwY2Aqf3EFhat73kWF9tQhjDI3RDXqUlR6H53C9Wq1mt+czoVGzHJgDDn+Yabs
-         B5Yqk+k5Rx+EDSRoRegqbma5S7Eo5FYl5z2m30piJYR5UbnoDs/W7fPK/hgDFCyW1XHc
-         h4iw==
-X-Gm-Message-State: APuU4Z/qM+P5An1c35l+DCBssXzsxtTe0dltbhi8O/yeIgorgVXiX6UP
-	wNO+BJ0ISctGm8CKiRG6VW/A/oiECHkDKSWQBAFKKZhX+w15+Rmcj4SS1tey3g==
-X-Gm-Gg: AYBFou2e/blSk01a63DeI+V6UcmENrRIO/gKLpY2mVgUlUyXtvvd3mGjjTPmdHqsXoq
-	/+nmN82wrxU06eTLi6zkG+cAgNxChii/yRrrjcfS9I085ctytCUVHUOPtO/QAbzcd5ceT9kvxcp
-	guFM3Ij2He/gDHhmMz0D7ahSzPlpAJWAWxsFKxZ8Wp2UjQZwHpU3tUN6EOt9gwOzPG0YzbSuP4+
-	9hJ49Rdx7oRW0haJpWrnezGpDiFdzLkGPEA2H/lfYS+tV6R+7DNBIuBXXKnKXlBcUpp/kfKwNGL
-	oHMBmjwPiOwaZfOg26aBBKVjIQE5/dSICVpaDyptf4myB4FM1VYt0b8hiejsMSsfp7nS6JWsx1X
-	Rhrm7sd5trwEE/XaiF9qN/qzyywR43FaipE7DzMtnjxRo/7MmRkF8O4g7e1nou/OL6tZNLXxqx3
-	+UCyWRBizJiftzM+bpxG/cb0cLS8xbZGI0QWsWKRFHPp9rnGFLHFuuPQhBuUAeDEBnhLn4YB5dG
-	IbjbE4fpGYl6p+sjLmkvrS1UkyNgeSo0hi2OH42FVj+ieYe2ABWRazU9nawwP/rVvqtpQinilXP
-	BGtYAj6Dj9nhD05AuGOk0pQsxD+pZezWf5FcO2vv2wq76WwSiLQT2H54DFPTXYn8hb1tj1dOd1M
-	i4Dil1dL1PpflNmk8Hl+951XqVl1v/GWnhYikbWk/rbqZUZ8PBu4IptIc7CfLUfR/tDgPb2zwY/
-	1KYv4=
-X-Received: by 2002:a05:6102:290b:b0:7b9:5abb:eb17 with SMTP id ada2fe7eead31-7d494cdfadbmr1012526137.3.1794414339164;
-        Wed, 11 Nov 2026 08:25:39 -0800 (PST)
+        bh=cjLn7M5ieXvAfZ8y4igCxY981YEzQBuP4NVgfX0xC5Y=;
+        b=MQj7GQPgugmHsCcBH1nKIgWMLthTx7mei7BTcTc1lMvIIY0G7OQTMGKr8+hbFfbIga
+         Vc1PAx7YF3xI3GxZjJkB8P5NgdILxe03Gg94pPAlaSuoSC/aKeYwX3LaAWZLSrqsyWeH
+         9xuSGUezR59kr1LhNYek9xNjaB/IQnopVgsIKCD27J9liuIlkImq5Pv7qmn3jImC82vY
+         CepShFWJJnueN02Vt0SjylSnqU5vGAqdlIJMrJEzjGfQRff16aaS09k41u3m1J+IkGyh
+         CvTmr/A9U0XXNXk19A8JhhUJZJCsbt3aYoOg+YDMz/pwxWarVcgkGiQ/mlMGOtcgqOp+
+         VNlw==
+X-Gm-Message-State: APuU4Z+sQJFSQgIQntIz20uSqNomRkYB+jXie3RWWdJMcl79z20f34CE
+	dKXoFbj9E4fzDiaYzwfOQGFc6bcU65XoMa4cGbGZePmaepwJpwiMKZG358dvpQ==
+X-Gm-Gg: AYBFou1uA6bulepz4QkSEiY7k+SP/jbxv4S2lfZ1nSX4Gk0XkLIvt/aGTcDD1LAHiQ3
+	a5Ucl8vg17uL043MPQAebnpilmDvM32+DMZZUlDKb8tgJ6fQlGxenSVjwh2pbkwm4sVB0yS8gqJ
+	2K7DbOym50aFWriw9v81fyvkk2f4SM2RW+Zl5PfSTgHSBPLRLtJAV4bbxJA7ejpQa2JzwAVljWa
+	X8CAtXuQJPBOQnTu3A5Fgyen/N5Bsg1mnYBnYNvAbFaRuMQ9FfYWvalSjNeEesiRzfIn06NkU1z
+	P0fxqIMnwfUykZsC00YQbWYUv80vN4TKPX1u3HfjA8Q3t/v9osWk60Tkio6xequRF8WOUG3F0r6
+	B1Qnhoo7CPrOYiTk21udUJaqdvUu53DGTGDMH8FaKOvIv1FDposIYOi+mPXX0w3owA4Q0Bu2U8P
+	kyIeOTXMTBOHDXND92Z9sB0PRJEw4D1XzDLpgaVHdElinFEKCRhtAgTcwuTMN9jSic6pO7RxKXX
+	SsYTu9PtKFw+KDS6gIIViebj9wb+FPr/c8FqcvJSLl66jTLco9q80uPVMIawkaNldVQXOKZjX/r
+	iSLeNGKaxz70DwKeuzUIaKpKv5pMpcdbUy1E1DI+wW2XgJUz7H+wNZaG+E70QjU56nAmaI3lsS4
+	8/FIEeQVzQkhFn5uss9mr2YuA/NQ7MMcqYTxzuMSuluRp8cmC/Qo06T/T99NBGvLqRgMiD156D0
+	uq2FA=
+X-Received: by 2002:a05:6102:b12:b0:7d2:cddd:935a with SMTP id ada2fe7eead31-7d5060d8bf6mr1001290137.16.1794414340179;
+        Wed, 11 Nov 2026 08:25:40 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c200004e7sm4269659241.3.2026.11.11.08.25.38
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c200004e7sm4269659241.3.2026.11.11.08.25.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 08:25:38 -0800 (PST)
+        Wed, 11 Nov 2026 08:25:39 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/4] test: functional: Cover switching the direction of a CIS
-Date: Wed, 11 Nov 2026 11:25:15 -0500
-Message-ID: <1220e86b130d5e1fe9b29f0eb39a3cf13016c863.1794414122.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v2 0/6] bap: Release cached ASEs on ClearConfiguration
+Date: Wed, 11 Nov 2026 11:25:16 -0500
+Message-ID: <cover.1794413813.git.luiz.von.dentz@intel.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <cover.1794414122.git.luiz.von.dentz@intel.com>
 References: <cover.1794414122.git.luiz.von.dentz@intel.com>
@@ -101,102 +101,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Have the initiator enable the Source ASE of the acceptor alone, then
-disable it and enable its Sink ASE right after, over the same CIS, and
-check that the Sink ASE transport becomes active on both sides. Then
-disable it as well and enable the Source ASE again, which needs a new
-CIS.
+An acceptor may keep an ASE in Codec Configured, caching its codec
+configuration, once the initiator removes the transport. The initiator
+then has no way to get rid of it, as it no longer has a transport to
+release.
 
-bluetoothd as initiator establishes a new CIS when needed, so the
-switch also succeeds when the acceptor disconnects the CIS. Count the
-CIS requests seen by the controller of the acceptor, recorded with
-btmon, and check that the acceptor is asked to accept a single one for
-the switch.
+Release such cached ASEs on ClearConfiguration of an endpoint, and add
+endpoint.clear to bluetoothctl to exercise it, with a functional test.
 
-Assisted-by: Claude:claude-opus-5-5
----
- test/functional/test_bap.py | 68 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+This series is independent of the other two.
 
-diff --git a/test/functional/test_bap.py b/test/functional/test_bap.py
-index 324304204caf..56205a61e61d 100644
---- a/test/functional/test_bap.py
-+++ b/test/functional/test_bap.py
-@@ -733,6 +733,74 @@ def test_bap_unicast_duplex_enable_one(duplex_hosts):
-         assert state == "active", f"{path} {state} once the Sink ASE released"
- 
- 
-+@pytest.fixture
-+def acceptor_cis_count(hosts):
-+    """
-+    Function telling how many CIS the acceptor (host1) was asked to accept so
-+    far, which bluetoothd does not report to the test: btmon records what the
-+    controller of the acceptor sees.
-+    """
-+    btmon = find_exe("monitor", "btmon")
-+    trace = "/tmp/acceptor-cis.btsnoop"
-+
-+    host = hosts[1]
-+    host.pexpect.spawn([btmon, "-w", trace])
-+
-+    # btmon has started recording once the trace has its header
-+    ready = f"until [ -s {trace} ]; do sleep 0.1; done; echo ready"
-+    with host.pexpect.spawn(["sh", "-c", ready]) as ctl:
-+        ctl.expect("ready")
-+
-+    def count():
-+        events = (
-+            f"{btmon} -r {trace} -P | grep -c 'LE Connected Isochronous Stream Request'"
-+        )
-+        with host.pexpect.spawn(["sh", "-c", events]) as ctl:
-+            _, m = ctl.expect(r"(\d+)\r?\n")
-+            return int(m[0])
-+
-+    yield count
-+
-+
-+@duplex_host_config
-+def test_bap_unicast_duplex_switch(duplex_hosts, acceptor_cis_count):
-+    initiator, acceptor, to_sink, from_source, sink, source = duplex_hosts
-+
-+    desync(initiator, to_sink, from_source)
-+
-+    # Enable the remote Source ASE alone, as for the microphone of a
-+    # voice call
-+    initiator.send(f"transport.acquire {from_source}\n")
-+    expect_all(initiator, [ACQUIRED, f"Transport {from_source} State: active"])
-+    expect_all(acceptor, [ACQUIRED, f"Transport {source} State: active"])
-+    assert acceptor_cis_count() == 1
-+
-+    # Disable it and enable the Sink ASE right after, over the same CIS
-+    initiator.send(f"transport.release {from_source}\n")
-+    expect_all(
-+        initiator, ["Release successful", f"Transport {from_source} State: idle"]
-+    )
-+    expect_all(acceptor, [f"Transport {source} State: idle"])
-+
-+    initiator.send(f"transport.acquire {to_sink}\n")
-+    expect_all(initiator, [ACQUIRED, f"Transport {to_sink} State: active"])
-+    expect_all(acceptor, [ACQUIRED, f"Transport {sink} State: active"])
-+
-+    # The Sink ASE streams over the CIS of the Source ASE: the acceptor must
-+    # not disconnect it, as the initiator does not have to request it again
-+    assert acceptor_cis_count() == 1, "CIS requested again for the Sink ASE"
-+
-+    # Once neither is enabled the CIS is disconnected, so enabling one
-+    # again needs a new CIS on both sides
-+    initiator.send(f"transport.release {to_sink}\n")
-+    expect_all(initiator, ["Release successful", f"Transport {to_sink} State: idle"])
-+    expect_all(acceptor, [f"Transport {sink} State: idle"])
-+
-+    initiator.send(f"transport.acquire {from_source}\n")
-+    expect_all(initiator, [ACQUIRED, f"Transport {from_source} State: active"])
-+    expect_all(acceptor, [ACQUIRED, f"Transport {source} State: active"])
-+
-+
- # Broadcast code used by the broadcast scripts, see BCAST_CODE in
- # client/player.c
- BCAST_CODE = (
+v2: Wait for the release of the cached ASEs before replying to
+    ClearConfiguration, validate the transport path of endpoint.clear and
+    update the remote PAC of an ASE when it is reused (new patch 2/6).
+
+Luiz Augusto von Dentz (6):
+  shared/bap: Add bt_bap_foreach_stream and bt_bap_stream_get_rpac
+  shared/bap: Update the remote PAC when reusing an ASE
+  bap: Release cached ASEs on ClearConfiguration of an endpoint
+  client/player: Add endpoint.clear command
+  doc/functional-bap: Document clearing a cached configuration
+  test: functional: Cover clearing a cached configuration
+
+ client/player.c               | 57 +++++++++++++++++++++++++++++++++++
+ doc/bluetoothctl-endpoint.rst | 20 ++++++++++++
+ doc/functional-bap.rst        | 24 +++++++++++++++
+ profiles/audio/bap.c          | 53 ++++++++++++++++++++++++++++++--
+ src/shared/bap.c              | 32 ++++++++++++++++++++
+ src/shared/bap.h              |  8 +++++
+ test/functional/test_bap.py   | 23 ++++++++++++++
+ 7 files changed, 214 insertions(+), 3 deletions(-)
+
 -- 
 2.56.0
 
