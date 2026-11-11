@@ -1,75 +1,75 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794390279;
-	b=OsB5GS0FQbTYZmMsmIAdHQbXet717GHhcIUkwKkCPX2Spu+z1E3VaLzQt5Wnvcv8Aa94
-	 s2VfBT9wZBAOUUm6LtWXBr2uCTB8JQ6GOgY291QgXzQP4gj30HDa4V1sPfqOsVoZ0vsqM
-	 xx7Vy2Iqrjdvx6DmSWIA5KoZJPZKGiv9HZM4h8MrENylksgJhUoV62fflSEVBlHJ4eKtv
-	 MsnUTKoVKaSDNINsESdty/U8vDHv+7IeAUl5keDctWCy2edqp+WBTGLQTxOxNkycuWa+s
-	 jMIdML8qE2W2MWIYKvlgiDWfGV0iIDpF5mkF9bFuwitw6Gz+/eUKoJ1LmhvK3g7fdBQ==
+	b=J6ceZEvSKj3nkS56Y0yU/GDP1IF2txL99Axr4O+rg+dslTAdvx9wMyXH34NueAnZ7Y/E
+	 yE9cPzvv+q024zWsQ20WMD2JxAyO1yAPib6OzxjUDqKnPq2NMTUggvqCSSZ044IvXC71/
+	 RgHUC2cKDb8oSJCJGUOpPCZpgncpP0ciCh8tgK9PyOICoKJKcmB61ms9RkZrQSihq+SSJ
+	 HZYduBs0DVRRe3qwyHSqxtblt9IGA6lHYkyuEcTTplq8KrJkyD41ZH1uaWpK/K0UDi2Qv
+	 xBC6cx5anuhk2E49K3HvGQUeJAkZtVGMl0r+9KKRT+KGVzy8d3cBIwZxNnVfSL59wJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794390279;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:
 	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:X-Authority-Analysis:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=sa/nBZbLaVvfVdOspOPbxC74pQg9iBW59WbSpO/KrpM=;
-	b=KgK3P60QggI8l4PvwsSVYC0rYsgU46j5QdIAx30tGTgACbqVcgSX2bYvHjigrpxf4ua7
-	 sqX2K6JlB1hexpKG4w9xmwLFnYxAQfYOyjgbsM96t6XLv5CA3D5vIqdQdPF9l7r6+yW/z
-	 +txxVrobNGAicEiqzEr76s7hVJdkJ6W8B+21vuHl6MlIDg0aoGOaaBTEqdZcOMdxKOJJr
-	 mTHVdtX5LYl3DCn6d9+k2km1ywZS0q5ZQJqnc7N989G9peFQKrh2l+EqTMyrzCLdAGdIH
-	 lZuwM5Lo+ThsB3KoyMs+xJvBpGJ+/ajzfZ0RJLXe/7qzlT8iZd7bJsSHkJcqUfII3+A==
+	bh=w/aHSqtU+ZIiYdNCwuWLVHpnTBji2okTt4YCUNYEjqE=;
+	b=EXYEySiVEeGCE6xB4M/123FdtIfxm5zXqgUgNjqbqraSHB9HrfSB01ENhFqEQnvUZ/AM
+	 R5N9KOpFmz6UjkJARvv8fBbBe6ognlEyVnSyDSyWchJ2Udu8utAtxQrEeDjIyyhsjHY8D
+	 pXXD9vurFVWZqqCadUJgpTg/TSTqvIhE//5c0ytAlyBUNCCNnKLcrpW7o6sMoxZhu/XdB
+	 WpAXNUk5s71H//76pos/Avsmryz4tz0kkB3tZXBFxMoOI9HoxHf1T054M6/In900nVCoB
+	 wy0koVjLxbZl/1YVDbhnaV/vuL4wwuHyws6xVTqL0GhF4DsvOWmltdFQeFIIWgxyWVg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KSBrF40v;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=DUAlgWpr;
 	arc=none smtp.remote-ip=205.220.180.131
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15EDD606A330
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 09:44:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 15EDD606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDD1606A324
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 09:44:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9DDD1606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=KSBrF40v
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB8v6GP015461;
-	Wed, 11 Nov 2026 09:44:38 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=DUAlgWpr
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB5KIom1386363;
+	Wed, 11 Nov 2026 09:44:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=sa/nBZbLaVv
-	fVdOspOPbxC74pQg9iBW59WbSpO/KrpM=; b=KSBrF40vLO27aKKSuizkoavbuhg
-	9IlRP5nt0yqHZ1OTQLquHkVD/71eIcxecLDsebfb1JJ+37NN/gU+e8B7T8nQlXj9
-	9hfKpsA+VlXwq1pEPN949HVpeqY/lyWW6wfbXFHT8rpUDhR6h3HyV/ZJt+3uLvBL
-	AzdES/p83IdqcT37QlfhUMB063TSr+dWYGqMeLx9eESDvEI1Oam8gTkAAAYZuBas
-	qXwNOArNQXA5k2mnwuBINLtPYBsFG8NaI4i1dichfj57di1TQ+deQPDFzWjkocdd
-	x5nAm8EhV/qQtkdq6gMNzHRaGLyKE3nIFjLisdLzCjSBc619nkq8k7/n4dA==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=w/aHSqtU+ZI
+	iYdNCwuWLVHpnTBji2okTt4YCUNYEjqE=; b=DUAlgWpryUY2gkYJ8na/ZXJ/YHj
+	MU9v1b0uMO+rgymuKV4YnxlOb3LMuFDGur9PqzoW5Iw1hKv89M1rAMnteritqv3R
+	GXAF+TYn5QjIsM8DS9f0KBQ6Dy97291gAvEX1hTi3mptmtRqCiLaUKaq6PzgPu4X
+	B7+i1bOoylzHNfhObVkyvi7pVPETJ9Ocpefo2/2DdFCQezAP+PsOH+JWcPwEvHZN
+	Trg0Rc26sawVb7MBUilIsq6qNLyHEnJvsx1CVD/d5PzlD/SMU7ajZ+jpLWGvbjJ/
+	UMjGJ0/foO0XeUVc2W//RDZdHO30CMDXdFgwhLuLaOoDE/Sh/KvaKPjgZ6w==
 Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hvna7875n-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hvdnm9xdw-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
 	Wed, 11 Nov 2026 09:44:37 +0000 (GMT)
 Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB9iZBj2424406;
-	Wed, 11 Nov 2026 09:44:35 GMT
+	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB9iYKA2424354;
+	Wed, 11 Nov 2026 09:44:34 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6AB9iZNa2424368
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6AB9iY8m2424341
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 11 Nov 2026 09:44:35 +0000 (GMT)
+	Wed, 11 Nov 2026 09:44:34 +0000 (GMT)
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 5EF52243D3; Wed, 11 Nov 2026 17:44:33 +0800 (CST)
+	id 2D06B23482; Wed, 11 Nov 2026 17:44:33 +0800 (CST)
 From: Jinwang Li <jinwang.li@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc: cheng.jiang@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
         shuai.zhang@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH BlueZ v2 13/20] obexd/pbap: Parse PbapSupportedFeatures in connect request
-Date: Wed, 11 Nov 2026 17:44:18 +0800
-Message-Id: <20261111094425.1444893-14-jinwang.li@oss.qualcomm.com>
+Subject: [PATCH BlueZ v2 01/20] obexd/pbap: Fix PRODID property name
+Date: Wed, 11 Nov 2026 17:44:06 +0800
+Message-Id: <20261111094425.1444893-2-jinwang.li@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261111094425.1444893-1-jinwang.li@oss.qualcomm.com>
 References: <20261111094425.1444893-1-jinwang.li@oss.qualcomm.com>
@@ -86,120 +86,84 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Proofpoint-ORIG-GUID: Yh4i6fgkA-zEvIyPPduUwyZpfS1nen4r
-X-Proofpoint-GUID: Yh4i6fgkA-zEvIyPPduUwyZpfS1nen4r
-X-Authority-Analysis: v=2.4 cv=U7UHnuru c=1 sm=1 tr=0 ts=6af43905 cx=c_pps
+X-Proofpoint-ORIG-GUID: L41FpL75gANvB2xrWgbEPasW86xht1x1
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTExMDAzOCBTYWx0ZWRfX6zNfFJyFFseY
+ 2be7mOseauU5AFL2TT8IgRWJtaRzsM6XJVZ9heSTG6hTtNtjHh/oyHvRnDjPVb24LGENcbwWiR/
+ 3oxTWZcz3W8OJXHHLWUkhJTdeGM0JV8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTExMDAzOCBTYWx0ZWRfX4AF1mkkU0xbu
+ 4/xLfqfo+33zPrZEqH7buhJFn1tAAM//r3Il4w+cWz1VahjUB6uZ7VQWGhgidAYAcWovTM7EyDr
+ Ds1d4PBy9/fREOVGzhfiUgLw26TngcCEvqN/BwMxdgNoIqBRriff0/yp/V85MIDUykQPeVqaeFh
+ QHXkENQRedSnllA1wM3DoWf82+xNpqDZ1UqMeEw4B6fOakbSIOm7vl8zWz78702ylK3HnNMvkxY
+ p4kRmsfjIwLIxa5ROQRoAPGBHS7mdA6vPnBGt3zDsazBtdvjqawjSHYVOwTAjMBzFwUdsFyW4ne
+ rKYQdaJd8PqTz+j5IdSRLfAGgqTTiHCrsvna4iN3HF22je5SxBVSI3wJ/Skj/hyzTWqZ09Gs0vb
+ IYDVQZynL2Yi1rtYtKJ6x75BjKkbEPGhZZWtBWVtn3+C9I6I6mbztfYHxuIJ/90su5dW8G/QNhs
+ V7VCsafD9HlR/eCL+cg==
+X-Proofpoint-GUID: L41FpL75gANvB2xrWgbEPasW86xht1x1
+X-Authority-Analysis: v=2.4 cv=MpzHeGae c=1 sm=1 tr=0 ts=6af43905 cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=3WHJM1ZQz_JShphwDgj5:22 a=_H_TX8z6i7KVAPa1vQQA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTExMDAzOCBTYWx0ZWRfX7uNhbd0i8uPC
- 2ll7pBvlZ9ox/m5yeLvaMyQ+beZJEX7/EpaZ/8c3PjM21Bc2vrMlK/H6z4bdzp0oGbtpCU0J+W5
- aYknplaf6jslr0Epx2ZJDxw47/GedZ+kTg653GpGiM+j0s1JMfRY4GOUZVOjfipNc/T+5koUSfE
- 7Ag5QJIKXl/Ner4K6z0pH2WuqlSIoMLMt8dg9r8HmbXOULTFTrY4DsHqlrk5rXwtbZNhP7DOSRp
- Q0n5kI3mbqsFbXfDWeJb3v0ZtnIPzibr9yUud59M90PlQJlVHFGoO/amwAYh6f5ZFAa5aG52ezv
- lehBgR/2BmmH/zm7qulIUWfHOfgtdrLMALzvKELYOsDgUU/KK8ImzjpHeTxMzOuG2UUqqIpqYe/
- kcxthJbbdhitcg1PmjtBq1dIZXW/cxGGHqRixpXiV8NokSc3ImiOxNQBANSLU7kjZ5vPGVT3ErT
- UiRCnNOliIJFKrEJJUQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTExMDAzOCBTYWx0ZWRfX3XS3J/DAGj3r
- Fhaz6Rk3onRBcQRZMuUE/ZD7zzz6SAlL8v55ZcgzjynRAlS8bma6NtpZGZhPzUmQxj6vwxCeOIQ
- DL9hbBJ8c8Iy+0AWHR0LhK4V+zkI40w=
+ a=gowsoOTTUOVcmtlkKump:22 a=gN9dK6AwCwxm5ZE0OCsA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-11_02,2026-11-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0 spamscore=0
- clxscore=1015 malwarescore=0 adultscore=0 phishscore=0 impostorscore=0
+ bulkscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 priorityscore=1501 adultscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611110038
 
-Parse the PbapSupportedFeatures tag of the CONNECT request, combine it
-with the features supported by the PSE and store the result in the
-session.
+Use the standard PRODID spelling in the PBAP property tables and filter
+mask so PropertySelector and vCardSelector bit 25 match the property.
 
+Fixes: 3a1e6b3e8dc1 ("obexd: Implement Filter related function for PBAP client")
+Fixes: 4f805f5e09f3 ("obexd: Add EVCard filter for PullPhoneBook")
+Fixes: c8e98708ea3a ("obexd: Add support to all fields required by vCard 3.0")
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- obexd/plugins/pbap.c | 47 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+ obexd/client/pbap.c             | 2 +-
+ obexd/plugins/phonebook-ebook.c | 2 +-
+ obexd/plugins/vcard.c           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index 83256c98c..92794b968 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -42,15 +42,22 @@
- #define VCARDLISTING_TYPE	"x-bt/vcard-listing"
- #define VCARDENTRY_TYPE		"x-bt/vcard"
- 
--#define ORDER_TAG		0x01
--#define SEARCHVALUE_TAG		0x02
--#define SEARCHATTRIB_TAG	0x03
--#define MAXLISTCOUNT_TAG	0x04
--#define LISTSTARTOFFSET_TAG	0x05
--#define FILTER_TAG		0x06
--#define FORMAT_TAG		0X07
--#define PHONEBOOKSIZE_TAG	0X08
--#define NEWMISSEDCALLS_TAG	0X09
-+#define ORDER_TAG			0x01
-+#define SEARCHVALUE_TAG			0x02
-+#define SEARCHATTRIB_TAG		0x03
-+#define MAXLISTCOUNT_TAG		0x04
-+#define LISTSTARTOFFSET_TAG		0x05
-+#define FILTER_TAG			0x06
-+#define FORMAT_TAG			0x07
-+#define PHONEBOOKSIZE_TAG		0x08
-+#define NEWMISSEDCALLS_TAG		0x09
-+#define SUPPORTED_FEATURES_TAG		0x10
-+
-+#define DOWNLOAD_FEATURE	0x00000001
-+#define BROWSE_FEATURE		0x00000002
-+
-+#define PSE_SUPPORTED_FEATURES \
-+	(DOWNLOAD_FEATURE | BROWSE_FEATURE)
- 
- struct cache {
- 	gboolean valid;
-@@ -72,6 +79,7 @@ struct pbap_session {
- 	uint32_t find_handle;
- 	struct cache cache;
- 	struct pbap_object *obj;
-+	uint32_t negotiated_features;
- };
- 
- struct pbap_object {
-@@ -513,6 +521,10 @@ static struct apparam_field *parse_aparam(const uint8_t *buffer, uint32_t hlen)
- static void *pbap_connect(struct obex_session *os, int *err)
- {
- 	struct pbap_session *pbap;
-+	const uint8_t *buffer;
-+	GObexApparam *apparam;
-+	uint32_t pce_features;
-+	ssize_t rsize;
- 
- 	manager_register_session(os);
- 
-@@ -520,6 +532,23 @@ static void *pbap_connect(struct obex_session *os, int *err)
- 	pbap->folder = g_strdup("/");
- 	pbap->find_handle = PHONEBOOK_INVALID_HANDLE;
- 
-+	rsize = obex_get_apparam(os, &buffer);
-+	pce_features = DOWNLOAD_FEATURE | BROWSE_FEATURE;
-+
-+	if (rsize > 0) {
-+		apparam = g_obex_apparam_decode(buffer, rsize);
-+		if (apparam) {
-+			g_obex_apparam_get_uint32(apparam,
-+						SUPPORTED_FEATURES_TAG,
-+						&pce_features);
-+			g_obex_apparam_free(apparam);
-+		}
-+	}
-+
-+	pbap->negotiated_features = PSE_SUPPORTED_FEATURES & pce_features;
-+
-+	DBG("negotiated features 0x%08x", pbap->negotiated_features);
-+
- 	if (err)
- 		*err = 0;
- 
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 1970d3357..fbd843a4a 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -107,7 +107,7 @@ static const char *filter_list[] = {
+ 	"KEY",
+ 	"NICKNAME",
+ 	"CATEGORIES",
+-	"PROID",
++	"PRODID",
+ 	"CLASS",
+ 	"SORT-STRING",
+ 	"X-IRMC-CALL-DATETIME",
+diff --git a/obexd/plugins/phonebook-ebook.c b/obexd/plugins/phonebook-ebook.c
+index beb72b22b..d8621b8f9 100644
+--- a/obexd/plugins/phonebook-ebook.c
++++ b/obexd/plugins/phonebook-ebook.c
+@@ -81,7 +81,7 @@ static const char *attribute_mask[] = {
+ 		"KEY",
+ 		"NICKNAME",
+ /* 24 */	"CATEGORIES",
+-		"PROID",
++		"PRODID",
+ 		"CLASS",
+ 		"SORT-STRING",
+ /* 28 */	"X-IRMC-CALL-DATETIME",
+diff --git a/obexd/plugins/vcard.c b/obexd/plugins/vcard.c
+index 0a727b729..3827602cc 100644
+--- a/obexd/plugins/vcard.c
++++ b/obexd/plugins/vcard.c
+@@ -54,7 +54,7 @@
+ #define FILTER_KEY (1 << 22)
+ #define FILTER_NICKNAME (1 << 23)
+ #define FILTER_CATEGORIES (1 << 24)
+-#define FILTER_PROID (1 << 25)
++#define FILTER_PRODID (1 << 25)
+ #define FILTER_CLASS (1 << 26)
+ #define FILTER_SORT_STRING (1 << 27)
+ #define FILTER_X_IRMC_CALL_DATETIME (1 << 28)
 -- 
 2.34.1
 
