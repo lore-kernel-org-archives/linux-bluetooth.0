@@ -1,91 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.177
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794414487;
-	b=MPn/1PWSbiVNtSR4z5J8/GThtIT0SyxSA6f93LcVy6GofAMzsfTnq++8GbxbXJnn/ghZ
-	 APezNHo52wSBUl4Xuq5mtPbJcAaLwS4csLOEUBFcXQOGE/3/yi7Dfvi8/Na+YUyWqfRS4
-	 /UGlZ7KvJaZWMdm+MPg6JbvQ8n4AZVfLUwj6PIwQiWpnp6B97lCiDzkfwT4InUFzoorrw
-	 Mgd8pP3FdHmfHuQKFV5BujmDMjXpkrR+pet704nGy5/DmmQutx1QMbA5t9SULWnxlMGMY
-	 GTc+qYAqRQ5KpqjNZHz6GIgT7GQFyVbRXxwRo3CZcu/CxS5uaTSN2ufus5HhN8gyjqQ==
+	t=1794414488;
+	b=FiIuxjBPDFE89Uboe4mR8NApRmJ3+JjVwse0GiNXxENk77gw/sKo81569m4yh1yPo+WG
+	 q+Gz1Y3cGCdCJ+spwfSyrV7FW2UEqp8mJOyOJWMTFoRXr4NoeeechkMedof8fe1MWPJDc
+	 ukJdgNpTBAYlNanqDb+0LpiOTcOijGnpcFzP83Fv9ktcCFyuULT+QJzc0LZ8h0uD7t0zV
+	 XzAAxNhutK5PZWpWayHmXsMCIFc8fa4fsQvBuqexFqTX6xMFre+mANDcnSb/1ywhVCuEu
+	 FPsOA8TVgKCSLPokv5wt4wYJrVQTbkxamauNPDYpdCgrjX1jFKhDEUdgNK1KxCX/UXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794414487;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794414488;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
-	b=k2ZdYCm1gArVV9w2YRfPtyqPMYMKr3V/hBmya+jW8y3779WVZ9gvRyfP4B/4QgpMsrhc
-	 Gv6d9HsuU3NWWCH62silLAWPYK3BikZAMzagJ52NKX2bvBZcrrgLexPl2CvthiN1a4kWs
-	 Mzvb3Tn/0VZ9doiQ4Ji051mYGZMswgTJrrVQ3IUmPSZ6VesH5nnXu4kJq0ja6hZYbKSf5
-	 tWfgZ+JGcdTOxzJwIVaOnnY1gAof9TpyE9iDYP4VyeqRsJbKlRFtfjZzbnkxuP5F2DK7g
-	 d9VvWJ1Xvpx4WCF0KhE0hqRwFRVFL097ynyHSk7Q6yfZ3zfS6aLsUsuBH+fhyURseGg==
+	bh=0G+RL5CgL55R/Ps6ohHgGPlTm5LVU7YABoGHGc54OME=;
+	b=zThDd3HVrH1M9u9RmCFMfn1USiq4q2IoKbntFEW3RkQCp9I25tVRwbv/AZs+Yxl36Gtb
+	 r6b64LQTtniOJ0z7FE/vRifsDMHh2bHUPaVZbhVZnC0QFUzcY8NThFIPu15/sIhHV2o3Z
+	 0Zfv7YoDPqyliqEFaGw1DEgdkzK2RipwUJp61rY7JERVwjHQzIrW6/oDbGeJE3xtElvlb
+	 ZKP/wKwMtWEclvDXDhiMSOXUNxUNT0vRhrqzmnJ7etP8vaReyMfajVA5ZQPgFcdFwkKsP
+	 WAkk3Y0BkbsErODWImBbHGSfzC2yEyaZHW5VSdiWMeALeU803KFe7mt6lqBk6oRyjoQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RpXkS4Kp;
-	arc=none smtp.remote-ip=209.85.221.177
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GMKyJtGw;
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCA1606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:28:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9CCA1606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3085B606A882
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:28:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3085B606A882
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RpXkS4Kp
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5eaabf28c06so2199871e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:28:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GMKyJtGw
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5eadadf23e5so2193810e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 08:28:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794414485; x=1795019285; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
-        b=RpXkS4Kp7yj9UiD8/hoIIgC9iaTKTJDeU2mZX6YHz1buR0amWFpWSmKlPlgOnMfSjf
-         MDrqUgYjmiRY1IitIeAnL39OMrH859nJ8g6C23bH++OoDHS3XMb0v3676+zQpM7So336
-         g3wgFFBHC/nYV1Qus4hjK1SJIoROlsVrEYwE48xZQ4dDLDuK+DpoL5w/jNFosGOz/nYE
-         2nWA/UZiCDp42zPNhG41J1qNYENXk1bE2cHHvfXQj8wQGF8N45gjlvM1Fp0EwjYEfZRa
-         0YCyCgrX//SBfLO5qnpBvx8g0vAFZG/ZwDP9swcIK0uUlDN8j2jsOeDB5i0tZTcWhHrG
-         nGxQ==
+        d=gmail.com; s=20260707; t=1794414487; x=1795019287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=0G+RL5CgL55R/Ps6ohHgGPlTm5LVU7YABoGHGc54OME=;
+        b=GMKyJtGwz7FQceqWrCMxGqF/Nqixsi/03FXVdMKoyP8ZwXbyebhokprwxvaXnj29a6
+         fCc+ldIgQ6Zu2BQCGN8PEh++LutuU6Q6F+NBgIJSPbK86JcC/ki5wWTgocKYdRPV5678
+         CElQwTFXTs8f4m+WSnsoofiFqBrL10fQLe3Xf+mXOL194VdOTq9zc13CUEVGpTukPce2
+         qvPK3ebOYxpjXXpuBBFdFqSfkCLtgYvNNxjDQXcyDYkj4m6lkLgU80xMmC53dJwwStG+
+         506Y0rydUtIzHiIbaWDUEEZRHV7mVR/quN79Hc51x4NCoQ8xqHrVuJiTRSh6pqL9Og9J
+         YO1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794414485; x=1795019285;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WMIYhqwlM7uGRphAhh4APEv8fYsCI0snPNC8fEfN/ok=;
-        b=2aSJivTGWhHPeTobdl41eNRy3zQ8Cnx3YNjuYQLhk9YDm60spu6QVMURyBFYH8gKDe
-         Rcm8DK4pY+l+Dai05ur0M+FtwkzXWKj2na8ZoZjH/AshaEN1jTHSbBj3dg/GU6TSU3/6
-         WPikmrI3oFmBIJsyoKz2wrBJX3RqHT8K1RCt+dQqIk26gsuJUJ32EYJyIiEdBH7IhZoK
-         ceyJ/VV3IiaBvbhX3GvD6Tk6YLwt/p8MeIIE5BR757Y1fQhKVeU0V+LAJoIu+yQ0mfS0
-         ePtM6r4nsFJiqQOWvVlkOx/s3NGrLoO1ZLrPQC1dp0wHdbPaG22G3AN1hp/pLd36RY+C
-         YH8w==
-X-Gm-Message-State: APuU4Z/fDb50YDifpP9Q4Vi1mWCkpkHhcWhHJVlX5uxZ/+b7rqiE5MFk
-	QVkE3G6/uA30ONqLfvwqcPvUEJWk9vmS472FhwYSkd+jiIcThnUOuq8QbCEhmQ==
-X-Gm-Gg: AYBFou0WE8ROxX9G6m346cV03SG4Ve3HEVhydTJMLzW3kX7dJkZeJDDOpwEMHoaT4pK
-	K/HNdUCGGGHJ2Y/KbrMwINpPKBY/Y5VxTCATeauo9EjJbR/xPuz8+PrFqafqTnQHoLNNspBOt9a
-	XIJjolwF92VXwdql+8RgedF4SVLuD/wXWziDSmou2vewkz/LB4TMCFxjKzRYKJFvV5CUxNqrShy
-	F4zkdY+Iz0Qrps+6GFOhqFIUS+xYST5GrveC0AuHNvKvbxfscKgX0HyZTvYoGYVQnyTa5XbrDp2
-	5jcYrRzuJOqB1vkMthVEqXtXb+LtprAbYHfUhmR2qA/5KhcLxzr6jukQg60IG+ZteA2sb1qapku
-	VIiFNcuqGw9X9ml9Bq4nAlz+A5qMQi1WtyDijxM34Oip0ajY00sLDpKDCj/72VNwIo9oy7yjn1E
-	cGKKAPjMjQIWPwQEKn5K4fPuNZviT201MlJYu667lKpd2n6ELSn09LFgjLPfhpi+imXI3JS6yAe
-	xfsCIzMLYKUUw8P+78IzDltuq8P/rlUciBJLh4khF56Y/CgQ7rXF9bpYMUZ5447Edgz4j7M53Ne
-	RrzCq/h/8v+abwUT9jPZAxwXYwerE2hjvKWinp9y0DL41bPJrOmiNLI0naRRI7MyFTgl41xGeWW
-	nWuf67/Ow7iH2GAInK0j8rsFGdoGOSwC8D688Rn14B3PbfUSbM4OoDPf1l2ZH8T/Hlm+h3qFKP0
-	PbJabfQQtxxpfoMLSIUMTP97Z+
-X-Received: by 2002:a05:6122:4f98:b0:5ea:c722:b3a with SMTP id 71dfb90a1353d-5ee1c3b5490mr1121457e0c.7.1794414483932;
-        Wed, 11 Nov 2026 08:28:03 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794414487; x=1795019287;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=0G+RL5CgL55R/Ps6ohHgGPlTm5LVU7YABoGHGc54OME=;
+        b=XHkwu17BTj2GdmuS2aCk2IzzXCx/jkz2b2GbmyBjHaBjYlJ7FOoEWV3nb5ZrAspr4K
+         VlfiXX2n33GHAGAVayeWGhaDp3uDVRTK9EESRdPaJvU1u6j+Mp0VY25TrUgTANz6oGUs
+         nBw8Qn66l2KllRa4Sk+ftuRth/QRDHdD+fjdXesPpANNl2DlLodmpgoUgxctnUx22XJf
+         guQcQ8F/QLN/lRqrZZC/aFHOCEJTISwulVngugE7ZhU9xrT7OvxUAmYTH1UuSCKEKStk
+         9B959kexUY4nQppTPopsnCM1irRN/hYGc38inFFB1BAq8oBYpU9SzayKt7HvqB5Jmu7l
+         Lt/Q==
+X-Gm-Message-State: APuU4Z/nOpGzC99MdUMTEIBjA9Vz6c2eR6zt12iykh8qjQeoIBVskY/i
+	ODpc09dpsdPsPGKarq6mJJDgNd6cBE9XHqB2iCSjhaawht5YT1SR8fE+Fs0DiA==
+X-Gm-Gg: AYBFou3l8XaJXQVzamTgoNAnzE2OmRsE9uaQ39qBgW7mGMyTj5x8GZB1s9ObZ8omNsc
+	NkT9JxCvozrBCMwGrYOnhuZ8ArKt8cAp4oVtdJKN5CQrfrL/vKs8wPKvyNzH6Sy7sbg9ZUxWdsE
+	6gJeZWZdbfYzyC98LYKtm+xF6QLOBC5+e7KS7BLQ2VnwaSAHBUHHOuYBebVeRnyVM5e2MHmDDzM
+	PzM1GyEtn0vNeMfLZeiHhktyIXWun+d8egXUu6sdTzZayhZ5iMLRyJTmXeV7v+yYYpc2ZKXMQ9c
+	/M53dnKz9gQrGIyG2Jzp8ipJxCuKLYMgNiT2nqdROFFhWMv1/79ZNLCKyt2IBqVzHYaAyB6Gizp
+	4ogRaCFAN14bV8S+wJC75L6fbMztdyA0pvUgdTgPykODlqE90LDdLC4nWtgSTkBkXGQla4NLNOd
+	wCe1tU15xhigu+hVRoR2AHfLPFgx4v22/1u8/ttdYjy32mXpksl05A+vIH5S4HZbqQxjb2JS57B
+	Geh+dkQpcAvfMK+MtreYPlR+cud3Pc3ZQFdIzNqGH7ooiRbdfWHIuTE77eVBkLPzCWHEuafnHHj
+	ebzAm32d5sIcSfUPMRBFpQ92glYbtf8fUlBRlLSOcru5QGjqaxEMgsbrLvcR+DCqx1Rai/DNY3T
+	pkD4/M+KFT8AR+VE/ojaD5QDCSfjmNZwdmhO2Go+iJMVJGnESwdUiiHN5pV+spXUpZmKVtIRhm4
+	jj4/A=
+X-Received: by 2002:a05:6122:6204:b0:5ec:16d2:4537 with SMTP id 71dfb90a1353d-5ee1c3f5f6fmr921283e0c.7.1794414486506;
+        Wed, 11 Nov 2026 08:28:06 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5ab918sm4007081e0c.7.2026.11.11.08.28.03
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5ab918sm4007081e0c.7.2026.11.11.08.28.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 08:28:03 -0800 (PST)
+        Wed, 11 Nov 2026 08:28:05 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v9 06/11] emulator: Add HDT support to btdev
-Date: Wed, 11 Nov 2026 11:27:49 -0500
-Message-ID: <20261111162755.3506226-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v9 08/11] shared/gatt: Add MIC length permission checks
+Date: Wed, 11 Nov 2026 11:27:51 -0500
+Message-ID: <20261111162755.3506226-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261111162755.3506226-1-luiz.dentz@gmail.com>
 References: <20261111162755.3506226-1-luiz.dentz@gmail.com>
@@ -98,1497 +97,565 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add a Bluetooth 7.0 controller type, BTDEV_TYPE_BREDRLE70, which
-advertises the HDT and EKS feature bits and supported commands and
-implements the HDT commands and events: LE Enable Encryption v2 with
-MIC length negotiation, Read/Write Suggested Default Data Length v2,
-Read Maximum Data Length v2, Set Data Length v2, Set CIG Parameters v2,
-Create BIG v2, Set HDT Default Parameters, CIS Established v3, Create BIG
-Complete v2 and the EKS Opportunistic Encryption host feature. Make it
-the default for btvirt.
+Add read and write MIC length permissions for 64-bit and 128-bit MICs,
+take the MIC length of the link from the BT_SECURITY socket option, and
+reject access with MIC Length Too Short when the link uses a shorter
+one. Expose the permissions as GATT characteristic and descriptor flags
+over D-Bus, and add bluetoothctl scripts exercising them.
 
-Assisted-by: OpenCode:claude-opus-5
+A MIC length requirement implies the link is encrypted, so without
+encryption the error is Insufficient Encryption, which lets the client
+encrypt the link, and the minimum key size is checked before the MIC
+length, as the spec orders them.
 ---
- emulator/btdev.c  | 1086 +++++++++++++++++++++++++++++++++++++++++----
- emulator/btdev.h  |    1 +
- emulator/hciemu.c |    3 +
- emulator/hciemu.h |    1 +
- emulator/main.c   |    5 +-
- 5 files changed, 1015 insertions(+), 81 deletions(-)
+ client/scripts/gatt-mic-128.bt       |   5 ++
+ client/scripts/gatt-mic-64-128.bt    |   7 ++
+ client/scripts/gatt-mic-64.bt        |   5 ++
+ doc/org.bluez.GattCharacteristic.rst |   4 +
+ doc/org.bluez.GattDescriptor.rst     |   4 +
+ src/gatt-database.c                  |  26 ++++++
+ src/shared/att-types.h               |  17 +++-
+ src/shared/att.c                     |  39 ++++++++
+ src/shared/att.h                     |   3 +
+ src/shared/gatt-db.c                 |   9 ++
+ src/shared/gatt-db.h                 |   3 +
+ src/shared/gatt-server.c             |  61 ++++++++++++-
+ unit/test-gatt.c                     | 130 +++++++++++++++++++++++++++
+ 13 files changed, 307 insertions(+), 6 deletions(-)
+ create mode 100644 client/scripts/gatt-mic-128.bt
+ create mode 100644 client/scripts/gatt-mic-64-128.bt
+ create mode 100644 client/scripts/gatt-mic-64.bt
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 2fe593ac4959..9448fd5e2533 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -84,10 +84,15 @@ struct hook {
- struct btdev_conn {
- 	uint16_t handle;
- 	uint8_t  type;
-+	uint8_t  tx_phy;
-+	uint8_t  rx_phy;
-+	uint8_t  mic_len;
- 	uint8_t  past_mode;
-+	bool     encrypted;
- 	struct btdev *dev;
- 	struct btdev_conn *link;
- 	struct queue *links;
-+	size_t data_len;
- 	void *data;
+diff --git a/client/scripts/gatt-mic-128.bt b/client/scripts/gatt-mic-128.bt
+new file mode 100644
+index 000000000000..9d566ae5bf9c
+--- /dev/null
++++ b/client/scripts/gatt-mic-128.bt
+@@ -0,0 +1,5 @@
++gatt.register-service 12345678-1234-5678-1234-56789abcdef0
++yes
++gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef2 mic-128-read,mic-128-write
++01 02 03 04
++gatt.register-application
+diff --git a/client/scripts/gatt-mic-64-128.bt b/client/scripts/gatt-mic-64-128.bt
+new file mode 100644
+index 000000000000..f4e595165e71
+--- /dev/null
++++ b/client/scripts/gatt-mic-64-128.bt
+@@ -0,0 +1,7 @@
++gatt.register-service 12345678-1234-5678-1234-56789abcdef0
++yes
++gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef1 mic-64-read,mic-64-write
++01 02 03 04
++gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef2 mic-128-read,mic-128-write
++05 06 07 08
++gatt.register-application
+diff --git a/client/scripts/gatt-mic-64.bt b/client/scripts/gatt-mic-64.bt
+new file mode 100644
+index 000000000000..b79717ae2534
+--- /dev/null
++++ b/client/scripts/gatt-mic-64.bt
+@@ -0,0 +1,5 @@
++gatt.register-service 12345678-1234-5678-1234-56789abcdef0
++yes
++gatt.register-characteristic 12345678-1234-5678-1234-56789abcdef1 mic-64-read,mic-64-write
++01 02 03 04
++gatt.register-application
+diff --git a/doc/org.bluez.GattCharacteristic.rst b/doc/org.bluez.GattCharacteristic.rst
+index 805f39593903..6dd5d44c04cf 100644
+--- a/doc/org.bluez.GattCharacteristic.rst
++++ b/doc/org.bluez.GattCharacteristic.rst
+@@ -382,6 +382,10 @@ Possible values:
+ :"secure-write" (Server only):
+ :"secure-notify" (Server only):
+ :"secure-indicate" (Server only):
++:"mic-64-read" (Server only):
++:"mic-64-write" (Server only):
++:"mic-128-read" (Server only):
++:"mic-128-write" (Server only):
+ :"authorize":
+ 
+ uint16 Handle [read-only] (Client Only)
+diff --git a/doc/org.bluez.GattDescriptor.rst b/doc/org.bluez.GattDescriptor.rst
+index 790a5482d080..425d9becf635 100644
+--- a/doc/org.bluez.GattDescriptor.rst
++++ b/doc/org.bluez.GattDescriptor.rst
+@@ -160,6 +160,10 @@ Possible values:
+ :"encrypt-authenticated-write":
+ :"secure-read" (Server Only):
+ :"secure-write" (Server Only):
++:"mic-64-read" (Server Only):
++:"mic-64-write" (Server Only):
++:"mic-128-read" (Server Only):
++:"mic-128-write" (Server Only):
+ :"authorize":
+ 
+ uint16 Handle [read-only] (Client Only)
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index d8e45581a138..cbee49d59f55 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1799,6 +1799,21 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
+ 		} else if (!strcmp("secure-write", flag)) {
+ 			*props |= BT_GATT_CHRC_PROP_WRITE;
+ 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
++		} else if (!strcmp("mic-64-read", flag)) {
++			*props |= BT_GATT_CHRC_PROP_READ;
++			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_MIC_LEN_64;
++		} else if (!strcmp("mic-64-write", flag)) {
++			*props |= BT_GATT_CHRC_PROP_WRITE;
++			*perm |= BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_MIC_LEN_64;
++		} else if (!strcmp("mic-128-read", flag)) {
++			*props |= BT_GATT_CHRC_PROP_READ;
++			*perm |= BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_MIC_LEN_128;
++		} else if (!strcmp("mic-128-write", flag)) {
++			*props |= BT_GATT_CHRC_PROP_WRITE;
++			*perm |= BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_MIC_LEN_128;
+ 		} else if (!strcmp("authorize", flag)) {
+ 			*req_prep_authorization = true;
+ 		} else if (!strcmp("encrypt-notify", flag)) {
+@@ -1860,6 +1875,17 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm,
+ 			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_SECURE;
+ 		else if (!strcmp("secure-write", flag))
+ 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
++		else if (!strcmp("mic-64-read", flag))
++			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_MIC_LEN_64;
++		else if (!strcmp("mic-64-write", flag))
++			*perm |= BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_MIC_LEN_64;
++		else if (!strcmp("mic-128-read", flag))
++			*perm |= BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_MIC_LEN_128;
++		else if (!strcmp("mic-128-write", flag))
++			*perm |= BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_MIC_LEN_128;
+ 		else if (!strcmp("authorize", flag))
+ 			*req_prep_authorization = true;
+ 		else {
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+index 69f45b6aa6d7..687ebf66cafa 100644
+--- a/src/shared/att-types.h
++++ b/src/shared/att-types.h
+@@ -98,6 +98,7 @@ struct bt_att_pdu_error_rsp {
+ #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
+ #define BT_ATT_ERROR_DB_OUT_OF_SYNC			0x12
+ #define BT_ATT_ERROR_VALUE_NOT_ALLOWED			0x13
++#define BT_ATT_ERROR_MIC_LEN_TOO_SHORT			0x14
+ 
+ /*
+  * Common Profile and Service Error Code descriptions (see Supplement to the
+@@ -131,14 +132,26 @@ struct bt_att_pdu_error_rsp {
+ #define BT_ATT_PERM_WRITE_SECURE	0x0200
+ #define BT_ATT_PERM_SECURE		(BT_ATT_PERM_READ_SECURE | \
+ 					BT_ATT_PERM_WRITE_SECURE)
++#define BT_ATT_PERM_READ_MIC_LEN_64	0x0400
++#define BT_ATT_PERM_READ_MIC_LEN_128	0x0800
++#define BT_ATT_PERM_WRITE_MIC_LEN_64	0x1000
++#define BT_ATT_PERM_WRITE_MIC_LEN_128	0x2000
++#define BT_ATT_PERM_MIC_LEN_64		(BT_ATT_PERM_READ_MIC_LEN_64 | \
++					BT_ATT_PERM_WRITE_MIC_LEN_64)
++#define BT_ATT_PERM_MIC_LEN_128	(BT_ATT_PERM_READ_MIC_LEN_128 | \
++					BT_ATT_PERM_WRITE_MIC_LEN_128)
+ #define BT_ATT_PERM_READ_MASK		(BT_ATT_PERM_READ | \
+ 					BT_ATT_PERM_READ_AUTHEN | \
+ 					BT_ATT_PERM_READ_ENCRYPT | \
+-					BT_ATT_PERM_READ_SECURE)
++					BT_ATT_PERM_READ_SECURE | \
++					BT_ATT_PERM_READ_MIC_LEN_64 | \
++					BT_ATT_PERM_READ_MIC_LEN_128)
+ #define BT_ATT_PERM_WRITE_MASK		(BT_ATT_PERM_WRITE | \
+ 					BT_ATT_PERM_WRITE_AUTHEN | \
+ 					BT_ATT_PERM_WRITE_ENCRYPT | \
+-					BT_ATT_PERM_WRITE_SECURE)
++					BT_ATT_PERM_WRITE_SECURE | \
++					BT_ATT_PERM_WRITE_MIC_LEN_64 | \
++					BT_ATT_PERM_WRITE_MIC_LEN_128)
+ 
+ /* GATT Characteristic Properties Bitfield values */
+ #define BT_GATT_CHRC_PROP_BROADCAST			0x01
+diff --git a/src/shared/att.c b/src/shared/att.c
+index ca431a89f95c..f06ebab9b572 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -63,6 +63,7 @@ struct bt_att {
+ 	bool close_on_unref;
+ 	struct queue *chans;
+ 	uint8_t enc_size;
++	uint8_t mic_len;
+ 	uint16_t mtu;			/* Biggest possible MTU */
+ 
+ 	struct queue *notify_list;	/* List of registered callbacks */
+@@ -2151,6 +2152,44 @@ void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
+ 	att->enc_size = enc_size;
+ }
+ 
++static uint8_t bt_att_chan_get_mic_len(struct bt_att_chan *chan)
++{
++	struct bt_security sec;
++	socklen_t len;
++
++	if (chan->type == BT_ATT_LOCAL)
++		return chan->att->mic_len;
++
++	memset(&sec, 0, sizeof(sec));
++	len = sizeof(sec);
++	if (getsockopt(chan->fd, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0)
++		return 0;
++
++	return sec.mic_len;
++}
++
++uint8_t bt_att_get_mic_len(struct bt_att *att)
++{
++	struct bt_att_chan *chan;
++
++	if (!att)
++		return 0;
++
++	chan = queue_peek_tail(att->chans);
++	if (!chan)
++		return 0;
++
++	return bt_att_chan_get_mic_len(chan);
++}
++
++void bt_att_set_mic_len(struct bt_att *att, uint8_t mic_len)
++{
++	if (!att)
++		return;
++
++	att->mic_len = mic_len;
++}
++
+ static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
+ 				bt_att_counter_func_t func, void *user_data)
+ {
+diff --git a/src/shared/att.h b/src/shared/att.h
+index 5b5cd4fbab2c..4bee694e4352 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -116,6 +116,9 @@ int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
+ bool bt_att_set_security(struct bt_att *att, int level);
+ void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
+ 
++uint8_t bt_att_get_mic_len(struct bt_att *att);
++void bt_att_set_mic_len(struct bt_att *att, uint8_t mic_len);
++
+ bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+ 			bt_att_counter_func_t func, void *user_data);
+ bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 23c705bd9d16..2384c5fc8135 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -2180,6 +2180,15 @@ gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib)
+ 	return attrib->permissions;
+ }
+ 
++void gatt_db_attribute_set_permissions(struct gatt_db_attribute *attrib,
++							uint32_t permissions)
++{
++	if (!attrib)
++		return;
++
++	attrib->permissions = permissions;
++}
++
+ static bool read_timeout(void *user_data)
+ {
+ 	struct pending_read *p = user_data;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 5e7e7203fcc3..8640768850fd 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -265,6 +265,9 @@ bool gatt_db_attribute_get_incl_data(const struct gatt_db_attribute *attrib,
+ uint32_t
+ gatt_db_attribute_get_permissions(const struct gatt_db_attribute *attrib);
+ 
++void gatt_db_attribute_set_permissions(struct gatt_db_attribute *attrib,
++							uint32_t permissions);
++
+ bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
+ 						uint16_t len);
+ 
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 4ec4a59993a2..ba1609a335ae 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -201,7 +201,11 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
+ 	iov->iov_len = length;
+ }
+ 
+-static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
++static uint8_t check_permissions(struct bt_gatt_server *server,
++				struct gatt_db_attribute *attr, uint32_t mask);
++
++static bool encode_read_by_grp_type_rsp(struct bt_gatt_server *server,
++						struct queue *q,
+ 						struct bt_att *att,
+ 						uint16_t mtu,
+ 						struct iovec *rsp)
+@@ -213,6 +217,21 @@ static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
+ 	while (queue_peek_head(q)) {
+ 		struct gatt_db_attribute *attrib = queue_pop_head(q);
+ 
++		/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
++		 * Section 3.4.4.9:
++		 *
++		 * If an attribute in the set of requested attributes would
++		 * cause an ATT_ERROR_RSP PDU then this attribute cannot be
++		 * included in an ATT_READ_BY_GROUP_TYPE_RSP PDU and the
++		 * attributes before this attribute shall be returned.
++		 *
++		 * So stop before a service the link does not have the
++		 * security to read, the caller reports it if it is the first
++		 * one.
++		 */
++		if (check_permissions(server, attrib, BT_ATT_PERM_READ_MASK))
++			break;
++
+ 		value.iov_base = NULL;
+ 		value.iov_len = 0;
+ 
+@@ -322,14 +341,27 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint16_t mtu,
+ 		goto error;
+ 	}
+ 
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
++	 * Section 3.4.4.9:
++	 *
++	 * If the first attribute in the set of requested attributes would
++	 * cause an ATT_ERROR_RSP PDU then no other attributes in the
++	 * requested attributes can be considered.
++	 */
++	ecode = check_permissions(server, queue_peek_head(q),
++							BT_ATT_PERM_READ_MASK);
++	if (ecode) {
++		ehandle = gatt_db_attribute_get_handle(queue_peek_head(q));
++		goto error;
++	}
++
+ 	rsp.iov_base = malloc(mtu);
+ 	if (!rsp.iov_base) {
+ 		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+ 		goto error;
+ 	}
+ 
+-	if (!encode_read_by_grp_type_rsp(server->db, q, server->att, mtu,
+-								&rsp)) {
++	if (!encode_read_by_grp_type_rsp(server, q, server->att, mtu, &rsp)) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+ 		goto error;
+ 	}
+@@ -451,7 +483,9 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
+ 			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
+ 	}
+ 
+-	if (perm & BT_ATT_PERM_ENCRYPT) {
++	/* A MIC length requirement implies the link is encrypted, see below */
++	if (perm & (BT_ATT_PERM_ENCRYPT | BT_ATT_PERM_MIC_LEN_64 |
++						BT_ATT_PERM_MIC_LEN_128)) {
+ 		if (security < BT_ATT_SECURITY_MEDIUM)
+ 			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
+ 
+@@ -459,6 +493,25 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
+ 			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
+ 	}
+ 
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 3, Part F,
++	 * Section 3.2.5:
++	 *
++	 * If access to a secure attribute requires an encrypted link, and
++	 * the link is encrypted with an encryption key size that is long
++	 * enough but a MIC length that is too short for the level of
++	 * security required, then an ATT_ERROR_RSP PDU shall be sent with
++	 * the Error Code parameter set to MIC Length Too Short (0x14).
++	 */
++	if (perm & (BT_ATT_PERM_READ_MIC_LEN_128 |
++					BT_ATT_PERM_WRITE_MIC_LEN_128)) {
++		if (bt_att_get_mic_len(server->att) < 0x02)
++			return BT_ATT_ERROR_MIC_LEN_TOO_SHORT;
++	} else if (perm & (BT_ATT_PERM_READ_MIC_LEN_64 |
++					BT_ATT_PERM_WRITE_MIC_LEN_64)) {
++		if (bt_att_get_mic_len(server->att) < 0x01)
++			return BT_ATT_ERROR_MIC_LEN_TOO_SHORT;
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index bf60741077c5..e306b725496b 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2053,6 +2053,17 @@ static const struct test_step test_server_authorize_1 = {
+ 	.handle = 0x0004,
  };
  
-@@ -143,7 +148,11 @@ struct le_big {
++/* The MIC length is only checked on an encrypted link with a long enough key,
++ * which the tests of the MIC length have to start with.
++ */
++static void test_server_encrypted(gconstpointer data)
++{
++	struct context *context = create_server_context(data);
++
++	g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_MEDIUM));
++	bt_att_set_enc_key_size(context->att, 16);
++}
++
+ static void test_search_primary(gconstpointer data)
+ {
+ 	struct context *context = create_context(512, data);
+@@ -2701,10 +2712,46 @@ static void test_hash_db(gconstpointer data)
+ 	context_quit(context);
+ }
  
- struct le_cig {
- 	struct bt_hci_cmd_le_set_cig_params params;
--	struct bt_hci_cis_params cis[CIS_SIZE];
-+	union {
-+		struct bt_hci_cis_params cis_v1[CIS_SIZE];
-+		struct bt_hci_cis_params_v2 cis_v2[CIS_SIZE];
++/*
++ * Test database for MIC length validation:
++ * Primary service at handle 0x0001 with 4 handles.
++ * Characteristic at handle 0x0003 (value handle) with read/write permissions
++ * requiring 128-bit MIC length.
++ * Service declaration also has MIC length permission for Read By Group Type.
++ */
++static struct gatt_db *make_mic_len_db(void)
++{
++	const struct att_handle_spec specs[] = {
++		PRIMARY_SERVICE(0x0001, GAP_UUID, 4),
++		CHARACTERISTIC(GATT_CHARAC_DEVICE_NAME,
++				BT_ATT_PERM_READ | BT_ATT_PERM_WRITE |
++				BT_ATT_PERM_READ_MIC_LEN_128 |
++				BT_ATT_PERM_WRITE_MIC_LEN_128,
++				BT_GATT_CHRC_PROP_READ |
++				BT_GATT_CHRC_PROP_WRITE,
++				0x01, 0x02, 0x03),
++		{ }
 +	};
-+	uint8_t version;
- 	bool activated;
- } __packed;
- 
-@@ -258,8 +267,13 @@ struct btdev {
- 	uint8_t  le_pa_data_len;
- 	uint8_t  le_pa_data[MAX_PA_DATA_LEN];
- 	uint8_t  le_ltk[16];
-+	uint8_t  hdt_def_mic_len;
-+	uint8_t  hdt_def_format;
-+	uint16_t hdt_def_rates;
- 	struct le_cig le_cig[CIG_SIZE];
- 	uint8_t  le_iso_path[2];
-+	uint8_t  le_def_tx_phys;
-+	uint8_t  le_def_rx_phys;
- 
- 	uint8_t  le_rl_enable;
- 
-@@ -1263,7 +1277,7 @@ static struct btdev_conn *conn_add_cis(struct btdev_conn *acl, uint16_t handle)
- }
- 
- static struct btdev_conn *conn_add_bis(struct btdev *dev, uint16_t handle,
--						const struct bt_hci_bis *bis)
-+						const void *bis, size_t len)
++	struct gatt_db *db;
++	struct gatt_db_attribute *attr;
++
++	db = make_db(specs);
++
++	/* Set MIC length permission on the service declaration for
++	 * Read By Group Type test.
++	 */
++	attr = gatt_db_get_attribute(db, 0x0001);
++	gatt_db_attribute_set_permissions(attr, BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_MIC_LEN_128);
++
++	return db;
++}
++
+ int main(int argc, char *argv[])
  {
- 	struct btdev_conn *conn;
+ 	struct gatt_db *service_db_1, *service_db_2, *service_db_3;
+ 	struct gatt_db *ts_small_db, *ts_large_db_1, *ts_tail_db;
++	struct gatt_db *mic_len_db;
  
-@@ -1271,7 +1285,8 @@ static struct btdev_conn *conn_add_bis(struct btdev *dev, uint16_t handle,
- 	if (!conn)
- 		return conn;
+ 	tester_init(&argc, &argv);
  
--	conn->data = util_memdup(bis, sizeof(*bis));
-+	conn->data_len = len;
-+	conn->data = util_memdup(bis, len);
+@@ -2714,6 +2761,7 @@ int main(int argc, char *argv[])
+ 	ts_small_db = make_test_spec_small_db();
+ 	ts_large_db_1 = make_test_spec_large_db_1();
+ 	ts_tail_db = make_test_tail_db();
++	mic_len_db = make_mic_len_db();
  
- 	return conn;
- }
-@@ -1309,7 +1324,7 @@ static struct btdev_conn *conn_link_bis(struct btdev *dev, struct btdev *remote,
- 	if (!bis)
- 		return NULL;
+ 	/*
+ 	 * Server Configuration
+@@ -5169,5 +5217,87 @@ int main(int argc, char *argv[])
+ 			test_hash_db, ts_tail_db, NULL,
+ 			{});
  
--	conn = conn_add_bis(dev, BIS_HANDLE, bis->data);
-+	conn = conn_add_bis(dev, BIS_HANDLE, bis->data, bis->data_len);
- 	if (!conn)
- 		return NULL;
- 
-@@ -2057,14 +2072,116 @@ static int cmd_set_conn_encrypt(struct btdev *dev, const void *data,
- 	return 0;
- }
- 
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
-+ * Section 5.1.3.1.2:
-+ *
-+ * If the connection is on a GFSK PHY, then it shall use a 32-bit MIC after
-+ * encryption is started. If the connection is on the LE HDT PHY and both the
-+ * Flags_P and Flags_C are set to allow a 64-bit MIC, then the connection shall
-+ * use a 64-bit MIC. Otherwise, the connection shall use a 128-bit MIC.
-+ *
-+ * So the MIC length negotiated only applies on the LE HDT PHY, which is the
-+ * PHY of both directions or of none (Vol 6, Part B, Section 2.4.2.23).
-+ */
-+static uint8_t conn_mic_len(struct btdev_conn *conn)
-+{
-+	if (conn->tx_phy != 0x05 || conn->rx_phy != 0x05)
-+		return 0x00;
-+
-+	return conn->mic_len;
-+}
-+
-+static void encrypt_change_v3(struct btdev_conn *conn, uint8_t mode,
-+				uint8_t eks_mode, uint8_t status)
-+{
-+	struct bt_hci_evt_encrypt_change_v3 ev;
-+
-+	if (!conn)
-+		return;
-+
-+	memset(&ev, 0, sizeof(ev));
-+
-+	ev.status = status;
-+	ev.handle = cpu_to_le16(conn->handle);
-+	ev.mode = mode;
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
-+	 * Section 7.7.8:
++	/*
++	 * MIC Length Too Short
 +	 *
-+	 * Encryption_Key_Size: Encryption key size in octets. This
-+	 * parameter shall be ignored for LE connections and shall be
-+	 * ignored when Link Level Encryption is OFF. Range: 0x07 to 0x10
-+	 * Key_Schedule_Enabled: 0x00 Encryption Key Schedule based
-+	 * encryption is not used for LE. 0x01 Encryption Key Schedule based
-+	 * encryption is used with AES-CCM for LE. 0x02 Encryption Key
-+	 * Schedule based opportunistic encryption is used with AES-CCM for
-+	 * LE.
-+	 *
-+	 * So the key size isn't meaningful for LE, and 0 is what an
-+	 * opportunistic encryption, which has no key from pairing, reports.
++	 * Verify that the server rejects requests with error 0x14
++	 * (MIC Length Too Short) when the connection MIC length is
++	 * insufficient for the attribute's requirement.
 +	 */
-+	switch (eks_mode) {
-+	case 0x00: /* EKS disabled */
-+	case 0x01: /* EKS enabled */
-+		ev.key_size = 16;
-+		break;
-+	case 0x02: /* EKS opportunistic */
-+		ev.key_size = 0;
-+		break;
-+	}
 +
-+	ev.eks_mode = eks_mode;
-+	ev.mic_len = conn_mic_len(conn);
++	/* Read By Type Request */
++	define_test_server("/robustness/mic-len/read-by-type",
++			test_server_encrypted,
++			mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x00, 0x2a),
++			raw_pdu(0x01, 0x08, 0x03, 0x00, 0x14));
 +
-+	send_event(conn->dev, BT_HCI_EVT_ENCRYPT_CHANGE_V3, &ev, sizeof(ev));
-+}
++	/* Read Request */
++	define_test_server("/robustness/mic-len/read",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x14));
 +
-+static void key_refresh_complete(struct btdev_conn *conn, uint8_t status)
-+{
-+	struct bt_hci_evt_encrypt_key_refresh_complete_v2 ev;
++	/* Read Blob Request */
++	define_test_server("/robustness/mic-len/read-blob",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x0c, 0x03, 0x00, 0x00, 0x00),
++			raw_pdu(0x01, 0x0c, 0x03, 0x00, 0x14));
 +
-+	if (!conn)
-+		return;
++	/* Read Multiple Request */
++	define_test_server("/robustness/mic-len/read-multiple",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x0e, 0x03, 0x00, 0x03, 0x00),
++			raw_pdu(0x01, 0x0e, 0x03, 0x00, 0x14));
 +
-+	memset(&ev, 0, sizeof(ev));
++	/* Read Multiple Variable Request */
++	define_test_server("/robustness/mic-len/read-multiple-variable",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x20, 0x03, 0x00, 0x03, 0x00),
++			raw_pdu(0x01, 0x20, 0x03, 0x00, 0x14));
 +
-+	ev.status = status;
-+	ev.handle = cpu_to_le16(conn->handle);
++	/* Write Request */
++	define_test_server("/robustness/mic-len/write",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x12, 0x03, 0x00, 0x01),
++			raw_pdu(0x01, 0x12, 0x03, 0x00, 0x14));
 +
-+	/* Check if BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2 has been enabled
-+	 * in the event mask page 2.
++	/* Prepare Write Request */
++	define_test_server("/robustness/mic-len/prepare-write",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0x01),
++			raw_pdu(0x01, 0x16, 0x03, 0x00, 0x14));
++
++	/* Read By Group Type Request */
++	define_test_server("/robustness/mic-len/read-by-group-type",
++			test_server_encrypted, mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x10, 0x01, 0x00, 0x04, 0x00, 0x00, 0x28),
++			raw_pdu(0x01, 0x10, 0x01, 0x00, 0x14));
++
++	/*
++	 * A MIC length requirement implies the link is encrypted, so without
++	 * encryption the error is Insufficient Encryption (0x0f), which lets
++	 * the client encrypt the link, not MIC Length Too Short.
 +	 */
-+	if (!(conn->dev->event_mask_page2[3] & BIT(3))) {
-+		send_event(conn->dev, BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE,
-+				&ev, sizeof(struct
-+				bt_hci_evt_encrypt_key_refresh_complete));
-+		return;
-+	}
++	define_test_server("/robustness/mic-len/read-unencrypted", test_server,
++			mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x0f));
 +
-+	ev.mic_len = conn_mic_len(conn);
-+	ev.eks_mode = 0x01;
++	define_test_server("/robustness/mic-len/write-unencrypted", test_server,
++			mic_len_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x12, 0x03, 0x00, 0x01),
++			raw_pdu(0x01, 0x12, 0x03, 0x00, 0x0f));
 +
-+	send_event(conn->dev, BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE_V2, &ev,
-+							sizeof(ev));
-+}
-+
- static void encrypt_change(struct btdev_conn *conn, uint8_t mode,
--					uint8_t status)
-+				uint8_t eks_mode, uint8_t status)
- {
- 	struct bt_hci_evt_encrypt_change ev;
- 
- 	if (!conn)
- 		return;
- 
-+	if (!status)
-+		conn->encrypted = !!mode;
-+
-+	/* Check if BT_HCI_EVT_ENCRYPT_CHANGE_V3 has been enabled in the event
-+	 * mask page 2.
-+	 */
-+	if (conn->dev->event_mask_page2[3] & BIT(2))
-+		return encrypt_change_v3(conn, mode, eks_mode, status);
-+
- 	memset(&ev, 0, sizeof(ev));
- 
- 	ev.status = status;
-@@ -2094,8 +2211,8 @@ static int cmd_set_conn_encrypt_complete(struct btdev *dev, const void *data,
- 	else
- 		mode = 0x01;
- 
--	encrypt_change(conn, mode, BT_HCI_ERR_SUCCESS);
--	encrypt_change(conn->link, mode, BT_HCI_ERR_SUCCESS);
-+	encrypt_change(conn, mode, 0x00, BT_HCI_ERR_SUCCESS);
-+	encrypt_change(conn->link, mode, 0x00, BT_HCI_ERR_SUCCESS);
- 
- 	return 0;
+ 	return tester_run();
  }
-@@ -4874,8 +4991,27 @@ static int cmd_ltk_reply(struct btdev *dev, const void *data, uint8_t len)
- 		mode = 0x01;
- 	}
- 
--	encrypt_change(conn, mode, status);
--	encrypt_change(conn->link, mode, status);
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
-+	 * Section 7.7.39:
-+	 *
-+	 * This event is used to indicate to the Host that the encryption
-+	 * key was refreshed on the given Connection_Handle any time
-+	 * encryption is paused and then resumed.
-+	 *
-+	 * So encrypting a link that is already encrypted, such as one with
-+	 * opportunistic encryption, refreshes its key.
-+	 */
-+	if (!status && conn->encrypted) {
-+		key_refresh_complete(conn, status);
-+		key_refresh_complete(conn->link, status);
-+		return 0;
-+	}
-+
-+	/* Pass eks_mode as 0x01 for EKS enabled since only in case of V3 being
-+	 * enabled it will get used.
-+	 */
-+	encrypt_change(conn, mode, 0x01, status);
-+	encrypt_change(conn->link, mode, 0x01, status);
- 
- 	return 0;
- }
-@@ -4900,7 +5036,7 @@ static int cmd_ltk_neg_reply(struct btdev *dev, const void *data, uint8_t len)
- 	rp.status = BT_HCI_ERR_SUCCESS;
- 	cmd_complete(dev, BT_HCI_CMD_LE_LTK_REQ_NEG_REPLY, &rp, sizeof(rp));
- 
--	encrypt_change(conn->link, 0x00, BT_HCI_ERR_PIN_OR_KEY_MISSING);
-+	encrypt_change(conn->link, 0x00, 0x00, BT_HCI_ERR_PIN_OR_KEY_MISSING);
- 
- 	return 0;
- }
-@@ -5000,6 +5136,34 @@ static int cmd_conn_param_neg_reply_complete(struct btdev *dev,
- 	return 0;
- }
- 
-+static int cmd_le_read_def_data_len(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	struct bt_hci_rsp_le_read_default_data_length rsp;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	rsp.status = BT_HCI_ERR_SUCCESS;
-+	rsp.tx_len = cpu_to_le16(0x001b);
-+	rsp.tx_time = cpu_to_le16(0x0148);
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_DEFAULT_DATA_LENGTH, &rsp,
-+						sizeof(rsp));
-+
-+	return 0;
-+}
-+
-+static int cmd_le_write_def_data_len(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH, &status,
-+						sizeof(status));
-+
-+	return 0;
-+}
-+
- static int cmd_read_local_pk256(struct btdev *dev, const void *data,
- 						uint8_t len)
- {
-@@ -5011,6 +5175,24 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
- 	return -ENOTSUP;
- }
- 
-+static int cmd_le_read_max_data_len(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	struct bt_hci_rsp_le_read_max_data_length rsp;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+	rsp.status = BT_HCI_ERR_SUCCESS;
-+	rsp.max_tx_len = cpu_to_le16(0x00fb);
-+	rsp.max_tx_time = cpu_to_le16(0x4290);
-+	rsp.max_rx_len = cpu_to_le16(0x00fb);
-+	rsp.max_rx_time = cpu_to_le16(0x4290);
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_MAX_DATA_LENGTH, &rsp,
-+						sizeof(rsp));
-+
-+	return 0;
-+}
-+
- #define CMD_LE \
- 	CMD(BT_HCI_CMD_READ_LE_HOST_SUPPORTED, cmd_read_le_host_supported, \
- 					NULL), \
-@@ -5055,6 +5237,10 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
- 					cmd_conn_param_reply_complete), \
- 	CMD(BT_HCI_CMD_LE_CONN_PARAM_REQ_NEG_REPLY, cmd_conn_param_neg_reply, \
- 					cmd_conn_param_neg_reply_complete), \
-+	CMD(BT_HCI_CMD_LE_READ_DEFAULT_DATA_LENGTH, cmd_le_read_def_data_len, \
-+					NULL), \
-+	CMD(BT_HCI_CMD_LE_WRITE_DEFAULT_DATA_LENGTH, \
-+					cmd_le_write_def_data_len, NULL), \
- 	CMD(BT_HCI_CMD_LE_READ_LOCAL_PK256, cmd_read_local_pk256, NULL), \
- 	CMD(BT_HCI_CMD_LE_GENERATE_DHKEY, cmd_gen_dhkey, NULL), \
- 	CMD(BT_HCI_CMD_LE_ADD_TO_RESOLV_LIST, cmd_add_rl,  NULL), \
-@@ -5065,7 +5251,9 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
- 	CMD(BT_HCI_CMD_LE_READ_LOCAL_RESOLV_ADDR, cmd_read_local_rl_addr, \
- 					NULL), \
- 	CMD(BT_HCI_CMD_LE_SET_RESOLV_ENABLE, cmd_set_rl_enable, NULL), \
--	CMD(BT_HCI_CMD_LE_SET_RESOLV_TIMEOUT, cmd_set_rl_timeout, NULL)
-+	CMD(BT_HCI_CMD_LE_SET_RESOLV_TIMEOUT, cmd_set_rl_timeout, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_MAX_DATA_LENGTH, cmd_le_read_max_data_len, \
-+					NULL) \
- 
- static const struct btdev_cmd cmd_bredr_le[] = {
- 	CMD_COMMON_ALL,
-@@ -5096,16 +5284,20 @@ static int cmd_set_default_phy(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
- 	const struct bt_hci_cmd_le_set_default_phy *cmd = data;
--	uint8_t status;
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
- 
- 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
--			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
-+			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
- 			(!(cmd->all_phys & 0x02) &&
--			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
-+			(!cmd->rx_phys || (cmd->rx_phys & ~0x17)))) {
- 		status = BT_HCI_ERR_INVALID_PARAMETERS;
--	else
--		status = BT_HCI_ERR_SUCCESS;
-+		goto done;
-+	}
- 
-+	dev->le_def_tx_phys = cmd->tx_phys;
-+	dev->le_def_rx_phys = cmd->rx_phys;
-+
-+done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_DEFAULT_PHY, &status,
- 					sizeof(status));
- 
-@@ -5127,9 +5319,9 @@ static int cmd_le_set_phy(struct btdev *dev, const void *data,
- 	}
- 
- 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
--			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
-+			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
- 			(!(cmd->all_phys & 0x02) &&
--			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
-+			(!cmd->rx_phys || (cmd->rx_phys & ~0x17))))
- 		status = BT_HCI_ERR_INVALID_PARAMETERS;
- 	else
- 		status = BT_HCI_ERR_SUCCESS;
-@@ -5140,6 +5332,36 @@ done:
- 	return 0;
- }
- 
-+/* Highest PHY of the ones set in phys: LE 1M, LE 2M, LE Coded then HDT */
-+static uint8_t phy_highest(uint8_t phys)
-+{
-+	if (phys & BIT(4))
-+		return 0x05; /* HDT PHY */
-+
-+	if (phys & BIT(2))
-+		return 0x03; /* LE CODED PHY */
-+
-+	if (phys & BIT(1))
-+		return 0x02; /* LE 2M PHY */
-+
-+	if (phys & BIT(0))
-+		return 0x01; /* LE 1M PHY */
-+
-+	return 0x00;
-+}
-+
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
-+ * Section 2.4.2.23:
-+ *
-+ * If a PHY is changing, then both fields shall be set to the LE HDT PHY or
-+ * both shall be set to a GFSK PHY (which may be a different PHY in each
-+ * direction).
-+ */
-+static bool le_phy_pair_valid(uint8_t tx_phy, uint8_t rx_phy)
-+{
-+	return (tx_phy == 0x05) == (rx_phy == 0x05);
-+}
-+
- static int cmd_le_set_phy_complete(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
-@@ -5153,35 +5375,51 @@ static int cmd_le_set_phy_complete(struct btdev *dev, const void *data,
- 		return 0;
- 
- 	if (cmd->all_phys > 0x03 || (!(cmd->all_phys & 0x01) &&
--			(!cmd->tx_phys || cmd->tx_phys > 0x07)) ||
-+			(!cmd->tx_phys || (cmd->tx_phys & ~0x17))) ||
- 			(!(cmd->all_phys & 0x02) &&
--			(!cmd->rx_phys || cmd->rx_phys > 0x07)))
-+			(!cmd->rx_phys || (cmd->rx_phys & ~0x17))))
- 		return 0;
- 
- 	memset(&ev, 0, sizeof(ev));
- 	ev.handle = cmd->handle;
- 
--	/* Use the highest PHY possible */
--	if (cmd->tx_phys & BIT(0))
--		ev.tx_phy = 0x01; /* LE 1M PHY */
-+	ev.tx_phy = phy_highest(cmd->tx_phys);
-+	ev.rx_phy = phy_highest(cmd->rx_phys);
- 
--	if (cmd->rx_phys & BIT(0))
--		ev.rx_phy = 0x01; /* LE 1M PHY */
-+	/* HDT has to be the PHY of both directions or of none, so if only one
-+	 * direction got it choose both again without it.
-+	 */
-+	if (!le_phy_pair_valid(ev.tx_phy, ev.rx_phy)) {
-+		ev.tx_phy = phy_highest(cmd->tx_phys & ~BIT(4));
-+		ev.rx_phy = phy_highest(cmd->rx_phys & ~BIT(4));
-+	}
- 
--	if (cmd->tx_phys & BIT(1))
--		ev.tx_phy |= 0x02; /* LE 2M PHY */
--
--	if (cmd->rx_phys & BIT(1))
--		ev.rx_phy |= 0x02; /* LE 2M PHY */
--
--	if (cmd->tx_phys & BIT(2))
--		ev.tx_phy |= 0x03; /* LE CODED PHY */
--
--	if (cmd->rx_phys & BIT(2))
--		ev.rx_phy |= 0x03; /* LE CODED PHY */
-+	if (ev.tx_phy)
-+		conn->tx_phy = ev.tx_phy;
-+	if (ev.rx_phy)
-+		conn->rx_phy = ev.rx_phy;
- 
- 	le_meta_event(dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE, &ev, sizeof(ev));
- 
-+	/* The peer receives on the PHY this side transmits on and the other
-+	 * way around.
-+	 */
-+	if (conn->link) {
-+		uint8_t tx_phy = ev.tx_phy;
-+
-+		if (ev.rx_phy)
-+			conn->link->tx_phy = ev.rx_phy;
-+		if (tx_phy)
-+			conn->link->rx_phy = tx_phy;
-+
-+		ev.handle = cpu_to_le16(conn->link->handle);
-+		ev.tx_phy = ev.rx_phy;
-+		ev.rx_phy = tx_phy;
-+		le_meta_event(conn->link->dev,
-+				BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE, &ev,
-+				sizeof(ev));
-+	}
-+
- 	return 0;
- }
- 
-@@ -5814,7 +6052,9 @@ static uint8_t bits_to_phy(uint8_t bits)
- {
- 	uint8_t phy = 0x00;
- 
--	/* Convert PHY bits to PHY values on a ascending order. */
-+	/* Convert PHY bits to PHY values on a ascending order so if HDT bit is
-+	 * set it takes precedence over LE 2M and LE 1M.
-+	 */
- 	if (bits & BIT(0))
- 		phy = 0x01; /* LE 1M */
- 
-@@ -5824,6 +6064,9 @@ static uint8_t bits_to_phy(uint8_t bits)
- 	if (bits & BIT(2))
- 		phy = 0x03; /* LE Coded */
- 
-+	if (bits & BIT(4))
-+		phy = 0x05; /* HDT */
-+
- 	return phy;
- }
- 
-@@ -6155,6 +6398,82 @@ static void ext_adv_term(void *data, void *user_data)
- 	}
- }
- 
-+static void le_phy_update_event(struct btdev_conn *conn, uint8_t tx_phy,
-+							uint8_t rx_phy)
-+{
-+	struct bt_hci_evt_le_phy_update_complete ev;
-+
-+	if (!conn || !tx_phy || !rx_phy)
-+		return;
-+
-+	memset(&ev, 0, sizeof(ev));
-+
-+	ev.handle = cpu_to_le16(conn->handle);
-+	ev.tx_phy = tx_phy;
-+	ev.rx_phy = rx_phy;
-+
-+	conn->tx_phy = tx_phy;
-+	conn->rx_phy = rx_phy;
-+	conn->link->tx_phy = rx_phy;
-+	conn->link->rx_phy = tx_phy;
-+
-+	le_meta_event(conn->dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE,
-+					&ev, sizeof(ev));
-+
-+	/* The peer receives on the PHY this side transmits on and the other
-+	 * way around.
-+	 */
-+	ev.handle = cpu_to_le16(conn->link->handle);
-+	ev.tx_phy = rx_phy;
-+	ev.rx_phy = tx_phy;
-+	le_meta_event(conn->link->dev, BT_HCI_EVT_LE_PHY_UPDATE_COMPLETE,
-+					&ev, sizeof(ev));
-+}
-+
-+/* Highest PHY both sides prefer: HDT, then LE 2M, then LE 1M */
-+static uint8_t le_phy_select(uint8_t local, uint8_t remote)
-+{
-+	uint8_t phys = local & remote;
-+
-+	if (phys & BIT(4))
-+		return 0x05; /* HDT */
-+
-+	if (phys & BIT(1))
-+		return 0x02; /* LE 2M */
-+
-+	/* LE 1M, unless LE Coded is the only one both sides prefer */
-+	if (!(phys & BIT(0)) && (phys & BIT(2)))
-+		return 0x03; /* LE Coded */
-+
-+	return 0x01; /* LE 1M */
-+}
-+
-+static void le_phy_update(struct btdev_conn *conn)
-+{
-+	uint8_t tx_phy, rx_phy;
-+
-+	/* Each direction is transmitted by one side and received by the
-+	 * other.
-+	 */
-+	tx_phy = le_phy_select(conn->dev->le_def_tx_phys,
-+					conn->link->dev->le_def_rx_phys);
-+	rx_phy = le_phy_select(conn->dev->le_def_rx_phys,
-+					conn->link->dev->le_def_tx_phys);
-+
-+	/* HDT has to be the PHY of both directions or of none, so if only one
-+	 * direction got it select both again without it, see
-+	 * le_phy_pair_valid().
-+	 */
-+	if (!le_phy_pair_valid(tx_phy, rx_phy)) {
-+		tx_phy = le_phy_select(conn->dev->le_def_tx_phys & ~BIT(4),
-+				conn->link->dev->le_def_rx_phys & ~BIT(4));
-+		rx_phy = le_phy_select(conn->dev->le_def_rx_phys & ~BIT(4),
-+				conn->link->dev->le_def_tx_phys & ~BIT(4));
-+	}
-+
-+	le_phy_update_event(conn, tx_phy, rx_phy);
-+}
-+
- static void le_ext_conn_complete(struct btdev *btdev,
- 			const struct bt_hci_cmd_le_ext_create_conn *cmd,
- 			struct le_ext_adv *ext_adv,
-@@ -6220,9 +6539,11 @@ static void le_ext_conn_complete(struct btdev *btdev,
- 	le_meta_event(btdev, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &ev,
- 						sizeof(ev));
- 
--	/* Disable EXT ADV */
--	if (conn)
-+	/* Disable EXT ADV and update PHY */
-+	if (conn) {
- 		queue_foreach(btdev->le_ext_adv, ext_adv_term, conn);
-+		le_phy_update(conn);
-+	}
- }
- 
- static int cmd_ext_create_conn_complete(struct btdev *dev, const void *data,
-@@ -6861,7 +7182,7 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 
- 	rsp.params.cig_id = cmd->cig_id;
- 
--	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis)) {
-+	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis_v1)) {
- 		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
- 		goto done;
- 	}
-@@ -6938,6 +7259,7 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 	}
- 
- 	memcpy(&dev->le_cig[cig_idx], data, len);
-+	dev->le_cig[cig_idx].version = 1;
- 
- done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_CIG_PARAMS, &rsp,
-@@ -7010,10 +7332,100 @@ static uint32_t le_cis_latecy(uint8_t ft, uint8_t iso_interval,
- 	return latency >= interval ? latency : interval;
- }
- 
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E, Section 4.8.2:
-+ *
-+ * If an event has more than one version and the event is generated, then
-+ * the Controller shall use the latest version that is both supported and
-+ * enabled ("unmasked") in the relevant event mask.
-+ *
-+ * LE CIS Established v1 is a prefix of v3, and v3 is LE event mask bit 57.
-+ */
-+static void le_cis_estabilished_send(struct btdev *btdev,
-+				struct bt_hci_evt_le_cis_established_v3 *evt)
-+{
-+	if (btdev->le_event_mask[7] & BIT(1))
-+		le_meta_event(btdev, BT_HCI_EVT_LE_CIS_ESTABLISHED_V3, evt,
-+							sizeof(*evt));
-+	else
-+		le_meta_event(btdev, BT_HCI_EVT_LE_CIS_ESTABLISHED, evt,
-+				sizeof(struct bt_hci_evt_le_cis_established));
-+}
-+
-+static void le_cis_estabilished_fill(
-+				struct bt_hci_evt_le_cis_established_v3 *evt,
-+				struct le_cig *le_cig, int cis_idx)
-+{
-+	uint8_t c_phys, p_phys;
-+
-+	if (le_cig->version == 2) {
-+		struct bt_hci_cis_params_v2 *cis = &le_cig->cis_v2[cis_idx];
-+
-+		c_phys = cis->c_phy;
-+		p_phys = cis->p_phy;
-+		evt->c_mtu = cis->c_sdu;
-+		evt->p_mtu = cis->p_sdu;
-+		evt->mic_len = cis->mic_len;
-+		evt->c_phy = bits_to_phy(c_phys);
-+		evt->p_phy = bits_to_phy(p_phys);
-+
-+		switch (evt->c_phy) {
-+		case 0x03:
-+			evt->c_rates = cpu_to_le16(cis->c_coded_rates);
-+			break;
-+		case 0x05:
-+			evt->c_rates = cis->c_hdt_rates;
-+			break;
-+		}
-+
-+		switch (evt->p_phy) {
-+		case 0x03:
-+			evt->p_rates = cpu_to_le16(cis->p_coded_rates);
-+			break;
-+		case 0x05:
-+			evt->p_rates = cis->p_hdt_rates;
-+			break;
-+		}
-+	} else {
-+		struct bt_hci_cis_params *cis = &le_cig->cis_v1[cis_idx];
-+
-+		evt->c_phy = bits_to_phy(cis->c_phys);
-+		evt->p_phy = bits_to_phy(cis->p_phys);
-+		evt->c_mtu = cis->c_sdu;
-+		evt->p_mtu = cis->p_sdu;
-+	}
-+
-+	evt->nse = 0x01;
-+	evt->c_bn = 0x01;
-+	evt->p_bn = 0x01;
-+	evt->c_ft = 0x02;
-+	evt->p_ft = 0x02;
-+	evt->interval = le_cis_interval(le_cig->params.c_interval);
-+	evt->c_sdu = evt->c_mtu;
-+	evt->p_sdu = evt->p_mtu;
-+	memcpy(evt->c_sdu_interval, le_cig->params.c_interval,
-+					sizeof(evt->c_sdu_interval));
-+	memcpy(evt->p_sdu_interval, le_cig->params.p_interval,
-+					sizeof(evt->p_sdu_interval));
-+	evt->framing = le_cig->params.framing;
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
-+	 * page 3050:
-+	 *
-+	 * Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
-+	 * ISO_Interval - SDU_Interval_C_To_P
-+	 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
-+	 * ISO_Interval - SDU_Interval_P_To_C
-+	 */
-+	put_le24(le_cis_latecy(evt->c_ft, evt->interval,
-+				le_cig->params.c_interval), evt->c_latency);
-+	put_le24(le_cis_latecy(evt->p_ft, evt->interval,
-+				le_cig->params.p_interval), evt->p_latency);
-+}
-+
- static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 						uint8_t status)
- {
--	struct bt_hci_evt_le_cis_established evt;
-+	struct bt_hci_evt_le_cis_established_v3 evt;
- 	int cig_idx, cis_idx = -1;
- 
- 	memset(&evt, 0, sizeof(evt));
-@@ -7025,44 +7437,19 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 	if (cig_idx < 0 && !evt.status)
- 		evt.status = BT_HCI_ERR_UNSPECIFIED_ERROR;
- 
--	if (!evt.status) {
--		struct btdev *remote = conn->link->dev;
--		struct le_cig *le_cig = &remote->le_cig[cig_idx];
-+	if (!evt.status)
-+		le_cis_estabilished_fill(&evt,
-+					&conn->link->dev->le_cig[cig_idx],
-+					cis_idx);
- 
--		memset(evt.cig_sync_delay, 0, sizeof(evt.cig_sync_delay));
--		memset(evt.cis_sync_delay, 0, sizeof(evt.cis_sync_delay));
--
--		evt.c_phy = bits_to_phy(le_cig->cis[cis_idx].c_phys);
--		evt.p_phy = bits_to_phy(le_cig->cis[cis_idx].p_phys);
--		evt.nse = 0x01;
--		evt.c_bn = 0x01;
--		evt.p_bn = 0x01;
--		evt.c_ft = 0x02;
--		evt.p_ft = 0x02;
--		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
--		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
--		evt.interval = le_cis_interval(le_cig->params.c_interval);
--
--		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
--		 * page 3050:
--		 *
--		 * Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
--		 * ISO_Interval - SDU_Interval_C_To_P
--		 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
--		 * ISO_Interval - SDU_Interval_P_To_C
--		 */
--		put_le24(le_cis_latecy(evt.c_ft, evt.interval,
--				le_cig->params.c_interval), evt.c_latency);
--		put_le24(le_cis_latecy(evt.p_ft, evt.interval,
--				le_cig->params.p_interval), evt.p_latency);
--	}
--
--	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
-+	le_cis_estabilished_send(dev, &evt);
- 
-+	/* Each device assigns its own handles, so the event of the
-+	 * receiving side carries its handle.
-+	 */
- 	if (conn) {
- 		evt.conn_handle = cpu_to_le16(conn->link->handle);
--		le_meta_event(conn->link->dev, BT_HCI_EVT_LE_CIS_ESTABLISHED,
--						&evt, sizeof(evt));
-+		le_cis_estabilished_send(conn->link->dev, &evt);
- 	}
- }
- 
-@@ -7108,13 +7495,22 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
- 			}
- 		}
- 
-+		memset(&evt, 0, sizeof(evt));
- 		/* Each device assigns its own handles, so the event of
- 		 * the receiving side carries its handles.
- 		 */
- 		evt.acl_handle = cpu_to_le16(acl->link->handle);
- 		evt.cis_handle = cpu_to_le16(iso->link->handle);
- 		evt.cig_id = le_cig->params.cig_id;
--		evt.cis_id = le_cig->cis[cis_idx].cis_id;
-+
-+		switch (le_cig->version) {
-+		case 0x01:
-+			evt.cis_id = le_cig->cis_v1[cis_idx].cis_id;
-+			break;
-+		case 0x02:
-+			evt.cis_id = le_cig->cis_v2[cis_idx].cis_id;
-+			break;
-+		}
- 
- 		le_cig->activated = true;
- 
-@@ -7284,7 +7680,7 @@ static int cmd_create_big_complete(struct btdev *dev, const void *data,
- 	for (i = 0; i < cmd->num_bis; i++) {
- 		struct btdev_conn *conn;
- 
--		conn = conn_add_bis(dev, BIS_HANDLE + i, bis);
-+		conn = conn_add_bis(dev, BIS_HANDLE + i, bis, sizeof(*bis));
- 		if (!conn) {
- 			queue_remove(dev->le_big, big);
- 			le_big_free(big);
-@@ -7898,8 +8294,8 @@ static int cmd_le_read_all_remote_features(struct btdev *dev, const void *data,
- 	memset(&ev, 0, sizeof(ev));
- 	ev.status = BT_HCI_ERR_SUCCESS;
- 	ev.handle = cpu_to_le16(conn->handle);
--	ev.max_pages = 1;
--	ev.valid_pages = 1;
-+	ev.max_pages = 10;
-+	ev.valid_pages = 10;
- 	memcpy(ev.features, conn->link->dev->le_features, 248);
- 
- 	le_meta_event(dev, BT_HCI_EVT_LE_READ_ALL_REMOTE_FEATURES_COMPLETE, &ev,
-@@ -8082,6 +8478,501 @@ static void set_le_62_commands(struct btdev *btdev)
- 	btdev->cmds = cmd_le_6_2;
- }
- 
-+static int cmd_set_data_len_v2(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_set_data_len_v2 *cmd = data;
-+	struct bt_hci_rsp_le_set_data_len_v2 rsp;
-+	struct btdev_conn *conn;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	conn = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!conn)
-+		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+	else
-+		rsp.handle = cpu_to_le16(conn->handle);
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_DATA_LEN_V2, &rsp, sizeof(rsp));
-+
-+	return 0;
-+}
-+
-+static int cmd_read_max_data_len_v2(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_read_data_len_v2 *cmd = data;
-+	struct bt_hci_rsp_le_read_data_len_v2 rsp;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	switch (cmd->phy) {
-+	case 0x00: /* No PHY */
-+	case 0x01: /* LE 1M */
-+	case 0x02: /* LE 2M */
-+	case 0x03: /* LE Coded */
-+		rsp.max_tx_len = cpu_to_le16(0x00fb);
-+		rsp.max_tx_time = cpu_to_le16(0x0148);
-+		rsp.max_rx_len = cpu_to_le16(0x00fb);
-+		rsp.max_rx_time = cpu_to_le16(0x0148);
-+		rsp.max_tx_win = 0x01;
-+		rsp.max_rx_win = 0x01;
-+		rsp.max_rx_packet = cpu_to_le16(0x00fb);
-+		break;
-+	case 0x05: /* LE HDT */
-+		rsp.max_tx_len = cpu_to_le16(0x1fef);
-+		rsp.max_tx_time = cpu_to_le16(0x148);
-+		rsp.max_rx_len = cpu_to_le16(0x1fef);
-+		rsp.max_rx_time = cpu_to_le16(0x148);
-+		rsp.max_tx_win = 0x04;
-+		rsp.max_rx_win = 0x04;
-+		rsp.max_rx_packet = cpu_to_le16(0x1fef);
-+		break;
-+	default:
-+		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		break;
-+	}
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2, &rsp,
-+				sizeof(rsp));
-+
-+	return 0;
-+}
-+
-+static int cmd_set_cig_params_v2(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_set_cig_params_v2 *cmd = data;
-+	struct lescp {
-+		struct bt_hci_rsp_le_set_cig_params_v2 params;
-+		uint16_t handle[CIS_SIZE];
-+	} __packed rsp;
-+	int i = 0;
-+	int cig_idx;
-+	uint32_t interval;
-+	uint16_t latency;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	rsp.params.cig_id = cmd->cig_id;
-+
-+	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis_v2)) {
-+		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+		goto done;
-+	}
-+
-+	if (cmd->cig_id > 0xef) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	interval = get_le24(cmd->c_interval);
-+	if (interval < 0x0000ff || interval > 0x0fffff) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	interval = get_le24(cmd->p_interval);
-+	if (interval < 0x0000ff || interval > 0x0fffff) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (cmd->sca > 0x07) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (cmd->packing > 0x01) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (cmd->framing > 0x01) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	latency = cpu_to_le16(cmd->c_latency);
-+	if (latency < 0x0005 || latency > 0x0fa0) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	latency = cpu_to_le16(cmd->p_latency);
-+	if (latency < 0x0005 || latency > 0x0fa0) {
-+		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	cig_idx = find_cig(dev, cmd->cig_id);
-+	if (cig_idx < 0)
-+		cig_idx = find_cig(dev, 0xff);
-+	if (cig_idx < 0) {
-+		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+		goto done;
-+	}
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-+	 * page 2553
-+	 *
-+	 * If the Host issues this command when the CIG is not in the
-+	 * configurable state, the Controller shall return the error
-+	 * code Command Disallowed (0x0C).
-+	 */
-+	if (dev->le_cig[cig_idx].activated) {
-+		rsp.params.status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
-+
-+	rsp.params.status = BT_HCI_ERR_SUCCESS;
-+
-+	for (i = 0; i < cmd->num_cis; i++) {
-+		rsp.params.num_handles++;
-+		rsp.handle[i] = cpu_to_le16(make_cis_handle(cig_idx, i));
-+	}
-+
-+	memcpy(&dev->le_cig[cig_idx], data, len);
-+	dev->le_cig[cig_idx].version = 2;
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_CIG_PARAMS_V2, &rsp,
-+				sizeof(rsp.params) + (i * sizeof(uint16_t)));
-+
-+	return 0;
-+}
-+
-+static int cmd_create_big_v2(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_create_big_v2 *cmd = data;
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
-+
-+	/* If the Advertising_Handle does not identify a periodic advertising
-+	 * train,, the Controller shall return the error code Unknown
-+	 * Advertising Identifier (0x42).
-+	 */
-+	/* Num_BIS ranges from 0x01 to 0x1F */
-+	if (!cmd->num_bis || cmd->num_bis > 0x1f) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (!dev->le_pa_enable) {
-+		status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		goto done;
-+	}
-+
-+	/* If the Host sends this command with a BIG_Handle that is already
-+	 * allocated, the Controller shall return the error code Command
-+	 * Disallowed (0x0C).
-+	 */
-+	if (queue_find(dev->le_big, match_big_handle,
-+				UINT_TO_PTR(cmd->handle))) {
-+		status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
-+
-+done:
-+	cmd_status(dev, status, BT_HCI_CMD_LE_CREATE_BIG_V2);
-+
-+	/* Only complete the command if it was accepted */
-+	return status ? -EALREADY : 0;
-+}
-+
-+static int cmd_create_big_v2_complete(struct btdev *dev, const void *data,
-+							uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_create_big_v2 *cmd = data;
-+	const struct bt_hci_bis_v2 *bis = &cmd->bis;
-+	struct le_big *big;
-+	int i;
-+	struct bt_hci_evt_le_big_complete_v2 evt;
-+	uint16_t *bis_handle;
-+	uint8_t *pdu;
-+	size_t pdu_len;
-+
-+	memset(&evt, 0, sizeof(evt));
-+
-+	pdu_len = sizeof(evt) + cmd->num_bis * sizeof(*bis_handle);
-+
-+	pdu = malloc(pdu_len);
-+	if (!pdu)
-+		return -ENOMEM;
-+
-+	/* If the Controller cannot create all BISes of the BIG or if Num_BIS
-+	 * exceeds the maximum value supported by the Controller, then it shall
-+	 * return the error code Rejected due to Limited Resources (0x0D).
-+	 */
-+	big = le_big_new(dev, cmd->handle);
-+	if (!big) {
-+		evt.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+		goto done;
-+	}
-+
-+	bis_handle = (uint16_t *)(pdu + sizeof(evt));
-+
-+	for (i = 0; i < cmd->num_bis; i++) {
-+		struct btdev_conn *conn;
-+
-+		conn = conn_add_bis(dev, BIS_HANDLE + i, bis, sizeof(*bis));
-+		if (!conn) {
-+			queue_remove(dev->le_big, big);
-+			le_big_free(big);
-+			evt.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
-+			goto done;
-+		}
-+
-+		queue_push_tail(big->bis, conn);
-+		*bis_handle = cpu_to_le16(conn->handle);
-+		bis_handle++;
-+	}
-+
-+	evt.handle = cmd->handle;
-+	/* The same stream send_biginfo() reports */
-+	evt.nse = 0x01;
-+	evt.bn = 0x01;
-+	evt.irc = 0x01;
-+	evt.phy = bits_to_phy(bis->phy);
-+	evt.max_pdu = bis->sdu;
-+	memcpy(evt.sync_delay, bis->sdu_interval, 3);
-+	memcpy(evt.latency, bis->sdu_interval, 3);
-+	/* ISO_Interval is in units of 1.25 ms and Max_Transport_Latency
-+	 * in ms.
-+	 */
-+	evt.interval = cpu_to_le16(le16_to_cpu(bis->latency) * 4 / 5);
-+
-+	switch (evt.phy) {
-+	case 0x03:
-+		evt.rates = cpu_to_le16(bis->coded_rates);
-+		break;
-+	case 0x05:
-+		evt.rates = bis->hdt_rates;
-+		break;
-+	}
-+
-+	evt.encryption = bis->encryption;
-+	evt.mic_len = bis->mic_len;
-+	evt.num_bis = cmd->num_bis;
-+
-+done:
-+	memcpy(pdu, &evt, sizeof(evt));
-+
-+	le_meta_event(dev, BT_HCI_EVT_LE_BIG_COMPLETE_V2, pdu, pdu_len);
-+
-+	free(pdu);
-+
-+	return 0;
-+}
-+
-+static int cmd_set_hdt_default_params(struct btdev *dev, const void *data,
-+					uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_hdt_set_default_params *cmd = data;
-+	uint16_t valid_rates = BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4);
-+	uint8_t status;
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
-+	 * Section 7.8.159:
-+	 *
-+	 * Preferred_MIC_Length: 0x01 Preferred MIC length is 64 bits.
-+	 * 0x02 MIC length is 128 bits (default). All other values Reserved
-+	 * for future use.
-+	 * Preferred_Packet_Format: 0x00, 0x01 and 0x02. All other values
-+	 * Reserved for future use.
-+	 * Preferred_ACL_Rates: bits 0 to 4. All other bits Reserved for
-+	 * future use.
-+	 */
-+	if (cmd->mic_len < 0x01 || cmd->mic_len > 0x02) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (cmd->format > 0x02) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	if (le16_to_cpu(cmd->rates) & ~valid_rates) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	dev->hdt_def_mic_len = cmd->mic_len;
-+	dev->hdt_def_format = cmd->format;
-+	dev->hdt_def_rates = le16_to_cpu(cmd->rates);
-+	status = BT_HCI_ERR_SUCCESS;
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS, &status,
-+					sizeof(status));
-+	return 0;
-+}
-+
-+static int cmd_le_write_def_data_len_v2(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	uint8_t status = BT_HCI_ERR_SUCCESS;
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2, &status,
-+						sizeof(status));
-+
-+	return 0;
-+}
-+
-+static int cmd_le_read_def_data_len_v2(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_read_def_data_len_v2 *cmd = data;
-+	struct bt_hci_rsp_le_read_default_data_length rsp;
-+
-+	memset(&rsp, 0, sizeof(rsp));
-+
-+	switch (cmd->phys) {
-+	case 0x00: /* All GFSK PHYs  */
-+		rsp.status = BT_HCI_ERR_SUCCESS;
-+		rsp.tx_len = cpu_to_le16(0x001b);
-+		rsp.tx_time = cpu_to_le16(0x0148);
-+		break;
-+	case 0x01: /* HDT PHY */
-+		rsp.status = BT_HCI_ERR_SUCCESS;
-+		rsp.tx_len = cpu_to_le16(0x001b);
-+		rsp.tx_time = cpu_to_le16(0x0148);
-+		break;
-+	default:
-+		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+	}
-+
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2, &rsp,
-+						sizeof(rsp));
-+
-+	return 0;
-+}
-+
-+#define CMD_HDT \
-+	CMD(BT_HCI_CMD_LE_WRITE_DEF_DATA_LEN_V2, \
-+					cmd_le_write_def_data_len_v2, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_DEF_DATA_LEN_V2, cmd_le_read_def_data_len_v2, \
-+					NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_DATA_LEN_V2, cmd_set_data_len_v2, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_MAX_DATA_LEN_V2, cmd_read_max_data_len_v2, \
-+			NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_CIG_PARAMS_V2, cmd_set_cig_params_v2, NULL), \
-+	CMD(BT_HCI_CMD_LE_CREATE_BIG_V2, cmd_create_big_v2, \
-+			cmd_create_big_v2_complete), \
-+	CMD(BT_HCI_CMD_LE_SET_HDT_DEFAULT_PARAMS, cmd_set_hdt_default_params, \
-+					NULL)
-+
-+/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 6, Part B,
-+ * Section 5.1.3.1.2:
-+ *
-+ * If the connection is on the LE HDT PHY and both the Flags_P and Flags_C
-+ * are set to allow a 64-bit MIC, then the connection shall use a 64-bit MIC.
-+ * Otherwise, the connection shall use a 128-bit MIC.
-+ *
-+ * The peer's preference is its LE Set HDT Default Parameters.
-+ */
-+static uint8_t le_mic_len(struct btdev_conn *conn, uint8_t mic_len)
-+{
-+	if (mic_len == 0x01 && conn->link &&
-+				conn->link->dev->hdt_def_mic_len != 0x01)
-+		return 0x02;
-+
-+	return mic_len;
-+}
-+
-+static int cmd_le_enable_encrypt_v2(struct btdev *dev, const void *data,
-+						uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_enable_encrypt_v2 *cmd = data;
-+	struct bt_hci_evt_le_long_term_key_request ev;
-+	struct btdev_conn *conn;
-+
-+	conn = queue_find(dev->conns, match_handle,
-+				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
-+	if (!conn) {
-+		cmd_status(dev, BT_HCI_ERR_UNKNOWN_CONN_ID,
-+				BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
-+		return 0;
-+	}
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
-+	 * Section 7.8.24:
-+	 *
-+	 * When the Encryption_Type parameter is set to 0x01 (use opportunistic
-+	 * encryption with Encryption Key Schedule), the command shall be only
-+	 * used for unencrypted connections and the Long_Term_Key parameter
-+	 * shall be ignored by the Controller.
-+	 *
-+	 * So refuse it for an encrypted connection, and otherwise skip the LTK
-+	 * request and proceed directly.
-+	 */
-+	if (cmd->encryption == 0x01 && conn->encrypted) {
-+		cmd_status(dev, BT_HCI_ERR_COMMAND_DISALLOWED,
-+				BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
-+		return 0;
-+	}
-+
-+	cmd_status(dev, BT_HCI_ERR_SUCCESS, BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2);
-+
-+	if (cmd->encryption == 0x01) {
-+		conn->mic_len = le_mic_len(conn, cmd->mic_len);
-+		if (conn->link)
-+			conn->link->mic_len = conn->mic_len;
-+		encrypt_change(conn, 0x01, 0x02, BT_HCI_ERR_SUCCESS);
-+		encrypt_change(conn->link, 0x01, 0x02, BT_HCI_ERR_SUCCESS);
-+		return 0;
-+	}
-+
-+	memcpy(dev->le_ltk, cmd->ltk, 16);
-+
-+	conn->mic_len = le_mic_len(conn, cmd->mic_len);
-+	if (conn->link)
-+		conn->link->mic_len = conn->mic_len;
-+
-+	ev.handle = cpu_to_le16(conn->link->handle);
-+	ev.ediv = cmd->ediv;
-+	ev.rand = cmd->rand;
-+
-+	le_meta_event(conn->link->dev, BT_HCI_EVT_LE_LONG_TERM_KEY_REQUEST, &ev,
-+					sizeof(ev));
-+
-+	return 0;
-+}
-+
-+#define CMD_EKS \
-+	CMD(BT_HCI_CMD_LE_ENABLE_ENCRYPT_V2, cmd_le_enable_encrypt_v2, NULL)
-+
-+static const struct btdev_cmd cmd_hdt[] = {
-+	CMD_COMMON_ALL,
-+	CMD_COMMON_BREDR_LE,
-+	CMD_COMMON_BREDR_20,
-+	CMD_COMMON_BREDR_LE_40,
-+	CMD_BREDR,
-+	CMD_LE,
-+	CMD_LE_50,
-+	CMD_LE_52,
-+	CMD_LE_60,
-+	CMD_LE_62,
-+	CMD_HDT,
-+	CMD_EKS,
-+	{}
-+};
-+
-+static void set_hdt_commands(struct btdev *btdev)
-+{
-+	btdev->commands[50] |= BIT(6);	/* LE Read Default Data Length V2 */
-+	btdev->commands[50] |= BIT(7);	/* LE Write Default Data Length V2 */
-+	btdev->commands[50] |= BIT(4);	/* LE Enable Encryption v2 */
-+	btdev->commands[50] |= BIT(5);	/* LE Read Maximum Data Length v2 */
-+	btdev->commands[52] |= BIT(3);	/* LE Set Data Length v2 */
-+	btdev->commands[51] |= BIT(0);	/* LE Set CIG Parameters v2 */
-+	btdev->commands[51] |= BIT(3);	/* LE Create BIG v2 */
-+	btdev->commands[52] |= BIT(1);	/* LE Set HDT Default Parameters */
-+	btdev->cmds = cmd_hdt;
-+}
-+
- static void set_le_commands(struct btdev *btdev)
- {
- 	set_common_commands_all(btdev);
-@@ -8123,6 +9014,8 @@ static void set_le_commands(struct btdev *btdev)
- 	btdev->commands[33] |= 0x20;	/* LE Remote Conn Param Req Neg Reply */
- 
- 	/* Extra LE commands for >= 4.2 adapters */
-+	btdev->commands[33] |= BIT(7);	/* LE Read Default Data Length */
-+	btdev->commands[34] |= BIT(0);	/* LE Write Default Data Length */
- 	btdev->commands[34] |= 0x02;	/* LE Read Local P-256 Public Key */
- 	btdev->commands[34] |= 0x04;	/* LE Generate DHKey */
- 	btdev->commands[34] |= 0x08;	/* LE Add Device To Resolving List */
-@@ -8133,6 +9026,7 @@ static void set_le_commands(struct btdev *btdev)
- 	btdev->commands[35] |= 0x01;	/* LE Read Local Resolvable Address */
- 	btdev->commands[35] |= 0x02;	/* LE Set Address Resolution Enable */
- 	btdev->commands[35] |= 0x04;	/* LE Set RPA Timeout */
-+	btdev->commands[35] |= BIT(3);	/* LE Read Maximum Data Length */
- 
- 	btdev->cmds = cmd_le;
- 
-@@ -8162,6 +9056,12 @@ static void set_le_commands(struct btdev *btdev)
- 		set_le_62_commands(btdev);
- 		btdev->cmds = cmd_le_6_2;
- 	}
-+
-+	/* Extra HDT commands for >= 7.0 adapters */
-+	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
-+		set_hdt_commands(btdev);
-+		btdev->cmds = cmd_hdt;
-+	}
- }
- 
- static void set_bredrle_commands(struct btdev *btdev)
-@@ -8244,6 +9144,25 @@ static void set_bredrle_features(struct btdev *btdev)
- 		btdev->le_features[9] |= BIT(1);
- 	}
- 
-+	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
-+		uint8_t *page_1 = &btdev->le_features[8];
-+
-+		btdev->version = 0x10;
-+
-+		/* The data length commands of 7.0 are the ones emulated */
-+		btdev->le_features[0] |= BIT(5); /* LE Data Length Extension */
-+
-+		page_1[1] |= BIT(4); /* Encryption Key Schedule */
-+		page_1[1] |= BIT(5); /* High Data Throughput */
-+		page_1[1] |= BIT(6); /* Receive HDT6 Rate */
-+		page_1[1] |= BIT(7); /* Transmit HDT6 Rate */
-+		page_1[2] |= BIT(0); /* Receive HDT7.5 Rate */
-+		page_1[2] |= BIT(1); /* Transmit HDT7.5 Rate */
-+		page_1[2] |= BIT(2); /* HDT Packet Format 1 */
-+		page_1[2] |= BIT(3); /* Link Quality Feedback */
-+		page_1[3] |= BIT(2); /* Opportunistic Encryption (Host) */
-+	}
-+
- 	btdev->feat_page_2[0] |= 0x01;	/* CPB - Central Operation */
- 	btdev->feat_page_2[0] |= 0x02;	/* CPB - Peripheral Operation */
- 	btdev->feat_page_2[0] |= 0x04;	/* Synchronization Train */
-@@ -8350,6 +9269,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
- 	case BTDEV_TYPE_BREDRLE62:
-+	case BTDEV_TYPE_BREDRLE70:
- 		btdev->crypto = bt_crypto_new();
- 		if (!btdev->crypto) {
- 			free(btdev);
-@@ -8369,6 +9289,12 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	btdev->revision = 0x0000;
- 
- 	switch (btdev->type) {
-+	case BTDEV_TYPE_BREDRLE70:
-+		btdev->version = 0x0e;
-+		set_bredrle_features(btdev);
-+		set_bredrle_commands(btdev);
-+		set_le_states(btdev);
-+		break;
- 	case BTDEV_TYPE_BREDRLE:
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
-@@ -9094,6 +10020,7 @@ int btdev_set_msft_opcode(struct btdev *btdev, uint16_t opcode)
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
- 	case BTDEV_TYPE_BREDRLE62:
-+	case BTDEV_TYPE_BREDRLE70:
- 		btdev->msft_opcode = opcode;
- 		btdev->msft_cmds = cmd_msft;
- 		return 0;
-@@ -9153,6 +10080,7 @@ int btdev_set_emu_opcode(struct btdev *btdev, uint16_t opcode)
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
- 	case BTDEV_TYPE_BREDRLE62:
-+	case BTDEV_TYPE_BREDRLE70:
- 		btdev->emu_opcode = opcode;
- 		btdev->emu_cmds = cmd_emu;
- 		return 0;
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index aa04ca611ab5..0e7ed8639568 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -54,6 +54,7 @@ enum btdev_type {
- 	BTDEV_TYPE_BREDRLE52,
- 	BTDEV_TYPE_BREDRLE60,
- 	BTDEV_TYPE_BREDRLE62,
-+	BTDEV_TYPE_BREDRLE70,
- };
- 
- enum btdev_hook_type {
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 2f544f319bf2..897402fa58dc 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -409,6 +409,9 @@ struct hciemu *hciemu_new_num_debug(enum hciemu_type type, uint8_t num,
- 	case HCIEMU_TYPE_BREDRLE62:
- 		hciemu->btdev_type = BTDEV_TYPE_BREDRLE62;
- 		break;
-+	case HCIEMU_TYPE_BREDRLE70:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDRLE70;
-+		break;
- 	default:
- 		return NULL;
- 	}
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index cdf1ebe16752..34ab3af44ab7 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -23,6 +23,7 @@ enum hciemu_type {
- 	HCIEMU_TYPE_BREDRLE52,
- 	HCIEMU_TYPE_BREDRLE60,
- 	HCIEMU_TYPE_BREDRLE62,
-+	HCIEMU_TYPE_BREDRLE70,
- };
- 
- enum hciemu_hook_type {
-diff --git a/emulator/main.c b/emulator/main.c
-index 794d381764b5..7be303716ca4 100644
---- a/emulator/main.c
-+++ b/emulator/main.c
-@@ -73,7 +73,7 @@ static void usage(void)
- 		"\t-C, --core=<version>  Core Specification version of the\n"
- 		"\t                      BR/EDR/LE controllers created with\n"
- 		"\t                      -l, -s, -t and -V:\n"
--		"\t                      5.0, 5.2, 6.0 or 6.2 (default)\n"
-+		"\t                      5.0, 5.2, 6.0, 6.2 or 7.0 (default)\n"
- 		"\t-h, --help            Show help options\n");
- }
- 
-@@ -106,6 +106,7 @@ static const struct {
- 	{ "5.2", BTDEV_TYPE_BREDRLE52 },
- 	{ "6.0", BTDEV_TYPE_BREDRLE60 },
- 	{ "6.2", BTDEV_TYPE_BREDRLE62 },
-+	{ "7.0", BTDEV_TYPE_BREDRLE70 },
- };
- 
- static bool parse_core_version(const char *version, enum btdev_type *type)
-@@ -157,7 +158,7 @@ int main(int argc, char *argv[])
- 	int letest_count = 0;
- 	int vhci_count = 0;
- 	/* Default to the latest version supported by the emulator */
--	enum btdev_type bredrle_type = BTDEV_TYPE_BREDRLE62;
-+	enum btdev_type bredrle_type = BTDEV_TYPE_BREDRLE70;
- 	enum btdev_type type;
- 	bool type_set = false;
- 	int i;
 -- 
 2.56.0
 
