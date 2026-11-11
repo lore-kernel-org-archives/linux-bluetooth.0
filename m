@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794426019;
-	b=yom7XJuLXORjbmQCz9oeSVEm0TiMsbpG7amusP7IK2114KqfSpb9Fv7MC+Uf6vCZ8G1x
-	 Lc8w3WK57MDkG98ExRB7lFpi9ZfBjr0vC9RxriPE9KWgOPAZy7UwPH2G2AzVzHYFuGStt
-	 SEow8Gl9VTkq7McuFjRsrk4J/+Mxfd6W2LIelX1QpIEjLB8+LTHtPw+Wgx65RTYrw8GeU
-	 kWuknBwy8MuJyQHylp5nwEXiQox/bK/AvCWw+x6LSRBfzb3SLYgAEj1dQW/jXotHMvpOw
-	 q4Gi+sAVnjdoQ89IhU1bTei3CmhJgYn+hieFms1+e145jMT4tjxjeBd9OeJsgoa27iA==
+	t=1794426020;
+	b=C91gUNppQakLgegyfX1c7y0Qkg+AqwhViWfrGC5nQAknq0ItsdBa5zH12ERZGkxpO1bX
+	 +SqEubr/A11XKQTz+ttsNsMgo9vcua+rQ9A/1Vs9LTTGhWCFaO+WH0hgWSjSRs5r3nAON
+	 YwASF4lVd8TSY91GLPW779SeBfWeMMF5pIaJDXIVnx8aCcp1JJ0ROkAGGJ+mDdoAeklJO
+	 b/wi8KSoJcMnF8RzJZPM0GfNdEuw/EANq+fMDbIdQxo/5bBsn9UQbEGQaxB8Lrw0dqPW7
+	 fWRyOBdRl7cfbpWMx0TYX586P/nP+Z6CZZr3lu9U7ioaP7qBxDC/ucdSKQZHlY4jJPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794426019;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794426020;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=WXrjfOZ4gvp3OJDwPgDdVpkcS64EwyB9cy66b0IxTFs=;
-	b=aC+QXuOpE3/SoJoB6IoKV5w/c4dMC3E2hhvzI4+0xIzTA/KZGI5kl0lYRnfiWmvyo/xa
-	 tOLnu5bw4J0Z5OBjbdoMu1sLUsZ6gyYNRYUv4Sfka5hpLlhMg0WPeTZcgq5BCbcQBMpwI
-	 Owpyyucsp3CYAjHVrjMpDEaR+sjku4yBRuo2UTBIkibvvm9wtksgGhNf1OUaPyrkNxnal
-	 Br7d+qq28zhKEctHWTTFoCZtjuK+ePwI432PmrhoT19i5t9zuWwjrSNPMzCRGN+X1BrUm
-	 UJmjFV010Kl/Q+Xgi4D+OTACzrUuBfLVplOhjeCanZTq3jrCO4eqpYzym1uulP/Vclg==
+	bh=6HWQUpM3PjW8+BhL116w3GjQjvGNhoMy2Dx/tVTVrDk=;
+	b=jik8pD5v6IqACAsopJihP+TejXYTbn0PlPDeN6x8c0fpb4agiltB0LjF8fYk5OdEjCGm
+	 mGLdUoRFP/VlMOSqtQhlz+RowtU6wpzL/H8UYi0UCTvyUz/IoYqITuCYSOizRSw4DKqY7
+	 jZ13xxbL6rUoSqQnYp4HciGUy+3VveulGOu3SdHWh29BWwcmg3IlcR1E5Vj2CC2BeixDd
+	 7S9hWQ7tpKKFJrio7j8rGlO1ZGrU+M/Zn1TfllcvaSH0JTPP706lbkI/lDduNZrLjX9O/
+	 wQ/LAIJNWXwW9Ol8+2Ff498PXR0OtbL3mU3EFhNB67fuqvdRBCa8uHh8kgwcd0Bddpw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJ36mWcE;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="hJPq/ZFh";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E6C606A335;
-	Wed, 11 Nov 2026 19:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9F5606A334;
+	Wed, 11 Nov 2026 19:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJ36mWcE
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD7E1F00A05;
-	Wed, 11 Nov 2026 19:40:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hJPq/ZFh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A63E01F00A05;
+	Wed, 11 Nov 2026 19:40:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794426019;
-	bh=WXrjfOZ4gvp3OJDwPgDdVpkcS64EwyB9cy66b0IxTFs=;
+	s=k20260515; t=1794426020;
+	bh=6HWQUpM3PjW8+BhL116w3GjQjvGNhoMy2Dx/tVTVrDk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=SJ36mWcEMXVH0JYNMl9AizIREo7Z1QQxNFLaxAGkTl2AbXMgjAKzdBAY0qqzkGMhR
-	 yoQk1t3a/CQmp/Y+a5E9MsKu13mDny5vj05C6lc8iYrZTvzQk0L+ohc5UXB0/iymG+
-	 kWmC9aYhI+HtkgNtiiADlIm/fhIE4LSC1TBD+BiR2rmwr9hJVopnFnuGAnMztcdYb+
-	 raEX+3hPpaIqy2/cZGaF9YqGInzuv5ZZXFpczzcjMnmxI7y8+0BU7Yz54RZtdUVdPP
-	 NEZuJFlflI6DSSHRte0ozs1j08jwFINydc08SGF5zedsW2m6hk/NXZemhio3Htzt3k
-	 bEntExIZ+bOag==
+	b=hJPq/ZFhM5A2mQhaliriYcks2OFyKkFI3KDY17+DL4ys/X3o6mEx8JuSxcsg8g/VB
+	 FxnoAIUWchI9BGiaChl89VpQTW/NXpTOxkUIwu4LSZ/THK46BTxbjDfwSVVnrpMDYR
+	 rGzLqMS2jgjJWzGfU48dbeSp/O1CgXkzNHOGaxX9Uv6g7QYnyq7q6W5siHEBzOoPiw
+	 /XliB9j5i+3fTwujeLL8CLlfXZ3EOUEHB2kBVCIdTpVszdz1Qg6HY7KMot3UO/lCzS
+	 tDOTI8iuTL2eZwHpTCmdZlKPxx7CLfkfH/DeknfbR1d/GiQRJzi/+wIZeGdLyUTo5B
+	 U4Io/xBcrKAFQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 210BA38003BF;
-	Wed, 11 Nov 2026 19:40:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9B26838003BF;
+	Wed, 11 Nov 2026 19:40:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,40 +54,42 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Use platform Bluetooth addresses on Broadcom UART
- controllers
+Subject: Re: [PATCH v2 0/2] Bluetooth for the RTL8852BS on BPI-F3
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179442601766.1604530.10253398492524205694.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Nov 2026 19:40:17 +0000
-References: <20261110-brcm-bcmbt-mac-v1-0-c68003a06f64@kernel.org>
-In-Reply-To: <20261110-brcm-bcmbt-mac-v1-0-c68003a06f64@kernel.org>
-To: Linus Walleij <linusw@kernel.org>
+ <179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Nov 2026 19:40:19 +0000
+References: <20261111094557.443481-1-frederic.mahe@cirad.fr>
+In-Reply-To: <20261111094557.443481-1-frederic.mahe@cirad.fr>
+To: =?utf-8?b?RnLDqWTDqXJpYyBNYWjDqSA8ZnJlZGVyaWMubWFoZUBjaXJhZC5mcj4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
 Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org
+ krzk+dt@kernel.org, conor+dt@kernel.org, dlan@kernel.org, anarsoul@gmail.com,
+ alistair@alistair23.me, pjw@kernel.org, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, alex@ghiti.fr, troy.mitchell@linux.spacemit.com,
+ linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 10 Nov 2026 11:45:25 +0100 you wrote:
-> Allow local-bd-address through the common Bluetooth controller binding,
-> including its six-byte little-endian representation.
+On Wed, 11 Nov 2026 10:45:55 +0100 you wrote:
+> The BPI-F3 (SpacemiT K1) carries an RTL8852BS Wi-Fi + Bluetooth module.
+> Wi-Fi (SDIO) has no upstream driver, but Bluetooth on UART works with
+> the existing hci_h5/btrtl code and linux-firmware's rtl8852bs files.
 > 
-> Enable the existing HCI core property.
-> 
-> Absent, unreadable and all-zero properties preserve the existing setup
-> path.
+> Patch 1 documents the compatible, with rtl8822cs-bt as fallback, so no
+> driver change is needed. Patch 2 enables it on the BPI-F3.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] dt-bindings: bluetooth: brcm: Allow a platform BD address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/05ad7f2dee07
-  - [2/2] Bluetooth: hci_bcm: Prefer a valid platform BD address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/afafcb373fd0
+  - [v2,1/2] dt-bindings: net: bluetooth: realtek: Add RTL8852BS
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c21f8cff7503
+  - [v2,2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
+    https://git.kernel.org/bluetooth/bluetooth-next/c/df348a0d065c
 
 You are awesome, thank you!
 -- 
