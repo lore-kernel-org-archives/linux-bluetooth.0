@@ -1,55 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794390770;
-	b=ZlDXBm1fD8bdvGT5179cXeVGKC9XXxIj9JDY2KGJQIyagKzr1KCY5wIh3/x6ojQPVe6G
-	 ir9Taz8/6/SIH6+bYgQBXrh5zgNgSLl0QlJtIltQ70UgdEJRPUKCRzfZXtiNS2rMb7YKz
-	 RqJ9X+9Id12V/U69foQbHvpI53x4868ekK5P5xpip0JF4Kanh1alsVzsU/ZWLJDEvtlaA
-	 mb/rGXI9TC4/qNhq08Mel/uEm1RLbiLftEegVe6MNZgZLykSx4dKV5Nj879OoKtczUrLv
-	 LYCXTo57d9zBpPmirX8rMmIxwg0zZ8JAaLgugm3qIVTqUOeGt87oFGQUo9Jua9HqHwg==
+	t=1794393853;
+	b=ozoLq0sYWPvkW75J7BUCf1wuw04zkIsfoXLRGKjYLRwvfyl/h5+pjLc9FqqgZUX/Ir7B
+	 fxC817L689LV86aCYhysRxeOf0OPTlecJL12VuItbJyS+xnIRnTMYEQg14jPsFfsk/Fg4
+	 NYhikMrLLWZk1GREZcAJkgavVA/u7rCXLUIu4szirx1sMzjj0Ay126+g7LUXpXxz77IPq
+	 QapYkTUfPpu3fcG0ruvK34e+MRaV7VF4leEIn1dHVXbZEOkoyS1dm233allpERM/sR5em
+	 zWcbmX+6yv65yfkRD3gq8w9OgWwSe/zTjKhAe3HvGJYGbASelIcEz6I/8bl/kKbsgag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794390770;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:Mime-Version:
-	 Content-Type:Date:Message-Id:Cc:Subject:From:To:X-Mailer:References:
-	 In-Reply-To:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:X-QQ-XMRINFO:
-	 X-QQ-RECHKSPAM;
-	bh=GWi9Mrn0MCeiOZQc5+4kfVX0EHtk3DfuQOjdPxmcFTQ=;
-	b=sju/4ZVVIBYq+z4DKEcrFIFgaXRJlJFsQuUxuf58S/Mf0GG79wtaYBnKtS1j4AW4dR5p
-	 zgQbV5+9vCY0h6wlVcluWqRj6zBNLLM4SY4pPKKUAFt+hGs8TPRN3aUydUEJCsRddTjIW
-	 KDsuefARekHkD0XO9wAUZGH/nWwBUAglMquGEj4Nxl09BzTJPWnrIO6d5RaSQ8L7rtfeE
-	 xWjTwa7VMc+8831L6l+vhv/3846o2RQATA5OxB6jTK8tzcsO6zj10peEX1UvEkHSuqB2O
-	 Q2JRmOCUlIkHmyodZO34nRSTyw14YfkCPO8y86mBEqGMszR85HprB44TmPXAh7swGLQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794393853;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=1ndBUtA+QdL4D76NH7jAIYZfoMRmvQ12HD1VEyIFJ+Q=;
+	b=uwz/qPUuOqZPHfD0UCDqBh6zJoTuWzgKN9zDx9BVb3V10NtzxnJ5DnfKlroLKcmw4mG5
+	 EdNl827f9BXg8frd2nG8W5GMK5kBvaUjU2PXVrWFxyVt3NMC7W4+SJp3c0tomVPnWjVw6
+	 8y09pANlBdaoQtRie8dSv7jvytpF8Po/y7kwjHpkGPMANcQ9YGTJI5aECGwaFDfV1Mv6N
+	 ioMh5xb/V52lGa1fO+B6axSsb/zOOS83YGMZIk/yccaVJtN608Df8nu7a0cBgcH/PtSUX
+	 Tlts93XPJp1/mzDn16dqlkrpDWb9eBV96ik0PjplnGOF2jawx1h60PVjH9E+NoL9dcw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=linux.spacemit.com;
-	spf=none smtp.mailfrom=linux.spacemit.com;
-	dkim=pass header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=f7+rYJlO;
-	arc=none smtp.remote-ip=52.59.177.22
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KZCgjYx5;
+	arc=none smtp.remote-ip=209.85.160.53
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC9C606A33D;
-	Wed, 11 Nov 2026 09:52:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2DC9C606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE06B606A326
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 10:44:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE06B606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=f7+rYJlO
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
-	s=mxsw2412; t=1794390708;
-	bh=GWi9Mrn0MCeiOZQc5+4kfVX0EHtk3DfuQOjdPxmcFTQ=;
-	h=Mime-Version:Date:Message-Id:Subject:From:To;
-	b=f7+rYJlOFA26NTV0INBR35r0W21EOZe4WDucyr825KEFuCV1tXwNLgeCkfWBesNgj
-	 OaP0KKJUiu4Y5UgsgNJIIHnyZg15a2FiSX87V5z2Fa4vZHpf+1ST88QJDW5t4++MNa
-	 6KJlGjyANok5Rh/+YwWbgVe9TB7mE4viCdr8qmhs=
-X-QQ-mid: esmtpgz16t1794390706t35ab9cf1
-X-QQ-Originating-IP: 7/3GNwEBAt+0SADWshzJh1j73v8R28IgqdTX80eo1hM=
-Received: from = ( [120.237.158.181])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 11 Nov 2026 17:51:43 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6762194668848470308
-EX-QQ-RecipientCnt: 20
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KZCgjYx5
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-4ad4072943dso1044631fac.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 02:44:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794393852; x=1794998652; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=1ndBUtA+QdL4D76NH7jAIYZfoMRmvQ12HD1VEyIFJ+Q=;
+        b=KZCgjYx5AOiXo7+NZvg7guR6+rbtSuqngwvmUlxwRM6p/QlDdvCd6CeqRl7CAkyPUz
+         CKEbZkZuYgQ7aHPTUpkcsaDQV6BCWPFgz9Qjmou0jEmO4CpVXr9CtU1oj7i1OwuNAYR6
+         1VAJGKV1sI1U7jyH6rXQTYvru6+lDHaWk7zG6A2hfjd9L9WhjU3AawD3IQAmQ/Lx3vuz
+         Hl8yS6fO6YtIWhTJ7fJnBtAht8fUzJZ0EshckSVRvDqXpX6VOcQ08OQ3rGg1vkkTMioE
+         9eH40lRE27zikaiW6DT7gFWBMk/fRLZrJQSWvwz2nJBtoNmdUGjemkFQiE4LTBSY6jkH
+         ogHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794393852; x=1794998652;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=1ndBUtA+QdL4D76NH7jAIYZfoMRmvQ12HD1VEyIFJ+Q=;
+        b=rLqjA4/0haxD3fb8yzl/I+4gFWaM0PbLmezhg881tE1MCob4gFVyhbRYubIJpd0lGs
+         a8iaU1Y04Bd47m/FCTX0qpTQlPDNDrBQXJYNIM5UriE7SR+iAgJTcZwj0O/gdb0f1m4u
+         ZmWdHX7opACeA90bvHqdREFHs86J2pq6Fch+31GgP1B49ZUGqOR6B7wQLsM+ffQ9gZB8
+         krxm+tadlUQ5oBNkgjheowjzgNX9rbbSfGZVcJHvTJBddsKHU+96ezXJV9YYrZqqthBU
+         nOex09K3KG/IVxfjmaSqycZAUHoC2ffU8txmr22bn5oGyuJaVxfDU5ZtxUriGLDuHxra
+         G04Q==
+X-Gm-Message-State: APuU4Z/bUBH0vcGANiIJCPUKyBqG7QQfrDqXXgOtdEXIvHOnj3QMQEPF
+	k6nQcwkCmCb0gtadjgVKo5mhnxPCxTL8yKPdWd1ftH8RMHde25grcOum9eN06w==
+X-Gm-Gg: AYBFou187TSAKPZnVA6obIc8+GhVpi2rjtHn5rn9xXTrREHWwHXUK8lu0A/CX5Dlt8r
+	Y+meQS7PyCmK85eV5zR3VXjWdYL6O71p3qQ8FPqKpqLodYWuJFXJ3mtE2xh7zyX+yg7qkTe8o32
+	0aj8YQeQWEx/D6ggg/lVJd442PEM+xpNZcurcVtQ28thosHOyOsSvdrBUNwC6qzFQbuNETjdHbM
+	HFKBfGkXIV9gFqecH3yDTMme9yNlbVsaFvv5hcggfCzyniUiHxapsqgS5jux/coK0et4LHcswfD
+	FsO6e/SZy5OP3pn/O1V/Nl1/2Rzgkz6dWFmNGLzJOqj8jCrL66uIw1OF03uJCMMnUdgZNCIQ632
+	pK/CAixNrmbFIyDe6Gni+1e7eA/7ih619fLjp9TKELPi3JbIxEL7RqFzdgXvUE4snYzp2Q6cDV0
+	jtAJAhlbw11yKRlQAr2Gok+irRlPKBA82wKG3DjLnhI1MZ8ZaQFsw3dMOuudWTgYirBhcbDK3VE
+	Y6fxUsXM2zai97BA0n8hLqGWXZ7iE7imFbxRzSDmALYehkehyw87oCjyaNXzGpzUDrwsz+AhQNA
+	/h7QXg==
+X-Received: by 2002:a05:6871:7408:b0:4a7:455a:b1a7 with SMTP id 586e51a60fabf-4ae46c35b19mr1695310fac.37.1794393851498;
+        Wed, 11 Nov 2026 02:44:11 -0800 (PST)
+Received: from [172.17.0.2] ([20.64.8.154])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4ae22f6b225sm2876127fac.3.2026.11.11.02.44.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 02:44:10 -0800 (PST)
+Message-ID: <6af446fa.efea58c9.2455ee.dfc1@mx.google.com>
+Date: Wed, 11 Nov 2026 02:44:10 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1858836179233665252=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,86 +88,81 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=25e53c27b1c6852924479b566cbfa263ebbd1c7ea96f00b6a8984ab5ea2b;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Wed, 11 Nov 2026 09:51:42 +0000
-Message-Id: <DMSAF0L4F8ZU.1R534QOL67WB5@linux.spacemit.com>
-Cc: "Vasily Khoruzhick" <anarsoul@gmail.com>, "Alistair Francis"
- <alistair@alistair23.me>, "Paul Walmsley" <pjw@kernel.org>, "Palmer
- Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
- "Alexandre Ghiti" <alex@ghiti.fr>, "Troy Mitchell"
- <troy.mitchell@linux.spacemit.com>, <linux-bluetooth@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <spacemit@lists.linux.dev>, <linux-kernel@vger.kernel.org>, "Conor Dooley"
- <conor.dooley@microchip.com>
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: realtek: Add
- RTL8852BS
-From: "Troy Mitchell" <troy.mitchell@linux.spacemit.com>
-To: =?utf-8?q?Fr=C3=A9d=C3=A9ric_Mah=C3=A9?= <frederic.mahe@cirad.fr>,
- "Marcel Holtmann" <marcel@holtmann.org>, "Luiz Augusto von Dentz"
- <luiz.dentz@gmail.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Yixun Lan" <dlan@kernel.org>
-X-Mailer: aerc 0.21.0-reader-ipc4
-References: <20261111094557.443481-1-frederic.mahe@cirad.fr>
- <20261111094557.443481-2-frederic.mahe@cirad.fr>
-In-Reply-To: <20261111094557.443481-2-frederic.mahe@cirad.fr>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:linux.spacemit.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: M83iEva+1QDBUBgdA7sSAtJcG3q5n/Zygl/jupVTurhnL4J4aBVtHSbE
-	icNuHZVnyuKnrEe8xPNF8sjgyZtuyeDzcEZ0hebOWObGvoTG9OgrMG778xKPKL464aFiRux
-	IoBuUmmOSZ47LZHGIvkdvdLuv/rQIBu4xw02iNIWRy1cnMppQSIwZZ4ZRY8wKZkln4iqDWX
-	j3EK6Gjio29t3T9V55wvT62Q3dcppbiGhQ5g44W+URE0piS3QJVakXdZ9IH8r5gv0VlqKzQ
-	kyby+dpDxy40j4+DuVLlkisrw0Vn/wfDU2KbpEGcfpqJKP5RGUlv4OH01bbE5uOETUpUMuI
-	EIgLK+Y9kPim3QQvXhdUXZZXDp64ttK1z+QnL6wXae6oWhCz4BAkPZN57kn3kXElG3Z5Lfi
-	rNkwe2B2/cVaVQZUuqyz7Pt2yEg+XGao8C3E2sLI9g3zAX1G1gtcFIe4df4Yaw4IetWg7PN
-	oQnbYjygK3OOWeLitGY2nFnSstepc7C6UArtns4XlkeMGYzMEReFmKxQ6bM1zHuV/xAtl2N
-	E2qu08efNj4RAF74CDMQdD2iTH+EuY/9pgEnWJsiJIaSytGzDmLaix6II1226hB5oF6M8Qz
-	Zb2moevaDdTHMv+Ljb/4S8hc/ghEHx3u6iH6HcsD3fR1ANAx9Vd4K88Novrk1SCm0W+vin8
-	7Cl6itjMSB/3BhNmf1bOXIwpTpI2C0yMacu1eNYB8CpqBcK07MUdI2MrV8Gvh6JdOQysqM0
-	3hlHx9YBAZG8rGrvPfMMBQYS6r8h7dw8mcfZH1Qz1ZFEDpYxDrfLnOuCrWN7XEwbypZEWB6
-	S1/xIx3e0tuB6AsahnqXkRSha5KyjF48t2jwVtrybsMPqopnEYHeab8UWQGI3/ruPg9yV6v
-	VrdJFnNTSscLXfeFgfd1Yz3W8KoDGH2Fc8tVwJaSI2IQZpyfhnschD5K3sS7qK0PbgZBU7V
-	w+HghMIBs+cugiPWEMd/z35Ril+6DUv45ePwEHq+l7vwjo97Vx9/+p3n0hRYpgquNxeP267
-	dNzhlDCNG3wEHwZyPMcjgIyvZUFIz154GfvRnU5l8JrkgapwK5vHpGte+tg+KhckvmmLhwh
-	A==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, joeyli.kernel@gmail.com
+Subject: RE: Bluetooth: SMP: Fail if local and remote public key X coords match
+In-Reply-To: <20261111094518.1359684-1-jlee@suse.com>
+References: <20261111094518.1359684-1-jlee@suse.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
---25e53c27b1c6852924479b566cbfa263ebbd1c7ea96f00b6a8984ab5ea2b
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+--===============1858836179233665252==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed Nov 11, 2026 at 9:45 AM GMT, Fr=C3=A9d=C3=A9ric Mah=C3=A9 wrote:
-> The RTL8852BS is a Wi-Fi 6 + Bluetooth 5.2 chip with Wi-Fi on SDIO
-> and Bluetooth on UART (H5). Its Bluetooth part works with the
-> RTL8822CS driver data, so use realtek,rtl8822cs-bt as fallback.
->
-> This patch was prepared with the help of an AI assistant (Claude),
-> which also ran the tests.
->
-> Signed-off-by: Fr=C3=A9d=C3=A9ric Mah=C3=A9 <frederic.mahe@cirad.fr>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Alistair Francis <alistair@alistair23.me>
-Reviewed-by: Troy Mitchell <troy.mitchell@linux.spacemit.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1208171/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.84 seconds
+VerifyFixes                   PASS      0.11 seconds
+VerifySignedoff               PASS      1.15 seconds
+GitLint                       FAIL      0.33 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      31.36 seconds
+CheckAllWarning               PASS      35.88 seconds
+CheckSparse                   PASS      37.99 seconds
+BuildKernel32                 PASS      31.27 seconds
+CheckKernelLLVM               PASS      41.46 seconds
+TestRunnerSetup               PASS      748.56 seconds
+TestRunner_smp-tester         PASS      6.42 seconds
+IncrementalBuild              PASS      29.14 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: SMP: Fail if local and remote public key X coords match
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#122: 
+The commit 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys are identical")
+
+total: 0 errors, 1 warnings, 0 checks, 25 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/14971828.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
---=20
-Troy Mitchell
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: SMP: Fail if local and remote public key X coords match
+
+5: B1 Line exceeds max length (94>80): "The commit 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys are identical")"
 
 
---25e53c27b1c6852924479b566cbfa263ebbd1c7ea96f00b6a8984ab5ea2b
-Content-Type: application/pgp-signature; name="signature.asc"
+https://github.com/bluez/bluetooth-next/pull/1109
 
------BEGIN PGP SIGNATURE-----
+---
+Regards,
+Linux Bluetooth
 
-iJcEABYKAD8WIQSL4Ay2cExaPXAQcU2YCe+A+TM0LwUCavQ6riEcdHJveS5taXRj
-aGVsbEBsaW51eC5zcGFjZW1pdC5jb20ACgkQmAnvgPkzNC+JWwEAo3AjrXyZm7p4
-9ZEUTYiTXAsJq4AVvELJfl2OA3dhFlYBAOWsMtFYDasIhrqeWg8qqk6/Kagb+qd1
-IfEbAOyLKHIJ
-=CYdm
------END PGP SIGNATURE-----
 
---25e53c27b1c6852924479b566cbfa263ebbd1c7ea96f00b6a8984ab5ea2b--
+--===============1858836179233665252==--
