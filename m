@@ -1,84 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794371706;
-	b=umeix0OoSi0ozRan6jPKG5SImiBWwLHrhql36BXST0WxW08dhwNj7kK9UqRvuclbHdtT
-	 faeJ/PrPvn5vmoHw4Je6DFxXR0q3GTMB7nGb3WBn+pNxaSiqz1hbGBG29v/4wkQCtbLVS
-	 nyclBAjg1PF1zp0s+86O1vFLmr7InPhbZ8yKDOpkpMuJJSg9wj9BmnQLDKWNNm7Lw4mTz
-	 tTt5Y1ua/pt4uz/Hi1lNRruWWXcpB2Y8h3SbQWZxBGWmK/lcs+b+k9P2D/SEwoCCvcmK0
-	 tg/q9fx/wthbvJTmDQcCJubvQr1uwXsK/VZf2aGqBpclFzW04TxWOvDTiKuPcN/koaA==
+	t=1794372011;
+	b=gBzAxybnius3cjOm4YYQdTb6t/5kE7SqxrMXjzLSIzp7gb+I6V3N6myfZ/STsfRi4UIc
+	 vegUVO7Pqu+x4w4L7wbp9hyOaREyCzpN7Du9X5OSatPpvdN+D8fVH4x57LRSSskMa1WLu
+	 0YfybiAwLkEpv1VpGaMgbCkZKK1iLbSy7eI9qRh1kFobllY7ccOowCszG7Ugf/k7Xa0jF
+	 9Cug44GgnGwfCMZnX5kYMJxwVfbmdKCeeN8gadGMi2N5j6K4Ign/1qHXfEYLTEYcbckWS
+	 DhT3EDAcgS5W1T5gA5BfacCx4h8sJApCjfaSZDwM7mIRuuBVGgkflmqp+WnytA2S4/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794371706;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794372011;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=TN8551Ey6kH+2Xk9uWQYcNoVC34qaCGKspFI2huz4pw=;
-	b=v3x4OdG1hySg1CKl4a5fbChfDrYWco4euCKvFA/0Yf3ACu3FtGqI9+RtpdIcdcPbhRro
-	 YKDCmr63O46Zw4hjbv2D+i3zzIqrL5c0JZlEORO1PLgVwqgeBXm46tDJz/eUozMXoxxMV
-	 Bcyx16L65a4h+mn0r57YFfu/2bP+M2bvkatIQpCpOj0tpBvqpZLd+G173BfaOEU433iUu
-	 NkmY7SGGdAerxJMQPkPFqMBCnzNlxENutlSetp3Y0whBwLR8q5ixi/hlbafwIwjF0TdD/
-	 TEJShEeqt2Pv9vE6RB/n+oSjgTlKoB73LtvUKvJ+JJkzOK9TTiwDi/sq0dBynflVfcA==
+	bh=ZJvtl6YGjdXn/0h+Vo5GaKqnRcbAAMTtLyRcXdCLjFc=;
+	b=zaVluKJ25AineFUqKX7qbhDnc46Xi1B5/NIwEYRay48Miy0MG4nKV9grG1gGDu9Xc5fS
+	 lzsPd/TfQWbvrblS/mu+ydO58jApr1BfK9hNS0uJm1hg9IF6oha2niPYQD2joLZBQhxoC
+	 HCO0peyoNIDuArnCwOC1w4bXbvoZ6D8DBbVmXTrsvcj37TXjODbMm+qtbknouU3V4VwnF
+	 XLkO5jPpU2m+18Cg2KzZ6Mm7065b4Lp6mzCCkbf9p1RWLuKHvf7USRACnXYxscwkhiZ+P
+	 he7ZpARZ5vomdfkCyNztBQ9nBSvDt3HLR9864y9s9XUepTTxHGwgOvfZ7y/imFQSqQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hmZsmdys;
-	arc=none smtp.remote-ip=209.85.214.182
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yVxstgwf;
+	arc=none smtp.remote-ip=209.85.214.178
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8184A606A320
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 04:35:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8184A606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0728606A320
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 04:40:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0728606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hmZsmdys
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2e8f2c3ad6bso18037225ad.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 20:35:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yVxstgwf
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ea7190aea1so11879635ad.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Nov 2026 20:40:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794371705; x=1794976505; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794372010; x=1794976810; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=TN8551Ey6kH+2Xk9uWQYcNoVC34qaCGKspFI2huz4pw=;
-        b=hmZsmdysfP6aAKZkeGPyXHPmDETAPIy8XDP71+UekI89qSYZDZFRx0ox85dISHK4gT
-         qLhAy1kqKpxlvApIZ5cEQuzCNVWH16VwalFzDpFx/pLeQ9kLMkPJzMjiww0Etl9aLoI/
-         3AQ/OFFGwjwTcTB4ZrSMD7b35qV+SR9Ujk4DkW17hCnGJV1F0e6sAVq7zdlJf268+Es1
-         x/sqEYo9t40FcndM8k3/n75Mr0D9j2wxOiSkGi+n9pIWacUwWHYX66AaHhhjfEKuydU2
-         1hdG0J//1zuAcqDMetVnRA517d18cVRPjo7QYkaIc0op9RCmNiLam77mQygiLB7Tzb2i
-         qB+g==
+        bh=ZJvtl6YGjdXn/0h+Vo5GaKqnRcbAAMTtLyRcXdCLjFc=;
+        b=yVxstgwf3UnP11haLBjE1ojBF2/QHbQcOMKAxB/X65sasntbyBjP113MXGWeldO0J5
+         Rq5risuIQEb6WATFDHBjRtplY2h2NioUXngM+clG8eIUNTqn58S2FcGXzKIbgt6eMLbE
+         bttpWfmG0ce5QdkozHtTh4emrMGMzACbYPOfOLFbrYSXIsKFc2ggCJG6iQZ5bdbwEPiM
+         Lt9THFzHYC925ka6gq7pnOphRhEw+SKJpbM46gzCJCGaEsyPKc8uVGIbcoEK4xb2wtsL
+         tFIymG7sssPWCwuJVkMVJKFqx+Do9+mCXbsXDa9H7rYTdbqPKqnKUD1++9n2hnuUODH5
+         TGpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794371705; x=1794976505;
+        d=1e100.net; s=20260707; t=1794372010; x=1794976810;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=TN8551Ey6kH+2Xk9uWQYcNoVC34qaCGKspFI2huz4pw=;
-        b=TsLrFyRzzqLfk8Fmokb1y3OR09plvFkiCm6FnQAkHvN+IsbnT/gMB4fNBs60oYvPPQ
-         GzcTzb6YN2uu9F1Nog3Amb2m1q5UTnJy93774fFfKG4NIyF8oJ6BLsoKX/LXGHh+el7+
-         kLZfzxvRNMfzp+tnzBMgiAvOl/FiDhCa5ZYTSXhSPU+l5Mh0OSfHa56lGhNkDseK9zpC
-         HRjzXth17BMg3U1+ExcGnB2UUVKRmkPmkJM8SBhai+/2jn0CvKFgSqdo8J+7Oo3KP0Oe
-         9LjLwkDKxnwreior6H7rJ1CWEiPMOXqgr6u1bwjQAu5vIc1G6M95jGwVpM1H0uHg8Yof
-         Q3pQ==
-X-Gm-Message-State: APuU4Z9XlvaT4NKJq4AadgvT3zaizVO++0mZ90CdojQl4mVUrTa3ByJl
-	5CElK6ojLVrIhpW1fOLRoYYMX094czEDHeVRDYFINk8HXiKF6ikpWDlpRBjdZQ==
-X-Gm-Gg: AYBFou1v6lT2d6XDfzlihVKBONK8Nrdgewqv4K+ISXqZAZMLfYwpBixoUk6cXrU8+WV
-	Hc3NK0hQmpqbBhmWrdoUEDx89NfpP2c16qEJgGnxn+ue6RFWiA0t0GX/MHwNkPPrYVTgknCN7Sd
-	DtlkyuthV9rT7dYmK9jzN89p6deKt1LPeevAK8GEEoTTIncMScjTVA9fOZinkgnYxJ3ohCM7EoV
-	zdtE6JtPoR3EQSCurGKBqpjSolI/7J+GBSIBtHfFUgwIfkcOL0Xllfk3K+QSA/wuqCi/Qbcsk60
-	tpthBdX2IR4nYQ30MvAcPj1N4ccX6nkUfPjONWihZXuPBz7tDVoZC24Y+fVIfIRYKjHwR8RVVRF
-	7qMGPx/GjAAnKRzIvKNiEQzyGs2cTZBsGiaQashYRm0dYjzSMZRh31gZPbelx/jm8Kav502xEr6
-	koA1KQZXJ50t8aOGR4tFh7hBTTeuJbp2EBIBXEwUELVaySCI43cfjkUjErBrhSdwIkajEPCPYEY
-	N+JTsAK3cnEWl76/pEavX9Y9C/kacvbWoxv92+f3gMZIikrnFLWCRlsWKlYrbfy
-X-Received: by 2002:a17:90b:1c83:b0:3ac:a11a:7c84 with SMTP id 98e67ed59e1d1-3b18301b07amr1326587a91.65.1794371704524;
-        Tue, 10 Nov 2026 20:35:04 -0800 (PST)
-Received: from [172.17.0.2] ([52.156.141.216])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b17db31cafsm2672780a91.3.2026.11.10.20.35.02
+        bh=ZJvtl6YGjdXn/0h+Vo5GaKqnRcbAAMTtLyRcXdCLjFc=;
+        b=siPQf6jujjLzSB6OFQXEzcfrkSFGvB1Z/MtPtbSLD8PaJhqPwsOSVvEMKoGJKGWC/a
+         bWo20e/NLSlWQw/i899o+4Uq6q4dVuHcDE3Ff7n1hjGkl1P3ga2Mh/X6Qi7lED8wjx/d
+         E73klaD5lx43w7A0bfY0WQh06uFOdpXkQSFu5+Fb8XbX9IJQ/f2Lmk4gYuCP0xI6g+9o
+         vr7WYtLIt2X3VVRH5Kbh8YVPV85jLWja9x+X75UNykO7B99SI20Le17FBbiorxmYZUWo
+         h0cpITzJQ+ck/M8h+eMIVfu5pcD58AZieT7Kt8M8cxppoVw/Wk20KAO2jxBipNfoyebh
+         iGLA==
+X-Gm-Message-State: APuU4Z96ih+SH2PAQJA0MWOwRqrQIyfAax8dSxT45wEK8f9AgIFE8rrK
+	EGbgAcom771NiEUsh23wtSxDxlcdkAefwiMmjm9dcgjHLjAjKrQD0MFsC3efNQ==
+X-Gm-Gg: AYBFou2FNdXCrdbWRHQ8PngjOW+UmEL1Ib6M8/nZ3NqqGn6fWocGwnc5drhyi6OGoys
+	LvTU6y6hMg2ZwVB6d16X+ncT06lehswgKCh1DYoqaqnau6WjIHf7t9XrsvMeGOK/I9F+hy4iMpP
+	XvNTPL04N8F9jIclrju6NO9727H2WsS1bMG2cYd0TsTibBnOagMzJmrBCjXQw9S5OH/PmMVRueE
+	hYCe24hOGKxNy41bjyCWnbCG9SxO2dNNvyCeWfAIIPeBHMJmDo01YqkBIwm7NLqG2iL6KJE+PVn
+	hHiA6kpQbCHju1b8PUo1wJ/DB9tEYoo0W8bhiR/s/voc6hyMHuhfkXC0Gnbzs/HAD5IQ2ayxmj2
+	9OYSPLMwA1E4hm04G91CAEaOBQoo5AigK7/cpGIks4OruesQdT0QNoh3h73H1DwzlogkdHk0TH5
+	2tzNf880Mqu62nDh98Xfc/YBzoaV0gf48vv+xualTgvdXP5+QJipkhLjHQNIs2DQxp39ndtRgrz
+	SWNOHoMPQLY+xZjW+fHOpRZQvu+GBRAKWfQuOJLhUX45ZEY2uwdYii0/ibN8/Ug7mtiviwFvd+n
+	zP1h6DGi
+X-Received: by 2002:a17:902:da87:b0:2ed:294c:2b9c with SMTP id d9443c01a7336-2edd7ac1ea6mr16622405ad.51.1794372009797;
+        Tue, 10 Nov 2026 20:40:09 -0800 (PST)
+Received: from [172.17.0.2] ([20.99.236.242])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6dd43bbsm15656575ad.57.2026.11.10.20.40.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 20:35:03 -0800 (PST)
-Message-ID: <6af3f077.a438010f.3865f1.7c79@mx.google.com>
-Date: Tue, 10 Nov 2026 20:35:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3501884386178707941=="
+        Tue, 10 Nov 2026 20:40:09 -0800 (PST)
+Message-ID: <6af3f1a9.fbff920f.1d47a8.7c4c@mx.google.com>
+Date: Tue, 10 Nov 2026 20:40:09 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6485437308867231745=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,12 +91,12 @@ Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: shared/bap: Don't disconnect a CIS still used by another ASE
-In-Reply-To: <cf1162f2dff21a8b179eacec6f6e3d385dfd8a28.1794349049.git.luiz.von.dentz@intel.com>
-References: <cf1162f2dff21a8b179eacec6f6e3d385dfd8a28.1794349049.git.luiz.von.dentz@intel.com>
+Subject: RE: Add support for HDT and EKS
+In-Reply-To: <20261110222511.3011494-2-luiz.dentz@gmail.com>
+References: <20261110222511.3011494-2-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3501884386178707941==
+--===============6485437308867231745==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -106,30 +107,105 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1207686/
+PW Link:https://patchwork.kernel.org/series/1207696/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      2.14 seconds
-GitLint                       PASS      1.59 seconds
-BuildEll                      PASS      16.38 seconds
-BluezMake                     PASS      231.42 seconds
-MakeCheck                     PASS      13.76 seconds
-MakeDistcheck                 PASS      118.19 seconds
-CheckValgrind                 PASS      281.31 seconds
-CheckSmatch                   WARNING   227.17 seconds
-bluezmakeextell               PASS      76.12 seconds
-TestFunctional                FAIL      3221.14 seconds
-IncrementalBuild              PASS      256.01 seconds
-ScanBuild                     PASS      840.88 seconds
+CheckPatch                    FAIL      6.77 seconds
+GitLint                       PASS      2.21 seconds
+BuildEll                      PASS      16.24 seconds
+BluezMake                     PASS      234.95 seconds
+MakeCheck                     PASS      13.79 seconds
+MakeDistcheck                 PASS      122.12 seconds
+CheckValgrind                 PASS      286.88 seconds
+CheckSmatch                   WARNING   240.42 seconds
+bluezmakeextell               PASS      78.18 seconds
+TestFunctional                FAIL      3079.41 seconds
+IncrementalBuild              PASS      612.71 seconds
+ScanBuild                     PASS      856.83 seconds
 
 Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v8,01/11] monitor: Use __packed in bt.h and its users
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#229: FILE: monitor/bt.h:16:
++#define __packed __attribute__((packed))
+
+/home/runner/work/bluez/bluez/src/patch/14970530.patch total: 0 errors, 1 warnings, 4719 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14970530.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v8,10/11] l2cap-tester, iso-tester, mgmt-tester: Add HDT tests
+WARNING:MACRO_ARG_UNUSED: Argument 'name' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+WARNING:MACRO_ARG_UNUSED: Argument 'setup' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+WARNING:MACRO_ARG_UNUSED: Argument 'func' is not used in function-like macro
+#417: FILE: tools/iso-tester.c:958:
++#define test_iso_full(name, type, data, setup, func, num, reason) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = new0(struct test_data, 1); \
+ 		if (!user) \
+ 			break; \
++		user->hciemu_type = type; \
+ 		user->test_data = data; \
+ 		user->client_num = num; \
+ 		user->accept_reason = reason; \
+
+/home/runner/work/bluez/bluez/src/patch/14970539.patch total: 0 errors, 3 warnings, 3084 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluez/bluez/src/patch/14970539.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
 ##############################
 Test: CheckSmatch - WARNING
 Desc: Run smatch tool with source
 Output:
-src/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:317:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+emulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.monitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresemulator/bthost.c:707:28: warning: Variable length array is used.emulator/bthost.c:708:32: warning: Variable length array is used.emulator/bthost.c:961:28: warning: Variable length array is used.emulator/bthost.c:995:28: warning: Variable length array is used.emulator/bthost.c:996:32: warning: Variable length array is used.src/main.c: note: in included file (through src/device.h):
 ##############################
 Test: TestFunctional - FAIL
 Desc: Run test-functional
@@ -440,30 +516,6 @@ FAIL functional.test_bap::test_bap_unicast_duplex_enable_one[hosts6-vm2]: failed
           File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
             raise RuntimeError("load failed")
         RuntimeError: load failed"
-FAIL functional.test_bap::test_bap_unicast_duplex_switch[hosts6-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
-            raise RuntimeError("load failed")
-        RuntimeError: load failed"
-FAIL functional.test_bap::test_bap_unicast_duplex_disable_one[hosts6-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
-            raise RuntimeError("load failed")
-        RuntimeError: load failed"
-FAIL functional.test_bap::test_bap_unicast_duplex_release_shared[hosts6-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
-    Remote traceback:
-        Traceback (most recent call last):
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
-            result = method(*msg["a"], **msg["kw"])
-          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
-            raise RuntimeError("load failed")
-        RuntimeError: load failed"
 FAIL functional.test_bap::test_bap_broadcast_transport_created[lc3-hosts7-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
     Remote traceback:
         Traceback (most recent call last):
@@ -570,11 +622,11 @@ FAIL functional.test_mpris_proxy::test_mpris_proxy_track_control[le-vm2]: failed
         RuntimeError: load failed"
 
 
-https://github.com/bluez/bluez/pull/2789
+https://github.com/bluez/bluez/pull/2793
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============3501884386178707941==--
+--===============6485437308867231745==--
