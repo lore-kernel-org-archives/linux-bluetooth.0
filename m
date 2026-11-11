@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794428409;
-	b=EkgxRlaD388bERCCg6PRBvKmbcmjyMMY4YVLdF+e/T1TIwYCtsD30PfHcct9QjEvbkn+
-	 ACCwIl0uRVQAxymbX5g3gpcD53Fu4Jv0C9SyKm/fi9BE9yrLWE9shere5tC2WeHfHcEzO
-	 Frl5SbQS9et/lkmgRCw3TdLuqBFn9OjPk4qB/I6G5YHHDdEMnF30JnzqZtQb/Peje1Hnv
-	 R8aiIgGiXh1140earicNhoyzVvjHLlgF9Yzu0bdwn3+J21i1aDiBEnVxApsuN3f7blCjz
-	 3IxokQcO6J3gjvKGuv1RugsOzeM+HcGTA7Lz5GRWR+0Og3ciou/aY/dDgLX6zo9vKhQ==
+	t=1794428410;
+	b=GQIwnbaxeSj6MJqzk1UEZAez1U4kAUg/2P35764UO4iHKrSZ+Y4wXnig0slT7/rNkZDW
+	 sfzsj6WYBNeizUs+ZFKXIoY7UEW92lcP2EhIt9HccD80andmurDRzuoyOJvojbbBs7P9z
+	 0LpeyNcsQZRG4LbR0YtkdKoQZTVLJfp2DhLeGzUyYOi0hMzc2Wzys1zkQdRnG79CmRDre
+	 1RfpljSyk+ZDlRaYHe4Ibyh1O/UDQhkieBUAsTfG7qqm+tRPn7dvuTntSzOfUZTySYkSS
+	 BPGUZVgk69KP9d13euh6d9ZOUACHAkF1zG5KfCokDicH8OkZwC5MpXLJ6GorG+/aIsg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794428409;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794428410;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=IO2DdP/qkuqzaLwklEKRvUD8vG7D6jQ8uitlFNc+8IQ=;
-	b=qzhfD1exH/c+hn1395+ceWhpxYXhjpDdJwm36IYmqH7Ydx+J+sZt/TljGKV+2e2gqsfh
-	 zQmFlRDk2ZHUowEH6hH/T4tx1VxFkDU/OLYBnfcxAoCg4QVR9yZZbf4kiwBqpaeOy9mOf
-	 QfGHscbxWjDBnuUeWtMj953wgrI1iEruIIYSmbbWRK910ie46EFxYJSVEVeiwYRBnGNR8
-	 u4Tpzf3wvcxBv/whYuLvFNJKvkRyA7hTSgf9D0gbXgksCwAwQoXoG7xv4/pHdtd4UvjkT
-	 +Cy3WpqAlKwK3GMDTiIGZd6Iqtb/LQcWyzIW7p26s8a96f4rJQuBdU7JCms0eTQvflw==
+	bh=FMS46IdSO1trNZAYe6qNxADJ8xUPjgMaYYobGQ/NDPI=;
+	b=S6SHEG8skVSYjWsl8p8laUX9gnv3JHsHJ4DYFzC6q59ZHVhVdG3sbuppLSgmTCLvgDAd
+	 9CKPb1Qi0ZTCMaUEshkaTyzk/BPojb5MOeo6zu7H3Iu/uXXTC57KgHI9cDlgIkmFzGV+R
+	 tEtMtA/rueK0FUuzC8ayph7vxdF3/DcfNEn5wapeJvYmnx8VCt0M95Dk111D+7nor0VFq
+	 g6Z/0R8WbbROFvZ4195IN6pgRHoKajoKuJ9Dzmc8vd8Bejeh8HwfFFHKnOqPp0IJ1ZwnF
+	 LnEpZwtILReppkH4Qtde7j7PnUhECEun9xNNI2K5CC9wHK6fPz5+TjYa1Nt18VuNeLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gGuUSBRH;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QZX6QMtO;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D95606A882
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8CF606A886;
+	Wed, 11 Nov 2026 20:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gGuUSBRH
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1DF41F00A05;
-	Wed, 11 Nov 2026 20:20:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QZX6QMtO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 682B31F00A05;
+	Wed, 11 Nov 2026 20:20:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794428408;
-	bh=IO2DdP/qkuqzaLwklEKRvUD8vG7D6jQ8uitlFNc+8IQ=;
+	s=k20260515; t=1794428410;
+	bh=FMS46IdSO1trNZAYe6qNxADJ8xUPjgMaYYobGQ/NDPI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=gGuUSBRHmkXpIJ9NwXu66qXK77iTjwSx9eJ7chweY4BSR4sTu8R5kFC4qC/Ft9YTC
-	 +yDoAz/+0vM093riBEKB6wkJbm3k5Si6v82yEGL06HRWrMQ2xshm2AQp3hENJxjrHh
-	 x9oSCHJEDIyGQ7xe9O2b1EZZ13CCQits7LGPswuQXQ1xA+24zk2A1Mb9HdPXTkrvwC
-	 sYdoxAZaVTcyQf1gKsk50qxe8m27AZ7bzfEjgvGhbU0At7kyx2hS3kI5LyFj3pzN0J
-	 YMtyVdudIhE+K97DNp8SjIF2kJWFaiLVt3uQAHevoiJN335XjMnm3Wa2kmyYR2GOfh
-	 w0NKdHjThlEUA==
+	b=QZX6QMtO06bZFnaNBGTExPDgFfmnUzzZU/qc6x/4qPboXMAbtPP1wo9br01/v/hRZ
+	 7516I/BM1YUhhCuodqfVgN7Wz0QPB95gn2AmywSWS8CVoOX/Vjl2HO9EY7xJk3pUBz
+	 XJ5Z1vP5cJYZ/6UdR7W2VXGFt6njoy0Fi65fpMvl0EMv7VnLiT+DTudN/oaDeDc5qh
+	 v/R787tn4jle6jF8+5PII98uKJ6ClKyQez0VrdB5otMEfCmb+kdCbhJvwWVdLRVgUr
+	 QoFKwViz+WTyZIh8IdyIpt7T3UuHN3x5DfKd+EMIZw4oIQG99jKdOF2CQ6U3BCFNYD
+	 xwlhkzv0LJKgw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D8259391AF9B;
-	Wed, 11 Nov 2026 20:20:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5E058391AF9B;
+	Wed, 11 Nov 2026 20:20:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,36 +54,37 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Fix SCP DBGC base address
+Subject: Re: [PATCH] Bluetooth: SMP: Fail if local and remote public key X
+ coords
+ match
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179442840742.1623293.17516886836216832680.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Nov 2026 20:20:07 +0000
-References: <20261111141822.2888893-1-chandrashekar.devegowda@intel.com>
-In-Reply-To: <20261111141822.2888893-1-chandrashekar.devegowda@intel.com>
-To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
- kiran.k@intel.com, aluvala.sai.teja@intel.com, pmenzel@molgen.mpg.de
+ <179442840892.1623293.2866290567513278884.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Nov 2026 20:20:08 +0000
+References: <20261111094518.1359684-1-jlee@suse.com>
+In-Reply-To: <20261111094518.1359684-1-jlee@suse.com>
+To: Chun-Yi Lee <joeyli.kernel@gmail.com>
+Cc: luiz.dentz@gmail.com, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, jlee@suse.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 11 Nov 2026 19:48:22 +0530 you wrote:
-> BTINTEL_PCIE_DBGC_BASE_ADDR_SCP was entered as 0xf0d5d500 by mistake
-> when the define was added. The base of the SCP debug controller is
-> 0xf0d5d400, as documented in the Intel SCP SAS document, so the value
-> is one register row too high. The status and wrap-around registers
-> derived from it at offsets 0x1C and 0x2C therefore point at the wrong
-> addresses, and the debug buffer status and wrap-around state read while
-> dumping SCP debug traces are incorrect.
+On Wed, 11 Nov 2026 17:45:18 +0800 you wrote:
+> From: Chun-Yi Lee <jlee@suse.com>
+> 
+> The commit 6d19628f539f ("Bluetooth: SMP: Fail if remote and local public keys are identical")
+>  patch be introduced since v5.13. Looks this patch can handle the
+> CVE-2021-37577 issue. However, it only checks if the full 64-byte
+> public key (X and Y coordinates) is identical, which is insufficient.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btintel_pcie: Fix SCP DBGC base address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1752a2c40059
+  - Bluetooth: SMP: Fail if local and remote public key X coords match
+    https://git.kernel.org/bluetooth/bluetooth-next/c/fd038b82c71b
 
 You are awesome, thank you!
 -- 
