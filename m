@@ -1,60 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.122
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794433455;
-	b=BzTVFXGY/mtrw9eeXlPYPCfcbIuEGTIDMX1F34onpv64QtaUzJRZ+31RshpTuJXIDZDj
-	 rBQQk2M75JizM6cFigIeNoSR6Uo0njbAcoinFAlzGBISEUeXfHXdtf1ueYOUAYG29Lkp4
-	 fFLsvcc29gvvpHzUQKJ8j06CxiaMsmq6tnRlbGUxXjcYR34EOk8MfAB2AvMBXLAakms2h
-	 8jYJofYGEPX0IP89L6IuZE3UQlJtpo68SfGUeTMbioikrbOcS5bNl4Gwvl/ejrXmuqopZ
-	 VUoAIYLY2Kz+zz9a3buYQrzr8AAeuq6TpgbGK2UdBD1isPbXzfNsEJxrAgZuTxBw1EA==
+	t=1794433772;
+	b=FIifSr7TnqTNIts+wkaEjf5eCvuQHcCfFC/bgDcjUkJCUPfDDm4WQMy3Bqoq3UUIW2Fw
+	 LN4/uzpyvFWYDl51HavDTtn+9OojtmOvnfKy2LqE/05qJxEq3MztEc5HS8AZ1llmHXdwE
+	 fSwdzYAjewoAibNpD49qVErCzw05Htl9NJjU/YQ8EUrQjBQvR1QxRqpzSeJ2qxM82qZ5r
+	 SkVmtaYbSty0RjLyalPwX1XKLZajuKTXv8REQO0smwe8xcXJ1pD3XEq881RvhuoS1WbGH
+	 WQiuZ970TKusgIrHCTrTvdXjH70Q4QZ3x+isPZHSUb4IGGmIIuvsB0Cy6fGai/ptFsA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794433455;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=aLseMH+ftcq5Y3JjVN09QvD+VymMinTgUUmmTTEpbzc=;
-	b=GhUqnuln5m6rCWKmMZBunHC0MxYVGP1CyEuWBarV9horSowSyJ7VdJuewfKDnNbEQqf6
-	 lymn69MMm4WlqqNbdTevN5MdalSuEhVluMS4twQYHVLCVpGcI83C8SGwVoUMSOIoYYIq9
-	 uhwJOH/9IUte5l1IXOKxGB/ltMwDm21IO6TAob5T4N6p93JrL/mPYnyflIAYfMWE/gSMy
-	 9MoT5m+3Qjf94lkGBfhFLEsrZZLQBFwqi7NYiSSuyTL95fRz5XXQ5hzWaJHcgcNdndMVw
-	 7oTJtbN/5rkGtHOdLFxB7drCRxtG4YTt+kv8WL0sg3nW5XohkRrMxvDZ8Xa2BZKpeBg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794433772;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=ghwIfE96OI9y9XOfb0MeMDcamu6SW78slBiWypbpbcM=;
+	b=Rw40MoWjjN+m0SnbDUujUT1C8Ouyw/t4uK9LEeLnMLAChAvJ+aNgKX4INv9wvKB2vCRm
+	 1bwFbwzMfGpcEuwEbUP8WAXBz5x5zZ0HlagVZy533DmtyomP84cMJxz5+3qLSVUj1tB2J
+	 ToJafE+36inHo7ck638Bfn33n3g97X7ALudx+fsI0Y3YQvdhfdVS0awpGcP232uq4Y6hm
+	 KW8eLDi+JrvyxIofrM2za9yjbYciC23vbGFiRCCVK6cPoIsHeqgHxlK32HYg0KaDCVg6k
+	 FrGaJJxyTXmjmMqA5EH7EJJfMEwFW8Ots5+T/Eg7B09aypbBkQ0S8wqKYPCkwPvnh2w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=lgz7LwnD;
-	arc=none smtp.remote-ip=109.224.244.122
-Received: from mail-244122.protonmail.ch (mail-244122.protonmail.ch [109.224.244.122])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=udAPqJer;
+	arc=none smtp.remote-ip=209.85.210.49
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF642606A321
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 21:44:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF642606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1763606A326
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 21:49:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F1763606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=lgz7LwnD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794433452; x=1794692652;
-	bh=aLseMH+ftcq5Y3JjVN09QvD+VymMinTgUUmmTTEpbzc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=lgz7LwnDvcIcbhkoFNxCk4DpxhgkRCFMf+7GJ3p/QBrgvSn0+OuZK39iH+tR4bAP6
-	 LAHa5fbXgNjn96KxVt7LrHgv/5dclbr5MuaVTGXPCITQcOx3pAmjVOZcfDbnPEVsOP
-	 c2kewYq0D1oIgK13e9yr+Eie4KrGVZe16srpdgJo4C8gFfQGF19KmyqLXTXGPABBcz
-	 FkPba+DHn8NtORChcg8EgP/DaaEWlX9msOkWIrAL8D4Bdee+SYfQ1mM6N/W8DndHul
-	 nx9aWw7sBgW2mKxDmQlVawDbE+3Ge8ORSQzlCJ2esMu8B+g8KkwWubQrQuQYBz2Cqe
-	 mLytD61i/JXNQ==
-Date: Wed, 11 Nov 2026 21:44:08 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=udAPqJer
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-825b40f8a26so1667191a34.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 13:49:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794433771; x=1795038571; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ghwIfE96OI9y9XOfb0MeMDcamu6SW78slBiWypbpbcM=;
+        b=udAPqJern4cV9Bh6LXrHWrTixhlYTe5DhEO5f2N57XeXVF8uCvHX3eIxz3FsbGtyW/
+         b8+wiGvyDwZ5yRnDkKd+4vLt9tnUp98WyhVDuDPYzBC/mVCO2VEMWpRoJl4nuVUTvRyi
+         oOzgYIt3lkmmzEuTTVxHkPBnCZSHSm5k75ZG4blFcHdWdV2L40kzxBGwqTmxMDfY2Yx9
+         oyl7Lmq4qbuoAazcMDvcJZKKWw2AaGyV4Wxw+sehEq1qXy2Xb7jZHHzmcdEPnvMUDVSI
+         ysuvj16vQIUd7dHDJ201FrLoxGpQOIIx5BWwDyBBYc1bc5qDbes42p75NLr/p4UPPxMd
+         +yKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794433771; x=1795038571;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ghwIfE96OI9y9XOfb0MeMDcamu6SW78slBiWypbpbcM=;
+        b=zX+ZoS2DHBKzDBHofm6DZLow99QzMOt7DohTEGCaDTkN5CXYIZrAZlN9xq4sEg4wrY
+         mOlFslebYYcAt4Ywl2UUoj/cXrUvH45uG0dJYj92oDDv3sb9D2+sv8MAjTy6QvPbTOxN
+         oZIx5LSZEHto3kwc51iXYXDXO/De30zN3ZS7wtLg7OIdHyat1Ygfj11IbpqU+o7suHn4
+         575VxWNcEnQhUuG/yEJrZxn37do0UJefyBn7Om/OYeG4+aNidw6QIqLilfcf5D+ZBG/w
+         UYzS2CMOXY/c6bADYGlCke+CeR2Sn3MmVyHX5nOltmAA5skQcebMyqoG/B6bWCq8xSZI
+         Jd8g==
+X-Gm-Message-State: APuU4Z/FGvN4nhVpaDI5pbCU56LOwHw6HcJnTgBrSvLSlpmJFRs+JlWJ
+	9ATuqTeQAGwEa8Tzslv0pam9wzctTFVdAFxPacknfX+ZWxA0AvFgPkBjYoFbub2e
+X-Gm-Gg: AYBFou0RhuRzJWTuUpDBmOp9ie/dJE6P/vYiA9Q5a8PscKvocjQyBRTlfhpBNgY64/7
+	8L2xvmZeesP3Lppz7Xn5tN+S3eTvaZ4ph4mjY+FExKd+OPJpVfb7M//QnuIb44izfXAG2hr8QxM
+	twlYpI21B23nlg/Zam0uTA3Ix/xRD7Haoy6PwjKZ8Yd7+YFsthCEv0PPFIe6bfkQq9+Qvqs6zFg
+	B+HGkdFcp+cFusBrfDAGkSNfnl207Fl/OYzwtzAIeKhfF8t0ixmkBZEPL4en7QaqCoOcxH9iUo2
+	LnE/uXFfD8Zu9ct8vPqN8Xe/QkAoIrP6BgN08pJmAlZSKpcL3LWYdp1NvMKxDCV6n/J3CEp3Dfg
+	v3Fq56t3Rz12i7Ex3ODh6ir/qKmfpSI5NrvoDLS+H5TEFbl+CXnCuwAIWf62P6RbxnTyXWwJRYF
+	M/bkqfsDebNZJEsNPAyaDt3Hf2WwVO20RiLsmoKGe4/0IaYdfqvxCmVJvK/rn8AQxr3/RK9naHX
+	m9OuB3D2/MLcENztI24gS+JATgnx8E3g04xo0N8PNpnZJXIgk7nK9QXngrHyC6//rCQINIIVuWx
+	iBk5ZJo80TLT/6YvCzV9LXmQ
+X-Received: by 2002:a05:6830:254a:b0:818:125c:f4d3 with SMTP id 46e09a7af769-860f28740afmr4236916a34.14.1794433770817;
+        Wed, 11 Nov 2026 13:49:30 -0800 (PST)
+Received: from en1.. ([204.144.167.9])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-860dcbebfc6sm5124610a34.18.2026.11.11.13.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 13:49:30 -0800 (PST)
+From: Amir Abudubai <amirabudubai@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com
-Subject: [PATCH v2 3/3] shared/gatt-client: Track pending discovery Database Hash reads
-Message-ID: <82e505da035120edbf1f698f6e3b4d07dda8c1f2.1794432660.git.cochcoder@proton.me>
-In-Reply-To: <cover.1794432472.git.cochcoder@proton.me>
-References: <20261107065854.2147141-1-cochcoder@proton.me> <cover.1794432472.git.cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 515edad5d0108c95d526d63b14cca7633b9e404f
+Cc: luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	surban@surban.net,
+	linux-kernel@vger.kernel.org,
+	Amir Abudubai <amirabudubai@gmail.com>
+Subject: [PATCH] Bluetooth: L2CAP: Fix size check for receive buffer space
+Date: Wed, 11 Nov 2026 15:49:05 -0600
+Message-ID: <20261111214905.518429-1-amirabudubai@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,168 +95,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-The discovery Database Hash read retains an operation that can outlive
-the client. Track the read in pending_requests so cancellation releases
-it before the client is freed.
+Check that available receive space covers a full MTU-sized SDU and its
+overhead, rather than just the overhead. Otherwise, credits can be
+exhausted before an SDU is completed. This could result in a deadlock under
+some configurations and SDU combinations.
 
-Add queued, pending and continued-read regressions with cached Server
-Features, so they exercise the hash read independently of that fix.
+This follows the SDU-sized credit policy from commit 96cd8eaa131f
+("Bluetooth: L2CAP: Derive rx credits from MTU and MPS"). Clarify the
+comment by replacing "packet" with "SDU".
 
-Fixes: 0f67d5e2f19f ("shared/gatt-client: Read database hash if available")
-
-Assisted-by: Codex:gpt-6
+Fixes: ce60b9231b66 ("Bluetooth: compute LE flow credits based on recvbuf space")
+Signed-off-by: Amir Abudubai <amirabudubai@gmail.com>
 ---
- src/shared/gatt-client.c | 24 +++++++++++++++------
- unit/test-gatt.c         | 45 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 62 insertions(+), 7 deletions(-)
+The exact SDU length that causes a deadlock depends on build and configuration.
+On my machine, 13090-byte SDUs caused deadlocks and this patch fixed it.
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 174325e27..e2e7113d0 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1468,12 +1468,16 @@ static void db_hash_read_cb(bool success, uint8_t a=
-tt_ecode,
- =09=09=09=09=09=09struct bt_gatt_result *result,
- =09=09=09=09=09=09void *user_data)
- {
--=09struct discovery_op *op =3D user_data;
-+=09struct request *req =3D user_data;
-+=09struct discovery_op *op =3D req->data;
- =09struct bt_gatt_client *client =3D op->client;
- =09const uint8_t *hash =3D NULL, *value;
- =09uint16_t len, handle;
- =09struct bt_gatt_iter iter;
-=20
-+=09bt_gatt_request_unref(req->gatt_req);
-+=09req->gatt_req =3D NULL;
-+
- =09if (!success)
- =09=09goto discover;
-=20
-@@ -1532,6 +1536,7 @@ static void get_first_attribute(struct gatt_db_attrib=
-ute *attrib,
- static bool read_db_hash(struct discovery_op *op)
- {
- =09struct bt_gatt_client *client =3D op->client;
-+=09struct request *req;
- =09bt_uuid_t uuid;
-=20
- =09/* Check if hash was already been read or there are more services to
-@@ -1546,11 +1551,18 @@ static bool read_db_hash(struct discovery_op *op)
- =09if (!op->hash)
- =09=09return false;
-=20
--=09if (!bt_gatt_read_by_type(client->att, 0x0001, 0xffff, &uuid,
--=09=09=09=09=09=09=09db_hash_read_cb,
--=09=09=09=09=09=09=09discovery_op_ref(op),
--=09=09=09=09=09=09=09discovery_op_unref)) {
--=09=09discovery_op_unref(op);
-+=09req =3D request_create(client);
-+=09if (!req)
-+=09=09return false;
-+
-+=09req->data =3D discovery_op_ref(op);
-+=09req->destroy =3D discovery_op_unref;
-+=09req->gatt_req =3D bt_gatt_read_by_type_request(client->att,
-+=09=09=09=09=09=090x0001, 0xffff, &uuid,
-+=09=09=09=09=09=09db_hash_read_cb, req,
-+=09=09=09=09=09=09request_unref);
-+=09if (!req->gatt_req) {
-+=09=09request_unref(req);
- =09=09return false;
- =09}
-=20
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index c8ba2b5bb..cd60578ce 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -42,6 +42,7 @@ struct test_pdu {
- enum context_type {
- =09ATT,
- =09CLIENT,
-+=09CLIENT_CACHED,
- =09SERVER
- };
-=20
-@@ -717,9 +718,15 @@ static struct context *create_context(uint16_t mtu, gc=
-onstpointer data)
- =09=09=09=09=09=09"bt_gatt_server:", NULL);
- =09=09break;
- =09case CLIENT:
-+=09case CLIENT_CACHED:
- =09=09step =3D test_data->step;
-=20
--=09=09context->client_db =3D gatt_db_new();
-+=09=09if (test_data->context_type =3D=3D CLIENT_CACHED)
-+=09=09=09context->client_db =3D
-+=09=09=09=09=09gatt_db_ref(test_data->source_db);
-+=09=09else
-+=09=09=09context->client_db =3D gatt_db_new();
-+
- =09=09g_assert(context->client_db);
-=20
- =09=09context->client =3D bt_gatt_client_new(context->client_db,
-@@ -2003,6 +2010,15 @@ static struct gatt_db *make_test_tail_db(void)
- =09return make_db(specs);
- }
-=20
-+static void test_client_cancel_hash(gconstpointer data)
-+{
-+=09struct context *context =3D create_context(23, data);
-+
-+=09g_assert(bt_gatt_client_cancel_all(context->client));
-+=09g_assert(bt_gatt_client_cancel_all(context->client));
-+=09context_quit(context);
-+}
-+
- static void test_client(gconstpointer data)
- {
- =09create_context(512, data);
-@@ -2714,6 +2730,15 @@ int main(int argc, char *argv[])
- {
- =09struct gatt_db *service_db_1, *service_db_2, *service_db_3;
- =09struct gatt_db *ts_small_db, *ts_large_db_1, *ts_tail_db;
-+=09struct gatt_db *hash_db;
-+=09const struct att_handle_spec hash_specs[] =3D {
-+=09=09PRIMARY_SERVICE(0x0001, GATT_UUID, 5),
-+=09=09CHARACTERISTIC(GATT_CHARAC_SERVER_FEAT, BT_ATT_PERM_READ,
-+=09=09=09=09BT_GATT_CHRC_PROP_READ, 0x00),
-+=09=09CHARACTERISTIC(GATT_CHARAC_DB_HASH, BT_ATT_PERM_READ,
-+=09=09=09=09BT_GATT_CHRC_PROP_READ, 0x00),
-+=09=09{ }
-+=09};
-=20
- =09tester_init(&argc, &argv);
-=20
-@@ -2747,6 +2772,24 @@ int main(int argc, char *argv[])
- =09 * Server Configuration.
- =09 */
-=20
-+=09hash_db =3D make_db(hash_specs);
-+=09define_test("/robustness/db-hash/queued", test_client_cancel_hash,
-+=09=09=09CLIENT_CACHED, NULL, hash_db, NULL, {});
-+
-+=09define_test("/robustness/db-hash/pending", test_client,
-+=09=09=09CLIENT_CACHED, NULL, hash_db, NULL,
-+=09=09=09MTU_EXCHANGE_CLIENT_PDUS,
-+=09=09=09raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b));
-+
-+=09define_test("/robustness/db-hash/continuation", test_client,
-+=09=09=09CLIENT_CACHED, NULL, hash_db, NULL,
-+=09=09=09MTU_EXCHANGE_CLIENT_PDUS,
-+=09=09=09raw_pdu(0x08, 0x01, 0x00, 0xff, 0xff, 0x2a, 0x2b),
-+=09=09=09raw_pdu(0x09, 0x12, 0x05, 0x00, 0x00, 0x00, 0x00,
-+=09=09=09=090x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+=09=09=09=090x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+=09=09=09raw_pdu(0x08, 0x06, 0x00, 0xff, 0xff, 0x2a, 0x2b));
-+
- =09define_test_client("/TP/GAC/CL/BV-01-C", test_client, NULL, NULL,
- =09=09=09=09=09=09raw_pdu(0x02, 0x00, 0x02));
-=20
---=20
-2.56.0
+AI assistance: OpenCode/GPT-6 Astra for testing and analysis.
 
+ net/bluetooth/l2cap_sock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 7a2551ef7f50..8603e63defb5 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1229,11 +1229,11 @@ static void l2cap_publish_rx_avail(struct l2cap_chan *chan)
+ 
+ 	/* Correct available memory by estimated sk_buff overhead.
+ 	 * This is significant due to small transfer sizes. However, accept
+-	 * at least one full packet if receive space is non-zero.
++	 * at least one full SDU if receive space is non-zero.
+ 	 */
+ 	expected_skbs = DIV_ROUND_UP(avail, chan->mps);
+ 	skb_overhead = expected_skbs * sizeof(struct sk_buff);
+-	if (skb_overhead < avail)
++	if (avail - skb_overhead >= chan->imtu + L2CAP_SDULEN_SIZE)
+ 		l2cap_chan_rx_avail(chan, avail - skb_overhead);
+ 	else
+ 		l2cap_chan_rx_avail(chan, -1);
+
+base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
