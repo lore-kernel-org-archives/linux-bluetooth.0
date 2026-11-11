@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794427640;
-	b=ncPrU7nYTwmjwxpgekx+VTstPFp3a+AzPPCD9TlW2+FuBvBCp89oB5Gc+kkMFg8mWKbO
-	 GHhww9l8nzzYLbFtUgghU2xoXrQyeo0YjdDFJmXthZpXIAYPSsBcLJhtyAwdSNukMF5xn
-	 Com0w3+HNIytbogAbpmoyFA9medIZVGCx7PjcUZlfqKKdF0Z9kS5So5JIHg2n6lvcq3H2
-	 ui6WX7lUlkPPsY1SzyNPUm19WcqslWUqYd2JBey/41umSxeOG1SB6oIbV3a4HP2MLw30v
-	 g0ETDW1AAnRWpa8eeeK1+okFbtfG+BpZ6zqXvkuBBXnn6uE8PjoLvCwszqgH3g3bH4Q==
+	t=1794427642;
+	b=LUha7+246YYu4/JxpkwgfWCjodyKX9Od0xom4YiBdnvRacXQdBvPL0RlShVMe6TZSZOi
+	 WFCCdODhQrcAEJZYnWiqeMgXt8SvOyM37u9XzwD7ATbCmuFWIzfnivycyOY39/DvVDdQ6
+	 k+C4dozZmQwDUgBDrxCedANwXyAjwOuCCVIHv/UYHQct5m3oZqvMLeiQLOQuk8B7iY6HJ
+	 fCMLIKRYYQU5hsZ1wqRK8+FOhMCZQ52kj3e5boaNisiOrM7tpP21snuQNO3ZS86pAX4Z9
+	 c9B5fFZf2bb/8d2QV/HDK6lC5iGY5Jm008ub3XWJcZc4QV3eidnHql9lLh4GXDvKQgA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794427640;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794427642;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
-	b=Xu2oVShRdgl6Nj7ENynaUKY9n9J3k/fW5NgH8gsJIM1sZEviZv6Q5fcVe/5w0wewxbCe
-	 xmsX1Yrng42seHO9vU71/SoqoJuF/4Uoz+LsWtb0+LuuRxzvkOOJHGQPuwABDwqLnsadS
-	 IM9voEUYd8F83Jc2vOAKZjL8d0goJBanUW+Yp7Oblh9yprUR82dm7gNjJ6MaCo7XGRv4k
-	 AanwIswiynFLX/kM6QZVZWqhPGlf5tjtDZGUSD1Lw7xRMwRtbkJUxU8leFqe14czzOBpQ
-	 aHGDn6WLMM44ZazTj+QU9HS0+ezaOgn5fU3tCygtSfHGPDjmK8NV6u2lFp+D3F0qT5g==
+	bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
+	b=nitdtxULtXGC0DZP8Rbhq2HZlKEB4HlYxDDCr9cAEDP1n5Hxctg4y7rANsmYuJUyuHgw
+	 3cbMzcbesXvJtLY9kIJBIr2hwI4/IdcYK3hP7CCBfLPvy04U78FdS/iiX8GJkpY1/ZtDL
+	 VBpsY4y5SizeazraGRhXSsBHyISfltnogrEoQAgIrxSPe7lYNda+jSgvX4VYmAw2Su+I+
+	 ymdCx9zID9XZdwCJHMk/V4UoyVm/XGkNTzqkdNbcVTnLwAdOX6hNCZNKp2LJVFD82f6fF
+	 /LC6SGKh5ZtT98wI48+tvqY4Qvc6/qd2ICKHc/4J2Eq/1mOlkIs+gVIGR7+zv8KnKlQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="rdC5/99R";
-	arc=none smtp.remote-ip=209.85.222.52
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=A0xpOUrY;
+	arc=none smtp.remote-ip=209.85.217.49
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0632D606A88B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:07:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0632D606A88B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612AA606A321
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 20:07:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 612AA606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rdC5/99R
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-9828fee1b4bso906088241.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:07:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=A0xpOUrY
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-7d2dbe5c4b0so1212726137.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 12:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794427639; x=1795032439; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794427641; x=1795032441; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
-        b=rdC5/99RB+cYEQpZjWiqOHUsfwt1tIp8rLM9aARz6SLup5giRn7KBNLiJ2GbWAUFfZ
-         oEaLLS7Blg0CI70SWEQ3HYPZ+QSKEQZyJK7k9pygZMltDle3CjCfdOtwcEVXKAJLI3kr
-         wnZoq36tfbwm+8xXJ3HGslMRtTXMMlOe3MlXAMRAiNTSvmsNVtEq5XFtfWIPNG3ZdapG
-         Ot/0mrf5+QrZ5RNrJEJ1HmxRsgYxh66XwCf21id2fge3gmR1vnrqvTDq6aY3NMJcrTIU
-         hA8JWgecxNLQKhdM1VO+nsitC5NusXwmn22SQjM6ztjW8w0vYuJ7ccKJeJMm/b2gOh+T
-         WPyQ==
+        bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
+        b=A0xpOUrYCuYFLmxV4EN0zKoUnoRs9/vrGTSlDxlonPiYZDU/FKVzrXz1byEPNqYFJ3
+         XJsmpo1KEfjds7Y1eD4fUz/V4zOgT7KjM3G5aYWKigEDeZK8N7HRgRd4EnqN3nj6S69J
+         cQraoctYxB5QpWeS229ZfUCKiOCcRNdxUA+spekUdMm2IC494LT8n2ik/eHnfsr0EPWU
+         VWcKkHn/W1FTp8c3n8Pw28rMniKSE4BTnjRid+OTwr6jsGejGu2RscXu4kJjvsni2zCx
+         59E48X4FpK83YyshfhInYmVgC4kZv/UP6UOnrAlZpVtXxV7V+dFtQDP3JX+M4y+F5bj1
+         1Eaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794427639; x=1795032439;
+        d=1e100.net; s=20260707; t=1794427641; x=1795032441;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=kXIyzr00gUT1YHgDddFrKekDf0iooBself3c83fTVF0=;
-        b=oFhFUIidSk9XdGhELZR5Bb6gBs9RAE64xW27wKKB1G2rjuiVGGJeWcOYJ1pxQ4tqz2
-         ojhyVFQNRPT/6rPbT3hF9OTLsHxZzb4Ss3tShnveIkjM5lYDva38JsaAD4hLHFlcGzox
-         ZNIW65DKgPHT6nzAHnJ+JtiWGw05t2qj9bVC5VWwe83/jlH+pkkCxp37lvFZezwMHsgC
-         3I0lZ477rG/jBDoyZZatiB064l01hNSpVpOyZG8n/8649o1VsdOBgRCZzQF7eakfBVQs
-         84iq5B1Rlpf9xY2SGLhh2G1Ty4jcwI5LS8Mv7xvhUeaCHM3HUMF3aWcgljuZPOV33qTn
-         XKVw==
-X-Gm-Message-State: APuU4Z/CjHvWT1BEVf8qWlJNxNixzCBBbieaLj/gAYrsU4hKyvhWF6+c
-	r14m8wIGdjVQ2HQP+LjBjxD7aUTw7UkczNnJYx9KpiX6K5vA1+CgxcMhfArF1g==
-X-Gm-Gg: AYBFou0om8KKOhb+uAG1QmffsrKJhbdLwwUfdO3+na3McfQacMTmJSWJLgWP+BDnvh8
-	SuNttArmsQaputzzISJQ6xkyB0g8qCZcTzdf4psxgq/yUKv1MVU2tFXrux4owrY5Mwdg5/2PkMk
-	wuHfvzFaZcY5N5xSGY0YUE7h2xuIbH4mrIWobX24ObGcPmAOMFXEzk18xkCiMW0F4MMOLKizdfx
-	Xl8j9aFY9EMpZDnuN46YeQ6rlNNWNgg9kvQr6VuLeFX0sszKTgUFMnNdW6HR4XPAn1e8bygENwy
-	ExhNCVLCz0n3aJW3K+kkFGF5X3dwfHfvFbE8e9NbUp/mDJPT2m0p20Uu+rgGgvnrhvcA7r9u7ar
-	lMtbyHTcNzNuhTHj8ZqfX+PGaCw7rm6U4d0zy6ahGWphGM/Zy90utaTo8OHgenGyEUgFiPlNoGT
-	DHvQVlszmeuuvHKbY66/YQtp+wMbF9yMD8sIvkMwf3lpxS6WuVcKvkuHbWeanuDe3ZQMGOTI3/Q
-	XvWojjQXaW4dOjUdgTV9v1OnOnUeN5PcSiflKpmH/SXMhbG3a5w/puS8qYvOF5LGbJiUII5QhP/
-	G0nnP1Q4zvlslbP6m+MObn/9rKN8rlOC/KSoLbfL2CnkiA/XYblAxbPAuoi0B3G19zqlIDuI6Ot
-	5jsPqHhhFb3zZajkCrCRtSG3zSoFKheDNb3UOUUcZtPQBRSFNP9Nh7lG4aoa6tJBhXp9ya/oO82
-	kxkWk=
-X-Received: by 2002:a05:6102:a54:b0:7cc:2daa:90ee with SMTP id ada2fe7eead31-7d4fb2a8f75mr1299613137.15.1794427638742;
-        Wed, 11 Nov 2026 12:07:18 -0800 (PST)
+        bh=fSdA6H3IUtpUsjU2Pe3SBFdeVZwew8l6kDfhKEJFNRg=;
+        b=sxwiMmxWgsdtT6EIIHkLhrgz143ssxGh6JZ4IxS4hOvgiQtTkx0inPIv8aC12dLTAi
+         qXhxNniVTgYcKQ5wUZY1CrYlmKRPug7uSN60Mc3DVR6psLcTWwD7xj+5AH8TkY13JsVN
+         jTdVRcIw/p7ui/TA9jaoToR2PTotHYuIAM806WMFGhEnyzA5Qdx6PEO9ticXtNYYP3Xx
+         RBE8FEkDk81JXafpZPd1ct7gYKIBm1SRWnQ6IUgs6UL3lmbmE6bGAWEqWIXA66mwDwXj
+         rAeM7nsiJ9oAkXl8YkY/PC6w6MLXQj+uWTBcn5ZIShxf5jtlBIzB6ZKCrW3PytJPuK6U
+         yKPw==
+X-Gm-Message-State: APuU4Z9mj4syR4C96atB7tXuVZqKfbZ8hTh3ydrOZOH8vyYeUowMVT6i
+	Smy60RR9ntPM5mqtWnYIrsJ/cSnB7iSI9u+oaP+ogiLjXU6yqynI4HZd/MFrlw==
+X-Gm-Gg: AYBFou0/7/FSZ17MAdU7EtJrpTN0WrKufoKDmRKcrtjCftkVa7lfFpRaJ4wzYpX3yXM
+	CDjyJ9u024UNgi5YIG/hWocxHqXETsSAw+HFf3WzXBJk+FRy2/ZVPSpJl/9gT/IS5QehTrM2hz3
+	UIkjSWPqA6RnKfUvScvo2Ie2RYYCK1g/UBulUYRVAL4Y7p+dTQaCXsqnzJYk4woMPTXrOx4g0lz
+	iEY28R8OesuxUEORDmvbc/T3ZGIgnyEZrzhS8iHNyosGurnsyrWfKuWtvcdMcWGWILZ7mlrc4AI
+	uf/CV0Ya4MkdUL/mm7SPLXt9xHNLtAK/bMZgii8y0QArqcHlRP5Tt2yTW1n4VcbGZNLcxPZzSXJ
+	avIuhnX0Gfllp9bS+4E3kwMcM1zdQZOwQA5fzc0w733m3Yyb8dLwlErxSB5HRKMU9COLTIi7Qod
+	GphXTCiBMhHMrIZOTHyb0PwCSYDpHfjldypwXR8EBGkNFpgxwPnVqT+xHkO5T3d7vel86p525Hp
+	I8PhJMrXTLRDMuWENeA3+/M8t/2FxX1BgUHX5CAORzTyqD0NayaluUFk77WRU5b7JWt4KsZt/FA
+	A42EdtBc4kL/kwM9L9vL3VWR5Jz7JLbcjAYyXaj/JgzhPnqrz2dGiZsV+s4wH6YkTUuoj94XF5z
+	mfEudO6MwBKVLXThx5IF1gUFNSKRP7CkGK7BoNE5xl7VXhyEQncpJHA8zHhRBeSLW/Fayxo/Riy
+	ATgXo=
+X-Received: by 2002:a05:6102:26d3:b0:7cc:9f01:1378 with SMTP id ada2fe7eead31-7d4edd0c445mr1311860137.1.1794427641169;
+        Wed, 11 Nov 2026 12:07:21 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30209ff97sm4954449137.0.2026.11.11.12.07.18
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d30209ff97sm4954449137.0.2026.11.11.12.07.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 12:07:18 -0800 (PST)
+        Wed, 11 Nov 2026 12:07:20 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v10 09/11] main.conf: Add HDT configuration
-Date: Wed, 11 Nov 2026 15:07:02 -0500
-Message-ID: <20261111200705.3802779-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v10 11/11] l2test: Add HDT options
+Date: Wed, 11 Nov 2026 15:07:04 -0500
+Message-ID: <20261111200705.3802779-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261111200705.3802779-1-luiz.dentz@gmail.com>
 References: <20261111200705.3802779-1-luiz.dentz@gmail.com>
@@ -101,219 +101,362 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add an [HDT] group with DefaultMICLength, DefaultPacketFormat,
-DefaultRates and EKSOpportunistic, and pass them to the kernel with the
-LE HDT default parameters and Opportunistic Encryption system
-configuration TLVs, documented in mgmt-protocol.rst.
-
-The values are those of LE Set HDT Default Parameters. In particular
-DefaultMICLength can only be 64 or 128 bits: the spec reserves every
-other value, the 32-bit MIC being the one of the GFSK PHYs, and the
-controller rejects it, which would fail powering on the controller.
+Add options to select the PHY, including the HDT rates, and to request a
+MIC length through BT_SECURITY, documented in l2cap-protocol.rst.
 ---
- doc/mgmt-protocol.rst |  3 +++
- src/adapter.c         | 28 +++++++++++++++++++++++++
- src/btd.h             |  7 +++++++
- src/main.c            | 48 +++++++++++++++++++++++++++++++++++++++++++
- src/main.conf         | 27 ++++++++++++++++++++++++
- 5 files changed, 113 insertions(+)
+ doc/l2cap-protocol.rst |  50 +++++++++++-
+ tools/l2test.c         | 169 ++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 187 insertions(+), 32 deletions(-)
 
-diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
-index bf6a3b20084c..c4e1421e3a5c 100644
---- a/doc/mgmt-protocol.rst
-+++ b/doc/mgmt-protocol.rst
-@@ -3469,6 +3469,9 @@ Currently defined Parameter_Type values are:
- 	0x001e, LE No Filter Scanning Duration for adv monitoring
- 	0x001f, LE Enable Interleave Scan for adv monitoring
- 	0x0020, BR/EDR Connection Idle Timeout
-+	0x0021, LE HDT Default MIC Length
-+	0x0022, LE HDT Default Packet Format
-+	0x0023, LE HDT Default Rates
+diff --git a/doc/l2cap-protocol.rst b/doc/l2cap-protocol.rst
+index d53438924448..c93e2f67abe0 100644
+--- a/doc/l2cap-protocol.rst
++++ b/doc/l2cap-protocol.rst
+@@ -76,7 +76,17 @@ with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
+ BT_SECURITY (since Linux 2.6.30)
+ --------------------------------
  
- This command can be used at any time and will return a list of supported default
- parameters as well as their current value.
-diff --git a/src/adapter.c b/src/adapter.c
-index 6588a6e2bdc9..ea438375cc72 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5167,6 +5167,34 @@ static bool load_le_defaults(struct btd_adapter *adapter,
- 			return false;
- 	}
+-Channel security level, possible values:
++Channel security level, set via ``struct bt_security``:
++
++.. code-block::
++
++    struct bt_security {
++        uint8_t level;
++        uint8_t key_size;
++        uint8_t mic_len;
++    };
++
++Possible values for ``level``:
  
-+	if (btd_opts.hdt.mic_len >= 0) {
-+		uint8_t val = btd_opts.hdt.mic_len;
-+
-+		if (!mgmt_tlv_add_fixed(list, 0x0021, &val))
-+			return false;
-+	}
-+
-+	if (btd_opts.hdt.format >= 0) {
-+		uint8_t val = btd_opts.hdt.format;
-+
-+		if (!mgmt_tlv_add_fixed(list, 0x0022, &val))
-+			return false;
-+	}
-+
-+	if (btd_opts.hdt.rates >= 0) {
-+		uint16_t val = cpu_to_le16(btd_opts.hdt.rates);
-+
-+		if (!mgmt_tlv_add_fixed(list, 0x0023, &val))
-+			return false;
-+	}
-+
-+	if (btd_opts.hdt.eks_oppt >= 0) {
-+		uint8_t val = btd_opts.hdt.eks_oppt ? 0x01 : 0x00;
-+
-+		if (!mgmt_tlv_add_fixed(list, 0x0024, &val))
-+			return false;
-+	}
-+
- 	return true;
- }
+ .. csv-table::
+     :header: "Value", "Security Level", "Link Key Type", "Encryption"
+@@ -88,13 +98,45 @@ Channel security level, possible values:
+     **BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
+     **BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
  
-diff --git a/src/btd.h b/src/btd.h
-index b059ab872764..9bf310271972 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -180,6 +180,13 @@ struct btd_opts {
- 	struct btd_advmon_opts	advmon;
- 
- 	struct btd_csis csis;
++Possible values for ``mic_len`` (LE only):
 +
-+	struct {
-+		int16_t	mic_len;	/* -1 = not set */
-+		int16_t	format;		/* -1 = not set */
-+		int32_t	rates;		/* -1 = not set */
-+		int8_t	eks_oppt;	/* -1 = not set, 0/1 = off/on */
-+	} hdt;
- };
- 
- extern struct btd_opts btd_opts;
-diff --git a/src/main.c b/src/main.c
-index 8e58b6b58ae2..3a051c5a46dd 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -190,6 +190,14 @@ static const char *advmon_options[] = {
- 	NULL
- };
- 
-+static const char *const hdt_options[] = {
-+	"DefaultMICLength",
-+	"DefaultPacketFormat",
-+	"DefaultRates",
-+	"EKSOpportunistic",
-+	NULL
-+};
++.. csv-table::
++    :header: "Value", "MIC Length", "Description"
++    :widths: auto
 +
- static const struct group_table {
++    0x00, 32 bits, "Don't care (default; initiator requests the default MIC
++    length)"
++    0x01, 64 bits, Require at least 64-bit MIC
++    0x02, 128 bits, Require 128-bit MIC
++
++When set on a **server** (listening) socket, incoming connection requests on
++the LE HDT PHY are rejected if the connection's MIC length is shorter than the
++required value, with the ``MIC Length Too Short`` result of each mode:
++
++.. csv-table::
++    :header: "Mode", "Result"
++    :widths: auto
++
++    LE Credit Based, 0x000C
++    Enhanced Credit Based, 0x0010
++
++When set on a **client** (initiating) socket, the value is used in the
++``LE Enable Encryption V2`` HCI command to request the specified MIC length
++from the controller. A value of 0x00 is treated as "don't care" and requests
++the default MIC length, 128 bits unless configured otherwise (see
++``DefaultMICLength`` in the ``[HDT]`` section of main.conf).
++
+ Example:
+ 
+ .. code-block::
+ 
+-    int level = BT_SECURITY_HIGH;
+-    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
+-                         sizeof(level));
++    struct bt_security sec = {0};
++
++    sec.level = BT_SECURITY_MEDIUM;
++    sec.mic_len = 0x02; /* Require 128-bit MIC */
++
++    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &sec,
++                         sizeof(sec));
+     if (err == -1) {
+         perror("setsockopt");
+         return 1;
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 2e2606db13b9..d7a52fe0dc41 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -122,8 +122,10 @@ static int timestamp = 0;
+ static int defer_setup = 0;
+ static int priority = -1;
+ static int rcvbuf = 0;
+-static int chan_policy = -1;
++static int32_t phy = -1;
+ static int bdaddr_type = 0;
++/* Required MIC length, -1 if not set */
++static int mic_len = -1;
+ 
+ struct lookup_table {
  	const char *name;
- 	const char * const *options;
-@@ -204,6 +212,7 @@ static const struct group_table {
- 	{ "AVRCP",	avrcp_options },
- 	{ "ChannelSounding",	bcs_options },
- 	{ "AdvMon",	advmon_options },
-+	{ "HDT",	hdt_options },
- 	{ }
+@@ -142,11 +144,33 @@ static struct lookup_table l2cap_modes[] = {
+ 	{ 0 }
  };
  
-@@ -1398,6 +1407,39 @@ static void parse_advmon(GKeyFile *config)
- 				0, UINT8_MAX);
+-static struct lookup_table chan_policies[] = {
+-	{ "bredr",	BT_CHANNEL_POLICY_BREDR_ONLY		},
+-	{ "bredr_pref",	BT_CHANNEL_POLICY_BREDR_PREFERRED	},
+-	{ "amp_pref",	BT_CHANNEL_POLICY_AMP_PREFERRED		},
+-	{ NULL,		0					},
++static struct lookup_table phys[] = {
++	{ "BR1M1SLOT", BT_PHY_BR_1M_1SLOT },
++	{ "BR1M3SLOT", BT_PHY_BR_1M_3SLOT },
++	{ "BR1M5SLOT", BT_PHY_BR_1M_5SLOT },
++	{ "EDR2M1SLOT",	BT_PHY_EDR_2M_1SLOT },
++	{ "EDR2M3SLOT",	BT_PHY_EDR_2M_3SLOT },
++	{ "EDR2M5SLOT",	BT_PHY_EDR_2M_5SLOT },
++	{ "EDR3M1SLOT", BT_PHY_EDR_3M_1SLOT },
++	{ "EDR3M3SLOT", BT_PHY_EDR_3M_3SLOT },
++	{ "EDR3M5SLOT", BT_PHY_EDR_3M_5SLOT },
++	{ "LE1MTX", BT_PHY_LE_1M_TX },
++	{ "LE1MRX", BT_PHY_LE_1M_RX },
++	{ "LE2MTX", BT_PHY_LE_2M_TX },
++	{ "LE2MRX", BT_PHY_LE_2M_RX },
++	{ "LECODEDTX", BT_PHY_LE_CODED_TX },
++	{ "LECODEDRX", BT_PHY_LE_CODED_RX },
++	{ "HDT2MTX", BT_PHY_HDT_2M_TX },
++	{ "HDT2MRX", BT_PHY_HDT_2M_RX },
++	{ "HDT3MTX", BT_PHY_HDT_3M_TX },
++	{ "HDT3MRX", BT_PHY_HDT_3M_RX },
++	{ "HDT4MTX", BT_PHY_HDT_4M_TX },
++	{ "HDT4MRX", BT_PHY_HDT_4M_RX },
++	{ "HDT6MTX", BT_PHY_HDT_6M_TX },
++	{ "HDT6MRX", BT_PHY_HDT_6M_RX },
++	{ "HDT75MTX", BT_PHY_HDT_7_5M_TX },
++	{ "HDT75MRX", BT_PHY_HDT_7_5M_RX },
++	{ NULL,		0},
+ };
+ 
+ static struct lookup_table bdaddr_types[] = {
+@@ -283,6 +307,36 @@ static void hexdump(unsigned char *s, unsigned long l)
+ 	}
  }
  
-+static void parse_hdt(GKeyFile *config)
++/* Require the MIC length, keeping the security level already set with
++ * -A, -E or -S and only raising it to what encryption needs.
++ */
++static int set_mic_len(int sk)
 +{
-+	int val;
-+	bool bval;
++	struct bt_security sec;
++	socklen_t optlen = sizeof(sec);
 +
-+	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4, Part E,
-+	 * Section 7.8.159:
-+	 *
-+	 * Preferred_MIC_Length: 0x01 Preferred MIC length is 64 bits.
-+	 * 0x02 MIC length is 128 bits (default). All other values Reserved
-+	 * for future use.
-+	 *
-+	 * So 0x00 (32 bits) is not valid, the controller would reject it.
-+	 */
-+	if (parse_config_int(config, "HDT", "DefaultMICLength", &val, 1, 2))
-+		btd_opts.hdt.mic_len = val;
++	memset(&sec, 0, sizeof(sec));
++	if (getsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec, &optlen) < 0) {
++		syslog(LOG_ERR, "Can't get security: %s (%d)",
++						strerror(errno), errno);
++		return -errno;
++	}
 +
-+	/* Preferred_Packet_Format: 0x00 any supported, 0x01 packet format 0,
-+	 * 0x02 packet format 1. All other values Reserved for future use.
-+	 */
-+	if (parse_config_int(config, "HDT", "DefaultPacketFormat", &val, 0, 2))
-+		btd_opts.hdt.format = val;
++	if (sec.level < BT_SECURITY_MEDIUM)
++		sec.level = BT_SECURITY_MEDIUM;
 +
-+	/* Preferred_ACL_Rates: bits 0 to 4 are HDT2, HDT3, HDT4, HDT6 and
-+	 * HDT7.5. All other bits Reserved for future use.
-+	 */
-+	if (parse_config_int(config, "HDT", "DefaultRates", &val, 0, 0x1f))
-+		btd_opts.hdt.rates = val;
++	sec.mic_len = mic_len;
 +
-+	if (parse_config_bool(config, "HDT", "EKSOpportunistic", &bval))
-+		btd_opts.hdt.eks_oppt = bval ? 1 : 0;
++	if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec,
++							sizeof(sec)) < 0) {
++		syslog(LOG_ERR, "Can't set security: %s (%d)",
++						strerror(errno), errno);
++		return -errno;
++	}
++
++	return 0;
 +}
 +
- static void parse_config(GKeyFile *config)
+ static int getopts(int sk, struct l2cap_options *opts, bool connected)
  {
- 	if (!config)
-@@ -1417,6 +1459,7 @@ static void parse_config(GKeyFile *config)
- 	parse_avrcp(config);
- 	parse_le_cs_config(config);
- 	parse_advmon(config);
-+	parse_hdt(config);
+ 	socklen_t optlen;
+@@ -360,16 +414,45 @@ static const struct bitfield_data phy_table[] = {
+ 	{ 12, "LE2MRX" },
+ 	{ 13, "LECODEDTX" },
+ 	{ 14, "LECODEDRX" },
++	{ 15, "HDT2MTX" },
++	{ 16, "HDT2MRX" },
++	{ 17, "HDT3MTX" },
++	{ 18, "HDT3MRX" },
++	{ 19, "HDT4MTX" },
++	{ 20, "HDT4MRX" },
++	{ 21, "HDT6MTX" },
++	{ 22, "HDT6MRX" },
++	{ 23, "HDT75MTX" },
++	{ 24, "HDT75MRX" },
+ 	{},
+ };
+ 
++static void print_security(int sk)
++{
++	struct bt_security sec;
++	socklen_t optlen = sizeof(sec);
++
++	memset(&sec, 0, sizeof(sec));
++
++	if (!getsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec, &optlen)) {
++		if (optlen < sizeof(sec))
++			syslog(LOG_INFO, "Security [level %d, key_size %d, "
++				"mic_len not available]", sec.level,
++				sec.key_size);
++		else
++			syslog(LOG_INFO, "Security [level %d, key_size %d, "
++				"mic_len %d]", sec.level, sec.key_size,
++					sec.mic_len);
++	}
++}
++
+ static int print_info(int sk, struct l2cap_options *opts)
+ {
+ 	struct sockaddr_l2 addr;
+ 	socklen_t optlen;
++	uint32_t cur_phy;
+ 	struct l2cap_conninfo conn;
+ 	int prio;
+-	uint32_t phy;
+ 	char ba[18];
+ 
+ 	/* Get connection information */
+@@ -425,13 +508,24 @@ static int print_info(int sk, struct l2cap_options *opts)
+ 		conn.dev_class[0], prio, rcvbuf);
+ 
+ 
+-	optlen = sizeof(phy);
+-
+-	if (!getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &phy, &optlen)) {
+-		syslog(LOG_INFO, "Supported PHY: 0x%08x", phy);
+-		print_bitfield(2, phy, phy_table);
++	if (phy != -1) {
++		syslog(LOG_INFO, "Setting PHY: 0x%08x", phy);
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_PHY, &phy,
++				sizeof(phy)) < 0) {
++			syslog(LOG_ERR, "setsockopt(BT_PHY): %s (%d)",
++							strerror(errno), errno);
++			return -errno;
++		}
+ 	}
+ 
++	optlen = sizeof(cur_phy);
++	if (!getsockopt(sk, SOL_BLUETOOTH, BT_PHY, &cur_phy, &optlen)) {
++		syslog(LOG_INFO, "Supported PHY: 0x%08x", cur_phy);
++		print_bitfield(2, cur_phy, phy_table);
++	}
++
++	print_security(sk);
++
+ 	return 0;
  }
  
- static void init_defaults(void)
-@@ -1444,6 +1487,11 @@ static void init_defaults(void)
- 	btd_opts.defaults.le.addr_resolution = 0x01;
- 	btd_opts.defaults.le.enable_advmon_interleave_scan = 0xFF;
+@@ -499,15 +593,6 @@ static int do_connect(char *svr)
+ 	}
+ #endif
  
-+	btd_opts.hdt.mic_len = -1;
-+	btd_opts.hdt.format = -1;
-+	btd_opts.hdt.rates = -1;
-+	btd_opts.hdt.eks_oppt = -1;
-+
- 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
- 		return;
+-	if (chan_policy != -1) {
+-		if (setsockopt(sk, SOL_BLUETOOTH, BT_CHANNEL_POLICY,
+-				&chan_policy, sizeof(chan_policy)) < 0) {
+-			syslog(LOG_ERR, "Can't enable chan policy : %s (%d)",
+-							strerror(errno), errno);
+-			goto error;
+-		}
+-	}
+-
+ 	/* Enable SO_LINGER */
+ 	if (linger) {
+ 		struct linger l = { .l_onoff = 1, .l_linger = linger };
+@@ -538,6 +623,10 @@ static int do_connect(char *svr)
+ 		goto error;
+ 	}
  
-diff --git a/src/main.conf b/src/main.conf
-index 7eb75d87163c..714e1e6fab49 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -253,6 +253,33 @@ KernelExperimental = 6fbaf188-05e0-496a-9885-d6ddfdb4e03e
- # Defaults to 1
- #EnableAdvMonInterleaveScan=
++	/* Set BT_SECURITY with mic_len */
++	if (mic_len >= 0 && set_mic_len(sk) < 0)
++		goto error;
++
+ 	/* Set receive buffer size */
+ 	if (rcvbuf && setsockopt(sk, SOL_SOCKET, SO_RCVBUF,
+ 						&rcvbuf, sizeof(rcvbuf)) < 0) {
+@@ -641,6 +730,10 @@ static void do_listen(void (*handler)(int sk))
+ 		goto error;
+ 	}
  
-+[HDT]
-+# Default Parameters sent to the controller via HCI_LE_Set_HDT_Default_Parameters.
++	/* Set BT_SECURITY with mic_len */
++	if (mic_len >= 0 && set_mic_len(sk) < 0)
++		goto error;
 +
-+# Default MIC Length
-+# 0x01: 64-bit
-+# 0x02: 128-bit
-+# The 32-bit MIC is only used on the GFSK PHYs, so it can't be set here.
-+#DefaultMICLength=0x02
+ 	/* Get default options */
+ 	if (getopts(sk, &opts, false) < 0) {
+ 		syslog(LOG_ERR, "Can't get default L2CAP options: %s (%d)",
+@@ -1355,7 +1448,7 @@ static void usage(void)
+ 		"\t[-K milliseconds] delay before receiving (default = 0)\n"
+ 		"\t[-g milliseconds] delay before disconnecting (default = 0)\n"
+ 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
+-		"\t[-a policy] chan policy (help for list, default = bredr)\n"
++		"\t[-a phy] select PHY (help for list, default = all)\n"
+ 		"\t[-F fcs] use CRC16 check (default = 1, affects BR/EDR only)\n"
+ 		"\t[-Q num] Max Transmit value (default = 3)\n"
+ 		"\t[-Z size] Transmission Window size (default = 63)\n"
+@@ -1370,7 +1463,8 @@ static void usage(void)
+ 		"\t[-M] become central\n"
+ 		"\t[-T] enable timestamps\n"
+ 		"\t[-V type] address type (help for list, default = bredr)\n"
+-		"\t[-e seq] initial sequence value (default = 0)\n");
++		"\t[-e seq] initial sequence value (default = 0)\n"
++		"\t[-f mic_len] required MIC length (0=32bit, 1=64bit, 2=128bit)\n");
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -1380,7 +1474,7 @@ int main(int argc, char *argv[])
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt = getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
++	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:mnpqrstuwxyz"
+ 		"AB:C:D:EF:GH:I:J:K:L:MN:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
+ 		switch (opt) {
+ 		case 'r':
+@@ -1510,11 +1604,13 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'a':
+-			chan_policy = get_lookup_flag(chan_policies, optarg);
++			if (phy == -1)
++				phy = get_lookup_flag(phys, optarg);
++			else
++				phy |= get_lookup_flag(phys, optarg);
+ 
+-			if (chan_policy == -1) {
+-				print_lookup_values(chan_policies,
+-						"List L2CAP chan policies:");
++			if (phy == -1) {
++				print_lookup_values(phys, "List L2CAP phys:");
+ 				exit(1);
+ 			}
+ 
+@@ -1591,6 +1687,23 @@ int main(int argc, char *argv[])
+ 			seq_start = atoi(optarg);
+ 			break;
+ 
++		case 'f': {
++			char *end;
++			long val = strtol(optarg, &end, 0);
 +
-+# Default Packet Format
-+# 0x00: No preference
-+# 0x01: Packet Format 0
-+# 0x02: Packet Format 1
-+#DefaultPacketFormat=0x00
++			/* 0 is 32 bits, 1 is 64 bits and 2 is 128 bits */
++			if (*optarg == '\0' || *end != '\0' || val < 0 ||
++								val > 2) {
++				fprintf(stderr, "Invalid MIC length: %s\n",
++								optarg);
++				usage();
++				exit(1);
++			}
 +
-+# Default Rates (bitmask)
-+# Bit 0: HDT 2M
-+# Bit 1: HDT 3M
-+# Bit 2: HDT 4M
-+# Bit 3: HDT 6M
-+# Bit 4: HDT 7.5M
-+#DefaultRates=0x001f
++			mic_len = val;
++			break;
++		}
 +
-+# Enable EKS Opportunistic Encryption. When both sides support it and no
-+# LTK is available, the link will be encrypted with an ephemeral key.
-+#EKSOpportunistic=true
-+
- [GATT]
- # GATT attribute cache.
- # Possible values:
+ 		case 'g':
+ 			disc_delay = atoi(optarg) * 1000;
+ 			break;
 -- 
 2.56.0
 
