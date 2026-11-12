@@ -1,91 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794453776;
-	b=CVwZxbwAwS/iePslLLvExyDopOkT8OD61Fe4MZ0CGanZYi8SqDbg2Gdj4Gng75MI5bh9
-	 GOE9m9joRyiMB1vKhRKDz7zagyo78wer67J8q/ZTsNPrWmmpSlrF9Mp4w6k7l1GwNEEd2
-	 +JA4wNEqa2K3h8+vy1tW9k2qWbOQfcV0SIzvgDJsOvpa1zKWWako9RD95aIZv367/hBc2
-	 KV0PHX6KaiRH+dMMsykKJAcZMThihxssSN+quQiB2HVL9xy0C01f8SggZQjCmPxtOjfxH
-	 l6dghER7tG1408CHBmgarplUORGPZDZ0iX5eGKGdyaxdv65ajmcPXhG/HFa4s+X8Ezg==
+	t=1794453777;
+	b=Xxzl6eEhIjkwrTuzFWeU7HtodaqkmxtANUM250mgfWT18+ccetbELTSuxdgYAY9nnpez
+	 mCFwyWEKQCiKGJEQhCznm+/QX3g0AI/Nch6AF/7yCCPmUz+kudjujURuKkRTDFE0WTcZj
+	 tPbK5ohhUD4h2qlUemznBaVI1ctKeChrz31+F3igJtrUsmx3ibA4cxh0jz+2B/MRGkPgQ
+	 M9FKFJj+Et/IaBPozIJwcFCUY3ImL0dH+dbtrTDFX3dD0oNEqeN4HT7lEKz4COa3Gwl4O
+	 uUwdEuEmgreoOWLQL+AzfPiPNZEN0dJcAf22otDb0b2EJqjVuGoHDTSCnf/PZFwa/Mw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794453776;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794453777;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=p8WbxyOcOHSOBde3OiWG8axgKOzW4dESWWAK6iJuM+Q=;
-	b=mrz8Xz05tsFIk9Mk0nXXZkZwnHD3+sDz2Une8ZphoR5yqcGkao5QmVyLiPhRpRhFno2P
-	 0StDrlB6JZI13KopnrpcVyMH+wyvDjID0S8eLH/+qvYSUXGLQB+htTluZTDo8a/gtHpcN
-	 L0Gmaoyd7T3xhhZbOFgkHu7bS4NyPBzOhuElXb1ORAj2+V/hB+Gfp716NlKoQsjVhDH3B
-	 j5gH9BqYNMXeoAv++rfbzotT3eKtPqV6Lr2GWW2pzrU2blOiWR4CFt8yCqTC5w+/BBAyE
-	 Vhq6FUQFqagG/ZFGtDkiA11nUX0YGpS69eiYsJxX/AJHJi2QycJqlo3OYdtzLeL+jWQ==
+	bh=oS526sacYKfHFr6kOJ4+2ywOZliNkhvCdoAu+3e/jvo=;
+	b=5UxSIJ9oNCDzjN44WVwuFnob8nkwpq5mXXAmyPO1MnIvdABg4q9wH7s3fyUsl4O1YI1R
+	 81k6OuxhTkwjrxO9D/sE87gq0/Nxj80ZB+pPm9RGXss+70UZXSvDWDEwW09WCFf/utKXR
+	 jtbj6HXtFxNXdy7ZfGk53EWNkyV25jynHFfFxvEoHQrY+LdJ9CI4U9XXRtnreRAqdbKc1
+	 Jq0ID6Rz6CYzlV1zKmYw7fdDbjzCeVMiHZ/rjeXNbq5IyxlfBCiM/MQrXWMknKspEY7c6
+	 jiOC3FAZNO3J/oFhFIXr7P+scIFV4gggzMTAB062gKK02XxTV2NK/CxsIdOhLWHl2DA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=w9FaMr2b;
-	arc=none smtp.remote-ip=74.125.82.173
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=azAABp01;
+	arc=none smtp.remote-ip=74.125.82.178
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B214606A321
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 03:22:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5B214606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E14B606A335
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 03:22:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E14B606A335
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=w9FaMr2b
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-37198ed3727so561596eec.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 19:22:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=azAABp01
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-3645f0f3fcdso8064379eec.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 19:22:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1794453775; x=1795058575; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1794453776; x=1795058576; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=p8WbxyOcOHSOBde3OiWG8axgKOzW4dESWWAK6iJuM+Q=;
-        b=w9FaMr2b2fEwpUa73tsjunJ5Az85nZA3lizHGMO17xCrZs7CPAkcdBsS3rcz/x61hP
-         lHSb9zf8Ou14ZPJ/wolMAJHtgXK8yW6hJA6JBgXuPHe+2LMU1o7ziSTZYTX9wyb3f3e9
-         LBdDurFwLb19mqyZ9N6p4vtjh0BsULTh9qSZX24BAVDUnMWpJaa8CVyCSwfor7gtB/57
-         GlgW7P9C0TTQoW68DK5KmWHLdNl33+3at5+KOoV4HbfXY2U0eiwSJrUoy4grubPXaeLs
-         oy4JjGlNLn1j8LHEM9cH/GsVCxqOYYQrcG9i7Wabiry0nNLLkKACoaiP309K4G0IJ/40
-         mLrg==
+        bh=oS526sacYKfHFr6kOJ4+2ywOZliNkhvCdoAu+3e/jvo=;
+        b=azAABp01CMdIU/7tliabhrzjM/bTtHMrGJvk5oHU48vHdNnB9EulehNmnmRXd5Dd1k
+         P+hA3GQfffo7viFMwMdrpJF+6d8iASTq2t22jimBdbvQNA4d/Ig3VZVqMqIvy9afmbSv
+         B5vPd3B37uLiaY5XJk81jgZWwIzOThTl536ZzJVTMTe7xl3zfoElOfR3eD98Q9QdOX6Y
+         59yWKxym5RYLloOz0vkVddPOu8JATGnd8//2XIuyfnpvxUXjbGFgu8G6R7ZafELmT8Ya
+         n0p9uuoxCo3ts6+l2sjC+2oa9qTrh/qOPgG/MjYip9TArCIHedg8OnuVroUCFrzCdJL5
+         pGog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794453775; x=1795058575;
+        d=1e100.net; s=20260707; t=1794453776; x=1795058576;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=p8WbxyOcOHSOBde3OiWG8axgKOzW4dESWWAK6iJuM+Q=;
-        b=PHXOG+kR2FNIXJQEnC46eioLfNrs4AGDx9PfIZ4PySiSL3+95e6PMdFrWucpGohsjS
-         XimA5u8LtF8zJ0xncvNec1LBznajaC8zEAD1EsLdNhwwQamjoouhST94qTrcAjk1C8Xf
-         OvsL1LisxbWG4UB+WWdtzyiFMLuyMfCT9dWr/T+nqbVhGES0Ewu8syCoh5HDH/R2ULBH
-         tkRURcp96pdlXM9Z+3dAUP2/CLLT3qOBCKUJAnTSrOVL/Xuv+kYFagjwbkXHqlz6/3J1
-         ivHPVDQxw/xmqaalryWMssqioxNbhYWyKXUuSIdbdQCUR0PBY7S3elWAnbUaKjoNYHUJ
-         hg5w==
-X-Gm-Message-State: APuU4Z/m81BG4H77nHTGPzlXss01GS1a1VGMQ3RSVlmUQujgzCaXmklW
-	OGggF+0xoPWp8zf7zjT/+6KmWw3OIpjD4j9yrdqS/dtlFDZkCHim0JYXhnr7slAWi1w1fjSDeOZ
-	7cns4kjA=
-X-Gm-Gg: AYBFou3Xj0pPXR/0yuVNEqoS0vrZVyYQg+Hy7bnvRBnc9Naq048ZZzaEEKhbxhVoXJn
-	y9+9WSFqweN63fkZ5KG6ssS40rmH7maz2ss6WSsZtGxZOEBXamA0elzq1TveKe/f1pRnrfURJgH
-	AsSEkSjoi9KmSul5rUwQgVUwyNjiIrOUjS/OvHZz/mq4p2tlSAcPmHLi/V49QyeDHPj6gDa4h7m
-	WhWm7d7CnfSHWHkcprEWtIS5oOovnjl+22l9s5rogRcyifLFhmrrYnfgpTBxZFiqYs8rb1Eez/O
-	BprPa/2sIZfK16L7CwL14vFcAmFRzy9qvYCajWxLTSHSLf+v5Es16yaetSP1+ap0jWuL7dWae+A
-	ippjcfRMf/dikZoH14Nf0dfM8B/cujxWzdSDowBC/sE87GhC6oFxQX7uwqvMxLP5DG+se5GNWkI
-	xX4VgMuhl9AyqwbMXyL7ywWXWekSsWg2ihpUTpK+Y/Pyszo/fu1HOIH5RqcOod+87Y/BiySgDuR
-	ljYGMygGUMSe3neaDkhqihlCt9mf1NZJCDEUkBvq6NWoWbD2hTxcIOmQYqVg+6Q4MvKd1vvc1/1
-	Le0P7BT4am2arm7e7yHhuSETVkSr/MAuAXudkuFL1Bx5c2kZr5IcmNdiIJFCIm9NoCKscED1ILH
-	zFx0u3GghOe85PFlD8sApBkbaSHbnKAzBqcCr01UMrKUzrDpC5ZFRgCxCgGYRps+m7qp9WAo1
-X-Received: by 2002:a05:7301:dd81:b0:36c:dd3b:a3e4 with SMTP id 5a478bee46e88-377deaeab9dmr1171768eec.3.1794453775240;
-        Wed, 11 Nov 2026 19:22:55 -0800 (PST)
+        bh=oS526sacYKfHFr6kOJ4+2ywOZliNkhvCdoAu+3e/jvo=;
+        b=SUxf6kBykqoO3cOjhOu6hNPPPOV2wFJ1ygHGCn1P7WaNS0Znw7XY5tutqOxTenih3U
+         5/SNNaA5D/RtXHoZoocaZeSahDCCtpbpb8GsFUj75AmRYKU2jUzNg3+Okq4Gx2aB3AXn
+         mFD9KfSHlzeKSPRwWaLlin+zjXKHoiQctrKxGbdd/R0B3eQT2W00XArvCKayweJP5dFc
+         NHWEcvUo6Pb8WZu0K8dWJnOxp1APmgKQkB5WHS2Div6jUZSDuP8WcesfFWQrg8M3AnE0
+         cz5O4c32m70Q0EgYenXgmSoWdwfLXiIObq9NaculiaJ4xo5DHvvb9j+yQE+rQttjcRAR
+         QdCA==
+X-Gm-Message-State: APuU4Z/wb3b3h5J6INGqurPOMw/W9t4qLGXqQWGHZE+O3hjEFTTtg1Dy
+	lBzhPSjuz0qVBDni1HAc4+DJneCpmYkeFwgw/ILKgBk/YM6mKcUdZNRYUvRV66dHhsS3qzrVoL2
+	jZwrxST4=
+X-Gm-Gg: AYBFou3xxlsHo5NoD+xHNjixrhpXonM7zU28JNhTwWrNKslett233fff4S1w4tSS6RD
+	5whlFx18pBaNv05WG//B2+XhHia/+cKACocrGY2j1d9K47CHcvN0OLraoSowFEAnB2m3WM9XefP
+	8ziImE5y0lW5s+ZEI1/K8Ot7ObU00UYG6MV8GLLxmA4S3CQ0H7LAgllhz8eP5WwtnAHkJEn8GbZ
+	Q3v61a2sGz4GKiJRPIUxF6YNC9+WcPWHd9enT5bN9qSaxA2yYbI1JG4uq5Y8e+2v2k23m9apEox
+	Xoq3SVa9sBC4tajgzMR/c/Z+yaESX/Qx4zfiIyE3N25cvZL8I5nk6fnv/+DtJwGoWyjD6+Qdv6+
+	j19UCSbpRjL8t4J95uSCCXSbYymjCSVDeuWSu5mAeiTQSkKrKjcSgFFziSdEU+8EIYr5ivdksgd
+	/iKfltEPjCX/UP9Gd/ygt3RNhANFwvsmwHtOGKWQZxZZAVNmUIiVSKH5pMpubKxZhsU17FcKTYY
+	R9kP9ResoFjzxPJ+MxHoLbbBlKz5lj7tHSVXSDUodOftieimrK8ISFK72XvkZDFF5/rmcHU36Vi
+	cEQBz3RIs9INYRmHllaIqNOUQlqTCVBNZ1vNYAQEgFTfYk0Sp+ZIbJ+5h5oFCxV7A3fc6ZRzd3x
+	2JamGg65gTr0gBObAwf24kVCXfl3FJz4xXnPqSlCOGT0qqqXToWXHODJx7XSJBPpVf7y9XsSV
+X-Received: by 2002:a05:7301:77c6:b0:36f:d53:cf2f with SMTP id 5a478bee46e88-37682f94242mr4733200eec.1.1794453776138;
+        Wed, 11 Nov 2026 19:22:56 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3751fe2ff5dsm21340765eec.5.2026.11.11.19.22.54
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3751fe2ff5dsm21340765eec.5.2026.11.11.19.22.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
         Wed, 11 Nov 2026 19:22:55 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [RFC PATCH BlueZ 1/4] org.bluez.Bearer: Add ReadRSSI method
-Date: Wed, 11 Nov 2026 19:22:47 -0800
-Message-ID: <20261112032250.37687-2-kevin@simpleble.org>
+Subject: [RFC PATCH BlueZ 2/4] adapter: Add btd_adapter_get_conn_info
+Date: Wed, 11 Nov 2026 19:22:48 -0800
+Message-ID: <20261112032250.37687-3-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261112032250.37687-1-kevin@simpleble.org>
 References: <20261112032250.37687-1-kevin@simpleble.org>
@@ -100,44 +100,60 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a method to read the RSSI of the current connection on LE bearer.
-Device1.RSSI only covers inquiry and advertising, so an application
-cannot follow the signal strength of a device once it is connected and
-no longer advertising.
+Add a function to send Get Connection Information for a connection, and
+one to cancel a pending mgmt request.
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- doc/org.bluez.Bearer.LE.rst | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ src/adapter.c | 22 ++++++++++++++++++++++
+ src/adapter.h |  7 +++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/doc/org.bluez.Bearer.LE.rst b/doc/org.bluez.Bearer.LE.rst
-index 3db5237b4..589b54873 100644
---- a/doc/org.bluez.Bearer.LE.rst
-+++ b/doc/org.bluez.Bearer.LE.rst
-@@ -57,6 +57,23 @@ Possible errors:
- 
- :org.bluez.Error.NotConnected:
- 
-+int16 ReadRSSI()
-+````````````````
+diff --git a/src/adapter.c b/src/adapter.c
+index 6588a6e2b..c4258fd76 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -11600,3 +11600,25 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
+ 				adapter->dev_id, sizeof(pkt.cp) + length,
+ 				&pkt, callback, user_data, destroy);
+ }
 +
-+Reads the Received Signal Strength Indicator of the current connection on LE
-+bearer from the controller, in dBm.
++unsigned int btd_adapter_get_conn_info(struct btd_adapter *adapter,
++					const bdaddr_t *bdaddr,
++					uint8_t bdaddr_type,
++					btd_adapter_reply_event_t callback,
++					void *user_data)
++{
++	struct mgmt_cp_get_conn_info cp;
 +
-+The kernel caches the value for a few seconds, so calls made in quick succession
-+may return the same value. Right after the connection is established, while it
-+is still being set up, the method fails with org.bluez.Error.NotReady.
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, bdaddr);
++	cp.addr.type = bdaddr_type;
 +
-+Possible errors:
++	return mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO,
++				adapter->dev_id, sizeof(cp), &cp,
++				callback, user_data, NULL);
++}
 +
-+:org.bluez.Error.NotConnected:
-+:org.bluez.Error.NotReady:
-+:org.bluez.Error.NotAvailable:
-+:org.bluez.Error.Failed:
++void btd_adapter_cancel_request(struct btd_adapter *adapter, unsigned int id)
++{
++	mgmt_cancel(adapter->mgmt, id);
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index 583168f4b..3c777afe1 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -328,3 +328,10 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
+ 					void *user_data,
+ 					btd_adapter_destroy_func_t destroy,
+ 					uint8_t timeout);
 +
- Signals
- -------
- 
++unsigned int btd_adapter_get_conn_info(struct btd_adapter *adapter,
++					const bdaddr_t *bdaddr,
++					uint8_t bdaddr_type,
++					btd_adapter_reply_event_t callback,
++					void *user_data);
++void btd_adapter_cancel_request(struct btd_adapter *adapter, unsigned int id);
 -- 
 2.54.0 (Apple Git-157)
 
