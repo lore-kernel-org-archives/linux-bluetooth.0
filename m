@@ -1,83 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794480473;
-	b=zUmpa+z1DMZiWVvj8MXVBeEZaYDN46WF+Iev8PT1tdI8Bnu0oIXlv9tlPhSC4lGlC9zZ
-	 tl2b1rRe8Srdn63B9FGcuDqaiAPI/Wr1X9hSb0naJeXEh92wCy00ceW6oKUr8cV5yo0EE
-	 H+gHO2H0lhvDgEb+DzhY0r+Dk0AkH5Q2+RuA/+Tl3jj7l0vbGSK1kPFnma3ihxtQWVwoq
-	 Y8ffu8XTpVsflWY9xfU4bm3o+tcXQmSOWej1w5aIVUo37rqgNY2auR2/HcRh8ncYiIEUY
-	 AtBmJOi6l/cg9AzDWCXNR4KJtHBpd2KQu+TxrHPVV+btO6rAm55EUXuW4EpjopiMlyA==
+	t=1794488070;
+	b=oIocHOSik4xv/mzFBlWsO4K1g3vHogINMeqJ+amF0I9bI3Ww1qynYzJ48B4EEOKUT0t6
+	 txevsr00zAeB53t+Zd2diJX7y19IlUrYtOw90c6gkU/oLEGPjNX+8bcITxm2Qqr0rF+6C
+	 q9THyuS9z1hDU0t2w5jfYaJZG8BPEPGguafrjjwhFpVJdBcAgdP7DF1nEHxFGBU3EdDPf
+	 Ww3ehBWQo1l9Uwb+6y6s4pt/8bPtfLDoBFO4Zp96B1KkxhAd1AL6epm8t68cKuKML6Arf
+	 EPLwA1Lx4aZnSaRjYU7zNEFl59L5Q8czgCQSns69hgsJriaxIy/yEJQ4KDFbDydZUbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794480473;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=LaAKKhAngwkFxDGEu7glsCDhQDKP6or5IXQD5q9C6lk=;
-	b=OFcbvIjbOzHGNtCHG4HXx0ddP1wgbt/3Y/+r4tWI7i36QpRA3TGP0QsB2bseewFlcLCS
-	 8I4tTQUplDSzJVrhdpMpR0IPnJtPlzQeXnXCJHIuJdi76Lsr5SF1+BD+TFKCEaPbbO/s6
-	 5RrHs6wJ+YP4kvKLu1McTyGz84P2VIYLHaSHB0/Jvz52Lmq3vffGz/sCSYW9ThnJAB2uW
-	 wLDOrhRz5qCp/OgUEPfDJD+H/xDPh2Fyy0xck4E6UXLMLJnSFGtJH9n25BHQRvUXCdzYu
-	 /2xSs4cwMFQuddCM4BELRVLokR3ISqVgFmbrCOJfCSf3kiFteblPsdztAfgfHSwhG4A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794488070;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=sK8lSGd7CdKaAvaHcw1VrkPxB7/S/YIrxUcCKrE63b0=;
+	b=GJcfY3WTFukL3P1CIyod+4TWUUXOSVOzGV++B0iMUyaM8hiNrss/HIjFXtHhp1xGeEEX
+	 vWrZlvbgDp4rZ9GWfCP5WGl7VsBn9C6tVJSqtYcy1SySnXNJ9zxgykbDryh07RtP1r2mt
+	 9q26EfablHyjbJ0ZHcnxZJ7WVBDh8xXIJzyodxYjsXCMLzgsNSN5Z75nRmZpSCh5Awkd9
+	 odKYa9t4BIpqDStsmhgUG5zzeW5dxTiRBlEQY/q2LQlo9R8SPNa/74WoQBvbDeGHp3WMH
+	 1XoNsgVNW92Y2T4dV8O9pEtnbgNKgPzctUohv881W1ECpDiJRLy3XrJLfdaMnQTsW5w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="bhRW52/O";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=none header.from=iiitd.ac.in;
+	spf=pass smtp.mailfrom=iiitd.ac.in;
+	dkim=pass header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=Gu+zG9Wf;
+	arc=none smtp.remote-ip=209.85.210.170
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505CF606A32D;
-	Thu, 12 Nov 2026 10:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656BA606A327
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 12:54:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 656BA606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bhRW52/O
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D85FD1F00A05;
-	Thu, 12 Nov 2026 10:47:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794480472;
-	bh=LaAKKhAngwkFxDGEu7glsCDhQDKP6or5IXQD5q9C6lk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bhRW52/OaiERqOjVo+YsX7WenTAM+RkUSYdDbFFgDeELIFl5MCvdrQ4/lrfg3PaBP
-	 OJEvlXHrGI0KP6Sf7isOdA90CQUC1tSnbnlL7KMlGmOGy1uOT4Tps4k2NALfzc5lt4
-	 GBKdaLdl6Hn4QG7D1jOt3xg+R2SbDhwXqrQ5QTOpBVzV6PCDTf9sB1jcXxmSVYEwEX
-	 9k1ve7B7mHoKt9f85FezBUXVhvbLCq9DZT0dTEHtWXQsiFKFjjwdYqhwDGS2C9B8hk
-	 PMIxYSXrd0qwW336ZZGtXr/22P+Xd17f+e0rYlMLg9nZUtItJXlZjgdtGYx+r60Y9l
-	 +6iWNMqoSTUaQ==
-Date: Thu, 12 Nov 2026 11:47:38 +0100
-From: Alejandro Colomar <alx+linux-hardening@kernel.org>
-To: Bence Csokas <bence.csokas@arm.com>
-Cc: Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, Philipp Stanner <phasta@kernel.org>, 
-	Sudeep Holla <sudeep.holla@kernel.org>, Cristian Marussi <cristian.marussi@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, Lyude Paul <lyude@redhat.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Zack Rusin <zack.rusin@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Selvin Xavier <selvin.xavier@broadcom.com>, 
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Chengchang Tang <tangchengchang@huawei.com>, 
-	Junxian Huang <huangjunxian6@hisilicon.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
-	Jes Sorensen <Jes.Sorensen@gmail.com>, Ping-Ke Shih <pkshih@realtek.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Benson Leung <bleung@chromium.org>, 
-	Tzung-Bi Shih <tzungbi@kernel.org>, Guenter Roeck <groeck@chromium.org>, 
-	Nilesh Javali <njavali@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	chrome-platform@lists.linux.dev, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] stddef: Add offsetofend() variant of
- struct_offset()
-Message-ID: <avWY8kNFlkLyxIrX@devuan>
-References: <20261112-offsetof-v2-0-276ede839967@arm.com>
- <20261112-offsetof-v2-1-276ede839967@arm.com>
+	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=Gu+zG9Wf
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-8b5c3288e6cso1884175b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 04:54:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=iiitd.ac.in; s=google; t=1794488068; x=1795092868; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=sK8lSGd7CdKaAvaHcw1VrkPxB7/S/YIrxUcCKrE63b0=;
+        b=Gu+zG9WfkrnAkdUzhHZhNWwPUAGsUrbIWEIguDBzjcb/1PDvM/iyqvtJsO+HHV2L4K
+         SYs7C+jDWrBrQNvbvzTU8XNoTfNlmnMZxLRGPK0IdZSbEXNgEJhiDsfDhCmzcg5Byagp
+         rFQaUrGJWRt58qh+CAIssN67zvXuEwCF4IwH4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794488068; x=1795092868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=sK8lSGd7CdKaAvaHcw1VrkPxB7/S/YIrxUcCKrE63b0=;
+        b=JZyV8MYtdMZDoUD/vLCdV59pNcO083TNRli5g30Sa428jhnHWScCSWSaLlCb0GEk/q
+         zj4hEyWjqNpcHm5G5FsLPWwDUta3i4dgFuD8XK8m+gv+X0ltKRliL98WrLDh1Gu8t9k7
+         aDo6/NTNHIPAgnEfgJj54Seuf0NEt9cYpwP3G31c2CJQxKblD6xxt0Q2J/hLoUsauOAx
+         qAWTfY0JUXTMs2kWcR+0CGcys6E6AUuF0BZ6RNXQliKisgjtYood4+s8aJsShcIylv8g
+         umfHuP6j7KIdSCpcxwvxbEgRV27PZxPjU5yJ9xEBLkp25f6xdrOryOwLCK+ZHwf1Tec5
+         X5qw==
+X-Gm-Message-State: APuU4Z8Sgd4J27RBQP+CSFw/dXJl5tXmjNzX8qUqUXSKRNXTVHf14yuJ
+	BXthN6FUl6jkITfvfufaRFUeVY+3V4+CFCZqC63q33JUkwIWMk/aavU08QNejRxqL2E=
+X-Gm-Gg: AYBFou3gH8SD7opaRgFzWFM29H7FTDuTApFvFVH+QZpTH2CuFUJmyyU4SV/CiY2nyXj
+	zRmwDpuc49TDqN6RTZdDyGS9lwtaVrJp9lkl2EjrYopb6j4Pxa5cOn7ajIxSA++luFug1+djCKq
+	TOtzs3HObzy40zGUjbMP4Jxeq7boq1vbxI1yO/k4VBs/kOUc+o4/S4mLCgPsCrfeHfpGGRvR318
+	t5Z/AhYD7mrZ1+Q6Q6OyKuyARDXL49FRMfNf4u3KDPdKDu80G5Adf6k31gYjs/7nZ9sJTY2hliR
+	GlzU8u42MmMiwapZChSoQxgvCuyu1cA+wOnUx63R7RuCt2iXIjDWHASMMGjWyB8Jq7DORYkxSQR
+	K4lcL91FPAbTUFG2rjWYyS6FHuqj3s9x1dp4oCv3JI14qpRepjqGvQ6WAb8cpJO+Z7ok6XtPFGW
+	6GoDd3bF8NjfOPpHQDXF25shs2wN+giFrkK18ghAv8In4tsKpqWygNJ+QY8OR7Y3oDiXM5VZDyZ
+	C0Wqw6ygJnKHnHuhg92WGA2s6gjHslaF6WPjsBLCU4o3U7hRwfYPYpsioNk6Ex4ppYDRKdpXNLD
+	gEbjN+skPM0K906Ne5yzLxlGrGWYYfdzWf6h6JzJJwlq1vrGQtLQav8O+7cfPBi4Fcxv6mrPJC0
+	0mA/MoRbnon41dTaXQcg38WN0hQrpSHRH7mGKK5uAcM+IF39aggXGtTW3cwn5b7L3
+X-Received: by 2002:a05:6a00:600d:b0:886:9078:546 with SMTP id d2e1a72fcca58-8bc1cc682cfmr5525239b3a.26.1794488068390;
+        Thu, 12 Nov 2026 04:54:28 -0800 (PST)
+Received: from iiitd-S2600STB.iiitd.edu.in ([103.25.231.160])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baaa86e1c9sm3492976b3a.23.2026.11.12.04.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 04:54:27 -0800 (PST)
+From: Piyus Kedia <piyus@iiitd.ac.in>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kapil Vaswani <kapil@presceralabs.ai>,
+	Piyus Kedia <piyus@iiitd.ac.in>
+Subject: [PATCH v3] Bluetooth: mgmt: drop advertising instances the controller cannot carry
+Date: Thu, 12 Nov 2026 18:24:20 +0530
+Message-Id: <20261112125420.3905719-1-piyus@iiitd.ac.in>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -87,139 +93,234 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hmbonzz4lyxux25l"
-Content-Disposition: inline
-In-Reply-To: <20261112-offsetof-v2-1-276ede839967@arm.com>
+Content-Transfer-Encoding: 8bit
 
+An advertising instance's data is validated once, when the instance is
+added, by tlv_data_is_valid() -> tlv_data_max_len() -> max_adv_len().
+max_adv_len() branches on ext_adv_capable(hdev), which reads
+hdev->le_features[1] - a controller capability re-read from the device on
+every bring-up.
 
---hmbonzz4lyxux25l
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx+linux-hardening@kernel.org>
-To: Bence Csokas <bence.csokas@arm.com>
-Cc: Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, Philipp Stanner <phasta@kernel.org>, 
-	Sudeep Holla <sudeep.holla@kernel.org>, Cristian Marussi <cristian.marussi@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, Lyude Paul <lyude@redhat.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Zack Rusin <zack.rusin@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Selvin Xavier <selvin.xavier@broadcom.com>, 
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Chengchang Tang <tangchengchang@huawei.com>, 
-	Junxian Huang <huangjunxian6@hisilicon.com>, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Hans de Goede <hansg@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
-	Jes Sorensen <Jes.Sorensen@gmail.com>, Ping-Ke Shih <pkshih@realtek.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Benson Leung <bleung@chromium.org>, 
-	Tzung-Bi Shih <tzungbi@kernel.org>, Guenter Roeck <groeck@chromium.org>, 
-	Nilesh Javali <njavali@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	chrome-platform@lists.linux.dev, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] stddef: Add offsetofend() variant of
- struct_offset()
-Message-ID: <avWY8kNFlkLyxIrX@devuan>
-References: <20261112-offsetof-v2-0-276ede839967@arm.com>
- <20261112-offsetof-v2-1-276ede839967@arm.com>
-MIME-Version: 1.0
-In-Reply-To: <20261112-offsetof-v2-1-276ede839967@arm.com>
+Nothing re-checks the stored instances when that capability changes.  A
+controller that reported LE Extended Advertising when the instance was
+added, and does not report it after the next bring-up, leaves behind an
+instance of up to 251 bytes that is then rendered into the 31-byte cp.data
+of hci_set_adv_data_sync() or __hci_set_scan_rsp_data_sync():
 
-Hi Bence,
+  Kernel panic - not syncing: stack-protector: Kernel stack is corrupted
+  in: hci_update_adv_data_sync+0x1dc/0x1e0
 
-> Date: 2026-11-12 10:29:33+0100
-> From: Bence Csokas <bence.csokas@arm.com>
->
-> Many call sites of offsetofend() use it for the purpose of pointer
-> artihmetic. Thus, a common usage pattern is:
->=20
->   offsetofend(typeof(*ptr), member)
->=20
-> Capturing this in one macro helps keep lines short and terse, while
-> still making the purpose clear. It also helps discourage spelling out
-> the type name on every callsite, leading to more maintainable code.
->=20
-> A similar struct_offset() macro already exists, so add an offsetof()
-> variant in the same spirit.
->=20
-> Signed-off-by: Bence Csokas <bence.csokas@arm.com>
-> ---
->  include/linux/overflow.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/include/linux/overflow.h b/include/linux/overflow.h
-> index d0f04436343e..060dad4b6f3e 100644
-> --- a/include/linux/overflow.h
-> +++ b/include/linux/overflow.h
-> @@ -464,6 +464,18 @@ static __always_inline size_t __must_check size_sub(=
-size_t minuend, size_t subtr
->   */
->  #define struct_offset(p, member) (offsetof(typeof(*(p)), member))
-> =20
-> +/**
-> + * struct_offsetofend() - Calculate the end of a member within a struct
-> + * @p: Pointer to the struct
-> + * @member: Name of the member to get the end offset of
-> + *
-> + * Calculates the offset of the end of a particular @member of the struc=
-ture
-> + * pointed to by @p.
-> + *
-> + * Return: number of bytes to the location of @member.
-> + */
-> +#define struct_offsetofend(p, member) (offsetofend(typeof(*(p)), member))
+  Kernel panic - not syncing: stack-protector: Kernel stack is corrupted
+  in: hci_update_scan_rsp_data_sync+0x20f/0x210
 
-The outer parentheses are unnecessary (they are unnecessary in
-struct_offset() too, but that already exists).
+Drop such instances once the capability has been re-read, and tell
+userspace through MGMT_EV_ADVERTISING_REMOVED so it can add them again at a
+size this controller will take.
 
+Two details decide whether this is correct.
 
-Have a lovely day!
-Alex
+The test has to be tlv_data_max_len() itself, not a bare max_adv_len().
+That function already encodes the per-flag adjustments the render applies -
+4 bytes for MGMT_ADV_FLAG_APPEARANCE, calculate_name_len() for
+MGMT_ADV_FLAG_LOCAL_NAME, and the flags and TX power fields on the
+advertising data side - so re-using it keeps one source of truth and the
+check cannot drift away from eir_create_adv_data() and
+eir_create_scan_rsp().  Comparing the stored lengths against max_adv_len()
+instead misses exactly those bytes: a 30-byte scan response carrying
+MGMT_ADV_FLAG_APPEARANCE is within 31 and is still rendered as 34.
+hci_adv_instance_flags() returns adv->flags for any non-zero instance, so
+adv->flags is the flag set the render will use.
 
-> +
->  /**
->   * __DEFINE_FLEX() - helper macro for DEFINE_FLEX() family.
->   * Enables caller macro to pass arbitrary trailing expressions
->=20
-> --=20
-> 2.56.1
->=20
->=20
+Using the add-time test means the rule is "would this instance still be
+accepted today", which is marginally stricter than "would this instance
+overflow".  eir_create_adv_data() drops the flags and TX power fields when
+they do not fit rather than overflowing, so an instance can be removed
+here that would in fact still have rendered.  That seems the right way
+round: the instance is one userspace could not add now, and it is told
+about the removal so it can add a version that fits.
 
---=20
-<https://www.alejandro-colomar.es>
+The call goes before the HCI_LE_ENABLED test in
+hci_powered_update_adv_sync(), not after it.  set_le() on an unpowered
+device changes that flag without clearing hdev->adv_instances, so an
+instance left behind would otherwise survive a bring-up untouched.  This
+runs once per bring-up, which is also the only point at which the
+capability can have changed: hdev->le_features is written only by the two
+handlers for the controller's LE Read Local Supported Features reply, both
+inside the init sequence.
 
---hmbonzz4lyxux25l
-Content-Type: application/pgp-signature; name="signature.asc"
+Per Documentation/process/generated-content.rst: the out-of-bounds writes
+were found by an AI-driven fuzzing harness developed jointly by Kapil
+Vaswani and myself.  The approach taken here is Luiz's, from his review of
+v1; the patch text, this changelog and the test programs were produced with
+the assistance of a large language model and reviewed by Kapil Vaswani and
+myself, who designed and ran the testing described below the ---.
 
------BEGIN PGP SIGNATURE-----
+Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Signed-off-by: Kapil Vaswani <kapil@presceralabs.ai>
+Signed-off-by: Piyus Kedia <piyus@iiitd.ac.in>
+---
+Changes in v3:
+  - take the approach you suggested on v1 and unregister the instances,
+    rather than bounding the copies in eir.c
+  - test with tlv_data_max_len() rather than max_adv_len(), which is what
+    Sashiko's second finding is about: the per-flag adjustments cannot
+    drift from the render if the check reuses the add path's own test
+  - call it before the HCI_LE_ENABLED early return, which is Sashiko's
+    first finding
+  - runtime before/after on net/main for four scenarios
 
-iQIzBAABCgAdFiEES7Jt9u9GbmlWADAi64mZXMKQwqkFAmr1mUAACgkQ64mZXMKQ
-wqniCg//WgRXXz7luTnHUaMXrHNthttFpY3wBO557jzGIfLwMa+0tJqYgSh8MGS8
-7F44pQ7lX8E0qC+aMkDd3ItqdrKeD3McIbqqgpr8iU1VT0ljohr8pnTU7UIyIP/u
-bX/o22pWYohJFt/xcJcLxQ63rHmjcfjH2ug2i8ZgZHh/YGX+Biah79nfkcAB+uYX
-NI+43mSTP1aHvUK3Jf/z7PJF/v1/vyv1zJ/nsoN74w3JhlYGMggMcXHSu+dp0jmX
-qJUkyYJ5SQEzMdU/n2pSgOJFIZl6YS957I6fhU3GxEPXSldcnd/VIH/QRKMpSyjM
-jWzBsyjyyink+9RSw7AcmU46DJ28GeWMW5jZdg7jXq6ZGjO0/AKleOtMrevQLN4s
-hB7CzUrtofXBv5Oa5javphhfKIEoawgDsDch5eXFQW/Rm9rSflWysbPTCST5n/h0
-GfKbUEzD+COFj6I+Y8COEceKp4Xv8Y08A3r6CyyNIPzPwcc0CulK6xAmHbsMxIXZ
-c6uz3LLfqukMfbuquIZE4KhlNt+ZLRtnxL6rFfFkvLYdz4KwIsljmiPqoyPQxp9A
-OX5vOdZ9ulzmuuNoTY5OeJWSlsI6edzNc17hE6jjR1+wFfJSzVF2cvvv6mRGnpY/
-bGpmsQZFuH/KWJutZlHbsMGYEKF7lo42UH0Tqx57oaglMss89x4=
-=8quq
------END PGP SIGNATURE-----
+Changes in v2:
+  - dropped oversized instances in hci_powered_update_adv_sync(), tested
+    against max_adv_len()
 
---hmbonzz4lyxux25l--
+Both Sashiko findings, and where they land:
+
+  1. The early return skipping the loop.  Fixed by calling before it.  We
+     could not reproduce the overflow the report draws from it, though: on
+     re-enabling LE, set_le_sync() calls
+     hci_update_adv_data_sync(hdev, 0x00) and
+     hci_update_scan_rsp_data_sync(hdev, 0x00), and instance 0 has no
+     adv_info, so neither copy runs.  The skip is real and worth fixing;
+     the path from it to a write was not one we could trigger.
+
+  2. MGMT_ADV_FLAG_APPEARANCE with scan_rsp_len in 28..31.  Reproduced at
+     30, which v2 keeps and renders as 34.
+     tlv_data_max_len(hdev, MGMT_ADV_FLAG_APPEARANCE, false) is 27, so all
+     of 28..31 are now dropped, and 27 - which renders as exactly 31 -
+     is kept.
+
+Tested on net/main at a2fd526d6442 (7.4.0-rc1), x86_64 defconfig plus KASAN
+with KASAN_STACK, booted by hand under qemu against the same rootfs each
+time with the image opened read-only.  "len=" is the length field of the HCI
+command the kernel emitted, read off the virtual controller - a witness
+independent of KASAN, since anything above 31 means eir_create_*() has
+already written past cp.data[31]:
+
+  scenario    | unpatched           | v2                  | this patch
+  ------------+---------------------+---------------------+----------------
+  adv_data    | len=220, panic      | no command          | no cmd, pruned
+  scan_rsp    | len=220, panic      | no command          | no cmd, pruned
+  appearance  | len=34              | len=34              | no cmd, pruned
+  le_toggle   | no command          | no command          | no cmd, pruned
+
+adv_data / scan_rsp: a 220-byte instance added while the controller reported
+LE Extended Advertising, then re-read without it.  Both panic on an
+unpatched kernel:
+
+  Kernel panic - not syncing: stack-protector: Kernel stack is corrupted
+  in: hci_update_adv_data_sync+0x1dc/0x1e0
+  in: hci_update_scan_rsp_data_sync+0x20f/0x210
+
+appearance: KASAN does not report this one - three bytes past a 32-byte
+stack object land in adjacent locals rather than in a redzone - which is
+why the emitted length is the evidence.
+
+No Fixes: tag - our clone is shallow and git blame lands on the shallow
+boundary, so we cannot name the introducing commit.
+
+The reproducer is one C program with the four modes above and needs no
+Bluetooth hardware.  It is not included here: this was found with AI
+assistance, which Documentation/process/security-bugs.rst says to treat as
+public while not posting the reproducer.  Ask and we will send it.
+
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_sync.c         |  8 ++++++
+ net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++
+ 3 files changed, 58 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6fb713d5e4be..ab5aa80abe2b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2573,6 +2573,7 @@ bool mgmt_get_connectable(struct hci_dev *hdev);
+ u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev);
+ void mgmt_advertising_added(struct sock *sk, struct hci_dev *hdev,
+ 			    u8 instance);
++void mgmt_remove_oversized_adv_instances(struct hci_dev *hdev);
+ void mgmt_advertising_removed(struct sock *sk, struct hci_dev *hdev,
+ 			      u8 instance);
+ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 9213e3ef9f26..b9f06dad1c41 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3605,6 +3605,14 @@ static int hci_powered_update_adv_sync(struct hci_dev *hdev)
+ 	struct adv_info *adv, *tmp;
+ 	int err;
+ 
++	/* The controller's advertising capability has just been re-read, so
++	 * this is the first point at which stored instances can be measured
++	 * against it.  Do it before the HCI_LE_ENABLED test below: set_le() on
++	 * an unpowered device clears that flag without clearing the instances,
++	 * and one left behind must not survive to be rendered later.
++	 */
++	mgmt_remove_oversized_adv_instances(hdev);
++
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
+ 		return 0;
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 260ef2a45719..d6a20a08b49d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8933,6 +8933,55 @@ static u8 tlv_data_max_len(struct hci_dev *hdev, u32 adv_flags,
+ 	return max_len;
+ }
+ 
++/* Drop stored advertising instances that the controller can no longer carry.
++ *
++ * An instance's data was accepted against tlv_data_max_len() as it was when
++ * the instance was added, and that depends on max_adv_len(), which branches on
++ * ext_adv_capable() - a controller capability re-read from the device on every
++ * bring-up.  A controller that stops reporting LE Extended Advertising
++ * therefore leaves instances behind that can no longer be rendered:
++ * eir_create_adv_data() and eir_create_scan_rsp() would write past the 31-byte
++ * buffers of hci_set_adv_data_sync() and __hci_set_scan_rsp_data_sync().
++ *
++ * Re-using tlv_data_max_len() is deliberate.  It is the same test the add path
++ * applies, so the per-flag adjustments - 4 bytes for MGMT_ADV_FLAG_APPEARANCE,
++ * calculate_name_len() for MGMT_ADV_FLAG_LOCAL_NAME, and the flags and TX
++ * power fields on the advertising data side - cannot drift out of agreement
++ * with it.  Comparing the stored lengths against a bare max_adv_len() misses
++ * exactly those bytes.
++ *
++ * hci_adv_instance_flags() returns adv->flags for any non-zero instance, so
++ * adv->flags is the flag set the render will actually use.
++ */
++void mgmt_remove_oversized_adv_instances(struct hci_dev *hdev)
++{
++	struct adv_info *adv, *n;
++
++	/* This is safe as long as there is no command send while the lock is
++	 * held.
++	 */
++	hci_dev_lock(hdev);
++
++	list_for_each_entry_safe(adv, n, &hdev->adv_instances, list) {
++		u8 instance = adv->instance;
++
++		if (adv->adv_data_len <= tlv_data_max_len(hdev, adv->flags,
++							  true) &&
++		    adv->scan_rsp_len <= tlv_data_max_len(hdev, adv->flags,
++							  false))
++			continue;
++
++		bt_dev_warn(hdev,
++			    "advertising instance %u no longer fits, removing",
++			    instance);
++
++		if (!hci_remove_adv_instance(hdev, instance))
++			mgmt_advertising_removed(NULL, hdev, instance);
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static bool flags_managed(u32 adv_flags)
+ {
+ 	return adv_flags & (MGMT_ADV_FLAG_DISCOV |
+
+base-commit: a2fd526d644233d6a892c28173f07c61e21e4c93
+-- 
+2.34.1
+
