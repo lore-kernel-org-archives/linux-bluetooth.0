@@ -1,85 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.92.39.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794443876;
-	b=ueZkGrEpujVgkc0seygC18aDB7kl7HAl9mieyvy7AkilfDEAO6xsqeRkDAXNLPycOIhH
-	 ieA/U9WYItzR2HOPlE+LOaMz7rypMVwgG2uL4pi46btDrewm2pkACA3hchqgPcM+KrSYr
-	 W4zxk46029bNdHBFB+tcF8xfCcFY/lgMKjQ+TJWAFlZSyi8p6Xnz446RBFBMxXZ0Fl51J
-	 thartojVU2UZVBI0H8d9mkMSF9a1cd/b8KjL1kkSij8pafaD3QLNx8KClU25IZ6oXBxPA
-	 d0Y5PsCZIXubRXnBW6wkabNqn8t/gbEOd1GzbHFCzWa9seDfTVEpvC+fAgxp0dHFwmg==
+	t=1794447990;
+	b=3OVEZhCp4B9aLdcKYys6OCqN7iOymoRiuXRQyEA4fnR/eJfMfhbcjourjeIkHalGZbf2
+	 MoKEh+3WJKhr0You4CRRK2K4gmZx8PNcwDfxpheBKqQ/4O51fPeJTSBH8Ewq7F7r8/HoE
+	 Rj9Ltgkwn7ikeaqFvBlBlrDMsMLRg3to+xC2jQTLotJvNFgunWxa+nQbPhe87BN9noP6W
+	 +mOvMCpDHv8Zl24fQKaQ3HQ4o6c7qDPpp6DDzqO7UPBRtz/pBP22c6lhm3IfMx9jN1OG0
+	 fG7H4Cq9sRWtNLu34GCgEOPFuRm6XvptSIdL2E43zabRsjtldIlovVijbtn28Dtqx9A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794443876;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=cqhLm2H6+TM2o+f2/OpzYav7i2NlFYN/YUnrQy2qSwk=;
-	b=Cw2efJ11QwQr3ul9j+hKSGYHTsDiqaVBdcC5gcJlBLL7jf58Ed/inhzSmGBOzWUgN8X2
-	 Yw4toAFMQ1FraXTTFBybhXEgHilCGbatEaQwQX1R6BOapRM6POjE52H6Runjq9O4TpPjY
-	 ZAfQf4Ewi8ZD318M9+df/m9fKf2KN8Ecswd3Z3ddV4xGnsLRjmYGl2cRa2tEOW8t7Y633
-	 a0aOg9LqMSG39vdZxXqr1cvj58yUVi3hhgD4HtHFxeoJrn4+wQ9pqHHyqsXDhF2ajv6Wh
-	 hV0Sxz3j5qo2ljIZmyKzVttq+lKMvUnyZftsH5n35mMWslt/Cm3IpYAahuofnGAuXSg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794447990;
+	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
+	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:Mime-Version:
+	 Content-Type:Date:Message-Id:Cc:Subject:From:To:In-Reply-To:
+	 References:Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:
+	 X-QQ-XMAILINFO:X-QQ-XMRINFO:X-QQ-RECHKSPAM;
+	bh=o9qbUelCx5fzvjlP9T4Xcmeuzs4IG3zEIHU3OITHRHo=;
+	b=E0Fx9V9OqCUKgBAhAWpufzty4OiKcMmRPmDoxy9IJ/1GjQGhBwH/5g4LqvdBJAn1B1uk
+	 04RMn4Hw7PUyjvaXOUn8ZEc1CoEwK1eXGDji0VShu7MeTQusd1X7Nhh91/xVMll1oOMXc
+	 JI86Z1cgerWaaxV2hgEIpol7DOL9XhibgQxOBHE6Ga/BhxLwRuQtnpKmCpxhrALRsYK+c
+	 eZgbnAwZt/Oo0yB+ZHmbRPjT4k9HJT9obRL/ENtoYCFf7cje2OeYJ/TwiAG+1QYNVajYm
+	 b8nc6i5ZOxdwDtLKARONwoDaJ/RHHYRe8PzUC/ldK3oI5Bk2d+Xhu6YMSs60IADKNsg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qILx1JNb;
-	arc=none smtp.remote-ip=209.85.216.49
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=none header.from=linux.spacemit.com;
+	spf=none smtp.mailfrom=linux.spacemit.com;
+	dkim=pass header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=piyJX+OD;
+	arc=none smtp.remote-ip=54.92.39.34
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D9606A32A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 00:37:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 815D9606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CC8606A31C;
+	Thu, 12 Nov 2026 01:46:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80CC8606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=qILx1JNb
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-3b0ae87069dso1833652a91.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 16:37:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794443876; x=1795048676; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=cqhLm2H6+TM2o+f2/OpzYav7i2NlFYN/YUnrQy2qSwk=;
-        b=qILx1JNb0tswHN4buAuW/EQNiNfrILbHLCCwRiUH+DH3gDzsfOeuN6Ug9K4KIJICsq
-         ViztsNiGsm5K849WT48RuFQ84F7kVPyWvAVq/OvodNeLoKaFhFuaWQlIBNmxVbjUKV8I
-         aj63oXY9O6PhSu1tDlZ9rcTQQWAkBYK5heoiwR97G6wvIBcHxPDbt7bBmCPSynEUxCP0
-         ZF7UNNKc+N8xc+y9gztQgfUYO/IldO4kHcmmgp9praQJjktKLEfkDRvKoSNnbEFn4T5b
-         t6tc7ma7CeYt1dJFiBGe6EQOsXqRE/Dio8XaZLbfO+TrRDwpB/iywV1j/QCZn/NpW23G
-         ffNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794443876; x=1795048676;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=cqhLm2H6+TM2o+f2/OpzYav7i2NlFYN/YUnrQy2qSwk=;
-        b=fRCR5ZTtvKG8jPgmNmXwP603j7ma23hbZKWO54Bi/aXJCBI4kEYboTR6dAuXs0R5lf
-         CnZwB7Tph1pJyYJQYEJNFiUUb5579UwHIMth2/0mPEMP1e5jdlZ84lhbEEm+EO5YMrTM
-         MB3fqEy3OkUsIdIdc8+rkQdfezDmsLKs5niJyYMg1zOM70s8fwRmk7o2VKJDzXz24zZW
-         GHWc4XH2nISGXFSWF9qaMK9KB5J5F4gv0OeQ+H0w8Jzx92SS/TvA38NWCd7pgtdE+Tbj
-         ymiflL/vLSrJMxTs3sUiVKXq0kDLnkZVJ+nvkzlbbV9leeteh/6M+HAW6RTHRqcFYyd4
-         +PjQ==
-X-Gm-Message-State: APuU4Z9st5Y1mjDornaHtW6xYbKQdURrScGZL3RnpXEvg7dbCjadr9fR
-	rReHNu9lzCGIK9jWN2uSvFKts6k1fhjnKLLHr3LQt1lUthCVOgaKnbOaYZ6YZw==
-X-Gm-Gg: AYBFou2Rrh6+wkK2two7kUzYxEWnDh2ELWRPniTta1qpj/Up6l3JuPKzYztCVM+5aq5
-	Fq+U+33J6tFmPHdxfZb/DcRjF8LDeWXedVM811jQGqYidQ4SaFyWd3LUme1Qc0wMy7t+jbUtb/M
-	gKT+AMXtibOgD494vqwkG6PZao6eOvGnPqu/b26tO0fqVCluCCcMObdfYiGnRXzeQhI1HSzxlyj
-	ie3P528Hq+e31l7yTN3+YaOPMswe2zXk45LNdTXIyPLobKT7UdjdidpnQpr0wAvY6f6LqpKjZwW
-	QUc4bmE76jTfcZw2zkUgE+SdN+KIbmFwEaNEgBkyvMDwXXiMfVxvKnFavikIElisAACw0tes08e
-	NzLcYlrJBSSYCDkp6DRVJpxCi+MBPWWwz2mtGiMWw2Zfk634doampiJEtnjTeOTrnS3F8KUMFfu
-	MRuEsWprWhw4nlyiqQvTAN7C92fA23Dq0UZC4CU7krToMh3MF8jYsfUU+HGoDJuOH00anyxW4JJ
-	kY7iadHfIeElq7aO47bTk3S6YeIZH+4bKqRHelEPvZgZK68OPihrV+4NuNf0Ynwt24p+DtWApv4
-	I1XubovC
-X-Received: by 2002:a17:90b:4b05:b0:3ab:3675:8ed with SMTP id 98e67ed59e1d1-3b182efad65mr3989153a91.22.1794443875818;
-        Wed, 11 Nov 2026 16:37:55 -0800 (PST)
-Received: from [172.17.0.2] ([20.64.175.145])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b197b603d9sm1580964a91.0.2026.11.11.16.37.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 16:37:55 -0800 (PST)
-Message-ID: <6af50a63.3cb833c2.3d9137.a084@mx.google.com>
-Date: Wed, 11 Nov 2026 16:37:55 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5034202091010906619=="
+	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=piyJX+OD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
+	s=mxsw2412; t=1794447957;
+	bh=o9qbUelCx5fzvjlP9T4Xcmeuzs4IG3zEIHU3OITHRHo=;
+	h=Mime-Version:Date:Message-Id:Subject:From:To;
+	b=piyJX+ODZSYYaVvjlTI2Eq9fElkjSsMxECUYYfK7ObaUBsg5PgSevcsupPAxywNUG
+	 M1V8o33I51bLUw7HNWTBkWtgIrCpBX6XsgTznpCjUmm4GjvzDmmTNdnXfXcOulnxIU
+	 W9hxC8AC0AIVB0KOWtwu9w9G0OOccXGgnGlv+qEE=
+X-QQ-mid: esmtpsz17t1794447955t84c88b44
+X-QQ-Originating-IP: nAMxank+hAidb3QvsKnH0QjBdmBkxc00yYWvW0b9tzA=
+Received: from = ( [120.237.158.181])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 12 Nov 2026 09:45:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6514529535114007816
+EX-QQ-RecipientCnt: 20
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,42 +58,87 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,6/8] test: functional: Cover disabling one ASE of a shared owner
-In-Reply-To: <40720115137c05aad4cdcb4c596c66516a97b963.1794428234.git.luiz.von.dentz@intel.com>
-References: <40720115137c05aad4cdcb4c596c66516a97b963.1794428234.git.luiz.von.dentz@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Thu, 12 Nov 2026 01:45:52 +0000
+Message-Id: <DMSUPKS0VL8N.1RUUESQVU8FMF@linux.spacemit.com>
+Cc: =?utf-8?q?Fr=C3=A9d=C3=A9ric_Mah=C3=A9?= <frederic.mahe@cirad.fr>,
+ <marcel@holtmann.org>, <luiz.dentz@gmail.com>, <robh@kernel.org>,
+ <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <dlan@kernel.org>,
+ <anarsoul@gmail.com>, <alistair@alistair23.me>, <pjw@kernel.org>,
+ <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>,
+ <troy.mitchell@linux.spacemit.com>, <linux-bluetooth@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <spacemit@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 0/2] Bluetooth for the RTL8852BS on BPI-F3
+From: "Troy Mitchell" <troy.mitchell@linux.spacemit.com>
+To: "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>
+In-Reply-To: <179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
+References: <20261111094557.443481-1-frederic.mahe@cirad.fr>
+	<179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:linux.spacemit.com:qybglogicsvrgz:qybglogicsvrgz3a-0
+X-QQ-XMAILINFO: OD73vtqOAFgqQdl8kVxlaorlGh6ZaUM7MaaEhliCvStV/AKYXHEQMwXv
+	mE8cjPXzZoSMzDP5rS79pEFkS9v0Cuth3c55LR7M61G2e8XnCAOlpEjrxoh8bqs8GEKMTfm
+	GTyWl/QZL70ACCCVQ6uj8Tlyf3KkE2JcX10i0FHHOsrnfmi5q+Ehkn3K7RXY3bZvU2FID2H
+	UvN7y9rKiw77FT7s6GhJ4fx1S1RlRbt7n6OsPhwPZHVivwHdgz9O3mYH3bj7sr9CPzEsPiZ
+	anYDNKhJiC+hgVRO+VxFCm7clKBTCO1/dpbNR1ml5GvrpEDfhV/2pIFyykr+YGZpQHxfY3p
+	TJc9QYLV1u0QXALxLj4Val5hsZE7/CthI+Qownvjkph5L1F+EXqwyrq4eoP0YcK/ilmDAho
+	ZvCFlYhVaBcsc2VU89cwcIOEQgZEehRzQdL+SJw7373sgvVEJE1Y4vyw/ms45GOTC2Q21Id
+	OMUuGZ3QjPuQHbb8B7XixuiYzs7iprF3xJjXo0jmeKrNhDIZGvuaDAh4bySOqW6kLnAbV56
+	RA+Y600SEiXKQWXcLbRFeMx6ywBNGCxG5a+UJRDhGRum8DpjlhmVG+CuhQ2RMmjgc4wr2TD
+	d9jJ3pfBFkZ94W/W+gOn3AIKoBSv2bAM+/8wb+QQJ5FJNFooxGq+YiWh3LAhoLGuVsbgV+D
+	cGyRNvuebtQHbocavAoJSFzS4BmjFe3dwxdXk0kd1Zcow1gxUfTvCHCmx0tZuh3HzTl/1bD
+	l1/6KffMQMTv7+AgDGYqGXZ/mf93hOH0+JeQSGtCJb9BHs+QrqmdnYhQb8uRxyx+kBYUNNl
+	06viwZorpHpExLypIKCmxYCnoJKmZprZWkCQBHUR8BYD7VkRJkGTe7sPXHBZu8AsEKY/jew
+	aZH2f1ovWzm8emaBcAGSmMYWkhghxdY3HkVZc6ExcZXgl8mK7/cUEWu2d5kcUwGmCbG4Qji
+	rdB4VW/J2kmthTdNN2Yl5OqyEXyWpT820kPtJaT3gkQUxcw6IWwrGWQL2IF+aHUev6hHd1F
+	5OEfl/viYZ1xVcnkitMrNIqckdq/L55vhD+jfzXnkrJegcbhzOxEi1uwRca08Usj47dp6VX
+	f8qGllmeqmKimpUt5M9OSQQo1cVnn7Swg2kYjxjGMTh
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
 
---===============5034202091010906619==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+--d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-This is an automated email and please do not reply to this email.
+Hi Luiz,
 
-Dear Submitter,
+On Wed, 11 Nov 2026 19:40:19 +0000, patchwork-bot+bluetooth@kernel.org wrot=
+e:
+> This series was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+[...]
+> Here is the summary with links:
+>   - [v2,1/2] dt-bindings: net: bluetooth: realtek: Add RTL8852BS
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/c21f8cff7503
+>   - [v2,2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/df348a0d065c
 
------ Output -----
+SpacemiT DTS changes normally go through Yixun's tree to the SoC tree,
+and Yixun hasn't acked this one yet. The binding patch is fine in
+bluetooth-next.
 
-error: patch failed: test/functional/test_bap.py:819
-error: test/functional/test_bap.py: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+Yixun, what do you think? Should Luiz drop the DTS patch and you pick it
+up?
 
-Please resolve the issue and submit the patches again.
+--=20
+Troy Mitchell
 
+--d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
-Regards,
-Linux Bluetooth
+-----BEGIN PGP SIGNATURE-----
 
+iJcEABYKAD8WIQSL4Ay2cExaPXAQcU2YCe+A+TM0LwUCavUaUCEcdHJveS5taXRj
+aGVsbEBsaW51eC5zcGFjZW1pdC5jb20ACgkQmAnvgPkzNC9TDAD/fhHvVXqOkUxo
+4u6rg6LrG/txpGkWipkP94X2k5PSn9EBAIezttdQYAric2H/Pw+q38b/NEdLHI/i
+7Au69q7vwYkA
+=ms2x
+-----END PGP SIGNATURE-----
 
---===============5034202091010906619==--
+--d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3--
