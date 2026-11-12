@@ -1,60 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794519747;
-	b=PITYyHypLlLMkRRgEuucgWy+K+5fHmGYD2E2W0yfbN8NHSVAgjs700Sy033vnHzPrNHq
-	 m3PvNCS1b2hm4OX0zJV7AnCw2TYe8TQNwl1Md/H5a3qkokrYef0BAwcvz/WzQ23+6204/
-	 sNHIuBboEdqvUGGWUbmjw5zm5VAgTa9dzc5Yf33GbP+0T5SZ4Oj/Qf/EXb5w+icd9N5jU
-	 guCHBuAJ1tKaNnYcxeKPbksPx/pU2ZknElOy7shSWI8ZdfFriuCHaUuiRaf1VJHyWSJ9R
-	 k82mGita1+r9OIzXAgX/skbV2A48zp0+giQwUkj93kH8VXSoc4++WDh/roGfm+MIvxg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794519747;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=9IcyXbdUhoLM9AX2gltsWZGtMspy7VkVz1qCGqgjj5s=;
-	b=elVua/iqAubHoYwDrSiuzxUpyU03DLlAWvfGYJQkWTy+muX09mYFu6uADA1wxuniwySG
-	 OvcVBnr7O5ribP6uEEg+U0y+ANkKzbF379YaCXUE/f666Y45mtODK5M1+VqSeL2zZmV4w
-	 nTOmGvioqspHB7DcRlc0gN/4OqfgbjX5lNXY0PdqwACg1pW3IGpINCwvfJ+ZNAxz9x1VV
-	 bjwRK1siBWfZFcK4PDPp3XRPSgk6V8EvPQyKIJ3CsbGRKLbTFfiBpGsxIjgcVfqJNZoHe
-	 NTWXYUot6ps2ZWPYQ6x/9En2deQouBKv8mnlxPwCR4FuAyK+yuHJKhxC/TLxM6ULSAg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=KLfnPggX;
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.33.12
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794522961;
+	b=trgsyDkY1ZH5GWMu6gRO2tTvIfWf2VDF5engvSpmQskHuLuU8jcM87Pm1w6FGTbBA9zg
+	 /KhsGl6Uo8PENzyP5o0vc3qKYushoNXfz4GG9OL2Q+APpb0qhX9419WsFl0cpJuGhNGGb
+	 Hrk4Jq6eKmLp8Sqppg+jPHSb+mFRdicCQvA4CP+1CFLShoqIgluPOD7GIV0LPDSd8OOz0
+	 +nTTNDq+pKoUF6Dpbzx3kMxOCi0BzZW8z7zKg8Y7GnLYjLS1lxqybDkNlpd6g2/iu0bLC
+	 Uvut5OIZ5isfFVw7+V3T4bYWtybv5R2BTN6ttPz3YMh6Tmj2u9qi3Tbn9dXht8sMNWg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794522961;
+	h=DMARC-Filter:Received:Received:Message-ID:Date:User-Agent:From:
+	 Subject:To:Cc:References:Content-Language:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-ClientProxiedBy:
+	 X-Microsoft-Original-Message-ID:MIME-Version:
+	 X-MS-Exchange-MessageSentRepresentingType:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SLBlob-MailProps:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=j1u0YM9ee89yTkuIr2ILkz1fx3Hq3OqZQjFOEJwv5hk=;
+	b=e7TE7kZ1Ez3iEqAWXTIR3rFxu3Msu7EFCsuZtqn+QrVcI79bXIfFgYPNPPTF+NFahyTF
+	 kXhW361Swcy+XxX5huLS9HiZ6ogn4S6lgPUFJh3Wcu6fPvUgQnPv5DVTPZhctOgvnGAr/
+	 MBsB7nUTOMr1gYYWnfr358F5H+6meoNxowAMm1l9VdTcEEKmnfMl6nwZZX96w55bIs0g0
+	 Mx9896ObeuChsmBAGbzT7x6aLEvc7hos4qCT95KRVJwni7rqT/GwgMcj2jId0SNRsQTco
+	 HnUVtvO4sUu/D08n1dL08v44noPupQlfzLeJ7afH/sHYPDo6dX4M5BgD1aE3m5ft2sw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=jwillmer.de;
+	spf=pass smtp.mailfrom=jwillmer.de;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.33.12
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazolkn19013012.outbound.protection.outlook.com [52.103.33.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983ED606A327
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 21:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 983ED606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=KLfnPggX
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794519743; x=1794778943;
-	bh=9IcyXbdUhoLM9AX2gltsWZGtMspy7VkVz1qCGqgjj5s=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=KLfnPggXmvJh+EBFsv2FjrSeinQguOwEDhzBeARYb3g2f5jPgu210kbviJIsMtV9T
-	 ipNge2mtOWeu2OKmQd0p3ev4+fB0Po4yL1+yt09SjPnSU5WaAF44JM8s3a7O4R0i4k
-	 LNn/lJr6McVlU4YlCpBEwxTbg5UIzO1KLAgR3UTrm3uTf2AaIiVLe0iN/+wipJfZpI
-	 qU4pmEPJdPjmsJ70a5ac+pJ3yOBfCDV30rEnyuMW1SmKrJH5wHg8ZqMOb/tB2HaUfC
-	 0taFyIY0hWHrkCsGuWZiNAjM0ThB1CdNxh7kdrPFEXbU5g0LsYwSEQW8Lvti/axd5f
-	 Q6VBjN/j5a2Yg==
-Date: Thu, 12 Nov 2026 21:42:17 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53911606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 22:36:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53911606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jwillmer.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jwillmer.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=i80QaoeCRpbsBqc0gctRbvr8NHdfdqTSBsQ9oQOzskHFZ5RlT9EYwhMl4IC6KXkD6g5vNkyr7ErPuDGtRvJ7Qe7KIXq6qzRzNCL/q4ZO2KxDyfAFah1l+u4vkNjom9L2TS0hHNF2j6oX4HKzRanVAQITNnV9WDTUVdOPqK2URSg9Fyx5USTDt8JtvH8TsJwlXWQtpPUy8zzaPLoiIGJsewJtKulq2OT6bH5BatG8DCArTjb6gNql6gLj8zoWfyTR16ef8Y+LZ3bV/iPyAIiKH9ZZg0WdUMYUT1Ri9o3oLN/4bDDbGQVpU0iW49TiVujAzrZzpF9GGd74McolKHM/Tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j1u0YM9ee89yTkuIr2ILkz1fx3Hq3OqZQjFOEJwv5hk=;
+ b=y+AbSv2alrwEUp/Q9TYEgllpN3/nasJk8mZ21RnKyn4PDb0uAdkgdY02dkJYWekdrpAQyX8D67L/xWvVE9qywuHhDxVm8CIN/AXeLNlbK7RVlVNf0pvS9/MvO6jp60G9QWX+cjpGGqTT/WKp0H4IWn+Srz4scPLkEHwVIygUN8G8B7MxcRGBbXTaqPo1Ks05IYJKvLPLteMbefVY+H/m1LZmdbV9x6T6S7+lvn9VO96ZZ1FqykZDC4c6/1O8yik6YvnHb64gv/zTuwLDvYvfShORj8iMT+c9N4c3BVYkIfnHKDJxGoAyGaQRdTkng9ffFccvmC6VU7qGnWmHHaz8jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from VE1PR08MB5247.eurprd08.prod.outlook.com (2603:10a6:803:10d::16)
+ by DBAPR08MB5653.eurprd08.prod.outlook.com (2603:10a6:10:1a9::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.10; Thu, 12 Nov
+ 2026 22:35:49 +0000
+Received: from VE1PR08MB5247.eurprd08.prod.outlook.com
+ ([fe80::c16c:8c20:cce6:13fc]) by VE1PR08MB5247.eurprd08.prod.outlook.com
+ ([fe80::c16c:8c20:cce6:13fc%4]) with mapi id 15.21.0592.009; Thu, 12 Nov 2026
+ 22:35:49 +0000
+Message-ID:
+ <AM0PR08MB5236476D29AE5CDA369BD6CFD5702@AM0PR08MB5236.eurprd08.prod.outlook.com>
+Date: Thu, 12 Nov 2026 23:35:40 +0100
+User-Agent: Betterbird (Linux)
+From: Jens Willmer <info@jwillmer.de>
+Subject: Re: Bluetooth: btusb: Wait for setup to finish before system sleep
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-From: cochcoder <cochcoder@proton.me>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [RFC PATCH v3] asha: Defer BR/EDR inquiry while streaming
-Message-ID: <rNJ1WcibKCaCy6uFxRuBzmB_s2x_MfnWijHpsutNOn4LS7jMxr3lZCUVHV5nOQ7bTC_Gsb8m8uIrU9HsY9t5sX6OrsZVF53NIp5m_HMGOWo=@proton.me>
-In-Reply-To: <CABBYNZ+U6C8aWRXcOuQzZeE_JvTcXiYK57dO0fBKMOeZ6U40Jg@mail.gmail.com>
-References: <20261028133243.262314-1-cochcoder@proton.me> <20261107014841.1452698-1-cochcoder@proton.me> <20261107024655.1481992-1-cochcoder@proton.me> <CABBYNZ+U6C8aWRXcOuQzZeE_JvTcXiYK57dO0fBKMOeZ6U40Jg@mail.gmail.com>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 827763c9eff8427b791698092b4de6af068e21f3
+Cc: linux-bluetooth@vger.kernel.org
+References: <VE1PR08MB5247BE2C05F27B1A2675FA25D5712@VE1PR08MB5247.eurprd08.prod.outlook.com>
+ <6af5086b.afff5b00.2aa0c8.9b05@mx.google.com>
+ <CABBYNZL=1cTSCt_3Nn4HoV62Tqq29Mxi2F73CGG+3hHpdEE-Pw@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CABBYNZL=1cTSCt_3Nn4HoV62Tqq29Mxi2F73CGG+3hHpdEE-Pw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: GV3PEPF0001DC40.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:158:400::2e7) To AM0PR08MB5236.eurprd08.prod.outlook.com
+ (2603:10a6:208:155::17)
+X-Microsoft-Original-Message-ID:
+ <3ea4498f-46d7-408a-897f-e0825dda1f9b@jwillmer.de>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,377 +91,127 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR08MB5247:EE_|DBAPR08MB5653:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6f30be9-fe8c-4e99-8d47-08df410d4c11
+X-MS-Exchange-SLBlob-MailProps:
+	+bEufbke4JdvqmTQng7ItjpfaCLJSA3uNvVna6KB6oTgb6lhEnJG4i6W29UaB7D91aRN6SfiGAYBiSE3QqMzagwiMbSP7JJQxYirOgAnzPDtdlbVl9TTGZJj9u3vHBkt8zld9TcJvnZavkxjDX29oVP0fTJwk2xQGl9vtwjDBLi6SsPjOH8T0GEk3yCGrxII84NCNW+JNJW6sV6HUFXcGkw/u9xdMG3lNqghEO/z54E0bMixBn1yTslC2BtHZCILlOX9cgRnEHAI7EYESz5qUyKVg4KQ2nDkK4uBAIpw+XNFxmF0udqPuQwyQEaFK6izSbejy77UDJy7LGiTEvZwhE5wDLcDBkH+mqbj9S5wwayAZY8ycEE4R7tP+XDT8zcLc2M9RsJbEEHmpLv7Xuz5PoY5XlHS7YP9+QD2kvOEDCL+BCzgdqqfmt53SI0ZQsA3cC/QA/uaH2tVc4d5h0FuBXvHzB/8QqS4YKIsCTvxhusKGmhGfE+o4ulBsjuQnOYuu/zy5jzExKotnRkzOuc6oiOSQqoDWtukHSltQnjDGFH4WuU1u5ctP0AHLk5VQpE88Gpc6wqLZERRlxOr/Hbd+mjD0nw9C58idwiy70qh9tczTtVUAhC3yD226W2+zrwOQSHnhIdNdEZFZo1Pxt0r8qbsqzWxooZNFZkumW+8bY05WA0F6GB3dQFOjIH0roysJyR+NOH/2050Gl0HFDR3zk0otP80nxO0cmjQ05vwiBrbWv+XE9G4YuquorxsLqV2pknspSI5Nyjdnr9ZEaXK+A==
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|8060799015|19110799012|5072599009|51005399006|23021999003|6090799003|15080799012|25010399006|24021099003|3412199025|4302099013|440099028|56899033|1602099012|12091999003|10035399007|40105399003|1141799003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TjhnVlJpc0Rxem00Y3hMUDZid1NpblN4eVZFQTMvYzFja3A2Z0NMQXBJVDZv?=
+ =?utf-8?B?RFdkZFRoYmJFZ29QOXRWQ0RYRy8yZU96YjUrd3dVWUpUKzB3K3Z1Nkg5R0Vj?=
+ =?utf-8?B?LzNKZ1hYZ3pZUk9ndjJ0M1gyU05OZll3THE5RWlkYTZLblpLVCsrQXNjdEEy?=
+ =?utf-8?B?VThUZWRYRDBGa3RIZjNJNkhVWVdmOEE4RzVselp3UCtCQTJjMEo0ZkhPd3ox?=
+ =?utf-8?B?TUZmeXJIczFJWHZuQ0FYellMZ0JCcVJSS2dxWUxlcDZmbUUvK2tubG83YmVL?=
+ =?utf-8?B?Zjk3cXFyV3pUUkVCcksyNjdjSXp5L0FLSlhlUW0rWGNRYWY3OEFMc09iajRG?=
+ =?utf-8?B?YW9TVDhjNVhTYkwvL2IzNVJRYXRUdkw1OGRvQ0pBL2JPSHBTVDFLQnNpR09m?=
+ =?utf-8?B?U0lURStIaWZEZ25oQ2RGT04zUGtBaGFIa1cxNGNjNDk1NzV5eTgwNFBGUldr?=
+ =?utf-8?B?V205VVFmVXpRTEVRTFY0U0ROZ1RQK2VpeE1QZjJmWnNXc0J4NCs5VzlpRHRq?=
+ =?utf-8?B?N1NJa1p2NHBFY096VVNrVlkvUjd5cDNXSmV0MmJzZmJ6VHd4TTY2ZFNlMzNJ?=
+ =?utf-8?B?ZThhcnZFcjEwSllRNyttSHhtT2N2dzNGS1NHbU5GaFJUMks0ZENKaXpWY1ZD?=
+ =?utf-8?B?UGN2dGhVV0F6SWpLOURING9iZmcySXJUN0RrWVp3SFZvN1hpaER2MUN6blEv?=
+ =?utf-8?B?bU5WbTNiZUxjWFF5K29WRmljaSs0cVNybHByZ2IzVm91RlB4SElsOTZDNGow?=
+ =?utf-8?B?R3YzVzE0MGlwdkRubVN1cXFNWnpBakYvUlczamxnT3UzSnlIWEFPMVZpckRU?=
+ =?utf-8?B?K1dSNmNIY0VzNGJkN2RDMWZSWVFFdllxMkh4eHJza2JTZVJvSzFaa0l4cXB1?=
+ =?utf-8?B?VW9TMDZqSy82NE5GKytqdnlWRVJNdFhrNnFnMlN1bWdqZ2tnV2dBL3phNEJn?=
+ =?utf-8?B?MVdFMzNxZm40Y2x2WSt3OVRsR0ZKQVNWUlFVeU1taDVwVloxL1hzRUsvZ1Bi?=
+ =?utf-8?B?SXM1S0dxU2NpWWduQlhtRG5IWTREU0hiSThCTGNQZWw4QlB6eHdMSEljN05r?=
+ =?utf-8?B?YlVFejRGRnFHM0RSQitHcU1leGs2TEdLNTBnTUZXajJ1Nmc5a1JIdkx3T2x4?=
+ =?utf-8?B?SXhNR2kvdmNSNXcvZFpvRXNQZUlwbDROV3RUWW5zUzJMK3E4M1hGSE9ucmpo?=
+ =?utf-8?B?VmRQTll1SHg3L1Q2RnNFV3ZsMEtaWFAvbGNoRnN3WkNXQllSdENVUG5mUXgw?=
+ =?utf-8?B?MVhjNlNzSG5EaysySTluOURjRVovUEhlVHl1MCtpcmdPQUpNNXZDSlEzTzll?=
+ =?utf-8?B?OS9PWUxTck9mL3JSTkg1T3N3aDBOYUtUbk0zWHJpa3R0MGZRWjQyS0lyZHd6?=
+ =?utf-8?B?RGhFelVRcnpsMDM1RUlkRUhtZTJaVHN6WVVDdmtELzZrb0l4ZllJUVk2NGxL?=
+ =?utf-8?Q?vrELbaBr?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UXdJYjhRcFJwUTU0eFd0NEJvV1VhV2psdGN1cTZDeDNNU1YvT1RybDAzNk43?=
+ =?utf-8?B?UUJrQktwTi9wZ0FXbnFsWGRLeEd0enlKZERDVGk0K0ZQUGo2NSt6ZVpWWkly?=
+ =?utf-8?B?ci90dDQxQTdhSmMxVWc0aEc1R2RRaDVUeXF3RlVETEtWKzZyUnpONTM0Ni9j?=
+ =?utf-8?B?RURNazRBbXN1WHlCNTFGWmFQV0h0eUxUQVJnUHI5S2RhcSsxWFVYYTJONWhk?=
+ =?utf-8?B?ZHVreGZORnliRTZyc1pDWk4rN3NYSmU4cHBuZEJNRUlBa3ZVUVdDY2J2dUNN?=
+ =?utf-8?B?TnlYdk1DYmFPVUtKQ25WVThkd2hxL3BEbFE3UUZzTFBGcUh5MzhoclJSYXg0?=
+ =?utf-8?B?R2EvSkR2UWJSejJXYnFpV3NIQnpWdzVWSXowQ1J6SWZGS3dSWTY4M0JlcEdt?=
+ =?utf-8?B?WDdjTnZHM0RtTnhuYWR1Ym83UE1tY2lXMEIrcmcvemdSeGRocUREQlpDRXhX?=
+ =?utf-8?B?QlVxWktQK3p1Z1hPbTFSN2RoaVkrWVp3NHV0ZlhXanl1ZjMwbnZHRDg5ckNE?=
+ =?utf-8?B?TmRQb3RDYytyN0JxKyszT3JWU3R0NnF1bUMwTE53QzJDQzBUUTRHZElEaWxr?=
+ =?utf-8?B?WFdIN1NvR3lBdlpLQWNoYkhvN2NPQTVDbzNtVlQyZWlxMzU2RTNpd0hoWHN4?=
+ =?utf-8?B?cEFTVXhWMUxKY01TY0g0MjU1Ui9ZNmYyOG1SNElUVlJuQlJCTGNRNG5MaDkx?=
+ =?utf-8?B?cFppNUwyZzZLN1lUb3YrekhsZ3c3V0YrVjFiVW1rdmtkZ1ZIakdJcU1zTU1k?=
+ =?utf-8?B?dXg2NmlZcTFkU2Nkc05NdHIvV1VMMWpaRXl6a0s5aXFYeTJZVWRMWHBUM3NY?=
+ =?utf-8?B?ZUw1MWtWV2FTMEFzMXZIYlNLdUxMMFJkNjhXNXJLVVlFVEw0U0gwNlo4a2Rr?=
+ =?utf-8?B?Sm84WEw0QWFEV2Q2Uk1yMHVoMFFaU01tbisrd1hxQ2RGVTRUTUVNV0JwZXFy?=
+ =?utf-8?B?SUxXdlFVQ1diQnFpUldzR3NBclNtZFpobE41amhFTGlCdjI3YUJ2NEdSc25o?=
+ =?utf-8?B?Njk3R1o1OUp2ZnJ4QWg2UFNVN1Nka3hXWWRtRmp2bW5hUG1aNGJXZWFMTndR?=
+ =?utf-8?B?VGZyMEhCRDBlTUd2UnZQMWFKUVJSZ0UxWGt2QVVBeW9HY05KbTgxdGlTRWF2?=
+ =?utf-8?B?Yk8zbVBLdU9QdnF2S1M1T0NvdkdUa0xPYVRpSXNlY1M4RTRjMUdoZGFERmpa?=
+ =?utf-8?B?dHNsZTBxQkx3OEgvbXVnMkliM3plWTN5ZzU2b3NsNERVRk9CcDR3S0R4Mk5L?=
+ =?utf-8?B?NnFNdzc3VjM2UEdKS05BY2VOL2hvbnRWOVg5RGsyWUZPbFpJOHFNNTE0a2Jw?=
+ =?utf-8?B?aHUxdkhVRTF0WE00ZStjZU84akpGN1ZuNEJqd2thWExqOTN2amtjL3pOQ0c5?=
+ =?utf-8?B?UjZKeW9ucE5xdXRma1A0eTQ5eXRVZityWE1hTWcxMzFyLzR0L1dpREJQV2Zn?=
+ =?utf-8?B?ZWsvaGFYbFBwbUVUaDN3akJvQ2EwUzY1cVUwREtVSDF1SHNacDhyQlRyUWRx?=
+ =?utf-8?B?a0pqUW8xdUczdFh3ZVNsTk1haE4xTGN0V3hlRGFuZVlIL091eEwrN3YyMTVv?=
+ =?utf-8?B?QVpIZVREdlI5MWRQVVAvNy92UHZYbHNYSGJxZ2ZmNTFDQjV5bThLNEs3U1Vz?=
+ =?utf-8?B?RG41aElFOGdFdHJPUy92NDdtMEVjN3IzdUJvcHZXNTVwY1ZXR1VvSFFpeFdU?=
+ =?utf-8?B?ZE1jSlo4bTh1a2M4Y3RjdERxYkFjaUhQTXJTb0o2ZlZ5NDI4SmtXQXQ3ZGp4?=
+ =?utf-8?B?UUM0cHhrSmdqMmJlQXdPOU0yM011aGc4a1hqUmJRU3k3ZmpzeEI2Ky9qVk83?=
+ =?utf-8?B?M1pWMVc0cDVta1k5RVU4S3ZWemhwNFB6K2U4cU9OZ1pVUXd2RXNCd3oxSHht?=
+ =?utf-8?Q?aT2BWeJR08Hwt?=
+X-OriginatorOrg: sct-15-20-9412-4-msonline-outlook-fbb9b.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6f30be9-fe8c-4e99-8d47-08df410d4c11
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR08MB5236.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2026 22:35:49.3781
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR08MB5653
 
-Hi,=20
+Hi Luiz,
 
-Thanks for the reviewing this. Please consider this patch withdrawn.
+On Thu, Nov 12, 2026 at 14:25 -0500, Luiz Augusto von Dentz wrote:
+> Sashiko flagged some problems with these changes:
+>
+> https://sashiko.dev/#/patchset/VE1PR08MB5247BE2C05F27B1A2675FA25D5712%40VE1PR08MB5247.eurprd08.prod.outlook.com
 
-This was an early experiment I was messing around with from before I
-had a working ASHA stream, and I forgot to withdraw it later.=20
-My current stack is streaming successfully without it.=20
+thanks for the pointer. I went through the report.
 
-Sorry for the confusion,
-Kyle Pepper
+1) Circular locking with dev->mutex (Medium)
 
+The two device locks in the reported chain are different mutexes:
+btusb_probe()/btusb_disconnect() run under the lock of the main
+interface (data->intf), while btusb_mtk_claim_iso_intf() takes the lock
+of btmtk_data->isopkt_intf. For a deadlock, a task would have to hold
+the ISO interface lock while it waits for pm_chain_head.rwsem. In btusb
+that would be probe or disconnect running for the ISO interface during
+setup:
 
+- btusb_disconnect() returns early there, because the interface is not
+  claimed yet and has no intfdata.
+- btusb_probe() would have to get past the endpoint checks for
+  interface 2. I do not have MediaTek hardware, so I could not confirm
+  that it never does.
 
-On Tuesday, November 10th, 2026 at 4:30 PM, Luiz Augusto von Dentz <luiz.de=
-ntz@gmail.com> wrote:
+There is also no lockdep report to expect, since dev->mutex is set to
+novalidate in device_initialize().
 
-> Hi Arun,
->=20
-> On Fri, Nov 6, 2026 at 9:47=E2=80=AFPM Kyle Pepper <cochcoder@proton.me> =
-wrote:
-> >
-> > Defer BR/EDR inquiry while ASHA streams are active. Keep LE discovery
-> > available and preserve client filters for restoration after audio stops=
-.
-> > Return Busy if a new request leaves no permitted scan type. Recheck
-> > pending discovery starts when audio changes.
-> >
-> > Release the stream count when START cannot be queued or its callback
-> > reports failure, so a failed acquisition cannot keep inquiry suppressed=
-.
-> >
-> > Assisted-by: OpenCode:gpt-6.1-sol
-> > Assisted-by: Codex:gpt-6
-> > ---
-> > v3: Wrap the unref call and shorten a comment to meet the
-> > 80-column limit. No behavior changes from v2.
-> >
-> > Previous version:
-> > https://lore.kernel.org/linux-bluetooth/20261107014841.1452698-1-cochco=
-der@proton.me/
-> >
-> > v2 CI: CheckPatch failed on these two long lines; the other
-> > 11 checks passed. Native MGMT/client arbitration and isolated
-> > hardware validation remain open.
-> >
-> >  profiles/audio/asha.c | 47 ++++++++++++++++++++++++---
-> >  src/adapter.c         | 75 ++++++++++++++++++++++++++++++++++++++++---
-> >  src/adapter.h         |  4 +++
-> >  3 files changed, 117 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-> > index 8e625fdca3..d1fcddbcee 100644
-> > --- a/profiles/audio/asha.c
-> > +++ b/profiles/audio/asha.c
-> > @@ -60,8 +60,36 @@ struct bt_asha_device {
-> >         uint16_t imtu, omtu;
-> >
-> >         unsigned int resume_id;
-> > +       bool streaming_counted;
-> > +       bt_asha_cb_t start_cb;
-> > +       void *start_cb_data;
-> >  };
-> >
-> > +static void asha_set_streaming(struct bt_asha_device *asha_dev, bool s=
-treaming)
-> > +{
-> > +       if (streaming =3D=3D asha_dev->streaming_counted)
-> > +               return;
-> > +
-> > +       if (streaming)
-> > +               btd_adapter_le_audio_ref(device_get_adapter(asha_dev->d=
-evice));
-> > +       else
-> > +               btd_adapter_le_audio_unref(
-> > +                                       device_get_adapter(asha_dev->de=
-vice));
-> > +
-> > +       asha_dev->streaming_counted =3D streaming;
-> > +}
-> > +
-> > +static void asha_start_cb(int status, void *user_data)
-> > +{
-> > +       struct bt_asha_device *asha_dev =3D user_data;
-> > +
-> > +       if (status)
-> > +               asha_set_streaming(asha_dev, false);
-> > +
-> > +       if (asha_dev->start_cb)
-> > +               asha_dev->start_cb(status, asha_dev->start_cb_data);
-> > +}
-> > +
-> >  static char *make_endpoint_path(struct bt_asha_device *asha_dev)
-> >  {
-> >         char *path;
-> > @@ -91,6 +119,7 @@ static void connect_cb(GIOChannel *io, GError *err, =
-gpointer user_data)
-> >
-> >         if (err) {
-> >                 error("%s", err->message);
-> > +               asha_set_streaming(asha_dev, false);
-> >                 return;
-> >         }
-> >
-> > @@ -107,8 +136,11 @@ static void connect_cb(GIOChannel *io, GError *err=
-, gpointer user_data)
-> >
-> >         asha_dev->io =3D io;
-> >
-> > -       bt_asha_start(asha_dev->asha, conn_data->cb,
-> > -                                       conn_data->cb_user_data);
-> > +       asha_dev->start_cb =3D conn_data->cb;
-> > +       asha_dev->start_cb_data =3D conn_data->cb_user_data;
-> > +
-> > +       if (bt_asha_start(asha_dev->asha, asha_start_cb, asha_dev))
-> > +               asha_set_streaming(asha_dev, false);
-> >  }
-> >
-> >  static int asha_connect_socket(struct bt_asha_device *asha_dev,
-> > @@ -171,12 +203,15 @@ unsigned int bt_asha_device_start(struct bt_asha_=
-device *asha_dev,
-> >
-> >         if (ret < 0)
-> >                 return 0;
-> > -       else
-> > -               return (++asha_dev->resume_id);
-> > +
-> > +       asha_set_streaming(asha_dev, true);
-> > +       return (++asha_dev->resume_id);
-> >  }
-> >
-> >  unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev)
-> >  {
-> > +       asha_set_streaming(asha_dev, false);
-> > +
-> >         bt_asha_stop(asha_dev->asha);
-> >
-> >         if (asha_dev->io) {
-> > @@ -190,6 +225,8 @@ unsigned int bt_asha_device_stop(struct bt_asha_dev=
-ice *asha_dev)
-> >
-> >  void bt_asha_device_state_reset(struct bt_asha_device *asha_dev)
-> >  {
-> > +       asha_set_streaming(asha_dev, false);
-> > +
-> >         if (asha_dev->io) {
-> >                 g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
-> >                 g_io_channel_unref(asha_dev->io);
-> > @@ -371,6 +408,8 @@ static void asha_source_device_remove(struct btd_se=
-rvice *service)
-> >                 return;
-> >         }
-> >
-> > +       asha_set_streaming(asha_dev, false);
-> > +
-> >         bt_asha_free(asha_dev->asha);
-> >         g_free(asha_dev);
-> >  }
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 6588a6e2bd..16a0920923 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -304,6 +304,7 @@ struct btd_adapter {
-> >                                          * without delay */
-> >         uint8_t discovery_type;         /* current active discovery typ=
-e */
-> >         uint8_t discovery_enable;       /* discovery enabled/disabled *=
-/
-> > +       unsigned int le_audio_active;   /* Active ASHA streams */
-> >         bool discovery_suspended;       /* discovery has been suspended=
- */
-> >         bool discovery_discoverable;    /* discoverable while discoveri=
-ng */
-> >         GSList *discovery_list;         /* list of discovery clients */
-> > @@ -1886,6 +1887,8 @@ static void discovery_remove(struct discovery_cli=
-ent *client)
-> >  }
-> >
-> >  static void trigger_start_discovery(struct btd_adapter *adapter, guint=
- delay);
-> > +static int update_discovery_filter(struct btd_adapter *adapter);
-> > +static uint8_t discovery_scan_type(struct btd_adapter *adapter);
-> >
-> >  static struct discovery_client *discovery_complete(struct btd_adapter =
-*adapter,
-> >                                                 uint8_t status)
-> > @@ -1964,6 +1967,11 @@ static void start_discovery_complete(uint8_t sta=
-tus, uint16_t length,
-> >
-> >                 discovery_complete(adapter, status);
-> >
-> > +               /* Audio or filters may change while START is pending. =
-*/
-> > +               if (!adapter->discovery_suspended &&
-> > +                   adapter->discovery_type !=3D discovery_scan_type(ad=
-apter))
-> > +                       trigger_start_discovery(adapter, 0);
-> > +
-> >                 if (adapter->discovering)
-> >                         return;
-> >
-> > @@ -1987,23 +1995,39 @@ static void start_discovery_complete(uint8_t st=
-atus, uint16_t length,
-> >         trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT * 2);
-> >  }
-> >
-> > +static uint8_t discovery_scan_type(struct btd_adapter *adapter)
-> > +{
-> > +       uint8_t type =3D adapter->current_discovery_filter ?
-> > +                               adapter->current_discovery_filter->type=
- :
-> > +                               get_scan_type(adapter);
-> > +
-> > +       if (adapter->le_audio_active)
-> > +               type &=3D ~SCAN_TYPE_BREDR;
-> > +
-> > +       return type;
-> > +}
-> > +
-> >  static bool start_discovery_timeout(gpointer user_data)
-> >  {
-> >         struct btd_adapter *adapter =3D user_data;
-> >         struct mgmt_cp_start_service_discovery *sd_cp;
-> > +       size_t sd_len;
-> >         uint8_t new_type;
-> >
-> >         DBG("");
-> >
-> >         adapter->discovery_idle_timeout =3D 0;
-> >
-> > +       if (!adapter->discovery_list || adapter->discovery_suspended)
-> > +               return FALSE;
-> > +
-> >         /* If we're doing filtered discovery, it must be quickly restar=
-ted */
-> >         adapter->no_scan_restart_delay =3D !!adapter->current_discovery=
-_filter;
-> >
-> >         DBG("adapter->current_discovery_filter =3D=3D %d",
-> >             !!adapter->current_discovery_filter);
-> >
-> > -       new_type =3D get_scan_type(adapter);
-> > +       new_type =3D discovery_scan_type(adapter);
-> >
-> >         if (adapter->discovery_enable =3D=3D 0x01) {
-> >                 struct mgmt_cp_stop_discovery cp;
-> > @@ -2047,11 +2071,27 @@ static bool start_discovery_timeout(gpointer us=
-er_data)
-> >
-> >         }
-> >
-> > +       if (!new_type) {
-> > +               struct discovery_client *client;
-> > +
-> > +               /* Reject new requests; keep sessions until audio stops=
-. */
-> > +               client =3D discovery_complete(adapter, MGMT_STATUS_BUSY=
-);
-> > +               if (client) {
-> > +                       discovery_remove(client);
-> > +
-> > +                       if (adapter->discovery_list)
-> > +                               update_discovery_filter(adapter);
-> > +               }
-> > +
-> > +               return FALSE;
-> > +       }
-> > +
-> >         /* Regular discovery is required */
-> >         if (!adapter->current_discovery_filter) {
-> >                 struct mgmt_cp_start_discovery cp;
-> >
-> >                 cp.type =3D new_type;
-> > +
-> >                 mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
-> >                                         adapter->dev_id, sizeof(cp), &c=
-p,
-> >                                         start_discovery_complete, adapt=
-er,
-> > @@ -2060,18 +2100,25 @@ static bool start_discovery_timeout(gpointer us=
-er_data)
-> >                 return FALSE;
-> >         }
-> >
-> > -       /* Filtered discovery is required */
-> > -       sd_cp =3D adapter->current_discovery_filter;
-> > +       /* Keep the requested filter intact for when audio stops. */
-> > +       sd_len =3D sizeof(*sd_cp) +
-> > +               btohs(adapter->current_discovery_filter->uuid_count) * =
-16;
-> > +       sd_cp =3D util_memdup(adapter->current_discovery_filter, sd_len=
-);
-> > +       if (!sd_cp)
-> > +               return FALSE;
-> > +
-> > +       sd_cp->type =3D new_type;
-> >
-> >         DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
-> >                                 sd_cp->rssi, sd_cp->type,
-> >                                 btohs(sd_cp->uuid_count));
-> >
-> >         mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
-> > -                 adapter->dev_id, sizeof(*sd_cp) +
-> > -                 btohs(sd_cp->uuid_count) * 16,
-> > +                 adapter->dev_id, sd_len,
-> >                   sd_cp, start_discovery_complete, adapter, NULL);
-> >
-> > +       free(sd_cp);
-> > +
-> >         return FALSE;
-> >  }
-> >
-> > @@ -6358,6 +6405,24 @@ struct btd_adapter *btd_adapter_ref(struct btd_a=
-dapter *adapter)
-> >         return adapter;
-> >  }
-> >
-> > +void btd_adapter_le_audio_ref(struct btd_adapter *adapter)
-> > +{
-> > +       if (adapter->le_audio_active++)
-> > +               return;
-> > +
-> > +       if (adapter->discovery_list && !adapter->discovery_suspended)
-> > +               trigger_start_discovery(adapter, 0);
-> > +}
-> > +
-> > +void btd_adapter_le_audio_unref(struct btd_adapter *adapter)
-> > +{
-> > +       if (!adapter->le_audio_active || --adapter->le_audio_active)
-> > +               return;
-> > +
-> > +       if (adapter->discovery_list && !adapter->discovery_suspended)
-> > +               trigger_start_discovery(adapter, 0);
-> > +}
-> > +
-> >  void btd_adapter_unref(struct btd_adapter *adapter)
-> >  {
-> >         if (__sync_sub_and_fetch(&adapter->ref_count, 1))
-> > diff --git a/src/adapter.h b/src/adapter.h
-> > index 583168f4bc..d5cda2d96b 100644
-> > --- a/src/adapter.h
-> > +++ b/src/adapter.h
-> > @@ -119,6 +119,10 @@ bool btd_adapter_uuid_is_allowed(struct btd_adapte=
-r *adapter, const char *uuid);
-> >  struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
-> >  void btd_adapter_unref(struct btd_adapter *adapter);
-> >
-> > +/* Defer BR/EDR discovery while ASHA streams are active. */
-> > +void btd_adapter_le_audio_ref(struct btd_adapter *adapter);
-> > +void btd_adapter_le_audio_unref(struct btd_adapter *adapter);
->=20
-> Ok, I don't think I agree with this design. First, what does BR/EDR
-> have to do with ASHA streams? I thought ASHA was LE only, and then the
-> naming says le_audio_ref? ASHA is not LE Audio. If we want to express
-> conflicts, that needs to be part of the driver resolving logic at the
-> core so it doesn't probe conflicting drivers.
->=20
-> >  void btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
-> >                                                         uint8_t minor);
-> >  int btd_adapter_set_name(struct btd_adapter *adapter, const char *name=
-);
-> >
-> > base-commit: a8067198717b38391ca183ed7f41a69ec4b81b6e
-> > --
-> > 2.56.0
-> >
-> >
->=20
->=20
-> --
-> Luiz Augusto von Dentz
-> 
+So I think this is a false positive, but I cannot test it on MediaTek.
+If you prefer to rule it out by design, I can send a v2 that drops the
+btusb notifier and does the flush_work(&hdev->power_on) in
+hci_suspend_notifier() before hci_suspend_dev(), as offered in the
+notes. Tell me which you prefer.
+
+2) Use-after-free in btusb_bcm_set_diag() (Critical)
+
+As the report says, this is not introduced by this patch. I left it
+out of scope here.
+
+The GitLint failure is trailing whitespace in the notes below the
+"---" line, not in the commit message. It is fixed for a v2.
+
+Regards,
+Jens
