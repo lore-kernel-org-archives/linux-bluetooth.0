@@ -1,49 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794505810;
-	b=y5tqGYefOWJSr+IUED25Nzgkm2Lav6XYvqELrzxyxZFpNj+7ZCT+jWh9E4uNhqe8KRMx
-	 +diolB98N8HqWPphAonbG3yQ2jeEHVBvWfr58bWMRwTzWhh1gCkkmsqwJHVymxXuYdWo4
-	 hbr3QqFRY2tMfWbK8ndc9MnR+7q84hdpC5od2igp0+jJi3ASOKt2pJ/kPob45rljRuOAk
-	 GKnm9O+cBJk0dFrbbVuo6PoDFi6fEXH3L5oqqV+26r18+/AkkepUJFEc7PNwCspOXE2ex
-	 I175WmOh1WRnHHDHd+dcK7C3pzkvznizksBa+966lq/AeXz8h3QFz2PNKltP99qr+cA==
+	t=1794507275;
+	b=yG2jD2nK3/+7CoFUq5cELrNDzUfZRYOHOdje7518zyJ+eyT6iRmvCtUB4L1T6upIk6Bj
+	 17DCNAbhsxRITf23gUoZGsyF8GMP9hsommb3fyDUbxMQHb+gBYtlAeQ/E9KF/gjpQqUdX
+	 HryT2k3xYnitSvVtP+QEG+T3VtgLrLKRSNoX0iiWB6FpaDq3AF4HTlzN1zDbGhBGYabQC
+	 y29Nspmo2iGn91bM6+aWmZD2+kIB7EfC2KQX1IGdNqoh+woH2p/L4VDIkzxVCl9jbyFrN
+	 Tc3bu2VdX/U1A1vmOKkPb9lZg9cV9Wps63wJywWsexukakToytTQem6j6Sw2SOe8x2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794505810;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=m5GKxQ8PqLPp+hqlEzITev2GBalcccPFypUBkQBbQWc=;
-	b=LfUkd+0hZWRVTDqFGnvwNapeMO6nFDbAvODg5G45Pjskugc6hLImwJJBc6I6VXR4BtJz
-	 T0P70+i7t+P7z6rmwOlXeJRj/Gz0hBydJ9BcOrg5B9Ozt3yT2Yk1tFLwY/5PblYan2JYU
-	 KKbl2yxzINqZQH17Oqh9hmIxT53NmkqB99H5uLvx8U4q4TMxIC55KeSgaBMXxCfvvvKVW
-	 gvuY5N9M8SUVAKZaSUT5Q0lnQNOtPEZWjSTWcMs79hqcfry4Kz9ujK118T0BsL8uxeY8X
-	 x/r0Ld26b2kIdKZqXLj6F2t7dnaDA+CtbKr1Cif4tYtF54niPEgTv2MuCZem97zRjrQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794507275;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Dpil9psFlgtwIMWjATh5d8pIq09fAQ6eGJvVY1xSHw0=;
+	b=JCfSZf8vr5ys5AcEVYJ6z82X1cXsI/VCLQE4jUwoDvdrFX1gQvNvDZMYzgeWdpjUpB+2
+	 kB1RiL3yGC2G4g5NAecXG6Fq2t0WOPjEnnw4XvAUmjSspKJFvDt3N8dG9pmnHrJNHl7MK
+	 AXKI5cAqBufLxM7bLEcylbfVRvzrnOYyzByAd25m2mRfmbIpfoYmlZoMxNLp0K8wonX+I
+	 4tGqbQ09JIr3/3YaYjvN82i2WTPXhJa8dzsWj9iGl0nyF8maQvJCQD+RpaLLncvMh/9f6
+	 Ba1WOHC1MLpAF2sEdUifZvssJU25oF0Mka1K5HpQ/m4NQWBPFxOsHHS5xETqikLNAOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOHjOd3E;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zPff5lAD;
+	arc=none smtp.remote-ip=209.85.217.43
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23279606A331
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B87F606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 18:14:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0B87F606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOHjOd3E
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE611F000C4;
-	Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794505809;
-	bh=m5GKxQ8PqLPp+hqlEzITev2GBalcccPFypUBkQBbQWc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=UOHjOd3EudlWH/RNB6CToQC4vt5gtItpf6Vo8QAS5TMuc/Bs4aNlJh8lnmfpapuP0
-	 1wXQySZ0E2K5/tcQw0bALkO4J/IzaIqLqqV5X1D7OiaQHrtUxYF0O4jMkYBfTtY/ID
-	 +aMaVPQJ0flyCvc8ebhQAwAM546drk/GBOGjgIqV1Ju8um+4nnDbn5jsjIKASdB/V3
-	 Y0498R4CM6fIS2I5K9BaXoVoQk0mqnJjfCz0z2uo8WVgeB3CrC/LTeLyQUUKucz0sg
-	 gJNXtYRncI+AvoHk2CCNXOqTTmFIDmOQyJA0Cyd/dMAFM/rhTsIQjEUAtrqebKgqY7
-	 V+rFiacHub+JQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4340380AA78;
-	Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zPff5lAD
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7d2d18f1bf5so19313137.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 10:14:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794507274; x=1795112074; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Dpil9psFlgtwIMWjATh5d8pIq09fAQ6eGJvVY1xSHw0=;
+        b=zPff5lADdv362s43mH8dgDN44z5mblqkE9yy65vlo25pI+Zd9zQjq5L1NxF6UdKHpN
+         ji5KWwEkW9uomUbQiB3Z3vAPm9xIDwlYhD6FGmZT1ahH4dEE/cs/tBPogbz90uwhsIeo
+         54h9IURrkoAgq6VAL4DPClMFtbCRicrclYMAHOT3aLroE08+Os4HWiIfaBSS+MtDddw9
+         swO9S5gVV+6T6sYo9slGpS84+GAgeMbcUB/HCsnnMkoaunKLzXHndw7WjyGWQo7APWFW
+         Ca9FKh7lauGEYrN58kKPOSCy2SS7PKEE/MDxbVqTgNsUoyWiBUMDpOfPBmp57HhETjAb
+         t7XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794507274; x=1795112074;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Dpil9psFlgtwIMWjATh5d8pIq09fAQ6eGJvVY1xSHw0=;
+        b=d09z9GDEHBW59a8i1gctGA6Iu5mQvM+eFG5JNtkmo1V6IJCPaap7gbgu9xRraDEJ97
+         CCUKqL5qwFmmsn6Y2hSMJ/t9crZA+0w/fk7gXi/JH/kapneNAjoXgZ4InMDovk93c+C1
+         BqXag2BsgmRQYaiWrWoU9CYAY+LpIhCOR4NMORlTDWOGN7u3DD///tUpLXDe9SZ78WSf
+         LL7nwuJAI5OJbV5xh0i49Yesm2zanKI4LtGlvJKHo+L+OUEw1EtrGE/8c4oOc52VHLGg
+         c3xO2Y2h9D6BeO2nT5xxqB6vhkeAAafB9hkZfCwKahuij329asdLNX4SYVQz6zLcXZH6
+         5WMA==
+X-Gm-Message-State: APuU4Z/oODGTDAHwOEKNVBU7ixgrWQj1Y/rG2GhHWXrkMqKAMXrBZfWY
+	pEJkfOcAzJniAgnCCn4KNDIC/G8nFM3ECUkqoB8XQTexFUm+f+3IsFkCuxl2Xg==
+X-Gm-Gg: AYBFou0mQITEnBBf4d+zIEgreRJvQ4KPDmYZF8fJcVBiERf6dB9oivEKDuTYCUlmUg4
+	R1Lju7LrALkPMdxX2ppW3NoBqZnuIZf0eWytgVUcxh8QHTmuWnUWtLIUIvme2VxWolA5cae58ff
+	D47xFy+jBMv1uwppMzCMWUJ5cD2qDsWWCfw7RgMeoQf7Vpnirto1TOdAddeYhUaC1MBgoBR8du0
+	utWmQ13V3whFydkd2cI1DH68L2rUwGGBv+wt+kLhF45hKb5wqVqVQxX5AvWuB6ymYoXJcsfOcfu
+	Dp47b7U9aFXs+icgX5AcPNKm21B4COJzS+D+CSykB6VnO723pJNUuKIEI5eiCYEmCgsIobYvxqT
+	CgA/p0TSYPNj5eaBZY3vEwAFddEgcrtTf7J31gd7NXnpuBs5jV3QLXjRWAz6HmlZ8OacT46adkU
+	6xLPj3xCsDhGtGrG4cuBOtJe52vTpYPiAp+C+O7XPsvcD+cDFYMVUr9jFcMEQKKl0p/+JOLdFN6
+	B4kagzJ/twa1TX5ZdW1PIFY0FhJ+t3ZEU4+yi+s6oDVGlQvWoxHz5Q4z/JMweDT9i8RxFmO2F9R
+	75fig0OkDfWcbNXz1LNR1XXNKoZfwYv5Y5+P9rrLLlOxDd83e0SJ2YYWOtK9szDiRm8I+uatKiM
+	M4v8Vtzb3QaFe+PZyL/iGnS0Ca26+fcl3yzmArroYCeHLqh8ELfm9oXKWmUlnwm+AbA==
+X-Received: by 2002:a05:6102:4188:b0:7d2:cdd6:6c2 with SMTP id ada2fe7eead31-7d64d76d256mr6938137.17.1794507273942;
+        Thu, 12 Nov 2026 10:14:33 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d64c1b33eesm178749137.2.2026.11.12.10.14.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 10:14:33 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 0/6] bap: Release cached ASEs on ClearConfiguration
+Date: Thu, 12 Nov 2026 13:14:25 -0500
+Message-ID: <cover.1794504552.git.luiz.von.dentz@intel.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -54,52 +93,48 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 0/5] shared: Use util_iov helpers in gatt-db,
- hog,
- asha and micp
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179450580827.563116.10974231348534576330.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Nov 2026 17:50:08 +0000
-References: <20261111203949.3874673-1-luiz.dentz@gmail.com>
-In-Reply-To: <20261111203949.3874673-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+An acceptor may keep an ASE in Codec Configured, caching its codec
+configuration, once the initiator removes the transport. The initiator
+then has no way to get rid of it, as it no longer has a transport to
+release.
 
-On Wed, 11 Nov 2026 15:39:44 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This continues the conversion of the GATT code in src/shared to the
-> util_iov_pull_* and util_iov_push_* helpers, so that the bounds check is
-> part of the access, now for gatt-db and the HoG, ASHA and MICP profiles.
-> 
-> The conversions are meant to be behavior preserving and are covered by
-> the existing unit tests (test-gatt, test-hog, test-micp). The existing
-> code already checked the lengths in the HoG and ASHA readers, so no new
-> tests were added for them.
-> 
-> [...]
+Release such cached ASEs on ClearConfiguration of an endpoint, and add
+endpoint.clear to bluetoothctl to exercise it, with a functional test.
 
-Here is the summary with links:
-  - [BlueZ,v2,1/5] shared/gatt-db: Use util_iov helpers to build and parse values
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c37508359cbe
-  - [BlueZ,v2,2/5] shared/hog: Use util_iov helpers to parse characteristic values
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=628a84f214e4
-  - [BlueZ,v2,3/5] shared/asha: Use util_iov helpers to parse characteristic values
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a848a36c8154
-  - [BlueZ,v2,4/5] shared/micp: Fix reading Mute State from an empty notification
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebc4876e895b
-  - [BlueZ,v2,5/5] shared/micp: Use util_iov_pull_mem instead of a local helper
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1bd266143b3a
+This series is independent of the other two.
 
-You are awesome, thank you!
+v2: Wait for the release of the cached ASEs before replying to
+    ClearConfiguration, validate the transport path of endpoint.clear and
+    update the remote PAC of an ASE when it is reused (new patch 2/6).
+
+v4: Complete every pending release of a stream once it is idle, including
+    the ones left behind by a failed release.
+v3: Reply to ClearConfiguration once the cached ASEs are idle, and
+    report a failed release as an error.
+v2: Wait for the release of the cached ASEs before replying, validate the
+    transport path of endpoint.clear and update the remote PAC of an ASE
+    when it is reused (new patch 2/6).
+
+Luiz Augusto von Dentz (6):
+  shared/bap: Add bt_bap_foreach_stream and bt_bap_stream_get_rpac
+  shared/bap: Update the remote PAC when reusing an ASE
+  bap: Release cached ASEs on ClearConfiguration of an endpoint
+  client/player: Add endpoint.clear command
+  doc/functional-bap: Document clearing a cached configuration
+  test: functional: Cover clearing a cached configuration
+
+ client/player.c               |  57 ++++++++++++
+ doc/bluetoothctl-endpoint.rst |  20 +++++
+ doc/functional-bap.rst        |  24 ++++++
+ profiles/audio/bap.c          | 158 ++++++++++++++++++++++++++++++++--
+ src/shared/bap.c              |  32 +++++++
+ src/shared/bap.h              |   8 ++
+ test/functional/test_bap.py   |  23 +++++
+ 7 files changed, 313 insertions(+), 9 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.56.0
 
