@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794514807;
-	b=iLwzg9rsoeFdjo5XNqAdeBOw3uoGjelRl2FGcdmYu5UtO2yjK0Y5KU1kgUQpvnACyRbo
-	 Dix2QRWsEBdI+6oNwA6FELjBXzVgXq2NEy9BpBdrYZEmnXo+PZzQcDjExwcHJwoyNBDqP
-	 IkeTBe3V4d1Xd1fzTUjg8eQpYbvpucDMFAg3z445+V+so5Law3v3a8T7MDMMWb2QKIXGP
-	 pstFXqgSf/25Q+qUpX0b4LH5v/U2m3uEKjaozRKF6muPrOlAvR9O0gMVx5+RR6wilv3VX
-	 UT4htl48H3L5Injm+myS3Up8B71tY39ukKEgMwt5hvioXGc1o/ekKSmMqvLbO6yExfA==
+	t=1794514806;
+	b=Pd1tYao5oH7i8zHDiprdq2RoGfv/WAqfRDb+36okYfstPTU45T0MupSK3SYq5BVrPL4q
+	 uMokbPnrmlkTSLuP6m2fhpnzjo51dafIboBB0wWNfE2ynm2F6WGIWXjBGb23KT5xHHuC1
+	 6g2PtPGvkemevbkIDCGD1Z79xG+g/xNIDVgd2tAij/MpSJwN/T32l4vRuTYbq4wPld+F2
+	 7pPGvy9D3vPOuyISrHuoGxSkiWHbX99g4+qiYWhUWmQHFYm+vHLc5HtBv01+nCpvVy/a3
+	 7vGWf58v+tuZEzxqFX8sr8SE+Ho06f0pklMZhyIIq2Qd5tU2O8y7s+2BKLSwQP9Rzfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794514807;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794514806;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=AuIrpwqq6b9D3mRoevwFLaylT0YExLcBIQSkTN6KrGU=;
-	b=S149O2Ayd7jB/ed3cNoXK9kKkC1TFonn567Mz74nsRcG4Kf7XP1Ww/tSTyvEmFKWkHrN
-	 Ie6CgcDNptnT7/THDi7XY8jPh7yLq0NR6pNclcl7bdOzVXT4Jckgf+0vf8yFIblCegb2t
-	 m2Sj9Dy85VFx7U3cs3Xh5xDcJ/wgrjYbO+AFVX6Aw/4cSah8g6CM7eWkPvYJ/p7iW2+UQ
-	 lInFpu9hbN0heY7ZO0TxzVIxeK8VAJc2Hhg0zKf7t2t9o7rD3+QcGoHNiSplGSo0kJX5J
-	 EM9i+LBdJ5Lxfws6OxoIRbVElS00Jh801jl6GylDQ1mUSydTiPRAHqIzXxkukvBxMZA==
+	bh=sOUSQUlOuiiLtiJvh4uWdl9GFgKpaaJmN5Pvd9I9Y6M=;
+	b=Wu/L5tX0dvXhgG+s5Kk8szivvSnU48MTBSvYyYE1LoTh4h8svdw9QhzHn4sISm1B5WwH
+	 XhKUIVuX8XqOOl4fA2HEztTligSg6NW6ORe/Fg2HxgDhpC2Hej+AAXTbRRV0zNiOdTPNu
+	 4pZM4GZoF8y+6prFPYfgvPVLAWambeLpOUpituMh32cTOhRuSPAtoFIzb0QidMhaF0sCu
+	 4cVzmX/8zaQLsbi7JjXj7w8xeKd7Je6kqVSr7Oicd+POMHIRa1/xm/Y4kuveNijHm1851
+	 tzKBMbIgpEFNNAeFDhfRF06dC0CI4KUpMr60IvgYgudR4A6XlAKILg3hc1PnEItfaxw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="gG2TT/RS";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XejwkhS1;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF6E606A335
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 20:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0696606A323;
+	Thu, 12 Nov 2026 20:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gG2TT/RS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC391F000C4;
-	Thu, 12 Nov 2026 20:20:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XejwkhS1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 426931F000C4;
+	Thu, 12 Nov 2026 20:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794514807;
-	bh=AuIrpwqq6b9D3mRoevwFLaylT0YExLcBIQSkTN6KrGU=;
+	s=k20260515; t=1794514806;
+	bh=sOUSQUlOuiiLtiJvh4uWdl9GFgKpaaJmN5Pvd9I9Y6M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=gG2TT/RS9YxQevP2jpqjn86Bas0ckexdvK9cLkso/vMand98Y5rurss8c3PlW3Z9C
-	 VEebSt6qv4nuxBP3a5rlGXHEUL9teM0GW1XJwjAqa0M6JSqng5GoW5VKZizV0q2QeC
-	 KsOWkxLcUHBoUxgNbRZ9M8ALSInT2dFwpLr4S6D7bJk7SUiGt8Mofk9v4is2WrA7RH
-	 gJLChqqYdZVZFSWpNJFP7fK/Fbqb3t+ASN7ngKBCGJWI2/oQTJr1PUrStMKR24yyAX
-	 zzJgQ1NKN8Cn9yRnLoL+0gMjl6M2P6IaU5+Rrt788+8ka6rypDHHkLNSQ5R6EB/GJ5
-	 +wsh45VQfqxog==
+	b=XejwkhS1QUyIww5e4xS7yJFMkye5trk9QlSP2S4k/HQpKb9SNALo/WQv890v/hoyO
+	 uEO4SK+KTTuXAROSvfJYPtOd/bH+6tFWEgWBz7pJUQ9qSnY4dnG+lK6L9E0RPwczma
+	 Dp8d/jbfilFwFsBNkNjPYHWuclg7Luew+tiCOY73SsfKxOFvvPzOzOXFAiKhq6M0Dj
+	 TpWgdagUVIo2miYKSoP9zex7IByXsXllnVg7qZiBxF9Q1U9gaJUlD9jJGu4hxJ0t5v
+	 G/lTMj/ZIBf75+F3GAelCl1laGbHTN8vBUEH8pyqIC52j8e8RZ7kmANLoD+k/8tpk9
+	 EgeGGSnLqqYrw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B44273926259;
-	Thu, 12 Nov 2026 20:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A3693926259;
+	Thu, 12 Nov 2026 20:20:06 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,37 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sync: Drop the command's sk reference
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix size check for receive buffer space
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179451480627.628769.17407039026686649697.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Nov 2026 20:20:06 +0000
-References: <20261112033428.898540-1-weihong.guan@gmail.com>
-In-Reply-To: <20261112033428.898540-1-weihong.guan@gmail.com>
-To: Weihong Guan <weihong.guan@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
+ <179451480503.628769.12990613488160990578.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Nov 2026 20:20:05 +0000
+References: <20261111214905.518429-1-amirabudubai@gmail.com>
+In-Reply-To: <20261111214905.518429-1-amirabudubai@gmail.com>
+To: Amir Abudubai <amirabudubai@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ marcel@holtmann.org, surban@surban.net, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 12 Nov 2026 03:34:28 +0000 you wrote:
-> hci_cmd_sync_alloc() takes a reference on the sk a command is sent for
-> (sock_hold()), and hci_cmd_sync_complete() means to drop it, but looks
-> for the sk in the response skb, which never carries one. The reference
-> is never dropped: every command sent with an sk leaks it, and with it
-> the sk and a reference on the bluetooth module.
+On Wed, 11 Nov 2026 15:49:05 -0600 you wrote:
+> Check that available receive space covers a full MTU-sized SDU and its
+> overhead, rather than just the overhead. Otherwise, credits can be
+> exhausted before an SDU is completed. This could result in a deadlock under
+> some configurations and SDU combinations.
 > 
-> The commands sent with an sk are LE Remove Advertising Set and LE
-> Clear Advertising Sets, for MGMT's Remove Advertising and the instance
-> removals, and Read Local OOB (Extended) Data. After each, the module's
-> refcnt stays one higher with no socket left open, and the module can't
-> be unloaded until a reboot.
+> This follows the SDU-sized credit policy from commit 96cd8eaa131f
+> ("Bluetooth: L2CAP: Derive rx credits from MTU and MPS"). Clarify the
+> comment by replacing "packet" with "SDU".
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_sync: Drop the command's sk reference
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f3183d7ad101
+  - Bluetooth: L2CAP: Fix size check for receive buffer space
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3b069de8a5d6
 
 You are awesome, thank you!
 -- 
