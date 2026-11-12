@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794451147;
-	b=XtEQ6f8eLhAvoJdg9XoIQZwh6BAz+EaE2xAL9jN9Izw1flmezya58do2sAxmeedCF3Gj
-	 MFNSWJMnBcjNQE+pyg5rC+Gdpr5AkO5rHC4+ZfCSiF2BsNbe/zZaBb/nWonreM2ezGMNX
-	 iQp7KEbd0Df9z2tx+semdBB7/6fEEJVmdUPTc3Ianq4xGDv5seInDLL4l0Aj2ZaKRtRzp
-	 7TfWPDDEDTjub2Kr7pSkNv8wTD+UzJDvk8c6/TbS8SZ/qiVXYEeeKfm0VyvC0+xauoued
-	 BH/ZL4o2cqhGu/38dVYPH4RY7q7vs/i8Q9Ps7HeRKo9W6m/5Gku/Ic5TqF8A8prnD+A==
+	t=1794451149;
+	b=bh77UB8H67gZzOj/ltYSfsciUBAmR6GMAJ07Bpn5uyXCVPIJgXuEtIY9rQnlb8BkLLik
+	 5RuMbn+H2cn/3VBHPmcJdV1b/2/peCqwJ5kvNTVYoXTMdj3K82I9DKhw1e66n/nTQPvDn
+	 TCfZkToD4oVTwSK3PKH+TNqmRpGBK+OdlVMQDTHAafvuu2dyC0v/hV19/UKwrsgN+G2+r
+	 hp5bYkXORN0nQi6WrSWx+7izT2DXPeB2+0pRWSWWN9kR5VRD5CYyxw1nRXyvd8Ex/li2Y
+	 QNp0lVkEsfkMCT4RcFFFMOezkUas5MgiB5XAMAwKFMLaTXkTFxTEFOeDkjBGhg6fh7A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794451147;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794451149;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=QZ3rraioebdUeCNwMhzMOUwSr0RCPcqwXnR69Jd2Us0=;
-	b=QIrBYHkzCUHpWs5YV4qSqAwLESa3pz/q5RrSduEWqXQJ3fuhGi7jMp7mhct8p6ryI18b
-	 hV4hd06O6EpfGYfs991KDkt+3QrNA8+df5ZqFeqXdx7UqnlZJ2K5Z5csvA7Zoq/AJLGjv
-	 WaPevgbk8SfeWsqpQ7bDHeDqoIt12Fi5+I69AdDcGfZls9BtVOBvZ00t6zPeS6R/ckaSp
-	 maFH+FUuRfFQJCKZdVAUs3PIylgrxdHMZtJN3YGLF/tJ/vvBPbdJi5vb/Mnil5mg0yhG4
-	 2sdE8SNmRzJSIMK+7OZ+xDOA9sxD16fEDsPD64OHDhd7jZmcK7serRAO+kHCwLVwGCg==
+	bh=zl69Td4flcv2GN4L8NNcvmLss9Guto6iBr3SBufS+lk=;
+	b=mEb51TmDPJghp6JjU5XGh/smHl7hvX551TJJCdPl7ozKGtaxCoYwfA440pRyqm0I/VK4
+	 KLOwE/1eQaaA4kJsOK4KIc2jTqhblbaiJxBxemYXaN5uCth49pnRlPYwSCSZxLh6HoQUx
+	 EwhlhxfttMbejQCTmAnZpF0xXCHemWaJzXpZkPPdH7Oyb6WwM179Bc5YEDA7Z8mxkGU8j
+	 J2x7Hme20j8ZvhOxoBZcFoqp22bqeIX0xm9Wy1th+gTzAFL/bS2ghTvMsxKLbZRtsQXwR
+	 I2KTxyaQyGYxw0zZh8E8SBCkVervn1efVmr2tensI2OHalpPHab+k+YTNYRWqX3qPUA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QSG6hVw5;
-	arc=none smtp.remote-ip=74.125.82.53
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vVfEM4dw;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE9A606A321
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:39:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5CE9A606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EF4606A321
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:39:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 57EF4606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QSG6hVw5
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-170135e43c7so2028128c88.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 18:39:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vVfEM4dw
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1b3acec6677so5678063c88.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 18:39:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794451146; x=1795055946; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794451148; x=1795055948; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=QZ3rraioebdUeCNwMhzMOUwSr0RCPcqwXnR69Jd2Us0=;
-        b=QSG6hVw5XpXr+DiPM15iNrzXRYL2tTTHBiasa0rVaY+/elwJ/+lGWjrCC3gLPvylTm
-         yU4wYBL7J7aM9nomjM5qENJeaKu9AVuaT7xJ8oPnWWtsQquUqCI2mQ3TYwRhAQiKpAxv
-         wlJXkoomSTIX7+DS3zvd1XXryMN3Rrps9AHLmIklDwakP6WBOnP0/gUzWtFDV7OL+SNZ
-         8cXPGucKe6g9dmNr5Viw1xZjfuhFi58e1Jew1JRV+E0HMtQwkG2JRUJoMBNfxSPUeSKi
-         QL1VYgFEIzYW0rk8024YCit2NHFUXHlGzRaO6q6Y/0R3+FXHEbmNOegg9H189KloewX6
-         3T/w==
+        bh=zl69Td4flcv2GN4L8NNcvmLss9Guto6iBr3SBufS+lk=;
+        b=vVfEM4dwDz4XHUBTRlxV4TUDIvPbxCajzoVC9mb3R1/DmegmqxTO2m4QYZ63elRex8
+         uSkSu0lq4jaHT9K2FPN5C4GyOBWwOUg7syfH69dKO2k6oehp2K0kmy75Dv19QI8amNTy
+         pOSi/Lx/Wts346Xp9SSx0QCwxu0TtFvHJq+I6PCbJlpd2lkp70CszGPXjKn0d/Fs33HE
+         3Mw5ak0eQGYw/th09Wflax9l2vCQlnlKcim+jYCaAR0170bCDzwjI6xBtKX8rA4rj+mp
+         +jw4h88w1FqVXer7OU6w0DMthUX50hUJagYmBPJ3aR4DvaIjSZCom+PXDOoFD/3Tdv0V
+         kdvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794451146; x=1795055946;
+        d=1e100.net; s=20260707; t=1794451148; x=1795055948;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=QZ3rraioebdUeCNwMhzMOUwSr0RCPcqwXnR69Jd2Us0=;
-        b=kt8Zh2AuxZQnsA9ull42ECRaG1kJgRkoe+UMjEeQVEhIDfeP02Y7mF8ju2YRh6Y9I7
-         vW/HlMWpONzRrGRdIjUYsGZonxXJ5IeQR1u5C5uEX3xyXEJv6f9s6m/uGB2UdwR+nbRR
-         jMlE72inLzaxQkx+DsIoQPD5SbH+FrsDWISBCliHac4bmY9IxdTzyM5Fid9On1BBnIl7
-         QhLOJvzdSquCXyJZSd2rRk+Qjf2OqAzhpgSCVai5DN3LVEhoSeckfe6LHiz23CQ7SLzQ
-         DhELkHaGQClPjWxHZG+lJ0AxFcj17s40zPt/i/URt9vG+lZfejv/rIOcU4eLuLjSZTud
-         rSJQ==
-X-Gm-Message-State: APuU4Z9aLLzwZBuIKNaiOqDM8HKktBoqgc6AJjgCaHpqIaj4XsewYPam
-	l20Airy3JrksPUk49XH3/nWYetJuaE7ncGS/ow4QbxddB26JRN9WiJTlBTj09y3lbAE=
-X-Gm-Gg: AYBFou1ZfFW+AddJ7RzmuFMoug8DX/0jVjQRO1CbvKKcVHia/LGoPwAop0tP0BfaVUe
-	qmYMsr3IQrM26rTbfVuAvrRuJPhEm17sz7vUa+roPxXADANHdBthstZJBA0W1KvZVMGTVloySY2
-	0Uc84kmgca4whNHtA7PS8+ZSrocqeLOqhfJEKyFdg2cuNLAIuWijVJ8f4OB91uzz2F+ZGyqMmef
-	yEjNfY71m8BahavpR8e2tczAZDPMFszLh9srrsrGHd3YrOUdWgsJx2wPFfVnFLJFuHAAgy9KMCg
-	P2zD2CPWLa4BKOY9uTLCZsmJZgXOysI77R4pm2XSbhdkJAbHkJyhNDCnXbTfupWlC71ciwuu4/7
-	zPewxmK2nqiVuc8gy8+lWYNCL/1Nfzk24jS3sbwokGRYYwTI8bY0AUlqTMEmiKAnP0PE8M0qZEp
-	S7GjlS0X70BPXIPUAO1JWNLpQuq5rpkdi1Bgf4WYWs8wMi2vJ4a69BvpjRV+tD0gwnF8lbrkpOu
-	iefeR04/rUGw7DA6jKe7BiiItLVpOmxoD6iG4s9rTRZ6V6DMQT3dD1TtSpz8BBmU+0Y/6uVzJVU
-	dsCBgN24ojc4e61Ywe4AqsxjOVJfIRgZf9h5vrTMC++f+iAkNQXPubAYtfQK57qOzbbQhaLsr+I
+        bh=zl69Td4flcv2GN4L8NNcvmLss9Guto6iBr3SBufS+lk=;
+        b=SinOvVpdFmyMwFvW+Xy9xHrQyROLpmNZOAWZZCWi/LE+OwKRyYK9Ui+XDFbuxlPja7
+         zLGCrLeRqu4EYw4LS9GRbwRxZaFivM1VHfSHclwWKElsZ3HpJ4ucZiVcS1t/MBXoJYVC
+         ZbxG24FUf8kuRN5SnywXSdff1tjNrcPm9/eS3QhRaNo6H9HOvZ3gLvV+mUURhkUzA5bm
+         ngdEpN8uLohB1AVyjx//M9YBjhnsIDcu/ZD1hnwZmbzvhNNPWRrNdOJEd/g+8Z/HmGaV
+         b0gY9uG544s2Cq3bZWRE0fTJWOQg1fVVYQjJKSgj4E4oTon7sMTMjwgWGjXiG48FKZqk
+         qNMw==
+X-Gm-Message-State: APuU4Z/6hF9xgLV1yy328PaD362pOeH72Nae3fCKqEJtLDLgUHEUBkGd
+	CqF9UWcKMHGvXnOXCbIs5yhfaw0hyzkjsB/Vm9V5YL0tnHcQUdm1v1F6DAFl1V1rjpY=
+X-Gm-Gg: AYBFou2Z4bU9pjZYlSNlvD+Ybh61jxmsJQmPSxNvAe8o0f1wxOtZSF2zL7a923TJQR4
+	qbohZoCkbuUFYqBeO6hNsdjsRtCVVROSkddLGOxOLsfLqxnhNXT1fLK6X4DIIfsoXr6re5AuFyd
+	ucgJPtDJBQKeQtAzdj6jduzq4Q78SSP5c99yxN/vGXxoaX9jfMVzFHVafhGuYFbT665A8QjsCKL
+	JDk2qI7rs6KUvY5eWsYbmPW+NWXizlhYZnaxTYmX5YB4I4c42cEFK8fEsLKcXKPQNQr5AP51yRg
+	5w3fQCYEtUNA/hWMOYOG741afQUQksvBKk4h6lyp4Crn8cfnNY9KCHiheGPnAn2x2kYRMfkKuzq
+	KzGRoY4p25Y59LZA4echhKuuf5E2im/LqU7xHj1yNBFsXhEJXorPeb75x/ytnNDUIhzqerAgLJG
+	gAbpvl/d08zGDh/EuncQYQ64r0YG7t3g7uvyPHGwuOeE17A40jYJ5FKdEKpHm+s4KzexstWnxTU
+	iXMz0bFO4pByQs9LYfuEudFRr3DfOrZq/EE51okAmXec2H7Jq9c2QOuwT4iAAV53ifutmHdaJqU
+	ZiCfVc8LCpBxSORrii25oyvcjlR+o/frW7TjPnqvus9SUdFTnvP5/EhCkP8gJ5BmvjivSbvOJDQ
 	=
-X-Received: by 2002:a05:7022:f902:20b0:1b3:a9c0:6a3e with SMTP id a92af1059eb24-1b3c032e5f1mr4385537c88.29.1794451146356;
-        Wed, 11 Nov 2026 18:39:06 -0800 (PST)
+X-Received: by 2002:a05:701b:20ce:20b0:1a4:3169:cb with SMTP id a92af1059eb24-1b3c0311b8dmr4062428c88.17.1794451148453;
+        Wed, 11 Nov 2026 18:39:08 -0800 (PST)
 Received: from localhost.localdomain ([96.44.128.241])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b3b5b4efc2sm17819912c88.15.2026.11.11.18.39.05
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b3b5b4efc2sm17819912c88.15.2026.11.11.18.39.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 18:39:05 -0800 (PST)
+        Wed, 11 Nov 2026 18:39:07 -0800 (PST)
 From: Weihong Guan <weihong.guan@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Weihong Guan <weihong.guan@gmail.com>
-Subject: [PATCH BlueZ 1/2] emulator: Set the number of advertising sets
-Date: Thu, 12 Nov 2026 02:38:57 +0000
-Message-ID: <20261112023858.892176-2-weihong.guan@gmail.com>
+Subject: [PATCH BlueZ 2/2] mgmt-tester: Add single advertising set tests
+Date: Thu, 12 Nov 2026 02:38:58 +0000
+Message-ID: <20261112023858.892176-3-weihong.guan@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261112023858.892176-1-weihong.guan@gmail.com>
 References: <20261112023858.892176-1-weihong.guan@gmail.com>
@@ -99,132 +99,145 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-btdev reports MAX_EXT_ADV_SETS (3) in LE Read Number of Supported
-Advertising Sets and allows that many sets. A controller may support a
-single set (the command's range is 0x01 to 0xF0), and the kernel then
-gives advertising instance 1 handle 0x00, the handle Global Advertising
-uses too; bugs on that path don't show with three sets.
+With a controller supporting one advertising set the kernel gives
+instance 1 handle 0x00. Check that the set's commands and events use
+the handle rather than the instance number:
 
-Add btdev_set_adv_sets() and hciemu_set_central_le_adv_sets() to report
-and allow fewer sets, kept across HCI_Reset as a controller keeps its
-capabilities.
+ - adding a non-connectable instance sets its random address on handle
+   0x00;
+ - an instance whose timeout the controller enforces (the set's
+   duration) is removed when the set terminates on handle 0x00;
+ - removing instance 1 removes the set on handle 0x00.
+
+They pass on bluetooth-next, which has the fixes since commit
+4dce35adafb5 ("Bluetooth: hci_event: Find the owner of a terminated adv
+set") and the three before it, and fail without them: the random
+address goes to handle 0x01, a set the controller doesn't have.
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- emulator/btdev.c  | 18 ++++++++++++++++--
- emulator/btdev.h  |  2 ++
- emulator/hciemu.c | 14 ++++++++++++++
- emulator/hciemu.h |  2 ++
- 4 files changed, 34 insertions(+), 2 deletions(-)
+ tools/mgmt-tester.c | 87 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 87 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 7a8d8a4..d7f9e5e 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -280,6 +280,8 @@ struct btdev {
- 	uint16_t le_rl_timeout;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 201bd43..c8282f7 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -367,6 +367,7 @@ struct generic_data {
+ 	bdaddr_t *setup_bdaddr;
+ 	bool setup_le_states;
+ 	const uint8_t *le_states;
++	uint8_t setup_adv_sets;
+ 	const uint16_t *setup_settings;
+ 	bool setup_nobredr;
+ 	bool setup_limited_discov;
+@@ -505,6 +506,13 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 	if (test && test->setup_le_states)
+ 		hciemu_set_central_le_states(data->hciemu, test->le_states);
  
- 	struct queue *le_ext_adv;
-+	/* Number of advertising sets reported, kept across HCI_Reset */
-+	uint8_t le_adv_sets;
- 	struct queue *le_per_adv;
- 	struct queue *le_big;
- 
-@@ -576,6 +578,17 @@ void btdev_set_rl_len(struct btdev *btdev, uint8_t len)
- 	btdev->le_rl_len = len;
++	if (test && test->setup_adv_sets &&
++			!hciemu_set_central_le_adv_sets(data->hciemu,
++							test->setup_adv_sets)) {
++		tester_warn("hciemu_set_central_le_adv_sets failed");
++		tester_pre_setup_failed();
++	}
++
  }
  
-+/* Set the number of advertising sets, 1 to MAX_EXT_ADV_SETS */
-+bool btdev_set_adv_sets(struct btdev *btdev, uint8_t num)
+ static void test_pre_setup(const void *test_data)
+@@ -9244,6 +9252,72 @@ static const struct generic_data add_ext_advertising_timeout_expired = {
+ 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
+ };
+ 
++/* A controller with a single advertising set: instance 1 is given handle
++ * 0x00, so the set's commands and events carry handle 0x00, not the
++ * instance number.
++ */
++static int set_adv_set_rand_addr_handle_0_check(const void *param,
++							uint16_t length)
 +{
-+	if (!num || num > MAX_EXT_ADV_SETS)
-+		return false;
++	const struct bt_hci_cmd_le_set_adv_set_rand_addr *cp = param;
 +
-+	btdev->le_adv_sets = num;
++	if (length != sizeof(*cp))
++		return -EINVAL;
 +
-+	return true;
++	return cp->handle != 0x00;
 +}
 +
- static void conn_unlink(struct btdev_conn *conn1, struct btdev_conn *conn2)
- {
- 	conn1->link = NULL;
-@@ -5350,7 +5363,7 @@ static int cmd_set_ext_adv_params(struct btdev *dev, const void *data,
- 						UINT_TO_PTR(cmd->handle));
- 	if (!ext_adv) {
- 		/* No more than maximum number */
--		if (queue_length(dev->le_ext_adv) >= MAX_EXT_ADV_SETS) {
-+		if (queue_length(dev->le_ext_adv) >= dev->le_adv_sets) {
- 			rsp.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
- 			cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
- 						&rsp, sizeof(rsp));
-@@ -5707,7 +5720,7 @@ static int cmd_read_num_adv_sets(struct btdev *dev, const void *data,
- 	memset(&rsp, 0, sizeof(rsp));
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
--	rsp.num_of_sets = MAX_EXT_ADV_SETS;
-+	rsp.num_of_sets = dev->le_adv_sets;
- 	cmd_complete(dev, BT_HCI_CMD_LE_READ_NUM_SUPPORTED_ADV_SETS, &rsp,
- 							sizeof(rsp));
- 
-@@ -8420,6 +8433,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 
- 	btdev->le_al_len = AL_SIZE;
- 	btdev->le_rl_len = RL_SIZE;
-+	btdev->le_adv_sets = MAX_EXT_ADV_SETS;
- 	return btdev;
- }
- 
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index aa04ca6..b40df29 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -95,6 +95,8 @@ void btdev_set_al_len(struct btdev *btdev, uint8_t len);
- 
- void btdev_set_rl_len(struct btdev *btdev, uint8_t len);
- 
-+bool btdev_set_adv_sets(struct btdev *btdev, uint8_t num);
++static const uint8_t remove_adv_set_handle_0_param[] = {
++	0x00,
++};
 +
- void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
- 							void *user_data);
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 2f544f3..eb791fa 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -701,6 +701,20 @@ void hciemu_set_central_le_rl_len(struct hciemu *hciemu, uint8_t len)
- 	btdev_set_rl_len(dev, len);
- }
- 
-+bool hciemu_set_central_le_adv_sets(struct hciemu *hciemu, uint8_t num)
-+{
-+	struct btdev *dev;
++/* Handle 0x00 and any address: printed if the check fails */
++static const uint8_t set_adv_set_rand_addr_handle_0_param[] = {
++	0x00,					/* handle */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* address */
++};
 +
-+	if (!hciemu || !hciemu->vhci)
-+		return false;
++static const struct generic_data add_ext_advertising_1_set = {
++	.setup_adv_sets = 1,
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_ADD_ADVERTISING,
++	.send_param = add_advertising_param_uuid,
++	.send_len = sizeof(add_advertising_param_uuid),
++	.expect_param = advertising_instance1_param,
++	.expect_len = sizeof(advertising_instance1_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_alt_ev = MGMT_EV_ADVERTISING_ADDED,
++	.expect_alt_ev_param = advertising_instance1_param,
++	.expect_alt_ev_len = sizeof(advertising_instance1_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_SET_RAND_ADDR,
++	.expect_hci_param = set_adv_set_rand_addr_handle_0_param,
++	.expect_hci_len = sizeof(set_adv_set_rand_addr_handle_0_param),
++	.expect_hci_param_check_func = set_adv_set_rand_addr_handle_0_check,
++};
 +
-+	dev = vhci_get_btdev(hciemu->vhci);
-+	if (!dev)
-+		return false;
++static const struct generic_data add_ext_adv_1_set_timeout_expired = {
++	.setup_adv_sets = 1,
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = advertising_instance1_param,
++	.expect_alt_ev_len = sizeof(advertising_instance1_param),
++};
 +
-+	return btdev_set_adv_sets(dev, num);
-+}
++static const struct generic_data remove_ext_advertising_1_set = {
++	.setup_adv_sets = 1,
++	.send_opcode = MGMT_OP_REMOVE_ADVERTISING,
++	.send_param = remove_advertising_param_1,
++	.send_len = sizeof(remove_advertising_param_1),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = remove_advertising_param_1,
++	.expect_len = sizeof(remove_advertising_param_1),
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = advertising_instance1_param,
++	.expect_alt_ev_len = sizeof(advertising_instance1_param),
++	.expect_hci_command = BT_HCI_CMD_LE_REMOVE_ADV_SET,
++	.expect_hci_param = remove_adv_set_handle_0_param,
++	.expect_hci_len = sizeof(remove_adv_set_handle_0_param),
++};
 +
- const uint8_t *hciemu_get_central_adv_addr(struct hciemu *hciemu,
- 								uint8_t handle)
- {
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index cdf1ebe..7299763 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -80,6 +80,8 @@ void hciemu_set_central_le_al_len(struct hciemu *hciemu, uint8_t len);
+ static const struct generic_data remove_ext_advertising_fail_1 = {
+ 	.send_opcode = MGMT_OP_REMOVE_ADVERTISING,
+ 	.send_param = remove_advertising_param_1,
+@@ -15713,6 +15787,19 @@ int main(int argc, char *argv[])
+ 					setup_add_advertising_connectable_1m,
+ 					test_command_generic);
  
- void hciemu_set_central_le_rl_len(struct hciemu *hciemu, uint8_t len);
- 
-+bool hciemu_set_central_le_adv_sets(struct hciemu *hciemu, uint8_t num);
++	/* A single advertising set: instance 1 on handle 0x00 */
++	test_bredrle50("Add Ext Advertising - Success (1 set, Rand Addr)",
++					&add_ext_advertising_1_set,
++					NULL, test_command_generic);
++	test_bredrle50_full("Add Ext Advertising - Success (1 set, Timeout)",
++					&add_ext_adv_1_set_timeout_expired,
++					setup_add_advertising_timeout,
++					test_command_generic, 3);
++	test_bredrle50("Remove Ext Advertising - Success (1 set)",
++					&remove_ext_advertising_1_set,
++					setup_add_advertising,
++					test_command_generic);
 +
- const uint8_t *hciemu_get_central_adv_addr(struct hciemu *hciemu,
- 							uint8_t handle);
- 
+ 	test_bredrle50("Remove Ext Advertising - Invalid Params 1",
+ 					&remove_ext_advertising_fail_1,
+ 					NULL, test_command_generic);
 -- 
 2.47.3
 
