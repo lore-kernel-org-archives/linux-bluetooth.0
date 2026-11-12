@@ -1,60 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.28
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794450650;
-	b=zJsxc4hGMZNKV1tky5sf9zG/c9CerCcBIgCDHe6EuSy4MrZXK0QBR9YSxGACWSQkMqbo
-	 YIddJr4882McJ/xSN4G9qJfvfV8j9CK24NctJjKs5Rd6MM4IzhqKtHuQGUisrgcP9sRC2
-	 bwiZ5QVxQj1C/KxNaZUknOxY220//eXGdLqrtYOl0NHLuIYGJ2W+LJjhq047QXr2xhqef
-	 lZeLfdxrBlJtnZ7RMNw9vqGneV9U89LRFGnFjBTuoIFY9HT8KmO68zzYbbojtdstiSTIV
-	 rcnd5y8MGMhXSRhF4JjWN+4vnbIz9ekKmboP/wYH4auhMKcqqUqESJIVthKYuG0ykaQ==
+	t=1794451145;
+	b=bQ6vfdMQJ3VM+EQFyAzteXmCRxMKHPTOwN5ILG8auxRlNJqzCCQWM6LtfrDV5xg4Hfo9
+	 ihM7YCdnYvC6hieWf25Kq9YIlLtnQNeBlMppK70V8tsw4Yt7zcAcmS4vKT0HxEg1KUdj9
+	 lHZg8WxwIZ1/t2JUbwyVbfCzDEskk9FdmndHxI7fknPPtRKEeithQ1Souq85C+OU3rLLl
+	 TVGEw+tSH7a5reMbMf7KNOsQ+sDP2hVqTHZHPEM3G2GsYDI85vtDBTFPza/jl8dTUD+rn
+	 ZOLYJeR6a0IseHHPVHI8H85SDq1amIq7nQYw4Q8yXu4lU/izFQDg7JL7vDADv6wnSrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794450650;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=fanzbmkFLp8wnwI+20OXUgBVZ//GS4MBHYYlTHJ6NJQ=;
-	b=qpbkp7+UG9fMeIu9eGrbOxrzT+zTHxHwiaOTh9Ucy5jYOJcS9dd3txe+1CfZ2qx7bCcC
-	 0w0sE0S+2gKe/ADssFUqhJK3VpkLzjOE6AgfX4bO4mfkRIw3iLPkde/ip82Jh/naBTmpj
-	 cZFy6sU+tbd/M41WQ2p1J0spfV63dYlOmsaefJCkCpDdPkgbHAekA+SC2RucJpCpPkj7D
-	 SpgXdjrT69OE1BOkx5ThUYj4CIK3mjvS1nWYlM1R0BJk1EdU8nB0/uQ8g4iCAqw0wFVWb
-	 bBPhvGr5sc0yEzTWl6zfiAH+VdlheDKxs6iuluaKnSMuDAdd7FckrHmuui8mDFwJOYA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794451145;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=A93ABjocx9uL1DqL9S/pXrd1FNBa30r5mGbJE0GOHJ4=;
+	b=V4SPQUxnczTZJfhm46/DZB0JeJIkDZcJQ5kolYFaaBkFU+hGTJfmrgG2cysWX6xHHAvv
+	 7mC+wlmU25iBHlk1uwvggfa8orp6QSmURM+QdnTWjXMnyNPujbFxlG5MVSktTjydNKjAh
+	 FD4IpvnmQC+sVcR55cDGye8S5grXR0U7TjO9nXJ5KnlEyRfCFe3LMPt1IEgUABklGMqrX
+	 IkZBwIm6enNqs2CTeeoESH0EKwyqv1Jq38uZ75iHBz+PuPT8mMHhj6WwDD7BW2Y/fBZjU
+	 zefb8ugqoTTnf/eNSlUiAgxfxyazEQ/9IgWik7K2KT2j1vxQw+p0dl0WN/4V5d5+BjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=rr0GTDid;
-	arc=none smtp.remote-ip=79.135.106.28
-Received: from mail-10628.protonmail.ch (mail-10628.protonmail.ch [79.135.106.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AwLhSBZg;
+	arc=none smtp.remote-ip=74.125.82.49
+Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159D9606A32D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 159D9606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DB9606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:39:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20DB9606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=rr0GTDid
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794450647; x=1794709847;
-	bh=fanzbmkFLp8wnwI+20OXUgBVZ//GS4MBHYYlTHJ6NJQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=rr0GTDid3zu0Kum9rfnhzfkj+pyI8660BupBA/lgOK+XuOm2GuIlM8wOXbojMOp8t
-	 mvqlc+Cm+BK+NY7i8CcHecVD/Fe1KQGdyCvkHMd7Hw5piHd0/PiF2KeteQ5w8K9gDA
-	 PwCaJ4Jm70DsFMfaRaueiuL3xu2Y0roL3e5yiJ2sPOboWuSQ+y2LRv6lcGYYl6ozys
-	 EzvKaMHroYJR3DNd2T/2zqVYofleacsv83DWB30DaceOVZfa8f6peZ+KVBAxckwl6l
-	 5ETg60ENPQZ0tn2YkzcLmxIIvhewh8g3WDiVPUlm0OomENmfvSrxroaF+rUspmPsSv
-	 S9suys/xFlFPw==
-Date: Thu, 12 Nov 2026 02:30:42 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AwLhSBZg
+Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-1a2af4c8d00so3816375c88.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 18:39:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794451144; x=1795055944; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=A93ABjocx9uL1DqL9S/pXrd1FNBa30r5mGbJE0GOHJ4=;
+        b=AwLhSBZg6p+vyC2DJbsdeZFZDI7O6GqzW7zJkIxgeGp3CW/hsswQ36JrBG/QffQdLD
+         tgr+ZYBqkNMJVGu/jzFZUFGOoV+zkngYBCf8AZUgt6/grgzH7vXDTLoZy8P2GZlhUA2y
+         TQiff6J0Egrc59g/0W4aJXmjOQDYsOZB/baOqzZ5srfFmMICthRWDqkLA5IH7lNqVTTC
+         XD4Ec/RmweGW283mH8z0rLCJYu8AQEwXIBXAcl5Fh0/eSqDO/nJb2Jk60oj6Jyq0+qlC
+         VNhzthkYwJfn7cVrCJCYRcJkWibYFCy5yOTZRBGQ6XIt2FubX/1VjouCeTqRpDUaUGLC
+         5mlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794451144; x=1795055944;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=A93ABjocx9uL1DqL9S/pXrd1FNBa30r5mGbJE0GOHJ4=;
+        b=FrQBKhAh0dk5wTGgtHHvEfbjU6Tl4W4SSH83DXTgJLvgzXufGROvR7+cW5Rj6T/u9H
+         RpMXdfWjAUcyBkDntXim5rKrdm0PKrAKYv2M8UCnf2O7QnvXi3dC0XCOkicRZUDGsgns
+         +0ffNEnFZTjej5+CEglTPgNITg223kcpAWJ8iS6CVEp2G+siAqzlVlVVoT54NeSGakv9
+         ByR5UefmT9rOI1W1+Mfeds1fO+goU4F3zOQff0jO1legWfekIGbwsOow70gjLcFy3kHb
+         4Dtut0iqQDPNe8l31P8A01RIEKq+c9lX7vxiZEmB0JWBsTxLny80Z1t9Cn1ccxS25OOk
+         59GA==
+X-Gm-Message-State: APuU4Z/aewU81vO2TbASLOCeAE8OegRpJuT8r+e47C8zUTE7Ygt/ZzLn
+	VVTGbWILObBrdBAMu/tmAiH3arJbEG7R+22Og3koPBzsyDGPclwF7SLtiWUhmmqckWY=
+X-Gm-Gg: AYBFou19KetEIGCGUjw7yL5UiiMr/SpogPmIaavJEP24OEAItRbqjkP3pGImWxXuDBp
+	l6DqBU5F+I5bJLflgBPmwWEknU8of0uKSuX1PAG+C+x7YwjEZiHz6i3jlH22iUqJJB5MbEpq5PG
+	aStJsit9Od9povhIhyZvH7kecb5f1976BKWI8aR+5v5GM2NrQgKjebU260NfYQPjywLWasExPSE
+	K8PTdw7uwFWHlKq1MfzhpNPfHIKlrCm95fb0XMih76PbzxSTVaQdbboFgxzDDBPXQrwowTNlKUP
+	WCmJyLbL5LQdmdfWYRuakDo73n9FD1cyEHJi2vXay25ke9c9ipft1DH0dKxaYQe0n5DcPI0UoS3
+	+GWJo0pocpWqoQUC5yvOPuVguHGEKw2UFaDTMWcneJYYJclvHJ1v7rmNbnIlnP1aHMGcT6kBO1N
+	hMbD++w5oeSNrEDNIivicZ/uS/3lHH9xYE8W2THrBhrpOA9uMsBmH7hGRJJuprnV6Z5dW77Qufh
+	FmVBYzHzpsqTFBAdrqyKxGZ7VZtMH2N0eYx7ov1W9KTF8FPujW24SK/erJPxzq5UBCf8CVkZsUJ
+	FtA4URmxKV0DHVrJACxfHKLwi68i/ZGPIBAVWQMBdqB1TyVBZ6reXPaNNMpFlQxOeE3aB0LGV9h
+	nkDz3p1Nck7xkj7A/rUrA
+X-Received: by 2002:a05:7022:5f1c:b0:166:b307:5855 with SMTP id a92af1059eb24-1b3c0163bb6mr3942162c88.0.1794451144080;
+        Wed, 11 Nov 2026 18:39:04 -0800 (PST)
+Received: from localhost.localdomain ([96.44.128.241])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b3b5b4efc2sm17819912c88.15.2026.11.11.18.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 18:39:03 -0800 (PST)
+From: Weihong Guan <weihong.guan@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH v9 2/2] Bluetooth: L2CAP: tolerate zero-ident LE credit indications
-Message-ID: <20261112023025.187702-2-cochcoder@proton.me>
-In-Reply-To: <20261112023025.187702-1-cochcoder@proton.me>
-References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me> <20261106021723.631339-1-cochcoder@proton.me> <20261106045515.853897-1-cochcoder@proton.me> <20261106173948.596166-1-cochcoder@proton.me> <20261107023556.1475788-1-cochcoder@proton.me> <20261107071634.2237059-1-cochcoder@proton.me> <20261112023025.187702-1-cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 8d12eb6ccec130cb7ccf6f8b99b5fe413cf0c9a9
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Weihong Guan <weihong.guan@gmail.com>
+Subject: [PATCH BlueZ 0/2] Single advertising set in the emulator and mgmt-tester
+Date: Thu, 12 Nov 2026 02:38:56 +0000
+Message-ID: <20261112023858.892176-1-weihong.guan@gmail.com>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,70 +93,51 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Cochlear Nucleus N8 captures contain LE credit indications with
-identifier zero. The specification forbids zero identifiers, so the
-current parser discards these grants and leaves the channel without
-usable transmit credits.
+A controller may report a single advertising set (LE Read Number of
+Supported Advertising Sets returns 0x01 to 0xF0). The kernel then gives
+advertising instance 1 handle 0x00, the handle Global Advertising uses
+too, and several places took the instance number for the handle. Those
+were fixed in bluetooth-next by commits daf949c968d4, e7e877bf658a,
+8b1eff978e66 and 4dce35adafb5, but the emulator always reports three
+sets, so mgmt-tester couldn't see them.
 
-Accept nonzero grants only for connected legacy LE CoC channels. Keep
-ECRED and all other commands excluded because the observed
-interoperability issue concerns legacy LE CoC. Apply normal credit
-overflow and pending-security handling, including the shared transmit
-guard from the preceding patch.
+Patch 1 lets a test set the emulated controller's number of sets
+(btdev_set_adv_sets(), hciemu_set_central_le_adv_sets()), kept across
+HCI_Reset; the default stays at three. Patch 2 adds three mgmt-tester
+cases on one set: the random address, the controller ending a timed
+instance, and the removal, each on handle 0x00.
 
-Let the credit handler validate the exact payload size after the
-signaling parser validates framing.
+How it was tested: on a Raspberry Pi 5 running 7.4-rc2 with
+net/bluetooth from bluetooth-next.
 
-Assisted-by: LLM
-Signed-off-by: Kyle Pepper <cochcoder@proton.me>
----
-v9: source edits unchanged from v8; depends on patch 1.
-Previous v8: https://lore.kernel.org/linux-bluetooth/20261107071634.2237059=
--1-cochcoder@proton.me/
+ - With the four kernel commits: the three new cases pass.
+ - Without them (bluetooth-next at def8a484b): all three fail. The
+   first shows the bug, LE Set Advertising Set Random Address for handle
+   0x01; the other two fail when adding the instance, for the same
+   reason.
+ - The whole of mgmt-tester with and without these patches on the same
+   kernel: the same tests fail on that machine either way (Read Ext
+   Controller Info and some LL Privacy cases, and a few that pass or
+   fail from run to run), so nothing changed for the existing ones.
 
- net/bluetooth/l2cap_core.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+The bugs were first found on real hardware: a WCH CH582 running an open
+controller firmware of ours that reports one advertising set, driven
+from btmgmt and checked with btmon. These cases let anyone repeat them
+without it.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8a2a99084..20b64626d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5501,6 +5501,10 @@ static inline int l2cap_le_credits(struct l2cap_conn=
- *conn,
- =09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
- =09=09goto unlock;
-=20
-+=09/* Tolerate identifier-zero credits only for a live LE CoC. */
-+=09if (!cmd->ident && (!credits || chan->mode !=3D L2CAP_MODE_LE_FLOWCTL))
-+=09=09goto unlock;
-+
- =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
- =09if (credits > max_credits) {
- =09=09BT_ERR("LE credits overflow");
-@@ -6138,11 +6142,20 @@ static inline void l2cap_le_sig_channel(struct l2ca=
-p_conn *conn,
-=20
- =09BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd->code, len, cmd->ident);
-=20
--=09if (len !=3D skb->len || !cmd->ident) {
-+=09if (len !=3D skb->len) {
- =09=09BT_DBG("corrupted command");
- =09=09goto drop;
- =09}
-=20
-+=09if (!cmd->ident) {
-+=09=09if (cmd->code !=3D L2CAP_LE_CREDITS)
-+=09=09=09goto drop;
-+
-+=09=09/* Credits have no response or identifier-matched transaction. */
-+=09=09l2cap_le_credits(conn, cmd, len, skb->data);
-+=09=09goto drop;
-+=09}
-+
- =09err =3D l2cap_le_sig_cmd(conn, cmd, len, skb->data);
- =09if (err) {
- =09=09struct l2cap_cmd_rej_unk rej;
+Weihong Guan (2):
+  emulator: Set the number of advertising sets
+  mgmt-tester: Add single advertising set tests
+
+ emulator/btdev.c    | 18 ++++++++--
+ emulator/btdev.h    |  2 ++
+ emulator/hciemu.c   | 14 ++++++++
+ emulator/hciemu.h   |  2 ++
+ tools/mgmt-tester.c | 87 +++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 121 insertions(+), 2 deletions(-)
+
+-- 
+2.47.3
 
