@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794507278;
-	b=L9yExZ+Hon5Z2Bb4BY3dpyUYoKW9FWHpbWXD0hU7JbdiJeVep3kXFhW/ZJGrGLbuDkw1
-	 +CqM+HRYZCs42IG0gqYL06jRi/pdUQCZat49Zmak4A8vNAgAh3e6c5Gd/MHZ7fjnpgJZ+
-	 9D4+f4U5A6DSastQaMbxIRW91/QnmiRRUg6/Ylg+G0sq/khTob3Q7OwTUMbMyQM2JV82W
-	 fxVP6BtYg/T0ZyC1TEQBNAiWo22RCRgikvZwtj0W2NChboHG2tjlcLQHIGSVbZKOxy0W+
-	 9CzfZ/9MwG868JbT/x4ViAqU0NMLtf9h11IlbGsYu5q4jy6w8/DJGhhaSvlw7e2SlAQ==
+	t=1794507279;
+	b=XPD55rQcSvyvLFLW9LlVZDCACPRXHI0URm0NIUhVF5SqBLISo526MYzQDsJIgZQX93YC
+	 qNB18FGEm1cESno5jUro2fEd3Btmml+6EFF9JY/WbJSiVPJK9z/oKMsVCRBqasjzy3DFO
+	 RybFRlmu9nF79HEyS99qQcZoxGWThsv12tQFBoezxgX7zQG5z729io9jll5j4TX3YpjQx
+	 LUB8pzD+sgmU1v0uBZOwl5dgLgMjWTQXRbq/3Ge0taZ2n2LhpNLMV5OnnDw5KtVe3Vvn+
+	 UoZRAkr5549DLr33rA5JQJvvUHWMqMJezqSog91O5Nnj76Ixu57wCUJQ0MOmG4EOVeg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794507278;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794507279;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=YCWr+j22vEA9suRst+RDtDDS7RC51DC248rk8uKJ9xQ=;
-	b=FmAE9GoJuxmDSunWbr2kgXgIsNtauq8+59hpl4h5ez4MIJy1a6G8/k5S9SIFLY0eZfAe
-	 uN5qxfEPBBb6ddLN+9nYrXV9v7rul7/rqpPGplQJpJUN2OnSVyQxwnlJRqojtQATGZQOc
-	 fQpQ79Turr485zhv9WTUOUd90ZgR4M/Er3P29GcDfFql5yMgWUSuTzgmc2zYkmFsThFtV
-	 xDmjIx/uUl+JDkKyUtXMbwraQ2uXq3Yn56L2kOQBYOfB/vDXjnIwoLUGryAfxtgL80ZV1
-	 8DgN8bwlZNKHKLhuAfRDzEqTxg0luNwrsM44uNLHVJAN5aY8DcHo+KoWmZSVIvUnj2Q==
+	bh=MS4BVrAatFI2pIIKsYtpuHHigeSrBF3sT2Hx9JJi8UE=;
+	b=ReBmU5rEnqERO5ZiwxbGARAlSjcVDONZm0CwzQx4YFyZDffmwNRtaKLn8zogxW3aPXaa
+	 qtX/gI9K2uvVfUPUteteLtpp27ROClNwKvxv7zIBc5iDUgjC2izOjoGOqSOEBCIl7We/p
+	 lWDryrPUygiXvYjZMhB9zvy6rIYY34ffVj3qDGsmlCzM3oFjW3bOBdQHiTRAVRlMTuNPM
+	 Z526igGG1Dsa6u8R1xe24DnFZvaPqLWmtD/W4mfg0ZWlzOuN+pLhU78M70rLUPFGZr6hr
+	 kIpuflVskwKxB8gdsEqNpbxSckNcEle6y25uv0FUXYcSA0xqsuGk7sV6U0BmuzX4lFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xJeJcT4P;
-	arc=none smtp.remote-ip=209.85.217.53
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=plzM3EEx;
+	arc=none smtp.remote-ip=209.85.222.43
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C86E606A333
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 18:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C86E606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62858606A32E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 18:14:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62858606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xJeJcT4P
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-7d2d18f1bf5so19360137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 10:14:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=plzM3EEx
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-99be54f9c14so783862241.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 10:14:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794507277; x=1795112077; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794507278; x=1795112078; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=YCWr+j22vEA9suRst+RDtDDS7RC51DC248rk8uKJ9xQ=;
-        b=xJeJcT4PQ68IXnl1hsE2YjIDg+h8R8WrqP3Bv6j611tDdBoVuRS51Y86Hs4if1cCmK
-         K5J2kSYkYz6XxSJfnwx6Q89ntxfIRtpQyaZb6sVrSY46PzTF+wrJhgi0DUe21SdeDzx8
-         Y68Xi/lnpRDGi3h2yD3gaI+qwFCKJGJKf6FHzXGkaGOMSllbIqw7MEV5JScvz5kXm2s9
-         pyVivCV/3t+e479lJ91cOBUoWX6pgqBrhE0/1c5zGSn9w94YKBCpCbTYDoU3zadCkSoT
-         1NzRXhe5W6znZFz4B917+JX3gQoOhccse5agvrFhAjbAbhLsxC4XHblf7Zr4WoyDahRR
-         Fv9w==
+        bh=MS4BVrAatFI2pIIKsYtpuHHigeSrBF3sT2Hx9JJi8UE=;
+        b=plzM3EEx9ZYMMdwGDBTbxO6Lg0VLWhjahVfZVfyy4o+o1vS/534CxhYVk4oA19VV7Z
+         FVQIhBMFYrjwXFfsbGT6wSFUHUQWZp7UK1a1s6cM/23viu9snBHWSWnBNs4kGaJgtdZW
+         Keiemz8V6+yx6RtZvX5kGJ6MP7JGy7efaOdZ5NhwHosmQFdU1Sc0yZE36ZG1tUbGr6tr
+         NrI2L6KkKK8mPhAAZpdwQTrbFL+zpyUbctr9YtYHlc7hsNMMFu8zyWh9+XAA/levWc2P
+         C+/VcXNPgX/9MZc7CbsWQ6yr8To3FtxXSo/NbBOt5XcA17PQX++6UYtYbpeN7ELwJbz6
+         LeYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794507277; x=1795112077;
+        d=1e100.net; s=20260707; t=1794507278; x=1795112078;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=YCWr+j22vEA9suRst+RDtDDS7RC51DC248rk8uKJ9xQ=;
-        b=t9o3C4njE5mzcB5anmlvTbG4HFriTA7JTXFAovAhXb6KzuLUlLQY8j9H30b8uKDOmv
-         UrLYzWd4C/Id0EHSApjN4dJmXUJPcyeymqXBHZ4cSLBx2gvLhX0bWVgom8L1a3r8KWes
-         YhO0bVs4i4QDz+7e3cqJpYtfPvDoGW2IHeSBVytTO20vwaLo2oaiuc+Vy5PwlxAKeY2v
-         Sdpe6m/jzOOkptvjosVD3p8M4DteFWdEKDIMg/L4+46SFFx58vpIqHdRabNwIHWulT2R
-         t0bzXXnW1ZR8YdlVXoYaOGyMeJX+s0cWBR/plvQps84HUlK5O0YKhT1bY6vByQTsV6tS
-         4vvw==
-X-Gm-Message-State: APuU4Z+kzzYg2iQoRCiwcP0qNSt7wWtwhVI2d66BSd/qoFu8CZJOhkWn
-	FDh5ljmTbPx4wHirRe2ywSZO51OVbqY2QlCj1Qq8SPxCMn8iG8c7u0qv2hwfmQ==
-X-Gm-Gg: AYBFou0D2h48CTOSOkgMC1DcZuR5pzZMpPeMk6lpDZ+JH5HHpHvlgjobAVA7ESW+eq+
-	Qlti8yJjfSF3Rokk+/7woGv8R9iA4QI8bpr+cDZrnGDilCrnO3fVP3z09nFPc2Qpz5f0d19YCXM
-	UNJB3oa2leYgMxmf/ZPJ2klD30+XQ+gaUNI0nxJsXn0TZJr3bIF81IUQhjJdkeO6xQwAeEwRoXp
-	+AH4N/DREDW4vcJ3vsoJX+jY+hM2grjr1P9MEfcpOSQ0TWwRU6IigbyM0gNJk0JtAeR0HbXOtn1
-	YIIGlHmpH52RFeeAXaXAGPcum3PvdSQyWWgomw0jYVYC4+fk9REng+h2f8r94adFwBudNdcTCn+
-	gh1qMOlQ9KzzI7Dgrp8kJ0gkykW0+yGFbNlc4ENB8tq4w4KlzOSE4pxV7qZMVfI4ydo0GZ74O5k
-	O9I9/VYbRlOl5YOuPOi1YQxdTcvcdD9Q8ohIqwYj/EJ/hEXqG+u+bK0aVhnm0aZ4lz4UjyqeG61
-	HLKEQwFmzEqeFjW6AXQdl1wBHh/SrhUwrsUip1OMMxe30EtH3a9LBqShZSSw38/xcAiDIy1MNIp
-	YI5+uu4sD175GVVpcnWdFL8w3umo0cxArS+O7BUUI5kWQ0VTU2oHxBqNNwX1YOepp/SPZuqBH/4
-	XfHpuIw46tB7C1FkRzYOdm7mcc0l97eXtdgehPLT5mEa4pzHEK4iKZ5lVsmUnxLihhw8Vyrbnub
-	DFDomqTPUXN4HZuNJaQskFptVe
-X-Received: by 2002:a05:6102:f07:b0:7a1:f951:664f with SMTP id ada2fe7eead31-7d64d816027mr4804137.22.1794507277353;
-        Thu, 12 Nov 2026 10:14:37 -0800 (PST)
+        bh=MS4BVrAatFI2pIIKsYtpuHHigeSrBF3sT2Hx9JJi8UE=;
+        b=lcWZ8W7yOfZmtxbXu3sVDCnG8rXvYGF5ruU36DRfjNaSZBVbuw43rcCNBz/BpV0cHX
+         oObCOQq0hmB0cScEUdU/jk69adZg9RXMsoyv7Pq0j8sdXfUjqVLvebmBipP5RT/FfWI7
+         0xtl4ca9IJXQlBf7lKPDpXIAA3U7t7xtzYOqKkoH53ey28/OfdhLD11li8kmRTe0g/pA
+         Aq8ey0CUTtQ92jaZCgGsGsKPcmc1AE5cZClcHtKb1Fb/5QqKlYpKGE1CtJkbvwHcNdI1
+         OrXLORI5HYLJIALp3Tca/X/jyqfLub/krq98kLVmwW1wJh7jA1xSBEj/F374VyLmSBQU
+         0UaA==
+X-Gm-Message-State: APuU4Z/XXp0uAhtGMDxuBStm3zwfEDs+MuajdA1y0JcxWbYQhxjZ4ohr
+	fe8WavbYPSvCDoFRJ38a08jc8D1cjPl0OAMbqqrfcdw28wfSGrn/kATYFdImIQ==
+X-Gm-Gg: AYBFou3Z/DoVM7ZJx7riVh52g2cyzQCt9NCY9N/KHCsHV5zjJqwgmB9VKi8VUsVMoc9
+	48ovqesoFo0Pf03SITGl6m8LoVN6NGlNItdDD6nwQLCahtcM/MRRbRd80kM8OuhoZkli9FiTLIb
+	x+eqNuk6+LBNsCl2uwmw0Dy+W8dcppaOAvjYkcZejt/338/L8jL+RcNJMZn6BlFbHvpd6FHXcKC
+	1M2hrH5LYzqe/7Gum/ECZqqSKMO+nB6OZSK5+/T6SEbSiZe53sOeMZ+CMELket1NQi9HZDeXQJt
+	L0jhfN2Sd1DTsCjbA/CmQF+XKJOxR6W2BLyuxbChMcJAYz86rYlIHHr4twKfW9BEyl2KzWH14VJ
+	XIbPnRnGVZDMNrVGsT+qldSSaxv0hkXC9Xlk+EhQTpGqBbm0PzK8+eJOjfISy8FOvyB5ywhnrzW
+	Ey2bgG6ISB1BDApzuG805eKh7obamRYbWf88qeOr5zUvgWN7VwwXgxp42m6C2xu04hU4PHuSrk9
+	1bEMs5jnXEeT23UK4tbOfhuvJvPYXJlW/RLujY4CvMOZ2hEf/T7v47UShpDihbu8Wp+ESwumuvS
+	Ayzb2g2yalXX6M5p1E+T7oPVjQIgtDdRK79dIOWnl6qyuFutCd2dwSSS1WzYyVM3+QEYGk58XmT
+	PFwypkicMDBQNRckY55HIGpkk6MyEDFmQ+pE9FWdyoSRWN2Mcqd0/2sIWFX6pOUfqqiJdFOj8W7
+	puCkI=
+X-Received: by 2002:a05:6102:6a92:b0:7c3:874d:60bb with SMTP id ada2fe7eead31-7d64d6c4928mr6357137.5.1794507278326;
+        Thu, 12 Nov 2026 10:14:38 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d64c1b33eesm178749137.2.2026.11.12.10.14.36
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d64c1b33eesm178749137.2.2026.11.12.10.14.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 10:14:36 -0800 (PST)
+        Thu, 12 Nov 2026 10:14:37 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 3/6] bap: Release cached ASEs on ClearConfiguration of an endpoint
-Date: Thu, 12 Nov 2026 13:14:28 -0500
-Message-ID: <c2567c9a5cb24aad7d5f95ccc533329d226cb234.1794504552.git.luiz.von.dentz@intel.com>
+Subject: [PATCH BlueZ v4 4/6] client/player: Add endpoint.clear command
+Date: Thu, 12 Nov 2026 13:14:29 -0500
+Message-ID: <df3a804182ce6111ff366307d02a64be446bcffb.1794504552.git.luiz.von.dentz@intel.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <cover.1794504552.git.luiz.von.dentz@intel.com>
 References: <cover.1794504552.git.luiz.von.dentz@intel.com>
@@ -101,295 +101,121 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Once a stream is released, the server may cache the codec configuration
-of its ASE, leaving it in Codec Configured state, while the setup of
-the stream is freed. ClearConfiguration only closed the streams that
-have a setup, so it could not release such an ASE anymore.
-
-When ClearConfiguration is given the path of the endpoint, also release
-its streams in Codec Configured state that have no setup, as a client
-may release an ASE in that state (ASCS Table 3.2, BAP 5.6.6).
+Add a command calling ClearConfiguration on a remote endpoint, to close
+the stream of a given transport or all the streams of the endpoint.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/bap.c | 158 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 149 insertions(+), 9 deletions(-)
+ client/player.c               | 57 +++++++++++++++++++++++++++++++++++
+ doc/bluetoothctl-endpoint.rst | 20 ++++++++++++
+ 2 files changed, 77 insertions(+)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index a0e0ba60d817..478e8358e551 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -46,6 +46,7 @@
- #include "src/shared/gatt-client.h"
- #include "src/shared/gatt-server.h"
- #include "src/shared/bap.h"
-+#include "src/shared/ascs.h"
- #include "src/shared/tmap.h"
- #include "src/shared/gmap.h"
- 
-@@ -138,6 +139,7 @@ struct bap_data {
- 	struct queue *bcast;
- 	struct queue *bcast_snks;
- 	struct queue *server_streams;
-+	struct queue *cached_releases;
- 	GIOChannel *listen_io;
- 	bool pa_synced;
- 	unsigned int pa_timer;
-@@ -149,6 +151,8 @@ struct bap_data {
- 
- static struct queue *sessions;
- 
-+static void cached_release_cancel(void *data);
-+
- static int setup_config(struct bap_setup *setup, bap_setup_ready_func_t cb,
- 							void *user_data);
- static int bap_select_all(struct bap_data *data, bool reconfigure,
-@@ -196,6 +200,7 @@ static void bap_data_free(struct bap_data *data)
- 	queue_destroy(data->srcs, ep_unregister);
- 	queue_destroy(data->bcast, ep_unregister);
- 	queue_destroy(data->server_streams, NULL);
-+	queue_destroy(data->cached_releases, cached_release_cancel);
- 	data->bcast_snks = NULL;
- 	queue_destroy(bcast_snks, setup_free);
- 
-@@ -996,8 +1001,9 @@ static int setup_close(struct bap_setup *setup, bap_setup_close_func_t cb,
- struct ep_close_data {
- 	int remaining;
- 	int count;
-+	int err;
- 	const char *path;
--	void (*cb)(int count, void *user_data);
-+	void (*cb)(int count, int err, void *user_data);
- 	void *user_data;
- };
- 
-@@ -1013,7 +1019,7 @@ static void ep_close_setup_cb(struct bap_setup *setup, void *user_data)
- 		return;
- 
- 	if (epdata->cb)
--		epdata->cb(epdata->count, epdata->user_data);
-+		epdata->cb(epdata->count, epdata->err, epdata->user_data);
- 
- 	free(epdata);
- }
-@@ -1035,8 +1041,125 @@ static void ep_close_setup(void *data, void *user_data)
- 		epdata->count++;
+diff --git a/client/player.c b/client/player.c
+index 88221076c1e0..932338ef53a2 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -4030,6 +4030,60 @@ static void endpoint_set_config_bcast(struct endpoint_config *cfg)
+ 		config_endpoint_iso_group, cfg);
  }
  
-+static struct bap_setup *bap_find_setup_by_stream(struct bap_data *data,
-+					struct bt_bap_stream *stream);
-+
-+struct cached_release_data {
-+	struct bap_ep *ep;
-+	struct ep_close_data *epdata;
-+};
-+
-+/* The release of a cached stream, done once the stream is idle */
-+struct cached_release {
-+	struct bt_bap_stream *stream;
-+	struct ep_close_data *epdata;
-+	int refs;
-+	bool done;
-+};
-+
-+static void cached_release_unref(struct cached_release *cr)
++static void clear_endpoint_setup(DBusMessageIter *iter, void *user_data)
 +{
-+	if (--cr->refs)
-+		return;
++	const char *path = user_data;
 +
-+	free(cr);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
 +}
 +
-+static void cached_release_done(struct cached_release *cr, int err)
++static void clear_endpoint_reply(DBusMessage *message, void *user_data)
 +{
-+	if (cr->done)
-+		return;
++	DBusError error;
 +
-+	cr->done = true;
++	dbus_error_init(&error);
 +
-+	if (err)
-+		cr->epdata->err = err;
++	if (dbus_set_error_from_message(&error, message)) {
++		bt_shell_printf("Failed to clear configuration: %s\n",
++								error.name);
++		dbus_error_free(&error);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +
-+	ep_close_setup_cb(NULL, cr->epdata);
++	bt_shell_printf("Configuration cleared\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +}
 +
-+static bool match_cached_release(const void *data, const void *match_data)
++static void cmd_clear_endpoint(int argc, char *argv[])
 +{
-+	const struct cached_release *cr = data;
++	GDBusProxy *proxy;
++	const char *path;
 +
-+	return cr->stream == match_data;
-+}
++	proxy = g_dbus_proxy_lookup(endpoints, NULL, argv[1],
++						BLUEZ_MEDIA_ENDPOINT_INTERFACE);
++	if (!proxy) {
++		bt_shell_printf("Endpoint %s not found\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +
-+static void bap_cached_release_idle(struct bap_data *data,
-+					struct bt_bap_stream *stream)
-+{
-+	struct cached_release *cr;
++	/* The path of the endpoint itself clears all its transports */
++	path = argc > 2 ? argv[2] : g_dbus_proxy_get_path(proxy);
 +
-+	/* Also the ones of a failed release, left behind for this stream */
-+	while ((cr = queue_remove_if(data->cached_releases,
-+					match_cached_release, stream))) {
-+		cached_release_done(cr, 0);
-+		cached_release_unref(cr);
++	if (!dbus_validate_path(path, NULL)) {
++		bt_shell_printf("Invalid transport path %s\n", path);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!g_dbus_proxy_method_call(proxy, "ClearConfiguration",
++					clear_endpoint_setup,
++					clear_endpoint_reply,
++					(void *) path, NULL)) {
++		bt_shell_printf("Failed to clear configuration\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +}
 +
-+static void cached_release_cancel(void *data)
-+{
-+	struct cached_release *cr = data;
-+
-+	cached_release_done(cr, -ECANCELED);
-+	cached_release_unref(cr);
-+}
-+
-+static void ep_release_cached_cb(struct bt_bap_stream *stream, uint8_t code,
-+					uint8_t reason, void *user_data)
-+{
-+	struct cached_release *cr = user_data;
-+
-+	/* The ASE is idle once it is notified, so only a failure completes
-+	 * the release here.
-+	 */
-+	if (code != BT_ASCS_RSP_SUCCESS)
-+		cached_release_done(cr, -EIO);
-+
-+	cached_release_unref(cr);
-+}
-+
-+static void ep_release_cached(struct bt_bap_stream *stream, void *user_data)
-+{
-+	struct cached_release_data *data = user_data;
-+	struct bap_ep *ep = data->ep;
-+	struct cached_release *cr;
-+
-+	/* The server may have cached the codec configuration of a released
-+	 * ASE, which has no setup anymore, so release it again.
-+	 */
-+	if (bt_bap_stream_get_rpac(stream) != ep->rpac ||
-+			bt_bap_stream_get_state(stream) !=
-+					BT_BAP_STREAM_STATE_CONFIG ||
-+			bap_find_setup_by_stream(ep->data, stream))
-+		return;
-+
-+	DBG("stream %p", stream);
-+
-+	cr = new0(struct cached_release, 1);
-+	cr->stream = stream;
-+	cr->epdata = data->epdata;
-+	cr->refs = 2;
-+
-+	data->epdata->remaining++;
-+
-+	if (!ep->data->cached_releases)
-+		ep->data->cached_releases = queue_new();
-+
-+	queue_push_tail(ep->data->cached_releases, cr);
-+
-+	if (!bt_bap_stream_release(stream, ep_release_cached_cb, cr)) {
-+		queue_remove(ep->data->cached_releases, cr);
-+		data->epdata->remaining--;
-+		free(cr);
-+	}
-+}
-+
- static void ep_close(struct bap_ep *ep, const char *transport_path,
--			void (*cb)(int count, void *user_data), void *user_data)
-+			bool cached,
-+			void (*cb)(int count, int err, void *user_data),
-+			void *user_data)
+ static void cmd_config_endpoint(int argc, char *argv[])
  {
- 	struct ep_close_data *epdata;
+ 	struct endpoint_config *cfg;
+@@ -4625,6 +4679,9 @@ static const struct bt_shell_menu endpoint_menu = {
+ 						cmd_config_endpoint,
+ 						"Configure Endpoint",
+ 						endpoint_generator },
++	{ "clear",        "<endpoint> [transport]", cmd_clear_endpoint,
++						"Clear Endpoint Configuration",
++						endpoint_generator },
+ 	{ "presets",      "<endpoint>/<UUID> [codec[:company]] [preset] "
+ 						"[codec config] [metadata]",
+ 						cmd_presets_endpoint,
+diff --git a/doc/bluetoothctl-endpoint.rst b/doc/bluetoothctl-endpoint.rst
+index 019e64e38452..ba30ef769ec4 100644
+--- a/doc/bluetoothctl-endpoint.rst
++++ b/doc/bluetoothctl-endpoint.rst
+@@ -154,6 +154,26 @@ Note:
+ If the endpoint was registered by an audio server, it can't be configured from bluetoothctl.
+ This must be done by the audio server as well.
  
-@@ -1051,6 +1174,15 @@ static void ep_close(struct bap_ep *ep, const char *transport_path,
- 	if (ep)
- 		queue_foreach(ep->setups, ep_close_setup, epdata);
- 
-+	/* The cached streams have to be released before replying, as an ASE
-+	 * still being released can't be configured again.
-+	 */
-+	if (cached && ep && ep->rpac) {
-+		struct cached_release_data data = { ep, epdata };
++clear
++-----
 +
-+		bt_bap_foreach_stream(ep->data->bap, ep_release_cached, &data);
-+	}
++Clear Endpoint Configuration.
 +
- 	epdata->path = NULL;
- 	ep_close_setup_cb(NULL, epdata);
- }
-@@ -1302,14 +1434,16 @@ struct clear_configuration_data {
- 	bool all;
- };
- 
--static void clear_configuration_cb(int count, void *user_data)
-+static void clear_configuration_cb(int count, int err, void *user_data)
- {
- 	struct clear_configuration_data *data = user_data;
- 	DBusMessage *reply;
- 
- 	DBG("%p", data);
- 
--	if (!data->all && count == 0)
-+	if (err)
-+		reply = btd_error_failed(data->msg, strerror(-err));
-+	else if (!data->all && count == 0)
- 		reply = btd_error_invalid_args(data->msg);
- 	else
- 		reply = dbus_message_new_method_return(data->msg);
-@@ -1338,7 +1472,8 @@ static DBusMessage *clear_configuration(DBusConnection *conn, DBusMessage *msg,
- 	cbdata->all = (path == NULL);
- 
- 	DBG("%p %s %s", cbdata, ep->path, path ? path : "NULL");
--	ep_close(ep, path, clear_configuration_cb, cbdata);
++:Usage: **> clear <endpoint> [transport]**
++:Uses: **org.bluez.MediaEndpoint(5)** method **ClearConfiguration**
++:<endpoint>: Path to the remote endpoint to clear
++:[transport]: Path to the transport whose stream to close (optional, all the
++	streams of the endpoint are closed if omitted)
++:Example Release all the streams of a remote endpoint:
++	| **> clear /org/bluez/hci0/dev_00_11_22_33_44_55/pac_sink0**
++:Example Release the stream of a single transport:
++	| **> clear /org/bluez/hci0/dev_00_11_22_33_44_55/pac_sink0 /org/bluez/hci0/dev_00_11_22_33_44_55/pac_sink0/fd0**
 +
-+	ep_close(ep, path, !path, clear_configuration_cb, cbdata);
- 	return NULL;
- }
- 
-@@ -1403,7 +1538,7 @@ static void reconfigure_select_cb(int err, void *user_data)
- 	free(data);
- }
- 
--static void reconfigure_close_cb(int count, void *user_data)
-+static void reconfigure_close_cb(int count, int err, void *user_data)
- {
- 	struct reconfigure_data *data = user_data;
- 
-@@ -1424,7 +1559,7 @@ static void ep_close_if_reconfigure(void *obj, void *user_data)
- 
- 	if (ep->reconfigure) {
- 		data->remaining++;
--		ep_close(ep, NULL, reconfigure_close_cb, data);
-+		ep_close(ep, NULL, false, reconfigure_close_cb, data);
- 	}
- }
- 
-@@ -1464,7 +1599,7 @@ static DBusMessage *reconfigure(DBusConnection *conn, DBusMessage *msg,
- 	queue_foreach(data->snks, ep_close_if_reconfigure, cbdata);
- 	queue_foreach(data->srcs, ep_close_if_reconfigure, cbdata);
- 
--	reconfigure_close_cb(0, cbdata);
-+	reconfigure_close_cb(0, 0, cbdata);
- 	return NULL;
- }
- 
-@@ -3031,6 +3166,8 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
- 			setup_free(setup);
- 		else
- 			queue_remove(data->server_streams, stream);
++Note:
 +
-+		bap_cached_release_idle(data, stream);
- 		break;
- 	case BT_BAP_STREAM_STATE_CONFIG:
- 		if (setup) {
-@@ -4054,6 +4191,9 @@ static int bap_disconnect(struct btd_service *service)
- 	queue_destroy(data->server_streams, NULL);
- 	data->server_streams = NULL;
- 
-+	queue_destroy(data->cached_releases, cached_release_cancel);
-+	data->cached_releases = NULL;
++Clearing an endpoint whose codec configuration was cached by the remote, after
++its streams were released, releases them again.
 +
- 	bt_bap_detach(data->bap);
+ presets
+ -------
  
- 	btd_service_disconnecting_complete(service, 0);
 -- 
 2.56.0
 
