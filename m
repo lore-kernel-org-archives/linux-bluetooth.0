@@ -1,124 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.47
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794510270;
-	b=4oUC31gEGW1iIKYScbCUI8H9tYlQPsTINbOVEbMU5D4iuLb5cIctOiUwTkM8SZ0wGrMW
-	 dRNB5RNs40UeCBZ4FcMICz8tePeqUf00LvhMywEfxbWyKRkFOsNBx0RlE6FvoeVv4TlQG
-	 I/WVvj+kcrpUGz8m+ym9+7D3uRXBZai5Wl1/eF+f1GQ77BLlY/loEJR8+/oEZR1f9AB2d
-	 yT1WRhDlg4Otnhb362/zegwECTrRzuY89zxLg3T54cq2JwGgcmWqU2sazHJKoSNy7WFy5
-	 UQKXS8DYCqDECAUOGp32CoLAe0zR9Lr6LYYPKh95nOA8vlcsTj/VqQ6y5WWbgzh/znA==
+	t=1794510736;
+	b=qSV/C/yxqyboayoJWFbcjkNVT3vDB/Y4z7MN/9BWHH2nf0UNsDeHLwm7YYjl+41w+KnT
+	 5XPavs95dV+1lWwWss3iVhk2rsG24ygv3oQpxrzw0zttzYb/nn/HQ1a8FMmPkAQ83QPbq
+	 Uqx2U6A5nSKC9RZ1k8EBFn1ei/zC3WsGu9Z22OQOKOh2EdoFz2GrGPyAQB2bgRznzcNlf
+	 ukVgMgxH1i1x/vkxPnhcdKXSb39pNYzK7st/87K871hN0UjQyuIvh/sDt2NiJbd3P6jbc
+	 XMSqVAW76lfip9ZXuzwZPOsBJAdQJNpVm/wj1K8lQMG5Q1yxZp5d5mHW1o5cPMOd5xg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794510270;
-	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Subject:From:To:Date:
-	 In-Reply-To:References:Autocrypt:Content-Type:
-	 Content-Transfer-Encoding:User-Agent:MIME-Version;
-	bh=TRRgHAzIJZgmXBfIDhCJKk+90ACToQSi0feblazRET4=;
-	b=mbpUFW1/EOvaXIq+eeajqSPy7AeJQlaNrWWibvQ20hvhufkaVWhCRo6sb4FeNM++3dpM
-	 rMgn5g1zLcwfhIzrkn3dxTWlz34pR/D/9w3nFl9ThdzhBTspC5+EobfwjyvmWQQeix1n+
-	 y5ef9mVV29OLgrpHdWh/8RdDf6j3WI9IjhP34pB3bhTfTbXgcrDSI2bZqcZrUpltIq0KD
-	 5jUOmA3h6axFBJx+KCiJVAGW0/Opk26TI0WEnrsseiSkgrNGsoobmyr9cLrqZWSioruRV
-	 CH7rMXQyE7Pf0kDjP/popjGEWLoIuq35WaW929wPxL2WgULOriQSa43ommm8RqAJtmw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794510736;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=rqk5CPiY59UsLG0gCy46rqp54XEDSm09ZFeKrVVDNPk=;
+	b=A7XbrkVTgwdzzdKj9ARCJgx/Ra7ha03ExuUixN2zp9AhICz27ZWPzglQFIVyw1Q3ZN21
+	 fpCTcZT9xWW296D781BZQaYapwolENVswYSmLuAOyby/d7vawD7voubH8/1IlsS1nHCXH
+	 /fpgzOSmlgwtTrpUsfyq9aHYW0pWSeKphvBcUfhTm9AqRY/tkPbRxMZS65wcFQcEmZA+E
+	 z8G6po4mABs/5bl9dA8mJOB/4lMiBg54Q2zyc8RoYphVSKfyoA1Ze7NI/61hvL/wvaLi4
+	 5/MGwV1IKhGwt4iGXDPwSqznDMCBDcUb38ioSiZQDB+hs2CYqwMQJetTjRfBgv+6msQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=iki.fi;
-	spf=pass smtp.mailfrom=iki.fi;
-	dkim=pass header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=lahtoruutu header.b="EXV/zlMq";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=185.185.170.37
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QW04nIwu;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.47
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9981E606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 19:04:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9981E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6A0606A32A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 19:12:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F6A0606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=iki.fi header.i=@iki.fi header.a=rsa-sha256 header.s=lahtoruutu header.b=EXV/zlMq
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:1::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4jQVDp4wp0z49Q0n;
-	Thu, 12 Nov 2026 21:04:26 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1794510267;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TRRgHAzIJZgmXBfIDhCJKk+90ACToQSi0feblazRET4=;
-	b=EXV/zlMqxSjlO2Xep5XUDD7N0zwIpl/5ESRxrrBbwY1Co5Jva1w9OHckx19K3hGY/xHUKY
-	IZtF6/EvZExqPHWSRfTZs4bR6h6KGhoD5OMzTVYTq2VFwKfjLGCBMmDhvmK0u/vPFokSuI
-	R6ejRsP75jYm4RQtdux1d/nYRw3oO00yb6NOTI2iEI4nB3wjrjHF/DMGCQqKULKrsfGAGU
-	C/RbFDjKfACTaH/UDKZXyBtPmmaLQdMWFvpPhsVSw+KxDJDFEwDMxoBoCBqh6FD7y0i2xM
-	VKvO+n65tkEJIma1LIu8jWp5OenCspl0Vmdy7dwJ/3Las0+FuUiJ2hfXK4DGpQ==
-ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=lahtoruutu; cv=none; t=1794510267;
-	b=qbjDgA95x5d/ovoWEydAz3HGnYlFleYSjWoInt4lOF/ZUaVQVeflKQYTZrLU7SLLyPjgGG
-	4LcLiV/zk49BmiuusPkCsZFC/yfU/dJVdnty/Ap2Csr0t9a16AJgvAPGxvWE81e7nMzlP6
-	mbZPX6HmEYwt/h5tPA1mPhX36hEZokqXp9aQERjK5xhLgRjfOTh7ifNSnceR87lLNQWUvc
-	hoTpMw4ZwzYcCn+3FkWpnVsgND83NZsLmQuxZ6KMFhAauyPWHPnRaGrFKWS6jGLo8MuNId
-	csCevyI5DoD86EFQZLKSndMB04X7nVPYvZaL7bel0LGux6PdmqIYEy0aKK3RmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1794510267;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TRRgHAzIJZgmXBfIDhCJKk+90ACToQSi0feblazRET4=;
-	b=Z21CerlhIRw8MkMa0h7fxVAGn6G0LV7WqssLTWcwKKynBwn21Q+y8gaickVBBpU24f2YES
-	fB/wstYDfEiZ5vLQc9q8XOmUR2l4e+pLOj/uwspRcpQ4gKMp4XLLW1L5bi+rUC5H50fKGn
-	UJY0GFeMcqexiyDOitDjM2vYPV30K2eB2XdQ3gTSjwH+9WEDagOBuf/jhRMr25e92LfmDG
-	lD3wiJnSQ58Nd82J9R9JQvCM326dApnFIjaP9P+BOetHrnzN0ZsT5A+z0xsIwpMbASSYFw
-	TU7ujWQ4x9/J1D6csWaqtSgqn5+9jxwy/UbacySHXNj7nYG6fgs5Fc+I4kskkw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <fb7500035873e36482ca50348f156805c48c4af6.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v4 5/6] doc/functional-bap: Document clearing a
- cached configuration
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>
-Date: Thu, 12 Nov 2026 21:04:24 +0200
-In-Reply-To: <58959d386b3510668043b393074e097f773e09af.1794504552.git.luiz.von.dentz@intel.com>
-References: <cover.1794504552.git.luiz.von.dentz@intel.com>
-	 <58959d386b3510668043b393074e097f773e09af.1794504552.git.luiz.von.dentz@intel.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-3.fc44) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QW04nIwu
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-67c2c2ac1c3so195218d50.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 11:12:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794510735; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jvWASrdAk7l+sPlMxBHgLkvJz7bA+HEIOCMT2DMYCfhGoxyNcN+a56PhyKQsdp+4Wk
+         74xsYdKIx0mOGtspmYhyZVWoBL1zK4HOvHKrmJ4j1HsgaK6U1YeQE5wLcb+XVV84VPUG
+         WURAWmbNawDgzbNSF8Yhm3aq2mZXE6WE6jWE0f7IbQZcf18yCcY9cbxMIhzxHVG8DtBC
+         jspF6jiPXPiPqAfkZvCvGedQE6GCXzQF0PG3kMXqJb8+zd4T5aRcaEgMkUwYCi6JOrnY
+         FLTk9LVHL+XGHh9Imf/pPraySGQLEBVNG3Qr29Ds2Cuok1JrrJwMdjoHhzof8phxAT2c
+         jQQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rqk5CPiY59UsLG0gCy46rqp54XEDSm09ZFeKrVVDNPk=;
+        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
+        b=hMaoWTg/eOrI5/JJQAC2Jl1hvX54v2hgI3pxrJcmqzRyOdU6u9vk5TAEScOaSd9855
+         2iRarrxNO+2OMlXJ+4DrE9SJi/TrB/n4ygwAN93Yzs8cirPyrVTCXnvFLpTRYOwfJQgJ
+         r74/VD/X8yBYA8SjII9vjOJFUwCrfZVNXLiI//D45cUgZzqQOLE1SOamc6D4vQeQZA6t
+         bUCnlQhB70EgPeXVFJj0EOBz2O13gIzxQdP+fZ3oucfYBBgLyZa+WtRXPh2W5f4dRHuZ
+         4aRhnHOYvAnrOlD19yE9n7pcdtpF1d+rPmAGkOe8mg3KuLb7tbKzvkxS2mUfHGJoLK9u
+         cdYQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794510735; x=1795115535; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=rqk5CPiY59UsLG0gCy46rqp54XEDSm09ZFeKrVVDNPk=;
+        b=QW04nIwupNVamdUCXdwoq5SOTPpvu9ql7RQs326lvFhr2RQ1XkB9FOlrAZObvSqvAf
+         xPnC3H2RLZmFflPBNGXFxJwzbifYzPriWMQzl+X1d0zuFk5/WD6L1IdkYcKMVBP4/ehY
+         ZbtOAFKnePuR+t5hUoYFVTCaZGfNHBhqO1ChVXVWBu0fYjY4Bv4JZGwZvdjxk8NHT7CB
+         VVE01V14wVQaw3Rrbhvtwn/rsl1fl73ccbRFmYItNTqKcVzBLIaPxFs3liVENGqGQSiz
+         +E8bmM+dmZ1jqM1G8XeIEtE5WqsHP7nkiL1i/XuUxcPaNGZ7Whurz0/Bt3Ah7DuV0Uqe
+         npMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794510735; x=1795115535;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rqk5CPiY59UsLG0gCy46rqp54XEDSm09ZFeKrVVDNPk=;
+        b=poDLxvpuxnz9e/fTc0jNTwo++Sjn1AFJ6BcfPdodB7UQdNqR0B7BvunyLGXR3btNGh
+         Jwsv0zH87NNf1NZJztc41rWzG3uFfOJPuw2DTLbbToqUZfgFt2ZcYB7Fx9060EfDiyXQ
+         FrrXNY/mjThp5zldly2r0SH4Yq/ph0+VLVuqV5PVogTVv1KsphKwLXn1L07end9p/yIZ
+         p+nwLGgutE6uWLMOoP9r1uh6RSAiEpnGxOE4l7DfS94P/oYZIYy3uNWbf5yLGyMrn1tM
+         kEZYRRzaDKXwpZWGwljrS0VjmMfO8w84XPElxqW1EL/sujoV1sDxByQ/W/EHTbKNEXpZ
+         de1w==
+X-Gm-Message-State: APuU4Z8jsucPFprpufsxVzvJTU+8CZqqaaRopE20loBDiRl6z55XpokQ
+	Zk+79q3NLdU2F72+MhJqq0ZxZpEFY+6Q4wbb6Q/kMtSrmlGXHuq/BBTkaabzzAIGG9JE60xwxKc
+	d5eMakgZVUBAz0XxUrfu5WoSYmGBCYys=
+X-Gm-Gg: AYBFou0KM2ppJuBGF4e5XpK4Y1yHqCHxA4wOZE84V8r87/E45Ym3BD7Br+l9mmM388d
+	mPr1zBXTmb7iAf2tJMJymRtGk4KLimqB2I13rq8n1+w+yqHZufcl1tpXclNpXxy+2ygdebtL+rc
+	pn2NRyAIZgaEeBoo7JHOO6KWu5+6zTSqJeOmqAwBUXnnMB5QWPw9042+0ShSeYUsAFm30kJoDux
+	dkG+fk1lRLO3tx7HI6AJ04163VTSuWzYQfB3mDtRJLtt1NFMuz1fLV+yksyggzki9zOaGBbYOYW
+	ZBmgXjuS/FynxxAynPQZmVTsaMUeZtDBkNkKQRqZt/HY0cKmGRz5/G/5FBd7Yn+E5bPAiE0e/ny
+	vRUsSOFDUnHDAYPSQTqte44zxSGuVKswdBeJMJRYgpsqBpLRJkjbfw8CO0uvJc3lV25ZbQMMsxZ
+	5rgqv9sRGbaRq96M93Xj7zPlul79BuQwqYnl6OXsCMfWWFgHhjBehvQNcvANk=
+X-Received: by 2002:a05:690e:4181:b0:67b:ea15:ece8 with SMTP id
+ 956f58d0204a3-67d89771ac9mr268520d50.101.1794510735292; Thu, 12 Nov 2026
+ 11:12:15 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -128,64 +104,132 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+References: <20261112032250.37687-1-kevin@simpleble.org> <CABBYNZLiwCUAUCnVDYqWdjv5m4sFA=pKX8JAeFU1OXq-6LN7vQ@mail.gmail.com>
+ <20261112174006.98288-1-kevin@simpleble.org>
+In-Reply-To: <20261112174006.98288-1-kevin@simpleble.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 12 Nov 2026 14:12:03 -0500
+X-Gm-Features: AclHuK9t5CPEemcF-AXKBCD5IE5aRZctLqxS5Y_0dlibhtdA6V9WRp1x56WFy_M
+Message-ID: <CABBYNZK4MW92Sddmq9_tWiHAuWiP9VZqmVrPQC0AJ5JHR7-j0A@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ 0/4] Bearer.LE1: Add ReadRSSI
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+Hi Kevin,
 
-to, 2026-11-12 kello 13:14 -0500, Luiz Augusto von Dentz kirjoitti:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->=20
-> Describe the test where the initiator clears an endpoint twice, the
-> second time releasing the ASE whose codec configuration the acceptor
-> cached.
->=20
-> Assisted-by: Claude:claude-opus-5-5
-> ---
->  doc/functional-bap.rst | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->=20
-> diff --git a/doc/functional-bap.rst b/doc/functional-bap.rst
-> index fc367e0f9181..eb04e6520aa8 100644
-> --- a/doc/functional-bap.rst
-> +++ b/doc/functional-bap.rst
-> @@ -230,6 +230,30 @@ test_bap_unicast_desync
->  	single ASE of a CIS, so a failure of that one can be told apart
->  	from a failure of the initiator to enable the ASEs separately.
-> =20
-> +test_bap_unicast_clear_cached
-> +-----------------------------
-> +
-> +:Setup: As above, with both transports created.
-> +
-> +:Steps:
-> +	1. Initiator: ``endpoint.clear <remote PAC Source endpoint>``.
-> +	2. Initiator: ``endpoint.clear <remote PAC Source endpoint>`` again.
-> +
-> +:Expected:
-> +	1. ``Configuration cleared``, and the initiator removes the transport
-> +	   of the Source ASE, which the acceptor moves to Codec Configured,
-> +	   caching its codec configuration.
-> +	2. ``Configuration cleared``, and the initiator releases the Source
-> +	   ASE again from Codec Configured, so the acceptor moves it to Idle
-> +	   and removes its transport. The Sink ASE transports are left in
-> +	   ``State: idle``.
+On Thu, Nov 12, 2026 at 12:40=E2=80=AFPM Kevin Dewald <kevin@simpleble.org>=
+ wrote:
+>
+> Hi Luiz,
+>
+> On Thu, Nov 12, 2026 at 8:07 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > That still a poll in my book, not bluetoothd directly but I bet
+> > application will start to just poll it on their own.
+>
+> They will, and Get Connection Information was designed for that: the
+> kernel caches the values for a random 1 to 3 seconds "to avoid client
+> trying to guess when to poll again". Applications that need the value
+> poll today anyway, as root through mgmt [1] or with raw HCI sockets
+> that bypass bluetoothd and the cache. Blueman still reads it through
+> libbluetooth for its signal bars, which only works on BR/EDR [2].
+>
+> > Well the reported values are vendor dependent, so I'm not sure how
+> > much it would help since you can't use a measurement of link
+> > degradation in a generic manner, it needs hardware details to go
+> > along. We need a clear motivation for why this would be useful apart
+> > from just covering what other OSes might have since they may use a
+> > vendor command, or in Apple's case, probably deal with an exclusive
+> > vendor which makes things a lot more simpler.
+>
+> For LE the spec fixes the value: Read RSSI returns the absolute
+> received signal strength in dBm to +/-6 dB accuracy (Vol 4, Part E,
+> 7.5.4), the same unit as the advertising RSSI in Device1.RSSI. BR/EDR
+> is the one relative to the golden range, which is why the method is
+> only on Bearer.LE1. Android's readRemoteRssi sends the standard Read
+> RSSI command, and BlueZ's own Android port implemented it with Get
+> Connection Information.
+>
+> What the value gives that a threshold event can't:
+>
+> - Choosing between links. A device in range of several gateways should
+>   stay connected to the one with the best link, and a hub with
+>   redundant sensors should read from the strongest. That needs numbers
+>   that can be compared, not a crossing per link.
 
-ASCS iiuc allows Release from Codec Configured to go Releasing, and
-then back to Codec Configured, so it may not possible to get rid of the
-configured endpoints.
+This sounds like something mesh was designed for. Yes, you can do it,
+but it will be inefficient and probably error prone to juggle between
+links, Bluetooth is typically a point-to-point/star topology; adding a
+hub as a middle man is a pretty bad idea.
 
-Samsung Galaxy Buds2 Pro IIRC works like this, wasn't possible to get
-endpoints go back to Idle.
+> - Diagnostics. Logging the RSSI next to throughput and packet loss is
+>   how support tells a weak link from a firmware bug, after the fact.
+> - Production test. Test stations connect to every unit and check its
+>   RSSI against a reference unit, to catch a bad antenna or enclosure.
 
-In this case, does the current patchset accumulate pending
-cached_releases?
+Yeah, that would be acceptable if this is behaving as a testing flag,
+though. Otherwise, we will have people trying to use RSSI for other
+purposes, like proximity, which is not really the intent of these
+metrics.
 
-> +
-> +:Notes: Releasing an ASE in the Codec Configured state is permitted
-> +	(ASCS Table 3.2, BAP 5.6.6) and is covered by BAP/UCL/SCC/BV-106-C
-> +	and BV-107-C. Without it, an initiator could not get rid of the
-> +	codec configuration an acceptor cached, as it no longer has a
-> +	transport for it.
-> +
->  test_bap_unicast_duplex_enable_one
->  ----------------------------------
-> =20
+> - Trends. An application streaming data can see the RSSI falling and
+>   lower its rate before the link drops, instead of finding out from a
+>   threshold picked in advance.
+
+RSSI values tend to fluctuate a lot. Even if that would make sense why
+wouldn't we deal with that directly at bluetoothd rather than leaving
+the decision to an application? Applications like PipeWire already
+scale the SBC bitpool if the audio starts skipping. We also have TX
+completion nowadays to measure how long each buffer takes to transmit,
+and I would be very surprised if using RSSI instead would be a better
+metric.
+
+> > Which means every btmon trace will now grow just with RSSI reports, I
+> > mean I could live with an event generated if RSSI drops below a
+> > certain threshold, not a command and event, every 2 seconds.
+>
+> Only while an application reads it. A threshold event needs the same
+> Read RSSI every 2 seconds underneath, as the RSSI Monitor RFC did in
+> 2011, unless the controller monitors it itself: LE Path Loss
+> Monitoring, which also needs LE Power Control on the peripheral, or
+> the MSFT extension's LE connection RSSI monitor, which the kernel does
+> not use yet.
+>
+> BlueZ already has both for advertising: Device1.RSSI for the value and
+> AdvertisementMonitor1 for thresholds. ReadRSSI is the value half for
+> connections, and I'm happy to add thresholds on top where the
+> controller can monitor the link itself.
+>
+> [1] https://lore.kernel.org/linux-bluetooth/aa77c035-d2aa-f227-bfcd-358b5=
+f063b21@labapart.com/
+> [2] https://github.com/blueman-project/blueman/pull/1642
+
+If a vendor command can monitor the RSSI of a link, perhaps we can use
+it. However, in that case we could gain much more with proper metrics,
+etc., but that opens another can of worms because vendors may not
+agree on all the fields of their telemetry events, and these events
+are typically for vendor diagnosis, not applications.
+
+There is also the likes of Read Link Quality, which is probably more
+subjective to vendor implementation, and also requires polling, also
+if you read more about what is required to get a _proper_ link quality
+then you will see this needs to be enable over the air:
+
+https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core_=
+v7.0/out/en/low-energy-controller/linklayer-ll--specification.html#UUID-837=
+54739-8b1b-4943-b310-0477faf28c45
+
+Otherwise you will only get a one sided value from the local
+controller while the problem could be at the remote end. But if I'm
+not mistaken this was introduced with HDT as Link Quality Feedback;
+see:
+
+https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core_=
+v7.0/out/en/low-energy-controller/linklayer-ll--specification.html#UUID-edb=
+79691-f7ea-9136-357c-6533d2cb77e0
+
+--=20
+Luiz Augusto von Dentz
