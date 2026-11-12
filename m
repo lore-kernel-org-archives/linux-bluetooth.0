@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794505808;
-	b=ZqLQUltPVuY88mcgX3KEF5dzozPdppoU81gyMDUGEGBE0UawdWW74ZzNLSt2puu8qBZm
-	 iH1QZP96YHmd6Yth3o7t5FUZm8aFETiLRgI1fcWQgODw8YnPNXaTZVLe9a39+FlOOZ2dx
-	 tadVvqDFU/AiD7a8Ue6eHoYtfLJ7f4rYR04K3333Q8AIyLZ8xeuYDn1bM87Oig01ih+w5
-	 oXiwYdyAg1VOAVi6nOoirb8C6u+euJsD07Psgprf2NWu1bOoNL9bFXPguLg2O+jvznmBN
-	 qoix0b0hBvUMRP+viyxVQAqfpF8X1KJlr2oHS8qH302oDg5xsFwaeAFqV3uicUho9fg==
+	t=1794505810;
+	b=y5tqGYefOWJSr+IUED25Nzgkm2Lav6XYvqELrzxyxZFpNj+7ZCT+jWh9E4uNhqe8KRMx
+	 +diolB98N8HqWPphAonbG3yQ2jeEHVBvWfr58bWMRwTzWhh1gCkkmsqwJHVymxXuYdWo4
+	 hbr3QqFRY2tMfWbK8ndc9MnR+7q84hdpC5od2igp0+jJi3ASOKt2pJ/kPob45rljRuOAk
+	 GKnm9O+cBJk0dFrbbVuo6PoDFi6fEXH3L5oqqV+26r18+/AkkepUJFEc7PNwCspOXE2ex
+	 I175WmOh1WRnHHDHd+dcK7C3pzkvznizksBa+966lq/AeXz8h3QFz2PNKltP99qr+cA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794505808;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794505810;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=mCLWbWSfmz7oe3xjpMCycZnt3k/d8hkqtETv8IkAh5o=;
-	b=g911cJKLLGX+Rfilk/PE7xdEIE4HjNF77TJ/YT5MFP4NOrSQi00ieCNspLIBfbAYr4FP
-	 ZHJvuS8LbvJLV1U6U8mBeFPRb6KrREhX9Sw5wkhIYWu8XIYzCBxMPTrt/J5L3FvnhekND
-	 A1cIkgFod996thmtQRqZdXb+GSyHnRifNmmtnxWYglIwoxeLBJF2HYAHIkQK/Y5jxygzK
-	 GH1chOkUlCFHD8HVD84ONj5jL7z2BoD7Xv31Ox6597VlqwYm13+f0T9VN348yJeupD/+f
-	 Ms0+MnW+E0CYoJbo3m5VIBAfeaxS15pZN9G1DsbPdMcf8K0IFUcVK9dxWjbCZQ6y0Qw==
+	bh=m5GKxQ8PqLPp+hqlEzITev2GBalcccPFypUBkQBbQWc=;
+	b=LfUkd+0hZWRVTDqFGnvwNapeMO6nFDbAvODg5G45Pjskugc6hLImwJJBc6I6VXR4BtJz
+	 T0P70+i7t+P7z6rmwOlXeJRj/Gz0hBydJ9BcOrg5B9Ozt3yT2Yk1tFLwY/5PblYan2JYU
+	 KKbl2yxzINqZQH17Oqh9hmIxT53NmkqB99H5uLvx8U4q4TMxIC55KeSgaBMXxCfvvvKVW
+	 gvuY5N9M8SUVAKZaSUT5Q0lnQNOtPEZWjSTWcMs79hqcfry4Kz9ujK118T0BsL8uxeY8X
+	 x/r0Ld26b2kIdKZqXLj6F2t7dnaDA+CtbKr1Cif4tYtF54niPEgTv2MuCZem97zRjrQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lVBnscxj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOHjOd3E;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698AA606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 17:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23279606A331
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lVBnscxj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458951F000C4;
-	Thu, 12 Nov 2026 17:50:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UOHjOd3E
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE611F000C4;
+	Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794505808;
-	bh=mCLWbWSfmz7oe3xjpMCycZnt3k/d8hkqtETv8IkAh5o=;
+	s=k20260515; t=1794505809;
+	bh=m5GKxQ8PqLPp+hqlEzITev2GBalcccPFypUBkQBbQWc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=lVBnscxjkDzBlmsGsMQCazmKFODgjz7O0BBBEhfe8J6dQIwkre+B1MqgPomYBbMqo
-	 tX/LxMsV/iwXSWWWagrdDA/JQpDlNXJSkgeOVQfvs9j4Qw+pgF6Rzq36jOHxbfd7vl
-	 fUo0TmB0eR1uQFCBr1mRIPMUrACt9BJhor0ZX1jfWOxZ4D6OIYLjjGnZNuDhzITQlp
-	 oX2UdGRP6XvxpRebwbCU2v3fHHp1sn5UQTPtkQdthyFBcCx9rxGdAKkPGMHaFq5GpR
-	 Mf5eBmUOT/uXD8POB2dkw4BOS+W3Wom7BAts8cYtg+vt0fHct/EjTLZFEoULpPRFaZ
-	 9brRWl825BRzA==
+	b=UOHjOd3EudlWH/RNB6CToQC4vt5gtItpf6Vo8QAS5TMuc/Bs4aNlJh8lnmfpapuP0
+	 1wXQySZ0E2K5/tcQw0bALkO4J/IzaIqLqqV5X1D7OiaQHrtUxYF0O4jMkYBfTtY/ID
+	 +aMaVPQJ0flyCvc8ebhQAwAM546drk/GBOGjgIqV1Ju8um+4nnDbn5jsjIKASdB/V3
+	 Y0498R4CM6fIS2I5K9BaXoVoQk0mqnJjfCz0z2uo8WVgeB3CrC/LTeLyQUUKucz0sg
+	 gJNXtYRncI+AvoHk2CCNXOqTTmFIDmOQyJA0Cyd/dMAFM/rhTsIQjEUAtrqebKgqY7
+	 V+rFiacHub+JQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A3A9380AA78;
-	Thu, 12 Nov 2026 17:50:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4340380AA78;
+	Thu, 12 Nov 2026 17:50:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,38 +54,48 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/3] shared/gatt-client: Track internal discovery reads
+Subject: Re: [PATCH BlueZ v2 0/5] shared: Use util_iov helpers in gatt-db,
+ hog,
+ asha and micp
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179450580703.563116.10409527926595397710.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Nov 2026 17:50:07 +0000
-References: <cover.1794432472.git.cochcoder@proton.me>
-In-Reply-To: <cover.1794432472.git.cochcoder@proton.me>
-To: Kyle Pepper <cochcoder@proton.me>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
+ <179450580827.563116.10974231348534576330.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Nov 2026 17:50:08 +0000
+References: <20261111203949.3874673-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261111203949.3874673-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 11 Nov 2026 21:42:55 +0000 you wrote:
-> Track Server Features and discovery Database Hash reads in pending_requests
-> so client cancellation releases them before the client is freed.
+On Wed, 11 Nov 2026 15:39:44 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Patch 1 adds shared request support. Patches 2 and 3 fix each read with
-> separate native ATT tests. Both depend only on patch 1; either fix and its
-> tests can be reverted independently.
+> This continues the conversion of the GATT code in src/shared to the
+> util_iov_pull_* and util_iov_push_* helpers, so that the bounds check is
+> part of the access, now for gatt-db and the HoG, ASHA and MICP profiles.
+> 
+> The conversions are meant to be behavior preserving and are covered by
+> the existing unit tests (test-gatt, test-hog, test-micp). The existing
+> code already checked the lengths in the HoG and ASHA readers, so no new
+> tests were added for them.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/3] shared/gatt-client: Support pending GATT helper requests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4be786143db8
-  - [v2,2/3] shared/gatt-client: Track pending Server Features reads
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2e6bb945d6fa
-  - [v2,3/3] shared/gatt-client: Track pending discovery Database Hash reads
-    (no matching commit)
+  - [BlueZ,v2,1/5] shared/gatt-db: Use util_iov helpers to build and parse values
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c37508359cbe
+  - [BlueZ,v2,2/5] shared/hog: Use util_iov helpers to parse characteristic values
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=628a84f214e4
+  - [BlueZ,v2,3/5] shared/asha: Use util_iov helpers to parse characteristic values
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a848a36c8154
+  - [BlueZ,v2,4/5] shared/micp: Fix reading Mute State from an empty notification
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ebc4876e895b
+  - [BlueZ,v2,5/5] shared/micp: Use util_iov_pull_mem instead of a local helper
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1bd266143b3a
 
 You are awesome, thank you!
 -- 
