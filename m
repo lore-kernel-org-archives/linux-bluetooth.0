@@ -1,57 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794450341;
-	b=d81K8uef47Cl+CWAnfuBLqo7s30gfzmGWom3Sd4gEkOASNimfivJmt0QJ142OF6d/Abr
-	 bUtQeUMvQWNgbX4HVD4yuPQOraMA3y35OBVWf2XtEi+lCsQfp8NsZUiD+2siJTB8xQXga
-	 MSE25goj0/E2pGnzHVkGH5N8NNwd+f8AkMU73oXsBYhzmZG/bCzf7RomVC3rTnzD6Wl/t
-	 BfK1tZPbKIHk/6+fieplcveYqchQTB0mKkXyeaZbtqRVIABCSlYegTFw2pNFDRIiQuJ3B
-	 XrcqpuS2K8lt+x4bjZh4wvPxY7JCw8FDVuBYsPkSzGjdY7bjm2+YyZzVZ0bFWJumyzw==
+	t=1794450645;
+	b=fpk2HPsGdRnEf9NAYxcRXouOJVks4SJqHeQGTYxrS3OiY8W9b18lOvN1mlRhL7h3gHiT
+	 9aWxYgQBFWrJWJzs64gQd/J5adDGlC99KilzB6YIjP0UFWdHn33neQUbU/tx1UxeAVejw
+	 6eX0/OM0vDSRKSk4ee+D7+CjZWIHDcpG2vPXtXOgZE8GSthoft1Jilmnh+T8xxuZucVrx
+	 z2jXCClksqMliAIG+4+aWwTmMyIE1Qo0K4x4WeDzPgteMiy0bpNy9cCzR+vfLK99R8rOe
+	 AMtWb8lkwo7Eru458Aj3UqvkB+MPh1iD4FG1E4BkLMOkcQ48VRW4WmyV1iHGpPL6Lmg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794450341;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794450645;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Fepc0TTS22ds1Z6LiH7axkKXf24Fd0xOpRbL0yNtyaI=;
-	b=DtXcC1k57G9ZAU86QTXeEIfsnkZ+0OzTdvpNFypPJLQJ5xyiNc5MCcUzCHFG/NYjBCBH
-	 O3FiDjGRi72aS+sTPliTXEdfEmqdWW9lBmMI1z3VZ8tSZrLlKCfhAftuLvQJH20HgU0+o
-	 iNhehrI63PbOxeYq+gVWhKbmK+uHb5uMN6yxm+jfxF4B7bl1EnubkzhvD0OMMG24gJXU2
-	 3wQmw7f6c3OItnf7P3Y0BV0N8MwKhD+0KRac7hW4jEJX4r6/szLizmRyyZLdlzG3EpK7T
-	 3hTqbzPry5iJ/JjWOaRcuAxEC5ykno1Yx7B0PlrN8QfTn51BDl+8GhmA0sjugwlisRg==
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=IdJSkITOsVEzLLwr1ySLgLSQtLSBSBwEpzbIgiWD0Po=;
+	b=QWLR10bvv+cFj04jjPSjh73U2Vwtsb3FknmHujF9G1j3A8AhaB43QIIlGQMZN54TZOot
+	 q0EKdCPo/dv1+YPieZPuqGT2AAIaBNUotMisVuqPlgXX6fkSkYvyl3IhHD6BFqcIooKDm
+	 P9HjcplaaDZRX5gCPNr9ldFlkTNUZ2OrOBDsZ9ZbJhwrrKavNqBcWwdM9qV8rOa/tZgp1
+	 PMZQYXtSI7mYc+OcyyFsjM8u0sfgdEX6PE+iobwn230j6sq2udFqyvGFkEVnoowG/wOtM
+	 dFGj5eMBGF3XQf9mkvPUIE6fx80CTPLwkIsycNIsU2BiR4hi6SpuuGKXJijbbIc/q4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=VLIko3T9;
-	arc=none smtp.remote-ip=185.70.43.103
-Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=Yk4OiiyT;
+	arc=none smtp.remote-ip=185.70.43.102
+Received: from mail-43102.protonmail.ch (mail-43102.protonmail.ch [185.70.43.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B26606A326
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:25:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85B26606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8909606A321
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 02:30:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D8909606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=VLIko3T9
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=Yk4OiiyT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1794450336; x=1794709536;
-	bh=Fepc0TTS22ds1Z6LiH7axkKXf24Fd0xOpRbL0yNtyaI=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=VLIko3T9df4JyWH6bDIuxSBar7C7r1WqP6OHK7nCn3yxlEGgzaoezwG/5ODVWqLUA
-	 KXMlCryHNlrBLX55F2hy+5AZ1l+/8pV7uvjEWWgg5wSufbSK4QykvfQ26EtpXxl0/u
-	 hAK4VjmAqC5Wv/Ry1MRuKitrZ5gaEFkI7xDcyYxaeoRQrqE54lK/sg02Ha7TVZ2oMe
-	 pz+aTSI2Ocak8/ZeDX3hpNagownOVGtiBMMYbanqZxpCP9w18IM0qtUbnExskVuZvl
-	 C2sLeddcs37IC7D89x00Q5AymP5Bw75vzvaJHnV0A8NDe7Lrw+7SO+mW5TAIjAt2nG
-	 U4p0WmIFL9zkQ==
-Date: Thu, 12 Nov 2026 02:25:31 +0000
+	s=protonmail2; t=1794450641; x=1794709841;
+	bh=IdJSkITOsVEzLLwr1ySLgLSQtLSBSBwEpzbIgiWD0Po=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Yk4OiiyTjbSa9pHe8mE/9POuJkKiTS6kh64wKUWnPhEIoOLHXiw1ASKnVwMnGeQki
+	 or/Dv8pGYF0ET2eDtx+7LzJNQCqQgCM7hXUaaFmxhT7YQ+LFfnMi5n3GesAjUiFr+Q
+	 GpLWHXX7sql3EaozxZJxhwFIkdQOFXOBIBGa1eFDbvrQq3InMOQ+5D8qTAMvVsDuUy
+	 4EQsmnbfaeUtmd+MAJVuRqXAZ5l4z7YMz+Io2zbh/g1kh11ac7RSV0uRvaf2hrhcfc
+	 EJ59jn53EiS9U0pyBf1t6BNxex+BX6MRJYAAq+yqawkIDw/npbHMJhthicVohWQOdM
+	 meAvStI25Fu0w==
+Date: Thu, 12 Nov 2026 02:30:38 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
 Cc: luiz.dentz@gmail.com, marcel@holtmann.org
-Subject: [RFC PATCH] l2cap-tester: Check deferred ECRED batch rejection
-Message-ID: <20261112022522.185562-1-cochcoder@proton.me>
+Subject: [RFC PATCH v9 1/2] Bluetooth: L2CAP: Keep credits from completing security upgrades
+Message-ID: <20261112023025.187702-1-cochcoder@proton.me>
+In-Reply-To: <20261107071634.2237059-1-cochcoder@proton.me>
+References: <20261013031943.489829-1-cochcoder@proton.me> <20261015052751.137705-1-cochcoder@proton.me> <20261015181624.48318-1-cochcoder@proton.me> <20261106021723.631339-1-cochcoder@proton.me> <20261106045515.853897-1-cochcoder@proton.me> <20261106173948.596166-1-cochcoder@proton.me> <20261107023556.1475788-1-cochcoder@proton.me> <20261107071634.2237059-1-cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: e1c77841719b607364dd3dc8cdbbb80103a942a6
+X-Pm-Message-ID: 671d59b10eb07ca16adb5644079cadb1fe062fab
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,130 +67,767 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Closing an accepted child while its ECRED response is deferred rejects
-the pending batch with the L2CAP security changes. Check the peer's
-authorization response and both zero DCIDs instead of waiting to accept
-a sibling that has been closed.
+Retain LE and ECRED credits without sending queued data or resuming
+connected sockets while a security upgrade is pending. Guard the shared
+send path and deferred acceptance, and preserve the requested level.
 
-Expect five zero DCIDs when rejecting the five-channel EATT request.
-Also check accept()'s return value before reading the child socket.
+Finish pending upgrades from referenced connection work outside the
+security callback's list walk. Keep failures terminal across later
+confirmations and notify pending channels when local SMP pairing fails.
+Use a dedicated unbound queue so management replies can report failure
+while the device queue drains. Drain it before L2CAP exits and release
+it if socket initialization fails. Ignore detached or powered-down links.
 
-Assisted-by: Codex:GPT-6
+Serialize BT_SECURITY with SMP receive under the connection lock and
+with management failures under the device lock. Take the device,
+connection, channel and socket locks in order. Record a failure generation
+on each request so delayed failure work leaves newer requests alone.
+Publish the failing generation in the consumed atomic and compare request
+generations with signed subtraction. Skip zero when the counter wraps.
+Keep EBUSY for channels with their own upgrade already pending.
+
+HCI confirmations describe the current ACL link. A failed encryption event
+can disconnect it, so pending requests still fail regardless of their
+local SMP generation. The powered-down check is advisory; HCI separately
+guards transmit admission while draining and flushes connections on close.
+
+Check every deferred ECRED sibling before responding. Reject the whole
+batch on failure even if a child has already become BT_CONNECTED while
+waiting for the response. Include a zero destination CID for each refused
+channel. Close rejected children under a temporary reference, using child
+socket lock nesting, so unaccepted sockets release their ownership.
+Normal incoming ECRED channels enter BT_CONNECT2 only with deferred setup.
+For a synthetic child without that flag or an identifier, delete locally;
+there is no pending deferred response to send. Choose this fallback before
+batch handling, avoiding a channel read after rejected children close.
+
+Wake deferred sockets after successful security even with no initial
+credits. Consume and return deferred batch errors. Preserve a pending
+security rejection through teardown without masking unrelated socket
+errors, and clear security and suspension state when removing a channel.
+
+Assisted-by: LLM
+Signed-off-by: Kyle Pepper <cochcoder@proton.me>
 ---
-Depends on the deferred ECRED batch handling in kernel RFC v8 patch 1:
-https://github.com/bluez/bluetooth-next/pull/1084
+v9: copy options before locking; reject failed deferred batches before
+resume. Rebase on current bluetooth-next, preserving the short security
+option ABI and MIC requirements introduced by EKS support.
+Previous v8: https://lore.kernel.org/linux-bluetooth/20261107071634.2237059=
+-1-cochcoder@proton.me/
 
-Local native L2CAP: original 109/111, repaired 111/111; unchanged base
-111/111. BlueZ unit suite: 35/35. Both failing CI cases reproduce.
-Required attribution remains; raw checkpatch rejects its trailer.
+CI checker repair: https://lore.kernel.org/linux-bluetooth/20261112022417.1=
+85349-1-cochcoder@proton.me/
+CI tester repair: https://lore.kernel.org/linux-bluetooth/20261112022508.18=
+5512-1-cochcoder@proton.me/
 
- tools/l2cap-tester.c | 39 +++++++++++++++++++++++++++++----------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+ include/net/bluetooth/l2cap.h |   7 +
+ net/bluetooth/l2cap_core.c    | 235 ++++++++++++++++++++++++++++++++--
+ net/bluetooth/l2cap_sock.c    | 176 ++++++++++++++++---------
+ net/bluetooth/smp.c           |   1 +
+ 4 files changed, 347 insertions(+), 72 deletions(-)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 4002ca561..84f8c2e26 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -1164,13 +1164,25 @@ static const uint8_t ecred_connect_req_2[] =3D {
- =09=09=09=09=09=090x42, 0x00, /* SCID #2 */
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index cf5c2df68..ce5c21f43 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -620,6 +620,7 @@ struct l2cap_chan {
+ =09void=09=09=09*data;
+ =09const struct l2cap_ops=09*ops;
+ =09struct mutex=09=09lock;
++=09unsigned int=09=09security_generation;
  };
 =20
-+static const uint8_t ecred_reject_rsp_2[] =3D {
-+=090xa0, 0x02, /* MTU */
-+=090xbc, 0x00, /* MPS */
-+=090x04, 0x00, /* Credits */
-+=090x06, 0x00, /* Result: insufficient authorization */
-+=090x00, 0x00, /* DCID #1 */
-+=090x00, 0x00, /* DCID #2 */
-+};
+ struct l2cap_conn {
+@@ -645,6 +646,9 @@ struct l2cap_conn {
+ =09struct sk_buff_head=09pending_rx;
+ =09struct work_struct=09pending_rx_work;
+ =09bool=09=09=09pending_rx_blocked __guarded_by(&lock);
++=09struct work_struct=09security_work;
++=09atomic_t=09=09security_failed;
++=09atomic_t=09=09security_generation;
+=20
+ =09struct delayed_work=09id_addr_timer;
+=20
+@@ -767,6 +771,8 @@ enum {
+ =09FLAG_ECRED_CONN_REQ_SENT,
+ =09FLAG_ECRED_RECONF_REQ_SENT,
+ =09FLAG_PENDING_SECURITY,
++=09FLAG_SECURITY_CFM,
++=09FLAG_SECURITY_FAILED,
+ =09FLAG_HOLD_HCI_CONN,
+ =09FLAG_DEL,
+ };
+@@ -993,6 +999,7 @@ void l2cap_chan_busy(struct l2cap_chan *chan, int busy)=
+;
+ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail);
+ void l2cap_chan_req_mic_len(struct l2cap_chan *chan, struct hci_conn *hcon=
+);
+ int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
++void l2cap_security_failed(struct l2cap_conn *conn);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan, struct l2cap_chan *p=
+chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 09ff32394..8a2a99084 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -59,6 +59,8 @@ static void l2cap_tx(struct l2cap_chan *chan, struct l2ca=
+p_ctrl *control,
+ static void l2cap_retrans_timeout(struct work_struct *work);
+ static void l2cap_monitor_timeout(struct work_struct *work);
+ static void l2cap_ack_timeout(struct work_struct *work);
++static void l2cap_security_work(struct work_struct *work);
++static struct workqueue_struct *l2cap_security_wq;
+ static void __l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ =09__must_hold(&chan->lock) __must_hold(&chan->conn->lock);
+=20
+@@ -705,11 +707,14 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ =09lockdep_assert(!chan->conn || lockdep_is_held(&chan->conn->lock));
+=20
+ =09__clear_chan_timer(chan);
++=09clear_bit(FLAG_PENDING_SECURITY, &chan->flags);
++=09clear_bit(FLAG_SECURITY_CFM, &chan->flags);
+=20
+ =09BT_DBG("chan %p, err %d, state %s", chan, err,
+ =09       state_to_string(chan->state));
+=20
+ =09chan->ops->teardown(chan, err);
++=09clear_bit(FLAG_SECURITY_FAILED, &chan->flags);
+=20
+ =09if (!test_and_set_bit(FLAG_DEL, &chan->flags)) {
+ =09=09/* Delete from channel list */
+@@ -877,6 +882,13 @@ static void __l2cap_chan_close(struct l2cap_chan *chan=
+, int reason)
+=20
+ =09case BT_CONNECTED:
+ =09case BT_CONFIG:
++=09=09if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL && chan->ident &&
++=09=09    test_bit(FLAG_DEFER_SETUP, &chan->flags) &&
++=09=09    !test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags)) {
++=09=09=09l2cap_chan_ecred_connect_reject(chan);
++=09=09=09break;
++=09=09}
 +
- static const struct l2cap_data ext_flowctl_server_accept_2_close_1_test =
-=3D {
- =09.server_psm =3D 0x0080,
- =09.defer =3D true,
- =09.mode =3D BT_MODE_EXT_FLOWCTL,
- =09.send_cmd_code =3D BT_L2CAP_PDU_ECRED_CONN_REQ,
- =09.send_cmd =3D ecred_connect_req_2,
--=09.send_cmd_len =3D ARRAY_SIZE(ecred_connect_req_2)
-+=09.send_cmd_len =3D ARRAY_SIZE(ecred_connect_req_2),
-+=09.expect_cmd_code =3D BT_L2CAP_PDU_ECRED_CONN_RSP,
-+=09.expect_cmd =3D ecred_reject_rsp_2,
-+=09.expect_cmd_len =3D sizeof(ecred_reject_rsp_2),
- };
+ =09=09if (chan->chan_type =3D=3D L2CAP_CHAN_CONN_ORIENTED) {
+ =09=09=09__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
+ =09=09=09l2cap_send_disconn_req(chan, reason);
+@@ -894,7 +906,11 @@ static void __l2cap_chan_close(struct l2cap_chan *chan=
+, int reason)
+ =09=09=09=09=09l2cap_chan_le_connect_reject(chan);
+ =09=09=09=09=09break;
+ =09=09=09=09case L2CAP_MODE_EXT_FLOWCTL:
+-=09=09=09=09=09l2cap_chan_ecred_connect_reject(chan);
++=09=09=09=09=09if (chan->ident &&
++=09=09=09=09=09    test_bit(FLAG_DEFER_SETUP, &chan->flags))
++=09=09=09=09=09=09l2cap_chan_ecred_connect_reject(chan);
++=09=09=09=09=09else
++=09=09=09=09=09=09l2cap_chan_del(chan, reason);
+ =09=09=09=09=09return;
+ =09=09=09=09}
+ =09=09=09}
+@@ -2711,6 +2727,9 @@ static void l2cap_le_flowctl_send(struct l2cap_chan *=
+chan)
 =20
- static const struct l2cap_data ext_flowctl_server_phy_test =3D {
-@@ -1310,6 +1322,11 @@ static const uint8_t eatt_reject_rsp[] =3D {=090xa0,=
- 0x02, /* MTU */
- =09=09=09=09=09=090xbc, 0x00, /* MPS */
- =09=09=09=09=09=090x04, 0x00, /* Credits */
- =09=09=09=09=09=090x06, 0x00, /* Result */
-+=09=09=09=09=09=090x00, 0x00, /* DCID #1 */
-+=09=09=09=09=09=090x00, 0x00, /* DCID #2 */
-+=09=09=09=09=09=090x00, 0x00, /* DCID #3 */
-+=09=09=09=09=09=090x00, 0x00, /* DCID #4 */
-+=09=09=09=09=09=090x00, 0x00, /* DCID #5 */
- };
+ =09BT_DBG("chan %p", chan);
 =20
- static const struct l2cap_data le_eatt_server_reject_test_1 =3D {
-@@ -3331,12 +3348,12 @@ static bool ext_flowctl_accept_2_close_1_listen_cb(=
-struct tester_io *io,
++=09if (test_bit(FLAG_PENDING_SECURITY, &chan->flags))
++=09=09return;
++
+ =09while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
+ =09=09l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
+ =09=09chan->tx_credits--;
+@@ -4043,8 +4062,13 @@ static void l2cap_ecred_list_defer(struct l2cap_chan=
+ *chan, void *data)
  {
- =09struct test_data *data =3D tester_get_data();
- =09int sk, new_sk;
--=09int err =3D 0;
-+=09struct pollfd pfd;
+ =09int *result =3D data;
 =20
- =09sk =3D tester_io_get_fd(io);
-=20
- =09new_sk =3D accept(sk, NULL, NULL);
--=09if (err < 0) {
-+=09if (new_sk < 0) {
- =09=09tester_warn("accept failed: %s (%u)", strerror(errno), errno);
- =09=09tester_test_failed();
- =09=09return false;
-@@ -3347,11 +3364,16 @@ static bool ext_flowctl_accept_2_close_1_listen_cb(=
-struct tester_io *io,
-=20
- =09close(new_sk);
-=20
--=09if (data->step--)
--=09=09return true;
-+=09memset(&pfd, 0, sizeof(pfd));
-+=09pfd.fd =3D sk;
-+=09pfd.events =3D POLLIN;
-=20
--=09tester_test_passed();
-+=09if (poll(&pfd, 1, 0) !=3D 0) {
-+=09=09tester_warn("Rejected batch left an acceptable sibling");
-+=09=09tester_test_failed();
+-=09if (*result || test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
++=09if (*result < 0 || test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
++=09=09return;
++
++=09if (test_bit(FLAG_SECURITY_FAILED, &chan->flags)) {
++=09=09*result =3D -ECONNREFUSED;
+ =09=09return;
 +=09}
 =20
-+=09/* The peer callback checks the rejection response for both channels. *=
-/
- =09data->io_id =3D 0;
- =09return false;
+ =09switch (chan->state) {
+ =09case BT_CONNECT2:
+@@ -4052,6 +4076,8 @@ static void l2cap_ecred_list_defer(struct l2cap_chan =
+*chan, void *data)
+ =09=09(*result)++;
+ =09=09return;
+ =09case BT_CONNECTED:
++=09=09if (test_bit(FLAG_PENDING_SECURITY, &chan->flags))
++=09=09=09(*result)++;
+ =09=09return;
+ =09default:
+ =09=09/* If not connected or pending accept it has been refused */
+@@ -4140,10 +4166,16 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan=
+ *chan, void *data)
+ =09=09rsp->pdu.rsp.result =3D cpu_to_le16(L2CAP_CR_LE_NO_MEM);
 =20
-@@ -3363,9 +3385,6 @@ fail:
+ =09/* Include all channels pending with the same ident */
+-=09if (!rsp->pdu.rsp.result)
++=09if (!rsp->pdu.rsp.result) {
+ =09=09rsp_flex->dcid[rsp->count++] =3D cpu_to_le16(chan->scid);
+-=09else
+-=09=09l2cap_chan_del(chan, ECONNRESET);
++=09} else {
++=09=09if (rsp->count < ARRAY_SIZE(rsp->pdu.scid))
++=09=09=09rsp_flex->dcid[rsp->count++] =3D 0;
++=09=09l2cap_chan_del(chan, rsp->pdu.rsp.result =3D=3D
++=09=09=09      cpu_to_le16(L2CAP_CR_LE_AUTHORIZATION) ?
++=09=09=09      ECONNREFUSED : ECONNRESET);
++=09=09chan->ops->close(chan);
++=09}
 =20
- static void test_ext_flowctl_server_accept_2_close_1(const void *test_data=
-)
- {
--=09struct test_data *data =3D tester_get_data();
--
--=09data->step =3D 1;
- =09start_test_server(test_data, send_req_new_conn,
- =09=09=09=09=09ext_flowctl_accept_2_close_1_listen_cb);
+ done:
+ =09if (locked)
+@@ -5464,6 +5496,11 @@ static inline int l2cap_le_credits(struct l2cap_conn=
+ *conn,
+=20
+ =09l2cap_chan_lock(chan);
+=20
++=09if (chan->state !=3D BT_CONNECTED ||
++=09    (chan->mode !=3D L2CAP_MODE_LE_FLOWCTL &&
++=09     chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL))
++=09=09goto unlock;
++
+ =09max_credits =3D LE_FLOWCTL_MAX_CREDITS - chan->tx_credits;
+ =09if (credits > max_credits) {
+ =09=09BT_ERR("LE credits overflow");
+@@ -5477,6 +5514,9 @@ static inline int l2cap_le_credits(struct l2cap_conn =
+*conn,
+=20
+ =09chan->tx_credits +=3D credits;
+=20
++=09if (test_bit(FLAG_PENDING_SECURITY, &chan->flags))
++=09=09goto unlock;
++
+ =09/* Resume sending */
+ =09l2cap_le_flowctl_send(chan);
+=20
+@@ -7618,6 +7658,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_c=
+onn *hcon)
+=20
+ =09skb_queue_head_init(&conn->pending_rx);
+ =09INIT_WORK(&conn->pending_rx_work, process_pending_rx);
++=09INIT_WORK(&conn->security_work, l2cap_security_work);
++=09atomic_set(&conn->security_failed, 0);
+ =09INIT_DELAYED_WORK(&conn->id_addr_timer, l2cap_conn_update_id_addr);
+=20
+ =09conn->disc_reason =3D HCI_ERROR_REMOTE_USER_TERM;
+@@ -8070,6 +8112,128 @@ static inline void l2cap_check_encryption(struct l2=
+cap_chan *chan, u8 encrypt)
+ =09}
  }
-@@ -3864,7 +3883,7 @@ int main(int argc, char *argv[])
- =09test_l2cap_le("L2CAP Ext-Flowctl Server - Nval SCID",
- =09=09=09=09&ext_flowctl_server_nval_scid_test,
- =09=09=09=09setup_powered_server, test_server);
--=09test_l2cap_le("L2CAP Ext-Flowctl Server - Accept 2 Close 1",
-+=09test_l2cap_le("L2CAP Ext-Flowctl Server - Close rejects deferred batch"=
+=20
++static void l2cap_queue_security(struct l2cap_conn *conn)
++{
++=09l2cap_conn_get(conn);
++=09/* Management process replies can fail SMP while the device queue drain=
+s;
++=09 * this work cannot depend on admission to that draining queue.
++=09 */
++=09if (!queue_work(l2cap_security_wq, &conn->security_work))
++=09=09l2cap_conn_put(conn);
++}
++
++void l2cap_security_failed(struct l2cap_conn *conn)
++{
++=09unsigned int generation;
++
++=09if (conn->hcon->type !=3D LE_LINK)
++=09=09return;
++
++=09/* SMP producers serialize on the fixed channel lock. */
++=09lockdep_assert_held(&conn->smp->lock);
++
++=09/* Zero means no failure queued, including after generation wrap. */
++=09generation =3D atomic_inc_return(&conn->security_generation);
++=09if (!generation)
++=09=09generation =3D atomic_inc_return(&conn->security_generation);
++=09atomic_set(&conn->security_failed, generation);
++=09l2cap_queue_security(conn);
++}
++
++static void l2cap_security_work(struct work_struct *work)
++{
++=09struct l2cap_conn *conn =3D container_of(work, struct l2cap_conn,
++=09=09=09=09=09    security_work);
++=09struct hci_conn *hcon =3D conn->hcon;
++=09struct l2cap_chan *chan, *next;
++=09unsigned int generation;
++
++=09hci_dev_lock(hcon->hdev);
++=09/* HCI_UP is advisory; device close flushes connections after clearing =
+it.
++=09 * TX admission during drain is guarded separately by hci_sched_tx().
++=09 */
++=09if (hcon->l2cap_data !=3D conn || !test_bit(HCI_UP, &hcon->hdev->flags)=
+)
++=09=09goto done;
++
++=09mutex_lock(&conn->lock);
++
++=09generation =3D atomic_xchg(&conn->security_failed, 0);
++=09if (generation) {
++=09=09list_for_each_entry(chan, &conn->chan_l, list) {
++=09=09=09l2cap_chan_lock(chan);
++=09=09=09if ((chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
++=09=09=09     chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) &&
++=09=09=09    test_bit(FLAG_PENDING_SECURITY, &chan->flags) &&
++=09=09=09    (s32)(generation - chan->security_generation) > 0) {
++=09=09=09=09set_bit(FLAG_SECURITY_FAILED, &chan->flags);
++=09=09=09=09set_bit(FLAG_SECURITY_CFM, &chan->flags);
++=09=09=09}
++=09=09=09l2cap_chan_unlock(chan);
++=09=09}
++=09}
++
++=09for (;;) {
++=09=09chan =3D NULL;
++=09=09list_for_each_entry(next, &conn->chan_l, list) {
++=09=09=09if (test_and_clear_bit(FLAG_SECURITY_CFM, &next->flags)) {
++=09=09=09=09chan =3D next;
++=09=09=09=09break;
++=09=09=09}
++=09=09}
++=09=09if (!chan)
++=09=09=09break;
++
++=09=09/* Batch rejection may delete siblings, so restart the walk. */
++=09=09l2cap_chan_hold(chan);
++=09=09l2cap_chan_lock(chan);
++=09=09lockdep_assert_held(&chan->conn->lock);
++=09=09if (!test_bit(FLAG_PENDING_SECURITY, &chan->flags) ||
++=09=09    (chan->state !=3D BT_CONNECTED && chan->state !=3D BT_CONFIG &&
++=09=09     chan->state !=3D BT_CONNECT2))
++=09=09=09goto next;
++
++=09=09if (test_bit(FLAG_SECURITY_FAILED, &chan->flags) ||
++=09=09    !test_bit(HCI_CONN_ENCRYPT, hcon->flags) ||
++=09=09    !smp_sufficient_security(hcon, chan->sec_level, SMP_ALLOW_STK) |=
+|
++=09=09    !l2cap_check_enc_key_size(hcon, chan) ||
++=09=09    !l2cap_check_mic_len(hcon, chan)) {
++=09=09=09set_bit(FLAG_SECURITY_FAILED, &chan->flags);
++=09=09=09__l2cap_chan_close(chan, ECONNREFUSED);
++=09=09=09chan->ops->close(chan);
++=09=09=09goto next;
++=09=09}
++
++=09=09clear_bit(FLAG_PENDING_SECURITY, &chan->flags);
++=09=09chan->sec_level =3D hcon->sec_level;
++
++=09=09if (chan->state =3D=3D BT_CONNECT2) {
++=09=09=09chan->ops->resume(chan);
++=09=09=09goto next;
++=09=09}
++
++=09=09if (chan->state =3D=3D BT_CONNECTED &&
++=09=09    chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL &&
++=09=09    test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++=09=09=09__l2cap_ecred_conn_rsp_defer(chan);
++=09=09=09if (test_bit(FLAG_DEL, &chan->flags))
++=09=09=09=09goto next;
++=09=09}
++
++=09=09l2cap_le_flowctl_send(chan);
++=09=09if (chan->tx_credits)
++=09=09=09chan->ops->resume(chan);
++=09=09l2cap_check_encryption(chan, 1);
++next:
++=09=09l2cap_chan_unlock(chan);
++=09=09l2cap_chan_put(chan);
++=09}
++
++=09mutex_unlock(&conn->lock);
++done:
++=09hci_dev_unlock(hcon->hdev);
++=09l2cap_conn_put(conn);
++}
++
+ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encryp=
+t)
+ =09__must_hold(&hcon->hdev->lock)
+ {
+@@ -8084,6 +8248,8 @@ static void l2cap_security_cfm(struct hci_conn *hcon,=
+ u8 status, u8 encrypt)
+ =09mutex_lock(&conn->lock);
+=20
+ =09list_for_each_entry(chan, &conn->chan_l, list) {
++=09=09bool le_flowctl, pending_le;
++
+ =09=09l2cap_chan_lock(chan);
+=20
+ =09=09lockdep_assert_held(&chan->conn->lock);
+@@ -8091,7 +8257,13 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
+, u8 status, u8 encrypt)
+ =09=09BT_DBG("chan %p scid 0x%4.4x state %s", chan, chan->scid,
+ =09=09       state_to_string(chan->state));
+=20
+-=09=09if (!status && encrypt)
++=09=09le_flowctl =3D hcon->type =3D=3D LE_LINK &&
++=09=09=09     (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
++=09=09=09      chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL);
++=09=09pending_le =3D le_flowctl &&
++=09=09=09     test_bit(FLAG_PENDING_SECURITY, &chan->flags);
++
++=09=09if (!status && encrypt && !pending_le)
+ =09=09=09chan->sec_level =3D hcon->sec_level;
+=20
+ =09=09if (!__l2cap_no_conn_pending(chan)) {
+@@ -8099,9 +8271,49 @@ static void l2cap_security_cfm(struct hci_conn *hcon=
+, u8 status, u8 encrypt)
+ =09=09=09continue;
+ =09=09}
+=20
++=09=09/* HCI reports the current link state. Encryption failure can
++=09=09 * disconnect that link, regardless of the SMP request generation.
++=09=09 */
++=09=09if (pending_le && (chan->state =3D=3D BT_CONNECTED ||
++=09=09=09=09   chan->state =3D=3D BT_CONFIG ||
++=09=09=09=09   chan->state =3D=3D BT_CONNECT2)) {
++=09=09=09if (status || !encrypt ||
++=09=09=09    !smp_sufficient_security(hcon, chan->sec_level,
++=09=09=09=09=09=09    SMP_ALLOW_STK) ||
++=09=09=09    !l2cap_check_enc_key_size(hcon, chan) ||
++=09=09=09    !l2cap_check_mic_len(hcon, chan)) {
++=09=09=09=09set_bit(FLAG_SECURITY_FAILED, &chan->flags);
++=09=09=09}
++=09=09=09set_bit(FLAG_SECURITY_CFM, &chan->flags);
++=09=09=09l2cap_queue_security(conn);
++=09=09=09l2cap_chan_unlock(chan);
++=09=09=09continue;
++=09=09}
++
+ =09=09if (!status && (chan->state =3D=3D BT_CONNECTED ||
+ =09=09=09=09chan->state =3D=3D BT_CONFIG)) {
+-=09=09=09chan->ops->resume(chan);
++=09=09=09/* A deferred multi-channel ECRED connection may have
++=09=09=09 * released one accepted channel into BT_CONNECTED while
++=09=09=09 * its batch still shares an ident with pending siblings.
++=09=09=09 * Its security-failure close rejects that whole batch and
++=09=09=09 * unlinks those channels from conn->chan_l; do not run it
++=09=09=09 * directly while this traversal holds chan and the list.
++=09=09=09 */
++=09=09=09if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL && chan->ident &&
++=09=09=09    test_bit(FLAG_DEFER_SETUP, &chan->flags) &&
++=09=09=09    !test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags) &&
++=09=09=09    (chan->sec_level =3D=3D BT_SECURITY_HIGH ||
++=09=09=09     chan->sec_level =3D=3D BT_SECURITY_FIPS) &&
++=09=09=09    !encrypt) {
++=09=09=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
++=09=09=09=09set_bit(FLAG_SECURITY_FAILED, &chan->flags);
++=09=09=09=09set_bit(FLAG_SECURITY_CFM, &chan->flags);
++=09=09=09=09l2cap_queue_security(conn);
++=09=09=09=09l2cap_chan_unlock(chan);
++=09=09=09=09continue;
++=09=09=09}
++=09=09=09if (!le_flowctl || chan->tx_credits)
++=09=09=09=09chan->ops->resume(chan);
+ =09=09=09l2cap_check_encryption(chan, encrypt);
+ =09=09=09l2cap_chan_unlock(chan);
+ =09=09=09continue;
+@@ -8430,9 +8642,15 @@ int __init l2cap_init(void)
+ {
+ =09int err;
+=20
++=09l2cap_security_wq =3D alloc_workqueue("l2cap_sec", WQ_UNBOUND, 0);
++=09if (!l2cap_security_wq)
++=09=09return -ENOMEM;
++
+ =09err =3D l2cap_init_sockets();
+-=09if (err < 0)
++=09if (err < 0) {
++=09=09destroy_workqueue(l2cap_security_wq);
+ =09=09return err;
++=09}
+=20
+ =09hci_register_cb(&l2cap_cb);
+=20
+@@ -8449,6 +8667,7 @@ void l2cap_exit(void)
+ {
+ =09debugfs_remove(l2cap_debugfs);
+ =09hci_unregister_cb(&l2cap_cb);
++=09destroy_workqueue(l2cap_security_wq);
+ =09l2cap_cleanup_sockets();
+ }
+=20
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 400c167a9..8c63610f1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -929,12 +929,59 @@ static int l2cap_set_mode(struct l2cap_chan *chan, u8=
+ mode)
+ =09return 0;
+ }
+=20
++static int l2cap_sock_set_security(struct sock *sk, struct l2cap_chan *cha=
+n,
++=09=09=09=09   const struct bt_security *sec)
++=09__must_hold(&chan->lock)
++{
++=09struct l2cap_conn *conn;
++
++=09conn =3D l2cap_chan_conn(chan);
++=09if ((chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
++=09     chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) &&
++=09    test_bit(FLAG_PENDING_SECURITY, &chan->flags))
++=09=09return -EBUSY;
++
++=09chan->sec_level =3D sec->level;
++=09chan->mic_len =3D sec->mic_len;
++=09if (!conn)
++=09=09return 0;
++
++=09lockdep_assert_held(&conn->lock);
++=09lockdep_assert_held(&conn->hcon->hdev->lock);
++=09chan->security_generation =3D atomic_read(&conn->security_generation);
++
++=09if (chan->scid =3D=3D L2CAP_CID_ATT) {
++=09=09l2cap_chan_req_mic_len(chan, conn->hcon);
++=09=09if (smp_conn_security(conn->hcon, sec->level))
++=09=09=09return -EINVAL;
++
++=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
++=09=09sk->sk_state =3D BT_CONFIG;
++=09=09chan->state =3D BT_CONFIG;
++=09} else if ((sk->sk_state =3D=3D BT_CONNECT2 &&
++=09=09    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
++=09=09   sk->sk_state =3D=3D BT_CONNECTED) {
++=09=09if (!l2cap_chan_check_security(chan, true)) {
++=09=09=09if (conn->hcon->type =3D=3D LE_LINK &&
++=09=09=09    (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
++=09=09=09     chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL))
++=09=09=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
++=09=09=09set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
++=09=09} else {
++=09=09=09sk->sk_state_change(sk);
++=09=09}
++=09} else {
++=09=09return -EINVAL;
++=09}
++
++=09return 0;
++}
++
+ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optna=
+me,
+ =09=09=09=09 sockptr_t optval, unsigned int optlen)
+ {
+ =09struct sock *sk =3D sock->sk;
+ =09struct l2cap_chan *chan =3D l2cap_pi(sk)->chan;
+-=09struct bt_security sec;
+ =09struct bt_power pwr;
+ =09struct l2cap_conn *conn;
+ =09int err =3D 0;
+@@ -950,79 +997,62 @@ static int l2cap_sock_setsockopt(struct socket *sock,=
+ int level, int optname,
+ =09if (level !=3D SOL_BLUETOOTH)
+ =09=09return -ENOPROTOOPT;
+=20
+-=09l2cap_chan_lock(chan);
+-=09lock_sock(sk);
++=09if (optname =3D=3D BT_SECURITY) {
++=09=09struct bt_security sec =3D { .level =3D BT_SECURITY_LOW };
++=09=09bool have_conn;
+=20
+-=09switch (optname) {
+-=09case BT_SECURITY:
+ =09=09if (chan->chan_type !=3D L2CAP_CHAN_CONN_ORIENTED &&
+ =09=09    chan->chan_type !=3D L2CAP_CHAN_FIXED &&
+-=09=09    chan->chan_type !=3D L2CAP_CHAN_RAW) {
+-=09=09=09err =3D -EINVAL;
+-=09=09=09break;
+-=09=09}
++=09=09    chan->chan_type !=3D L2CAP_CHAN_RAW)
++=09=09=09return -EINVAL;
+=20
+-=09=09/* mic_len was added at the end of struct bt_security, so
+-=09=09 * accept the shorter struct as well, leaving mic_len unset.
+-=09=09 */
+-=09=09if (optlen < offsetofend(struct bt_security, key_size)) {
+-=09=09=09err =3D -EINVAL;
+-=09=09=09break;
+-=09=09}
++=09=09/* Keep accepting the struct size used before mic_len was added. */
++=09=09if (optlen < offsetofend(struct bt_security, key_size))
++=09=09=09return -EINVAL;
+=20
+-=09=09err =3D copy_struct_from_sockptr(&sec, sizeof(sec), optval,
+-=09=09=09=09=09       optlen);
++=09=09err =3D copy_struct_from_sockptr(&sec, sizeof(sec), optval, optlen);
+ =09=09if (err)
+-=09=09=09break;
+-
+-=09=09if (sec.level < BT_SECURITY_LOW ||
+-=09=09    sec.level > BT_SECURITY_FIPS) {
+-=09=09=09err =3D -EINVAL;
+-=09=09=09break;
+-=09=09}
++=09=09=09return err;
+=20
+-=09=09/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4,
+-=09=09 * Part E, Section 7.7.8: MIC_Length 0x00 is 32 bits,
+-=09=09 * 0x01 is 64 bits and 0x02 is 128 bits; all other
+-=09=09 * values are reserved for future use.
+-=09=09 */
+-=09=09if (sec.mic_len > 0x02) {
+-=09=09=09err =3D -EINVAL;
+-=09=09=09break;
+-=09=09}
++=09=09if (sec.level < BT_SECURITY_LOW || sec.level > BT_SECURITY_FIPS)
++=09=09=09return -EINVAL;
+=20
+-=09=09chan->sec_level =3D sec.level;
+-=09=09chan->mic_len =3D sec.mic_len;
++=09=09/* MIC length encodings 0, 1 and 2 mean 32, 64 and 128 bits. */
++=09=09if (sec.mic_len > 0x02)
++=09=09=09return -EINVAL;
+=20
++=09=09l2cap_chan_lock(chan);
+ =09=09conn =3D l2cap_chan_conn(chan);
+-=09=09if (!conn)
+-=09=09=09break;
++=09=09if (!conn) {
++=09=09=09lock_sock(sk);
++=09=09=09err =3D l2cap_sock_set_security(sk, chan, &sec);
++=09=09=09release_sock(sk);
++=09=09=09l2cap_chan_unlock(chan);
++=09=09=09return err;
++=09=09}
++=09=09l2cap_conn_get(conn);
++=09=09l2cap_chan_unlock(chan);
+=20
+-=09=09/* change security for LE channels */
+-=09=09if (chan->scid =3D=3D L2CAP_CID_ATT) {
+-=09=09=09l2cap_chan_req_mic_len(chan, conn->hcon);
+-=09=09=09if (smp_conn_security(conn->hcon, sec.level)) {
+-=09=09=09=09err =3D -EINVAL;
+-=09=09=09=09break;
+-=09=09=09}
++=09=09/* SMP receive holds conn->lock; management holds hdev->lock. */
++=09=09hci_dev_lock(conn->hcon->hdev);
++=09=09have_conn =3D l2cap_chan_lock_conn(chan);
+=20
+-=09=09=09set_bit(FLAG_PENDING_SECURITY, &chan->flags);
+-=09=09=09sk->sk_state =3D BT_CONFIG;
+-=09=09=09chan->state =3D BT_CONFIG;
++=09=09lock_sock(sk);
++=09=09if (l2cap_chan_conn(chan) !=3D conn)
++=09=09=09err =3D -ENOTCONN;
++=09=09else
++=09=09=09err =3D l2cap_sock_set_security(sk, chan, &sec);
++=09=09release_sock(sk);
++=09=09l2cap_chan_unlock_conn(chan, have_conn);
++=09=09hci_dev_unlock(conn->hcon->hdev);
++=09=09l2cap_conn_put(conn);
++=09=09return err;
++=09}
+=20
+-=09=09/* or for ACL link */
+-=09=09} else if ((sk->sk_state =3D=3D BT_CONNECT2 &&
+-=09=09=09    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
+-=09=09=09   sk->sk_state =3D=3D BT_CONNECTED) {
+-=09=09=09if (!l2cap_chan_check_security(chan, true))
+-=09=09=09=09set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
+-=09=09=09else
+-=09=09=09=09sk->sk_state_change(sk);
+-=09=09} else {
+-=09=09=09err =3D -EINVAL;
+-=09=09}
+-=09=09break;
++=09l2cap_chan_lock(chan);
++=09lock_sock(sk);
+=20
++=09switch (optname) {
+ =09case BT_DEFER_SETUP:
+ =09=09if (sk->sk_state !=3D BT_BOUND && sk->sk_state !=3D BT_LISTEN) {
+ =09=09=09err =3D -EINVAL;
+@@ -1284,11 +1314,23 @@ static int l2cap_sock_defer(struct sock *sk)
+ =09=09if (!have_conn) {
+ =09=09=09release_sock(sk);
+ =09=09=09err =3D -ENOTCONN;
++=09=09} else if ((chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL ||
++=09=09=09    chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) &&
++=09=09=09   test_bit(FLAG_PENDING_SECURITY, &chan->flags)) {
++=09=09=09release_sock(sk);
++=09=09=09err =3D -EAGAIN;
+ =09=09} else if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) {
+ =09=09=09sk->sk_state =3D BT_CONNECTED;
+ =09=09=09chan->state =3D BT_CONNECTED;
+ =09=09=09release_sock(sk);
+ =09=09=09__l2cap_ecred_conn_rsp_defer(chan);
++=09=09=09lock_sock(sk);
++=09=09=09if (sk->sk_state =3D=3D BT_CLOSED) {
++=09=09=09=09err =3D sock_error(sk);
++=09=09=09=09if (!err)
++=09=09=09=09=09err =3D -ECONNRESET;
++=09=09=09}
++=09=09=09release_sock(sk);
+ =09=09} else if (bdaddr_type_is_le(chan->src_type)) {
+ =09=09=09sk->sk_state =3D BT_CONNECTED;
+ =09=09=09chan->state =3D BT_CONNECTED;
+@@ -1393,7 +1435,7 @@ static void l2cap_sock_kill(struct sock *sk)
+ =09/* Take lock to synchronize against access without owning sk->sk_socket=
 ,
- =09=09=09=09&ext_flowctl_server_accept_2_close_1_test,
- =09=09=09=09setup_powered_server,
- =09=09=09=09test_ext_flowctl_server_accept_2_close_1);
---=20
-2.56.0
+ =09 * eg. in l2cap_sock_cleanup_listen(). proto_ops etc. don't need lock.
+ =09 */
+-=09lock_sock(sk);
++=09lock_sock_nested(sk, L2CAP_NESTING_NORMAL);
+ =09l2cap_sock_put_chan(sk);
+ =09release_sock(sk);
+=20
+@@ -1758,6 +1800,7 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan =
+*chan, int err)
+ =09lock_sock_nested(sk, atomic_read(&chan->nesting));
+=20
+ =09parent =3D bt_sk(sk)->parent;
++=09clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
+=20
+ =09switch (chan->state) {
+ =09case BT_OPEN:
+@@ -1774,7 +1817,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan =
+*chan, int err)
+ =09=09sk->sk_state =3D BT_CLOSED;
+ =09=09chan->state =3D BT_CLOSED;
+=20
+-=09=09sk->sk_err =3D err;
++=09=09if (!test_bit(FLAG_SECURITY_FAILED, &chan->flags) ||
++=09=09    READ_ONCE(sk->sk_err) !=3D ECONNREFUSED)
++=09=09=09WRITE_ONCE(sk->sk_err, err);
+=20
+ =09=09if (parent) {
+ =09=09=09/*
+@@ -1810,8 +1855,11 @@ static void l2cap_sock_state_change_cb(struct l2cap_=
+chan *chan, int state,
+=20
+ =09sk->sk_state =3D state;
+=20
+-=09if (err)
+-=09=09sk->sk_err =3D err;
++=09if (err) {
++=09=09WRITE_ONCE(sk->sk_err, err);
++=09=09clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
++=09=09sk->sk_state_change(sk);
++=09}
+=20
+ =09release_sock(sk);
+ }
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index f8f86b8f7..0c52a819d 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -785,6 +785,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 rea=
+son)
+ =09=09=09     &reason);
+=20
+ =09mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
++=09l2cap_security_failed(conn);
+=20
+ =09if (chan->data)
+ =09=09smp_chan_destroy(conn);
 
