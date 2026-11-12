@@ -1,55 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794447990;
-	b=3OVEZhCp4B9aLdcKYys6OCqN7iOymoRiuXRQyEA4fnR/eJfMfhbcjourjeIkHalGZbf2
-	 MoKEh+3WJKhr0You4CRRK2K4gmZx8PNcwDfxpheBKqQ/4O51fPeJTSBH8Ewq7F7r8/HoE
-	 Rj9Ltgkwn7ikeaqFvBlBlrDMsMLRg3to+xC2jQTLotJvNFgunWxa+nQbPhe87BN9noP6W
-	 +mOvMCpDHv8Zl24fQKaQ3HQ4o6c7qDPpp6DDzqO7UPBRtz/pBP22c6lhm3IfMx9jN1OG0
-	 fG7H4Cq9sRWtNLu34GCgEOPFuRm6XvptSIdL2E43zabRsjtldIlovVijbtn28Dtqx9A==
+	t=1794448731;
+	b=T/6t4VIAbDSgfLpNNuw6cYAsctxq4gklnP6BkvAdzid/CmWSO2Z7JLPcPYn9tYFmi0hJ
+	 tnEx+TG2ErVFzCO2+UrQAdssfG++lw/vFtIuCLN5fDhewT0mJjvZDoSYHHrrQGCm2KhRU
+	 A+Co2og9DOIgadsO44puBMnNmtiDYFPGj8qas+AaVWBUdnRNamQngTGerTuUE7sqepdS+
+	 byr5AiVv4xynfvwsSNIk7hLUDCdLNFwW9Dz8CYqGZ9+2W3KSia2cjWZjbLPhTIkCUC7IZ
+	 LgssEJzQlhMBoXRREjwBZ9dLntIF5bUAYxQVm5gx7uLLKlMuORY6NP8AcDJF8H++QLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794447990;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:Mime-Version:
-	 Content-Type:Date:Message-Id:Cc:Subject:From:To:In-Reply-To:
-	 References:Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=o9qbUelCx5fzvjlP9T4Xcmeuzs4IG3zEIHU3OITHRHo=;
-	b=E0Fx9V9OqCUKgBAhAWpufzty4OiKcMmRPmDoxy9IJ/1GjQGhBwH/5g4LqvdBJAn1B1uk
-	 04RMn4Hw7PUyjvaXOUn8ZEc1CoEwK1eXGDji0VShu7MeTQusd1X7Nhh91/xVMll1oOMXc
-	 JI86Z1cgerWaaxV2hgEIpol7DOL9XhibgQxOBHE6Ga/BhxLwRuQtnpKmCpxhrALRsYK+c
-	 eZgbnAwZt/Oo0yB+ZHmbRPjT4k9HJT9obRL/ENtoYCFf7cje2OeYJ/TwiAG+1QYNVajYm
-	 b8nc6i5ZOxdwDtLKARONwoDaJ/RHHYRe8PzUC/ldK3oI5Bk2d+Xhu6YMSs60IADKNsg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794448731;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=L8gmkAd81nq7SrmSquVWaweNRS0P2cMbphrcSEzOtak=;
+	b=tbbYFG2EMU+J+E+CvS6kB6bXcwJWS0EYzu+3jhHdVrHTQCd4vDtaFEVgD0e05tahZ8YY
+	 FsqFGByY0Yj1CQXeg9A5pVqnGcXuYklLcqIqbSGsVkxUJ2Ii4eR2/dx0fd50BJG4u0uRS
+	 v47g44M5O+zXGzwj3NALr/DKSO+b9A+jkhYi8BqSM4Dl1Oycr0uJDKguqC1LV9zapoyQl
+	 DCYj++B6ts4PnYnS/0jDzPI5UP5OVbqhGLRovh8L8aDZ5XIm0rAoRbFS9aOmczqzTJEKH
+	 l0f+PPGGBFTuV3eN4KJAxcJ+JAS48OR35Qw+v37mCQFaCPpb2ZjrGWZi/WGFN6X0YMw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=linux.spacemit.com;
-	spf=none smtp.mailfrom=linux.spacemit.com;
-	dkim=pass header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=piyJX+OD;
-	arc=none smtp.remote-ip=54.92.39.34
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RmXr1qlZ;
+	arc=none smtp.remote-ip=209.85.161.53
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CC8606A31C;
-	Thu, 12 Nov 2026 01:46:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 80CC8606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.spacemit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.spacemit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61339606A321
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 01:58:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61339606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.spacemit.com header.i=@linux.spacemit.com header.a=rsa-sha256 header.s=mxsw2412 header.b=piyJX+OD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.spacemit.com;
-	s=mxsw2412; t=1794447957;
-	bh=o9qbUelCx5fzvjlP9T4Xcmeuzs4IG3zEIHU3OITHRHo=;
-	h=Mime-Version:Date:Message-Id:Subject:From:To;
-	b=piyJX+ODZSYYaVvjlTI2Eq9fElkjSsMxECUYYfK7ObaUBsg5PgSevcsupPAxywNUG
-	 M1V8o33I51bLUw7HNWTBkWtgIrCpBX6XsgTznpCjUmm4GjvzDmmTNdnXfXcOulnxIU
-	 W9hxC8AC0AIVB0KOWtwu9w9G0OOccXGgnGlv+qEE=
-X-QQ-mid: esmtpsz17t1794447955t84c88b44
-X-QQ-Originating-IP: nAMxank+hAidb3QvsKnH0QjBdmBkxc00yYWvW0b9tzA=
-Received: from = ( [120.237.158.181])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 12 Nov 2026 09:45:53 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6514529535114007816
-EX-QQ-RecipientCnt: 20
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RmXr1qlZ
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6f8a519e215so457360eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Nov 2026 17:58:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794448729; x=1795053529; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=L8gmkAd81nq7SrmSquVWaweNRS0P2cMbphrcSEzOtak=;
+        b=RmXr1qlZbT7Jgo089m6pIMVKooUMVXvpZYo+M1F2Gr9EZhm+XMjW4BG9XE3th/rVBg
+         l6Cday+TcQTm3VK1ypNjDQL4n67wiPFHzQ6sM86rKgRmT/9K6/lM6UtvDG95msAycv/F
+         k0ZRlT04BC5uVv7P62JYG2LfDcZfNyVoL4bEDHzQuayglU+KCq11lh3D1BzFZKswvMU0
+         ylmZ+IU+ycEBSMccuc6rUeU85AHC8F5yiCBKdxzKbY+4AYRNJ3mJ+lqiUhnwzfG3eUXD
+         42ajqMxiWOOoOwBich/BTuIPxVqMJDZtkuxoALp9Wc6XlQhQXmjDA7vYSXvFoO9ASYa0
+         94Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794448729; x=1795053529;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=L8gmkAd81nq7SrmSquVWaweNRS0P2cMbphrcSEzOtak=;
+        b=yKzn8INXb//FsY6HQMJQnoHLBxkvOMuYLhzPu/cBsCN18yTygmG6dVjzH4j+1go6Bu
+         et9XOu9Ie54qDpVNTsjMvCjPffakk9aXdoPz08RL97BWrD6DUCEtfxUhY20UtH8+rzh7
+         oHREiYqY1JSCoKdV8JMXZOHEW/QO8RByZGzagaPYwDhybS6GVgA+Z+LZz2Yr2k5SibiZ
+         lXm/aM5tLQOwAmuGbtLo0IgUFClEfPQ+hTzaU5CWHMHmNlUpg7jU3dgjKEXgDkSxWdop
+         0u34iA29RJnzPewGfFiaTEr795tgIKX8ObIKIgCsz0llqBxpy3nwca1bkcsSYWWypgRv
+         vX6Q==
+X-Gm-Message-State: APuU4Z+xDnjiOlyOiKKOmyl84sSmEOqE8g3Q3J9oWmF6JaLvONp74YZx
+	uZXAnCChCGVT8VOWb58eAHaozMge3b6bLTt2FhaS8UKiRRzyJIftwnIob7J9UQ==
+X-Gm-Gg: AYBFou1rFGXNcFIxEhEoXu4HlCdoHw0lGrKH0cZWEN0mP8HVendJCbTh4a57CraPlND
+	qLRoPHBSBo9LZzyf7M9GGqpPbTosyN25DqI+y/QTCSONu5/LEqfQuCvTPGETIiPIWTaBh/wFhb4
+	u5W2gswcivXOUDrIlGhbj/zYDjCKjmiRrei234JknhU1DGSSVCgjiRWmAYnAfT2xxNHCDxcl+vp
+	dRJHMpRTrn+AXLASlYUroyUFZtkCrMxiyQmsYaYDQX/c3lkSBi8Lo2BU2pdWLEfkJKqSkqTeGBB
+	59aHb2lbppAe8Sq6Z3z1fo0oL5QxULGK/uH0Xa3d0djv2qbUaj+Z45pRmHnQRsi64XvT0Iopl+O
+	kKMaQuVpf4B7MqqNfgz17/tRw0Srd4wmx1/YIgH8eNqnU+OmgvnfRxLYwl9ZIUhK0GxvCgVs22x
+	aizXaG24IH5KZBeU/Hk5/731ZXE0bav8CP2AELn1K82uQ0LI5zixHvlWfRUKPM6TGGkhoxXorVB
+	ENIkWS7IYL2tX6uTVEpnf1oyYnId/+qzak2lKT7slw7j7tTXMQePbzQVFeeFjK97Q==
+X-Received: by 2002:a05:6820:2224:b0:716:f261:d8c0 with SMTP id 006d021491bc7-7196b5edd48mr897341eaf.2.1794448729043;
+        Wed, 11 Nov 2026 17:58:49 -0800 (PST)
+Received: from [172.17.0.2] ([130.131.207.206])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-718a94588d4sm5513584eaf.6.2026.11.11.17.58.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 17:58:48 -0800 (PST)
+Message-ID: <6af51d58.3ae93811.17fa1e.df96@mx.google.com>
+Date: Wed, 11 Nov 2026 17:58:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6950879021001692343=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,87 +87,470 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Thu, 12 Nov 2026 01:45:52 +0000
-Message-Id: <DMSUPKS0VL8N.1RUUESQVU8FMF@linux.spacemit.com>
-Cc: =?utf-8?q?Fr=C3=A9d=C3=A9ric_Mah=C3=A9?= <frederic.mahe@cirad.fr>,
- <marcel@holtmann.org>, <luiz.dentz@gmail.com>, <robh@kernel.org>,
- <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <dlan@kernel.org>,
- <anarsoul@gmail.com>, <alistair@alistair23.me>, <pjw@kernel.org>,
- <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>,
- <troy.mitchell@linux.spacemit.com>, <linux-bluetooth@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <spacemit@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Bluetooth for the RTL8852BS on BPI-F3
-From: "Troy Mitchell" <troy.mitchell@linux.spacemit.com>
-To: "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>
-In-Reply-To: <179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
-References: <20261111094557.443481-1-frederic.mahe@cirad.fr>
-	<179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:linux.spacemit.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: OD73vtqOAFgqQdl8kVxlaorlGh6ZaUM7MaaEhliCvStV/AKYXHEQMwXv
-	mE8cjPXzZoSMzDP5rS79pEFkS9v0Cuth3c55LR7M61G2e8XnCAOlpEjrxoh8bqs8GEKMTfm
-	GTyWl/QZL70ACCCVQ6uj8Tlyf3KkE2JcX10i0FHHOsrnfmi5q+Ehkn3K7RXY3bZvU2FID2H
-	UvN7y9rKiw77FT7s6GhJ4fx1S1RlRbt7n6OsPhwPZHVivwHdgz9O3mYH3bj7sr9CPzEsPiZ
-	anYDNKhJiC+hgVRO+VxFCm7clKBTCO1/dpbNR1ml5GvrpEDfhV/2pIFyykr+YGZpQHxfY3p
-	TJc9QYLV1u0QXALxLj4Val5hsZE7/CthI+Qownvjkph5L1F+EXqwyrq4eoP0YcK/ilmDAho
-	ZvCFlYhVaBcsc2VU89cwcIOEQgZEehRzQdL+SJw7373sgvVEJE1Y4vyw/ms45GOTC2Q21Id
-	OMUuGZ3QjPuQHbb8B7XixuiYzs7iprF3xJjXo0jmeKrNhDIZGvuaDAh4bySOqW6kLnAbV56
-	RA+Y600SEiXKQWXcLbRFeMx6ywBNGCxG5a+UJRDhGRum8DpjlhmVG+CuhQ2RMmjgc4wr2TD
-	d9jJ3pfBFkZ94W/W+gOn3AIKoBSv2bAM+/8wb+QQJ5FJNFooxGq+YiWh3LAhoLGuVsbgV+D
-	cGyRNvuebtQHbocavAoJSFzS4BmjFe3dwxdXk0kd1Zcow1gxUfTvCHCmx0tZuh3HzTl/1bD
-	l1/6KffMQMTv7+AgDGYqGXZ/mf93hOH0+JeQSGtCJb9BHs+QrqmdnYhQb8uRxyx+kBYUNNl
-	06viwZorpHpExLypIKCmxYCnoJKmZprZWkCQBHUR8BYD7VkRJkGTe7sPXHBZu8AsEKY/jew
-	aZH2f1ovWzm8emaBcAGSmMYWkhghxdY3HkVZc6ExcZXgl8mK7/cUEWu2d5kcUwGmCbG4Qji
-	rdB4VW/J2kmthTdNN2Yl5OqyEXyWpT820kPtJaT3gkQUxcw6IWwrGWQL2IF+aHUev6hHd1F
-	5OEfl/viYZ1xVcnkitMrNIqckdq/L55vhD+jfzXnkrJegcbhzOxEi1uwRca08Usj47dp6VX
-	f8qGllmeqmKimpUt5M9OSQQo1cVnn7Swg2kYjxjGMTh
-X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
+Subject: RE: shared/gatt-client: Track internal discovery reads
+In-Reply-To: <4c16af75cbdb770ef8bf3ba44ef2173c10e9fc8a.1794432472.git.cochcoder@proton.me>
+References: <4c16af75cbdb770ef8bf3ba44ef2173c10e9fc8a.1794432472.git.cochcoder@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
---d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+--===============6950879021001692343==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hi Luiz,
+This is automated email and please do not reply to this email!
 
-On Wed, 11 Nov 2026 19:40:19 +0000, patchwork-bot+bluetooth@kernel.org wrot=
-e:
-> This series was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Dear submitter,
 
-[...]
-> Here is the summary with links:
->   - [v2,1/2] dt-bindings: net: bluetooth: realtek: Add RTL8852BS
->     https://git.kernel.org/bluetooth/bluetooth-next/c/c21f8cff7503
->   - [v2,2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
->     https://git.kernel.org/bluetooth/bluetooth-next/c/df348a0d065c
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1208775/
 
-SpacemiT DTS changes normally go through Yixun's tree to the SoC tree,
-and Yixun hasn't acked this one yet. The binding patch is fine in
-bluetooth-next.
+---Test result---
 
-Yixun, what do you think? Should Luiz drop the DTS patch and you pick it
-up?
+Test Summary:
+CheckPatch                    PASS      1.17 seconds
+GitLint                       PASS      0.76 seconds
+BuildEll                      PASS      13.45 seconds
+BluezMake                     PASS      173.45 seconds
+MakeCheck                     PASS      12.74 seconds
+MakeDistcheck                 PASS      104.03 seconds
+CheckValgrind                 PASS      226.42 seconds
+CheckSmatch                   WARNING   172.25 seconds
+bluezmakeextell               PASS      62.29 seconds
+TestFunctional                FAIL      2977.33 seconds
+IncrementalBuild              PASS      233.51 seconds
+ScanBuild                     PASS      598.83 seconds
 
---=20
-Troy Mitchell
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1495:23: warning: Variable length array is used.src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1495:23: warning: Variable length array is used.src/shared/gatt-helpers.c:845:31: warning: Variable length array is used.src/shared/gatt-helpers.c:925:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1462:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1495:23: warning: Variable length array is used.
+##############################
+Test: TestFunctional - FAIL
+Desc: Run test-functional
+Output:
+FAIL functional.test_adv_monitor::test_adv_monitor_GHSA_hhgc_hfgf_8m4x[hosts1-vm1]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_show[hosts16-vm1]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_list[hosts16-vm1]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_script_show[hosts16-vm1]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_script_list[hosts16-vm1]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_btmgmt::test_btmgmt_info[hosts19-vm1]: AssertionError: assert 'addr 00:00:00:00:00:00' in '\x1b[0;91mReading hci0 info failed with status 0x11 (Invalid Index)\n\x1b[0m'
+     +  where '\x1b[0;91mReading hci0 info failed with status 0x11 (Invalid Index)\n\x1b[0m' = CompletedProcess(args=['/home/runner/work/bluez/bluez/src/src/tools/btmgmt', '--index', '0', 'info'], returncode=0, stdout='\x1b[0;91mReading hci0 info failed with status 0x11 (Invalid Index)\n\x1b[0m').stdout
+FAIL functional.test_a2dp::test_a2dp_transport_created[hosts0-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_a2dp::test_a2dp_transport_acquire[hosts0-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_a2dp::test_a2dp_disconnect_during_setconf[hosts0-vm2-accept]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_a2dp::test_a2dp_disconnect_during_setconf[hosts0-vm2-reject]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_a2dp::test_a2dp_reconnect_pending_disconnect[hosts0-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_connect[hosts12-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_conn_params[hosts12-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_connectable[hosts12-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_pair[hosts12-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_bredr_pair[hosts13-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_conn_update[hosts14-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bearer::test_bearer_le_not_connectable[hosts15-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_bredr[hosts17-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bluetoothctl::test_bluetoothctl_pair_le[hosts18-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_agent::test_agent_pair_bredr[accept-hosts2-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_agent::test_agent_pair_bredr[reject-hosts2-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_hog::test_hog[no-sci-hosts20-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_hog::test_hog[sci-hosts20-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_mpris_proxy::test_mpris_proxy_playback_control[bredr-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_mpris_proxy::test_mpris_proxy_track_control[bredr-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_obex::test_obex_ftp_list[hosts24-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_obex::test_obex_ftp_get[hosts24-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_obex::test_obexctl_list[hosts24-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_avrcp::test_avrcp_GHSA_m2vx_pw5f_rc8v[hosts3-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_transport_created[hosts4-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_transport_acquire[hosts4-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_transport_resume[0-hosts4-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_transport_resume[0.1-hosts4-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_transport_resume[1.0-hosts4-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_reconfigure_metadata[empty-hosts5-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_reconfigure_metadata[media-hosts5-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_desync[hosts6-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_duplex_enable_one[hosts6-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_transport_created[lc3-hosts7-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_transport_created[pbp-hosts7-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_transport_acquire[lc3-hosts7-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_transport_acquire[pbp-hosts7-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bass_past_transport_acquire[hosts9-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts10-vm3-sc]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_set_transport_created[hosts10-vm3-legacy]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_unicast_set_transport_acquire[hosts10-vm3]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_earbuds_transport_created[hosts8-vm3]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_bap::test_bap_broadcast_earbuds_transport_acquire[hosts8-vm3]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_mpris_proxy::test_mpris_proxy_playback_control[le-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
+FAIL functional.test_mpris_proxy::test_mpris_proxy_track_control[le-vm2]: failed on setup with "pytest_bluezenv.rpc.RemoteError: load failed
+    Remote traceback:
+        Traceback (most recent call last):
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/rpc.py", line 102, in server_stream
+            result = method(*msg["a"], **msg["kw"])
+          File "/usr/local/lib/python3.14/dist-packages/pytest_bluezenv/../pytest_bluezenv/env.py", line 238, in wait_load
+            raise RuntimeError("load failed")
+        RuntimeError: load failed"
 
---d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+https://github.com/bluez/bluez/pull/2810
 
-iJcEABYKAD8WIQSL4Ay2cExaPXAQcU2YCe+A+TM0LwUCavUaUCEcdHJveS5taXRj
-aGVsbEBsaW51eC5zcGFjZW1pdC5jb20ACgkQmAnvgPkzNC9TDAD/fhHvVXqOkUxo
-4u6rg6LrG/txpGkWipkP94X2k5PSn9EBAIezttdQYAric2H/Pw+q38b/NEdLHI/i
-7Au69q7vwYkA
-=ms2x
------END PGP SIGNATURE-----
+---
+Regards,
+Linux Bluetooth
 
---d400da5dd7a138166c54bfc43864faed746c419ff16dffcffaf97ceb07d3--
+
+--===============6950879021001692343==--
