@@ -1,61 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=18.194.254.142
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794464396;
-	b=3dQmTVpOgLBjgEyDrK6nsYPS03CKKDySGbtV289vIpetoLyXuS50P+GjmvLG3RzrFGVk
-	 EGQ/d9IMbZqN5ufrcknnza3IrBUjTrqTdHfCjewzDgRY0qt1ucKtoPlzfd9pVaw6veaof
-	 KfSDEy/sxIno7Gh/KaCwhKf99wSIZhGJgH6006zruTIbejmq2WuqTESSGRbii1qcLK8Eo
-	 odS7wogc/1ZIoFsRhwIbLnjBM+VQE1o9CniXghfBzwKGsAfXmupDCDLBYl7e2VUwXZHxZ
-	 h041zL3ZiTqT7xgMc8/47t7Su+pqg6b1VXhb2bPh513QQZ620RZWxZ2CCh0wVBAvSXw==
+	t=1794471997;
+	b=4jt4j20r7wsBSNqQfjXeaZnKH3fRMG90OgXbhURdTXnhqm5mY4F6D4CjLvgzp0Hlq15m
+	 OnzIWFklTDvCy9IRFs7t24q4ksEpznnb3KwAmE/jD9oJ/N8t/3utPX+U9Jm+xm51SQY1U
+	 1Bg0xQlQUrAjW8V4QOkEd/pFp7+mBFzEhhB47YgXaZ40xg1rQe/ssLSvgD+L80ZAWL0e9
+	 hZp9qQgaIlm3OPg6wcNM3Fjtvs2Ko+RX2ST8ZmwnpspZuCHCdn07yCA9ZcGoeYbjKp6w4
+	 QvEF81HikH0kAATEoTmeoew7TTV3jK3LlikrbFbRY6YMlkH5AE2DFiyNcqQzjEhNAvw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794464396;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=neSRzhF/d5DoRVpSm0zYWoFxhd17W2VLi2BCLsSsDLI=;
-	b=vjpqzdlGwK6F8piRCwvku0xFKrSFlW57/BtwWjp3pzL01DmefE1arupgSenMs85AqHvQ
-	 vhAPROqoZdwheT4s/eTqrN/ZheLwHP8Kfdh7bXQkFF8JaZEeFm6eVIrHLixGAlVptcEYe
-	 UnVy7C/M3FkhiDa6UAwTnA2WVWDCP25Exl8Z0+1c4xNOVDYsyuw2QKO30VIkLzZq7k/b6
-	 QjoEqGBl+tzsOH+FWxw5TMRKnIL7wKwEk816zKb3mTt6+wRsNGT073Zw8baFJMdUy90ZP
-	 EWOc2GEuodXV5sXMax8vR/QD0WZf5yc1kb1C7uDpTjdCL6HuddnMPNJVkuiE9QmzQlA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794471997;
+	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
+	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
+	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
+	bh=ALlmcWUT8hLm+bMDDq61tHU2NhGeQNt9726k88rnyjI=;
+	b=m3JmufqCt4OKhgs9FphEKJbRju+eqqvT0R0S5O1WUJuoE40VPBVV4f2K7RxoL1UD2dns
+	 PooIzVZwyueuZc4//rG4OjmPA7leQS5jbq6uSFyCyTaUxbCnYmhDEh8HgbPZgQkIboLjJ
+	 OIvDuIsylQ/k51I5hpEBREcywEzrpoHeMz+UX3GO/+CZv1gOeoUsjYI0Qo7CtOiBCXZ66
+	 wnDd4CeRTq5kQDw6ncKY+y+ayT4VKw2g4dphpzCqRV6hu0pnc0myYcf8NPwlbSbktrAES
+	 4bj+/oLlzHaq1KsCqOhiiNKFPeli7eH8gH0+KNVRJUSs2jcqGkjy7qF4ggvk0fTklhg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ctjilLN4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=uniontech.com;
+	spf=pass smtp.mailfrom=uniontech.com;
+	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=EV2yZaGs;
+	arc=none smtp.remote-ip=18.194.254.142
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AEF606A323;
-	Thu, 12 Nov 2026 06:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A97606A323;
+	Thu, 12 Nov 2026 08:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4A97606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ctjilLN4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF1461F00A05;
-	Thu, 12 Nov 2026 06:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794464396;
-	bh=neSRzhF/d5DoRVpSm0zYWoFxhd17W2VLi2BCLsSsDLI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ctjilLN4RNMv/a6ywxFLBBf5r6QEIHNLpp1KM7XvMCdUS1jm42Geh4MwWtCMcv0F/
-	 Hld0s6yVuD8QDO5X9cVCd1Yd7jOOO09N8Aem4VLDmuJJijAPvcaNh79SwCdYJqBDKc
-	 zlvG3sDlX3ERr3aI/a1q8x4jbCmf9Nm43ddHn5Wz4t3UN6qzNgJc4XzPNiZcx/BfEI
-	 IxjaAJGV85Rp380DY67sc73p3ylzB1l7QSUFUnG1mP68pDzNAf/01z2jmbu7a7IKCs
-	 e1N/HaqV9fPx3AixTRP55vuv0nNPzaidGDCCVCE256iFAeYZAI4rfKt7HD7UUMj+2C
-	 Jt9iQV47EAXIA==
-Date: Thu, 12 Nov 2026 06:19:51 +0000
-From: Yixun Lan <dlan@kernel.org>
-To: Troy Mitchell <troy.mitchell@linux.spacemit.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	=?utf-8?B?RnLDqWTDqXJpYyBNYWjDqQ==?= <frederic.mahe@cirad.fr>,
-	marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, anarsoul@gmail.com,
-	alistair@alistair23.me, pjw@kernel.org, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, alex@ghiti.fr,
-	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] Bluetooth for the RTL8852BS on BPI-F3
-Message-ID: <20261112061951-GKA62271@kernel.org>
-References: <20261111094557.443481-1-frederic.mahe@cirad.fr>
- <179442601916.1604530.1705197925952408060.git-patchwork-notify@kernel.org>
- <DMSUPKS0VL8N.1RUUESQVU8FMF@linux.spacemit.com>
+	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=EV2yZaGs
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1794471969;
+	bh=ALlmcWUT8hLm+bMDDq61tHU2NhGeQNt9726k88rnyjI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=EV2yZaGsyn2hlirQd81vnhev9jV2VN/PUYIi6NukJE8Uqlc0d4RDXCZFTWJ4CQaQh
+	 /dT9+8QjfQNWh4/7AMA8Ep9NJOdNrfkLKguOtZyQiGuBYYMRt+hvIPhOdYXE7xfEca
+	 IdvWOtN7aDk40ewNWGzQYKU2MwwjTnMSSblsA6d0=
+X-QQ-mid: esmtpsz18t1794471964t89470df4
+X-QQ-Originating-IP: k56wWTcPTlKlrR/LsO4FnsffIDy49lTP5C+ygjI4QhM=
+Received: from PEN202512010004 ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 12 Nov 2026 16:26:02 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 791511799139374376
+EX-QQ-RecipientCnt: 5
+From: raoxu <raoxu@uniontech.com>
+To: marcel@holtmann.org
+Cc: luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	raoxu@uniontech.com
+Subject: [PATCH] Bluetooth: hci_vhci: Report write readiness with queued input
+Date: Thu, 12 Nov 2026 16:26:01 +0800
+Message-ID: <A77F6FF053467FCC+20261112082601.1356290-1-raoxu@uniontech.com>
+X-Mailer: git-send-email 2.50.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -65,41 +69,70 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <DMSUPKS0VL8N.1RUUESQVU8FMF@linux.spacemit.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MABkn+BX1UZ4qV99deJJuiGcugFIHBUXo3Z+CNttgQkiOlrbx5PtStLu
+	0cg3G2Kw07RY0oh391eKpLpSyNBVV3Tb/KGPCOO0PzA1tQiIPL+w97nlkaJTmqAjsHG1yPc
+	8j4c2E0tpLXqrKoJV2+e6lEfZuBZK9TrTcgIMrhdZM570nsojT2u3Ngsy0FT3vbffwSbaWX
+	qtQCAqSSZTTyHmitB8HnKC9KHpLbs4ya3X+bkoCgePXWMNGNVVl9RmW7gexK3VQavR4jb34
+	rE+5IojQGoF/h1gv4oLYRGEquJsACNKcy8nZiyFW5b4pNwwT5nAOz9V/Jxvnpd36eC6/i9y
+	ba+JOsd8GbVaQuDHzzc0Cw9VesKcfpDPdl/oxCtaCGROyM4w+F0VX9rSQFOjTyqDsGpM83z
+	yoYxofuPeo6yaBPBCXWlNJOtqquC5ZVfntLgEhhFavlDBqkqL9Jis9oPBmC/7AkjCes3r/n
+	948nN8nznmT1kez0bDD2d/idcwPkpRxd2LL1GjcR7+RkwKi2OQ9LVTqpXfqxcIDHkMFOgL8
+	wh9KnK9SqIuSyN9T4TKfXAT9/ubN+jf6501aH5hiI7ZVeyd6/Dm4WsA4WoazaQbwfBiBjCd
+	f51e70v82MuUM26WMPIX1PiVFAJ6qlqVh8TD1maWcz9fADW2RWXgrqyMSwyAos2HhgAqF+n
+	39cHF9Zpm2meTeY1PbPtCs+358KhQwo3Lkt7+lHd+Wyd4pBDjDdDDK8r5zeBwzmsXPYcDI8
+	U2QJpuKmju+rlo5H+y3QEKhmSAVVormdNrqKrnyJZxVSfNs6hZ8m+I+01wzwz/cWKLtOJqu
+	7FDJk5OMayogEdwJ9spxranwjX+9Mcl5DGGjLiP1ypKEavSAmNoCl0Xa/gW8BTFtBho5fxn
+	7ROpW8JVCjLYsfBIoOaYCLeBDFrCTmDyp/Fm2/QTLf9qKHzWEOqa5mhu+pXIvRU582kCksw
+	4TwG/h9+J1Mt2UWPpu+cBxNPep148RrWlIFAZHEjbI4YuVNP0MXJOjxZKuBjWxBzy3Q4MbJ
+	tLkXH1ld5NzqxBu3+D/Nujq4oW/ItPCSe5iO4Mzw==
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
 
-Hi Luiz, Troy,
+From: Xu Rao <raoxu@uniontech.com>
 
-On 01:45 Thu 12 Nov     , Troy Mitchell wrote:
-> Hi Luiz,
-> 
-> On Wed, 11 Nov 2026 19:40:19 +0000, patchwork-bot+bluetooth@kernel.org wrote:
-> > This series was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> [...]
-> > Here is the summary with links:
-> >   - [v2,1/2] dt-bindings: net: bluetooth: realtek: Add RTL8852BS
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/c21f8cff7503
-> >   - [v2,2/2] riscv: dts: spacemit: enable Bluetooth on BPI-F3
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/df348a0d065c
-> 
-> SpacemiT DTS changes normally go through Yixun's tree to the SoC tree,
-> and Yixun hasn't acked this one yet. The binding patch is fine in
-> bluetooth-next.
-> 
-This do happen sometimes.. I agree with the split, or another solution -
-I could also take patch 1/2 with bluethooth maintainer's Ack, either way
-is fine by me
+vhci_poll() returns only EPOLLIN and EPOLLRDNORM when readq is nonempty,
+dropping the write readiness bits it reports when the queue is empty.
+However, vhci_write() does not wait for readq to drain: incoming frames
+are handled independently by vhci_get_user().
 
-> Yixun, what do you think? Should Luiz drop the DTS patch and you pick it
-> up?
-> 
-Ideally, the DT part patch [2/2] should go through SpacemiT's SoC tree,
-which would avoid potential unnecessary conflicts.. besides, the DT maintainer
-did complain about this thing before and request dts go through soc tree, see
-https://lore.kernel.org/all/20260918-belligerent-succinct-kraken-7fa592@quoll/
+As a result, userspace polling only for write readiness can time out or
+remain asleep while input is queued, even though it could submit a
+frame. Applications that drain input before waiting to write avoid this
+case.
 
--- 
-Yixun Lan (dlan)
+Always include EPOLLOUT and EPOLLWRNORM in the readiness mask, and add
+EPOLLIN and EPOLLRDNORM when readq contains data. Keep the existing wait
+queue registration and empty-queue behavior unchanged.
+
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+---
+ drivers/bluetooth/hci_vhci.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 771ad9893c44..0b427c65ce59 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -636,13 +636,14 @@ static ssize_t vhci_write(struct kiocb *iocb, struct iov_iter *from)
+ static __poll_t vhci_poll(struct file *file, poll_table *wait)
+ {
+ 	struct vhci_data *data = file->private_data;
++	__poll_t mask = EPOLLOUT | EPOLLWRNORM;
+
+ 	poll_wait(file, &data->read_wait, wait);
+
+ 	if (!skb_queue_empty(&data->readq))
+-		return EPOLLIN | EPOLLRDNORM;
++		mask |= EPOLLIN | EPOLLRDNORM;
+
+-	return EPOLLOUT | EPOLLWRNORM;
++	return mask;
+ }
+
+ static void vhci_open_timeout(struct work_struct *work)
+--
+2.50.1
+
