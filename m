@@ -1,100 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.170
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794499677;
-	b=oTtzZRpo24LntnRW7b66xsmTxHrVi5c/n815tIkp+FTms8da+MIstwZ/xUzj1eDioqRS
-	 B/E1TbXAvVFwMriNGuOo4wV4Fy/SynFVGt6amz2nvFlhWyD1CDcjTRUuRTYfqslUjCHNt
-	 5Ew/nCEz0yOBMb318Y7i2LX8dLGpbJ4oIJmTkDEbUK8QCG6i1RZot3mdIw7sYjRUDJ1Oa
-	 QTBmf6YSp670cvpYjOPVSuFVqpaFTBctHGp+9MvahmTc2TtU6MWePZJdwIPzyq+gJUvI4
-	 7EMnOSDGg4C908Ol/xW4x1ZTwCQuF8LQ4RW01Be6+dku1Wis7RksrhItvZyGVvagfXQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794499677;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.182
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794500322;
+	b=k3rq8qI9UqxK47pkyjO3+o795BqQqfg5gN5MANvC0F/1sW/w2vkCeHvILL6FD6wFtoRd
+	 3BITwQl3JN4rXrry64o3Xda2bl51KqiaalF9r+aj/ngGvt/6O2yTBLbG0SERTkigavMzi
+	 gL5PJRVt+j6AAwiTzYEtMCPTMXwgug/RBMArrVuE4ZFMdACEGtROJD75yDBeC/Zr/mfQP
+	 5ej3dwJNVc8PjFdRku5rtK8dcbhOkdCAF6cIKma9a4BWg+QtLPQCK2cYPKHN+p58oMjdh
+	 2yy+dVI01Cl1FkpcJsBmlmjXs1gPCP9WLv8PY/Im4hlsDw65iuopomHa/ZJ3c1uB0hw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794500322;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=0j9XAe++jFkHvVPrr2Fgcz/pjM7x8OzYNQ361KAdK8Y=;
-	b=vwcoIylCk5naz4q26J40YhFLqVcghgEU0gBN8nd0MJ2OIxBn1Ua9bdwDpZaoqmPPg7sK
-	 UDh3/uEyNdNdmGa2KcQrwfmEB6sbgTcVwn/Tixe28SZrDP/5xtjj+8bdh0fbKEiXgWukI
-	 tINjA1ZAQIph/ISDsSsdhndR0Qm1q4K5+aNswQXueLyMK1fBrhfttc+aQB8sgSfMYQD/h
-	 Q5Dj6bsWcMXS2nLwSV91hYLHavdFzNc8vfQ3cHSQ/jVXOYQucI969fFuRhiTD1gnd4PqT
-	 Fq2l97usS423PER3n6/pEqgE6pUkOvKkvTDwaKnyGaKBk31QJ7fOaD7CXWnXMJnlcGw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=wm2X6Q9WO6S3ryZqISgW6UrbipF+rIndX88Sra72qMM=;
+	b=k8SOX1jOeRwTxJuBv8s/umNn9Nc1dnWIQJhdH5KPLfdYEFGkBRM3OyTZ+YnC6UlM20/6
+	 I/ImjSANPiRYAQKQ8blVp6sdBsjMZpTepREfCaAACAlmA3x2Z63XVWo23Fl14xwrChoh+
+	 Vc3p3og83cHJ41gNtPslG2yX2POIZBEi2A8NAydu+J1GUT6WB+8OK/xtiz+7gmCHKlwcs
+	 UQBH0PN+6sSLQhNy0yBJl4t8aSAM4YcdGBy94qLg5p8KHAfejo295eAqB6rh7H36QGXl+
+	 NlmfiUFcR0h+v3USZkf2/P1RaHcHnKRpPCupNxH2XmNlN1bYq8VRbKzMwj33TE7JrJA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ficoD+iR;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.170
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=g80a7033;
+	arc=none smtp.remote-ip=209.85.160.182
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AC0606A32A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 16:07:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25AC0606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EA2606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 16:18:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60EA2606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ficoD+iR
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-8b3b57a31f7so58257b3.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 08:07:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794499676; cv=none;
-        d=google.com; s=arc-20260327;
-        b=b85QOEzqfu0e5rREuD3Vju9IiWePNQWu+mMDzM5So+ecgwft3jXJyLsbqrUJQMFu0K
-         66eyQwN/ldrQULyuBXdS1mggQsSPYYKuYyxxi8Lk46RDesFpzw1QC86BoARj81DarUiX
-         4mJoPuvCPS1qFVV192qPQd6yBwVTzc1PX1PilQpnGq50ajlENf+Z4vDe9cht32gF6pN8
-         mt3qTJHKfZPkLUzNi9/bQKnpcvLDWzyq/wBzNL0aSCUgM9BhwLHggig2yU9AwUd9tI6/
-         owkyoZgYEDrbWlVY+7ofa1uXLg3MrWYHl6drSC/VPaNtLEb9czMCG5q1yMmlq7RMEL98
-         5Alg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0j9XAe++jFkHvVPrr2Fgcz/pjM7x8OzYNQ361KAdK8Y=;
-        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
-        b=i0H4iRjkeVnuDXKJoWGGV9ZOR9a2V5HFX0evDBEoiewKO2579VnrHbDziytDNrDxoj
-         XKuv2LJzdmB1ljhIePPaqNyqXJ4sO9W+x6+PF7kYGPBRJvEzEFR+VImMvd8cV99ozyfS
-         aD3xnLe0dXTiqURDrjP5bHoPsOT4qnNw+AgNwKclfPA+H4x0WuE7v5CQil/slxjXkn5Z
-         315oHV1mtgE6bLXLcBsqzp7ss4o+ZUFFtuMAns6EMw9e3aQwk2ECwOG8dEgMTxTHbN3j
-         n1+VOAnAY70CFxmr423Kz3xwpXs6cdkJPQfibOXmgXmHgH8O901+SdOO8xGa5x6nW3JQ
-         AmOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=g80a7033
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-5365f9a04c5so56158331cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Nov 2026 08:18:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794499676; x=1795104476; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0j9XAe++jFkHvVPrr2Fgcz/pjM7x8OzYNQ361KAdK8Y=;
-        b=ficoD+iRtpU9OIwoRLqYS4UAEAMMUDSLoTTj4koto/tA+qrP9bRMI/83glzcztaYHc
-         x8XzBPsDYo4L/UxZfkXN10uBGTBmMa96sqvshWVVJpC2cUO4TJplo7LiKpFpQIpGT7hX
-         a1UwGFKfpK5gzoA1sZ3NZGFRwfn3RTYtVasw71ouDp3EvJngV5WD1mPU1DKcioRS7Erx
-         PrP2ZfBCprmY4GwvJ/es5X4HYypPd1UY+TU40gDlPYY6CzQVxhVJJMaPK5ItSPzyHCNh
-         e/8ssBs11pyfWQ1CG/Ati/TWv9Ztb26XZEs6sjsV30SO/Cf/OatA94KzsEEYVO0tes3R
-         gJJw==
+        d=gmail.com; s=20260707; t=1794500321; x=1795105121; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=wm2X6Q9WO6S3ryZqISgW6UrbipF+rIndX88Sra72qMM=;
+        b=g80a7033OAOgNdk30monzeqjuPKHAoQTJdp16xcS1MuKiq1NqDbyJ9RQq1EmVX5V6G
+         Eyjoin4NZAXvOYX5CtvSqReZyI2MOqxa93EQqQuQ4aNd16AxwK0nrgWrx6mLptXhdhp3
+         KGGWsNCt0mkknrEWA1mkQBx/Y4K0yEEJXP196oyN9tjgppPy0Q2nwKjK7MDzFGD68q4c
+         PhMciObFgFOIMi9v+vB+RV8STWJYeUlIi6iMbHA/I4ooBgtaXTa35QfJxA1RZUwRKIcG
+         tcsxPkEq2iHFnSCQC8D17tJrNpfdLAbASonq1qw6dF0yAJrTN5Ke8PckPnQL6GqaNpyF
+         Ud9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794499676; x=1795104476;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0j9XAe++jFkHvVPrr2Fgcz/pjM7x8OzYNQ361KAdK8Y=;
-        b=NqmNGjoOEhCEZjk6Tqhs9EtD0FmjNbzUH/c+mUATi5j8BExh7H34TcYCNglIHjBggJ
-         4Ad2mEbthbE2gMy1ovTfpv9zW5L8PfkYsGX/H81BmF1hQz5bqpQ9AYwA/THljJjKBInN
-         R5nfsKmDZF9q0c2JmWbuVFefhyEce403mu6C3c7nyKIBd0803ssngySVH+1eU245Pi4L
-         z05qtqLT27QANhY14d7QnSZTuN59eDQtVWDpSTSXef+vxeMIAF9RFKXr+FmJaUQiHALk
-         slsBSzPLR+d24NqWuJ1EcIPu2aLkCpJSpp5tuhX5Cs5IHMjqlx07XK8tTH38sCuJgjAN
-         vusQ==
-X-Gm-Message-State: APuU4Z/830jM6EmWCqikFCZedFrpSkg+fbDmruwpzAZgAhryo5Cw0LP3
-	q+2JZMnDxxqCQAanq3q6Y0TH4sW6+JHokaQ/RXgOhIAiKywvbBvxfF75BZTq+4iBQA3L4YOOuyn
-	kLc6fF/mlhgvXXIYXQJiC3YdlG2if5gU/8aQA
-X-Gm-Gg: AYBFou1X334w+HPOAoGMsSN+RhJGVw8ayCArFPhkxwi+53QYBANmikFhnuPLsVUfd0H
-	hb3lvKMS0WVWfcrhSamfDCjHZWU4QkrkJB+EpqAPUwbUQyWS1ObJpSQBoTV6mTdkJ4StKuPnpgO
-	DUrWTiC9HH02fJ53z3SuxznlJhZQyzEOjlgVcD8ateKbKPA2N914ZtXz+4vAAAZMvGxsUXZDc3X
-	Uos0GbxJpfJSzr/r3JogSZ67ahj11lotr3dEMpEqyIZdWXl1m2W+3UEf8uc4SvWBi68p+K761yp
-	2WXvjsFlWuOlqIkEcOAzVIxBUnMrZFOJyqt572V2d+bA4274R1DBZx6qMd9GXNr0++04MV9KgXp
-	+7bA43zjMO3ih3FD08+CIs+CoqCJK56CLFVan+o57Ucmj89SCvV9eIVnVppt7bBBDPdA5jBxNyr
-	82MGTAMLWNZRtZUyBTy+h1S6HpHP1jXZBqFd5kLR6RTvc+tyDqdxWt0uFd2XU=
-X-Received: by 2002:a53:d6cc:0:b0:67c:1336:e183 with SMTP id
- 956f58d0204a3-67c6812cc86mr2642567d50.104.1794499676192; Thu, 12 Nov 2026
- 08:07:56 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794500321; x=1795105121;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=wm2X6Q9WO6S3ryZqISgW6UrbipF+rIndX88Sra72qMM=;
+        b=1ciDphcBHm37Jgd9CLnYPspZxtjOFwF8E7JqPS09w2x6gRREeB1UV9uGGS5O7VrYTG
+         tvop1Ab1tEFZIrCSfyQp1ezljm+UCMt3x32mls5aEj0Afrq4pC7g6TwhTcnxAHM5dNGv
+         /QrlcQ2dzORWy83lGFW0gZr+BQCLuuft5S4FFDpkELQvCnKU0j8FWd6MLY8UmqidEjIA
+         x3Uq1YelZjyBw4RTfGUqRC5fCOHWLC76n/SrfPq/kiQHZJpuJdfAiHt8os+5g9LBQ13H
+         o9jJUUtANis1EoPsUHzxElgXRjD1mh0/5GGoApckMSWRz6MCKLyKPa4BusObgHbRwB0P
+         DJcA==
+X-Gm-Message-State: APuU4Z9U+O9APeCvD++VKoNbTlGDZL02twTEqcm8FNw+ADb45lUuuu1B
+	qST2Ma8OdHzq02NQiB8wSHwL15Nw3E61qYi3ChJLPKu52gzVL27LNXYxbEb5wQ==
+X-Gm-Gg: AYBFou3gmjBUSch1iJPmyRFIXP3ooq/yb1n48E1/ppS8wUJtDMwIl50+KG7Di8z2ZRe
+	0ifjl+xrZLA3h2LQYS4TRuxV9Gr+p+ZIZquy3Y32Wi7VZPBmfGyYvQx6MSx0fr07DQbNN/Z9e82
+	PPCO0beSMjtKg9lgwD6pUH2Qol3XED/FeTiwSQcNdk9gfnvdgfY+Gh12KCYhNI8DSD98YQ6V/5y
+	b3p4cv9iiQLWP1Gwiz9PvttfW8XWIp01ooIGtYljDYvgzIKOU09vgMEp4Sg/fkR4N18B/5W5Q/g
+	XBo3cghFw+1BUj8Kh5hJWGY9X1+xx8gUhHl+70M5p5OpVlJEhwXUMqNctak2B6SebDX3JRZ7duJ
+	bkukiwr1ntC98d5mIZUKnAe5emYXN7jQiGOgJRN90MbpkiSzSWQRb3cIeLDDb3Z5PjzrUtNvn7M
+	XWBnKcNXOht7oWEHhwXdSpnMjjcrxkystvjtW9vArlQgHF1NsUc4EF0mzgMf2h2kmFEMucmdZlb
+	oLc0clZXxjTqIupbKHSQbcIMCRBdOruhwjv/A7+YJ8xwvUa/MtzGgKneAc5kg==
+X-Received: by 2002:a05:622a:590b:b0:537:5488:ac63 with SMTP id d75a77b69052e-556c05ee631mr108089281cf.34.1794500321348;
+        Thu, 12 Nov 2026 08:18:41 -0800 (PST)
+Received: from [172.17.0.2] ([68.154.79.21])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5550ba432c4sm76931231cf.20.2026.11.12.08.18.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 08:18:40 -0800 (PST)
+Message-ID: <6af5e6e0.55d9540d.264330.5663@mx.google.com>
+Date: Thu, 12 Nov 2026 08:18:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8624806167529045618=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,97 +88,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261112032250.37687-1-kevin@simpleble.org>
-In-Reply-To: <20261112032250.37687-1-kevin@simpleble.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 12 Nov 2026 11:07:44 -0500
-X-Gm-Features: AclHuK9RnvpyLrXtFpSLoDmCCUJI_BvqS0oDKWkIdxwpzlKG9t9heF8IURS33xE
-Message-ID: <CABBYNZLiwCUAUCnVDYqWdjv5m4sFA=pKX8JAeFU1OXq-6LN7vQ@mail.gmail.com>
-Subject: Re: [RFC PATCH BlueZ 0/4] Bearer.LE1: Add ReadRSSI
-To: Kevin Dewald <kevin@simpleble.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zijun.hu@oss.qualcomm.com
+Subject: RE: [bluez] doc: Add CONFIG_POWER_SEQUENCING to tester.config
+In-Reply-To: <20261028-fix_tester_cfg-v1-1-e965db9c3c09@oss.qualcomm.com>
+References: <20261028-fix_tester_cfg-v1-1-e965db9c3c09@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Kevin,
+--===============8624806167529045618==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 11, 2026 at 10:22=E2=80=AFPM Kevin Dewald <kevin@simpleble.org>=
- wrote:
->
-> Device1.RSSI only covers inquiry and advertising, so once a device is
-> connected and no longer advertising, there is no way to follow its
-> signal strength over D-Bus. Applications want it to warn about a link
-> that is getting weak before it drops. Android (readRemoteRssi) and iOS
-> and macOS (readRSSI) offer it, and the kernel has Get Connection
-> Information for it, which only btmgmt uses today.
->
-> This adds ReadRSSI to Bearer.LE1. It is a method rather than a property,
-> so bluetoothd does not poll: each call sends Get Connection Information,
-> which the kernel answers from the controller or with the value it read
-> in the last 1 to 3 seconds.
+This is an automated email and please do not reply to this email.
 
-That still a poll in my book, not bluetoothd directly but I bet
-application will start to just poll it on their own.
+Dear Submitter,
 
-> This was proposed in 2014 as ConnectionRSSI with Start and
-> StopConnectionMonitor on Device1 [1], and you found raw RSSI too low
-> level and suggested a normalized link quality instead. I went with the
-> raw value because it is what the other platforms expose, and what
-> applications compare with the advertising RSSI that Device1.RSSI already
-> gives in dBm. A normalized value depends on the controller and antenna,
-> and it can be derived from dBm but not the other way round. If you would
-> rather have a quality value, or the TX power from Get Connection
-> Information as well, I can rework it.
+This series was picked up by the CI more than 2 weeks ago and the pull
+request created for it is still open, which means the series was never
+applied to the tree.
 
-Well the reported values are vendor dependent, so I'm not sure how
-much it would help since you can't use a measurement of link
-degradation in a generic manner, it needs hardware details to go
-along. We need a clear motivation for why this would be useful apart
-from just covering what other OSes might have since they may use a
-vendor command, or in Apple's case, probably deal with an exclusive
-vendor which makes things a lot more simpler.
+   Series:       [bluez] doc: Add CONFIG_POWER_SEQUENCING to tester.config
+   Pull Request: https://github.com/bluez/bluez/pull/2732
+   Created:      2026-10-28 15:21:12+00:00
 
-> The kernel reports a connection as soon as it is established, but
-> refuses Get Connection Information until it has read the remote
-> features. A ReadRSSI made right after Connect returns therefore fails
-> with NotReady for a few tens of milliseconds. Letting get_conn_info()
-> accept BT_CONFIG would avoid that, and I can send that to the kernel
-> separately if you agree.
->
-> I tested it with the functional test in patch 4 on bluetooth-next
-> 3f425f95ba39, and on real hardware: an RTL8761BU connected to an
-> nRF52840 with a random static address. ReadRSSI returned -50 to -52 dBm
-> while the advertising RSSI was -50 dBm, and the kernel sent HCI Read
-> RSSI about every 2 seconds however often ReadRSSI was called.
+The pull request has been closed and no further action is taken on this
+series.
 
-Which means every btmon trace will now grow just with RSSI reports, I
-mean I could live with an event generated if RSSI drops below a
-certain threshold, not a command and event, every 2 seconds.
+If the change should still be considered, it must be resent to the Linux
+Bluetooth mailing list (linux-bluetooth@vger.kernel.org) so that it is
+picked up again.
 
-> I left out a bluetoothctl command and can add one if you want it.
->
-> [1] https://lore.kernel.org/linux-bluetooth/1401177171-19994-2-git-send-e=
-mail-andrzej.kaczmarek@tieto.com/
->
-> Kevin Dewald (4):
->   org.bluez.Bearer: Add ReadRSSI method
->   adapter: Add btd_adapter_get_conn_info
->   bearer: Add ReadRSSI method
->   test: functional: add bearer ReadRSSI test
->
->  doc/org.bluez.Bearer.LE.rst    |  17 +++++
->  src/adapter.c                  |  22 +++++++
->  src/adapter.h                  |   7 +++
->  src/bearer.c                   | 110 ++++++++++++++++++++++++++++++++-
->  test/functional/test_bearer.py |  23 +++++++
->  5 files changed, 177 insertions(+), 2 deletions(-)
->
->
-> base-commit: 9659adb6819d7e0284d0d2ba226a3894423d8db4
-> --
-> 2.54.0 (Apple Git-157)
->
+---
+Regards,
+Linux Bluetooth
 
-
---=20
-Luiz Augusto von Dentz
+--===============8624806167529045618==--
