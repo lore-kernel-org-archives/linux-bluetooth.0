@@ -1,98 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.44
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794587575;
-	b=HVDHK7pO05jeer97+4eDoVf8oMdDTtnGy02izELzmf5G9hFgX1p4V+yY3TsLKFjoNcIL
-	 MXvucQXIVMXneHesZMknjDdS0Xr8a+iL55W3fMNyh20fFbLUuV96lkn9Emp2QxHTcT2sP
-	 wkK5Xa7dsY6OkMwZMkZBOLWtDr1q2djqKR+gxdzJ7dRyP1cyniAmEKPkxUx/2aKzfqmGg
-	 kLR12SFMvqHdAJEcXI1e+ETWfTNkZG3v9mxKnfiQ9d7FxANtKjQOKkXeYuwPoOVkVwdim
-	 HmhT+Bpo+5CluMoBhBBp2W/ygJJYsVweuDqBZAAaabL2ea+M32P3tl3OxtQlZeQlf6Q==
+	t=1794587593;
+	b=Tr2xnHG37gPAQzUX0vl6s7Q7g0tvwrp5ZYMo0NWIfQUS/YhVQqeAqFIDC0+hlfSXyq0I
+	 wrAlH1vHBfckshc6gRcDa0JU14lQyeHFHnbA0Arn6kDVqu47wpbyqu+2ZEGTsWxgtbDll
+	 JuB4GrIpEdU9NnW2IGct1hcIPZwjpxc1ML54JVmEZfm/GCJontG64OS1qyqlaS8nQi/Vs
+	 191vTXdJ1U7HVNX8hnXM7tytb+xDlOB4q6zLrLGVo44cKkzhg4gHEAaMQ3BwbmiR7U5q0
+	 +PoQsI5uaZuIDczVfWQ3Zt9UYpEjwxuJ09QY5QEL5VSaVhx9GE0JiIPxbMm36HtXpvQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794587575;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794587593;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=OhQ4VvBeytePCKEBDRXAk9FEqcTaWFnpXRWzd42nCrE=;
-	b=jiPRFTPC9SSEKCGIY0MwvDrbDIRu5PSDamIhOQo4E8PMnuf7IefHmDUAWEt9QL8mAavX
-	 xu73eLdvaBOPFBNDpUao2+UP546Jp1BVYSXQa+OmPV91J0pG2pYLD4qOz7Yer6JXIKtl6
-	 jBFdDuYF+63eJosvFDZSC+qncaDHWUWLv6nJFTAQs6CiP5JrsUIdADcwBziIF2gS0p9fX
-	 0ryVBmApcvZkdIcXUiANeDN+zqKdI5HyUjEEQ7X8G9YqJRljCvArN0pCpkpLaeC3zHWin
-	 O8GROAiqq38tZ7nopCmd2S1cxI2oELfpyx0FgILJJt8tZVST4axjhyvvO74a4c/1SpQ==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=baR+59Y2mE8hUnwSU4h/EglmHTzJDMGvpfXOzUgEWh8=;
+	b=e5rEiZJFhYyOm6dW+rzYzPh2W1j49tt+lUdZsHHgo6CusQLU88cfqaB4utcwV+S4Ukft
+	 s08dlfXFSFwrzizOAwnxoBPcyrCFrYHbSrxFYgC5gzTvFBnqfNoo+SsVunDQiin0igm1z
+	 DnbxJEx7yXjBd5kd1snCgfsZOQ3QCyw7dY0EcDfZjn0ED7V5qYPJYGpEcBH51HnqDuXKx
+	 2T7iSEsDonYLiQK4hVtTekXGHqv6xH+G3KTtBizJZB9YJGeCB5S7dsJJqn/ZzywceriFv
+	 BemPtUnlPKXcr+AMA6iPcZpk8LeTtelG+yQxRc3Amh2IYawFCTfYBM7OvhzauYJj0Kw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=iiitd.ac.in;
-	spf=pass smtp.mailfrom=iiitd.ac.in;
-	dkim=pass header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=WGLfZu+N;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.45
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RHvuUNgV;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.44
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F639606A337
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:32:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0F639606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C423606A32D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:33:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C423606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.a=rsa-sha256 header.s=google header.b=WGLfZu+N
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c4d30639709so219450166b.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 08:32:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794587571; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RHvuUNgV
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-4ad4072943dso349430fac.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 08:33:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794587592; cv=none;
         d=google.com; s=arc-20260327;
-        b=rEQ/4XA6sc3VgtQ+j85NZaKh6cR14xkPLHZ/O2Ur+8fGjHna48cJCDwKTqCegGqc/V
-         dFe4JnBkjPSc24Vzv+PyEK5DTv432RvVE1E6Ncy53tK9ZKEc8d3l6+s0WKJsY2J6RfjG
-         DX0P5/vYGh5HNMZjiWEXeZxalRjZxdAepLmE+y2mB71/lT55dMm4xlV/MdjsvQHsujeS
-         gdWzG3sWTFapRI/T9KDn53cOQj82xHJQOB5Cv/IzANfHFtQ0TOCXlM8vz6h//Ht0RK5M
-         WAK+7xMEjz1QKSDHhCVW46g7nVpZxqCQiS7Mo0VSfdmyxOwcEtvkJac5SPylJotWHZlG
-         D4Eg==
+        b=QnBJpKPf12hhF877gH1v9mZZBCQv8ZHfZNAxlXXiBj8b9iU/IEVcC41zKn8egW5fFA
+         D2BrPk7Qg9tMp5ESSAQ+slGG9gEPHfIhtph1RGsQgQZfHL92xVIauJJvaQQGpQR4W+l3
+         74cJggakTIhnIZyUIgbqI6guhQFWBrH603HO5FJjf+ODTRoCULuB9VK/cI/T/+YPf7HD
+         oohsOUv452PtzCFtmK/FvSyMFCUpU609uR1ojU4FOcYefED7AlLy8GD0mO9hGdMln75R
+         RHP3nrJcJrApxVsOjVqGdZWALBqTaALrgqRjez5fKa1yq4ahTjMjjQQHK3+A8cAnmtV/
+         VNQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=OhQ4VvBeytePCKEBDRXAk9FEqcTaWFnpXRWzd42nCrE=;
-        fh=XG9QD7pdR1hfuJqxXmEpqE81HFqAJ0mQMCjhgGFseqI=;
-        b=f9QU9oLrXomsgo+vibTYhkpOTHQ8bitGUDbk6DPH66WQCNscT23wJqxDw/TP2TNnaO
-         7IEr8+ReQEWrDsyKH0/kkwbHaSw14eKKOKAQAd6zXQdB//NF22CjVdeoM0f1I6Nvtct2
-         38ZMs+6tpvxrIn/iJN4j/W8puSLxyUz1BpH3RSYGfxUXQey50Ft5ciaysJ7i//EqJk+D
-         05+u/1bTP/fORsIHvrUviPb/OepWraTAtVTUrI3/7mHwgTuRBZ9V4cCkftLIxYH6SigX
-         IqsIg7B7LiMH70/VVUt8xShjQFwbfFu1HeFcdkml5ML9lOg/LmeBCfgM/vv1Dala/tv9
-         MR/g==;
+        bh=baR+59Y2mE8hUnwSU4h/EglmHTzJDMGvpfXOzUgEWh8=;
+        fh=dss+mvtVWWcCKjYBBjtoOwyfdbc8Dj1NBkicxxfSm3A=;
+        b=h8l60uJzSB1XyMxG2Z7CKRjgyURB3/pWksNcebBniDYHTuLCyz4exixlYVdGPpC+Vz
+         jJICs2hDmpNJYmH7PGF3H8YMOFujiQEmvPYWDZlgQbconRQEJIKrBOyl53ELUFWlbmfB
+         w/X0t7rS5yxyheKGnUoOf299tV/8cKsrT3772hb3GByMOCQv+C6wfrJ6tOnce5EElGlV
+         ZcdKIcl5OcxsZZjd5yzi5WbDvB88ftjjDlABzUNlPwJTKazHBknFR6bz1JckENzD/xcT
+         U9fQEbdNIIs1pXBsmEDrqiyjfbxjEfNyz+ke/Fq/QR5NfArrIsW/b22KO1HJyAwxSKqv
+         BuTw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iiitd.ac.in; s=google; t=1794587571; x=1795192371; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794587592; x=1795192392; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=OhQ4VvBeytePCKEBDRXAk9FEqcTaWFnpXRWzd42nCrE=;
-        b=WGLfZu+NiPQoyA0vDbMykLD+krbRxp9B60Od8eNtRf0KH5qx5oN1mBHD532BaYYPLQ
-         nJ3wGbxu8hRo5MUJ9jNyQN34I7wCzdffdgMt4QK367T0OJ7XTkkNQ1IV9pESwebmF/of
-         q9UvfIlWaKbJPI01LWTmZYQkW1stEGqAXgdG4=
+        bh=baR+59Y2mE8hUnwSU4h/EglmHTzJDMGvpfXOzUgEWh8=;
+        b=RHvuUNgVnLpWg+6fnkM8oTmCd0rIy0NK2+KwghjphMGC0cPbrlftzzG7RYrfi0m80Z
+         LNUqDT/aasYMcyrkRnhRmvewVy1HdXJtOb4hoijScUkeBAWb2tjYSGi9K+LAmokvW1hm
+         kBZ1VCwuGq4YnNHR6nPUBFqvmOJMzG6cMKXUFcm8EuznfEvioibErYyjjl1KAXQ0Xufx
+         /B+ypxxMWtU7xpxRSCt5UTQnoAHoEmnwGbFkDvpBzGhvEVVxixBL+SH179ZLuGev3J55
+         8W/VEiUTJF1N/CVn4V8LIOUcu6LIGQ6pO+Zok3HnWz91LAAOsiqvUaitVLgVTivI0aX3
+         B71A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794587571; x=1795192371;
+        d=1e100.net; s=20260707; t=1794587592; x=1795192392;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=OhQ4VvBeytePCKEBDRXAk9FEqcTaWFnpXRWzd42nCrE=;
-        b=mHRwsRVXFH0SEq70I5xnnNoSEH9GLyY0eGnPtHhA07JP/5GlTaXiJaWX2uEiS/F0e9
-         fD4CxoXULN5lkqvuuSzZ3rBdQTtAy6Q6l+1JaXmXyogkbaWpJg6hBd+iIdI4CCWBAxpv
-         t8jeMkhxQbzxeHDVFIXw/BrcyJ9i5A5tCkbGG0R9yA1O+PY1uoVA1E/T3Zvzq+0ItD/P
-         TrA8WunLuH8wtj3QgKHAOELNRAshPbtH3vm1MYRkWBGWKIux+tSBUhaSNltXrqlo8M00
-         8tSEaVZdz9Yv/kZXqt7El9h4p/uodbX5Y4zPB8GK1hzcrgWocK5lW+ewbhbPrb80srGW
-         gqbA==
-X-Forwarded-Encrypted: i=1; AL+hErFV9U40LksgmSomeRv0DN/qlUoFjnTtewJBGiWt7FUVbYx8sKdLtx1E4vdfsxtz8t1dvyMUGJ8KOWiFOHO4Om0=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8Tvqa9+0/okd4F0Ck6qwOAxBSWCF0TrSAX6E8ZifUZmRMECKdv
-	mK6EDj9F/s6H80NSOX1cpX6EfCnFq6lLha68J1t1S98eFCjorf2kcbtT+5aUuOokEIh3QB1fChN
-	Z1zqq0z75ihjZ4JAp7fZTsuLEW/K6v3UQDzSmetYO0A==
-X-Gm-Gg: AYBFou1qsKMaj1byb7xLifNgmfqycRGeFxll/1fuAAbpnyz6kzMOJS3Zc9lSVfm+tyY
-	ANF7Iy//ZwfEm3IbsmnlgiwjXDyPAaxqPZCfOZsol7LJZeW44/V+AU0wg2q8UxwNQ25MdYcc+Jy
-	/jP1HxyfxQNSK0oWaY758FRDhTJxk6Sx+/YOOFOpBFTu02U3rxw7d7U01CM5T0OV7tzYQbxZ5Za
-	ONoDGZkblx3L7jUvcHyedAaWIeXrDHSLjZugFd8BiW58CUxwVEjTbjDFEB5QQThSlPQwH5MM/9e
-	s9Xn9K1aF66OZlO/pMdFqglMdrDUWJR88E+eXUXDC1gxRFaZOVcPx7TtmTiUPs+Rtm6FSHnqT6S
-	0S2T46Dj5zO2sNqyFJq7QV0l9FpwTvnDUCD/cpNbsJKsJ+rwPSdzAI03WFw5ejARYRCW+dDhiEd
-	AdoDggNej0aZP8YmZpr263VZCvyBJcIOaWJx2/1B6jKrgxmaen/jQug1w=
-X-Received: by 2002:a17:907:9304:b0:c46:9ee4:8f0 with SMTP id
- a640c23a62f3a-c50963d470fmr304538466b.10.1794587571235; Fri, 13 Nov 2026
- 08:32:51 -0800 (PST)
+        bh=baR+59Y2mE8hUnwSU4h/EglmHTzJDMGvpfXOzUgEWh8=;
+        b=x109rW2lqxf9mbvQS8Gqi77yxk+MDNEOU3oy44Q8aODGdkdIR2/Va0kN/9V5MLiW0N
+         6wXTtg/taQO4YDWkC71YuzV1lQZad0XNUg5c5jDHxL7D+WIfIccGjsXqnKKESY3BeStf
+         /gG8DpWLfI7HumrF7mlEpVuXlz1RU4EwtjKBmkFq+CIbPMXzm3uY8GPFde5BQhyX5W4O
+         l527A5WkXJJoE/Pj+6NX7ekcOzCotNWRE50+zwgWY45qiG4MCJoTjHTQ6mz0/w+AAfwh
+         m/qnz64OlXsautEL6BN/Bk1xNfvdcHvXst5R8LnZihqsMBYaZ2YjVfhipExSbunXw76q
+         /xTg==
+X-Gm-Message-State: APuU4Z+H3QuXzhLOeCTAfvt4MUxGbmFUCu4zPc3EXxTqw7iWQ9FDescs
+	xJoJ7WCPaQVylZTpQKsBnY5IKHPo0zzktyTKqbp4IgRX40uXxZWMvakG5GrDzpQmxH6+pAE8A0j
+	jznzXiE0l7UJQnBtPF+LX66jILYuowmQNwCHvdlBAEw==
+X-Gm-Gg: AYBFou3BMGFFrSqfiBaY6eUOTKv2SFVWIVUBoV41e9ZkRHk2z4N7junj/yk54A1UE5i
+	Co4Y2Sykp+iwJ5K5eGVLiGKuGLN8dbCFZvIzxUtWhQWxYoRdPrO9jYRFldOHf7XWwZAouVDEJqC
+	wKBjUfTX+9A046/D7rjNUZa+Mcasi/Ev4U2W8p2J8otYEiq45Cj77i5CM/hYJNxrlRTT9pd4ux+
+	U8Cx6kqH3sWnNUSD6pFSRQgUT9Tq13XkuFIxpP2uXz+RAIs4zQqmAJQAcD03OfXLj8YQd1/zyCg
+	bzfXVNh51tVYhCFdq0InHVffHsmkloC09OmBj7R78Cj/PMCK09dzLRgQfwjUhZbkYdIimP6hIia
+	okj4BGgvbeBsQ0BW3hIPlwUOk0kH/azsmt5UJ9ZG0nUUMJMAPQpGuUbqd0g4ckIIvqtfLEvzqvE
+	JjSG05ylh22Zhkw+JXq6m0LxA/fy3BoXwAP95jvH16/0LKomT2Xw8gWVwUgbkgJg/U9r+8yXzVG
+	lmk89Cb
+X-Received: by 2002:a05:6808:3010:b0:4d6:92b3:5c85 with SMTP id
+ 5614622812f47-56e6572a069mr2422516b6e.66.1794587591764; Fri, 13 Nov 2026
+ 08:33:11 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -102,67 +105,68 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261112173812.18696-1-piyus@iiitd.ac.in> <20261112173812.18696-2-piyus@iiitd.ac.in>
- <CABBYNZK4akYzoWc97v8FTXc77+godNTHASn8ZnfNji=jPd2oiw@mail.gmail.com>
- <CADq=QSz7GMXXjsykU87=6yCcWL1QX3NVOpxjQpJD3T2KG-nssw@mail.gmail.com> <CABBYNZKeBYiJTH6m+yo5bqfpmVO6cpqLcz5ZdQ0xvw5kjnGN9Q@mail.gmail.com>
-In-Reply-To: <CABBYNZKeBYiJTH6m+yo5bqfpmVO6cpqLcz5ZdQ0xvw5kjnGN9Q@mail.gmail.com>
-From: Piyus Kedia <piyus@iiitd.ac.in>
-Date: Fri, 13 Nov 2026 22:02:40 +0530
-X-Gm-Features: AclHuK988UL3AkRvIvimRf7f5ka9T8GhR_5iJfAVFt9_JRB0HJ4AO-rpsVa8HZE
-Message-ID: <CADq=QSy6Z_5Zj92mQQZzOCNwYpEa0eXHY7DO685koCPEJ=0CBw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: clear the SDU before the receive callback
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kapil Vaswani <kapil@presceralabs.ai>
+References: <20261113051438.75230-1-kevin@simpleble.org>
+In-Reply-To: <20261113051438.75230-1-kevin@simpleble.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 13 Nov 2026 11:33:00 -0500
+X-Gm-Features: AclHuK8J8z426NNJhNcqJYX1NisBL17rLHi8dpfjX68gpC7W4JdCxsOv0Z1wu1E
+Message-ID: <CABBYNZKatNkuK1=ontKC=NPMk0aeA=Z0isbZEkQPtdt-6bFajw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/4] Bearer.LE1: Add ReadRSSI
+To: Kevin Dewald <kevin@simpleble.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Sounds good, thanks for taking care of both!
+Hi Kevin,
 
-Best,
-Piyus
+On Fri, Nov 13, 2026 at 12:14=E2=80=AFAM Kevin Dewald <kevin@simpleble.org>=
+ wrote:
+>
+> This adds ReadRSSI to Bearer.LE1 as a testing method, for diagnostics
+> and production testing, as discussed on v1 [1]. It is only available
+> when D-Bus testing interfaces are enabled, with bluetoothd -T or
+> Testing =3D true in main.conf.
+>
+> Each call sends Get Connection Information, which the kernel answers
+> from the controller or with the value it read in the last 1 to 3
+> seconds. A call made right after Connect returns fails with NotReady
+> until the kernel has read the remote features.
+>
+> Changes in v2:
+> - Make ReadRSSI a testing method and mark it [testing] in the
+>   documentation.
+> - Enable testing interfaces on one host in the functional test, and
+>   check that the other host does not export ReadRSSI.
+> - Rebase on master.
+>
+> Tested with the functional test on bluetooth-next 3f425f95ba39, and on
+> an RTL8761BU connected to an nRF52840. With -T, ReadRSSI returned
+> -48 dBm; without it, the method was not exported.
+>
+> [1] https://lore.kernel.org/linux-bluetooth/20261112032250.37687-1-kevin@=
+simpleble.org/
+>
+> Kevin Dewald (4):
+>   org.bluez.Bearer: Add ReadRSSI method
+>   adapter: Add btd_adapter_get_conn_info
+>   bearer: Add ReadRSSI method
+>   test: functional: add bearer ReadRSSI test
+>
+>  doc/org.bluez.Bearer.LE.rst    |  19 ++++++
+>  src/adapter.c                  |  22 +++++++
+>  src/adapter.h                  |   7 +++
+>  src/bearer.c                   | 111 ++++++++++++++++++++++++++++++++-
+>  test/functional/test_bearer.py |  42 +++++++++++++
+>  5 files changed, 199 insertions(+), 2 deletions(-)
+>
+>
+> base-commit: 20ffd285b58facfd1f2478d159a5f941b09d5be1
+> --
+> 2.54.0 (Apple Git-157)
 
-On Fri, Nov 13, 2026 at 9:53=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Piyus,
->
-> On Fri, Nov 13, 2026 at 11:20=E2=80=AFAM Piyus Kedia <piyus@iiitd.ac.in> =
-wrote:
-> >
-> > Hi Luiz,
-> >
-> > Thanks for sharing this!
-> >
-> > On the double free: that free isn't new. The block this patch replaces
-> > already did it,
-> >
-> > failed:
-> >   if (err) {
-> >       kfree_skb(skb);
-> >       kfree_skb(chan->sdu);
-> >
-> > with skb NULL by then, and l2cap_reassemble_sdu() has the same block.
-> > So if a shared skb can reach the callback, the existing code
-> > double-frees in exactly the same way - this patch neither adds that
-> > nor fixes it. What it fixes is the use-after-free on chan->sdu.
-> >
-> > As far as we can tell, it can't be shared here: skb_share_check() only
-> > acts when skb->users !=3D 1, and nothing on the ACL receive path takes =
-a
-> > reference - the only two skb_get() calls in net/bluetooth are req_skb
-> > in hci_core.c and req_rsp in hci_sync.c, both on the HCI command path,
-> > and
-> > append_skb_frag() doesn't touch skb->users. We may be wrong about
-> > that, and if we are, the fix belongs in recv_pkt() rather than in each
-> > caller - it frees the caller's skb on one drop path and leaves it on
-> > the others. Happy to send a patch for that separately.
-> >
-> > You're also right that "frees the skb outright" was wrong: recv_pkt()
-> > consumes the skb on its success paths and leaves it to the caller on
-> > most of the drop paths. I have a v2 ready with that sentence fixed,
-> > but the diff is unchanged from v1. Please let us know if you want it
-> > posted.
->
-> Ive sent a fix the 6lowpan, so no need to respin this, I will add the
-> missing Fixes tag that sashiko flagged.
+Copilot flagged 2 problems:
+
+https://github.com/bluez/bluez/pull/2820#pullrequestreview-5894592293
+
+--=20
+Luiz Augusto von Dentz
