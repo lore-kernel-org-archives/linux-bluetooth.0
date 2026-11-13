@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794590628;
-	b=bSCTrRLUAT+b+bNQKddWgqa/t//74EhWN2W1LcoaFGUD07Aqw/buzeEjn2IVfXBc/z8V
-	 lWTcLpP/7Hwt8rcJdUnUXMI6mJiOlJECwSxrUrX7Vk9bzlMS5WTVBHgE/Pt+Zp7BEQMHo
-	 K/mGceHg7xg1c5hTEfUFBxNsXaWreMb0/TnnhHz673sWazpg1wThSMSeS15YFvcF1jtu3
-	 IQIKGJgwbBbSTiTWSxNXZh6Ix9rm8M6oUhAOgf7ZP+ccl5qsVMhYXBRi1ULNKJef/BMyK
-	 Vkix+DJ8f5w/x8/heryIeaLcRFw8n2iWmkHrPE2LDvWdU/qo1kI8a7Zq2I7mfNQTUiQ==
+	t=1794590629;
+	b=bDA8iFczXh8Wkpdp+ImcSmGfNt6mN0/ZQzVYi3VQVSSYnJ0tJvQnajp8Dak0zwkS1Paz
+	 c8OjMe2XgRQ6TvbgWYdmC+ZCk77B+Z32UU+EF3e874d7ZJr65tBNcAXrNJ0BmuNitq4oq
+	 IxotGxobfEyTymCjnSEZ4pnjledQ4tMA6/bghoHrF0nRPjHuGDshTkqYoWSwWYQBgh2NO
+	 y7RuPqeKH4foxTCeWT2N1GbLUEYRIeuudAnmi9QKuHuU7nx0g78Iddc+SBbINHhQCRehr
+	 WW8iB3ZtP3h4NC5QvhQsaN0YcE0ox9mZffLKTcv4+7jVs66RS6mxryeeI45eHerbgYw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794590628;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794590629;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=/RNmK3ONZ7a2UgUSLxXT70l1Ir4lgX9TSPw45HND/f8=;
-	b=s5CkMKOLgU0QpY5A66ZGWVQf02eK/Z+DzHXqTZdw/YRTJ8EcprH9YcSYs+9vcD4ObbQH
-	 K2ZBxebj7+ovnbqMtHxgJozwiFbmrWbkD5kThIt/Lb5LkQeUkkg/T1IHblE4MigFHJXSG
-	 kRvh/b0YEAm458/wiIdL5sExENcxYwz5OIjlhnUndy7doUD+2VVVWx2oGllEJLRbYkbB4
-	 YKsurIBy45W9O7phXeKqR8HKp2P7Zox/m7yr5ZoQ45yRhvElJqzuFzKn/j3AjjUBRsQ5I
-	 XT0M8LSaXuVbv8eFJ/YUaSeovuBtHFKw6aD8sbpaHpOyv5F5/ly2zitcVQoyKDnE96A==
+	bh=k7Y7vqGa80cawwwxSZovqIQGbKG+YqWbNOxNZfTga5I=;
+	b=QM+GpgpHLIXqWzRr35lrc8x52VW0/Yw/+GKs1e3CVnpDDQzBCjui57ZufGZ+niWcdkfd
+	 gido6lQLvUrrqcjhkCTHbBHZnDngipmpkqL0oOfrPUUQBR6WLO2Je4dNM4RoHKZlbQBtT
+	 Lr9gQYeN6JwCowbwzpH9LhM6ZZM7EmiewJiVyZDwpWEONy+1rBOQiziqYHylnQPaQhTAZ
+	 UUIcUbf1lztsUmZVJ6ZVuq9CSSSHExlp5pUJJfNBQfbopwBSpuGNhWBKA9ePhTZs1KbPk
+	 T/g4sJmyqEfwuHMmKGq92mDHdOGkSC7D4o5ml0HeckQUfwKrkQkc3iUBVzx/M7LEwtw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=I2no4Ktj;
-	arc=none smtp.remote-ip=209.85.215.181
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=GsN5aGJU;
+	arc=none smtp.remote-ip=209.85.215.180
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F209C6075E34
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 17:23:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F209C6075E34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCE360A260C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 17:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3BCE360A260C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=I2no4Ktj
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-cc758830601so1861350a12.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 09:23:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=GsN5aGJU
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cc758830601so1861367a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 09:23:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1794590627; x=1795195427; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1794590628; x=1795195428; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/RNmK3ONZ7a2UgUSLxXT70l1Ir4lgX9TSPw45HND/f8=;
-        b=I2no4Ktj7bqWbpO9tlz5Q/pO4ZsFqf8hCHtrbJwJ5DPP34u8n3u5JCdOvGuUyZ0ln8
-         kyNhOOh/bX7tkIqTP2e/TyxhCJ+cTG4i9xoMO7YyaWx6ehMYo78TEMospbmXvh+3LZWg
-         08Wj1E8Nw9xurYOfcHxiMXA4qLtBH6hql1JWj6avox2t/E4+8+9vJVM90D9u0qJVTzJG
-         eGB8lmjLdLi9wyl1cArtkFv7SBWpQke/ayJrALvCzTaqCXB2GAkFVrNgttKxb5aXV7YZ
-         qGlQxlC6bZut4dplUtxJHUvMyT29Dbo15FaFmetrIunDR200HrG5wyViiD72+mqFx4XM
-         5vpA==
+        bh=k7Y7vqGa80cawwwxSZovqIQGbKG+YqWbNOxNZfTga5I=;
+        b=GsN5aGJUO7qzJDMFWRS/CSJldQJnZdZGl12ZBu43Q/1DjsUp9vYgPM9JmpWfGXqw5m
+         6CppFLhkXXNyzjF1aSTZuBC6hjyjd2BcRnaVcjDjugFagV35KZkXrvU3UPc1AIJcQUWl
+         +YahIRP+Y+ZSyI/lFhxjG4FnVREKHSjgX/5TDrJ2P3Ex4xkg/fGIiH73p8o+i1ucSzUP
+         Figu/KhkgwO99gDpXfrCVteNEGNibUojIfiTVtLPZqORIbScEvPZNjS3gsdeylCAvrky
+         z/RM6m+4T1dcI6TyFWKIdMusIORBkaG9G+s442mmI7S6xpk79ibkl7wQYLw3AVM6CsEs
+         tveA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794590627; x=1795195427;
+        d=1e100.net; s=20260707; t=1794590628; x=1795195428;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/RNmK3ONZ7a2UgUSLxXT70l1Ir4lgX9TSPw45HND/f8=;
-        b=B6S3l+Z4z4BzBH6t2Impz6jf44JJ9huPtBLpxdJo958WrKuMMTA36omcxd5CyyF//o
-         euiqL1oX6ehHUMJkiOSP62SnohUHb3z5GCzsUTeUxzORry7FVILnQCCnZGmlf0QB4RHx
-         0l7EUEV8FzTM7bwAZvf8a3960PZx1Y8vUj/m/icTH8xWPCY2sZ8KMrMluiHqvXPVmKOV
-         018g0r2pfMW68TbHWxL/ls0XmOnrWQUBU37+Gicbv9c9LibdxCYJuN8wKGxsBx9n58Sy
-         aNj6ix4yFADg5q4L4BXl4QlwSFRTCgAc45FH5DZySG07xiyeyK8MdJoDgZjj+AiNDp5n
-         AcyA==
-X-Gm-Message-State: APuU4Z+FYpnfWjO3wO07l/+sODRDDVxNqri1wiQ40yUMgbtNFRAOdCmO
-	uKiDjd33TK/K5bLdexF38aI8gp74nR0Qd6JrKiBVziZYR5ix4dPfbCo6mdau7R1q6e7mmDfC/uY
-	iGDvwbh4qnw==
-X-Gm-Gg: AYBFou3wA4kpx4XS/sGMsY55yU3YQDTsZRS17J67fcz1YJ1PIhcOMYTqZgkd47F4Tw8
-	aq6O04wR1Y7Fef4hhmPi0EfTYHFi0+Bxo4R0BNpISeJOCo7Kx6oizoxmgPIQfyuAkd1814mQGn1
-	7Jg6iT0epiYYNoJdsRVzp1tWi7h97KdcHmMikjrU0spojzWC8pxwewXFmolXyeEOcC2HqKT9e1p
-	khSEz/qqDK59Nacg2x1GOcGdsa3mr+H91xyb1Ifez9l4cqt6ySZsJzbafi6PoT7NQMRrGcClLL6
-	9KKOnLR9ilXYBSwXJS+xu9LGR377SxJ5CBpk02tH6+oNG2S0JXoFmFFkD5sVCkDtYDx+o1Oyw5u
-	aaws8I0m9wPaI7LSXDgdxLz5DoLvJb36Qpz4Z4l+lbfJclDTHoyznhcCLXB/SzLreKnfBqqyr7c
-	7sOa74Zj0LWEeBb9O4d+oJyWolU/KbdUpe24VBCmHWqkEulFXHMNkvvvh/cbxGcQOHyyA617Zeo
-	dBqZmUkEyYsZ5Vn7D/sOQp3RrsbxR2VmaNWk3Cm5eb8V7sj8wjXr/c2C8LeNefeoNTEp8lPPA35
-	4P3jcgcaSDGNNTRMxWmG6jn2FyiMDXnBo9WRCAK33nrFu8r99qFDWRVz9iofwCixmppL/EQ7KSp
-	XTsgP0te1DGCg6/guL207LGcFtWgHj+yD/e75jFKwKd/qZTNZRp7BezmuM74IgQoLGuR0pYQ=
-X-Received: by 2002:a05:701b:230c:b0:1ab:fe29:5081 with SMTP id a92af1059eb24-1b5030fc6e2mr3054278c88.20.1794590626993;
-        Fri, 13 Nov 2026 09:23:46 -0800 (PST)
+        bh=k7Y7vqGa80cawwwxSZovqIQGbKG+YqWbNOxNZfTga5I=;
+        b=QT67zL0AnrjJ6k40hyW7qXP7XaP0baSuiT/ZDRY0T6HS5Wrs3pmGR145nNwAdqKzfx
+         qH17BwKvSNzquWqaNiENwo94Yle/eQ6F9aRzQe53TnAP6760UIxYg0Ymoe+HrYql1CiH
+         uCSWHSC0Zbo4OTVSVOGbMdoLHN1o7xzMReIh8xH+IjAek+Jamw87U1NtjRq87hFnxlAm
+         UUVgLYE8/W9qCjHyZCS+4a8sZ8bm60OMdE5lfwUmf2sai2ZMSxRAVGX4m6CyprdktTHO
+         R3J2Q4FxPXz2KKyZwmtn3BBkaB1wXyQJp87OpgZtZjZRI22QEXkyyrNpyCk2xnjcA4+M
+         T5VA==
+X-Gm-Message-State: APuU4Z88PbpMHKMzkhwdcEsy4tTTDVa/PuJOjTYhNZWHkVDeZ7BR6uOM
+	JhMNMC84r+1Ekpt4TiJ0YXD22MQz2/+010/LO/LZdxFh1M3qunJlAbsJjaF2sRloSGooTv0xIOt
+	5MqesUy3xTA==
+X-Gm-Gg: AYBFou0gdlFbxW/Ar/bqavsWQBKYjCcx3M0CeQRUjIwTH0tNxLl8ViN/+9/8CfM5On0
+	5eTEoCjdktdDtpk5wNwvGFao46E7PaUQCh6x3g164cdRXpBoHadxqsp+fcfeyQAnseuQzK5D3gy
+	IVBvM5dK9O6xVBVwUDa62wPQ9aPHsLR/Gu823JYxhw/PysxSzet0Tujs8EFv1EErcSLcoHtJM5q
+	FK0BdSdD56uGubd14iLLDNj7lsOrJthIGu+oEgE9601gGS+kraSyUeGAWrmLS/P6ZAmxnIQL/zz
+	RtSFaIoxQ3gx7vm4fjxM3QoC2BO0Leq1Px/BxdTWUVjfBoGm1KbmgKNQmslXfo64R9g9SRCl758
+	I15QrVg445KYF/aXwUKGTPNceXMGNK00Ix4x9mibOPWshflJ0cnp+oXdt2D/azKi2lC+0kNrpaG
+	FR6d/btQwcUaMNZqJm21kBzBsRoBodcniEm8C11lSJdEArzLUz/jzncxm8uZqWfUvmFftVMWpEe
+	sodyUnqJPmKsUujDEnZrbPQkClNLNd9SegJ0wD+zPFePIx05+CX4LsE5xa67IbIegeEK+k0lJGY
+	tKDVDayHUwgQIDqKOHBapDChgLjN0fUZNI2o4lPsMmRyNG/KRx2wgFKYCX20nAZ2OWtQEDiu2mk
+	VxsmJQkCh25aTIPSJ5PMv36kxD5oRk49ay+T29jhi59FNf1OAlPsmxBXHiSug8S6x7XMgjdjbox
+	5FueBb9Rka6q1AUhcT
+X-Received: by 2002:a05:701a:844c:10b0:1a2:2da2:b278 with SMTP id a92af1059eb24-1b5030e2b35mr3230456c88.14.1794590628172;
+        Fri, 13 Nov 2026 09:23:48 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b50316e008sm8151800c88.6.2026.11.13.09.23.45
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b50316e008sm8151800c88.6.2026.11.13.09.23.47
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 13 Nov 2026 09:23:46 -0800 (PST)
+        Fri, 13 Nov 2026 09:23:47 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ v3 3/4] bearer: Add ReadRSSI method
-Date: Fri, 13 Nov 2026 09:23:38 -0800
-Message-ID: <20261113172339.54683-4-kevin@simpleble.org>
+Subject: [PATCH BlueZ v3 4/4] test: functional: add bearer ReadRSSI test
+Date: Fri, 13 Nov 2026 09:23:39 -0800
+Message-ID: <20261113172339.54683-5-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261113172339.54683-1-kevin@simpleble.org>
 References: <20261113172339.54683-1-kevin@simpleble.org>
@@ -100,183 +101,98 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement Bearer.LE1.ReadRSSI with Get Connection Information, as a
-testing method. The kernel reads the RSSI from the controller, or
-returns the value it read last if that is recent enough
-(conn_info_min_age and conn_info_max_age, 1 to 3 seconds by default).
-
-The kernel reports a connection as soon as it is established but only
-answers Get Connection Information once it has set it up, so a call made
-right after Connect returns fails with NotReady rather than NotConnected.
-
-Calls made while a request is pending get its result rather than sending
-another one, as the kernel would answer that with its cached value,
-which a new connection does not have yet.
-
-The method is only on Bearer.LE1, as the RSSI of a BR/EDR connection is
-relative to the golden receive power range rather than in dBm.
+Read the RSSI of the LE connection from a host with testing interfaces
+enabled, check ReadRSSI fails with NotConnected once disconnected, and
+check a host without testing interfaces does not expose it.
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- src/bearer.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 109 insertions(+), 2 deletions(-)
+ test/functional/test_bearer.py | 58 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/src/bearer.c b/src/bearer.c
-index ebcdc2b4c..3cbb74bcc 100644
---- a/src/bearer.c
-+++ b/src/bearer.c
-@@ -57,6 +57,10 @@ struct btd_bearer {
- 	 */
- 	DBusMessage *connect; /* connect message */
+diff --git a/test/functional/test_bearer.py b/test/functional/test_bearer.py
+index 59ce8ef7d..3f1033b35 100644
+--- a/test/functional/test_bearer.py
++++ b/test/functional/test_bearer.py
+@@ -54,6 +54,9 @@ UPDATE_CONF = LE_CONF + "[LE]\nMinConnectionInterval = 80\nMaxConnectionInterval
  
-+	/* ReadRSSI calls waiting for the Get Connection Information reply */
-+	unsigned int conn_info_id;
-+	struct queue *rssi_reads;
-+
- 	/* LE connection parameters, only valid while connected */
- 	bool conn_params;
- 	uint32_t interval; /* in microseconds */
-@@ -213,10 +217,93 @@ static DBusMessage *bearer_disconnect(DBusConnection *conn, DBusMessage *msg,
- 	return NULL;
- }
+ CONN_PARAMS = ("Interval", "Latency", "SupervisionTimeout", "Subrate")
  
--static const GDBusMethodTable bearer_methods[] = {
-+static DBusMessage *rssi_reply(struct btd_bearer *bearer, DBusMessage *msg,
-+					uint8_t status, uint16_t length,
-+					const struct mgmt_rp_get_conn_info *rp)
-+{
-+	dbus_int16_t rssi;
++# ReadRSSI is a testing method
++TESTING_CONF = LE_CONF + "Testing = true\n"
 +
-+	/* The kernel reports the connection as soon as it is established, but
-+	 * only answers once it has set it up, e.g. read the remote features.
-+	 */
-+	if (status == MGMT_STATUS_NOT_CONNECTED) {
-+		if (btd_device_bdaddr_type_connected(bearer->device,
-+							bearer->type))
-+			return btd_error_not_ready(msg);
-+
-+		return btd_error_not_connected(msg);
-+	}
-+
-+	if (status != MGMT_STATUS_SUCCESS)
-+		return btd_error_failed(msg, mgmt_errstr(status));
-+
-+	if (length < sizeof(*rp))
-+		return btd_error_failed(msg, "Invalid response");
-+
-+	/* 127 means the controller has no RSSI for the connection */
-+	if (rp->rssi == 127)
-+		return btd_error_not_available(msg);
-+
-+	rssi = rp->rssi;
-+
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INT16, &rssi,
-+							DBUS_TYPE_INVALID);
-+}
-+
-+static void conn_info_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_bearer *bearer = user_data;
-+	DBusMessage *msg;
-+
-+	bearer->conn_info_id = 0;
-+
-+	while ((msg = queue_pop_head(bearer->rssi_reads))) {
-+		g_dbus_send_message(btd_get_dbus_connection(),
-+				rssi_reply(bearer, msg, status, length, param));
-+		dbus_message_unref(msg);
-+	}
-+}
-+
-+static DBusMessage *bearer_read_rssi(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
-+{
-+	struct btd_bearer *bearer = user_data;
-+	struct btd_device *device = bearer->device;
-+
-+	if (!btd_device_bdaddr_type_connected(device, bearer->type))
-+		return btd_error_not_connected(msg);
-+
-+	/* Calls made while a read is pending get the same result */
-+	if (!bearer->conn_info_id) {
-+		bearer->conn_info_id = btd_adapter_get_conn_info(
-+					device_get_adapter(device),
-+					device_get_address(device),
-+					device_get_le_address_type(device),
-+					conn_info_complete, bearer);
-+		if (!bearer->conn_info_id)
-+			return btd_error_failed(msg, "Unable to read RSSI");
-+	}
-+
-+	queue_push_tail(bearer->rssi_reads, dbus_message_ref(msg));
-+
-+	return NULL;
-+}
-+
-+static const GDBusMethodTable bearer_bredr_methods[] = {
-+	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, bearer_connect) },
-+	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL,
-+						bearer_disconnect) },
-+	{}
-+};
-+
-+static const GDBusMethodTable bearer_le_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, bearer_connect) },
- 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL,
- 						bearer_disconnect) },
-+	{ GDBUS_TESTING_ASYNC_METHOD("ReadRSSI", NULL,
-+					GDBUS_ARGS({ "rssi", "n" }),
-+					bearer_read_rssi) },
- 	{}
- };
  
-@@ -404,6 +491,14 @@ static const char *bearer_interface(uint8_t type)
- 		return BTD_BEARER_LE_INTERFACE;
- }
+ class Bearers(HostPlugin, EventPluginMixin):
+     """
+@@ -206,6 +209,22 @@ def conn_params(host, remote):
+     return dict(zip(CONN_PARAMS, map(int, values)))
  
-+static const GDBusMethodTable *bearer_methods(uint8_t type)
-+{
-+	if (type == BDADDR_BREDR)
-+		return bearer_bredr_methods;
-+	else
-+		return bearer_le_methods;
-+}
-+
- struct btd_bearer *btd_bearer_new(struct btd_device *device, uint8_t type)
- {
- 	struct btd_bearer *bearer;
-@@ -426,10 +521,11 @@ struct btd_bearer *btd_bearer_new(struct btd_device *device, uint8_t type)
- 	bearer->type = type;
- 	bearer->path = device_get_path(device);
- 	bearer->disconnects = queue_new();
-+	bearer->rssi_reads = queue_new();
  
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					bearer->path, bearer_interface(type),
--					bearer_methods, bearer_signals,
-+					bearer_methods(type), bearer_signals,
- 					bearer_properties,
- 					bearer, bearer_free)) {
- 		error("Unable to register BREDR interface");
-@@ -459,6 +555,17 @@ void btd_bearer_destroy(struct btd_bearer *bearer)
- 		bearer->connect = NULL;
- 	}
++def read_rssi(host, remote):
++    """
++    The RSSI ReadRSSI returns for the LE bearer host has for remote, or
++    None if the kernel has not finished setting up the connection yet.
++    """
++    host.bearers.call(remote.bdaddr, LE_INTERFACE, "ReadRSSI")
++    event = host.bearers.expect(
++        (f"{LE_INTERFACE}.ReadRSSI:reply", f"{LE_INTERFACE}.ReadRSSI:error")
++    )
++    if event.kind.endswith(":error"):
++        assert event.error.get_dbus_name() == "org.bluez.Error.NotReady"
++        return None
++
++    return int(event.values[0])
++
++
+ def connect_le(host0, host1):
+     discover(host0, host1)
  
-+	if (bearer->conn_info_id) {
-+		btd_adapter_cancel_request(device_get_adapter(bearer->device),
-+							bearer->conn_info_id);
-+		bearer->conn_info_id = 0;
-+	}
+@@ -283,6 +302,45 @@ def test_bearer_le_conn_params(hosts):
+             assert host.bearers.get(remote.bdaddr, LE_INTERFACE, name) is None
+ 
+ 
++@host_config(
++    [
++        Bluetoothd(conf=TESTING_CONF, args=ARGS),
++        Agent(capability="NoInputNoOutput"),
++        Bearers(),
++    ],
++    [
++        Bluetoothd(conf=LE_CONF, args=ARGS),
++        LeAdvertiser(),
++        Agent(capability="NoInputNoOutput"),
++        Bearers(),
++    ],
++)
++def test_bearer_le_read_rssi(hosts):
++    host0, host1 = hosts
 +
-+	if (bearer->rssi_reads) {
-+		queue_destroy(bearer->rssi_reads, bearer_free_dbus_message);
-+		bearer->rssi_reads = NULL;
-+	}
++    connect_le(host0, host1)
 +
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), bearer->path,
- 					bearer_interface(bearer->type));
- }
++    for host, remote in peers(host0, host1):
++        wait_until(
++            lambda: host.bearers.get(remote.bdaddr, LE_INTERFACE, "Connected") is True
++        )
++
++    wait_until(lambda: read_rssi(host0, host1) is not None)
++
++    # Controllers report the RSSI of a connection from -127 to 20 dBm
++    assert -127 <= read_rssi(host0, host1) <= 20
++
++    host1.bearers.call(host0.bdaddr, LE_INTERFACE, "ReadRSSI")
++    error = host1.bearers.expect(f"{LE_INTERFACE}.ReadRSSI:error").error
++    assert error.get_dbus_name() == "org.freedesktop.DBus.Error.UnknownMethod"
++
++    disconnect(host0, host1, LE_INTERFACE)
++
++    host0.bearers.call(host1.bdaddr, LE_INTERFACE, "ReadRSSI")
++    error = host0.bearers.expect(f"{LE_INTERFACE}.ReadRSSI:error").error
++    assert error.get_dbus_name() == "org.bluez.Error.NotConnected"
++
++
+ @host_config(
+     [
+         Bluetoothd(conf=LE_CONF, args=ARGS),
 -- 
 2.54.0 (Apple Git-157)
 
