@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1794588821;
-	b=VVMdKt2hDxWMhvyyo4mkCFocyj8K0Yh6N3evT5icX2Gg64cJknO3NT7XZ6kZgWNXWPNI
-	 1Qc3cD7Ny83z6dv6GPb9s140ihCtGhyUezKOLRklGzs9H/ngJBQ49v6MXlP8xc8cDxg0x
-	 g7rFnBXMLQDz4RZrGrAewxHkYHgWMp/xXGm1gN9ixlrAKx0q0OdHemBQubv9qTcIuiF5E
-	 hjIM6bCUDLVe+oUeAk+mW11B6UYVV92Zfqk1y3yBzQnOKR6cLr94QLdzqANLlI83rFwmz
-	 kTv7vTGm7aJYy/osA0niza14a/n1myJ/0S4bCOBCoW3gG1/T0BVJtdXpPH/K3A8zi3Q==
+	b=WykV+RzcVZQXNui1YSg+M8qC/BZJVnYh7sI3yJxt16eLkiYq8tuNfJ0GEwtqn7MKN3eb
+	 iOO8RWXUAyWJ+2/09tbbNUd3Z6hZ5j9jJ2+WzQU7rbDO3qSdvZyefvIJLU8J3SxAT3aHy
+	 Ws0X2ymuEGmjsj0IvOVr7Yajd6ic4nbc2gZwk9Ri4XzYYtK3aFFLEGo3vmsZ/xikaa1ZS
+	 rIhtSXb/5zp5nTCzspvLrtZZ7Y3UAgBYXGsJH8bdGHerDPImxUkWlJ3nLXfKOZeC6Ghns
+	 uzYnt+/StIlbxxXFu6EY8YkARkpa8NDHHhMym/HdCO+4n+jPty2j2PY+UF2bJc8sWIA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794588821;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:References:In-Reply-To:To:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=LBbzLDMi3tUpJWb9FAQ+FK8k0XDL0E1xorOpMlHneUs=;
-	b=3EKkyO33r1eaZA+wfJYWyUayHNddFX1Vaf0WXPlNQ1jISF71fWhqN3MIJBlsHJuLaXKu
-	 XH5mzXtaLPreFBdNS1m0Iovr0rK33CghVYnl3jwcCKBH8EKXWbdsaqLAe9MpqUtv8mm0X
-	 0hE86Blr4ZyCtF+vSBvNRo+2SQ6sM6XetBhMIfEspLCjY+LBMFeJEWcwlG1Gkq6iqh7RF
-	 5y2NBQ6cbTt5Ym9yD46hkDW9l71Y14tAD1VqpUt+8C1fUhdvJMiXVnngOmnUxy3yEyP89
-	 0R+NwIu/GuNQP+3LTfbpmh12HKjL0GTqenoWT0aJZBgq+AOSM3wRBOy1yHSOVHcRJ+Q==
+	bh=gJ2RbXESB5NrWF1kq5b5d5yUoxdyfWBl1b67Pb3MGDg=;
+	b=i1vFOkfSgC9yjjw0vY18gLYYPmDMRsiJS4N3zI/lXXMEOgxonRv3j1LGkRr1E1v295rW
+	 04ovRa6joRAUL61EAF5YVwG8i+ZfpqyTr2TtV/V4A8Kzq7PmWj+z8l62xtkUTUjvfQg/4
+	 4zgakKZLPXbyP4xTLVDQDUtwG5U6GtVnkMtWVF9eU2/gu1J/TYgFrbcV52819uNfb6kYB
+	 p6P0D4/i8WbH2jz6JPItrm9Yj41DOU+YgbhKjLbx08PiUA99kevOesjW1be47CKlrxZjN
+	 pX58LTMHOJ2Orx6flM6kYBZmYM1aEAkACJhoqSL+EAPamRaZ8PVqX9aGPZ2zt4OCS+A==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="nS/PqsEf";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZGUeyfpG;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2516606D602
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7585606D608
 	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nS/PqsEf
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZGUeyfpG
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
 	t=1794588821;
-	b=q+whi2r4ov6yviWJxUmGDFnzbPJdiu+ZwF6OWMC9KLSalhkg+UQx3QZB35Zvi3PoQ9TF
-	 enIYSU5E+MsE4e6EleV7IhE/Shm3TMpTkPDOpfF9ttt3cIAU4ZnRegdo8gmZaAWbbmJCt
-	 tMGx7jzs/3Y5mbNri0iwZQEh9d4LmrbNuktCdjlAYapbHl78RX/ZRfnFmPTCtCVXOv1s0
-	 CKXWUmBqiilr95bEVTmIS9Gx/rmS1UzQJMjujyKD4FBS+JFs0uOjjAYC8WZm89JWepFjl
-	 MuvtntvzahAkGiRzkSyjyDqwG7V/o9xCkaaxwFxgD/elg8H/0RszkFc8f1Z9E3OaoBg==
+	b=FdnZ24pCMomF5Zr/QHS512n3PRHSaMKHKLMPRrm/8D7RXRgcJauPNu0UdamrbGJFviFL
+	 qLy8pS5eGa74Pg7clT6sGk6Y5+B7F29T0YASNrwJwex1Z4JCWOgspi8i0uE7IcbRkvfec
+	 ucYXu2CZ2bvwftRBgZUxjEd/AKsRex6kqFUg9n4fi5ncciNYSoGOYH9NNChcMHZFy7DdB
+	 ZdB+XYiT68J1GhEZkg2DPSi1bXql4lVprWi/NAl7Fb2khF+O4mCzYlX8fXRUXC7tQWjlR
+	 YDl57bzOCNKZBjQv7UOofHWTkeG565GootIANZ7TnuYmGsHrKuBZaPCTWGaXeWWpkbg==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
 	c=relaxed/relaxed; t=1794588821;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:References:In-Reply-To:To:X-Mailer:X-Developer-Signature:
 	 X-Developer-Key:X-Endpoint-Received:X-Original-From:Reply-To:
 	 Content-Transfer-Encoding;
-	bh=LBbzLDMi3tUpJWb9FAQ+FK8k0XDL0E1xorOpMlHneUs=;
-	b=buGO0F2cxQgKfkJHPNqoPNVzXyl+pd6+qqjy2a/tEXKV1mgXuQXuA2yxB9hpgjsmHRFg
-	 UBXEVDlGbEwXbbetB/fHeqXFu277n8horUXhiTrVjqyrJw9J4cgE3y1PXecj2nfuo7r97
-	 XL6WvrpaaudaMfXAEKbzFRbVgW5I2KsuxX2WvaDbF9I1Joho1mkglbbKiYPgeSAmDjhfJ
-	 eokZK+oM4kkD+Lc5yVXuzg9M4I7YeHYVOwtN27cQDB/s0NNEn5sKINEJXLjSuHBIoyzwM
-	 Mepx6DWymz9UtolQmc+QSYeLrDr/JmUXmSJOqN3MdlnLg5MPX2N3p9QwtxE/45QeV0Q==
+	bh=gJ2RbXESB5NrWF1kq5b5d5yUoxdyfWBl1b67Pb3MGDg=;
+	b=wJhWBfa8kC3UsWVFTTpArZK+hEzxpkF1ZRO/LHGMtqDlzLHvdxIsSN0fciEb5fXIcI6s
+	 tUVH4HFQVFZVwhTymRSpKyJ83nNmLoaePECSkIrIKfuNhtGE2Cxj80RoQ58FTgKNaZXow
+	 QRzDSEPckJWnOj8wNBDEZvmt/CMFmtJZFw8RAqRg3iRIkMFBIMwnKWwsdxtyPRMB9/f30
+	 n5Mw7f7NyidF7auU+pjAzG6zK9zLyZZZgbquTFZCzV+UlAliyYwTAOf5oonmonC04rHWD
+	 OvlES0Fuwg6WLyos0/iv3bqkawja0FxP4fQF/3uZA/yze/k5gg6zqWdKEotv6JNbWMA==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id DBFF21F000C5
+	by smtp.kernel.org (Postfix) with ESMTPS id E4C5F1F000C6
 	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1794588821;
-	bh=LBbzLDMi3tUpJWb9FAQ+FK8k0XDL0E1xorOpMlHneUs=;
+	bh=gJ2RbXESB5NrWF1kq5b5d5yUoxdyfWBl1b67Pb3MGDg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Reply-To;
-	b=nS/PqsEf3zUlaZp+SyltH3SZPn4RJEO2h9mg9wrCnURfKerNz7Pw+KYJ68paYg38P
-	 /frOtPs7nxQXf6P2LLb3LEotZK5HvSM+b+DwYSCtflLIdFOP8snky5Mlz28+WioRhl
-	 sENSJ1W9YCZcGbenAJsIo/Wk8CqL1Fxy98NY3YyGrYVvIOfXDSHTSre15NJXT90F7N
-	 +OrkToJ9M3B08zqexef8cctKE9ziMpCOaCWNthG/n0UZtwc6dr485Qv1ZHR7pCbldR
-	 VKi7DyUMJ7v7vJJ0KrFO1XBfn89kEZVPIUllmrK4VXWFjgtrcKnZ4YKtImohn9092r
-	 IpgPR8h8AnplQ==
+	b=ZGUeyfpG8DsC0LV8cr6KD4dTnsUG8B+mO6Zc/kk4yK302vF9STK+BLXI7JJskLbD1
+	 4lE5gzTvKWb95Y1gITI1WKqGn2zT11puWe3YCSFmo5s699SXxc4eMUzNgKSGSR0gwS
+	 D8rEPtBvqVaOcx2SkXrC5aTxvKBIchfkQ5asiK0mk0ZjyhCRuh/l5Y2UkS41aOJhDz
+	 pwfQIxCD6rItk6Et9tHvtNkGCd4VJM89gtHQkNgbCMjczNNQEgsENNqUfUpdzYl8yc
+	 RaTIcrId1j7w7vzoI3/Jgga+2FAtHsVLVhm8lALvZcWhBil82rYUcJl9rb6OwVvKIb
+	 qnQiLfiL2ad0A==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 5BEAD499FB
+	by lkml.kernel.org (Postfix) with ESMTP id 6D883499F7
 	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:40 +0000 (UTC)
 From: Marian Poltak via B4 Relay <devnull+marianpoltak.gmail.com@kernel.org>
-Date: Fri, 13 Nov 2026 17:53:40 +0100
-Subject: [PATCH bluez v2 1/2] shared/gatt-client: Fix init when Service
- Changed lacks Indicate
+Date: Fri, 13 Nov 2026 17:53:41 +0100
+Subject: [PATCH bluez v2 2/2] unit/test-gatt: Add Service Changed
+ registration tests
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,16 +84,16 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261113-svc-chngd-notify-only-v2-1-e07cc198f32b@gmail.com>
+Message-Id: <20261113-svc-chngd-notify-only-v2-2-e07cc198f32b@gmail.com>
 References: <20261113-svc-chngd-notify-only-v2-0-e07cc198f32b@gmail.com>
 In-Reply-To: <20261113-svc-chngd-notify-only-v2-0-e07cc198f32b@gmail.com>
 To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794588819; l=2178;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794588819; l=3061;
  i=marianpoltak@gmail.com; s=20261112; h=from:subject:message-id;
- bh=1/TTqObs78ywj9niQGB3b4pnlfDX7RjHY1NjRlkW48Q=;
- b=YhT2CvZTV1HFWzD1xmJFdXb2XhFWwwJ/gg0jZmbcXGPSDww0BbPWBR+ktmzaipSCVVWyVi60o
- HPR+cK1f7UVCGuvB39gzMFEIZNBhgE8pWjfSm28YpRV8xTasu2jsTiv
+ bh=AWuuhQZCzmugPiIPFZIXU2E6nWv6JH4eaEXPdPqyg2A=;
+ b=iBOIE7PGFkH3fEL+FXbptbVWX+c1N2pq0MxWrOVrishzteKby5qTSVojmtlOXcPg28YaQQk6J
+ 2it4nAw46XmDtC/YmQdohDb1TNv9apiixDoLGcMS1GTiTzoGxgLq/J9
 X-Developer-Key: i=marianpoltak@gmail.com; a=ed25519;
  pk=VPxSnAMaNkyjfVbKo8tQ1gFPwqOoZoPqtVZ8znSiAiA=
 X-Endpoint-Received: by B4 Relay for marianpoltak@gmail.com/20261112 with
@@ -104,62 +104,92 @@ Content-Transfer-Encoding: 7bit
 
 From: Marian Poltak <marianpoltak@gmail.com>
 
-register_service_changed() requests indications explicitly and
-register_notify() rejects this when the characteristic does not declare
-the Indicate property. Some devices, e.g. the Aqara Presence Sensor P2
-in Matter commissioning mode, declare Service Changed as Read | Notify
-only, so the client initialization fails and no services are exported,
-although ServicesResolved is set.
+Add client tests enabling Service Changed when the characteristic
+declares Indicate, and when it declares Notify only.
 
-Request indications only when they are supported, and otherwise pick
-the CCC value from the properties as before.
-
-Fixes: 52fdca35b8e7 ("shared/gatt-client: Allow registering notify with explicit CCC value")
 Assisted-by: Claude:claude-opus-5-5
 ---
- src/shared/gatt-client.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ unit/test-gatt.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 7bebc50dc..ea9f7167c 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1887,6 +1887,8 @@ static bool register_service_changed(struct bt_gatt_client *client)
- {
- 	bt_uuid_t uuid;
- 	struct gatt_db_attribute *attr = NULL;
-+	uint8_t properties;
-+	uint16_t ccc_value = 0;
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index bf6074107..06c9505fd 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -303,6 +303,25 @@ struct context {
+ 		DESCRIPTOR_DISC_SMALL_DB
  
- 	bt_uuid16_create(&uuid, SVC_CHNGD_UUID);
  
-@@ -1898,6 +1900,17 @@ static bool register_service_changed(struct bt_gatt_client *client)
- 	if (!attr)
- 		return true;
- 
-+	/*
-+	 * "Service Changed" shall be indicated, but some devices only
-+	 * declare the notify property. Request indications only when they
-+	 * are supported, otherwise let register_notify() pick the CCC value
-+	 * from the properties.
-+	 */
-+	if (gatt_db_attribute_get_char_data(attr, NULL, NULL, &properties,
-+							NULL, NULL) &&
-+				(properties & BT_GATT_CHRC_PROP_INDICATE))
-+		ccc_value = 0x0002;
++/*
++ * GATT service (0x0001-0x0004) with a Service Changed characteristic
++ * declaring the given properties, value handle 0x0003 and a CCC at 0x0004.
++ */
++#define SVC_CHNGD_DISCOVERY_PDUS(props)					\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),\
++		raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x05, 0x00, 0x0a),			\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x09, 0x07, 0x02, 0x00, props, 0x03, 0x00, 0x05,\
++				0x2a),					\
++		raw_pdu(0x08, 0x03, 0x00, 0x04, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a)
 +
- 	/*
- 	 * Register an indication handler for the "Service Changed"
- 	 * characteristic and report ready only if the handler is registered
-@@ -1905,7 +1918,7 @@ static bool register_service_changed(struct bt_gatt_client *client)
- 	 */
- 	client->svc_chngd_ind_id = register_notify(client,
- 					gatt_db_attribute_get_handle(attr),
--					0x0002,
-+					ccc_value,
- 					service_changed_register_cb,
- 					service_changed_cb,
- 					client, NULL);
+ #define SERVER_MTU_EXCHANGE_PDU raw_pdu(0x02, 0x17, 0x00)
+ 
+ static bt_uuid_t uuid_16 = {
+@@ -2507,6 +2526,18 @@ static const struct test_step test_notification_1 = {
+ 	.length = 0x03,
+ };
+ 
++static void test_svc_chngd_register(struct context *context)
++{
++	/*
++	 * The client is reported ready once the "Service Changed" CCC write
++	 * is queued, keep the context running until the PDUs are exchanged.
++	 */
++}
++
++static const struct test_step test_svc_chngd_register_1 = {
++	.func = test_svc_chngd_register,
++};
++
+ static void notification_short_cb(uint16_t value_handle,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+@@ -3736,6 +3767,28 @@ int main(int argc, char *argv[])
+ 			raw_pdu(),
+ 			raw_pdu(0x1B, 0x03, 0x00, 0x01, 0x02, 0x03));
+ 
++	/* Service Changed with Indicate: indications are enabled */
++	define_test_client("/robustness/svc-chngd-indicate", test_client,
++			NULL, &test_svc_chngd_register_1,
++			CLIENT_INIT_PDUS,
++			SVC_CHNGD_DISCOVERY_PDUS(0x22),
++			raw_pdu(0x12, 0x04, 0x00, 0x02, 0x00),
++			raw_pdu(0x13),
++			raw_pdu());
++
++	/*
++	 * Service Changed declaring Notify only (not compliant, seen on
++	 * real devices): notifications are enabled instead of failing the
++	 * client initialization.
++	 */
++	define_test_client("/robustness/svc-chngd-notify-only", test_client,
++			NULL, &test_svc_chngd_register_1,
++			CLIENT_INIT_PDUS,
++			SVC_CHNGD_DISCOVERY_PDUS(0x12),
++			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x00),
++			raw_pdu(0x13),
++			raw_pdu());
++
+ 	define_test_server("/TP/GAN/SR/BV-01-C", test_server, ts_small_db,
+ 			&test_notification_server_1,
+ 			raw_pdu(0x03, 0x00, 0x02),
 
 -- 
 2.56.0
