@@ -1,57 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=2.228.72.60
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794562507;
-	b=I040G8G5gkoC7J4iG0Lk9iNFp2wL9Oe9AVkotcRRQI4yVR5ZhNmh3lKSz9S+ZsEefcPC
-	 Zl6JfLkrP3JDCP9ICpdLxwXmeJFeMuK6pHcHqLSsBA6Ye9c3by6Ph6zC6clAuqcBDK6v4
-	 qsAMvspcwP/SSptnZ/0wWwcdzgD8UPPPSphOO60Pi0EJeXGkkr8rCrczzRpuC0OSP3RCG
-	 O/hOPZoNsaggXbhsRkDMq6Kil+z19LTIHR53RcGFwqIDX+koI8/JAr6rLdcUrcWUTb41L
-	 Z+cHkK6LhsANFq2FYV7AKI4dmZCayPIDRbc9KmGszxp+NRRCkB0AT7kB9Xr81IUSYpg==
+	t=1794566664;
+	b=3IiA5jQXSl5vMmtAcTwHf3lCKvo2zl/URuteV+R/WhSdM93IZdi3jSGp3jv/7CwlR7iI
+	 YpQ3lwP6mmWmaa9bJfBWcW0EZzGljwqi3BI7P1jqMsvGG2uXIznWNUgmjI0RZpIsnTQOw
+	 2c9px3aLVPAV7g8jE+QoERI91Yo/0kfl4pg5eKvZMpnpUfhtUWCUF8zt1Hno5qf62TOE3
+	 H/UHyvpdIkSH76bK2hj6bSyM6MfM3V+asiCblno08he34WYHfwp8YhQS4cOzL15fGaXUo
+	 ZpoG6sxHWUM0kNrmQjiL86xTS5riZ0GlJWqCnDh636zWHmuaA+2eWskLGPqoGmpAgTw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794562507;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=KZ6fswn3l/a3uVRqxwf9XZvixk3FRu6gwFdvV+FhYfw=;
-	b=5YOmcRp4Cwb2LK26qu/9nA6A06SaAV2WPyjCunZRCRkAdRWlmPzSls+IG7PIAEwGoeK5
-	 o85uXfEuXm2Dlb0OZMFSi8sb5jNs9Fs4bFY4nLyP/znHSxwzGCWdVnldhkYBgGgKXKly3
-	 Ly1AvUFjrtfDGL/c/10RM6WZsazLvNjUVeMp7zO+h9wh0T2HFj13gt1Ras1QOTzwIpO7X
-	 ZQ1EeC7QBzMkkDbmnQZeemtakkjI0bfwony+GaEy3lOyXP9kk9I0xeBqsQV1m4RQeP86I
-	 OQ/djTPRN2ZXPE0qGr1nO7KRfrONIV4WfuH/lkr8iskQBujw8b3RiwRfAHuHr/BGptw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794566664;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=pkkkulZhiwuEfTgVNOuoQi46HDKEcp+5pFbAQV0uMu0=;
+	b=N0ceMXWKmuDOS9l1DCV4vE+zQsvSGD/uhw0A90pLdxsGvvZwJ0MpH41uehp2Gy2mVx9I
+	 W2KkCLl4cJMuS7DUMcjeWTpdR62RUAVhNpmka86z6snBhyKZ0IKGEDcYl902ndMl6Hi5X
+	 X7sQJda06upekmhe2wDXqFT9kZ8Idp0jWhfgTQJ5DQjtKVT9X+xuIPrgU3beNjEo6nijX
+	 VaR2nq8JVCj9j0vvne2WCntfOzgF5Kp7UKBEjljmJJfSXFokRAXlfRzc+GHw/ru4vpd82
+	 hf6e+jMW0u8FlDaAB9w3T/eMvUS0IB7U+1pyOBkgF+Sez1UncdTu/sFz8kxbZcjOO6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=codewiz.org;
-	spf=pass smtp.mailfrom=codewiz.org;
-	dkim=pass header.d=codewiz.org header.i=@codewiz.org header.a=rsa-sha256 header.s=mail header.b=jAhFMPWN;
-	arc=none smtp.remote-ip=2.228.72.60
-Received: from morpheus.develer.net (morpheus.develer.net [2.228.72.60])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=z1NXCR3Y;
+	arc=none smtp.remote-ip=74.125.82.179
+Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B565606A33D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 09:35:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B565606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codewiz.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewiz.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19F7606A31C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 10:44:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C19F7606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=codewiz.org header.i=@codewiz.org header.a=rsa-sha256 header.s=mail header.b=jAhFMPWN
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codewiz.org; s=mail;
-	t=1794562504; bh=1e4lQ3TvPUQc/Ggc07tFEYmZmM4K/klR7UEWQco6jJ4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jAhFMPWN8CxfxxY8NmKp/6kHj2DllQqJWzJh2onI/Lf/UboTPOcrJFQwLZdXIHxw6
-	 ryFo+OEUqE7D18B8mbfjpdofBZWnYYBmuxgQSKQ7gndyi1e7wiQBwHXyzM3yxcs0KP
-	 y0n7+0fzN1zSxlsOFPH096/FbuVAlba2yO7eQigo=
-Received: from giskard.lan (unknown [IPv6:2404:7a80:ff26:6c00:fb7a:abd8:86ed:512c])
-	(Authenticated sender: bernie)
-	by morpheus.develer.net (Postfix) with ESMTPSA id 32A03247D82;
-	Fri, 13 Nov 2026 10:35:02 +0100 (CET)
-From: Bernie Innocenti <bernie@codewiz.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Bernie Innocenti <bernie@codewiz.org>
-Subject: [PATCH BlueZ 2/2] cups: Port printer discovery to the ObjectManager API
-Date: Fri, 13 Nov 2026 18:34:28 +0900
-Message-ID: <20261113093428.2971436-3-bernie@codewiz.org>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261113093428.2971436-1-bernie@codewiz.org>
-References: <20261113093428.2971436-1-bernie@codewiz.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=z1NXCR3Y
+Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-33bf40b0c8bso289266eec.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 02:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794566663; x=1795171463; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=pkkkulZhiwuEfTgVNOuoQi46HDKEcp+5pFbAQV0uMu0=;
+        b=z1NXCR3YU+GcF2GYqpz6eY+Qi8ne0Ckj3anlBl4gNtRr/bjbDfhcf9hM7kr1DbzZDV
+         As0QIBMGZy0fqLY1xlwG6Eecc+g9DCcSuql2MWDizaMQvejElP07/1GOejE6ypTJkB0N
+         t8jTkpJI314xqNinpUIeHeYuJqeQozryZSoywonO0bX7yK4SSizqHT4Q4V34utfu1J1F
+         kJCW2e3MmhcqUnuYxZfjo/gQgLopoSQTiT50XxSy08dUShqmRuO6hVtWLbRT3bupV4Po
+         wvZtR+80NY+8GOGwurApMojhqGqa2Ajh8K9y+DFx9Zd9OxDHjRcD15js6EhxnQ+kmNnA
+         d6aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794566663; x=1795171463;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=pkkkulZhiwuEfTgVNOuoQi46HDKEcp+5pFbAQV0uMu0=;
+        b=wac16fF0XQCnkqIZMQTQP8HeWfNrO1rONZ/nzTapvYVMUynY3/SQEgappbD4zXMfG0
+         EiQn+/k7+XVEaraIQynDqdUe8pYyAIBU1SVX+taW3z9mJ3ArjblI9IfTZ1SX/6wV1RED
+         nRTu+Pkb9nqy6kPiZGmFYfhPCzAkchMe0D94B32kCOfTOO53RQuuT84EGlQ/V9S7Uq3H
+         VwukjMGL0L0QAL20CFucjIBL1+Edd97SH07yiR689wh0vmyAr/+acVFFK1EMA++07tTn
+         UpSzDvZ4p4mdp9RNCZ6l5HN89PRHMdtw5PbiFs+gTthTz2uLvb+7ayKHQvK/xnN20ET4
+         681g==
+X-Gm-Message-State: APuU4Z/ZBO9urghUSoZnSI4lZ1bjcXT9hLDH/ZvtDVDNFdxOwqUlE1gj
+	WZ16GnXqa/je0rN3Z5WhP+RSU8WVU05hosmST88cfeNe31ECKB+iRkiX67KqaA==
+X-Gm-Gg: AYBFou0c+Z9n9kzGbm1TJRNI3NsDRB5n+PSEmZrF0hR7DNDusVmEXoIL4TSgXkfVfmX
+	o/JmDt+K6VeZUVPvKGddOO7ajVZWuyHFNlBKdBXl2qScWQBIH9GtDpVP10mocB/iLwqn7rjuuES
+	Pb0fNrAWmteWGWKo9XwouMugTpiOowAyK71qT5TRK6AldDW0XbCMYULzsPxuFixxL1+jywlP8pp
+	21Jz+add/t4ihpSAOMGdFsg7I1pHks3loB02fYBeW3FSN82y/o3ZKNyIK28pfhZJIjuaG3ocHSS
+	WdB+mdLIBnzQRo8b2uc/3xBzxTpM1MqEX6XZ6Id6bNQq/Qf8qaJ+6J/ymTs30dPaEBewhd0JWO4
+	DCGqyvCB07tKsdxYRW1g2K5a41ag8WFOMs3NCMYottLndVUXieTlu61baC/OnlhI3XTGmxwPnhq
+	XeN4nQV2G8VdhbLfJ49sWk5fPpF+H7nFuLVW84760Us5zy4E3qS5rPKRbQKBSVGFIsB77blHIDz
+	TzgVx09gFfIsaVQ9ulMeuUw2obiSX+gjgQlEWsCwcULTl+cfoH6TaKWkNZz
+X-Received: by 2002:a05:7301:1625:b0:36c:9f1a:30b8 with SMTP id 5a478bee46e88-37966c4a5fbmr1910119eec.31.1794566662756;
+        Fri, 13 Nov 2026 02:44:22 -0800 (PST)
+Received: from [172.17.0.2] ([57.154.31.55])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3795591f4f8sm6959743eec.13.2026.11.13.02.44.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Nov 2026 02:44:21 -0800 (PST)
+Message-ID: <6af6ea05.8ee6fb5b.2840dc.3b71@mx.google.com>
+Date: Fri, 13 Nov 2026 02:44:21 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2363044190985642596=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -61,507 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
+Subject: RE: Bearer.LE1: Add ReadRSSI
+In-Reply-To: <20261113051438.75230-2-kevin@simpleble.org>
+References: <20261113051438.75230-2-kevin@simpleble.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Discovery still used org.bluez.Manager and the Adapter1 ListDevices,
-FindDevice and CreateDevice methods, none of which exist in BlueZ 5,
-so the backend never listed any printer.
+--===============2363044190985642596==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-List the printers among the known devices, then run discovery for 10
-seconds, since it no longer stops by itself.
+This is automated email and please do not reply to this email!
 
-Assisted-by: Claude:claude-fable-5
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1210165/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.24 seconds
+GitLint                       PASS      0.91 seconds
+BuildEll                      PASS      13.79 seconds
+BluezMake                     PASS      182.37 seconds
+MakeCheck                     PASS      12.80 seconds
+MakeDistcheck                 PASS      103.53 seconds
+CheckValgrind                 PASS      228.31 seconds
+CheckSmatch                   PASS      180.57 seconds
+bluezmakeextell               PASS      63.29 seconds
+TestFunctional                PASS      841.13 seconds
+IncrementalBuild              PASS      197.45 seconds
+ScanBuild                     PASS      607.53 seconds
+
+
+
+https://github.com/bluez/bluez/pull/2820
+
 ---
- profiles/cups/main.c | 409 ++++++-------------------------------------
- 1 file changed, 57 insertions(+), 352 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/cups/main.c b/profiles/cups/main.c
-index bcd6d2f9f..588bd80a7 100644
---- a/profiles/cups/main.c
-+++ b/profiles/cups/main.c
-@@ -19,7 +19,6 @@
- #include <unistd.h>
- #include <stdlib.h>
- #include <string.h>
--#include <assert.h>
- #include <signal.h>
- #include <sys/socket.h>
- 
-@@ -33,16 +32,11 @@
- 
- #include "cups.h"
- 
--struct cups_device {
--	char *bdaddr;
--	char *name;
--	char *id;
--};
-+#define DISCOVERY_TIMEOUT 10
- 
--static GSList *device_list = NULL;
-+static GSList *printer_list = NULL;
- static GMainLoop *loop = NULL;
--static DBusConnection *conn = NULL;
--static gboolean doing_disco = FALSE;
-+static gboolean adapter_found = FALSE;
- 
- static char *device_get_ieee1284_id(const char *address)
- {
-@@ -85,400 +79,111 @@ static void print_printer_details(const char *name, const char *bdaddr,
- 	g_free(uri);
- }
- 
--static void add_device_to_list(const char *name, const char *bdaddr,
--								const char *id)
--{
--	struct cups_device *device;
--	GSList *l;
--
--	/* Look for the device in the list */
--	for (l = device_list; l != NULL; l = l->next) {
--		device = (struct cups_device *) l->data;
--
--		if (strcmp(device->bdaddr, bdaddr) == 0) {
--			if (device->name != name) {
--				g_free(device->name);
--				device->name = g_strdup(name);
--			}
--			g_free(device->id);
--			device->id = g_strdup(id);
--			return;
--		}
--	}
--
--	/* Or add it to the list if it's not there */
--	device = g_new0(struct cups_device, 1);
--	device->bdaddr = g_strdup(bdaddr);
--	device->name = g_strdup(name);
--	device->id = g_strdup(id);
--
--	device_list = g_slist_prepend(device_list, device);
--	print_printer_details(device->name, device->bdaddr, device->id);
--}
--
--static gboolean parse_device_properties(DBusMessageIter *reply_iter,
--						char **name, char **bdaddr)
--{
--	guint32 class = 0;
--	DBusMessageIter reply_iter_entry;
--
--	if (dbus_message_iter_get_arg_type(reply_iter) != DBUS_TYPE_ARRAY)
--		return FALSE;
--
--	dbus_message_iter_recurse(reply_iter, &reply_iter_entry);
--
--	while (dbus_message_iter_get_arg_type(&reply_iter_entry) ==
--							DBUS_TYPE_DICT_ENTRY) {
--		const char *key;
--		DBusMessageIter dict_entry, iter_dict_val;
--
--		dbus_message_iter_recurse(&reply_iter_entry, &dict_entry);
--
--		/* Key == Class ? */
--		dbus_message_iter_get_basic(&dict_entry, &key);
--		if (!key) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		if (strcmp(key, "Class") != 0 &&
--				strcmp(key, "Alias") != 0 &&
--				strcmp(key, "Address") != 0) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--
--		/* Try to get the value */
--		if (!dbus_message_iter_next(&dict_entry)) {
--			dbus_message_iter_next(&reply_iter_entry);
--			continue;
--		}
--		dbus_message_iter_recurse(&dict_entry, &iter_dict_val);
--		if (strcmp(key, "Class") == 0) {
--			dbus_message_iter_get_basic(&iter_dict_val, &class);
--		} else {
--			const char *value;
--			dbus_message_iter_get_basic(&iter_dict_val, &value);
--			if (strcmp(key, "Alias") == 0) {
--				*name = g_strdup(value);
--			} else if (bdaddr) {
--				*bdaddr = g_strdup(value);
--			}
--		}
--		dbus_message_iter_next(&reply_iter_entry);
--	}
--
--	if (class == 0)
--		return FALSE;
--	if (((class & 0x1f00) >> 8) == 0x06 && (class & 0x80))
--		return TRUE;
--
--	return FALSE;
--}
--
--static gboolean device_is_printer(const char *adapter, const char *device_path, char **name, char **bdaddr)
-+static void device_added(GDBusProxy *proxy)
- {
--	DBusMessage *message, *reply;
--	DBusMessageIter reply_iter;
--	gboolean retval;
--
--	message = dbus_message_new_method_call("org.bluez", device_path,
--							"org.bluez.Device1",
--							"GetProperties");
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
--
--	dbus_message_unref(message);
--
--	if (!reply)
--		return FALSE;
--
--	dbus_message_iter_init(reply, &reply_iter);
--
--	retval = parse_device_properties(&reply_iter, name, bdaddr);
--
--	dbus_message_unref(reply);
--
--	return retval;
--}
--
--static void remote_device_found(const char *adapter, const char *bdaddr,
--							const char *name)
--{
--	DBusMessage *message, *reply;
- 	DBusMessageIter iter;
--	char *object_path = NULL;
-+	dbus_uint32_t class;
-+	const char *bdaddr, *name;
- 	char *id;
- 
--	assert(adapter != NULL);
--
--	message = dbus_message_new_method_call("org.bluez", adapter,
--							"org.bluez.Adapter1",
--							"FindDevice");
--	dbus_message_iter_init_append(message, &iter);
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+	if (!g_dbus_proxy_get_property(proxy, "Class", &iter))
-+		return;
- 
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
-+	dbus_message_iter_get_basic(&iter, &class);
- 
--	dbus_message_unref(message);
-+	/* Imaging major class with the printer bit set */
-+	if (((class & 0x1f00) >> 8) != 0x06 || !(class & 0x80))
-+		return;
- 
--	if (!reply) {
--		message = dbus_message_new_method_call("org.bluez", adapter,
--							"org.bluez.Adapter1",
--							"CreateDevice");
--		dbus_message_iter_init_append(message, &iter);
--		dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+	if (!g_dbus_proxy_get_property(proxy, "Address", &iter))
-+		return;
- 
--		reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, NULL);
-+	dbus_message_iter_get_basic(&iter, &bdaddr);
- 
--		dbus_message_unref(message);
-+	if (!g_dbus_proxy_get_property(proxy, "Alias", &iter))
-+		return;
- 
--		if (!reply)
--			return;
--	}
-+	dbus_message_iter_get_basic(&iter, &name);
- 
--	if (dbus_message_get_args(reply, NULL,
--					DBUS_TYPE_OBJECT_PATH, &object_path,
--					DBUS_TYPE_INVALID) == FALSE) {
--		dbus_message_unref(reply);
-+	if (g_slist_find_custom(printer_list, bdaddr, (GCompareFunc) strcmp))
- 		return;
--	}
-+
-+	printer_list = g_slist_prepend(printer_list, g_strdup(bdaddr));
- 
- 	id = device_get_ieee1284_id(bdaddr);
--	add_device_to_list(name, bdaddr, id);
-+	print_printer_details(name, bdaddr, id);
- 	free(id);
--
--	dbus_message_unref(reply);
- }
- 
--static void discovery_completed(void)
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
- {
--	g_slist_free(device_list);
--	device_list = NULL;
--
--	g_main_loop_quit(loop);
-+	const char *interface = g_dbus_proxy_get_interface(proxy);
-+
-+	if (!strcmp(interface, "org.bluez.Adapter1")) {
-+		adapter_found = TRUE;
-+		g_dbus_proxy_method_call(proxy, "StartDiscovery", NULL, NULL,
-+								NULL, NULL);
-+	} else if (!strcmp(interface, "org.bluez.Device1")) {
-+		device_added(proxy);
-+	}
- }
- 
--static void remote_device_disappeared(const char *bdaddr)
-+static void property_changed(GDBusProxy *proxy, const char *name,
-+					DBusMessageIter *iter, void *user_data)
- {
--	GSList *l;
-+	const char *interface = g_dbus_proxy_get_interface(proxy);
- 
--	for (l = device_list; l != NULL; l = l->next) {
--		struct cups_device *device = l->data;
--
--		if (strcmp(device->bdaddr, bdaddr) == 0) {
--			g_free(device->name);
--			g_free(device->bdaddr);
--			g_free(device);
--			device_list = g_slist_delete_link(device_list, l);
--			return;
--		}
--	}
-+	if (!strcmp(interface, "org.bluez.Device1") && !strcmp(name, "Class"))
-+		device_added(proxy);
- }
- 
--static gboolean list_known_printers(const char *adapter)
-+static void client_ready(GDBusClient *client, void *user_data)
- {
--	DBusMessageIter reply_iter, iter_array;
--	DBusError error;
--	DBusMessage *message, *reply;
--
--	message = dbus_message_new_method_call("org.bluez", adapter,
--						"org.bluez.Adapter1",
--						"ListDevices");
--	if (message == NULL)
--		return FALSE;
--
--	dbus_error_init(&error);
--	reply = dbus_connection_send_with_reply_and_block(conn, message,
--								-1, &error);
--
--	dbus_message_unref(message);
--
--	if (dbus_error_is_set(&error)) {
--		dbus_error_free(&error);
--		return FALSE;
--	}
--
--	dbus_message_iter_init(reply, &reply_iter);
--	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
--		dbus_message_unref(reply);
--		return FALSE;
--	}
--
--	dbus_message_iter_recurse(&reply_iter, &iter_array);
--	while (dbus_message_iter_get_arg_type(&iter_array) ==
--						DBUS_TYPE_OBJECT_PATH) {
--		const char *object_path;
--		char *name = NULL;
--		char *bdaddr = NULL;
--
--		dbus_message_iter_get_basic(&iter_array, &object_path);
--		if (device_is_printer(adapter, object_path, &name, &bdaddr)) {
--			char *id;
--
--			id = device_get_ieee1284_id(bdaddr);
--			add_device_to_list(name, bdaddr, id);
--			free(id);
--		}
--		g_free(name);
--		g_free(bdaddr);
--		dbus_message_iter_next(&iter_array);
--	}
--
--	dbus_message_unref(reply);
--
--	return FALSE;
-+	if (!adapter_found)
-+		g_main_loop_quit(loop);
- }
- 
--static DBusHandlerResult filter_func(DBusConnection *connection,
--					DBusMessage *message, void *user_data)
-+static gboolean discovery_timeout(gpointer user_data)
- {
--	if (dbus_message_is_signal(message, "org.bluez.Adapter1",
--						"DeviceFound")) {
--		const char *adapter, *bdaddr;
--		char *name;
--		DBusMessageIter iter;
--
--		dbus_message_iter_init(message, &iter);
--		dbus_message_iter_get_basic(&iter, &bdaddr);
--		dbus_message_iter_next(&iter);
--
--		adapter = dbus_message_get_path(message);
--		if (parse_device_properties(&iter, &name, NULL))
--			remote_device_found(adapter, bdaddr, name);
--		g_free (name);
--	} else if (dbus_message_is_signal(message, "org.bluez.Adapter1",
--						"DeviceDisappeared")) {
--		const char *bdaddr;
--
--		dbus_message_get_args(message, NULL,
--					DBUS_TYPE_STRING, &bdaddr,
--					DBUS_TYPE_INVALID);
--		remote_device_disappeared(bdaddr);
--	} else if (dbus_message_is_signal(message, "org.bluez.Adapter1",
--						"PropertyChanged")) {
--		DBusMessageIter iter, value_iter;
--		const char *name;
--		gboolean discovering;
--
--		dbus_message_iter_init(message, &iter);
--		dbus_message_iter_get_basic(&iter, &name);
--		if (name == NULL || strcmp(name, "Discovering") != 0)
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		dbus_message_iter_next(&iter);
--		dbus_message_iter_recurse(&iter, &value_iter);
--		dbus_message_iter_get_basic(&value_iter, &discovering);
--
--		if (discovering == FALSE && doing_disco) {
--			doing_disco = FALSE;
--			discovery_completed();
--		}
--	}
-+	g_main_loop_quit(loop);
- 
--	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-+	return FALSE;
- }
- 
- static gboolean list_printers(void)
- {
--	/* 1. Connect to the bus
--	 * 2. Get the manager
--	 * 3. Get the default adapter
--	 * 4. Get a list of devices
--	 * 5. Get the class of each device
--	 * 6. Print the details from each printer device
--	 */
--	DBusError error;
--	dbus_bool_t hcid_exists;
--	DBusMessage *reply, *message;
--	DBusMessageIter reply_iter;
--	char *adapter, *match;
-+	DBusConnection *conn;
-+	GDBusClient *client;
- 
- 	conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 	if (conn == NULL)
- 		return TRUE;
- 
--	dbus_error_init(&error);
--	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
--	if (dbus_error_is_set(&error)) {
--		dbus_error_free(&error);
--		return TRUE;
--	}
--
--	if (!hcid_exists)
--		return TRUE;
--
--	/* Get the default adapter */
--	message = dbus_message_new_method_call("org.bluez", "/",
--						"org.bluez.Manager",
--						"DefaultAdapter");
--	if (message == NULL) {
--		dbus_connection_unref(conn);
--		return FALSE;
--	}
--
--	reply = dbus_connection_send_with_reply_and_block(conn,
--							message, -1, &error);
--
--	dbus_message_unref(message);
--
--	if (dbus_error_is_set(&error)) {
--		dbus_error_free(&error);
-+	if (!dbus_bus_name_has_owner(conn, "org.bluez", NULL)) {
- 		dbus_connection_unref(conn);
--		/* No adapter */
- 		return TRUE;
- 	}
- 
--	dbus_message_iter_init(reply, &reply_iter);
--	if (dbus_message_iter_get_arg_type(&reply_iter) !=
--						DBUS_TYPE_OBJECT_PATH) {
--		dbus_message_unref(reply);
--		dbus_connection_unref(conn);
--		return FALSE;
--	}
--
--	dbus_message_iter_get_basic(&reply_iter, &adapter);
--	adapter = g_strdup(adapter);
--	dbus_message_unref(reply);
-+	loop = g_main_loop_new(NULL, FALSE);
- 
--	if (!dbus_connection_add_filter(conn, filter_func, adapter, g_free)) {
--		g_free(adapter);
-+	client = g_dbus_client_new(conn, "org.bluez", "/org/bluez");
-+	if (client == NULL) {
-+		g_main_loop_unref(loop);
- 		dbus_connection_unref(conn);
- 		return FALSE;
- 	}
- 
--#define MATCH_FORMAT				\
--	"type='signal',"			\
--	"interface='org.bluez.Adapter1',"	\
--	"sender='org.bluez',"			\
--	"path='%s'"
-+	g_dbus_client_set_ready_watch(client, client_ready, NULL);
-+	g_dbus_client_set_proxy_handlers(client, proxy_added, NULL,
-+						property_changed, NULL);
- 
--	match = g_strdup_printf(MATCH_FORMAT, adapter);
--	dbus_bus_add_match(conn, match, &error);
--	g_free(match);
--
--	/* Add the the recent devices */
--	list_known_printers(adapter);
--
--	doing_disco = TRUE;
--	message = dbus_message_new_method_call("org.bluez", adapter,
--					"org.bluez.Adapter1",
--					"StartDiscovery");
--
--	if (!dbus_connection_send_with_reply(conn, message, NULL, -1)) {
--		dbus_message_unref(message);
--		dbus_connection_unref(conn);
--		g_free(adapter);
--		return FALSE;
--	}
--	dbus_message_unref(message);
-+	/* bluetoothd stops the discovery when we drop off the bus */
-+	g_timeout_add_seconds(DISCOVERY_TIMEOUT, discovery_timeout, NULL);
- 
--	loop = g_main_loop_new(NULL, TRUE);
- 	g_main_loop_run(loop);
- 
--	g_free(adapter);
-+	g_dbus_client_unref(client);
-+	g_main_loop_unref(loop);
- 	dbus_connection_unref(conn);
- 
- 	return TRUE;
--- 
-2.56.1
 
+--===============2363044190985642596==--
