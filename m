@@ -1,80 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794588821;
-	b=R1c8peqqvnQg2x37iO7CbmZb1vXfr8uRQ+IpEyHkgkMbNX/DCxXByHddk8yDQkX/JGHA
-	 tfureDieOgwd/UHvXCqbEj/nQqn5VfyadkopxxJPRkkL/EpE8kN0tTxhHxvpn9IcxI1Ju
-	 GI8A9YETtlWo0n6OFpVs3j5g3O3LKtSb34BCtVxFoFb2QU05ZKsi8gy9EBFeOdUg35tqU
-	 nZdO2AIu8iC9DRt2mmOEaf1MQqGFK3DFS6UImoQcfxn9rGMEUJhCWYNhnAPVE21Q3H+Oq
-	 apEQ1jCwjk5ZKWW9EHVRfBlZpFFt7HSKd16RcX6jbtHy12EwFxesI0Lykb1RqfTIpeA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794588821;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=ZaHO+6xbW5Ux0NtJcT3mSzVeYXwMBUX+UM/ZVbnihEg=;
-	b=ctnebOfe9dwRC2vFaxxlDoS2J19vugmzbj6UA6plauvQCkI/jbzgJrgpJSiwV/cekQVj
-	 CXVayinRHnzV8/dWm6uklCCE97OYRvG2SG3iC/edkpUf1+knRzE/YRtcKAkNwLeoSOMdK
-	 Iz8BD1LYq3/goh40wPrx5orNL9AAwPSigpELxsB8SvNFyxzsDfGwEMf2kjXMFFxldqf1y
-	 qXM6vDwOHeoC9hlU6cdlwC5q4XtavnvHzPt0+5tHx4TUDx5emMXg7pf1HikBb0vlnG0P6
-	 4Ng6wXxXFl5nQoao2I9ue3d55lxKCdPVWxYt2kpUnnKe80cOD9Jw0lgpS3VXK5qoQjQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Qp0Xn8Cx;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694D4606A887
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Qp0Xn8Cx
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794588821;
-	b=liYnMa8hvzv8ZC7oORCds+ERGPBVYVI3dgFc7/+9oMmmyDYotC79LCpu7oP6kXHuWFbz
-	 ur/cPgJntC4FxEdeaYmEz8xDwWjw74nUebwx46C243NZG0UTGUbC8wWSDMO/hvDe7ySNy
-	 f3Y23TvIAXBr0LYzE1Hwii1vPHmHRev6TXfzOL4py0W5egwObpbTPqB73MwKqkh5v1b/y
-	 OI1oKIZLWBLzkWuPUmON/9dZ6gdFtF/AWTo9j3I9M7qPfOlrJjGyMP+z8dEBJDhCkWqOY
-	 huc4KNq3+5EiDEOdzRAYgLeYhB21ZfQHwu0Fq/PfaYJ0bFk1M6aolC72GMa+OQrORyg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794588821;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=ZaHO+6xbW5Ux0NtJcT3mSzVeYXwMBUX+UM/ZVbnihEg=;
-	b=E2k1msvp5R5+PUPTJaSesUm7P5oeI5/dXQl+WoE99hnQcuO+upKMa1mP/rwWX51QjCBL
-	 4kofu8RFHtsUdA30h1nPyuNvWcujqHWeIz3gHz/6gVGqI0aVv1neIoXeN/+wkil6A1Njy
-	 LIxJyc1AKTDqqR8XmRFMmiQW0In8zE0SvShLm1uw5ekypa9a86EPQW8E6v7+IBmbRYatU
-	 xXD4lANy4fkQ6bEEBGVRlQ8dJC+GVxBepjnwSMt8uqd4aOZrdZ/fhA7DEOcQ/SazUsmx8
-	 4/zd1ZaIcz33VhXne+M5xwSHSfDKK1ggHGhxyO8bBO4uC4PWIKyo0pPXBqTQ4Jsex1A==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.175
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794589303;
+	b=4nR59jEFv9FqfwbGCc7NrrL622Kf5cuUcvQG5A6FKdY08cdU0IzMIWhiiOKFieM4B9y4
+	 NWwJvXxnhnsVAxd1ElSIT1oZ8rwdKLFannSEm7YYQdwJrJNggYOO3yYFOQlc2h1oH25oi
+	 VUnMod4wbvOS85BpxzAVN2Mkg/NnRNkG9eOxYi6TVewOB/Kf7Eu3Tyyu4C5G7nkOwkJEd
+	 8hCapYtGoq4/9pP6EgDEQvNbV328NpfjeQgiApSrqEZt2nHEhsQsWsZrKiLjYmHseKEtt
+	 6HeM0fHWI0oviMmyWmqzY/ram8/EpwjLvokNXjiZRbaIDGOuua3j6bcbecMWfQgWgZA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794589303;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=McLeS1PilJbJLEL7SUk/6jkqA0dOGmd14cP91HzEva4=;
+	b=ix5xk360FNamR3gkUGmztBeLTU764YguVHVhsSzXkcscMPghw+sLIFrkxpYjoQhTB0GU
+	 5EBBCGz6WGK9ARPdRWTQlBZV2lQ+ewiwzVV9QVVFcHo4UvXiPLxYjATk6TGSxChjfSUj4
+	 aQAr3L1TQS1Z9yeEtwymrdO+vHJPeIaYrEAjSsG6YUZ+cY9ar9QYRBdY3sBEMx6O9uLur
+	 WJrffKA4O742vi0Z8RuIGS2dOcBRNtF0GymSqAr79gwER6yvXtsOEihzPNHeulkbp/6CP
+	 y+ehZZrXSIDkIFVZ09/42eh/T7gLUenustUnjUwHmAdVeb6Ndcr1CiOCodELEMOvc2A==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=X7LmGZH5;
+	arc=none smtp.remote-ip=209.85.214.175
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id CD3F91F000C4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794588821;
-	bh=ZaHO+6xbW5Ux0NtJcT3mSzVeYXwMBUX+UM/ZVbnihEg=;
-	h=From:Subject:Date:To:Reply-To;
-	b=Qp0Xn8CxsF7Ye7XWSjnIo1S5hMIEa8n+diZjqiRYqn75J9bBenO6YPCrqKdxgavFI
-	 asPW5QvlZW4jKLPF6fJGOTe9Z+zBUbSjLZMV3yj4xNlV/a++F7PVv/IGECAi0J9O/c
-	 VTc4VEaxMV7z4eDzmdLy/WXNqG3OisArwCjQseaoXZtBLOlOpuZOig8vgVj1GztVH3
-	 vCcrAvl+QKJvksfBlzjwyES/Qsg7oOP9/yNNaU481GrTlfM5RqfpF1fuI/DeZGB2eD
-	 dTCkUa8IPI7j7ofkvnw6K1wzKTfUzuEsUFX6CxbaA+USoa1IF74lhcvwvW6Te9AQ+1
-	 7APpmj7CB2pmA==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 4623F49991
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 16:53:40 +0000 (UTC)
-From: Marian Poltak via B4 Relay <devnull+marianpoltak.gmail.com@kernel.org>
-Subject: [PATCH bluez v2 0/2] shared/gatt-client: Fix init when Service
- Changed lacks Indicate
-Date: Fri, 13 Nov 2026 17:53:39 +0100
-Message-Id: <20261113-svc-chngd-notify-only-v2-0-e07cc198f32b@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E455D606A330
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 17:01:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E455D606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=X7LmGZH5
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2e977109392so7126615ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 09:01:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794589302; x=1795194102; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=McLeS1PilJbJLEL7SUk/6jkqA0dOGmd14cP91HzEva4=;
+        b=X7LmGZH5PQ/SE5KrKAc9wky40juoLw2aQrBWVu+YvtQehOe7uNKM/aYBxe2lwVeh6F
+         oxqLJEp0+oYUmkhKWMZUmivU791FZ9YpMdy6jBOSShOSqfTeSA4ncLFNIxE5nBZoA3Y/
+         f325cM28hzUSOtzKcvNlK/z6CI5LYF31Wlr6+cJ+wrAELVkv4UTlIeJJwuPD79sJ+tPQ
+         iRtD35gpGO+vuu4Y0bmeksyy6LwmGQLkkvBazEfkdLQdTylOpJchUGyEWLqMvwMivwlC
+         nGsWd9PxLpkTYzVLe21ZGSBeqaoZ2MnXfIaBw+ZO/J/91goMIcjLzt/pRVCJP4pX2sXQ
+         RzNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794589302; x=1795194102;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=McLeS1PilJbJLEL7SUk/6jkqA0dOGmd14cP91HzEva4=;
+        b=KAU3L50ks6ZRCVLs3ZoE80H6k7xLFDEqsp20A/YtvbctF2l09FqhWbrsURh0A71Mxv
+         PI5q+tJR0V7dGqHquqF5ouz/DZRoi72W19aD1l27glibXSIQW97adEUDQVtTFFU+mOJq
+         ljWJH8oNp/1yAA4sKYJVs9a4zGnY9+Mb19kj9zhfsk+w73lTKs6zYNzfZ649YQjgG1Sy
+         YYU4gvhOohwzmiD9+L4xR8R6Uh9cnjOjbEJgUnyExZnJPNPP6wJQ62i/QxbUEtwQrZJT
+         a0jBgTq6a7P+kWsRRs6LBap8Ir60U6JX1CP4EgU/Y3a+yvVG4wllryCDWTNh4DSVD/wO
+         q2Lw==
+X-Gm-Message-State: APuU4Z9N2t1EkKX2uCS9FfqwOWO50C2+Y3lKSY0ZziBIv4wOJmiVGi1Q
+	Q9dvdKraO1Wt/MEtIaZWiALecWnVSMfbusbfaLeQcofYwR7n4bgUNyg7VP46Cg==
+X-Gm-Gg: AYBFou1M786+xSjyASKgCWztHDs6hTNLLmg4j27v0ZPi3SFbUVVgnhROkFe1T0/5CT7
+	qKCmK+oKwYBdurUf64I/aBn+N66X3yjGT7AY3HvsMm319868jZrGd37xDbrkff9UNpPJPZvZNiE
+	ESO5AeBry3Gs0krunY9aoPM8yIYMXc3oabsGsJkDNim182RuifF9/RyP4sJ+vzwF2TzhIox71Iz
+	VXN/bi7FhbzehqdOjmIgOMbfSJfsBMrjjThBTpMO3ZDZEUXKpSczA2dzTBQCV/SMxFFeByGsMCB
+	4qagdoG8iqxY1y/z8BWSrIAD8gAXdMDCIti+UoyNHCNFuApj8FXiIYDlGVa9wX6qvY+Ya0zhiml
+	zp7iHsVI9bFf5GqZ0lmfuIKsZnL4y7/IbZIqdo7HCfxsZ09PoYXaf+3zaOGHRqomi46IMvoRl2A
+	GwcDlWOAJQ/t8AtaFkz19ZTCAH+TdkX7idyioSl98+ZdZl4KPSpjzhkBV9XyeGPhtpyFKEpCR36
+	7zqaLW3wST4o0W24L/GZZ1XbwXDC+4I9Zk8h8ezggehvoI9JRh0gMPGYoUXddhaIVJMHMCpZyTg
+	JJ/VjUiVWmAi1xEQf2rScKQeJodBElnkIMIzJA==
+X-Received: by 2002:a17:903:22d1:b0:2e9:84f2:3738 with SMTP id d9443c01a7336-2ee0d65dbf1mr30470705ad.6.1794589302067;
+        Fri, 13 Nov 2026 09:01:42 -0800 (PST)
+Received: from [172.17.0.2] (ec2-3-42-157-24.us-west-2.compute.amazonaws.com. [3.42.157.24])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ee0f8d4612sm13470165ad.57.2026.11.13.09.01.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Nov 2026 09:01:40 -0800 (PST)
+Message-ID: <6af74274.fbff920f.bb9db.e649@mx.google.com>
+Date: Fri, 13 Nov 2026 09:01:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6062375122931532209=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,57 +89,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, paul.cercueil@bootlin.com
+Subject: RE: [1/2] Bluetooth: hci_bcm: Drop CONFIG_PM guards
+In-Reply-To: <20261113142600.74004-1-paul.cercueil@bootlin.com>
+References: <20261113142600.74004-1-paul.cercueil@bootlin.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============6062375122931532209==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNSw6DMBBDr4Jm3amYgIroqveoWEB+jARJldCoF
- HH3RrlAF148W7YPiDqwjnCvDgg6cWTvMohLBXIendXIKjOIWtyISGBMEuXsrELnNzY7erfsaEi
- R6nvVmKaF3H0FbfhTdp8wLW/9hSHbM8fNh728JSrhn+FEWKPs1NSNss0yD7uOvFylX2E4z/MH+
- 48ijsEAAAA=
-X-Change-ID: 20261112-svc-chngd-notify-only-f1d1d99d3f34
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794588819; l=1251;
- i=marianpoltak@gmail.com; s=20261112; h=from:subject:message-id;
- bh=cU0eWVhQ+xVj3g+Gv9TfHlL2h2IVIvL88iR1p7mjDvc=;
- b=pljTBl/XB8PkI2Qt5r0/6dJ1VZPhoETA3nKfGcT5sZuVLXWXq5k2gcLlQ1EjRBfg+KpIE65qO
- HPB2oF9K3+RDSNXpb+USZboVb7mF6xMhiknimi6j/OQprUQ2cw9TWVR
-X-Developer-Key: i=marianpoltak@gmail.com; a=ed25519;
- pk=VPxSnAMaNkyjfVbKo8tQ1gFPwqOoZoPqtVZ8znSiAiA=
-X-Endpoint-Received: by B4 Relay for marianpoltak@gmail.com/20261112 with
- auth_id=1502
-X-Original-From: Marian Poltak <marianpoltak@gmail.com>
-Reply-To: marianpoltak@gmail.com
 
-Some devices, e.g. the Aqara Presence Sensor P2 in Matter commissioning
-mode, declare the Service Changed characteristic as Read | Notify only.
-The client initialization then fails because indications are requested
-explicitly, so no services are exported although ServicesResolved is
-set.
+This is automated email and please do not reply to this email!
 
-Patch 1 requests indications only when the characteristic supports
-them. Patch 2 adds unit tests for both cases.
+Dear submitter,
 
----
-Changes in v2:
-- unit/test-gatt: keep the new tests running until the Service Changed
-  CCC write is exchanged; they previously ended as "Not Run" once the
-  client reported ready (reported by Copilot review).
-- Link to v1: https://patch.msgid.link/20261112-svc-chngd-notify-only-v1-0-c7db7ac47acf@gmail.com
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1210616/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.80 seconds
+VerifyFixes                   PASS      0.05 seconds
+VerifySignedoff               PASS      0.05 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      20.30 seconds
+CheckAllWarning               PASS      23.18 seconds
+CheckSparse                   PASS      24.60 seconds
+BuildKernel32                 PASS      20.48 seconds
+CheckKernelLLVM               PASS      20.77 seconds
+TestRunnerSetup               PASS      486.08 seconds
+IncrementalBuild              PASS      20.61 seconds
+
+
+
+https://github.com/bluez/bluetooth-next/pull/1129
 
 ---
-Marian Poltak (2):
-      shared/gatt-client: Fix init when Service Changed lacks Indicate
-      unit/test-gatt: Add Service Changed registration tests
-
- src/shared/gatt-client.c | 15 +++++++++++++-
- unit/test-gatt.c         | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+), 1 deletion(-)
----
-base-commit: 9659adb6819d7e0284d0d2ba226a3894423d8db4
-change-id: 20261112-svc-chngd-notify-only-f1d1d99d3f34
-
-Best regards,
--- 
-Marian Poltak <marianpoltak@gmail.com>
+Regards,
+Linux Bluetooth
 
 
+--===============6062375122931532209==--
