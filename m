@@ -1,84 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=141.14.17.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794560343;
-	b=m2q/hLJO9je+vv5FFI78nK135ozHL93F6u8uPWL49omgoUTSUGJwIj005iH3RHnTjw5w
-	 xDku5tyHPRMs/nervfpt4ej7/VSRrgtuzBpg/SBL08USMhorb18ZvLHPjwUxnikvZ17zR
-	 GR1FBefKFL9hjsvDoAFNtsC9kXlcYjhWosu8eJGPRdS9e3Ucgo3c2MwJR5db/A/qRy1E8
-	 c7QzVcQ3Nn6RRsAabHlreY/jhfiEy/Zaw1VKyTfYbmaP5CkaJCdRM/AK3K2jyA0WPuTmI
-	 TaXu9M1uC1spsGalTaYGWGaQ9JzFcZt7atEq4hAqCkvXofIbap2TPuqGKIgc4dF7luA==
+	t=1794561347;
+	b=2PW6bjdyreR3lHytQpmuzgETQc9XIPdy27nIqVzkua9TodP4dqwrN9fo2opXGVBq29o3
+	 NwHphsSTKLzFsO6rRSGmf8ltuJCid1gb/F3XLu440sjz867M/qj0uykBxiC1JvoCmhE20
+	 uGvmR/sWGh7nYPHX4yrEBIqK8bhx0L9+Vo/HsJUgW+nLAbQa6m89ewJZDRXFKOhT/GlYO
+	 WMDWmt6EcDvNWKm1wHVMHu2THttqfbfYJsykgqjEHvEf+zfAtwI+dpmdZCRfJ1Ns3YcfY
+	 vtlbImLrndZRMuO2YEPrMWCMxv9ME5+N7ZSqYdX8jgcWbsi4MGrJ+pt48c3TCvaSJxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794560343;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=7Tk3AtqO3C+rJXPhWomYOFCeBK41LoEO/v3tG3IczxI=;
-	b=LUuAWSgJ1pXNnotX/IRUrHkrVI4uYxWwl6t+dY4FIJXENefVKBmnoUury5AlGU5R4lrD
-	 c3iC0bikNodTHVIjvDCKXUz+vqQtGXLRyW4WXZSwIqqWGe4UJzOu3gDBo0dlPJoB03fqK
-	 iNl0JW7a9FcE97JALWJE/gUfMAkwauJxSPjWUJAlxUcPyijRxsAT89fTM3jsJFlSeBLud
-	 wqXFtsvttbTYPBQEywaZX7htuIVtEPXzky1lEDzX6HQhlj/HSnBw/3IH+2WpVZO44Gcxc
-	 ov0TMyRdJlPVDUWvlExgxm/01zWi22jkHgO9a/ATnfsjcZb6/a1UCOKAjBq8IlI6Meg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794561347;
+	h=DMARC-Filter:Received:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:DKIM-Signature;
+	bh=fU5Neoe78Mt6jA+2d9styoQFJY5fyxh/1FhK7doYsQA=;
+	b=xk6wKA53rwx6DzqpoSpuOnKTqlHPnbQzvZIgqf/YyPTo/jmRqcu/5n0eHcJZh52z4S0J
+	 3qSgPtm3jusrW4b16c/zKo6M7phgKm5OnBGnfU3PpL/Z6mwBapeMqcCU4lONSoW2piOAP
+	 HBe31vYD4MNMMT6s5Xv2LlRxY1A7VIZ3jd/W8wg4qKPU4p0jKDh6+n9cjEUhd0FYHlKD4
+	 SSQewKFq6yzIbP0XHY9qrhqZEtLqjlh15OBvJ0jpupTQrYFBjECegsq9bwjTuMA7Endb5
+	 atIh1cjTpxrL/Qh8UdL400cZxVXNsS/VpMdJRY7WjmS+gdrJoNF03xxOIAKhTfmlMQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QWojgHt7;
-	arc=none smtp.remote-ip=74.125.224.41
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=molgen.mpg.de;
+	spf=pass smtp.mailfrom=molgen.mpg.de;
+	dkim=pass header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=LY4VcVYw;
+	arc=none smtp.remote-ip=141.14.17.11
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ADD606A321
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 08:59:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 65ADD606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3951A606A31C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 09:15:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3951A606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QWojgHt7
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-67c02c106e6so618571d50.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Nov 2026 00:59:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794560342; x=1795165142; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=7Tk3AtqO3C+rJXPhWomYOFCeBK41LoEO/v3tG3IczxI=;
-        b=QWojgHt7au2WX1NBH+QY9AtHB8dMlbRGDmx0iB5yJlQeaBsVPnqyp6RxZxJYTDB9t4
-         R7+9qgAtelz6IW6a9GZn89BPa5HBKrl5wgmldHwds3RGSwH0aWjo2wwlvm1WBZ1RDIjT
-         +oI2eYGYAC4WXdvKeYaOalO1zXj3XhlLuFZRnc0GD9utUECxF3q8O5k7q8+iCLOoXMbz
-         NHIVfsOj4gbs3YnwChaAWlmPzubUtX/yJHO+96LxhmYUe2TVkBXDms+uOjnzroTWSf0/
-         fKqzDTQg4mZV8ihfJ2UaX2sQSQPZ6veGFeNgIM/FTA7VUcy9vj/BOZWLzP4PJLK6mbV4
-         PFYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794560342; x=1795165142;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=7Tk3AtqO3C+rJXPhWomYOFCeBK41LoEO/v3tG3IczxI=;
-        b=rMakDnSEndkHq9vKVxe70hhZDk3sWkZPZkqJ+uB9sIODYIDtDj/mUshEUAJNLB/YY1
-         IpAmk9RV3RMUGx3r9rK/oyF4MhqUQncFMZ+NpRMApVo596GtFRIQVwz0Dl2Dx+0kR56P
-         9W1W4JxF/XqwzMr/9R0p2hZCMe+OsNgLtH70+a8Ami+B7L/8GMQoqSvzMAy0oHQ/BmbE
-         /13y0HnSZ2HychO3pxhkfYeipGJvmkxJd0wnNhV0xSsd8HdPcr3vtg8IeUeNy4nscx4X
-         H1XqsRi3XuoewatX6TD7jD00WxGqPivvhEw+bUoGwlHtizHx/vUJeHwTNCaElcwTJYdA
-         D/DA==
-X-Gm-Message-State: APuU4Z+eokkVFHjkFqlZ3pNcFtoLkYEtn2tcEBjoELtyBGnyES9SKuNE
-	KYW6UJ7CyqRhoTqu0fLPdfkr3b/VOJAye+aWVwe2zWL5X031epIIjhHC4WQQMw==
-X-Gm-Gg: AYBFou2hfymtxhSOMd/hG6jFyy6txM22UJTSEcBfc9u5Z0cBtJjoa/bgAsa5ix867cG
-	8u+Zs7kwELsWTvcjCZdCchkv+73c0+gReenGqo3wOcSDQPRYJreZLTurB62wypTYA1UOxFS1dPP
-	Wb9NYEbpO9UNH2syv8JF/gAu/kJT8jYO7UcIoduiVrfkCXxz8WNhQWqXU2Kex25wfw999jnBRo3
-	x7tOmkDmCJ8buTRvPDoIXKxpzk+Nelj7D9ckErktyJi2Eo8BxBak69BDYm2PSvt+au/hIg0tNEY
-	rD4oHkctvLJvG6JTUAOSmchVKqpBh41XHOQs8NtbOyPXxtMjF3VSc2mkpGZHOYKD4y/MbNK15+D
-	42lY4fJZYVBRYD56KzRGF+u3+deHU0ukYSwfg+lh8hz7iPzRPyOCRJFihtldxlZQXl5w25LBdxR
-	Fh9rdDekVZqHGcfaVAsesM9yQg3kpeANAU5mapUizy693WTZd6IEtj1fbjX8aWfPYz5TSRNwJEX
-	lSNV4gnlccyA0uy0/VLp4OD6nChXu2VubLqCuXBy0DPWB1mbbJ3GgHqzhSn
-X-Received: by 2002:a05:690e:191d:b0:679:985a:3fc3 with SMTP id 956f58d0204a3-67d897dd712mr1360485d50.85.1794560342180;
-        Fri, 13 Nov 2026 00:59:02 -0800 (PST)
-Received: from [172.17.0.2] ([51.57.147.1])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-67d8a5cac43sm1498528d50.14.2026.11.13.00.59.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Nov 2026 00:59:01 -0800 (PST)
-Message-ID: <6af6d155.b530263c.39147f.7ad1@mx.google.com>
-Date: Fri, 13 Nov 2026 00:59:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7221126048141125505=="
+	dkim=pass (2048-bit key, unprotected) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=LY4VcVYw
+Received: from [192.168.0.32] (ip-095-090-245-070.vkd79.pools.vodafone-ip.de [95.90.245.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0B8A64C442F80D;
+	Fri, 13 Nov 2026 10:15:22 +0100 (CET)
+Message-ID: <d41821ea-bba9-4024-9b02-1547d3a93c90@molgen.mpg.de>
+Date: Fri, 13 Nov 2026 10:15:21 +0100
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,49 +51,165 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chandrashekar.devegowda@intel.com
-Subject: RE: [v6,1/2] Bluetooth: btintel: Add TOP silent reset hooks
-In-Reply-To: <20261113052538.3030771-1-chandrashekar.devegowda@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/2] Bluetooth: btintel: Add TOP silent reset hooks
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ kiran.k@intel.com
 References: <20261113052538.3030771-1-chandrashekar.devegowda@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20261113052538.3030771-1-chandrashekar.devegowda@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=molgen.mpg.de; s=20260906; 
+	t=1794561322; 
+	h=from:from:subject:date:message-id:mime-version:content-type:content-transfer-encoding; 
+	bh=fU5Neoe78Mt6jA+2d9styoQFJY5fyxh/1FhK7doYsQA=; 
+	b=LY4VcVYwqXEZ245XBcAfYROAmeWFg8pebvnx2xkkCnZhAeUe+pDYdPgVJ26/nGrLsf6RYegWm8G4
+	jQ9HlopRWhfjNv22o0MQdZKCuPJrE3dYnftr6Drv/QcD1F8dnBLOjyL3MPinX/nXcP0KIHw0ZKi6Ht
+	do+f4JJ7Dsqk57xoXl2pS8wnS537XZyb3dzROsbgzI183Bs8O4Kq0gmr77voW+7ETFwWFbKfixA8Cc
+	/aN1v3h4uRGxoJoIKkIFrpIuDBAyJuN6W+rsazjuHSJJUk0nEbUfWTLeqf1H8Cpw+FFURppZ1FKVfo
+	DzBHMUTy8aW+gLF6qeG46yIseL275X4g==
 
---===============7221126048141125505==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1210172/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.42 seconds
-VerifyFixes                   PASS      0.12 seconds
-VerifySignedoff               PASS      0.12 seconds
-GitLint                       PASS      0.64 seconds
-SubjectPrefix                 PASS      0.24 seconds
-BuildKernel                   PASS      28.53 seconds
-CheckAllWarning               PASS      32.04 seconds
-CheckSparse                   PASS      34.40 seconds
-BuildKernel32                 PASS      28.16 seconds
-CheckKernelLLVM               PASS      28.75 seconds
-TestRunnerSetup               PASS      672.69 seconds
-IncrementalBuild              PASS      27.22 seconds
+Dear Chandrashekar,
 
 
+Thank you for your patch.
 
-https://github.com/bluez/bluetooth-next/pull/1126
+Am 13.11.26 um 06:25 schrieb Chandrashekar Devegowda:
+> Add an INTEL_TOP_RESET flag so btintel_boot() returns -ECANCELED and
+> the transport can run its own TOP silent reset instead of the Intel
+> soft reset. Cache boot_addr in struct btintel_data for the replay.
 
----
-Regards,
-Linux Bluetooth
+A motivation for this change would be nice to have.
+
+> No functional change on its own.
+
+Maybe:
+
+No change until a transport sets INTEL_TOP_RESET.
+
+> Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+> ---
+>   drivers/bluetooth/btintel.c | 28 ++++++++++++++++++++++++++++
+>   drivers/bluetooth/btintel.h |  2 ++
+>   2 files changed, 30 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index a0aa110f4cdd..de0868504fbe 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -1281,6 +1281,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+>   {
+>   	const u8 *fw_ptr;
+>   
+> +	if (hdev->bus == HCI_PCI) {
+> +		struct btintel_data *data = hci_get_priv(hdev);
+
+As you also read it in the next hunk, move that assignment out of the 
+loop, and remove it from the second hunk?
+
+> +
+> +		data->boot_addr = 0;
+
+Add a comment, that the cache needs to be invalidated, when a new image 
+is loaded? Maybe:
+
+invalidate the cache, we are about to parse a different image
+
+> +	}
+> +
+>   	fw_ptr = fw->data;
+>   
+>   	while (fw_ptr - fw->data < fw->size) {
+> @@ -1298,6 +1304,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+>   
+>   			*boot_addr = le32_to_cpu(params->boot_addr);
+>   
+> +			if (hdev->bus == HCI_PCI) {
+> +				struct btintel_data *data = hci_get_priv(hdev);
+> +
+> +				data->boot_addr = *boot_addr;
+
+boot_addr == 0 now means two different things: “no BOOT_ADDR TLV in this 
+image” and “transport is not PCIe”. Could that be a problem?
+
+> +			}
+> +
+>   			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+>   
+>   			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+> @@ -2107,6 +2119,13 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+>   	ktime_t calltime;
+>   	int err;
+>   
+> +	/* Let the transport replace the Intel soft reset for a TOP reset */
+> +	if (hdev->bus == HCI_PCI &&
+> +	    btintel_test_flag(hdev, INTEL_TOP_RESET)) {
+> +		bt_dev_info(hdev, "TOP reset pending, skipping Intel soft reset");
+
+Should this be a debug message, or is it interesting for users or bug 
+reports, where `dmesg` output gets attached?
+
+> +		return -ECANCELED;
+> +	}
+> +
+>   	calltime = ktime_get();
+>   
+>   	btintel_set_flag(hdev, INTEL_BOOTING);
+> @@ -3595,6 +3614,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>   	struct intel_version_tlv new_ver;
+>   	struct btintel_data *data = hci_get_priv(hdev);
+>   	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
+> +	bool top_reset = btintel_test_flag(hdev, INTEL_TOP_RESET);
+>   
+>   	bt_dev_dbg(hdev, "");
+>   
+> @@ -3611,10 +3631,18 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>   	for (int i = 0; i < __INTEL_NUM_FLAGS; i++)
+>   		btintel_clear_flag(hdev, i);
+>   
+> +	if (top_reset)
+> +		btintel_set_flag(hdev, INTEL_TOP_RESET);
+> +
+>   	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+>   
+>   	data->unlocker = false;
+>   
+> +	if (top_reset && ver->img_type == BTINTEL_IMG_OP) {
+> +		bt_dev_err(hdev, "TOP reset requested on operational image");
+
+Elaborate, so that a normal user reading output of `dmesg` knows what’s 
+wrong, and what should be done. What is an “operational image”?
+
+> +		return -EALREADY;
+> +	}
+> +
+>   	/* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak):
+>   	 * Boot ROM -> unlocker.sfi -> IML -> OPFW
+>   	 *
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index 372c6d7d8cbe..a59d642f096e 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -260,6 +260,7 @@ enum {
+>   	INTEL_ACPI_RESET_ACTIVE,
+>   	INTEL_WAIT_FOR_D0,
+>   	INTEL_UNLOCKER_LOADED,
+> +	INTEL_TOP_RESET,
+>   
+>   	__INTEL_NUM_FLAGS,
+>   };
+> @@ -268,6 +269,7 @@ struct btintel_data {
+>   	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+>   	int (*acpi_reset_method)(struct hci_dev *hdev);
+>   	u32 cnvi_bt;
+> +	u32 boot_addr;
+>   	bool	unlocker;
+>   };
 
 
---===============7221126048141125505==--
+Kind regards,
+
+Paul
