@@ -1,84 +1,116 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.67.36.66
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794675639;
-	b=JWpnBxf1UJEnuXalQmqqiqXIQosY+2Q520wydtiKSZCfpBraBPq/GQDy90lGz0N7IRdt
-	 8igC2eSyUIpRpSs+qjvDtIAs9jiMg1LTYMGHb10aJm3XDKueADoPmxMhTOUGdTD73q6/p
-	 Yc7019FFTV0k5rnJm+7x5sZArjA5IGZ3dkwKfZ/Xdc1VSe2ud45erH/uVNVh1T/5jmsm9
-	 xLVQXZqGlmtc4kvCtmw4AsFV9H649CKQyZDnzHQQ9KXhf3W2d7ZEf7mH9eyzbfJrLadkg
-	 ERWwrQVRw15jKUMzoDNzyUqqZn9rB74rMZtxvfwDG0gy/9DBjUSx7EevsoAxmGR/U/w==
+	t=1794676000;
+	b=1de2H/cPIsZQX+dPrDvGfrDtOMz/GHZm4cwANVRF4UHkAG8LqfNv3h4G9WFUpNpdN+2t
+	 V9GD+jPk25oFPwtKYsGxK+k0T5Sifh2b5+6ebhLHofgwXbl5rPLeOpFq88ACjWn/R8ZIZ
+	 02BrKWkhBMNMO1K5+tAlDmBsfIk1g+Et/5mAMvz8mr2cByQP20xuqapqKhLKbZZjQPGEr
+	 ZhTh63pBzT4cLJRKA3OIrUshpT+GUZaXCw87nUw9nfpfY5fQa0rokFQ9emJU/u1ZjtMP2
+	 eDhmewIWdOlWLw9cB3M7ytyHAE2To2YSdL86f9Y50NP/Js0S7dNuGjbm+G1Cbe1WZCw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794675639;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
-	b=S8RJSU+OL2txgVS3ftllPViECEnxlEE9T/72ZraORYex2CfVJb3r+XwaYWDhGKb6kVim
-	 YMXVCxcLBTG+whBT041Tqu5ILqzLGllblZ3HI2lBzVfp44x9didgtEPs2Ji/1hTcqUqBz
-	 2G/fMghylF/XiAx+ui7CoyFYvsZ7Go1ykd/UmkbQKC/d2n5H35ap3+wni36tuNRfq/Q6e
-	 KOkVH6GZZk42WIqI5pxLF2Hno8GasPS+IYela95eLxkh0GLMQ/vRAUBlMyjUgjdth3Kpk
-	 iojrWdztlUW7YSPbxh/XQkY2eIgyU6R1SiRJ419Ew8zmRQbSHxqmCPXnT0ShIrjdoaQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794676000;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Message-ID:Subject:
+	 From:To:Cc:Date:In-Reply-To:References:Autocrypt:Content-Type:
+	 MIME-Version:OpenPGP;
+	bh=bZSuAPjJ+v3XkKNzimjkiEXtH8QqSAUW7r+KOR1UNck=;
+	b=3Vz2D4HAFiPCjeACGsvhIYvSjuOVY53AAHuzIxOGKNAhva9gsN6/xjDybHKdtpNmCc5p
+	 bhlAy6im4QjqajKhHKIIqxdERKmud+HhOegIWHC39boRIPHyst/IkizPkyUeTgArkA6/H
+	 dSuNMTw/MbwHaooZFGUdd9VYk0D4U4xLxKuVmGlYoUSTj2kAp33USumCyuVwLSkUxZj4I
+	 9frfk5Af4V1yvqO1ISXBCxw0XTwpcrp1hH74n7eA7QEk/ah38pNCGj7Uz00l2e/PfEkQo
+	 ihAIQlA04wArzm7BHT4URBbwQL2269KoyJm5UO6oQhjKtLtHffQTrW7SeoHZY76RSKg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zE6cg5Sx;
-	arc=none smtp.remote-ip=209.85.222.176
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=posteo.de;
+	spf=pass smtp.mailfrom=posteo.de;
+	dkim=pass header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=SyohQEom;
+	arc=none smtp.remote-ip=185.67.36.66
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E220606A329
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 17:00:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E220606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C272F606A327
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 17:06:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C272F606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zE6cg5Sx
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-93f3c616c84so235242085a.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 09:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794675638; x=1795280438; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
-        b=zE6cg5SxcwXLWCySoOJlf9jhhYXy2ApawXtkazP3kltLIOpxlfcozyNXinuoLZH3f2
-         x1hyr/MgMpdChDLduEn9ix2KgpG+n0EYpHeun3/TgCs4vN5oz72UxURFaOuziSQf+pmv
-         j4xSI4tIHMDUr+vk1hADuKRusI4rKX2EEJKhswFV8RQLHZRtH+G1qPwc66vONqTuHWuk
-         O0L3pBuz+NthZumn/i23rKpPu6MsPuu4g5+ds7OaF5E0Xss6eUUxt9ofc7P41PBxKooh
-         qtef54Ly9+pGHvSc7xJEddl9Mn+XKLySZs6dI8WMA7cG9NZTE5uQU8ad70Pxe1BhiA8W
-         kU2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794675638; x=1795280438;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
-        b=hupRk1wjodEQmHSROUJ5qHdYSKrb4Iv2zfnTs1UWNJQ/OjftqUpT/+Gq5L46MLWFp+
-         hXkMITEhr1QaK9tTjMHyRiA/S3YX3xiaMh2qmFpEglwoIy0mpnblyrtNeAs76nD36QHj
-         CQYYoQ3m8P/S8m+Jvu3/zJSa7/XO/2ZUyYfRht02PGiH6Xt4MW8BBVmuzBADyCBEVns2
-         wc836ntX02aHDT8f7rkkpKIgvNSxyCHM8hhQRRi/8JhsWm0JXmWjUReSwUy3ST/SC2cl
-         Vpi92R18DEpwTyOSFLBOn9mKrZ6WejJ+C6cSnPjuFWefEM7AsfkoHN80pk5Ky+1HMF7F
-         1UyA==
-X-Gm-Message-State: APuU4Z9gQvOVCXqBLCe3Jv1Jfaa6aUeMcUozX2JdrYD7GK3ul1v98uAn
-	fRNlXvR/91NUd/MgELnNisrjr6D91d7WMSrnXhLLdxl2yGtX5rYYUAP/D/VkgCBE
-X-Gm-Gg: AYBFou1AwYTdHZtpjjKofEdvn2NedbHAhST2YCeZANAFba4yegqRZHavPuSvNf0/O6v
-	9GqaBe5Vz+W3eebjg2lsuRNAW0TDtoYWiFkvXAhGDMgpexKwZSGtHZdKd9SRG76MVqU+GPHxRpF
-	3eeJnbg4qCSRu55DCvwgIyflrUZGit2bFudIzZl26tGhaSkewUhhihi59xm2hVZsSjS10tChmfo
-	R9bEdrjffOuS6TjSrgGYqCkf0Y/yU3Pv6QwvAFs64QYRTDwOca6GDmB+9TupZ0eGFFFEG8S8pXJ
-	FkgZzj5fLBMvbJfka6/2o5jtxAy1VUCfVV2b0x+B2W80RkzDM4VbRmd/o+Dsup80IilpGa4RDXM
-	pHbRPz9Bj6zY88tRibWPOT5grHKIBzZ2h5VZkrIizrcWXkusnF82NFD8TqrTrCVSQonN1BKDm9d
-	0K5sxwbwi6sgccee9jnAPdUlkoPU9wmeyhkSrIxI0+98a2C4TbYJUedEs4/PDJP98/Y9EoMVdBE
-	8du+OxTUaxUICQ+9s4Nvzr4Y0b5L3O1kCJukdEAOyd+GXmSYdWllT7t9WAbuB8=
-X-Received: by 2002:a05:620a:2987:b0:93f:2a56:2772 with SMTP id af79cd13be357-9494bcbc465mr985507985a.78.1794675638432;
-        Sat, 14 Nov 2026 09:00:38 -0800 (PST)
-Received: from [172.17.0.2] ([74.235.70.229])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9494c803ad1sm443379785a.12.2026.11.14.09.00.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 09:00:37 -0800 (PST)
-Message-ID: <6af893b5.ced8aaa0.1c61c4.831a@mx.google.com>
-Date: Sat, 14 Nov 2026 09:00:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5950773711115334900=="
+	dkim=pass (2048-bit key, unprotected) header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=SyohQEom
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id B227E240103
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 18:06:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de;
+	s=1984.8680eb; t=1794675997;
+	bh=bZSuAPjJ+v3XkKNzimjkiEXtH8QqSAUW7r+KOR1UNck=;
+	h=Message-ID:Subject:From:To:Cc:Date:Autocrypt:Content-Type:
+	 MIME-Version:OpenPGP:From;
+	b=SyohQEomfPbKxQQTxZA1xxZuZfKgxDnij1Cx+/FcptINrcPxH84phY9S3OLo5zDvv
+	 QyFR8J26RyiC+fdrKBwZsBuTjSGh7Kn1iyLsZyN84bQiAJ6tu3HbjQY/8Edvcd4i3c
+	 dxE4gLARWHv2QRjQvI9TczQQPaH72FPtixvSWYi4ydneVBn6cu4rdXmWuz/LozCwZ5
+	 iReniHrWwE2iaOSR7dG/WgI4OP9ksNaAjzGvHa/AGJm/2D7Y84dLe3IhMPj3f8O6jG
+	 Gmy9kHM9n4qjtBcpnVtGXbKQlf6/g9WVHsz+sAacweKn9h7rW8gr9f43fZ5fFfAGw4
+	 tRCXhSwXrVI/w==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4jRgWv2qdFz6tsb;
+	Sat, 14 Nov 2026 18:06:35 +0100 (CET)
+Message-ID: <fc05ed7435e2fa282a163f99110048f6cfe56b6a.camel@posteo.de>
+Subject: Re: [PATCH 0/1] Bluetooth: hci_mrvl: Fix duplicate serdev open/close
+From: Markus Probst <markus.probst@posteo.de>
+To: Michael McAllister <me@michaelmcallister.org>, luiz.dentz@gmail.com, 
+	marcel@holtmann.org, Loic Poulain <loic.poulain@oss.qualcomm.com>, Sascha
+ Hauer	 <s.hauer@pengutronix.de>, Stefan Eichenberger
+ <stefan.eichenberger@toradex.com>,  Gongwei Li <ligongwei@kylinos.cn>,
+ Marcel Ziswiler <marcel.ziswiler@toradex.com>, Vitor Soares	
+ <vitor.soares@toradex.com>, Hiago De Franco <hiago.franco@toradex.com>, 
+ Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Sat, 14 Nov 2026 17:06:37 +0000
+In-Reply-To: <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
+References: <341e56b1ff7d8a5b109e26e30dfed61faa54d603.camel@posteo.de>
+	 <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
+Autocrypt: addr=markus.probst@posteo.de; prefer-encrypt=mutual;
+ keydata=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
+ jfGillcaQOqFZ3WwVqyzG1BUfTow==
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-RNNjEGgBFzqiQk7v4Asd"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,54 +120,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nebkat@gmail.com
-Subject: RE: [bluez] gatt-client: Fix not emitting MTU on reconnection
-In-Reply-To: <20261114-gatt-client-mtu-reconnect-v1-1-a86edc1eb208@gmail.com>
-References: <20261114-gatt-client-mtu-reconnect-v1-1-a86edc1eb208@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5950773711115334900==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1211415/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       FAIL      0.35 seconds
-BuildEll                      PASS      20.32 seconds
-BluezMake                     PASS      312.39 seconds
-CheckSmatch                   PASS      315.19 seconds
-bluezmakeextell               PASS      101.22 seconds
-TestFunctional                PASS      1191.12 seconds
-IncrementalBuild              PASS      313.59 seconds
-ScanBuild                     PASS      1185.74 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[bluez] gatt-client: Fix not emitting MTU on reconnection
-
-28: B2 Line has trailing whitespace: "--  "
+OpenPGP: url=https://posteo.de/keys/markus.probst@posteo.de.asc; preference=encrypt
 
 
-https://github.com/bluez/bluez/pull/2827
+--=-RNNjEGgBFzqiQk7v4Asd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
----
-Regards,
-Linux Bluetooth
+On Sat, 2026-11-14 at 16:15 +0000, Michael McAllister wrote:
+> Hi Markus, thanks for flagging this!
+>=20
+> You're right, hci_serdev already opens and closes the port, so the extra
+> calls in the Marvell driver aren't needed. This removes them as a
+> separate fix.
+>=20
+> I've build-tested it and checked that the duplicate-open reproducer
+> passes with the fix, but I don't have Marvell hardware to test on.
+>=20
+> Thanks,
+> Michael
 
+Hi,
 
---===============5950773711115334900==--
+Thanks for the patch!
+
+I added some more people from the git history (incl. from existing
+device trees that have this hardware) to CC here in the hope that they
+can test it.
+
+If nobody tests it, there is still be linux-next. But its generally
+better if it gets tested once before that.
+
+Thanks
+- Markus Probst
+
+--=-RNNjEGgBFzqiQk7v4Asd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJPBAABCAA5FiEEgnQYxPSsWOdyMMRzNHYf+OetQ9IFAmr4lRUbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMiwyAAoJEDR2H/jnrUPSezoP/15HddtPh5s0xtRmwOIH
+HO6Alam6NRspxv2Cm8w7W0IdS0V/u/Krq+kCnCUHkiOZYgu6zzdeEVojPZ2TO5My
+XcMeCBcEvECy6rf2D28D2JaAh2kc+44XGeA5mfak5rTNY22SrV7xRsjlo4Z4JSFq
+kQQLlvalZgdn76/PKZjckFxurFiJwP40u+xmIQMqz9qu8kqeE6Cdm6Ars+sH0TCQ
+B0YnMFWNZ5ZhDZa02RAKKU+IsIZaSWE+BDur9NmHFJW2MeVNuIVFdWpmMnRyzfcQ
+i3DlwKY9dJvLauSVlsQqWo9Ajbnv5Vo3UXPSdIfSeP5nXq+PtuCxTJCIh5VyFjr3
+aPzp5P0UHjnRkmPTrbBp59fSRZYHubvzRt6TtkVg+Zw86BXRC9A5yLIyObBz3Vfc
+OZ37sCEksO988toNsB+5zVP9tGnZTLOW9u9NKB2+L/aY5ujYoZcIS5sUgZ2TA+SN
+/8gnRxg8zboTkikXOS1fnD/KsinX/7umogR9kB6wCXCeHCrM+bQuqpAHsp/Q403W
+Kg4HPPfQqJ3vzMUOqdDkYsbq4wEJ7w94GO1CWkwMQ0ZEy5tIWtRrHLUdSdzEdhuB
+73XK5KocJMJEiGauz87RcxYznJHlAtlaSAKcc3YxbBgyfbchlz4xrkRn608UDYVk
+0vbwWmlOtais7onDKnwUM8T+
+=dMnd
+-----END PGP SIGNATURE-----
+
+--=-RNNjEGgBFzqiQk7v4Asd--
