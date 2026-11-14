@@ -1,61 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794672971;
-	b=bwqcCCz4oKUi/sXbLqNG3cKKqK140qfQekE5ioE+aNf30cLgKt1Ensm1aTxoQ3d2Qpav
-	 7C0iu6v5yEf8X0OKep5niEg1xGjo1OvCuhzY8p8unAoD63MzvuxqZIo1vS0jwWGhfJ48J
-	 yRNnlFu4G+KzeCic+IClI1c+/+eaeexrJOOm2yH191/3UmlTgjdwnn+D85Rf1U+LhNa8l
-	 aVPp+QNKoMjFiPYWOiUj80MSIX/cP3HdEndZQoWW2Sp/BAC3CEy9UCsRy6MUTel70MrfG
-	 pGG5CV6fd9fscf1gOlna/V1K8scZNhhA9DbxwUuC7OkYE3sQoByfiXWyQjpNd/23JPw==
+	t=1794675639;
+	b=JWpnBxf1UJEnuXalQmqqiqXIQosY+2Q520wydtiKSZCfpBraBPq/GQDy90lGz0N7IRdt
+	 8igC2eSyUIpRpSs+qjvDtIAs9jiMg1LTYMGHb10aJm3XDKueADoPmxMhTOUGdTD73q6/p
+	 Yc7019FFTV0k5rnJm+7x5sZArjA5IGZ3dkwKfZ/Xdc1VSe2ud45erH/uVNVh1T/5jmsm9
+	 xLVQXZqGlmtc4kvCtmw4AsFV9H649CKQyZDnzHQQ9KXhf3W2d7ZEf7mH9eyzbfJrLadkg
+	 ERWwrQVRw15jKUMzoDNzyUqqZn9rB74rMZtxvfwDG0gy/9DBjUSx7EevsoAxmGR/U/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794672971;
-	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
-	 Subject:Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version;
-	bh=ApmNo1VyKCyxdEAUvkrRU2wuXDxWxgVe5Q7ZRn02jfY=;
-	b=QwTRFTWSSeJyyNJJz2jb3DxwvdfQ/bzeSPm7wV+KbqUaHvQNo/5MVueD+ia86ir4tQ10
-	 CFndbbYq6OXH7G5xTDg7op+8jxJynUuyvnT8CsxsX8ArEk5DU4D4vWEINbflq5SQuayFF
-	 6Lt6FNbdPoOUP4M9xQwbsPTQQEjsl2w7wLWbtrCY2LDckZacM43UOcloEX7gLBbT20ABM
-	 ZIZeXEG9uP8s85LUB6XkFGXBER6zNIM8mr1vk4JOSmbmY2MKCV4RVx2jiH64Ww+rMiwCV
-	 LEbjANvU1HadlqAvXTilVfbavY5dawISo4m+HIFvEI4OYrC7i3KtNYARs7NWK5T8QJg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794675639;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
+	b=S8RJSU+OL2txgVS3ftllPViECEnxlEE9T/72ZraORYex2CfVJb3r+XwaYWDhGKb6kVim
+	 YMXVCxcLBTG+whBT041Tqu5ILqzLGllblZ3HI2lBzVfp44x9didgtEPs2Ji/1hTcqUqBz
+	 2G/fMghylF/XiAx+ui7CoyFYvsZ7Go1ykd/UmkbQKC/d2n5H35ap3+wni36tuNRfq/Q6e
+	 KOkVH6GZZk42WIqI5pxLF2Hno8GasPS+IYela95eLxkh0GLMQ/vRAUBlMyjUgjdth3Kpk
+	 iojrWdztlUW7YSPbxh/XQkY2eIgyU6R1SiRJ419Ew8zmRQbSHxqmCPXnT0ShIrjdoaQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=michaelmcallister.org;
-	spf=pass smtp.mailfrom=michaelmcallister.org;
-	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=LN4dySTH;
-	arc=none smtp.remote-ip=185.70.43.171
-Received: from mail-43171.protonmail.ch (mail-43171.protonmail.ch [185.70.43.171])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zE6cg5Sx;
+	arc=none smtp.remote-ip=209.85.222.176
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C6C606A329
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 16:16:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 68C6C606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E220606A329
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 17:00:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E220606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=LN4dySTH
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=zE6cg5Sx
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-93f3c616c84so235242085a.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 09:00:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=michaelmcallister.org; s=protonmail2; t=1794672968; x=1794932168;
-	bh=ApmNo1VyKCyxdEAUvkrRU2wuXDxWxgVe5Q7ZRn02jfY=;
-	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
-	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=LN4dySTHaRijHL91eaR7cDLl8RLg2YMfXB2cO+sPtPajBR4SKBp2fRs00u8Sd4UdJ
-	 z1W5XRTxMi9vnPOBbdMBXCoyKGt6RRH5wJhCdRonIUbBUEBWWK5fSgD6QqC0xXlmSy
-	 6sBFpeWd1Thq6gkrTSG+r8L9vK/BRP97i+VckTWbal9Zqj/iTMSOx+lKhZWiSMTm+S
-	 Jh8vMx1oZBsQu/ElGoBLjg7TfsvFvLj3GWpX15p7uCWZfMBFY2YEHoIMAN1PcmodRn
-	 DGm57TbzTieO0ryntqrxYizLOEI+Q8gEO2lU7dcSmSVlVcHQWKs0ZWmXw2G9tNEGF9
-	 PqBloHMn8/FXg==
-X-Pm-Submission-Id: 4jRfPf4Ckvz2ScmC
-From: Michael McAllister <me@michaelmcallister.org>
-To: markus.probst@posteo.de, luiz.dentz@gmail.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Sat, 14 Nov 2026 16:15:55 +0000
-Subject:
- [PATCH 1/1] Bluetooth: hci_mrvl: Leave the serdev port lifetime to hci_serdev
-Message-ID: <179467295519.97469.5747232754111917783.marvell-serdev-v1-1@michaelmcallister.org>
-In-Reply-To: <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
-References: <341e56b1ff7d8a5b109e26e30dfed61faa54d603.camel@posteo.de> <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+        d=gmail.com; s=20260707; t=1794675638; x=1795280438; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
+        b=zE6cg5SxcwXLWCySoOJlf9jhhYXy2ApawXtkazP3kltLIOpxlfcozyNXinuoLZH3f2
+         x1hyr/MgMpdChDLduEn9ix2KgpG+n0EYpHeun3/TgCs4vN5oz72UxURFaOuziSQf+pmv
+         j4xSI4tIHMDUr+vk1hADuKRusI4rKX2EEJKhswFV8RQLHZRtH+G1qPwc66vONqTuHWuk
+         O0L3pBuz+NthZumn/i23rKpPu6MsPuu4g5+ds7OaF5E0Xss6eUUxt9ofc7P41PBxKooh
+         qtef54Ly9+pGHvSc7xJEddl9Mn+XKLySZs6dI8WMA7cG9NZTE5uQU8ad70Pxe1BhiA8W
+         kU2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794675638; x=1795280438;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=OjTQDDI8N0rYnclEu7zFG8y/MxXvR8XsR+8N1kFUpOA=;
+        b=hupRk1wjodEQmHSROUJ5qHdYSKrb4Iv2zfnTs1UWNJQ/OjftqUpT/+Gq5L46MLWFp+
+         hXkMITEhr1QaK9tTjMHyRiA/S3YX3xiaMh2qmFpEglwoIy0mpnblyrtNeAs76nD36QHj
+         CQYYoQ3m8P/S8m+Jvu3/zJSa7/XO/2ZUyYfRht02PGiH6Xt4MW8BBVmuzBADyCBEVns2
+         wc836ntX02aHDT8f7rkkpKIgvNSxyCHM8hhQRRi/8JhsWm0JXmWjUReSwUy3ST/SC2cl
+         Vpi92R18DEpwTyOSFLBOn9mKrZ6WejJ+C6cSnPjuFWefEM7AsfkoHN80pk5Ky+1HMF7F
+         1UyA==
+X-Gm-Message-State: APuU4Z9gQvOVCXqBLCe3Jv1Jfaa6aUeMcUozX2JdrYD7GK3ul1v98uAn
+	fRNlXvR/91NUd/MgELnNisrjr6D91d7WMSrnXhLLdxl2yGtX5rYYUAP/D/VkgCBE
+X-Gm-Gg: AYBFou1AwYTdHZtpjjKofEdvn2NedbHAhST2YCeZANAFba4yegqRZHavPuSvNf0/O6v
+	9GqaBe5Vz+W3eebjg2lsuRNAW0TDtoYWiFkvXAhGDMgpexKwZSGtHZdKd9SRG76MVqU+GPHxRpF
+	3eeJnbg4qCSRu55DCvwgIyflrUZGit2bFudIzZl26tGhaSkewUhhihi59xm2hVZsSjS10tChmfo
+	R9bEdrjffOuS6TjSrgGYqCkf0Y/yU3Pv6QwvAFs64QYRTDwOca6GDmB+9TupZ0eGFFFEG8S8pXJ
+	FkgZzj5fLBMvbJfka6/2o5jtxAy1VUCfVV2b0x+B2W80RkzDM4VbRmd/o+Dsup80IilpGa4RDXM
+	pHbRPz9Bj6zY88tRibWPOT5grHKIBzZ2h5VZkrIizrcWXkusnF82NFD8TqrTrCVSQonN1BKDm9d
+	0K5sxwbwi6sgccee9jnAPdUlkoPU9wmeyhkSrIxI0+98a2C4TbYJUedEs4/PDJP98/Y9EoMVdBE
+	8du+OxTUaxUICQ+9s4Nvzr4Y0b5L3O1kCJukdEAOyd+GXmSYdWllT7t9WAbuB8=
+X-Received: by 2002:a05:620a:2987:b0:93f:2a56:2772 with SMTP id af79cd13be357-9494bcbc465mr985507985a.78.1794675638432;
+        Sat, 14 Nov 2026 09:00:38 -0800 (PST)
+Received: from [172.17.0.2] ([74.235.70.229])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9494c803ad1sm443379785a.12.2026.11.14.09.00.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Nov 2026 09:00:37 -0800 (PST)
+Message-ID: <6af893b5.ced8aaa0.1c61c4.831a@mx.google.com>
+Date: Sat, 14 Nov 2026 09:00:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5950773711115334900=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -65,63 +88,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, nebkat@gmail.com
+Subject: RE: [bluez] gatt-client: Fix not emitting MTU on reconnection
+In-Reply-To: <20261114-gatt-client-mtu-reconnect-v1-1-a86edc1eb208@gmail.com>
+References: <20261114-gatt-client-mtu-reconnect-v1-1-a86edc1eb208@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_uart_register_device_priv() opens the port before calling mrvl_open(),
-so Marvell opens it twice. Likewise, mrvl_close() closes it before the
-transport closes it again during unregister or registration error cleanup.
+--===============5950773711115334900==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Remove the extra calls and let hci_serdev own the port lifetime. This also
-avoids failing probe when serdev rejects a second open with -EALREADY.
+This is automated email and please do not reply to this email!
 
-Fixes: be70e5e774a6 ("Bluetooth: hci_mrvl: Add serdev support")
-Reported-by: Markus Probst <markus.probst@posteo.de>
-Closes: https://lore.kernel.org/341e56b1ff7d8a5b109e26e30dfed61faa54d603.camel@posteo.de/
-Assisted-by: LLM
-Signed-off-by: Michael McAllister <me@michaelmcallister.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1211415/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+GitLint                       FAIL      0.35 seconds
+BuildEll                      PASS      20.32 seconds
+BluezMake                     PASS      312.39 seconds
+CheckSmatch                   PASS      315.19 seconds
+bluezmakeextell               PASS      101.22 seconds
+TestFunctional                PASS      1191.12 seconds
+IncrementalBuild              PASS      313.59 seconds
+ScanBuild                     PASS      1185.74 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[bluez] gatt-client: Fix not emitting MTU on reconnection
+
+28: B2 Line has trailing whitespace: "--  "
+
+
+https://github.com/bluez/bluez/pull/2827
+
 ---
- drivers/bluetooth/hci_mrvl.c | 14 --------------
- 1 file changed, 14 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-index 5798a8db0..def19907c 100644
---- a/drivers/bluetooth/hci_mrvl.c
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -57,7 +57,6 @@ struct hci_mrvl_pkt {
- static int mrvl_open(struct hci_uart *hu)
- {
- 	struct mrvl_data *mrvl;
--	int ret;
- 
- 	BT_DBG("hu %p", hu);
- 
-@@ -75,17 +74,7 @@ static int mrvl_open(struct hci_uart *hu)
- 
- 	hu->priv = mrvl;
- 
--	if (hu->serdev) {
--		ret = serdev_device_open(hu->serdev);
--		if (ret)
--			goto err;
--	}
--
- 	return 0;
--err:
--	kfree(mrvl);
--
--	return ret;
- }
- 
- static int mrvl_close(struct hci_uart *hu)
-@@ -94,9 +83,6 @@ static int mrvl_close(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p", hu);
- 
--	if (hu->serdev)
--		serdev_device_close(hu->serdev);
--
- 	skb_queue_purge(&mrvl->txq);
- 	skb_queue_purge(&mrvl->rawq);
- 	kfree_skb(mrvl->rx_skb);
--- 
-2.39.5
 
+--===============5950773711115334900==--
