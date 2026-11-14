@@ -1,50 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.107
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794681665;
-	b=XgAr2ly6ozNPG9+TTHpQP5gGE791PFnTvHeCfMMovzOXXDgnsTebNFZnCsAiieUI/LaN
-	 tOONKK87EFVkYtIHThnhuDCk5qq8nMLkwJ58m/PQG2EvScEWcpn5mAOL0f03YjrmAEHkv
-	 HAz0/40Nox5wRmy94UwNHOwuEEh8LY4zWI1kdbrFhHCIjGChlNLu/n+tOQUp7RCN4Q9c6
-	 WVc39rv2/trDf0SS+BfmMVmoYwXxLtXd/AEwaA9DxTcY+gJIVp1wFRHDFAfFRY3I775Ik
-	 Qzcd04QMLDyrJ7MBbdRCZH/ftVECm6MC+F+2i4LX0grNZudOZw1T4OBaqxtN2FvirNQ==
+	t=1794681667;
+	b=RIEX4Ea0aA3dz7YFkLumUfBftlm/rVixbXKybVuTB3aqzPy4Jm41oNiNeFt9QaKA3fTE
+	 FFYh3vSTmyD94IuZNH+U8IP8Lsk1ZzJcqbXdpPtPaftiYnU//u7JlWzZdF6oUMbG39YKp
+	 7D+HyJMgb0h3cR5X5+9Ua3VyJPP8cq9TiXzO3ywtX3q4TcQXhgdwhbdwQXvNwZ5Nr7cPr
+	 7ZjYdy2Xnewi5e+RLMaHbHBtN8to9iElicOh1qoK3iG613bQ7mhxf/cWv40AHHHJyyENh
+	 3kirJ/u4P0SjrTg8nOUBzwpyzvEVUy630hfAoJwBdCNWe3NbZVi8jeqOD2zZJ7FAiWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794681665;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794681667;
 	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
 	 Message-ID:Subject:In-Reply-To:References:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=dmDChotEha0iFqm+8jnyADjXLoziwfDG7A+l0ZouVYg=;
-	b=hbn4I6Li0GnAfroRr9Rwmyp1YUfqgvlGbbZErQ2qv7KaK4/gWHkYpI43buSGfCURBN/i
-	 1T5q2XLWHorDZHerjAR+LMm9TxwrENFaThhgQi1wZss2YDenLIULC1UBcQUuvyekJXp7d
-	 VKruF+z2KfrxPwxPHMec5eOcNu2wDH7rIlEFkhHCuU0dh///1GGGuibiMMf1JhXedwW3g
-	 NzKbfiLjANuDmVQXSr7ixOE4tsiGaRs/R/jK73ZokJl6PKRk9ThMmbo/FJbXvNDU3EstU
-	 Ax2oLBXsSjlpowBMZyqGawQyWLe1eWxazFDTLHu0tvypFc66Ian0LI8yzjwPA9FNl2g==
+	bh=3D0u6TnXn7cU9TzO0Oe/RHRjfSNFZVI4UOig4klv+f0=;
+	b=3BsNvzdHwLIkl9wLcuEhFrRMlM7/M4G5RNINbeI7A7NpzOSLySvIDi3dmOcg8oV/Za7f
+	 /pfdwWCLkSOa2cySUD76TMmBtaNjXaPLZ531IBGIfsEKCcdRm7ACDc2T1nnNTP7sKokCt
+	 +OWfyJ/NOBbpveoHw6V73BSgogga0m0Wo7BVImVRmeE7/ZTIqTUtlLtsq430S4n8VE3Ht
+	 EvuWNwh/if1Ltt3BxPf5BPAZ4Prf5vh+O5gpHGhombTC5ZCD+TZujRdvp88Y7kwmlLFXn
+	 6Nv19udQfvOEbFEOTiMs1SPNoqmTeYtCfsUBxs1mfYUZeczwmv3GuP3fwFuckrCcK/w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=michaelmcallister.org;
 	spf=pass smtp.mailfrom=michaelmcallister.org;
-	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=NNu8OilY;
-	arc=none smtp.remote-ip=109.224.244.107
-Received: from mail-244107.protonmail.ch (mail-244107.protonmail.ch [109.224.244.107])
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=owvH1950;
+	arc=none smtp.remote-ip=185.70.43.170
+Received: from mail-43170.protonmail.ch (mail-43170.protonmail.ch [185.70.43.170])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBF5606A8B3;
-	Sat, 14 Nov 2026 18:41:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7DBF5606A8B3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE38060A2624;
+	Sat, 14 Nov 2026 18:41:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE38060A2624
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=NNu8OilY
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=owvH1950
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=michaelmcallister.org; s=protonmail2; t=1794681662; x=1794940862;
-	bh=dmDChotEha0iFqm+8jnyADjXLoziwfDG7A+l0ZouVYg=;
+	d=michaelmcallister.org; s=protonmail2; t=1794681664; x=1794940864;
+	bh=3D0u6TnXn7cU9TzO0Oe/RHRjfSNFZVI4UOig4klv+f0=;
 	h=From:To:Cc:Date:Message-ID:Subject:In-Reply-To:References:From:To:
 	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=NNu8OilYSfmJv3scRXsVU5WQCzlFMwrhI3MpjKlReU2gLF2YdA4ufxaRJp0eMd6eZ
-	 oD7G8aLcpsa/S73zv0zh2eyLepzgLQz1FU4n9dYjlQpjukoQ5S1mwrfLxAEEz836dl
-	 1/aOqC7l2O4xr2xyp23wvwcpygKyyutrSBMsZTXlUImDrVpsvP/j8jv1RpbiERuv7C
-	 L4Azm0vH6nEQAZezMDvXd1alf8kfRoaXs57y+IDjKNoZM/Wzvix/oG0XIzJt/djzlg
-	 rqTyY4z9mFDXelx3FbXYOl6oclrA/10fuA545mFLbeq3zlxfpaCES98VvEPflgg6ou
-	 p1u2zQG4byXdw==
-X-Pm-Submission-Id: 4jRjcs0Y39z1DF5G
+	b=owvH1950Gqqr2UFMAo0Hjg/0UDn94Sg07TKdsNAvSoUTMf4uYxGZ0tCIRK1XaWKbN
+	 Z3fv3Yk8/5+D+G0lPhmjVPYTQNnGDK7P+/y57yqpBbko69HMJ7qYc44CUVU+JgOQFL
+	 llxiAOskad7t2ckuJo/0YYBKMvM1fw/4WShHrzlButnNEMY0fvG+GYO3JAVoTHi9op
+	 l30Wdn5S6pl9SBXaz9JSbhoG+/qIt3pTQqv/N/zxrZi5/bc4Aykna1MhgkRxNu9XXZ
+	 BhttytXMVt2C3Par2PaOTVhD8qaEU8s5QYvVS3bsD0LfcP+KwO8+KB8IS9eaYtBT0Z
+	 i6L1rHwkQzs/g==
+X-Pm-Submission-Id: 4jRjct4MJWz1DF4s
 From: Michael McAllister <me@michaelmcallister.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -54,8 +54,8 @@ Cc: brgl@kernel.org, linux-bluetooth@vger.kernel.org,
  me@michaelmcallister.org, markus.probst@posteo.de,
  shuai.zhang@oss.qualcomm.com
 Date: Sat, 14 Nov 2026 18:39:54 -0000
-Message-ID: <179468159400.2456.12123448176300132161.wcn3950-poweroff-v2-3@michaelmcallister.org>
-Subject: [PATCH v2 3/4] Bluetooth: qca: Handle failed power-pulse writes
+Message-ID: <179468159400.2456.1620455624350858393.wcn3950-poweroff-v2-4@michaelmcallister.org>
+Subject: [PATCH v2 4/4] Bluetooth: qca: Power off WCN3950
 In-Reply-To: <179468159400.2456.8302096233933976388.wcn3950-poweroff-v2-0@michaelmcallister.org>
 References: <179322687810.94538.4628148055419456389.wcn3950-poweroff-v1-0@michaelmcallister.org>
  <179468159400.2456.8302096233933976388.wcn3950-poweroff-v2-0@michaelmcallister.org>
@@ -71,36 +71,39 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-A failed UART write leaves hardware flow control disabled. A zero-byte
-write is also treated as success even though no pulse was queued.
+Turning Bluetooth off on the Moto G10 leaves the WCN3950 regulator
+votes enabled. qca_power_off() handles the other WCN39xx controllers
+but omits WCN3950 from both switches.
 
-Require the one-byte pulse to be accepted and restore flow control on
-the error path, returning -EIO for a zero-byte write.
+Add it to the existing power-off pulse and regulator-disable paths.
 
-Fixes: f9558270b85c ("Bluetooth: hci_qca: use wait_until_sent() for power pulses")
+Fixes: d5712c511cb3 ("Bluetooth: qca: add WCN3950 support")
 
 Signed-off-by: Michael McAllister <me@michaelmcallister.org>
 ---
- drivers/bluetooth/hci_qca.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_qca.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ddbeb0787..6642af781 100644
+index 6642af781..bd8cfe95c 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1430,9 +1430,10 @@ static int qca_send_power_pulse(struct hci_uart *hu, bool on)
- 	serdev_device_write_flush(hu->serdev);
- 	hci_uart_set_flow_control(hu, true);
- 	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
--	if (ret < 0) {
-+	if (ret != sizeof(cmd)) {
- 		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
--		return ret;
-+		hci_uart_set_flow_control(hu, false);
-+		return ret < 0 ? ret : -EIO;
- 	}
+@@ -2283,6 +2283,7 @@ static void qca_power_off(struct hci_uart *hu)
+ 	power = qcadev->bt_power;
  
- 	serdev_device_wait_until_sent(hu->serdev, timeout);
+ 	switch (soc_type) {
++	case QCA_WCN3950:
+ 	case QCA_WCN3988:
+ 	case QCA_WCN3990:
+ 	case QCA_WCN3991:
+@@ -2303,6 +2304,7 @@ static void qca_power_off(struct hci_uart *hu)
+         }
+ 
+ 	switch (soc_type) {
++	case QCA_WCN3950:
+ 	case QCA_WCN3988:
+ 	case QCA_WCN3990:
+ 	case QCA_WCN3991:
 -- 
 2.39.5
 
