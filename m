@@ -1,116 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.24
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794676000;
-	b=1de2H/cPIsZQX+dPrDvGfrDtOMz/GHZm4cwANVRF4UHkAG8LqfNv3h4G9WFUpNpdN+2t
-	 V9GD+jPk25oFPwtKYsGxK+k0T5Sifh2b5+6ebhLHofgwXbl5rPLeOpFq88ACjWn/R8ZIZ
-	 02BrKWkhBMNMO1K5+tAlDmBsfIk1g+Et/5mAMvz8mr2cByQP20xuqapqKhLKbZZjQPGEr
-	 ZhTh63pBzT4cLJRKA3OIrUshpT+GUZaXCw87nUw9nfpfY5fQa0rokFQ9emJU/u1ZjtMP2
-	 eDhmewIWdOlWLw9cB3M7ytyHAE2To2YSdL86f9Y50NP/Js0S7dNuGjbm+G1Cbe1WZCw==
+	t=1794677756;
+	b=uZzZH51nQSQdLLtrD8H6Lo+SVFYoEJzIYFi57YmRX344ApCeKwSuXPSTUVstdaj4KiL0
+	 LktFyLo/g5OzInNM3fIC8o6HiC6+Ha66+SSQsTTYPI3YDwTGnZi9UrLF8WyrIS6oW4lbz
+	 839mv5eGn0w5qzaBtKNegMbYmk6FHdYOacdA11a+YZ9zq3cmrvitF4j+9Pej0lqenQqf3
+	 WXIhh14Pghe3CvaW4UT7PGOybG46TkjiLk4thu01K9lkCZuSVC+JUu/mJVocQoCYG+Ici
+	 hC3nuZXahBvx9Pbz6mhgSezOplGzEamLc7+LK+nbeVKFpG/vsLWB4O1o/GS//AEsGkA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794676000;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Message-ID:Subject:
-	 From:To:Cc:Date:In-Reply-To:References:Autocrypt:Content-Type:
-	 MIME-Version:OpenPGP;
-	bh=bZSuAPjJ+v3XkKNzimjkiEXtH8QqSAUW7r+KOR1UNck=;
-	b=3Vz2D4HAFiPCjeACGsvhIYvSjuOVY53AAHuzIxOGKNAhva9gsN6/xjDybHKdtpNmCc5p
-	 bhlAy6im4QjqajKhHKIIqxdERKmud+HhOegIWHC39boRIPHyst/IkizPkyUeTgArkA6/H
-	 dSuNMTw/MbwHaooZFGUdd9VYk0D4U4xLxKuVmGlYoUSTj2kAp33USumCyuVwLSkUxZj4I
-	 9frfk5Af4V1yvqO1ISXBCxw0XTwpcrp1hH74n7eA7QEk/ah38pNCGj7Uz00l2e/PfEkQo
-	 ihAIQlA04wArzm7BHT4URBbwQL2269KoyJm5UO6oQhjKtLtHffQTrW7SeoHZY76RSKg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794677756;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=qK7SuyRaPZU4Zu8y5BHFfEAd1B/irS9odpnB5X268FU=;
+	b=YTC+NKIpbpZs8Kc72j7Ad0R84+4jSEbL4QpON31tVzq/O3igdDXw2j2Xxr9kWNvBCrUj
+	 ctkIsFNs1BqaoYgn2D/DYw8d4v9BxVXbVp8X3vRBkO0f3u34/omTaehXvfokAacnnqi6S
+	 Y/uTiTbfV0/nGk5xORusBUykYxRnj2mK+9fgE9nzjryBBKL2s+K4/Gf+kIlIFZE9VNULU
+	 12G6JEH3TRZwoIsyagC4JlcyXx99NyFQD2rKMYhfYiVeqcLMzCff3WpUk1G9F8dJh/VsU
+	 c64+bWRWecD7rqkYhP+naKB8SEG82UjXm6arASsbsbSBvXcqvPMVZyHxgYthjy9twNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=posteo.de;
-	spf=pass smtp.mailfrom=posteo.de;
-	dkim=pass header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=SyohQEom;
-	arc=none smtp.remote-ip=185.67.36.66
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=justthetip.ca;
+	spf=pass smtp.mailfrom=justthetip.ca;
+	dkim=pass header.d=justthetip.ca header.i=@justthetip.ca header.a=rsa-sha256 header.s=key1 header.b=v+0QoPX8;
+	arc=none smtp.remote-ip=91.218.175.24
+Received: from mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C272F606A327
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 17:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C272F606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED71606A337
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 17:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CED71606A337
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=justthetip.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=justthetip.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=posteo.de header.i=@posteo.de header.a=rsa-sha256 header.s=1984.8680eb header.b=SyohQEom
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id B227E240103
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 18:06:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.de;
-	s=1984.8680eb; t=1794675997;
-	bh=bZSuAPjJ+v3XkKNzimjkiEXtH8QqSAUW7r+KOR1UNck=;
-	h=Message-ID:Subject:From:To:Cc:Date:Autocrypt:Content-Type:
-	 MIME-Version:OpenPGP:From;
-	b=SyohQEomfPbKxQQTxZA1xxZuZfKgxDnij1Cx+/FcptINrcPxH84phY9S3OLo5zDvv
-	 QyFR8J26RyiC+fdrKBwZsBuTjSGh7Kn1iyLsZyN84bQiAJ6tu3HbjQY/8Edvcd4i3c
-	 dxE4gLARWHv2QRjQvI9TczQQPaH72FPtixvSWYi4ydneVBn6cu4rdXmWuz/LozCwZ5
-	 iReniHrWwE2iaOSR7dG/WgI4OP9ksNaAjzGvHa/AGJm/2D7Y84dLe3IhMPj3f8O6jG
-	 Gmy9kHM9n4qjtBcpnVtGXbKQlf6/g9WVHsz+sAacweKn9h7rW8gr9f43fZ5fFfAGw4
-	 tRCXhSwXrVI/w==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4jRgWv2qdFz6tsb;
-	Sat, 14 Nov 2026 18:06:35 +0100 (CET)
-Message-ID: <fc05ed7435e2fa282a163f99110048f6cfe56b6a.camel@posteo.de>
-Subject: Re: [PATCH 0/1] Bluetooth: hci_mrvl: Fix duplicate serdev open/close
-From: Markus Probst <markus.probst@posteo.de>
-To: Michael McAllister <me@michaelmcallister.org>, luiz.dentz@gmail.com, 
-	marcel@holtmann.org, Loic Poulain <loic.poulain@oss.qualcomm.com>, Sascha
- Hauer	 <s.hauer@pengutronix.de>, Stefan Eichenberger
- <stefan.eichenberger@toradex.com>,  Gongwei Li <ligongwei@kylinos.cn>,
- Marcel Ziswiler <marcel.ziswiler@toradex.com>, Vitor Soares	
- <vitor.soares@toradex.com>, Hiago De Franco <hiago.franco@toradex.com>, 
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Sat, 14 Nov 2026 17:06:37 +0000
-In-Reply-To: <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
-References: <341e56b1ff7d8a5b109e26e30dfed61faa54d603.camel@posteo.de>
-	 <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
-Autocrypt: addr=markus.probst@posteo.de; prefer-encrypt=mutual;
- keydata=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
- jfGillcaQOqFZ3WwVqyzG1BUfTow==
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-RNNjEGgBFzqiQk7v4Asd"
+	dkim=pass (2048-bit key, unprotected) header.d=justthetip.ca header.i=@justthetip.ca header.a=rsa-sha256 header.s=key1 header.b=v+0QoPX8
+X-Envelope-To: linux-bluetooth@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=2E6UwzKVw7xbUUzy4LRhSE/cy3bndWxPXfWiSHkxIRI=;
+ c=simple/simple; d=justthetip.ca;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794677753; v=1; x=1795282553;
+ b=v+0QoPX8dnT9S1HhuRc4W7BP60sTbojQ7gjTlfbKmjHx2O1ZdoQoQasPl/1gRvcgZmNdmB0S
+ nG/XsQvSG32fSAsMVhln1wwsjXQPkahZ2G3C/ZEIJSyoaClwzzvNPvuAhT5yH1B2F/SOBtFGdDt
+ NteqXejawRnA71OQ6cNaSzlJBa7YImTxAURHPYeDfY/5gze8jWCQoxwJQp4Hz/zsR1XEr8/pLY0
+ IdEIViFKOAfjBPHGi+vfqdf4G6O3JASzljz4+3RtvOs2AD8ucmSpQt1rVxjZdcpkmDsLzLZu2sB
+ E26mEUTgrckRsEIk8xXY6tHoMvIK0nxuE1tcXZfHWbuPA==
+X-Envelope-To: linux-bluetooth@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 4af640e38ee65c47;
+	Sat, 14 Nov 2026 17:35:53 +0000
+X-Mizu-Trace-ID: 4af640e38ee65c47
+X-Migadu-Flow: FLOW_OUT
+From: Devin Wittmayer <lucid_duck@justthetip.ca>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Hao Qin <hao.qin@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Chris Lu <chris.lu@mediatek.com>,
+	linux-bluetooth@vger.kernel.org,
+	regressions@lists.linux.dev
+Subject: [STABLE 6.6] Bluetooth MediaTek controller reset fixes
+Date: Sat, 14 Nov 2026 10:35:50 -0700
+Message-ID: <20261114173550.5736-1-lucid_duck@justthetip.ca>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -120,60 +72,42 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-OpenPGP: url=https://posteo.de/keys/markus.probst@posteo.de.asc; preference=encrypt
-
-
---=-RNNjEGgBFzqiQk7v4Asd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, 2026-11-14 at 16:15 +0000, Michael McAllister wrote:
-> Hi Markus, thanks for flagging this!
->=20
-> You're right, hci_serdev already opens and closes the port, so the extra
-> calls in the Marvell driver aren't needed. This removes them as a
-> separate fix.
->=20
-> I've build-tested it and checked that the duplicate-open reproducer
-> passes with the fix, but I don't have Marvell hardware to test on.
->=20
-> Thanks,
-> Michael
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8bit
 
 Hi,
 
-Thanks for the patch!
+Please queue these two for 6.6.y, in this order:
 
-I added some more people from the git history (incl. from existing
-device trees that have this hardware) to CC here in the hope that they
-can test it.
+  a7208610761a ("Bluetooth: btmtk: Remove resetting mt7921 before
+                 downloading the fw")
+  33634e2ab7c6 ("Bluetooth: btmtk: Remove the resetting step before
+                 downloading the fw")
 
-If nobody tests it, there is still be linux-next. But its generally
-better if it gets tested once before that.
+6.6.145 brought in the controller reset they remove, as a dependency
+of another backport (1c770a550df2, upstream ccfc8948d7e4). 6.12.29 has
+both already [1].
 
-Thanks
-- Markus Probst
+On 6.6.162 an MT7921AU USB adapter on a USB 3.0 port has no Bluetooth.
+Setup ends with
 
---=-RNNjEGgBFzqiQk7v4Asd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+  Bluetooth: hci1: Opcode 0x0c03 failed: -110
 
------BEGIN PGP SIGNATURE-----
+and the controller cannot be powered on. On a USB 2.0 port it works.
 
-iQJPBAABCAA5FiEEgnQYxPSsWOdyMMRzNHYf+OetQ9IFAmr4lRUbFIAAAAAABAAO
-bWFudTIsMi41KzEuMTIsMiwyAAoJEDR2H/jnrUPSezoP/15HddtPh5s0xtRmwOIH
-HO6Alam6NRspxv2Cm8w7W0IdS0V/u/Krq+kCnCUHkiOZYgu6zzdeEVojPZ2TO5My
-XcMeCBcEvECy6rf2D28D2JaAh2kc+44XGeA5mfak5rTNY22SrV7xRsjlo4Z4JSFq
-kQQLlvalZgdn76/PKZjckFxurFiJwP40u+xmIQMqz9qu8kqeE6Cdm6Ars+sH0TCQ
-B0YnMFWNZ5ZhDZa02RAKKU+IsIZaSWE+BDur9NmHFJW2MeVNuIVFdWpmMnRyzfcQ
-i3DlwKY9dJvLauSVlsQqWo9Ajbnv5Vo3UXPSdIfSeP5nXq+PtuCxTJCIh5VyFjr3
-aPzp5P0UHjnRkmPTrbBp59fSRZYHubvzRt6TtkVg+Zw86BXRC9A5yLIyObBz3Vfc
-OZ37sCEksO988toNsB+5zVP9tGnZTLOW9u9NKB2+L/aY5ujYoZcIS5sUgZ2TA+SN
-/8gnRxg8zboTkikXOS1fnD/KsinX/7umogR9kB6wCXCeHCrM+bQuqpAHsp/Q403W
-Kg4HPPfQqJ3vzMUOqdDkYsbq4wEJ7w94GO1CWkwMQ0ZEy5tIWtRrHLUdSdzEdhuB
-73XK5KocJMJEiGauz87RcxYznJHlAtlaSAKcc3YxbBgyfbchlz4xrkRn608UDYVk
-0vbwWmlOtais7onDKnwUM8T+
-=dMnd
------END PGP SIGNATURE-----
+  6.6.162, Alfa AWUS036AXML at USB 3.0    as released   with both
+  boot                                    0 of 1        1 of 1
+  plug-in                                 0 of 1        1 of 1
+  USB reset, then probe                   0 of 5        10 of 10
+  the same, Wi-Fi driver loaded           0 of 5        5 of 5
 
---=-RNNjEGgBFzqiQk7v4Asd--
+With the Wi-Fi driver loaded, its probe also resets the device [2].
+The fixed kernel then still logs that line once per probe, and the
+controller comes up.
+
+Both apply to 6.6.162 unchanged.
+
+[1] https://lore.kernel.org/all/aBxdpIabalg073AU@m.b4.vu/
+[2] https://lore.kernel.org/all/20261112-mt7921u-bt-reset-v1-1-65587a4d7b81@flipper.net/
+
+Devin
