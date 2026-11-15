@@ -1,59 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794737955;
-	b=T6zvV8zCd6j/+y7QNE+kr1H8Ttfqsj7ZFVgULDDeAHGJU/Fp3tOljwSIqUpBEadRUqg1
-	 2j3dXvCedAzf1oL3BeTn2323qc0xqDDQengGq3ti5HjHjLPeV5eWGrv/nsxc4Vg6aA2TB
-	 ueiJft1Evndk5h6Q00IOiWq2WqTr5ukDP3xJGJhukgxBLaAgTzes/OVZG7+Th5A3Lm8w3
-	 AAMaWKD6fINJjzDn5Mi2Dw0lIucpsJjDcRkiyngXuSWqNtLA4miKOJNcldZAW/tjap6CQ
-	 g+Sf5DQTI9sEckNGQ/ehHgTIGK7lXAs8iUow160JHhcSBj3GLvjaqdnbExh+z5kOCCg==
+	t=1794737994;
+	b=Dqkwkh9RmzkxqF1ywN+KrPOFVTpaC+TT4vreHhCQ4Pa1jtk0EFLg8LJfdE5ocrmiguxg
+	 +w4tWB/BVC8uAvnznpnNc3S2wFFSbZj/6wikTD8p7+q63i8U7WodamlRhjilyXayjvxoA
+	 B89fhlMxSLZmC3YFnLFtIVzD4p0lx6CzSRt1acSuOM/BF0XrCZqcw6K/BunZ3bIFONyum
+	 lwUwZhU13csMcDx37+bk24fUqVA63OSe3oSNBT3hltneeHJMY9mR+1OcYPbEERA7sVzH/
+	 NI7+YdnRVRrIHHB6P4N2AmiNOpT8zc7RZLepxXySCKt3X4R+4GM/kEF1HeKlAmdUusw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794737955;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794737994;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
 	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=3r55KL7eBrHrbeDPiMXmVW2NaDcym3nxHa/NS9skFpg=;
-	b=qz5UPAC1YCeZWeT9H2Uq2H1aArCrqCYZ7snzraPasVWRvueayp5y4PpGW9K5fuye7wrs
-	 /SooWKbiH/4+bZ+zFUeaZFRtf4R9UkTVReDHajuwtj02xNz9Y/UZkWMohLJDYa4n4zKvA
-	 dQaR2nxYQZPfbHfK/fO/Vs/Niv1IP1f7WQv2qgpTQhUkujHepXDCL2Q1MckuZ55c6T3tu
-	 R83VP4bpnYiU0y5NMYnBZg/8wp6PmSQN+7yFTCP/namL4w+wbnNXnF8BDIkWzFRd+YcK/
-	 t1Z9tK8sSMyq3yD6tgw4kABhsvODjyLJIeVz4T4xLswDsU91TAG2OHcDHUlaoroMjNg==
+	bh=xttC6qvwnkJaM+T8snQbEM2LebyDZfAQYi3A/c4bnKk=;
+	b=fnhQzC+MtCSzfgBh4ym8KBT/wI2A/Xscplv9VMsI6Qp5iU/8JW+4SDpxYUvCJ169Fsxn
+	 Ru1RbaLqYbGFgPqTx0Xj4qsl7TuH3SdGJkNlt2dhQhknnWZNOxDDsT578KJWTMkSA0pal
+	 DkpixwTh7n8ptKd0Kj2Lp5pYZSqbtcbpHnQFsoM1VCo+rqG62+cszg2aD/VS3xO6aXcJ9
+	 nljDbhcsshHj3dhckk3/sXN4KHCieKL08ZeHnVOSSLc/nKexqNcSUKjURvNXlIsohEFMV
+	 Qp9FICIzdEzY4LdE9KjSxIDPr6r1OVx73NnRxKtmFRhIDOAzPo4c3kqkYAsG9gTAapw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=VArkl0tp;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=FmiRWiCL;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEC0606A31A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 10:19:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFEC0606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B117D606A31D
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 10:19:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B117D606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=VArkl0tp
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=FmiRWiCL
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1794737953;
-	bh=gI/18Kv02kh2bTJkvK2HmZaN/ANQQlR34RO+qssJSzU=;
+	s=mail; t=1794737992;
+	bh=M7U2SUQtL5jU0HeLy8CijY9PWueDv+d6BNytdH7Nn6U=;
 	h=From:To:Subject:Date:From;
-	b=VArkl0tpF4hgtHxs51Kpi9chIR99WkN3IDt5GNAFtwW8+nj4xyu7ih9fTmQxgEWDU
-	 esxFR5+XVPpfNl24tgrLvv1Srg7wr5KCBD2wWwJSiu2SrrGqtcow9Q1WBNclhZbHxC
-	 QJ453G8XkPedb4UrSqfuoS77CcNpskJuRywMm+boyMbLCClFeBQ+S+USee3HnGzrkM
-	 wtnM8dbOCw0qzq1w4bHY3I2m2DnuaPK1tgGs0bz2+2Vem1CoqCvMscQ4y9A/ozctH1
-	 3QLz2StnW2XPR4BTdIaysv9wrB7pPTI7mc7iVv8iM+o0fZDfAdXHKKh/1rplbkuqbI
-	 TFCsogkY2BSMA==
+	b=FmiRWiCLIsjr/A2G5eHdCBXDys+AzDv+ZIkXk9UBz5k5AwHk+hFJTnri2FORRhqLa
+	 yxiWZvCptTYmAk1nVxjTTrah7Ji5CId32B7bA+3lb425ZoyJd/R5X4aFe6swgxVJI0
+	 bPDUwdz8smeWeHzwjyHz0vLIS7XKRcovenyaXE9uPv06zhvhTn/6dn7MlMzloUC/MJ
+	 tgzbJhSAQWo20hka8jH2ThRcPXMZtONi22CWWh7HT0H/EML3SMj/JM0SyABD3oRa1f
+	 REjvUA5f0z8HIRf7dj63D51jicpHGJe/6Bw8Nsq9PImg4E8bkjNE3MvyCSQJ28m3V1
+	 gaMvZ2MEdeo5w==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id DD06217E04B4
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 11:19:12 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 209D017E091F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 11:19:52 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/hfp-hf: Fix org.bluez.Telephony1.Dial reply message
-Date: Sun, 15 Nov 2026 11:19:07 +0100
-Message-ID: <20261115101907.68963-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ] audio/media: Add hfp-hf supported feature flag
+Date: Sun, 15 Nov 2026 11:19:46 +0100
+Message-ID: <20261115101946.69033-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -69,107 +69,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-An org.bluez.Call1 object is expected to be returned on
-org.bluez.Telephony1.Dial() success.
+This flag is set when HFP HF internal plugin is started.
+It allows external applications like PipeWire to know that HFP HF can
+be managed by BlueZ and they have to register endpoints for the
+supported codecs.
 ---
- profiles/audio/hfp-hf.c | 51 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 48 insertions(+), 3 deletions(-)
+ profiles/audio/media.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/profiles/audio/hfp-hf.c b/profiles/audio/hfp-hf.c
-index 4e626653d..bc6d7229f 100644
---- a/profiles/audio/hfp-hf.c
-+++ b/profiles/audio/hfp-hf.c
-@@ -90,6 +90,7 @@ struct hfp_device {
- 	uint8_t			codec;
- 	unsigned int		resume_id;
- 	struct connect_data	*pending_connect;
-+	DBusMessage		*dial_msg;
- 	hfp_hf_sco_closed_cb	sco_closed_cb;
- 	void			*sco_closed_data;
- };
-@@ -192,6 +193,29 @@ static void sco_connect_complete(struct connect_data *connect_data, int status)
- 	g_free(connect_data);
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 34ff251c7..3433a7b6e 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -3765,11 +3765,23 @@ error:
+ 	return false;
  }
  
-+static void dial_complete(enum hfp_result res, enum hfp_error cme_err,
-+							void *user_data)
++static bool probe_hfp_hf(struct media_adapter *adapter)
 +{
-+	struct hfp_device *dev = user_data;
++	struct btd_profile *profile;
 +
-+	if (dev->dial_msg == NULL)
-+		return;
++	profile = btd_profile_find_remote_uuid(HFP_AG_UUID);
++	if (!profile || profile->external)
++		return false;
 +
-+	if (res != HFP_RESULT_OK) {
-+		DBusMessage *reply;
-+		const char *name = dbus_message_get_member(dev->dial_msg);
-+
-+		error("Command %s error: %d", name, res);
-+		reply = g_dbus_create_error(dev->dial_msg, ERROR_INTERFACE
-+					".Failed",
-+					"Command %s failed: %d", name, res);
-+		g_dbus_send_message(btd_get_dbus_connection(), reply);
-+		dbus_message_unref(dev->dial_msg);
-+		dev->dial_msg = NULL;
-+		return;
-+	}
++	return true;
 +}
 +
- static void device_destroy(struct hfp_device *dev)
- {
- 	struct hfp_server *server;
-@@ -200,6 +224,10 @@ static void device_destroy(struct hfp_device *dev)
+ static const struct {
+ 	const char *name;
+ 	bool (*probe)(struct media_adapter *adapter);
+ } features[] = {
+ 	{ "tx-timestamping", probe_tx_timestamping },
++	{ "hfp-hf", probe_hfp_hf },
+ };
  
- 	telephony_set_state(dev->telephony, DISCONNECTING);
- 
-+	if (dev->dial_msg)
-+		dial_complete(HFP_RESULT_ERROR,
-+				HFP_ERROR_NO_CONNECTION_TO_PHONE, dev);
-+
- 	if (dev->pending_connect)
- 		sco_connect_complete(dev->pending_connect, -ENOTCONN);
- 
-@@ -288,10 +316,23 @@ static void hfp_hf_call_added(uint id, enum hfp_call_status status,
- 		call->multiparty = mpty;
- 	if (telephony_call_register_interface(call)) {
- 		telephony_free_call(call);
-+		if (status == CALL_STATUS_DIALING ||
-+				status == CALL_STATUS_ALERTING)
-+			dial_complete(HFP_RESULT_ERROR, HFP_ERROR_MEMORY_FULL,
-+									dev);
- 		return;
- 	}
- 
- 	queue_push_tail(dev->calls, call);
-+
-+	if ((status == CALL_STATUS_DIALING || status == CALL_STATUS_ALERTING)
-+			&& dev->dial_msg) {
-+		g_dbus_send_reply(btd_get_dbus_connection(), dev->dial_msg,
-+					DBUS_TYPE_OBJECT_PATH, &call->path,
-+					DBUS_TYPE_INVALID);
-+		dbus_message_unref(dev->dial_msg);
-+		dev->dial_msg = NULL;
-+	}
- }
- 
- static void hfp_hf_call_removed(uint id, void *user_data)
-@@ -566,10 +607,14 @@ static DBusMessage *dial(DBusConnection *conn, DBusMessage *msg,
- 	if (strncmp(number, URI_PREFIX, strlen(URI_PREFIX)) != 0)
- 		return btd_error_invalid_args(msg);
- 
--	ret = hfp_hf_dial(dev->hf, number + strlen(URI_PREFIX), cmd_complete,
--					dbus_message_ref(msg));
--	if (!ret)
-+	dev->dial_msg = dbus_message_ref(msg);
-+	ret = hfp_hf_dial(dev->hf, number + strlen(URI_PREFIX), dial_complete,
-+									dev);
-+	if (!ret) {
-+		dbus_message_unref(dev->dial_msg);
-+		dev->dial_msg = NULL;
- 		return btd_error_failed(msg, "Dial command failed");
-+	}
- 
- 	return NULL;
- }
+ static gboolean supported_features(const GDBusPropertyTable *property,
 -- 
 2.43.0
 
