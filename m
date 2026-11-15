@@ -1,88 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794726589;
-	b=jdyhhshFz8eEAKa8AlOqBf7m2Z60fM7NAibtQgB+rk6/x7ruejRd5nWYkzo6eEViHWbH
-	 gh5zOTvEkxoJOSBi1BGMGN4Ah7oPQlsKuOv4mPlWy6A2ByVqVhnM0MuA36Ub+jcT7TKwz
-	 WgB8QD92uhoHU5Vc+/x26juDtfSU3sy3XPYsOvlvZvVIHL3748pQzvMx60BN4Eev3Rv6m
-	 nSZueZyJUwCFXOOfEJU8dxFuGlV8cZ2or6pj46VUus6EOSfM8NyT1vhHi8GB7V6stTXBN
-	 3dwfqgyD85LoCHdOqugsrclkU77MvssxMi8kiwLSaFZVQltN4pl6GmSqwuxrLVf/YNQ==
+	t=1794726592;
+	b=WgBKw40Da5l3lL9XMBKt5CNvkPGN2wtNuGPdVSz7Q1TviwnlmQBDaFs7sSMU6djHaXAf
+	 ucSVExaKMZenJAOgq1QsGd+X1JY+IYMlcZJzJU4cTDoc+wyg34ZTI1NFJuvWiz5x1KWyU
+	 FY8zzUTsXRfgb1AxC4WWJXjzbCZ7w509AaoBivAuruV6v3H42T7R7PNwMu+XeUMQf/Ojq
+	 JMO2xbdsNrAwdvfutOlZkNQT6b4swrYTFmT3i5CKYx1hDDx7XgndoHXkeNYauFSM9VQBk
+	 l7/zxPqlSkLV0ObkfRKmA5mSfbdK5AO4F2AY6ktxxxOSJZZBS5SjLPVgh/Oefpr+FiQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794726589;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794726592;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=ssSyrrbdcdoCXfADw8of9AOPU1EY7r5ssdcoiWTmGrI=;
-	b=hteZm0RBpM8j2v29t5YxOyhvx2putRejMog0yeRfzR4clDDQjfZnCoc+iForyJ6mVrqG
-	 XqaEOytlQ+OQNkS9Qv4PqJrFnnBaQryCP18YAbDlLwPwmirLGBFytlNoSo8WzEAheOBNp
-	 8BYl8VU7fo6H7x9e6IUPH29PYu5yR8WTbDCuMf3DYwQ0XTBZcNL0+bLbn2cD9vXbMCONE
-	 OCW05Qu4VLZWSqZJ2mOHfzBfFJQ4YY+lMlW9DG0Lc//BWgmFdSp6s2jAKnm/srX7Ty5ZD
-	 5somg7xMzLnTfcfA/rgh7XWJUFd/WGLt8x1XsqeLspjDrjKZbVrQcWk9GbB9/562sRg==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=uBLzkq0sfdjElKI2azDbJASTVB8haM5Yuxloh62ZCgY=;
+	b=thnLDAf2pN60g/XHfGI9pltD98F+mXe7g1vjVoMvK0firRYG2d/maTx5qgivJxjBB8aa
+	 /yvt7gegLCn7JWq7P14n1Su5p75S3ukhLAo+AFlfZXxBPCa565HskzGILwRuJAttkKEaM
+	 Hq8T4axxMczIzpxUcqXoFrayIToHdWtJfelvOZB9Nxeu8WN2eUB8fxAwwCdsgFXWKC+PC
+	 HRQg8m3D24aFXrBEhhZe2hEjl9CFHRXIYycbx+y3yy9V01x9RrEd00yb2mkrg7VxVfiAE
+	 aMsYTUfPjYFPsLh/N7hTTiYJyelXAGIKoXq3PRjUpOWvXmTQSw/l/jtL5AWT6UahEew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K1jJbxmW;
-	arc=none smtp.remote-ip=209.85.217.43
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Q8i3ianu;
+	arc=none smtp.remote-ip=209.85.217.46
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D571D606A323
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 07:09:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D571D606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BBC606A329
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 07:09:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0BBC606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K1jJbxmW
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7d2ee9e7093so572754137.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 23:09:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Q8i3ianu
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7cc013095d4so687566137.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Nov 2026 23:09:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794726588; x=1795331388; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ssSyrrbdcdoCXfADw8of9AOPU1EY7r5ssdcoiWTmGrI=;
-        b=K1jJbxmWYG/Z/RmV1vfC5+Wp++s68dx+Koz5mE4lm96lhaMXizGssBOH3afUUel7Fj
-         oZJzNLdIj0UL5TV0ls/d8UhnH62lWok+Mger7Tvy8OfkUc0dUkcYC/ZemP9gsip5oUeu
-         i8F+WNhTpIgomWADwJsJDL5gQNaYBxCLRBw1WTNL6ctAlW89c3emyFJQ3rCVNj+s2qcZ
-         HMxczT3ogeFfF4HkU7sla5cPl9HYoPirFfGVzQyXIO4U+Ji673HAasa0i1d+E53ac//9
-         FADU0NyrSooqERt1pHpAF8uGCxhgV+AmnJkgQI/cLTpZKV7hKDhgW6o19Gd38WgQa76Q
-         POEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794726588; x=1795331388;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1794726591; x=1795331391; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ssSyrrbdcdoCXfADw8of9AOPU1EY7r5ssdcoiWTmGrI=;
-        b=jZH1rQ7X9ds8bIiOqWiGGskIpLsVJQD8wkkPQ93ffvAsqYkRX2M+vDuFq4aMqymFr5
-         ds5pyOfD7pre2y1nqyQnEswaP4BV5Dj2sfBtyRPSbgC6DOXtvP5DbKAq+X7PTeZdm7nr
-         HCYwi3crHPEG9cDJjzg5sSbENNFAYC+dNwrRGKWCesvCB/QK3wYLaDoHtsYfoPLPGjzu
-         Jb0XmR+kzhzIcTv1CqX+3ANBHAePaZppTXIEKbt09tIn8ogwD4oT1hB8DsSsOi8Sohw6
-         TZAKh5A6Qn3GsiIaqWwofx6TTg1qzY1sVe6xJ8ieouxqdy6O3oJYtGLD1fIGWT66s075
-         0faQ==
-X-Gm-Message-State: APuU4Z+SK7sMXt46R6Pg2qKIqsD6LMeCCxyHc2IVHRwHL91d7Eo1lGQg
-	85LfuyT9cKbc0kbvmge1NeUNWe8nfJIEkFJa+VC7Jp1u+Vl/KCyTdcjAzRxbVV/f
-X-Gm-Gg: AYBFou0HNJf2xnVeScVU55i89+X7IYmeBCcHQW/dTGkTG8mUtopktGGhnxzm/VfXk8j
-	nM4bFXaBg0d88iCNaCYpmE08dUKfcvBX184AID7KHUWI8lSrbxCJBCn1gzOovJ9fSwwNb7FSoGw
-	B8uD+QWEyZCwzymVBb9i9DU4RCMZ2ZVQkHIEcYv5SgH+5oUpSX4yI5KpRN/aXgrYVEzAaMS8y43
-	rIsdKvgpsRPep0LCdPjnK2YPZ3vQdQCCAgoioVhZ2ngABFBv/DAEKh9+0Iu2tKp65lKGBs0ha76
-	NofnplUzBDj72xkIIJspSAZtYxTltdoPk38xHMB/61HBkjEa1rUXUkeqtc7EdEOaBWhK52eRWI/
-	UlqJiIj2aUcmuoK73AJJFPWf9mEjRQiqdJ9wmy65D0Em41piEiDFYXpE4Qe6l7MNl9iXkfyGw14
-	2lXeWqQM0zaBTIdHXf8t0xuC8S+8IlIGcJwCJH8gXnYIqZf4xOSTMwjP2YnEIKVmn41AFfIeq3c
-	Ptg1HwOysPTNMttd4aYEoMtKkJ4hFdHojRTUFKS1dVdXfsMFckxh0WHvLOlbeHCL9QKqme6vlKE
-	tlWA9WUHiF3zZrNu4V3Y9wclcSgMZqOwvsQEXJifkHNOEojU9f5sN5vQr3bnn8hxXfyz68UJRJO
-	WxEQNrmSWY5XRqSHG4OzsXZMzUESz2IP3B4oOL20V
-X-Received: by 2002:a05:6102:5128:b0:7d0:6db8:dc3d with SMTP id ada2fe7eead31-7d64d425102mr2134405137.5.1794726587489;
-        Sat, 14 Nov 2026 23:09:47 -0800 (PST)
+        bh=uBLzkq0sfdjElKI2azDbJASTVB8haM5Yuxloh62ZCgY=;
+        b=Q8i3ianuolOrf57vMQgmg5mXLEZ6cZqpopivgQvyn9XBuTvPyWeCxONJzisqp3QGh8
+         20CLf9xp11mbTfv9V0e70UOIIOWwlcQa07TZpnIjJNL6/VV4y3qe7PoNiz2XloTX8nqF
+         SfE2s8/0R4n5AR3ecyMT0ZxFwdcoC9kQ7C76QS6xvTUR+8g9+cNcYxk8jHCzYBU4Min5
+         4hQ8p2zWM9bSaZG7ti4G4k56dY6Tb4VAapja95kDP3z2cS2RpNCtwVGhmaNoaUJCNS5S
+         peYdIioHZ0HNldAivjnPBiDHX+lMkEWSKs8r2oN8LueZf8K6mi4fVcqEWBGnGY9mUyk7
+         H3OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794726591; x=1795331391;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=uBLzkq0sfdjElKI2azDbJASTVB8haM5Yuxloh62ZCgY=;
+        b=YKbkO1ZV5KeaQ3GYJQy8DEZqhOGmpZLev5oc1VwNEh2y4e8v8cxpj7tPUZULQpJFJs
+         5JWCUePtcSZge6TK+EjrQzW1vaKOc3h2W0SFd3BBfWzOJgAvnvYHJlz9uM2cXtlWWKBS
+         s3aJrFxChkCLay8KUv5YLxTPusieCELmzNc9N6SzP77DrZ7vyHYUU2FKLcBIG5KM6z2j
+         dIRnJH2DSoOS0Xc9RO6tz9AHRnMcBHxnqxlz2zRZUEJk3zb1SKapGNenU8CMqyI6Wtzk
+         v7XUzoVgCF1eph59rCfbSYJ/t2psEbMwRyf/oTQk+j9PKILkdTRKfoWWYHlFwRL8iqwq
+         0BiQ==
+X-Gm-Message-State: APuU4Z91/L+43Tdrzr5FmJ9/zCRA4LLUW+CZ8q9Cmh/Sa4I+UbN+alGb
+	c9ZStBua4Yl1KcAWGgvzyT1fCb95jhYgTE8eFWZL4gCs8HkFwbEfftkafqiu4RVZ
+X-Gm-Gg: AYBFou1R1Z4FxXpGk7O35NPT/JPv53Wv3i89LyPDj/YUuGNAU88mNItcHO62vEO9rP5
+	iXwmCgpNPb0IpqR9LCErOTeTJh3+DUD/bCYZ6CM/YvNhQXYXjMAmzG6leaustNrU7mPoqhBh45e
+	KKLIfzrl6ODsJFfyB6Z47ZXVSIqU5eCpYdgpR8yYcCgWH+xOi0g+o0mvvBATJPalAXG7tM1VMbA
+	wtcePCuNbt5mIy94xIvHfoFR/vOVbz+da4Xz0eCrDwi+X6oblQVsCzdUKupTCT702Zhb9kMCCtj
+	CEqr0loqyznFLMeGHMIw2bHSL4rQZpQQLEkbWGpCzZpLOCGyXamYULxHDDC6j5YeApBlhVosW88
+	frb3d802TuykTirIkjB3vsE29LdINOIDYRkRPs/4n8pkCuzVw5wHHPnqlKiC1xER3SLpIYlz+Ts
+	Lg7H6mBL8zjGohzLrnkEq7o4i/p9Qyz8PyFaIHG6VMHtSUYpKy9+hl1ps33Q95bAF4spy+ZIHQt
+	lUlnCd6nZ+6CibmlIfUhacuul0vFVFsJmuychKsGJwpZOARXmr6czUVqfDN6N/hoRQsnXsWFR1J
+	NNLbnaMxDhLnOEEsCz4oIz7Iql2QtmIzKpoW0US45yT43N1IDx55Sz5RH1Y++JjNp0AiECW6Ni2
+	ppFFgYCycAVNp97wPdnZ6NyMKobAybToBFGKDzbTv
+X-Received: by 2002:a05:6102:2c82:b0:7cc:2152:4f79 with SMTP id ada2fe7eead31-7d64d75729emr2222633137.16.1794726590359;
+        Sat, 14 Nov 2026 23:09:50 -0800 (PST)
 Received: from fishcake-omen-transcend.uwaterloo.ca (wn-res-nat-129-97-125-18.dynamic.uwaterloo.ca. [129.97.125.18])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d64c4b47aesm4580080137.7.2026.11.14.23.09.46
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d64c4b47aesm4580080137.7.2026.11.14.23.09.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 23:09:46 -0800 (PST)
+        Sat, 14 Nov 2026 23:09:49 -0800 (PST)
 From: Muxian Li <muxianli5401@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Muxian Li <muxianli5401@gmail.com>
-Subject: [PATCH BlueZ 1/2] device: Fix SDP records without a record handle
-Date: Sun, 15 Nov 2026 02:00:54 -0500
-Message-ID: <20261115070055.45999-1-muxianli5401@gmail.com>
+Subject: [PATCH BlueZ 2/2] test: functional: Cover SDP records without handle
+Date: Sun, 15 Nov 2026 02:00:55 -0500
+Message-ID: <20261115070055.45999-2-muxianli5401@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261115070055.45999-1-muxianli5401@gmail.com>
+References: <20261115070055.45999-1-muxianli5401@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -94,157 +98,322 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Devices that leave the ServiceRecordHandle attribute out of their
-Service Search Attribute responses, such as the Nintendo Switch 2,
-produce records that all carry the 0xffffffff placeholder handle.
-update_record() then drops every record but the first as a duplicate,
-so e.g. the AVRCP Controller record of the Switch 2 is lost and
-absolute volume is rejected.
+Make host1 answer SDP like a Nintendo Switch 2, whose records lack the
+ServiceRecordHandle attribute. Check that bluetoothd on host0 keeps
+and caches each record once, also when a record is returned by both of
+its searches.
 
-Compare such records by content instead, so copies returned by the
-different searches are still merged while distinct records are kept,
-and cache them under distinct keys, where they would otherwise
-overwrite each other. As for records with a handle, cached entries are
-not removed when a later browse returns fewer records.
-
-Fixes: 8b2e688eaf5b ("Check for duplicate record handles and not UUIDs")
 Assisted-by: Claude:claude-opus-5-5
 ---
+ doc/functional-testing.rst  |  48 ++++++++
+ test/functional/test_sdp.py | 239 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 287 insertions(+)
+ create mode 100644 test/functional/test_sdp.py
 
-Notes:
-    Tested with a Nintendo Switch 2 as A2DP source on BlueZ 5.85 with the
-    rec_cmp() change backported: its volume keys work, while without it
-    bluetoothd rejects SetAbsoluteVolume. The new functional test fails
-    without this patch and passes with it, also with AddressSanitizer and
-    UBSan.
-
- doc/settings-storage.txt |  3 +-
- src/device.c             | 68 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 66 insertions(+), 5 deletions(-)
-
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 8bd677e24..2b075725d 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -187,7 +187,8 @@ Each file, named by remote device address, may includes multiple groups
- (General, ServiceRecords, Attributes, Endpoints, NameResolving).
+diff --git a/doc/functional-testing.rst b/doc/functional-testing.rst
+index 371258261..fd8760d8e 100644
+--- a/doc/functional-testing.rst
++++ b/doc/functional-testing.rst
+@@ -237,6 +237,54 @@ test_btmgmt_info
+ :Notes: Skipped if `btmgmt` is not built. Checks the mgmt interface is
+ 	usable without a daemon.
  
- In ServiceRecords, SDP records are stored using their handle as key
--(hexadecimal format).
-+(hexadecimal format). Records without a ServiceRecordHandle attribute are
-+stored as 0xFFFFFFFF, 0xFFFFFFFE, ... in the order they were found.
++test_sdp.py
++===========
++
++test_sdp_records_without_handle[switch2]
++----------------------------------------
++
++:Setup: Two hosts. host0 runs `bluetoothd` with an agent. host1 runs no
++	`bluetoothd`: `btmgmt` makes it connectable and discoverable, and it
++	answers SDP on PSM 1 itself with the records of a Nintendo Switch 2,
++	none of which has the ServiceRecordHandle attribute.
++
++	.. code-block::
++
++		+--------------------+                 +--------------------+
++		| host0              |      BR/EDR     | host1              |
++		| bluetoothd, agent  | --------------> | SDP server, PSM 1  |
++		| discovers, browses |                 | no bluetoothd      |
++		+--------------------+                 +--------------------+
++
++:Steps:
++	1. host0 calls ``org.bluez.Adapter1.StartDiscovery`` until it has a
++	   device object for host1, then ``StopDiscovery``.
++	2. host0 calls ``org.bluez.Device1.Connect``, which browses the SDP
++	   records of host1.
++	3. Wait until ``org.bluez.Device1.UUIDs`` of host1 contains the Audio
++	   Source UUID of its first record.
++
++:Expected:
++	1. ``UUIDs`` also contains the A/V Remote Control Target, A/V Remote
++	   Control and PnP Information UUIDs of the other records.
++	2. The cache file of host1 in the state directory of host0 holds
++	   each of the 4 records once.
++
++:Notes: Records without a handle all keep the 0xffffffff placeholder, so
++	a duplicate check that compares handles only keeps the first record
++	and drops the others, and records cached under their handle
++	overwrite each other. Skipped if `btmgmt` is not built.
++
++test_sdp_records_without_handle[duplicate]
++------------------------------------------
++
++:Setup: As above, but host1 also returns the PnP Information record for
++	the L2CAP search, so host0 receives it from both of its searches.
++
++:Steps: As above.
++
++:Expected: As above: the PnP Information record is cached once.
++
+ test_adv_monitor.py
+ ===================
  
- In "Attributes" group GATT database is stored using attribute handle as key
- (hexadecimal format). Value associated with this handle is serialized form of
-diff --git a/src/device.c b/src/device.c
-index 36a980d1e..a042f6267 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5948,14 +5948,15 @@ add_uuids:
- 	device_add_uuids(device, uuids);
- }
- 
--static void store_sdp_record(GKeyFile *key_file, sdp_record_t *rec)
-+static void store_sdp_record(GKeyFile *key_file, sdp_record_t *rec,
-+							uint32_t handle)
- {
- 	char handle_str[11];
- 	sdp_buf_t buf;
- 	int size, i;
- 	char *str;
- 
--	sprintf(handle_str, "0x%8.8X", rec->handle);
-+	sprintf(handle_str, "0x%8.8X", handle);
- 
- 	if (sdp_gen_record_pdu(rec, &buf) < 0)
- 		return;
-@@ -6024,8 +6025,41 @@ static int rec_cmp(const void *a, const void *b)
- {
- 	const sdp_record_t *r1 = a;
- 	const sdp_record_t *r2 = b;
-+	sdp_buf_t pdu1, pdu2;
-+	int ret;
- 
--	return r1->handle - r2->handle;
-+	if (r1->handle != r2->handle)
-+		return r1->handle - r2->handle;
+diff --git a/test/functional/test_sdp.py b/test/functional/test_sdp.py
+new file mode 100644
+index 000000000..47bf5389c
+--- /dev/null
++++ b/test/functional/test_sdp.py
+@@ -0,0 +1,239 @@
++# -*- coding: utf-8; mode: python; eval: (blacken-mode); -*-
++# SPDX-License-Identifier: GPL-2.0-or-later
++"""
++Tests for the bluetoothd SDP client using VM instances
++"""
 +
-+	/*
-+	 * Some devices (e.g. the Nintendo Switch 2) omit the
-+	 * ServiceRecordHandle attribute from their Service Search Attribute
-+	 * responses, so all of their records keep the 0xffffffff placeholder
-+	 * set by sdp_record_alloc(). Comparing handles alone would treat every
-+	 * such record as a duplicate of the first one, so compare their
-+	 * contents instead: copies of one record returned by different
-+	 * searches are identical, different records are not.
-+	 */
-+	if (r1->handle != 0xffffffff)
-+		return 0;
++import configparser
++import glob
++import os
++import socket
++import struct
++import subprocess
++import threading
 +
-+	if (sdp_gen_record_pdu(r1, &pdu1) < 0)
-+		return -1;
++import dbus
++import pytest
 +
-+	if (sdp_gen_record_pdu(r2, &pdu2) < 0) {
-+		free(pdu1.data);
-+		return -1;
-+	}
++from pytest_bluezenv import (
++    host_config,
++    Agent,
++    HostPlugin,
++    find_exe,
++    run,
++    wait_until,
++    mainloop_wrap,
++    get_dbus,
++)
 +
-+	if (pdu1.data_size != pdu2.data_size)
-+		ret = pdu1.data_size < pdu2.data_size ? -1 : 1;
-+	else
-+		ret = memcmp(pdu1.data, pdu2.data, pdu1.data_size);
++pytestmark = [pytest.mark.vm]
 +
-+	free(pdu1.data);
-+	free(pdu2.data);
++SDP_PSM = 0x0001
++SDP_SVC_SEARCH_ATTR_REQ = 0x06
++SDP_SVC_SEARCH_ATTR_RSP = 0x07
++L2CAP_UUID = 0x0100
++PNP_INFO_UUID = 0x1200
 +
-+	return ret;
- }
- 
- static int update_record(struct browse_req *req, const char *uuid,
-@@ -6054,6 +6088,31 @@ static int update_record(struct browse_req *req, const char *uuid,
- 	return 0;
- }
- 
-+/*
-+ * Records without a ServiceRecordHandle all keep the 0xffffffff placeholder,
-+ * so store them as 0xffffffff, 0xfffffffe, ... in the order they were found
-+ * instead of under the same key.
-+ */
-+static uint32_t record_storage_handle(struct browse_req *req,
-+						const sdp_record_t *rec)
-+{
-+	uint32_t handle = 0xffffffff;
-+	sdp_list_t *l;
-+
-+	if (rec->handle != 0xffffffff)
-+		return rec->handle;
-+
-+	/* The last entry is the copy of rec added by update_record() */
-+	for (l = req->records; l && l->next; l = l->next) {
-+		const sdp_record_t *r = l->data;
-+
-+		if (r->handle == 0xffffffff)
-+			handle--;
-+	}
-+
-+	return handle;
++# Attribute lists sent by a Nintendo Switch 2 for the L2CAP and PnP searches
++# of bluetoothd, over the full attribute range. None of its records has the
++# ServiceRecordHandle attribute (0x0000).
++SWITCH2_RECORDS = {
++    L2CAP_UUID: bytes.fromhex(
++        "36009c"
++        # Audio Source
++        "360030090001350319110a090004351035061901000900193506190019090103"
++        "0900093508350619110d090104090311090000"
++        # A/V Remote Control, A/V Remote Control Controller
++        "360033090001350619110e19110f090004351035061901000900173506190017"
++        "0901040900093508350619110e090106090311090002"
++        # A/V Remote Control Target
++        "360030090001350319110c090004351035061901000900173506190017090104"
++        "0900093508350619110e090106090311090001"
++    ),
++    PNP_INFO_UUID: bytes.fromhex(
++        "36002e"
++        "36002b0900013503191200090200090103090201090553090202092060090203"
++        "0901000902042801090205090001"
++    ),
 +}
 +
- static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
- {
- 	struct btd_device *device = req->device;
-@@ -6136,7 +6195,8 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
- 			goto next;
- 
- 		if (sdp_key_file)
--			store_sdp_record(sdp_key_file, rec);
-+			store_sdp_record(sdp_key_file, rec,
-+					record_storage_handle(req, rec));
- 
- 		if (att_key_file)
- 			store_primaries_from_sdp_record(att_key_file, rec);
-
-base-commit: 20ffd285b58facfd1f2478d159a5f941b09d5be1
++
++def search_uuids(params):
++    """UUID16 values of the ServiceSearchPattern of a request"""
++    if params[0] == 0x35:
++        size, pos = params[1], 2
++    elif params[0] == 0x36:
++        size, pos = struct.unpack(">H", params[1:3])[0], 3
++    else:
++        return set()
++
++    pattern = params[pos : pos + size]
++    return {
++        struct.unpack(">H", pattern[i + 1 : i + 3])[0]
++        for i in range(0, len(pattern) - 2, 3)
++        if pattern[i] == 0x19
++    }
++
++
++def search_attr_rsp(tid, attr_lists):
++    params = struct.pack(">H", len(attr_lists)) + attr_lists + b"\x00"
++    return struct.pack(">BHH", SDP_SVC_SEARCH_ATTR_RSP, tid, len(params)) + params
++
++
++class Switch2SdpServer(HostPlugin):
++    """
++    SDP server without bluetoothd that answers Service Search Attribute
++    requests with the records of a Nintendo Switch 2.
++    """
++
++    name = "switch2_sdp"
++
++    def presetup(self, config):
++        try:
++            self.btmgmt = find_exe("tools", "btmgmt")
++        except FileNotFoundError as exc:
++            pytest.skip(reason=f"btmgmt: {exc!r}")
++
++    def setup(self, impl):
++        self.records = dict(SWITCH2_RECORDS)
++
++        for cmd in (("connectable", "on"), ("power", "on"), ("discov", "yes")):
++            run(
++                [self.btmgmt, "--index", "0", *cmd],
++                check=True,
++                stdin=subprocess.DEVNULL,
++            )
++
++        self.sock = socket.socket(
++            socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP
++        )
++        self.sock.bind((socket.BDADDR_ANY, SDP_PSM))
++        self.sock.listen(1)
++        threading.Thread(target=self.serve, daemon=True).start()
++
++    def serve(self):
++        while True:
++            try:
++                conn, _ = self.sock.accept()
++            except OSError:
++                return
++
++            with conn:
++                self.answer(conn)
++
++    def answer(self, conn):
++        while True:
++            try:
++                pdu = conn.recv(1024)
++            except OSError:
++                return
++
++            if not pdu:
++                return
++
++            if len(pdu) < 6 or pdu[0] != SDP_SVC_SEARCH_ATTR_REQ:
++                continue
++
++            tid = struct.unpack(">H", pdu[1:3])[0]
++            attr_lists = b"\x35\x00"
++            for uuid in search_uuids(pdu[5:]):
++                attr_lists = self.records.get(uuid, attr_lists)
++
++            conn.send(search_attr_rsp(tid, attr_lists))
++
++    def answer_pnp_in_l2cap_search(self):
++        """
++        Also return the PnP Information record for the L2CAP search, so
++        that bluetoothd gets it from both of its searches.
++        """
++        l2cap = self.records[L2CAP_UUID][3:]
++        pnp = self.records[PNP_INFO_UUID][3:]
++        self.records[L2CAP_UUID] = (
++            struct.pack(">BH", 0x36, len(l2cap) + len(pnp)) + l2cap + pnp
++        )
++
++    def teardown(self):
++        self.sock.close()
++
++
++@mainloop_wrap
++def device_uuids(address):
++    bus = get_dbus()
++    manager = dbus.Interface(
++        bus.get_object("org.bluez", "/"), "org.freedesktop.DBus.ObjectManager"
++    )
++
++    for ifaces in manager.GetManagedObjects().values():
++        device = ifaces.get("org.bluez.Device1")
++        if device is not None and device["Address"].lower() == address.lower():
++            return [str(uuid) for uuid in device.get("UUIDs", [])]
++
++    return []
++
++
++@mainloop_wrap
++def bluetoothd_state_directory():
++    """State directory of the bluetoothd that owns org.bluez"""
++    bus = get_dbus()
++    bus_daemon = dbus.Interface(
++        bus.get_object("org.freedesktop.DBus", "/org/freedesktop/DBus"),
++        "org.freedesktop.DBus",
++    )
++    pid = bus_daemon.GetConnectionUnixProcessID("org.bluez")
++
++    with open(f"/proc/{pid}/environ", "rb") as f:
++        env = dict(var.split(b"=", 1) for var in f.read().split(b"\0") if b"=" in var)
++
++    # Set by the Bluetoothd plugin; src/textfile.c uses its first path
++    return env[b"STATE_DIRECTORY"].split(b":")[0].decode()
++
++
++def cached_records(address):
++    """Service records in the cache file bluetoothd keeps for a device"""
++    state_dir = bluetoothd_state_directory()
++    paths = glob.glob(os.path.join(state_dir, "*", "cache", address.upper()))
++    assert len(paths) == 1, paths
++
++    cache = configparser.ConfigParser(interpolation=None)
++    cache.optionxform = str
++    cache.read(paths[0])
++
++    if not cache.has_section("ServiceRecords"):
++        return []
++
++    return list(cache["ServiceRecords"].values())
++
++
++@host_config([Agent()], [Switch2SdpServer()])
++@pytest.mark.parametrize("duplicate", [False, True], ids=["switch2", "duplicate"])
++def test_sdp_records_without_handle(hosts, duplicate):
++    host0, host1 = hosts
++
++    if duplicate:
++        host1.switch2_sdp.answer_pnp_in_l2cap_search()
++
++    host0.agent.adapter_method("StartDiscovery")
++    host0.agent.expect("org.bluez.Adapter1.StartDiscovery:reply")
++
++    wait_until(host0.agent.has_device, host1.bdaddr)
++
++    host0.agent.adapter_method("StopDiscovery")
++    host0.agent.expect("org.bluez.Adapter1.StopDiscovery:reply")
++
++    # Connecting browses the SDP records of host1; host1 offers no profile
++    # to connect, so the result of Connect itself does not matter.
++    host0.agent.device_method(host1.bdaddr, "Connect")
++
++    # All UUIDs of a browse are added at once
++    audio_source = "0000110a-0000-1000-8000-00805f9b34fb"
++    wait_until(lambda: audio_source in host0.call(device_uuids, host1.bdaddr))
++
++    uuids = host0.call(device_uuids, host1.bdaddr)
++    assert "0000110c-0000-1000-8000-00805f9b34fb" in uuids
++    assert "0000110e-0000-1000-8000-00805f9b34fb" in uuids
++    assert "00001200-0000-1000-8000-00805f9b34fb" in uuids
++
++    # Each record is cached once, also the PnP record received twice
++    records = host0.call(cached_records, host1.bdaddr)
++    assert len(records) == 4
++    assert len(set(records)) == 4
 -- 
 2.53.0
 
