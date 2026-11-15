@@ -1,97 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794772460;
-	b=CdVBUC6C73YU5zUb/IA9uzo7mKtiJuDVuqt/J6xyHTWTzNpKpbHNAZ5BS6sJkdoGUwa2
-	 uFS1zz9PUq2HOlqKpNSz8ExZYQ6Y6oTMd2FDiB/v2vJzI0jAdqf6W8sE+urszkZG+VMEH
-	 IX0OjMnMknYnOLu6FvEhhjcAchHwLkq/XGbymT90iu5ztKG3Q1kAD3APZRSnczqvdYw4W
-	 ySG2DTeL8Ft793uGmMv0Rb0HZWO2Q4w/rDM4QAaWkBfDNunLKuvYBFqdLKxALKkHeagmq
-	 FwrSL3D+NgBE5p5iuyNWC+OG27J9seFUM3kjjyRSec8S4II08dy7dfY8Mm7rktCtCOw==
+	t=1794774885;
+	b=RIhVN6Z9RhVpdSnV+G5NWgvdQIfA49o7Xw1QC+DZlyzqf7esT9Ct03X+lfrvNOfzBb12
+	 c05ysu8PdnOQsdMv2lF7Cl5ElZFdkFs7q6gv00D5mtmvtCo7SfSneSGfk8xfq/5fJRyQF
+	 zRLqI8H2Q+SgrrKxVMND/2SFE4P4lHQzuPtI/boMRJBdqBntAe5yZzES+nZxalTsXON6o
+	 BtETanonDMglsXDo9gQnMIQ0dgPvfyJUIxO36d6CrCqw3faonXsGUkbNZni/yrfvYLc4j
+	 hcv7M/Qb90uLeI/uzeIvVym6I98aU/Znsw86eZeMit9zDrdhgWIztW2V1aPygUgTemQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794772460;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794774885;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=/561T8b2RxuBwCplKNcYjJeaSc56gqYrUu2RLjDgEug=;
-	b=YLqECohra0+FN+TqJkf2R6E4ZSjjYhhBMXW+o/CvHbpPhknlkVjvh1+uZiX5jGrTdN3u
-	 PP7o+Rp9Ll7Zu+y1x3Dceo6zsNv3eqIAYq2F8jyjzeiiqVGWhwbJtIhnxcTrjwhmJgPMe
-	 DM1UxhoR5LlAYG69uez83QBjlTdLPFlc5f37ZmObyH450YFwkPtf2YAC324+DNChI8SjK
-	 TxyoHyWEbi4WoM0bZZ7NbJTg67748G13Y2xwJZ1vBQ2aM7hm5U+bKZ+iirGFZJajOJ9C4
-	 mn9XXxIsUiQLU3KL515Jde5Gg1kGWUc06jXW8zftR6zRSexbqT5s2HW6EA1WJwss9BQ==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=mEPXfr6Jd1/j4WRpJKHmDjPIHsGOyGFbgY1Rhpbebcw=;
+	b=sPDlHxSIfj/wtIT4bQD9AAFQVWNuXdya35kQ0VA6qiRYwF+u1hfDRRfaFiE/wcSOLJLb
+	 r0JTHrnL/tfUSaH41CXxph+ip9P/XZ5VFup8bLZWNWhb0hEDxQKfSFq3frvN1BBNvwhA3
+	 bsuIMO0U8b/Ufc/2C6P8a71937+i3pGZ6ht5/5FoQLEl/I+3L11KdGhjRBIVJCcc3Gih0
+	 mGCK2AMLY4+LJThhZuie9W4bwNe5fG7ApNTp2MCWxMb5GH6d3pJrsnSAS2b1dnEhG/J2r
+	 3/CsLjGvurmKciJMuJOiBWi4iP2wZS8r3MUHUcWEGugFc0wE0vNq8wrAMLOd3aTFQIw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z7TsIVVk;
-	arc=none smtp.remote-ip=74.125.224.41
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hlCXSdfa;
+	arc=none smtp.remote-ip=209.85.222.174
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621EB606A32F
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 19:54:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 621EB606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F24606A329
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 20:34:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0F24606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z7TsIVVk
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-67db35e7953so397933d50.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 11:54:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hlCXSdfa
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-9496473b511so172989185a.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 12:34:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794772459; x=1795377259; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/561T8b2RxuBwCplKNcYjJeaSc56gqYrUu2RLjDgEug=;
-        b=Z7TsIVVk19NtVa6edgu2WO3WasqQi0/UtjK8i6SKwOYuQI0j3n7pWeLFfqUaF/T2wv
-         OgHRDB7yqwDNLFpScBIvKFJiRx1qK/ynky3RxtN5biukP6oL+vrm28fBbKNxpIP07AHr
-         kS+nXU6Go/HOMp2DsgFHt7IV4k4eJr/drDD3Ai1mXKTsZ+fFhAdIaqvzNeERhCNpyhyz
-         4LM5a6PsK6ctPFmNRX0aOzDkLyWi9PIL8t+kbrN04PQUd0iLsij5k+7g28p62cZgFcKK
-         /1rn5mG3byrBazo6muIsSljvOT3AIh/x7aQs3ImgJdmj3vvxNrdTJH9U4K5A7I8UeGxt
-         lUyQ==
+        d=gmail.com; s=20260707; t=1794774884; x=1795379684; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=mEPXfr6Jd1/j4WRpJKHmDjPIHsGOyGFbgY1Rhpbebcw=;
+        b=hlCXSdfaYLFYk+5Ya8GQt+TD4JOQM8gCiFcs5B+cldPWawk0lhp0U0k6o8ScqKAax5
+         xoCcBF+W0MV1yBsQTe9H4HK5oJTMdj5wx5xDkUnFu6mRJzTkaHiMLSNHlqUGXsug7iRM
+         D+lmEMHhsH2SICiE2UuGb/3PAHyg6t6LhG44CiA6LBWHQ9PQOL+q0LcIywUORt8Na5Qb
+         7LLu3pp/io7Nzf0pbm2iW6QCsHC4fM/DQ8XEGDPiM1LxO3RstKKiIy7ZCe5Aepjdo+dv
+         btOYEkAFS58dn3AfGY5zZ/Nn/uuogsUeeO2iqzBQyRSIGpltqXc1KoMnmPDXURup31VP
+         8cnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794772459; x=1795377259;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/561T8b2RxuBwCplKNcYjJeaSc56gqYrUu2RLjDgEug=;
-        b=eYhGFn9cp3asX/IjQV/Ae7ERjzkeDi+TyJG+LYPBHiivdfrsSeUEOiUZ661yGJoL9D
-         mSbDS+PmDUolmGHAXFOeOQFJVXmGhjOSuLthS6yuMTCHDsX/dxziqvjP8TUgcRMBIXD2
-         YmqkAnzz2sky9MMZi3lEGCtcjX78TMHGug+jOPn2OvZUhds3Q6z71WKgp7X7kyINMKQc
-         7TKKm2yrjhH1FdFnK2y//9ycquQK8rm/BVM9p98sHgEjlFUHrORTxvXPpAzjnFABJT/d
-         ZFg5hphi8Tn2hfXHt+0I2JhBnZTzF1Cz2bN4oUY7fYW9eNVvEIG4OjB6mcqfV95khd/b
-         hBZA==
-X-Forwarded-Encrypted: i=1; AL+hErG7Te66wyCMI6r96obsI6PSgvCgJ018MhhdwPa+AghcKqPGAD3FDtKv3nrh7+OEFab9zWtb+/PzDOY3w1PIyWI=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+Ff+0rWCPcQOUG5pug7oqn3aLgX/LgJFPWRbRoKKsgRaxnlhJy
-	3Xrqh9PzC4Rba4EJIDrjt0UmU8NxRlqjMoKgZGzxl95nxDakWsbJbOr8
-X-Gm-Gg: AYBFou0GJDamKFWH8cpARUMuu4am27hyjcxI133oPLcvYYIGMId9q37Sg+bMtikmEXp
-	EbOskFbKb/PK8ID589RSsr12wlfwL9HCgo0a/n9XrCR+JlYgSd959JldojpwuQdoyvERCSlBCNx
-	itSlneB+U8rESCE3E4cK7u/c3aQwv5ONlHwYAlHMzi0Bu2qIhZ0149+eiVVP2uVRTj7I1lLQV3o
-	RK+9IY/XLq0XR8FYf7zvPO3ZGd3OJJtYfVerysGkn6aXkf8Ze2BQSgXzlUqTHfN6DsbrxPuok4k
-	4dSBQY75MX3yxSeN8hDNXRKwRhAkunfH0k2RHNRGDZwRKcI0rSBxXnIFv2irBy48kpofM4QzdDK
-	9TkVqKil4P1c5XU7ARUaCaOAbgi+WtNqsF2jbgNAcPg/GelaEMyZg1SeLV1WCDVe4Ey9Z1k3ZId
-	UYhmKAx/8InZOCz9SOv2BXdJGFkYHUJaYuP7/5Yu9nJ/4QEkxVKEZb5oA64/3Ow9/McBkyIqptG
-	LUQnu/FbE7XZ1mKbqNLhDRkoeN+713KSgBZagzFGE1CGARcwRDmm4NLg7+vJpLvjKpSwHCFaXRb
-	YsGGXAPjyw9auca5kSlr20fe81ZG/OtqcaCaAlXzuhbFW5rqjm6EJl0bWe1FAT5704whrrRP6AJ
-	8wwDoo20fUMYOTgCsWGIIwAeWmF4=
-X-Received: by 2002:a05:690c:c183:b0:8b4:cd96:e2e5 with SMTP id 00721157ae682-8b4cd96e6femr8657377b3.57.1794772459411;
-        Sun, 15 Nov 2026 11:54:19 -0800 (PST)
-Received: from localhost.localdomain (179-252-148-65.user3p.v-tal.net.br. [179.252.148.65])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b4aa9da90bsm69816367b3.37.2026.11.15.11.54.17
+        d=1e100.net; s=20260707; t=1794774884; x=1795379684;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=mEPXfr6Jd1/j4WRpJKHmDjPIHsGOyGFbgY1Rhpbebcw=;
+        b=jarxN3Oc0pNXg0Jkt5BQ8mCUTxKrok4I2L0kjJZ++qwnG4gT0z3RddGCzG7Wooy3IN
+         V8UtEtIRcTzXfCd7dWRC+g8jNvOTh64wkDzmqCNMR2A7QAOrnSLn0ggJbP3/4j1mKiQe
+         z8KCwNqsWyLUD8HMrz4CD5EHowxffK9jWCKeFqa5pPYAjuarWkqTcw0oliMZF9FDnbAu
+         SgOjZWG+SHoNI2ZtSiX16jSJDLPta8XPs+QO44CEFZnSJZ9l1kBGvmaaXXVP98Qfjw0v
+         MSAQzbosr8bpXfaAS5e38aiFvgq6M9zz37peiUXi27T9sT5+1mu9+ZxsrZNhVvVy42Rl
+         +Siw==
+X-Gm-Message-State: APuU4Z9vp6+wil5C8HfofnJEEHjUvYcwnV7vkQ7RsDM97TM2fHjkTYbZ
+	g4lNT+9lkfzDWFy9rplMRmwb2BzfkCkHesIEjeyof3JYTHgIKqG07q2zGMd3kret
+X-Gm-Gg: AYBFou1IGQcyaYgCRroSBPdi7puKjXPzTKWjrjpzKFmzIRod7lHjd4QyN7cqGk3KqEt
+	49V5xKksvrNZzHJD5SdXoVUcsgW9Z0UQ2z5jgzGSQSkl9AR8ez6sVIuTAYg0Dd76tCZ2a7US81J
+	i9RAYf+huvM6e3eLSTCkxJNig4Vea8eevLzg/qAk4BLnW8wpbstyFFjW2Wn6vUVk9/rYYUAm9Ir
+	8dhholujf78AqirASPsdDGj9pa820BAbkRZVoNnvlnLq8aQLUY5e2dX6dyuWKs9IbHph5ArSWYK
+	Uf39JGzaDsdBfp0bmWJErvVlMByXdPDBf62fqtOJojYkLk0UfV83FLYnx3FkgO+B1Wxjnli1avE
+	AJzCuwN3AL/jXm3Ygr5ZNkupcI4cLSPIOWwiwgjI+bJ737mt6XVytYqZLNwtJEWqSka+xySZiYb
+	Dj3MgIk5Jl3dbNe/R39i6Prev2gi/cKuoCJ0b+ocaSnm4n5ihoeABnzD8WL1W08aDkQ77kEMlG5
+	yFR++JoGV6JLOXcFwn7MdX9r7PL7LmCScLgD8b+3bf7ujueHPSY36zbAJiMKfg=
+X-Received: by 2002:a05:620a:1727:b0:949:6e10:b8dc with SMTP id af79cd13be357-9496e10bae6mr592561485a.13.1794774883858;
+        Sun, 15 Nov 2026 12:34:43 -0800 (PST)
+Received: from [172.17.0.2] ([128.24.34.168])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9494c835b45sm696067985a.16.2026.11.15.12.34.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2026 11:54:19 -0800 (PST)
-From: Artur <arturfaleiros1254@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Max Chou <max.chou@realtek.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Artur <arturfaleiros1254@gmail.com>
-Subject: [PATCH 2/2] Bluetooth: btrtl: Set an error code when skb allocation fails
-Date: Sun, 15 Nov 2026 19:53:13 +0000
-Message-ID: <20261115195313.20809-3-arturfaleiros1254@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261115195313.20809-1-arturfaleiros1254@gmail.com>
-References: <20261115195313.20809-1-arturfaleiros1254@gmail.com>
+        Sun, 15 Nov 2026 12:34:43 -0800 (PST)
+Message-ID: <6afa1763.a51614f5.ccab6.9fc2@mx.google.com>
+Date: Sun, 15 Nov 2026 12:34:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1301576139404098554=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,60 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ] audio/media: Add hfp-hf supported feature flag
+In-Reply-To: <20261115101946.69033-1-frederic.danis@collabora.com>
+References: <20261115101946.69033-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-When btrtl_initialize() asks the controller to drop its firmware and
-bt_skb_alloc() fails, it jumps to its error path without setting 'ret'.
-'ret' still holds 0 from the previous successful vendor command, so
-btrtl_initialize() returns ERR_PTR(0), which is NULL.
+--===============1301576139404098554==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Both callers, btrtl_setup_realtek() and h5_btrtl_setup(), only check
-the result with IS_ERR() and then dereference the NULL pointer in
-btrtl_download_firmware() and btrtl_get_uart_settings().
+This is automated email and please do not reply to this email!
 
-This path used to jump to a label that carried on with the setup.
-Commit 9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")
-turned it into a failure but did not set an error code.
+Dear submitter,
 
-Set 'ret' to -ENOMEM before jumping to the error path.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1211775/
 
-The problem was found with smatch, which keeps reporting the following
-for this path once the RTL_SEC_PROJ read failure is fixed:
+---Test result---
 
-  drivers/bluetooth/btrtl.c:1252 btrtl_initialize() warn: passing zero to 'ERR_PTR'
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      14.67 seconds
+BluezMake                     PASS      197.21 seconds
+MakeCheck                     PASS      2.57 seconds
+MakeDistcheck                 PASS      106.04 seconds
+CheckValgrind                 PASS      105.95 seconds
+CheckSmatch                   PASS      184.30 seconds
+bluezmakeextell               PASS      65.14 seconds
+TestFunctional                PASS      901.54 seconds
+IncrementalBuild              PASS      181.39 seconds
+ScanBuild                     PASS      654.91 seconds
 
-The analysis, the fix and this description were prepared with the help
-of an AI coding assistant (Claude Opus 5.5).
 
-Fixes: 9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")
-Cc: Max Chou <max.chou@realtek.com>
-Signed-off-by: Artur <arturfaleiros1254@gmail.com>
+
+https://github.com/bluez/bluez/pull/2830
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    Compile tested only (x86_64, W=1, sparse, smatch). The error path has
-    not been exercised at runtime: no Realtek Bluetooth controller was
-    available and no reproducer was written.
 
- drivers/bluetooth/btrtl.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index d2c2e79800fc..35a2c9d3380c 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1143,8 +1143,10 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 
- 	if (btrtl_dev->drop_fw) {
- 		skb = bt_skb_alloc(sizeof(*cmd), GFP_KERNEL);
--		if (!skb)
-+		if (!skb) {
-+			ret = -ENOMEM;
- 			goto err_free;
-+		}
- 
- 		cmd = skb_put(skb, HCI_COMMAND_HDR_SIZE);
- 		cmd->opcode = cpu_to_le16(0xfc66);
--- 
-2.43.0
-
+--===============1301576139404098554==--
