@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794859213;
-	b=nme+WfzmB1TDINGjQFE11vUVL66cXPX6MYs6yFJOr8ijO3PS1wug6UrS4IRQ7lqGvL3r
-	 j3+ZxwHtytqgdnoNjdyvuyqkmDwzDBgvLexKd9hP3F2rPc5tabl5inePh1ZZpygJqY9dL
-	 Air7SmdXPUuZZpNJGLDaDZxVCjuTMhbdkJcruS2r+2cnjegARlQBJumhdN44TNAGn+WdQ
-	 lWh4YqDtmKu2ZgiP1syMcuXfN5LL6yQfN1Cmrf/kmRD8Gm8cMQeUJRO1VfmMKHKg580TK
-	 YiFDxnw3cf3bnv3GzoQA6w1zb+c3uUMkps1qckU1NZx9KL83PX4Iz2usTiyHH2T5TwQ==
+	t=1794859215;
+	b=JT0pEyknvAc4YaRUDFKgXiVimzDxaHNqwtdcWyyPqSuhGljmvypJtarxBZ0y8T8NDZO5
+	 pzxtapuqmV6DBmmGOP48wkzw9T1L2Wg+cumCV4QxXgFzfKIq6uQ+2PFL/ruDtDJ9g2an2
+	 Oe5z4DB6FdMI3QtZ3jEdl/DJTZKb53AYNLWoJiEksIdJPevgBo2/APlL4exBMojO9Xd6A
+	 6u4ACwgg53yBA5xRzZ44OaatG0PozNczq40VvX6G35Qdqwlw09pJX+MWNM/iGltAx6Rn4
+	 Ij1rqCQJErnFBBChQuLy47CYStK0mM4Wf9BMoNQKh119mddGH/unLJR3eFyvBp9xZWQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794859213;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794859215;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=3jOQQAxFAPQrUiv9hNG0pHej8Q3l8zqxtcRuEhbSxCM=;
-	b=JZYElntPalNyjLGqMO8ZMwKKD/YEfVJm8BI9BH6Vjl7+SWUpLwFpKn7ZObpqqEtBgcnE
-	 EWjZ/6zpK2agjDirlIvGQtt9TUKQZYUsDpyrdKM3m1RbjnHOXLmThrhle4BdWHzyGZBKt
-	 ruMzvSVfx3nUT2kxU/219G+xQoQkPedGiUFF+hJyfWx3ClfEMwbIlT07QDzrWregTqUWT
-	 niM6BuRAs7kbQMnA0sWT2/foZ4vtxb5UmzKnbQW11Y7z+EYx/DcYTVrURBkM3I79PtO0T
-	 mDgXoDjyo9l6QalkinSvxtYwctN8/kT+gj1JDXF4Mc8rRypZbroI4MNgcl8CRn1zrjw==
+	bh=E7ds0rKjFLjTwWVGDmGaZsSO96540U10FJ94t9XZeXE=;
+	b=bnnXp2gFFOXyfKWW4fVsOKLGR5XGNLvYE5MdX8inwXjseFBdUv84/dAUn/vNkTDtk1+q
+	 VfDiwiv/mZ8FU3rCZXc6uQz3pzXZL/IGGAKjzcnzwVIPRs5uQ71Wvrgjw4vLlhFV+WTM0
+	 BCazaMwCuRInnp5InCIvkK4TWG75OlnQTgC8ZphCS4Q9i8CPNsNd96qmaWLM2AHm4m6r2
+	 GOJZFeYh5I6yCOBxEfSYL4SGSnOZH+8zryWvEr1w4w0SvFchVApLFfawlmCpAruvC8IdI
+	 D3Ag/nboNLyOnK04oAwfSECS9n9yjUhKgO3BZ3TmtDqfJfqJbQzibwdP9UNzv0uMGnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HeYe8znn;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aJapWJiR;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BD9606A322
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFFB606A32C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 20:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HeYe8znn
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82C971F000C4;
-	Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aJapWJiR
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A7D1F000D0;
+	Mon, 16 Nov 2026 20:00:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794859213;
-	bh=3jOQQAxFAPQrUiv9hNG0pHej8Q3l8zqxtcRuEhbSxCM=;
+	s=k20260515; t=1794859215;
+	bh=E7ds0rKjFLjTwWVGDmGaZsSO96540U10FJ94t9XZeXE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=HeYe8znnQbLlb5ZFQt6dgNZ6w5YZudn/XAWHPNK8EK6JFdXDv+qg5lbsuVuEN+tUg
-	 LuzP2t4ZF3w2CX8tx5tHdsAzjmCrwMbmH3Yo24rLuPiZgfDw4CATcE1iksv5GOTKCq
-	 62MI7OVPbYNSWc+SdYe2/cm65V2oARhkyhwXzIqbaIoMrITxcfryXa9Ybss3Qs/4Iy
-	 JnzwlO1BtWf5oaZVm9X0vbPqc8iwgw+DyEbCTpLnX3XIvufyjDBOQ7/2yomm9OKf7D
-	 CVCS0/1g9zifETrpWdVgUd3Z3Sobi1VpIejdTAIri6B3fN1QsH6NGHP51CghcL82h2
-	 WrKaQfbv1zfwg==
+	b=aJapWJiRCJ9T1Zjgf5z2gHk5HWIyk5DlrTYIYiwmSmTWeNVyTvGNpnRFM3HgJCOKp
+	 FvclAssMmBC/m9ZQNa2OqEYpCzmi/cMDLnnbIUP0ZXR4YUr2i8wT5C9vqq1EPV+Km4
+	 aCj8uylTaC5hAB08I7C/6kIoyievqqiEyNjzVTP1gxk/ZbqtfE8gbI64BY5b4SAtt/
+	 w6bzxTdq6tdEWiO4bMqVGSmJwse7KL6Ir/wGvExuaOfZQKxnyqqMVgAIyl4JA4cwTB
+	 1rN3u5kgH5zGyKMOBnmJJd6aTrQesZYHi4o01nA3hOuZIxmmet8ThG8TiG73ghDnoW
+	 qIrl6dUBJHeGQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 773D9391AFCC;
-	Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F13E4391AFCC;
+	Mon, 16 Nov 2026 20:00:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,35 +54,38 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] advertising: Fix double-free in client_free
+Subject: Re: [PATCH BlueZ v3 RESEND] avrcp: Poll GetPlayStatus when position
+ changed event unsupported
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179485921202.3860040.16430372342970958452.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Nov 2026 20:00:12 +0000
-References: <20261113092759.24927-1-pvbozhko@salutedevices.com>
-In-Reply-To: <20261113092759.24927-1-pvbozhko@salutedevices.com>
-To: Pavel Bozhko <pvbozhko@salutedevices.com>
-Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+ <179485921352.3860040.5845821355706416129.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Nov 2026 20:00:13 +0000
+References: <20261116093308.79430-1-frederic.danis@collabora.com>
+In-Reply-To: <20261116093308.79430-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 13 Nov 2026 12:27:59 +0300 you wrote:
-> Unregister, disconnect and a failed RegisterAdvertisement can each
-> queue client_free() from idle. The second g_free(client->owner) aborts
-> bluetoothd. Freeing the client directly while that idle is still
-> pending lets the callback run after the client is gone.
+On Mon, 16 Nov 2026 10:33:08 +0100 you wrote:
+> Some remote targets do not support the AVRCP_EVENT_PLAYBACK_POS_CHANGED
+> notification, meaning bluetoothd never learns about track position
+> updates for such devices.
 > 
-> Remember the g_idle_add() id and do not queue another free while it is
-> set. Drop the idle source when the client is freed directly.
+> When this event is not present in the capabilities reported by the
+> remote, fall back to polling AVRCP_GET_PLAY_STATUS once a second so
+> the media player position stays in sync. Polling is only kept running
+> while playback is actively progressing (playing) and is stopped
+> otherwise, and is torn down on session destruction.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v2] advertising: Fix double-free in client_free
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=de977a4eb953
+  - [BlueZ,v3,RESEND] avrcp: Poll GetPlayStatus when position changed event unsupported
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8a3bdbb1f5c5
 
 You are awesome, thank you!
 -- 
