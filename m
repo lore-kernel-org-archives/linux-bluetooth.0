@@ -1,91 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794813390;
-	b=SZKI60ezQtH/mueMD6X6O/8AZUQLBYZngsCfgrpPmn5gcSX3qvVFOTJNBjkuTkO0CS/3
-	 V6JmXg3uwGmdZULdfm6UBFrMcVnoABNT6lkWDtoarHcSyCCa5Kx5VAvR3Qw21rLQieXMf
-	 5qwNrjacjXKIXk/wQ3kkbp0+fvAJ4nu55eT+wbqyqXNdW2+Fihd1K4C3FLtiIHfmX328r
-	 uhcp5wTvaD8hdiYIqky3/gjpUhS1OS68OptoDEiPc3ytkwcwhrnEM9bZ+ckaC7HyacSd/
-	 65HrxYYX+apzaQsPglCDFKgtrULtamlN2SgOHEcE4kKVf1hr++hwbxwziG8vnjsO78w==
+	t=1794813391;
+	b=4VNF3+aD2F4K2BRZAunHap0jEmu1hddIDZg/eZkegf1tDH5pjZ6Qk2CvQ+LHgoaqVpUk
+	 dc8LPvgaV+e1RNNadqX3PLcovG6olt3XETcBu+/svaE3iUnmLvWR7HlFJ5A9YyWMDxWDt
+	 LLDxtY3sUwUD1aFuTTSkR0qC/WC69pAnCdqmAOi7K5mfji8t4pB5F+Wmcz5WYtTwKXExm
+	 7m3RNdaD0lI9Pr5p/mtHsJZQboWM3/MkzCddjf8YRyuHCMfrxBBg3RDeo4P3fkBGr6vcB
+	 YJUHztyQZegQ310fpUEePZwfYmANqS7xsViJbtkHMM5UJdNgJp8RA7gYwJSkspbnlcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794813390;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794813391;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=RgHXf3SuEX0LXwGHSVtCN8y3JpJukMNKGV4p9Ed/SF8=;
-	b=c9lR2WbWSfJFIBu2Kx4V4gkh0Z+SyFDu1ZpA3bydJz97D6CXRMaY4Hlxt9AAl0VSLpwX
-	 71nVazfu31cPUTmV7usRx1phBbgKZkM3ze8tonMrTIKt50MEzFtgcxQW4tJkGPVCXb1e3
-	 lqD0TwYhoAHTProFT3LBHXVXWIDN2j/QL72L3Csy2ApmOL0fdaCdU7Cx5djSYr/30298Q
-	 hJjxHnaSdkzfA/AHy7Fs5A1QopCnFIcdK9XYsxyOVaj/7SDoDX4SIZQi/Tc/ICdw/QOHT
-	 5LHJ+PyaW/Ho7FIXwSRGSE6TSTOsGTjQ/+SpZFt8olgbKMFQUPLt16a0oB/7c9+c+lg==
+	bh=eZPzxNpOcRP3vxiTGjneIkC3zoRbyt56y0di5ytMmbE=;
+	b=IKn7cPGpN082r6rpvw9D7/lR6npshacQpZS5l9x9kR+Ll0amK2koAiQYPEaTWym5Ogo+
+	 EcpKkJVmrPbF7HSfm6h4tpXG1q0B8TE6YVH7wY9SrIP8mqppWpZl2O2ep5Zh9mL3XOazh
+	 Ipb4H9CVXyM34hjqmeqVLmEUWlcqQ/3NNPhP+OQU7HBGOVju07VN9lebjuO+PY5rIFjhf
+	 AksoC/w3kAQz7QwYMmsW1zNngmokQYiyq7F9jHLqO/xvd8Bah2AszgsLTH116HY2VaVoy
+	 M7pKTIvOGjtRDd6JWt/jsyDrjhE8Oh6l/zJuKgigIH890MCC3nQNA85FT6goK3qGHJA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=simpleble.org;
 	spf=pass smtp.mailfrom=californiaopensource.com;
-	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=KbfXbkQB;
-	arc=none smtp.remote-ip=74.125.82.41
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	dkim=pass header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=GLcs6jPv;
+	arc=none smtp.remote-ip=74.125.82.44
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9278B606A331
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 07:16:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9278B606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DA8606A32C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 07:16:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50DA8606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simpleble.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=californiaopensource.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=KbfXbkQB
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1b3b4944abeso606274c88.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 23:16:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=simpleble.org header.i=@simpleble.org header.a=rsa-sha256 header.s=google header.b=GLcs6jPv
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1a2af4c8d00so6378185c88.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Nov 2026 23:16:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=simpleble.org; s=google; t=1794813389; x=1795418189; darn=vger.kernel.org;
+        d=simpleble.org; s=google; t=1794813390; x=1795418190; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=RgHXf3SuEX0LXwGHSVtCN8y3JpJukMNKGV4p9Ed/SF8=;
-        b=KbfXbkQBPnPXXq4GaSmlJyOf/MUv9IKmK8+AfSzOzQTrNy+/ulMt1Wfjim8QjTRPj8
-         JHsuOIi9qvmK5S8mCzDJO9OY8JHdCaqOSr7/9z3wgat+aOHDZeAMkaF/NORd02cZaCNX
-         KKACsJhNvSvpA3M3PZMwOZNHap8ujXVEmYK9w+SSV4fm/9yUz5yA6qCZwQLyTqDogoMg
-         Y9qF2BAZe+mMlTf1poJYffPXnqJgDncD8cbP5mUye9vEzU7NOS8hX0oVRdpN9WfzafUb
-         A5CYlNkOvBieQGcX2gTXWNcSNE7ktfJvXvvRnmm7B81EAM39PjcEB2p2Up/Ht0h0J4kU
-         p3TQ==
+        bh=eZPzxNpOcRP3vxiTGjneIkC3zoRbyt56y0di5ytMmbE=;
+        b=GLcs6jPv524KG/sFRhje1bXDaOtmWpoj1SFoKXKdLC8aI7hBtWDX3Zz9mZxpEstagM
+         Js+f9IQfQH1irvTKSO+RyxkRC80WE7GqQ2AmaxbkVbCHEa8bWJoBj6YJ8tgRFo5jV9uu
+         boo/wI5P3UF1nuE09KzfxWxxPxFJBySEuinhuO13cW/+wq022tl43MsrHnry6THLhpyp
+         eQmPQzvtYUkoc2bQ4V9CgEkSvn6CMJusc+oiOK3NR+2Fjq6BH0aG3W/7KEUn7VjmmmTr
+         ipwPbm9ymdZoXxZKLOLDNIlVo2NQDypMOAdG/xBMvDgc5+WbPICJIL8QPBx6/NgJS5PM
+         ZAGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794813389; x=1795418189;
+        d=1e100.net; s=20260707; t=1794813390; x=1795418190;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RgHXf3SuEX0LXwGHSVtCN8y3JpJukMNKGV4p9Ed/SF8=;
-        b=0x0JnJULddXD29X8Ur1qUZaXuFsot999G1F6Wbf0az6iim4Z0WROpxWk4nkfpeR1C2
-         Riy560wE6ZhevgmrJ+SooCkN09yEEWMMGCyJLYVvsB8e0Vnd408K/i0X8sS3Q9sw279l
-         EF+j3HIaEZninelilMVaTRobQWLJs4Hov5pzWMQXvC1+3O7fGcZhR3tOU6OpyzrNdwWy
-         V5JEyca/blnXBCvKkojrSxX7d3kIWiK035hZWdYhNeMX1+GhlQI5MQszqEXYUYKNkHdQ
-         wZ3XiVLIgGsFhhCy/5VU2/PN/v2QbBju5OFXgi9NQ8l6d1xkv9SG6Dng/eIaSTxAr7i8
-         q3Rg==
-X-Gm-Message-State: APuU4Z8Z0KI2/47P8T+F8ICdJxg56O03UD8hBNJnme37gigStdV5r6l7
-	Y/nrCBtveFbi1hd/Xa0AYYsegjuz/J5Ts/kLD2/wykXaUV1sa0iVyNalk7ZprJOWs4WBcUQOy5F
-	StgbWcJg=
-X-Gm-Gg: AYBFou1OBJUDqEzB7r9WTbUxDxEbt45UKZWeAlX+UTjI9flev87zPqqxEq+6zddYe7B
-	NnimSZ4dhaJgVAXv1A1yf4f90r1utHxi6IayqU0NXcdVb2Ifsp8OGNYU4BnVhq8x8d0PBhFUaoL
-	LtVe6+BtvLZhPQnkH9oae8AW/d2jKLOVuKClo703tQ7iozKw/v+8wwYYaZrdR3CslQwC5OqYF3O
-	CAdvNdBghFFANC/LvoIg9+WZiikYDG0A8Mu0FJl7cTtU9yGYB3YO9DwI6+0Ha0pOwJfhVqrVyws
-	/VmVxti8EuAEWnxmL6AUJnr2FpvS6WYixCVmk5A4euvj89P/xR08dm4dsTO+xlseNhZzLXr5n2W
-	1eK5vlOiP6NtvEZMiuVPgl6eFCrYkbPGM91DMdY0085E7C8TJwTzO+dXpmdgxRK4sq/OQ4ARPTU
-	2uehcYjDs6Lpd+6xWPn+bo4YBW/y1HGX5HNwb9xQefNzSsUqJ+kruPhsLdZwDl9HhMr1cGxQh2S
-	ZTMceCsKQ3HfyX3SFzJvMAOSNOzo9DSZB5rnhQXpmhewo6rIWfv9eAScVy/CnngvF/t32D7JTZO
-	CQ9CyUTZHX58nPSOMs6xPS1J898QwNCSuPh2hdDDB6FenLvXVC7m+y+BaFpZWYEd8+JcDykFiFv
-	yB+wy4H4J3nwbP4gT35fUBkSKW+rW0lNrKgEMSkcmQsWWYJ3g9QcxuRgayC+I+vjFLo39O2Q=
-X-Received: by 2002:a05:701b:4590:10b0:16c:ff3a:d72e with SMTP id a92af1059eb24-1b5030f5875mr9453042c88.20.1794813388553;
-        Sun, 15 Nov 2026 23:16:28 -0800 (PST)
+        bh=eZPzxNpOcRP3vxiTGjneIkC3zoRbyt56y0di5ytMmbE=;
+        b=swg2xlC/N6g7sI+JC00cvDyeX3lFYaIOq9XIhuRd6REpSGy9VHUrU3TlAdb1jrUiwC
+         sI5oYlko7KyQlJmoqwbLq8/zxwf5VlMr4nMgIFtEYfQw6HLiOu4S57olbB6SMDlcoCKj
+         j+srnYuIUUj5HBE9mp/c+ruXq/qOQBKRIfwv+7SX86jrkfX1RxMSDi++DY+jm9Myzwu2
+         U38C7YGTqTRvuOSmilaymVH0ZmP82UkWBzt0IxObrzh56ABEriCQbVDcMAKJNGODPW5y
+         1IrwyF1O7q+TApsR2+62fcZNdTGM+7wynDuRnxzLQLYuYSTf6sapOQiQNjDWCxjIQkmt
+         +U3g==
+X-Gm-Message-State: APuU4Z+mKxlbtipa/+aCa3aoT/RxDYfDTnsXqdQ6zWOeAj4nPBV6R/CJ
+	FiJMF1u2Q0gsxugkl1yYwKRHenNQL7ydoEB9MGFp9lVwj1OYStEXRg1VDE7YJocXx8sIbfaIWS/
+	CXWspCHk=
+X-Gm-Gg: AYBFou1NJrx7+/g/dlHaUoyWwRx7NSX5fLJf+UOWsVvpBEHUSIpdJfHuw9xpOAFmCRI
+	2Eml+78GCDNvCK8XAXW1FOGiInc9w4DZOUx9uqvjqXfIec/A90IKzN6+cVcy1JckwkbmK/M7iaf
+	cDMAqnhvdaVrc8M5HfUivjHk/DPAcYgNR3NAd9hAOtCVvJSHDXrVnRonGkpAg0O9/5nLhSs/kF2
+	HoW16PjWHFK8+uG8KMI+RmAr4Y2hvShNgCZ/cni6r8JWXpMfwTSXVNS/xJAMuNOXfeMUql7Vty8
+	9J9fOlYXI+Y0gDESlpZeEmcheb3Ab/2/A1Sst7+ibXb9UVoCg3PbIp0rC5aoxlXOrFejav8ldor
+	AHODDZ08ZCNn4MLbL1N+pW+jOlLA35wCsGNWfyg6igTv4ZbtvxkGjzMmxHU+6hSaZFU07yDKMLC
+	HB84rxPzGUu6MLb3uMsgJaI7dCjN+kKOL9/0DyCleuFe1es8sglZvyndu7fiBAuyfSBXlQ1QPuH
+	OD7YTfF4Kzzpv8iXJ7KNRoJcjI8r6TH6zEzAu/7YOieqyNARd/SR3TzTXXbq8tKmC0Sw6vr5DDJ
+	b/CJ2PrxBFCjW5JPe/BSjjR/S8yl+/XBs1x7SUcNO20PyKMnGbDTxIj4DpNLqdKr7L35/LM8T54
+	GZshSx9aqG6Dtcl5pG55eHwujvcisbmRnTm0us3xWnuWR1kqMk+9cHJTBboHEQQy6PSMRVOw=
+X-Received: by 2002:a05:701a:8148:10b0:1b5:1a6e:1bec with SMTP id a92af1059eb24-1b51a6e1f70mr6293257c88.10.1794813390146;
+        Sun, 15 Nov 2026 23:16:30 -0800 (PST)
 Received: from localhost.localdomain ([147.185.47.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5031918c7sm40571430c88.9.2026.11.15.23.16.27
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5031918c7sm40571430c88.9.2026.11.15.23.16.28
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 15 Nov 2026 23:16:27 -0800 (PST)
+        Sun, 15 Nov 2026 23:16:29 -0800 (PST)
 From: Kevin Dewald <kevin@simpleble.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Kevin Dewald <kevin@simpleble.org>
-Subject: [PATCH BlueZ v4 2/4] adapter: Add btd_adapter_get_conn_info
-Date: Sun, 15 Nov 2026 23:16:19 -0800
-Message-ID: <20261116071622.35355-3-kevin@simpleble.org>
+Subject: [PATCH BlueZ v4 3/4] bearer: Add ReadRSSI method
+Date: Sun, 15 Nov 2026 23:16:20 -0800
+Message-ID: <20261116071622.35355-4-kevin@simpleble.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261116071622.35355-1-kevin@simpleble.org>
 References: <20261116071622.35355-1-kevin@simpleble.org>
@@ -100,55 +100,215 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a function to send Get Connection Information for a connection.
+Implement Bearer.LE1.ReadRSSI with Get Connection Information, as a
+testing method. The kernel reads the RSSI from the controller, or
+returns the value it read last if that is recent enough
+(conn_info_min_age and conn_info_max_age, 1 to 3 seconds by default).
+
+The kernel reports a connection as soon as it is established but only
+answers Get Connection Information once it has set it up, so a call made
+right after Connect returns fails with NotReady rather than NotConnected.
+
+Calls made while a request is pending get its result rather than sending
+another one, as the kernel would answer that with its cached value,
+which a new connection does not have yet.
+
+A request still pending when the bearer is destroyed is left to complete
+rather than cancelled, as the kernel replies to it anyway and the reply
+would be taken for the reply to the next request.
+
+The method is only on Bearer.LE1, as the RSSI of a BR/EDR connection is
+relative to the golden receive power range rather than in dBm.
 
 Assisted-by: Claude:claude-opus-5.5
 ---
- src/adapter.c | 18 ++++++++++++++++++
- src/adapter.h |  7 +++++++
- 2 files changed, 25 insertions(+)
+ src/bearer.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 130 insertions(+), 2 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index ea438375c..7c40a0460 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -11628,3 +11628,21 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
- 				adapter->dev_id, sizeof(pkt.cp) + length,
- 				&pkt, callback, user_data, destroy);
+diff --git a/src/bearer.c b/src/bearer.c
+index ebcdc2b4c..779f6ea3c 100644
+--- a/src/bearer.c
++++ b/src/bearer.c
+@@ -44,6 +44,12 @@
+ 
+ #define DISCONNECT_TIMER	2
+ 
++/* Get Connection Information request of ReadRSSI */
++struct rssi_req {
++	struct btd_bearer *bearer; /* NULL once the bearer is destroyed */
++	struct queue *msgs; /* ReadRSSI calls waiting for the reply */
++};
++
+ struct btd_bearer {
+ 	struct btd_device *device;
+ 	uint8_t type;
+@@ -57,6 +63,8 @@ struct btd_bearer {
+ 	 */
+ 	DBusMessage *connect; /* connect message */
+ 
++	struct rssi_req *rssi_req;
++
+ 	/* LE connection parameters, only valid while connected */
+ 	bool conn_params;
+ 	uint32_t interval; /* in microseconds */
+@@ -213,13 +221,117 @@ static DBusMessage *bearer_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 	return NULL;
  }
-+
-+unsigned int btd_adapter_get_conn_info(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr,
-+					uint8_t bdaddr_type,
-+					btd_adapter_reply_event_t callback,
-+					void *user_data,
-+					btd_adapter_destroy_func_t destroy)
+ 
+-static const GDBusMethodTable bearer_methods[] = {
++static DBusMessage *rssi_reply(struct btd_bearer *bearer, DBusMessage *msg,
++					uint8_t status, uint16_t length,
++					const struct mgmt_rp_get_conn_info *rp)
 +{
-+	struct mgmt_cp_get_conn_info cp;
++	dbus_int16_t rssi;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.addr.bdaddr, bdaddr);
-+	cp.addr.type = bdaddr_type;
++	/* The kernel reports the connection as soon as it is established, but
++	 * only answers once it has set it up, e.g. read the remote features.
++	 */
++	if (status == MGMT_STATUS_NOT_CONNECTED) {
++		if (btd_device_bdaddr_type_connected(bearer->device,
++							bearer->type))
++			return btd_error_not_ready(msg);
 +
-+	return mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO,
-+				adapter->dev_id, sizeof(cp), &cp,
-+				callback, user_data, destroy);
++		return btd_error_not_connected(msg);
++	}
++
++	if (status != MGMT_STATUS_SUCCESS)
++		return btd_error_failed(msg, mgmt_errstr(status));
++
++	if (length < sizeof(*rp))
++		return btd_error_failed(msg, "Invalid response");
++
++	/* 127 means the controller has no RSSI for the connection */
++	if (rp->rssi == 127)
++		return btd_error_not_available(msg);
++
++	rssi = rp->rssi;
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INT16, &rssi,
++							DBUS_TYPE_INVALID);
 +}
-diff --git a/src/adapter.h b/src/adapter.h
-index 583168f4b..18e6eaa78 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -328,3 +328,10 @@ unsigned int btd_adapter_send_cmd_event_sync(struct btd_adapter *adapter,
- 					void *user_data,
- 					btd_adapter_destroy_func_t destroy,
- 					uint8_t timeout);
 +
-+unsigned int btd_adapter_get_conn_info(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr,
-+					uint8_t bdaddr_type,
-+					btd_adapter_reply_event_t callback,
-+					void *user_data,
-+					btd_adapter_destroy_func_t destroy);
++static void rssi_req_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct rssi_req *req = user_data;
++	struct btd_bearer *bearer = req->bearer;
++	DBusMessage *msg;
++
++	if (!bearer)
++		return;
++
++	while ((msg = queue_pop_head(req->msgs))) {
++		g_dbus_send_message(btd_get_dbus_connection(),
++				rssi_reply(bearer, msg, status, length, param));
++		dbus_message_unref(msg);
++	}
++}
++
++static void rssi_req_free(void *data)
++{
++	struct rssi_req *req = data;
++
++	if (req->bearer)
++		req->bearer->rssi_req = NULL;
++
++	queue_destroy(req->msgs, bearer_free_dbus_message);
++	free(req);
++}
++
++static DBusMessage *bearer_read_rssi(DBusConnection *conn, DBusMessage *msg,
++							void *user_data)
++{
++	struct btd_bearer *bearer = user_data;
++	struct btd_device *device = bearer->device;
++	struct rssi_req *req;
++
++	if (!btd_device_bdaddr_type_connected(device, bearer->type))
++		return btd_error_not_connected(msg);
++
++	/* Calls made while a read is pending get the same result */
++	if (!bearer->rssi_req) {
++		req = new0(struct rssi_req, 1);
++		req->bearer = bearer;
++		req->msgs = queue_new();
++
++		if (!btd_adapter_get_conn_info(device_get_adapter(device),
++					device_get_address(device),
++					device_get_le_address_type(device),
++					rssi_req_complete, req,
++					rssi_req_free)) {
++			rssi_req_free(req);
++			return btd_error_failed(msg, "Unable to read RSSI");
++		}
++
++		bearer->rssi_req = req;
++	}
++
++	queue_push_tail(bearer->rssi_req->msgs, dbus_message_ref(msg));
++
++	return NULL;
++}
++
++static const GDBusMethodTable bearer_bredr_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, bearer_connect) },
+ 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL,
+ 						bearer_disconnect) },
+ 	{}
+ };
+ 
++static const GDBusMethodTable bearer_le_methods[] = {
++	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, bearer_connect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL,
++						bearer_disconnect) },
++	{ GDBUS_TESTING_ASYNC_METHOD("ReadRSSI", NULL,
++					GDBUS_ARGS({ "rssi", "n" }),
++					bearer_read_rssi) },
++	{}
++};
++
+ static gboolean bearer_get_adapter(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -404,6 +516,14 @@ static const char *bearer_interface(uint8_t type)
+ 		return BTD_BEARER_LE_INTERFACE;
+ }
+ 
++static const GDBusMethodTable *bearer_methods(uint8_t type)
++{
++	if (type == BDADDR_BREDR)
++		return bearer_bredr_methods;
++	else
++		return bearer_le_methods;
++}
++
+ struct btd_bearer *btd_bearer_new(struct btd_device *device, uint8_t type)
+ {
+ 	struct btd_bearer *bearer;
+@@ -429,7 +549,7 @@ struct btd_bearer *btd_bearer_new(struct btd_device *device, uint8_t type)
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					bearer->path, bearer_interface(type),
+-					bearer_methods, bearer_signals,
++					bearer_methods(type), bearer_signals,
+ 					bearer_properties,
+ 					bearer, bearer_free)) {
+ 		error("Unable to register BREDR interface");
+@@ -459,6 +579,14 @@ void btd_bearer_destroy(struct btd_bearer *bearer)
+ 		bearer->connect = NULL;
+ 	}
+ 
++	/* Let a pending request complete rather than cancel it, as the kernel
++	 * replies to it anyway and the reply would complete the next request.
++	 */
++	if (bearer->rssi_req) {
++		bearer->rssi_req->bearer = NULL;
++		bearer->rssi_req = NULL;
++	}
++
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), bearer->path,
+ 					bearer_interface(bearer->type));
+ }
 -- 
 2.54.0 (Apple Git-157)
 
