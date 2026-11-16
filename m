@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794851422;
-	b=g6Nxl7rD0iIPEBQ9K0D9ZktIUTq/12cuoHbKJY9cdzQqT87W6nT2dTVitkBrDaIbPcrw
-	 qw6U1Gl+0hFNU3i6t8Xj1YO4G8HhcCCFA9rMusf5hMqCsPoQ8pTdmudZ12gQJtrKg6ItZ
-	 BE7jQkFYJGUirI1Sjlt7ZjRgBccgot8F65ltCS2fypjPd3eKo4paPQVDLjzFP/Gy7EJsa
-	 Hrn3+mWCm81C64LdJoHad5una19hkRfNOsNPaO8veUnXiMJ9T5EgKeObLLdWoCjivU3wV
-	 PZjlJwoi3AboOnew3UQqpBh/L3Pra1VLzxu2m7H+kwtnlSjjO5u7NmgpchVV0UbamGg==
+	t=1794851423;
+	b=BkfWIc80aEGED0vgticz3mB/foqrIJ0uBazJlpWtzm2C9HTLJItBeZGIzyqHxxpIZW9B
+	 +n/WRY47IO9mnuhqI/RgM1Mk9VqtWv72QI3BZphr7FpRoLKGWFUUv9dVhEv2dwNVcfBkl
+	 nvpaJ1ZXus+uTac6xlroKELGATZTG+NyvWwMwQTKOUR1SBAq00BOLsc+bV5yi7wbQqlyS
+	 KsdLXtSdOOa/fQM9mYonOWUKMWe18P9DlwhuhYf45o9s5HWEk0tyLHVNFWb6w0KHurKI4
+	 uXGcrzcdy7vxuvNqWxdGJ0hbWcXw9fK+kWu4CazEblZ2dJNd16C5BkczQeP4slxhUIQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794851422;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851423;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=Adq0k1FJEIAXTzZOZYDnypYWVrau0w7XidkDVX3jipc=;
-	b=mEAcaSnuz2flsZZ5OKZhAw2xGpf8Ppxt7VPG5LzbyUvyFJadF+9h5AyTccFcjwhgJrjF
-	 Txri3newSdoo53zkE2PGzZ11B0bk+Uf1rO6/3v/AIZw8Q+AjglqFSIZUyUuU4mi32j7xF
-	 xCbGJaMfr/etNW60WEYmUTYulJGPPepxzYdWEkwAhxfviqmjMn2V95tJg/E7dQFhD0x/k
-	 TU0S7NetCJJGZtbBpInVduYGUwye7y2uzCySyFaAcYE+x12fwCyKmfNAPWPXMZDoxbJe2
-	 ydJX7lG8YM5soclU0bcn4Rkmj5jGJE4rQlstjoBOWlFSEoyLTvpUOm8P+1NEMKWY5GQ==
+	bh=1UURXOj1ASz3Ntn7tL3qkzvOG6AMvDC59WLDyfCN2gk=;
+	b=Q5O0ynfPuOcFK8SHmb7lZjFvqo/K/RGuY90bpKo5yuC8Gb5vgHy5eaVTqwh3SRwIxEg8
+	 vWnKkKBYD2Xn9QVx/p0nwTFdbO8RZwV9VGXu8bC9rDtHUvR3Aku86OtgSLirmoaJk/oui
+	 SUV3XbYbDhIXFUQRJY3WC6ASx9hasTOJ2KLajOX4iTP8g0SODxa6KoGCSemX4fq1OI1qR
+	 iXHrUvP9h8JUt6xazpucichT5lq4JDZerXiWnR+vqlZVG1LXctB9IYnMoL49rbJjFiAWF
+	 ucZ6/7g50pa0rkJ1n1bZdjbok7WB6cNJYCu5aNWIjiIl1MYPTncVM73eTgKQTpVPSHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ht8Z8n10;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QCH7QLis;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073BD606A31C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641CC606A32C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ht8Z8n10
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36C51F000C4;
-	Mon, 16 Nov 2026 17:50:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QCH7QLis
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 091511F000C4;
+	Mon, 16 Nov 2026 17:50:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794851421;
-	bh=Adq0k1FJEIAXTzZOZYDnypYWVrau0w7XidkDVX3jipc=;
+	s=k20260515; t=1794851423;
+	bh=1UURXOj1ASz3Ntn7tL3qkzvOG6AMvDC59WLDyfCN2gk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=ht8Z8n10bmkt0hKBOwgaWXFCc65GQ33Nw6Hh6eCgENtA6NraZdxFnzlAnZQndwuKG
-	 tVJwMj9qrfHJq4mjvm8z5YPSwiL5hoRlYyWHnFHPSG5VfqfhRyDf3DmBvTAEOlexFp
-	 SJXg+Ilz1CQcHsw3qBwf2DCR8fx+nTU63teChdxkls45nuKrlgWh9q0n069kgeQWw5
-	 QTGLqeB3sR39HUGJkguNjCxstDl/JCGF3jQ8xOd1Kmj/D1r48SDO95hZrE1WsUE2tu
-	 /RLsq9CVQApoxJm+WWPhe18sd4KQ390Q8ocZ/IU7ume/qOaos6F/kvVWyhmyOWk4dF
-	 gUEbKtBh5f6kg==
+	b=QCH7QLis6lcGeAOq7gZxexW5XGKc5v3oAZhg10kv+fUVTOVQuYUqXD8hVQSBsAIoh
+	 TqRzRjJzchX4PG8tIty3OGxVMmC7AbTOzJMDMcA/16eFBd6sXFssU4srLZuj/96ovW
+	 dLBq66HEcsPT225rBWLeEPQNOh71tWGk8ma34fK0GWCYIjfpc6jopf3ACSUshQ/eHP
+	 YTzOmrC5SxS9jhCEaMUvmA8bpsFP6iaSF3WJ4sC7AbyWQabiqlnEO0evhtXKUNJAfU
+	 i3wiYxiSUASUApgM3G5X54PovDVEDU3PoX3CjU5HmjUO+dUcNNL5eLBjAd/xcW5nBL
+	 Z1BYUOC/whwVA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9BAB1391AFAF;
-	Mon, 16 Nov 2026 17:50:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F155E391AFAF;
+	Mon, 16 Nov 2026 17:50:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,15 +54,16 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 4/6] client/player: Add endpoint.clear command
+Subject: Re: [PATCH BlueZ v1 4/8] transport: Don't hand the owner over while
+ releasing
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179485142027.3796096.5711904589172896494.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Nov 2026 17:50:20 +0000
+ <179485142167.3796096.4868983132472691625.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Nov 2026 17:50:21 +0000
 References: 
- <231c6e7909673a62925ebf13cef9d7e537ee9da6.1794428234.git.luiz.von.dentz@intel.com>
+ <08b31b48642208e419dc10f83f6fad0712ad0579.1794349049.git.luiz.von.dentz@intel.com>
 In-Reply-To: 
- <231c6e7909673a62925ebf13cef9d7e537ee9da6.1794428234.git.luiz.von.dentz@intel.com>
+ <08b31b48642208e419dc10f83f6fad0712ad0579.1794349049.git.luiz.von.dentz@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -71,19 +72,22 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 11 Nov 2026 15:37:31 -0500 you wrote:
+On Tue, 10 Nov 2026 17:19:13 -0500 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Add a command calling ClearConfiguration on a remote endpoint, to close
-> the stream of a given transport or all the streams of the endpoint.
-> 
-> Assisted-by: Claude:claude-opus-5-5
+> As a server, handing the owner over to a link still streaming also
+> happened when the audio server released the transport. Release sets the
+> transport to suspending before disabling its ASE, and disabling a Sink
+> ASE reaches the handover synchronously, before the request of Release
+> is installed. The handover cleared the owner of the transport, so the
+> removal of the owner by Release did nothing, and the link, which kept
+> the owner, was left owned and never moved to idle:
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,4/6] client/player: Add endpoint.clear command
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4d6b6de326ee
+  - [BlueZ,v1,4/8] transport: Don't hand the owner over while releasing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=578b16afd93c
 
 You are awesome, thank you!
 -- 
