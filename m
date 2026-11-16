@@ -1,75 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794820019;
-	b=e3AeZq8ZnZ/EIAGG7v8clLaYLWeOKh693Dis2hvA752n2VKC06JtuYnM5mR6DU4fGrGc
-	 /BSi5hwDnnig6VZwlEridJxRb8ANwvvh5U0hXqatPfXwAZBazsF7ULTAp99HYe3VXkOnb
-	 jPt902iagmdx3/s1QmrAayviihkz5KPfPSEd6gWJ1Y9cnV9m6HatWTZc6KFf8kcDBwT+P
-	 zCA0AouJWlcrL9dpoFAhtf0dcFHELASc7/xDh5lte2/HqXmtqUF1SsBA5UuTr4G0zhsl1
-	 heU1RhI4wueM2ENcCtHCJ0Hed5ORTFkqYrycMMmCj7uV883Tng1UWg/l45rQ84biRTg==
+	b=UsjlJl1nMV+bfGEU1LI4KN93+bXikvzMzg7J/qKL/HDsmOl4MGQn8iOeVBgQXT1iyuX9
+	 u0fjjUP0HxDb/sLf/dtN8Wcdj2Ou/2E45iC/5YI8gm4qe5ikm3cjNbmWadO1Zk7GO2KgP
+	 PLG2T8IoGH6HPgzfcds97iMzH762EA5qvup8oY2BF97h4MevaUdQAG6hb3qduNUe0au8Z
+	 lsIqryrxbP8zXM6t/MH7cBv2mTc8nNoQGQGmXLaaxkVyPv9sUjfkheMFdNoxsprAXtXo1
+	 IzAJTMuOO4S3M8J+O98Gms4gYIBWaOs3BmTHxB12PyU95gpK8BYnaUBH6AFpn9bCJLQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794820019;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:
 	 X-Proofpoint-Reinject:X-QCInternal:X-QCInternal:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-GUID:X-Proofpoint-Spam-Info:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=i7k5dkzs9bhcsn5aw2WwpMgQujfmFRjmu+0bnYfsQIs=;
-	b=kgfmqVCGI7zuEoScR8dZOqmTIoucjk8z1cFLZsG0kjbTynnHzQnpWUTPK89M92UYxr43
-	 W311Z+Ahxfi5wK+KOjM42vM7+OXPAPDi1LpuTbjn5mNayqGGZTqcpRLbXu/VuU13S31AR
-	 rSWNYIs9Vpl/VbJACbSAQw3s7a9h2Jme1+MR0k8zJ4IY2hgCzEp6qs7BXZ6PuyqXiB+S/
-	 Yx3oCCoOVfnhZqyxs0ts0yKuW3NjVVv03GQ3oG2wZZIi88AMe6OKSyqYfQcpxrK7gdZ4Z
-	 Tcw6zgK02+PbC3izwm2T0YuiNja5Z1zkGfUlSyAbcl4oBMKOwTmbb6Jj3hLHi3S9sIg==
+	bh=PwwZ24pmv9E+3grE1ALFO+z+b1+yrppFdcs304GPfRY=;
+	b=VP8BlEwUVhrKorMOXr+F36475XkdKZYFhC1SaykgqDhzKI9e2JXVG0vx0dtIP0BjSmS0
+	 TwyELa5JJBftNK0ReFEgIkVmyVi8XFVk2c4rOzqKAfMhmnU4h/0zS0m4fv8E/xigpStOF
+	 jRH0MdfL4W2vWl2F89PgGL+S/weIenrQrfsz3CzT4yVrdWK5UTALnV9qqqLuIOSbrpZta
+	 C/sycPIOvUP4Dbfyik4GwoxlCuXwJcHK1b3r58ugy1F4megy/8U7leLVZbUq1P2IUnOSq
+	 cUQtUKp9N4Na3PmxJs8I+CWAIK555HtpKcP0xPqwb9Wwg5kVzTptJQtJGgHzITkjNfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=oss.qualcomm.com;
 	spf=pass smtp.mailfrom=qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Sjz1iOs9;
-	arc=none smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=AXcMmKyB;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94D9606A33A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6929606A337
 	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 09:06:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C94D9606A33A
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6929606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Sjz1iOs9
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AG7ergn903109;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=AXcMmKyB
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AG8TrNf2650619;
 	Mon, 16 Nov 2026 09:06:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=i7k5dkzs9bh
-	csn5aw2WwpMgQujfmFRjmu+0bnYfsQIs=; b=Sjz1iOs9hchHi2hEUUYdb+MZJ2B
-	AJRDLyhkRr5yFQe03XwiCHJP8kYkuKflBHVAzlsWDpZ6y9b+EnrNiAtSUR73VL0s
-	qdxgJsOUYoadgATJBYd67WLygfR2+8WQI8aziEvhSQvomzcqEE1hObHnB9nA1ZHD
-	hl6k1hBmNzLTa8rG2eq4+dfv6FTq+iO+wB0SgpfMk0x1pJhaE8E0qbMR7NwzCWIG
-	IsDp6VQV/eGcBNIP8LU+ZhQJjfAq/jQeQ/bVrfSiim3ovlCRujC7l+2GdDzkv4yc
-	AqM7k0+wYNyxfqXhHGDnozj4pTvIN7HQ8hqLo0Xx3Gek/q5bdNHfMCuAKwA==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=PwwZ24pmv9E
+	+3grE1ALFO+z+b1+yrppFdcs304GPfRY=; b=AXcMmKyByEbk2TCpuVhb36lGzXT
+	R1BEE+wliDR0ZVvRHZU9cKuxEZrtZRnPXnYlGM1b/CaCbMEVS7DdiIlgtPOPuAJP
+	vZH1GpbexpOdKp22fCvqth9FEByP4+A/OBqYLhJTf+L/yWVg/Y0zteEofVc4NpUq
+	FwRUzi5QNWDh8LSVdqlk3k/OzgU5QZbc5TFdSx1ixor+pK2L5j9Lrrw6ftAvBWSU
+	Wl4DcjelhSPS2VrvY9DHgTt1rbGogNsIIeaC5CRsQYjNGrCVX5f3R2dz3y5LUbDK
+	i7Xqe87NW5AejR1li7vh7xm+TatsASRKhWZeF8Zv7GQ5HioJBRxAQoLB1Ow==
 Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hxhhjwr8j-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hyxcf04by-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 16 Nov 2026 09:06:57 +0000 (GMT)
+	Mon, 16 Nov 2026 09:06:56 +0000 (GMT)
 Received: from pps.filterd (aptaippmta02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AG96tux2942871;
-	Mon, 16 Nov 2026 09:06:56 GMT
+	by APTAIPPMTA02.qualcomm.com (8.18.1.11/8.18.1.11) with ESMTP id 6AG96sXq2942823;
+	Mon, 16 Nov 2026 09:06:54 GMT
 Received: from bt-iot-sh02-lnx.ap.qualcomm.com (smtphost-taiwan.qualcomm.com [10.249.136.33])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6AG96tsA2942842
+	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 6AG96sK62942795
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 16 Nov 2026 09:06:55 +0000 (GMT)
+	Mon, 16 Nov 2026 09:06:54 +0000 (GMT)
 Received: by bt-iot-sh02-lnx.ap.qualcomm.com (Postfix, from userid 4467392)
-	id 9E81F27A03; Mon, 16 Nov 2026 17:06:53 +0800 (CST)
+	id 855A1279FD; Mon, 16 Nov 2026 17:06:53 +0800 (CST)
 From: Jinwang Li <jinwang.li@oss.qualcomm.com>
 To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc: cheng.jiang@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
         shuai.zhang@oss.qualcomm.com, jinwang.li@oss.qualcomm.com,
         xiuzhuo.shang@oss.qualcomm.com
-Subject: [PATCH v3 08/20] obexd/pbap: Refresh cache for each vCard listing
-Date: Mon, 16 Nov 2026 17:06:22 +0800
-Message-Id: <20261116090634.1222593-9-jinwang.li@oss.qualcomm.com>
+Subject: [PATCH v3 02/20] doc: Fix PRODID property name
+Date: Mon, 16 Nov 2026 17:06:16 +0800
+Message-Id: <20261116090634.1222593-3-jinwang.li@oss.qualcomm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261116090634.1222593-1-jinwang.li@oss.qualcomm.com>
 References: <20261116090634.1222593-1-jinwang.li@oss.qualcomm.com>
@@ -86,89 +86,53 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Reinject: loops=2 maxloops=12
 X-QCInternal: smtphost
 X-QCInternal: smtphost
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE2MDAzNiBTYWx0ZWRfX1R0tgetVgE6H
- T0Zz3nTBwQwiqGeeCMFdgoht+0oJSkrxx6TzLSjpeFA8tKhIavwmAQImG4CifJqn4skBl8PLSWR
- 38/qMefqbgigeabcJA6W1kaFSDakma7BOMbvPcttEAHB7bPXcf51bae4+YuLoRrQHYG1KgNFwu4
- 6++1O5wchl9IRpJ0ciLaPZe9xufrFBTebXCjNecz+r/oA9/zQbtwAP1RmPKhLnLBw1yPETEjaUy
- TCEt6slRWz7uyQGKX2Ckhysrq1Zt0N25D5PW+hQOGCJG8wcVs+ExHf3/ObMfXP7B09VhkXlRVcv
- tIyZlnHHCxLD47BI45g3auZe/x5BmSRtKSMJ+U22J72ZcCJ3LO6DeBRAhrwjR2m68O4D7MgsPYX
- nMT3MH4Ylibvu3U97ahZBVVq4dl3WpjRUhbsZlQkYoOhXqFARd8mwasxyOsQv7vvGNjdlToo1yH
- De83zEWS9ItkZhqDjlA==
-X-Proofpoint-ORIG-GUID: ORSLABk0XeFFMluZMjDLSORrJCd-ujtA
-X-Proofpoint-GUID: ORSLABk0XeFFMluZMjDLSORrJCd-ujtA
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE2MDAzNiBTYWx0ZWRfX6SWmx94KMLEj
- 6PCt6fHxA4Mr8tSMey9gU0j0oYebHT4d+Qdgq5Ui5g/qXgGARmxkRCrsAZH69w9FTS4TnBNS778
- Ug2wTqGHZ7ESQ0prk60MlvSzGG93oJY=
-X-Authority-Analysis: v=2.4 cv=X9rHu2Te c=1 sm=1 tr=0 ts=6afac7b1 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE2MDAzNiBTYWx0ZWRfX8TYSt744Iyip
+ 98uuGInPiu7ZsszOhiFh/ahsd+lEcTo4ETOCwGVZbDAgZ36BQq8jz+N7oZeajy3sFl3pKXyhdCw
+ E1Uz9Ezvyf1An0seTEGMkxIV9Bd1RGm2+haNgQ7fUXIxyXxnDOXP2m8zz0iwLBslTiAyJE+KJoV
+ I1H7ah25dbKH890dxx3nBey/k+nxXIv1Z8bkwID0djLhZDOaiCkZoLc8pC+qqqsJTPSkvz4bz+l
+ 0QcYz7v0UJNMAtwLqlu9eIEx9+MZqwl6H6EFf4bM+kPqsmPoO2EdKZrN5HrQIksCvS5YYrXEImZ
+ NqJ7LXpFZS4qPMHXFJOYjg6lQCWpjDx8mlSt+neGMGUPVedEMKV7t+VBwFr7a19yle5fqQt5VbI
+ gkiusNWr0sDRln3i4MAIIStRiYZe7mLMEZCbW4xAITjfK3hIs1WJeIDZDV8j+LwqFznkM1IJPtV
+ GbBfXGS5tmw5U5cmGtw==
+X-Authority-Analysis: v=2.4 cv=RtZQvymK c=1 sm=1 tr=0 ts=6afac7b1 cx=c_pps
  a=nuhDOHQX5FNHPW3J6Bj6AA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=yOCtJkima9RkubShWh1s:22 a=0w67O7jM8qCzAa_46VwA:9
+ a=3WHJM1ZQz_JShphwDgj5:22 a=fK_377rzG6kPcQo8kDQA:9
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE2MDAzNiBTYWx0ZWRfX69cf7/AU6Nd+
+ mUclVMy/rFUHJMEH5BgE4sEAm5ORtT2LBmgL1Aaco+TpDUMoCGimHCyS7OKscLnHhENMbiJkaFK
+ UU3dbzIZGp7lusUEtBLSl2bumreOAjc=
+X-Proofpoint-ORIG-GUID: Fwd3BnejEJU6U0jsL02zKjGwDlfjAjeH
+X-Proofpoint-GUID: Fwd3BnejEJU6U0jsL02zKjGwDlfjAjeH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-16_03,2026-11-11_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
- adultscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611160036
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 impostorscore=0 adultscore=0 spamscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
+ definitions=main-2611160036
 
-Rebuild the cache for each PullvCardListing request. Return current
-folder entries on repeated requests within a connection.
+Use the standard PRODID spelling in the PhonebookAccess filter fields.
 
-Fixes: 581b305d17b5 ("obexd: Changes the interface between the PBAP core and backends")
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- obexd/plugins/pbap.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+ doc/org.bluez.obex.PhonebookAccess.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index 436981a4c..9176fc92a 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -735,7 +735,6 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 				void *context, size_t *size, int *err)
- {
- 	struct pbap_session *pbap = context;
--	struct pbap_object *obj = NULL;
- 	int ret;
- 	void *request;
- 
-@@ -751,29 +750,22 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
- 		goto fail;
- 	}
- 
--	/* PullvCardListing always get the contacts from the cache */
-+	/* The cache is rebuilt for each listing request. */
-+	pbap->cache.valid = FALSE;
-+	pbap->cache.index = 0;
-+	cache_clear(&pbap->cache);
- 
--	if (pbap->cache.valid) {
--		obj = vobject_create(pbap, NULL);
--		ret = generate_response(pbap);
--	} else {
--		request = phonebook_create_cache(name, cache_entry_notify,
-+	request = phonebook_create_cache(name, cache_entry_notify,
- 					cache_ready_notify, pbap, &ret);
--		if (ret == 0)
--			obj = vobject_create(pbap, request);
--	}
- 	if (ret < 0)
- 		goto fail;
- 
- 	if (err)
- 		*err = 0;
- 
--	return obj;
-+	return vobject_create(pbap, request);
- 
- fail:
--	if (obj)
--		vobject_close(obj);
--
- 	if (err)
- 		*err = ret;
- 
+diff --git a/doc/org.bluez.obex.PhonebookAccess.rst b/doc/org.bluez.obex.PhonebookAccess.rst
+index 5b22d67f5..eb5142d86 100644
+--- a/doc/org.bluez.obex.PhonebookAccess.rst
++++ b/doc/org.bluez.obex.PhonebookAccess.rst
+@@ -329,7 +329,7 @@ Possible return:
+ :"KEY":
+ :"NICKNAME":
+ :"CATEGORIES":
+-:"PROID":
++:"PRODID":
+ :"CLASS":
+ :"SORT-STRING":
+ :"X-IRMC-CALL-DATETIME":
 -- 
 2.34.1
 
