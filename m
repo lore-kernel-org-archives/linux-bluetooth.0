@@ -1,63 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.111
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794846402;
-	b=qzGdBnDF5HIj+wPOmUk312DoZtf2rsgeLvMG0qsa4+Ev+mWtaxJIKI6luIw1DhTCW9/a
-	 s6N0UOpgEsV5lb1tMqqaqH250Fix6Awc0/W5ngKxUy2HDh0YVpcsHJYJy1dL6weIOWPe8
-	 c26kmA6EBLXWM09k4YzJUFA3G5TBERlxaSlrKJaRRYCbOCyCo5lkSpopqrb28ifzbsulu
-	 xJuAKfcQv9j4wgfJ+wAHY8L78EoWP7cXF/BZjZin8+gXEbfuPUFhKKvdoqZ5EZ50K3b5s
-	 CxWhZdfK65SkcSgntTg/J2gwzTq+UFQDc49dF0lm8DqYP4k0YaEir+rRxz4lAGg7Nvw==
+	t=1794846920;
+	b=sDm3oOtztqSeQ6CKCCCSE/uOYEsNtsv8E4SZlxGGeMiyxnfO+KpOBg5HlZnheEXkCN/X
+	 Xng3X01SGn9gElLyC8Xw5592W1QNAyy5lOwb+gFu46qtk6yxRw8lb7f454RnqrgKKgWFS
+	 VSjY5zCIeTjEuqC3+i2LZLXnhl2CgyaYNo/3UJLyf+pS5y2/1MyuTBA6KRbgVtQjdEVRm
+	 +BF5N2aMZ/Gs2KwFa0FpFLAM/cxdL1Y8kPbiGZiMZer6bsuXeJ2pXyIAHeyHNFsryS50b
+	 NoY/0VFiGESccMaCUKMXWG/VDOL8+Pd7VlF+qw/A0iJEuNxC/DtEChqEX9aWW++FNWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794846402;
-	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
-	 Subject:Message-ID:In-Reply-To:References:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1794846920;
+	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Subject:
+	 Date:Message-ID:In-Reply-To:References:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=dmDChotEha0iFqm+8jnyADjXLoziwfDG7A+l0ZouVYg=;
-	b=UYx0UFk+wwb9SYd/ZeL55oZh1zRUfHMJt8yCS854mbMtSiO09Kt8MpVXpAgHdCumJgZy
-	 G0F31DfGHLVsKhih6SWX8OiI+MB0QG7ZCOfQOTRTudvHtiAqxoperjHBBgT00dDQU5uPe
-	 FFFUQttQdB2SlHQpF2QJ7zyeaJ7AlFnIt23lUNg3PyLCo0eO/cxaTXyZuL7XAiSZKRY+h
-	 fcaQVjASGStiBQZg5GolvU1bjsSdfBWzw2/yu5U1u2zrhZ1K/l0iKxIea9J+PVduqXgti
-	 ZES3vZZGqz/uf0GHRw44psAni7+KGPtm6h35ODqZspyHc/pyzGeTzPJy9wbfU0W3ULA==
+	bh=r5btRg3TqToxM2rgsequ5t5+wR9SSFwRBSngheUfYuQ=;
+	b=K3orMbZO4hJiI6IS5QGTGGeZ6JT2RnKCVtJ5+vOM1eJN3E5OquqBgPcAr0dtSZpLUZLH
+	 i69UjTYl2ILEyCdElC+gOUQRimHav6HSf+3bnw20LOzcfMpvV8Z2VOltfWp+IK2Y3YNEm
+	 /fs2A35HVpazuPufpk4rF93P/1A8XRdNTFcwLZjPGpip25rw7K95X15xusq6hXshBhCyl
+	 RSCylt39U9THdn9wKz4EEjxCx+0zYuTapIvs/0BNOpUYpexAtGjGuddJnZZLd6syz/FOI
+	 DYB3aq7Dgfg0BvzEKEUg0FsNidyGPEw0BSN79MAp86e5td0U8ZBFaAX2MO3Q3JvvqDA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=michaelmcallister.org;
 	spf=pass smtp.mailfrom=michaelmcallister.org;
-	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=sTyVA0aV;
-	arc=none smtp.remote-ip=185.70.43.171
-Received: from mail-43171.protonmail.ch (mail-43171.protonmail.ch [185.70.43.171])
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Xk6E4nnr;
+	arc=none smtp.remote-ip=79.135.106.111
+Received: from mail-106111.protonmail.ch (mail-106111.protonmail.ch [79.135.106.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CACC606A330;
-	Mon, 16 Nov 2026 16:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CACC606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFC9606A323;
+	Mon, 16 Nov 2026 16:35:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6FFC9606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=sTyVA0aV
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Xk6E4nnr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=michaelmcallister.org; s=protonmail2; t=1794846399; x=1795105599;
-	bh=dmDChotEha0iFqm+8jnyADjXLoziwfDG7A+l0ZouVYg=;
-	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
+	d=michaelmcallister.org; s=protonmail2; t=1794846917; x=1795106117;
+	bh=r5btRg3TqToxM2rgsequ5t5+wR9SSFwRBSngheUfYuQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
 	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=sTyVA0aVUz4LmdT0TlQlZlGGqbuFziWiwo1RpgZeGEfcv5DbH4dsDgJQK/N6v8FDa
-	 oxdnj9vohi4sOUXKEvb9Z2V6BYtTswGzeuaTy5HY7bwM27raYsV6d7DORmD8SYr/cv
-	 sVrR3nCvkYLVnsnx2/x8jgjAAnuLDELAUGgeNVz/o4yzAK+oHG6j9iwEwhrF9LjH40
-	 y+BA9vmrtwB6/KgQ86lsVFL1PoFQv1aAEMO1WbL54Kiel+Oz7f9WHVY5GFhmCbl3VC
-	 e552IHHBPak2JYIG4Jd7rTXirYb1r4JNNT9MPOoxLxCJ0FkRR8OgMHZBjymzx8FrV/
-	 fdSY6abCXoVPg==
-X-Pm-Submission-Id: 4jStXr49zgz1DF5G
+	b=Xk6E4nnrh1qqQIBubbt5QkfjQZp7wzIPAO15gzxc1NcVsh1Ysygbd0L2R/LQDxUF2
+	 2qkP+nSvhpMQ70O5lkRal+kIpg1hnU8hf64/rfZY9dQTX/gIu7tp2V5sLreRSWX1wJ
+	 xwY+WmgOVNax40SN0vEtMcyN1Ho6U/cdAUAvOfHkeJBV6JX+PYuYdYp5PtOHa0DBnf
+	 e8kwHtNtizLiXdABT2xJslBmz1D38nYe7KNjMUmxc8zegzfURuBnt2WR/2gp/+e1E0
+	 dAmaBxXJGPS57yiyxYrzEamf/hGcX53Lf83mX6quVEYmHDWD7W9XmHlVqt6lVgztxl
+	 /T1xA8xJTgjyQ==
+X-Pm-Submission-Id: 4jStkq4QFYz2ScWg
 From: Michael McAllister <me@michaelmcallister.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: brgl@kernel.org, linux-bluetooth@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_bgodavar@quicinc.com, lumag@kernel.org, mka@chromium.org,
- me@michaelmcallister.org, markus.probst@posteo.de,
- shuai.zhang@oss.qualcomm.com, enderaoelyther@gmail.com
-Date: Mon, 16 Nov 2026 16:26:21 +0000
-Subject: [PATCH v3 4/5] Bluetooth: qca: Handle failed power-pulse writes
-Message-ID: <179484638195.54009.8260068189701829762.wcn3950-poweroff-v3-4@michaelmcallister.org>
-In-Reply-To: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
-References: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
+To: markus.probst@posteo.de, luiz.dentz@gmail.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject:
+ [PATCH v2] Bluetooth: hci_mrvl: Leave the serdev port lifetime to hci_serdev
+Date: Mon, 16 Nov 2026 16:35:14 +0000
+Message-ID: <179484691454.54083.14464729860702732145.marvell-serdev-v2@michaelmcallister.org>
+In-Reply-To: <179467295519.97469.5747232754111917783.marvell-serdev-v1-1@michaelmcallister.org>
+References: <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
+ <179467295519.97469.5747232754111917783.marvell-serdev-v1-1@michaelmcallister.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -70,36 +67,72 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-A failed UART write leaves hardware flow control disabled. A zero-byte
-write is also treated as success even though no pulse was queued.
+hci_uart_register_device_priv() opens the port before calling mrvl_open(),
+so Marvell opens it twice. Likewise, mrvl_close() closes it before the
+transport closes it again during unregister or registration error cleanup.
 
-Require the one-byte pulse to be accepted and restore flow control on
-the error path, returning -EIO for a zero-byte write.
+Remove the extra calls and let hci_serdev own the port lifetime. This also
+avoids failing probe when serdev rejects a second open with -EALREADY.
 
-Fixes: f9558270b85c ("Bluetooth: hci_qca: use wait_until_sent() for power pulses")
-
+Fixes: be70e5e774a6 ("Bluetooth: hci_mrvl: Add serdev support")
+Reported-by: Markus Probst <markus.probst@posteo.de>
+Closes: https://lore.kernel.org/341e56b1ff7d8a5b109e26e30dfed61faa54d603.camel@posteo.de/
 Signed-off-by: Michael McAllister <me@michaelmcallister.org>
 ---
- drivers/bluetooth/hci_qca.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Markus,
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ddbeb0787..6642af781 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1430,9 +1430,10 @@ static int qca_send_power_pulse(struct hci_uart *hu, bool on)
- 	serdev_device_write_flush(hu->serdev);
- 	hci_uart_set_flow_control(hu, true);
- 	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
--	if (ret < 0) {
-+	if (ret != sizeof(cmd)) {
- 		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
--		return ret;
-+		hci_uart_set_flow_control(hu, false);
-+		return ret < 0 ? ret : -EIO;
- 	}
+This just drops the non-standard trailer that checkpatch flagged. No
+code changes from v1; still looking for a test on Marvell hardware.
+
+Thanks,
+Michael
+
+Changes in v2:
+- Drop the Assisted-by trailer. AI assistance was used for v1.
+
+ drivers/bluetooth/hci_mrvl.c | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
+index 5798a8db0..def19907c 100644
+--- a/drivers/bluetooth/hci_mrvl.c
++++ b/drivers/bluetooth/hci_mrvl.c
+@@ -57,7 +57,6 @@ struct hci_mrvl_pkt {
+ static int mrvl_open(struct hci_uart *hu)
+ {
+ 	struct mrvl_data *mrvl;
+-	int ret;
  
- 	serdev_device_wait_until_sent(hu->serdev, timeout);
+ 	BT_DBG("hu %p", hu);
+ 
+@@ -75,17 +74,7 @@ static int mrvl_open(struct hci_uart *hu)
+ 
+ 	hu->priv = mrvl;
+ 
+-	if (hu->serdev) {
+-		ret = serdev_device_open(hu->serdev);
+-		if (ret)
+-			goto err;
+-	}
+-
+ 	return 0;
+-err:
+-	kfree(mrvl);
+-
+-	return ret;
+ }
+ 
+ static int mrvl_close(struct hci_uart *hu)
+@@ -94,9 +83,6 @@ static int mrvl_close(struct hci_uart *hu)
+ 
+ 	BT_DBG("hu %p", hu);
+ 
+-	if (hu->serdev)
+-		serdev_device_close(hu->serdev);
+-
+ 	skb_queue_purge(&mrvl->txq);
+ 	skb_queue_purge(&mrvl->rawq);
+ 	kfree_skb(mrvl->rx_skb);
 -- 
 2.39.5
 
