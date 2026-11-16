@@ -1,101 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.173
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794848677;
-	b=zbvzDMlLlB+26DfI/Gx2643tx7FzMs2/wM+9WilARdKvWcEP2XGx7jz+YgjLkOK8Txv4
-	 MlZ3dmQODf7shFoxWQ3x4r3qrDf0M+DYpHZOvoQgaIspRX3aPxzH80zyFDjH8Eo1jmtxX
-	 ejiO63Br43U4cvjqz3acBnv9VOqzHl3tezP0REH8qS+X/K/thSuQqREDN1tEJJS/SmgMw
-	 a+uyBm4O2zYSxPsXoY5vxnBd6i71RLks3iDuvUYRnM7s9z8H+iwkUfybtw6sf4RLLVZ02
-	 TLx+7+EYKcMRFGGPn5ZTxzF23SPlLDnkHQAjJD4oHjfu3adhW6P1bqsPMAH6QKL0pXw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794848677;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
-	b=qTegPXqKL/zD/iB4lIX2l++oQ3VZAUu9Q6RcvIg+S7ZXHVWCFXuOOJNKp2tFfEEgCxNK
-	 qlBVn4+a4JjxpeeMwm96FeP+Vu63YQMPZWihOwVZogc7PoffC0DxeweXds02kEYJ6/ay3
-	 37is9XAcz3Y4XImr8/aEU6iVUrcc+KTJY5LIEfjDl58vkB/Gn6/12oh4ryRIFaCTQXtqL
-	 Y1T56JPvRoQFUtLUH+yAJ0Qkg9dlnsNeFt2xrcTY4Fpu3PJSetCTnE3tuBOnFcylbFZmV
-	 muapaT/eYksGy9w5/ENjffkyvPD3gXPImyUmpRqN598q1ifkbwSUkkB3DgfoFVNUneg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WZYY2r8K;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.173
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797AE606A338
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:04:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 797AE606A338
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794849251;
+	b=e4rurydjca4ohEAOuRhjsBqf3Laihd+G++1rlFP4Z5mHVNRsTSbls8l/Ca0SfDAtFJrM
+	 nElpX/yUjYb5e0xmmw4h0c9lBUR4nVk/FX5SKufy5dFsLqhv4gkrpyfHEaE3DBE9ZOhXv
+	 VHZkOwH24WPz6+UYF/YxVc4sEwpCUirK3P0FIfs6094LBE7tgUlOsL+oC20QFwy0cX28q
+	 bx796WC/l8cQbdGh2X/Rh2PRP2xW6iPed63wvjw1cZdpvgabPBJ2zDhZnSDhLy3F4GAMx
+	 gKOOL2HiV7goCxra7LGP3zFnbaXsF79oRVf8JGGfoCIevU+eNCj0zW8llc+cd9ursHQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794849251;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=oD6xjLGP1p1QO/KyzSmaklpRQQCQt5kNwZ1vxWq45Wo=;
+	b=4Pc+qsfGngv9X4UvHXQ9Mihlystl5siIzCPUaeCr3bRZlpukHKu0h0IQ+3bv2IWPSiiW
+	 H7rUZToK9ymVMJpapjbIrl29Id1wCN9xFADGEsw9Q8AmqVZo9RIu0ieE2iU+2F/Kx1gnM
+	 xk/sVaoTVveE+zIM0lI+w7rxLWzNbICnCdrRo32P6KrfZbO8Ff86ox9nnt9dk+Tvj64Qj
+	 n5zDwexF3Hb9rxgWiqvosE4CAUnjGa2Dv2rsRd2k0GG+G5uDQhYIWgUjgbNpHN8DiBTP5
+	 Bua/xFK3mE2kNd6yqDeTRypWk2Os+VfXAhfqCsUa0B88hJeIF1RtBzkwoeR3zeNPETQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=t766+NIJ;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194FA606A322;
+	Mon, 16 Nov 2026 17:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 194FA606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WZYY2r8K
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-8b4bc5b8de5so292687b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 09:04:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794848676; cv=none;
-        d=google.com; s=arc-20260327;
-        b=fdaJ8qfi4d9yIfrNYGz+flCQPRiVfmdBV6qFZGxVKyHkvFaVXJekSeMetGx8fQ5sZt
-         GUuEp4Rgfk7eALCMhph0iX4JSb26zhx9GZIGPm+M1XkHJGkCxOgPY8i4JUjztmmh9ebj
-         yazWWHQbzTKH8FQfvvwvk0J4SXHGfd2rwjATu0Cpik1LW14jYsFOlM2LfQK2w3SlyeUf
-         h8g7UX9bCY69QiDh9tXTDrqhQ6ClTeutfO56jn4A4QxCPraaEbnu5EEF2HzincmUbryo
-         4+dwgyFz5eMExeKGP2a7nLdRdSxJpMhnhQbA4w6bmkTT7FyvCCw4lTRV9gS04OWEqKSl
-         59LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
-        fh=cafIMaLk87UFIskGY+saxcyFW18xU3iMYjbTLAq/AU0=;
-        b=G9uFc7q/9BOVBLXuGmP1oFoXOmsut5BKZb20RUOcBWtlZZ7xiDLWxOETnLuwLggYmR
-         cd224WuBczmEsPXG+hnkDoTHLGE7ZmGHRP//ZCO0x1YlqKmtfdZ/N/LdnfS/1y/KZmYW
-         F4o1ZaeDU/P+qpdudSnCEtO377Y6hwzm0ipIee6UxmBesBMylMaPAbqk1FodNGfbRFtV
-         CC92Y0OI3qg8sXhQNbQeglonqHeQMCF99Zi8fL2wX5aQRqn+vt6eNJORRdVPWnaM7obf
-         DS34JrENu8VvUEY9nlili5qccZl8N1cVgMt6Y1Qiy0iU1OgHV007bEN+DepUGzvfSNLm
-         n+WQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794848676; x=1795453476; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
-        b=WZYY2r8KgTyJC8YKopk67NlqvwpC1c5dZ4/uebpyAgqgLz7Uc/bMqiwjjrEI3xwkoV
-         +VhQx82XFmQwmTJncIGsGKv4tFZM4AfYO7d0mx/KDjSYKbsSMEexaRRcyS5s26s059Ve
-         TUKHv/A6NpzCtrL7atOzRURA1LFIwh+2swxki0IZzipXDtTzWrQjDbuWmS0LcnOPKnIM
-         mD5Oo2li6ok9yYVXWD7LZugQesJkeQBHppksRD3FRdDmebsc4pu8/VvgC4E3sRjmXcA0
-         7EHqvZbdaQd0Y6JJ/8XcPAEmz3lBpdyDSuT0uRdlKgHOPX7rBgQsA0a7RUSmh9qCJ26t
-         CW+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794848676; x=1795453476;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
-        b=orJD8cfXtBYIUUMh8ZjM1c4lltSOm6mP5KPfBDz1Rd2tUEfwaVrVFdB5RQNrD9LoVl
-         Y1DGblbJkDRzWkBP+v8jiosHapJHAWtTY4E4kD2JC20AxfYeg67kgfU3QjWBKBRenO78
-         LmKFBW9wf67cYK46cqh1CjL5HCQFX/t5GZHcfMjSxmQCvUDX0ByJSWkiKsUgKVSZnHhN
-         9JdRvDNA/zy6rQTgs5Ue3Lpm+HwLxrT5wKgMrnsbpeLaGtQ2W5o2jQL4zGUGBf5Hc3DC
-         jw0qrenPrfAMUK+v/cqFqon9u5ZH0+s8qLQQUDwzuqACf7PDBdw2IDrOM7X3BqF0dgMc
-         2dow==
-X-Forwarded-Encrypted: i=1; AL+hErFD4Ora9CmareBDlegi70JDPprEXYBxBRxR/NXJSVCXotO3YBE8KwDCYcnkNyiz8O/BGqGrXIdjpPmIHLLyDmM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+yoE2DTJlekwrRK8bKhDKHL4DEabk7rqLEiKKx4oYbkwuN4syU
-	FRAKt3mjvsGxPqzVHdKtGFGHolZ9n0msEfFMy4uON1ta4tQNBikJfWZ1BNrePUfr+gqsFRRA+jJ
-	gRQA0lUVEeHhv5expFbz23XrjhnA5roY=
-X-Gm-Gg: AZFdTZeCfujUnFYR4C45sJJhRPYxOY3q0wbvbWagHMS8QyEtUmh/BXFGeFAUVe5kjPV
-	qbeD79DpMVN9Ag4ok7PCPN8ho2hhZynQ3cqkvDgAn8ZGcrdmOJW07Y3x8twK/X7w0wgiCfpfE5o
-	GOG5bqPrpDCz491PPvdkL0CE223+THEwG5B1fA3fQKi8KdWBs9FsXYvShdtER3G5Dlazg8Awlab
-	YmwEysiLTUHgzRO2hFIRF4HouokUnjZrKvcWOoHLVgojKlXTtwIqilgW5aTD4cW2YwAgv8RyqAz
-	s8sgmD4aEbf6f5yjAdcys+SWhAQH73So2QyWjHVeIkkcC+91l9JwJ/2+0k95B51fwDCLfR8O5xW
-	svPAwkeH8jEU8f51GetbGMpFOC3YI4qtSiJYJHY03XJ9L6ANble2o7jRbcNMvliBsyxe5FR6paD
-	qNw74AT87ql4KvLmDlbtz46dOY33OEYR43MFXsmxqytP3L6g6hSicgtMBa
-X-Received: by 2002:a05:690e:4145:b0:679:97d1:439e with SMTP id
- 956f58d0204a3-67dc76a3aebmr61822d50.2.1794848675703; Mon, 16 Nov 2026
- 09:04:35 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=t766+NIJ
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 114891476;
+	Mon, 16 Nov 2026 09:14:05 -0800 (PST)
+Received: from [10.2.212.23] (e121345-lin.cambridge.arm.com [10.2.212.23])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AADC3F632;
+	Mon, 16 Nov 2026 09:14:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794849248; bh=Y/LDVkPRdojFVdWdZuy7hYb3sZ13M4Qo5KKpMgZclts=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t766+NIJWk5CeADE62+AhYQCjogseUG8qdQVHJYyj6KD3epFwb8pvhsiozOg7ow0G
+	 5dFAk4nz9rFqs7YbyhEGy+PpBCzFEWertlgn27JbNZYVynM8CKOlSXtLGr+b5sU4x6
+	 ZROeUlBRlr3SWPygTZwemQ1XL0y6Vhs3ScVuxo6U=
+Message-ID: <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+Date: Mon, 16 Nov 2026 17:13:59 +0000
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,164 +53,194 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
-In-Reply-To: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 16 Nov 2026 12:04:22 -0500
-X-Gm-Features: AclHuK-7mHIMY0CY3JZllTpHy6nwtTontz9GqLEJ12QCe-O4w2_0-LpJPkaVhfo
-Message-ID: <CABBYNZLEONoqo+mdnNyv19pd3HxyfHAyHTPUpi-et0RFMctN6Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: don't reserve an ident for L2CAP_LE_CREDITS
-To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Stig Hornang <stig@hornang.me>, 
-	syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ "Joerg Roedel (AMD)" <joro@8bytes.org>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Nipun Gupta <nipun.gupta@amd.com>, Nikhil Agarwal <nikhil.agarwal@amd.com>,
+ Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+ linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-pci@vger.kernel.org, iommu@lists.linux.dev,
+ Jason Gunthorpe <jgg@ziepe.ca>
+References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
+ <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
+ <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com> <20261110122237.GG8635@unreal>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20261110122237.GG8635@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Nguyen,
+On 10/11/2026 12:22 pm, Leon Romanovsky wrote:
+> On Mon, Nov 09, 2026 at 01:53:02PM +0000, Robin Murphy wrote:
+>> On 09/11/2026 7:33 am, Leon Romanovsky wrote:
+>> [...]
+>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>>> index b486b8bbd1fcd..8be2a246d4903 100644
+>>> --- a/drivers/iommu/iommu.c
+>>> +++ b/drivers/iommu/iommu.c
+>>> @@ -1879,7 +1879,7 @@ static int iommu_get_def_domain_type(struct iommu_group *group,
+>>>    static int iommu_get_default_domain_type(struct iommu_group *group,
+>>>    					 int target_type)
+>>>    {
+>>> -	struct device *untrusted = NULL;
+>>> +	struct device *restricted = NULL;
+>>>    	struct group_device *gdev;
+>>>    	int driver_type = 0;
+>>> @@ -1901,14 +1901,15 @@ static int iommu_get_default_domain_type(struct iommu_group *group,
+>>>    		driver_type = iommu_get_def_domain_type(group, gdev->dev,
+>>>    							driver_type);
+>>> -		if (dev_is_pci(gdev->dev) && to_pci_dev(gdev->dev)->untrusted) {
+>>> +		if (dev_is_pci(gdev->dev) &&
+>>> +		    pci_dev_default_is_restricted(to_pci_dev(gdev->dev))) {
+>>
+>> I think this should be the generic device_is_adversarial(gdev->dev) now - in
+>> fact probably all the dev_is_pci()/to_pci_dev() stanzas aren't conceptually
+>> PCI-specific, just an artefact of the current "untrusted" flag being so.
+> 
+> I wanted to do the same, but iommu_get_default_domain_type() may be called
+> before the PCI device's trust level has been set. At that point, we are
+> still in "disabled" mode, whereas device_is_adversarial() checks for
+> "adversarial" mode.
+> 
+> The below is from AI, I asked to present me the path for that:
+> --------------------------------------------------------------------------------
+> For a newly discovered PCI device with an available IOMMU and a new IOMMU group:
+> pci_scan_single_device()
+>    pci_device_add()
+>      device_add()
+>        bus_notify(dev, BUS_NOTIFY_ADD_DEVICE)
+>          blocking_notifier_call_chain()
+>            notifier_call_chain()
+>              iommu_bus_notifier()
+>                iommu_probe_device(dev)
+>                  __iommu_probe_device(dev, NULL)
+>                    iommu_setup_default_domain(group, 0)
+>                      iommu_get_default_domain_type(group, 0)
+> 
+> For a device whose initial policy is adversary, its state during that call is:
+> dev->trust_policy          = DEVICE_TRUST_POLICY_ADVERSARY
+> dev->trust_level           = DEVICE_TRUST_DISABLED
+> dev->trust_committed_level = DEVICE_TRUST_DISABLED
+> dev->driver               = NULL
+> 
+> device_is_adversarial(dev) = false
+> 
+> The active level changes later, during binding:
+> really_probe()
+>    device_trust_prepare()
+>      __device_trust_prepare()
+>        WRITE_ONCE(dev->trust_level, DEVICE_TRUST_ADVERSARY)
+>    dev->bus->dma_configure()
+>    call_driver_probe()
 
-On Sun, Nov 15, 2026 at 6:53=E2=80=AFAM Nguyen Ngoc Thang
-<ngocthang2710.1999@gmail.com> wrote:
->
-> l2cap_chan_le_send_credits() allocates an ident from conn->tx_ida, sends
-> L2CAP_LE_CREDITS and then frees the ident unconditionally, since the
-> command has no response.
->
-> But the ident is visible in tx_ida while the command is in flight, and
-> the remote may answer it with L2CAP_COMMAND_REJ anyway. The RX path then
-> releases it in l2cap_put_ident() under conn->lock, while the credits path
-> runs from recvmsg() with only the socket lock held. Whichever ida_free()
-> comes second hits:
->
->   ida_free called for id=3D3 which is not allocated.
->   WARNING: lib/idr.c:594 at ida_free+0x24c/0x2d4 lib/idr.c:594
->   Call trace:
->    ida_free+0x24c/0x2d4 lib/idr.c:594
->    l2cap_chan_le_send_credits+0x17c/0x29c net/bluetooth/l2cap_core.c:7113
->    l2cap_chan_rx_avail+0xb4/0x134 net/bluetooth/l2cap_core.c:7126
->    l2cap_publish_rx_avail+0x110/0x168 net/bluetooth/l2cap_sock.c
->    l2cap_sock_recvmsg+0x280/0x7b8 net/bluetooth/l2cap_sock.c:1317
->
-> Worse, if the ident is reallocated for a real request in between, the
-> credits path frees that request's ident instead.
->
-> tx_ida only exists to track requests awaiting a response, so a command
-> without one has no business in it. Give L2CAP_LE_CREDITS a plain cyclic
-> ident instead, which never needs releasing. The ident is still never 0
-> and never exhausts the range, which is what commit 6e1930ece855
-> ("Bluetooth: L2CAP: fix tx ident leak for commands without a response")
-> set out to fix.
->
-> Fixes: 6e1930ece855 ("Bluetooth: L2CAP: fix tx ident leak for commands wi=
-thout a response")
-> Reported-by: syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D9dc8780713b11155dd74
-> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-> ---
-> Tested in QEMU (x86_64, KASAN + lockdep) with the syzbot C reproducer,
-> 15 runs per kernel:
->   base (origin/master 23c62304dde2): 31x "ida_free called for id=3DN ..."
->   patched:                           0 warnings, 1200 LE credits sent,
->                                      none with ident 0 (ident wraps fine)
->
->  net/bluetooth/l2cap_core.c | 44 +++++++++++++++++++++-----------------
->  1 file changed, 24 insertions(+), 20 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 7dcb0586a10b..0b861ced5703 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1028,21 +1028,36 @@ int l2cap_chan_check_security(struct l2cap_chan *=
-chan, bool initiator)
->                                  initiator);
->  }
->
-> -static int l2cap_get_ident(struct l2cap_conn *conn)
-> +static u8 l2cap_ident_max(struct l2cap_conn *conn)
->  {
-> -       u8 max;
-> -       int ident;
-> -
->         /* LE link does not support tools like l2ping so use the full ran=
-ge */
->         if (conn->hcon->type =3D=3D LE_LINK)
-> -               max =3D 255;
-> +               return 255;
-> +
->         /* Get next available identificator.
->          *    1 - 128 are used by kernel.
->          *  129 - 199 are reserved.
->          *  200 - 254 are used by utilities like l2ping, etc.
->          */
-> -       else
-> -               max =3D 128;
-> +       return 128;
-> +}
-> +
-> +/* Ident for a command that has no response: it is not reserved in tx_id=
-a,
-> + * so nothing has to release it and it can't be released twice.
-> + */
-> +static u8 l2cap_next_ident(struct l2cap_conn *conn)
-> +{
-> +       u8 ident =3D READ_ONCE(conn->tx_ident) % l2cap_ident_max(conn) + =
-1;
-> +
-> +       WRITE_ONCE(conn->tx_ident, ident);
-> +
-> +       return ident;
-> +}
-> +
-> +static int l2cap_get_ident(struct l2cap_conn *conn)
-> +{
-> +       u8 max =3D l2cap_ident_max(conn);
-> +       int ident;
->
->         /* Allocate ident using min as last used + 1 (cyclic) */
->         ident =3D ida_alloc_range(&conn->tx_ida, READ_ONCE(conn->tx_ident=
-) + 1,
-> @@ -7081,7 +7096,6 @@ static void l2cap_chan_le_send_credits(struct l2cap=
-_chan *chan)
->         struct l2cap_conn *conn =3D chan->conn;
->         struct l2cap_le_credits pkt;
->         u16 return_credits =3D l2cap_le_rx_credits(chan);
-> -       int ident;
->
->         if (chan->mode !=3D L2CAP_MODE_LE_FLOWCTL &&
->             chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL)
-> @@ -7099,18 +7113,8 @@ static void l2cap_chan_le_send_credits(struct l2ca=
-p_chan *chan)
->         pkt.cid     =3D cpu_to_le16(chan->scid);
->         pkt.credits =3D cpu_to_le16(return_credits);
->
-> -       ident =3D l2cap_get_ident(conn);
-> -
-> -       l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
-> -
-> -       /* L2CAP_LE_CREDITS has no response so the ident is never release=
-d by
-> -        * l2cap_put_ident() - release it right away, otherwise the tx_id=
-a
-> -        * range is exhausted after 254 packets and from then on credits =
-are
-> -        * sent with the invalid ident 0, which some remote stacks ignore=
-,
-> -        * stalling the channel.
-> -        */
-> -       if (ident > 0)
-> -               ida_free(&conn->tx_ida, ident);
-> +       l2cap_send_cmd(conn, l2cap_next_ident(conn), L2CAP_LE_CREDITS,
-> +                      sizeof(pkt), &pkt);
->  }
->
->  void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
-> --
-> 2.43.0
+OK, that seems less than ideal. Feels like it would be better if bus 
+code set the initial device state prior to device_add, so then it only 
+ever changes later as a result of an explicit attestation/acceptance 
+process. If the initial IOMMU probe still has to poke into bus-specific 
+code to avoid always making a worst-case assumption, doesn't that rather 
+defeat the point of having a generic abstraction?
 
-Sashiko flagged a problem:
-https://sashiko.dev/#/patchset/20261115115341.316484-1-ngocthang2710.1999%4=
-0gmail.com
+Even with the slightly dubious argument that this series only intends to 
+shuffle the existing PCI code around rather than fully introduce the 
+generic abstraction that it claims to, if the PCI behaviour is still 
+just based on propagating the internal "untrusted" flag plus the new 
+global override, both of which *are* known at add_device time into the 
+common trust state, then there seems little excuse for not doing that 
+up-front so that the new API *can* just work as expected.
 
+>>
+>>>    			/*
+>>> -			 * No ARM32 using systems will set untrusted, it cannot
+>>> -			 * work.
+>>> +			 * No ARM32 using systems select a restricted trust
+>>> +			 * policy; it cannot work.
+>>>    			 */
+>>>    			if (WARN_ON(IS_ENABLED(CONFIG_ARM_DMA_USE_IOMMU)))
+>>>    				return -1;
+>>> -			untrusted = gdev->dev;
+>>> +			restricted = gdev->dev;
+>>>    		}
+>>>    	}
+>> [...]
+>>> @@ -616,6 +608,28 @@ static inline struct pci_dev *to_pci_dev(const struct device *dev)
+>>>    {
+>>>    	return container_of(dev, struct pci_dev, dev);
+>>>    }
+>>> +
+>>> +static inline bool
+>>> +pci_dev_default_is_restricted(const struct pci_dev *pdev)
+>>> +{
+>>> +	enum device_trust_policy policy = READ_ONCE(pdev->dev.trust_policy);
+>>> +
+>>> +	return policy == DEVICE_TRUST_POLICY_DISABLED ||
+>>> +	       policy == DEVICE_TRUST_POLICY_ADVERSARY;
+>>> +}
+>>
+>> Unless I've wildly misunderstood, I'm not sure this is right - if the user
+>> has set DEVICE_TRUST_POLICY_DISABLED to explicitly override the bus-default
+>> behaviour, but that leads to the IOMMU layer special-casing all PCI devices
+>> as adversarial and thus force-*enabling* all their trust-model restrictions,
+>> isn't that pretty much the complete opposite of what was asked for?
+> 
+> We have two levels: policy - that describes the default of all devices
+> for that bus. level - actual decision on how that device is going to be
+> operated.
+> 
+> "Disabled" prevents driver probing until the device is authorized,
+> "Adversary" permits probing and requests the available protections
+> for operating an untrusted device.
+> 
+> Both need conservative initial IOMMU setup: a disabled device may later
+> be authorized as adversary, and authorization does not rebuild its IOMMU
+> domain.
 
---=20
-Luiz Augusto von Dentz
+Urgh, I can be absolutely certain I'm not the only one who is going to 
+be confused this way... I see "disabled" and instinctively take it to 
+mean disabling the device_trust *mechanism*, as the logical thing that 
+people will reach for in terms of "I don't care what this new thing is, 
+just get it out of my way and let my drivers work like they always used 
+to; I want to disable the new thing."
+
+ From there it then also makes perfect self-consistent sense that 
+"device_trust=full" would be the opposite end of the scale as in "Apply 
+the explicit trust model 'fully', to all devices regardless of their 
+bus-level default."
+
+Now I guess you could name it something like 
+"device.default_trust_level" to attempt to make it clearer that it 
+represents a value the value represents the "trust" *of* each individual 
+device itself, but TBH it's still liable to look backwards to many users 
+- similarly it's hard to guess that FOO_POLICY_DISABLED might mean 
+something entirely different from "don't enforce the policy for FOO.", 
+thus rather than try to contort the naming of everything, I'd still be 
+much more inclined to just flip the meanings to be more intuitive from 
+the outsider perspective.
+
+Say you upgrade your kernel and find your boot is broken because it now 
+flibbles, but at least there is a "flibble" parameter whose values are 
+"disabled", "wibble" and "frobble". Are you really going to spend time 
+straight off reading up on what flibbling is to understand what wibbles 
+and frobbles mean? Or is your instinct just going to be to try the 
+seemingly obvious way of disabling flibbling, and then getting 
+positively annoyed if that only makes it flibble harder?
+
+Robin.
