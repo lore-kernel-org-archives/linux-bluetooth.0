@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794851424;
-	b=n5tkUvObHGT9I1L3CgA+YYqCxtYbOYturx1efegRwabM/7CxIjV2xz+AIf2eQrBVIqiJ
-	 UCyrwMFoMAP+aLBozScWeGCKw94MjsyxF8vYppt67eOebSMkgQA9j/QYrfFhU2cG0UoRg
-	 tYVKdaE+Tmo/Mqft8aMhb6KoXedxtTrJKn+7fROjowlvVptljyk8Yy8VJHtFIfsmyKuqW
-	 YRYLjVKKNZ9IOwYJUQGWd+b+PdTjl8Z47C8CwiiILqI5n5Matfw2aWvpLo+qVyYWj8sc4
-	 /D85gZ97S0FLJPeYWwEgCjYwp8CQzruNTqCUnYF1p6APqQG2qWvsVGJUxDttLjmAxAQ==
+	t=1794851426;
+	b=apacvhaLfqZ8q2XoDut0/TWzxYBbgEngHtS4XqelIpWRQ2WW56bi9y6fHh2WRq1qJv1K
+	 +1uP05hnAUe/SdW0UimurhK7oEEd1CRPMIqMfIFBrYCx80NNCW5cu/bJi/xj6Tvj5ES18
+	 /HNyyJ6EcZdOUPqSPh+svDuwNoguq0bLq41s4T4cG2noeqArhWxR5L4bHKLy42JyRuKq2
+	 02r+FkeuYgqN0/YsbBh4ZKh9doWNIViosX1IfGvW23iaLM6x9PPCOamg07VaDku4SrfeJ
+	 r1q8FvS3l8g4vTIqmUoe16Tl+ObAFln26xNZK4hmZ0qkebyN+vtcahsAuuC5snwuXZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794851424;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851426;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=91rJEWjxPHIGpYMTg/LFG0q+FN55YR+n+YawYVkO0As=;
-	b=GY6iOUVcyoLQUvvKO3EQwxt/+pq3YOYnJTD7AS9zvOkJBETY/FvdUeYA6hhdxj2eW1Fv
-	 UFbXZKP33swTUpBmCQAFxUsUPlkkaTCmDMj3LS6RrLms2/sHFjEZXEMEyEadOItRiZcHg
-	 opnDTfypPg8SYbTtaqGDC8xl9/A+e1kpJsy68/e5Bi+nJrD5rUNzDXmuPtH7kl5+NMP51
-	 PHqwjokvAIEiOoaZ2cfX/kYVKl2I4pX1WREuzrwbUOFus0ndPp9Y7fRAgXuTsOeRG7l1b
-	 vUfVZL3ihaDd3rF7o9Nf0OfhqbBXQ8QAV2+dkt9SZc7jBIftLUJDT2ch60lZTetZ6fg==
+	bh=45ZQzrCgcYw6uEYFuV8Qoz9Hz8SJI38vD21bDkrs13g=;
+	b=rYuu5xaeBVJTWKRNaHPD83HwLYG09WhJ/a/TdWIsZC70ckvpor5SoEuYh265URJr1G9h
+	 7d0UD8201Yv3b0Bq3NyGjZyT9/PnRXLyrN7vSzuHHWev7pzU47ZPr2Ov5Yiav+WO/7682
+	 2qQa2+craZTQaEa9sgYY2+lUQF0O1ZcdeVHyom5rnYxVwKGQI1MO+xTZhAay+Y/Wlet/7
+	 4Q+gRNGEnImA2651zkviz+jda9d+OEN3p0FGqIjPjFrdZAaodYd2oEmYKNzkNnhT4vIJv
+	 RZ5YHJroaZZW9vJjILVzZXAc8aZXcvdlMagwwz+GbG5IxOhyK9Zg2KZLtzj573Vi2ng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VTwv9ATH;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CIcwdxXy;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EED606A323
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E3D606A323
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VTwv9ATH
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80B1E1F000C4;
-	Mon, 16 Nov 2026 17:50:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CIcwdxXy
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07BD91F000C9;
+	Mon, 16 Nov 2026 17:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794851424;
-	bh=91rJEWjxPHIGpYMTg/LFG0q+FN55YR+n+YawYVkO0As=;
+	s=k20260515; t=1794851426;
+	bh=45ZQzrCgcYw6uEYFuV8Qoz9Hz8SJI38vD21bDkrs13g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=VTwv9ATHZ3/BcI7e5PnUUn6RNHFcxkOKQzUeiqUHJbx5jY/Lv2oAbfXPPtvTppzEs
-	 zaKcyXRd5vzE3gdpJIZ0XaekjwyFIeBWfLNE1A2nnOY9+mTDf52c0l0lcmhUw7XLNS
-	 KLMkydkRr6Nsk+jUfT4z7Xi97kw6/quJR2CpPmX7DPI7y6kV8ssUzPMOXYSjArCf/P
-	 jA2umOvzvWIM8NHaD4G8qVWNWV4utTBfvLck68SCRwQAjhney97y9Q5UkOsuMcGRDk
-	 FU+mBsFqzlUMqoTypKjL6FP9zGfh3IZfinOroJHziy595/efXj9xr3E76hRHihUH1l
-	 u+7EeuoNwYLWA==
+	b=CIcwdxXycTcVbFL1/gj2L9AnZDPoQm/n4WmqeazD4eqjZKb8IBefI2P+toVC4rFpT
+	 5jAqT2Ln5imMfSibht+QAXsvGsl2Z5L/5NLaaXPzAre5vHGZTkqg+us2jV8KHSJ2si
+	 zyf71tNaDyT7igwO1kH2Kqwif2NByvECcIEbW0tnDoCH1YQndpdZsb19fNIEQbom3T
+	 w2xwHXxWWk14qDIzSw7ZPAVwYSrMJqSY6z2SlW0pUUlCZR/4svvjpt8Xfltnf7Pwnh
+	 SXTaPYvK+xkd8H7OUty2RCt0THndzUTI8ngOv73/hz4c2gXn2MId/phtLH6jVrbK7y
+	 qcwRbnCJ/l6FQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7733B391AFAF;
-	Mon, 16 Nov 2026 17:50:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F13CB391AFAF;
+	Mon, 16 Nov 2026 17:50:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,16 +54,16 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 4/8] transport: Don't hand the owner over while
+Subject: Re: [PATCH BlueZ v3 4/8] transport: Don't hand the owner over while
  releasing
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179485142302.3796096.8223622744336339718.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Nov 2026 17:50:23 +0000
+ <179485142452.3796096.17811546275183515310.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Nov 2026 17:50:24 +0000
 References: 
- <6cdc89f8101db17c443fadd37dc35d4fe5197674.1794414122.git.luiz.von.dentz@intel.com>
+ <07eac67b88248b126fcec9d784db800a69ac3e0c.1794428234.git.luiz.von.dentz@intel.com>
 In-Reply-To: 
- <6cdc89f8101db17c443fadd37dc35d4fe5197674.1794414122.git.luiz.von.dentz@intel.com>
+ <07eac67b88248b126fcec9d784db800a69ac3e0c.1794428234.git.luiz.von.dentz@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -72,7 +72,7 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 11 Nov 2026 11:25:27 -0500 you wrote:
+On Wed, 11 Nov 2026 15:37:38 -0500 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
 > As a server, handing the owner over to a link still streaming also
@@ -86,7 +86,7 @@ On Wed, 11 Nov 2026 11:25:27 -0500 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,4/8] transport: Don't hand the owner over while releasing
+  - [BlueZ,v3,4/8] transport: Don't hand the owner over while releasing
     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=578b16afd93c
 
 You are awesome, thank you!
