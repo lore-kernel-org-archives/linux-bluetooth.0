@@ -1,60 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794821601;
-	b=K+waQCfDPSBaffKM03WWBJrXYwlha45VLaSno1jlLU++pWucpZqHh6/ebFDmcbhR9F40
-	 4gfnHlxSTnjLLW9PAqkztjYs2F3zmgKasPIuty1Dk8yKGeQjUt8RhunV0yIKz323UDzOY
-	 excicrCLMzznEAZto2t5Oor4IASDHtnkRZztkuatlfCTMxrrRFld3D6UlL2QbBIz9stI7
-	 IF2jyOAo4GkWGhsEsifRQhgsHCmByhuNJ3fHmRNsCCBJsvklw0H3M9+hEbb1zzaDbIQz/
-	 XgL8zyEspm0BBGtYV3pOohF/iM0+sbqZCVRmV6mXsnDCE6mdDW8OoYgkxRO0KLkc6qA==
+	t=1794825002;
+	b=vVfvKWvVjGVFvVWNxRtHo6kc6WdLouc1QnFKNuWC5kNw5hr8UZJ3lZcM54ytdnnae3/s
+	 QyEyMeENYaDn28NK7lLeh+GfLmYNqsKB+BwkSdpk8Df3Nz4+QEsMv4Z6YLW2MJGv4Kqgf
+	 f7pHP4eLPsNN/EKVg85/0bp2ir71HTL46p1NT5ryAHyfHdUDTS/uL8OMalnEskyPjj/Bl
+	 GTB+37It5oFES2LhoZIYDCtPq0Bm0LZMaDZbNqJwexx10nQgv2D/HtngLpCGfFzMHzYyT
+	 ft1DndGpOzu2M6DaMOv+OjwDmA6NtP0GBTUU7KTGmqqourXQW84VbwU5pIidxdBVC1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794821601;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=zZD1ecSQpfHzr0M/Z2wi+FG+/jH6oQvvrQSRGb/w98U=;
-	b=IJXhtm7mCWpkRwT0IBJHWvAy4lqU9XTVjjP9pcdYFxuojsiRc9m6xkPwnZBOGq0Hzd32
-	 UYnSjFf2KzhqvhCJ5+jokiRAPQdISaIdHypI6Kox+8YfuvxUl2ToRNIChiosfABj+mxem
-	 uLXTbGlTwh+C7XbEA3IdogkquG1cRFKeha99xbOgQ6LQVNMlPUzZneUfOc9swjPU2cjuB
-	 zsjEmpro9bvjytk455VkEVtQJqlveUEZmz5hcAjxCvjyfv+0Z0tMCUynudwD/qW3jWwDL
-	 GiRYWgD061SVomz7bK6xcmQcQ7pkvkH12PQnEm8u/ZTbDx/LAcweirGJUXVSNMPTfvg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794825002;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 MIME-Version:X-Received:Date:X-Google-Appengine-App-Id:
+	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
+	 Content-Type;
+	bh=/1cdmyABstoM351Jd9SchcWWY1DQ8/OQeZxf5NBIclE=;
+	b=yab52xSR3wdWCJBzgFS2xxprLu57zTXj08kVD/YfRn09NMe+3Dm1AfQ5JBlJminojrMa
+	 dBF6AvYdUSzbLNDXGi+/SjFJJfkrU5+P7awBCjxMkJ2mc/YNqNmAV7rxmgImpADTqS11T
+	 ZDDASOaZaFvnzW2K2yeqhx+O1bn/ooksOxFOcOkDklOYu8IJneKpFps0YRQtr4Tykz8eJ
+	 jAzJ6w+nYxI7vwVvNRNSn7mvq53vqrvpXogGmEVeJEyYsLRH02DMWlbNjQc62AGGerz+a
+	 LHP8knWnfJYX98cixZ36PCs/AYSacB0i9zX7gxKkif6ftDDRh5yCNhXeBqIrlVsnXNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=collabora.com;
-	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=lD3bbq0x;
-	arc=none smtp.remote-ip=148.251.105.195
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.167.198
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838CE606A31C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 09:33:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 838CE606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=lD3bbq0x
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1794821598;
-	bh=69igiJHwoSRqVkHyDrlHC7STzHibppvduashZN+z6l4=;
-	h=From:To:Subject:Date:From;
-	b=lD3bbq0xVqTp7LUfGXaMol9XrjsuTQX429758m+F98qTJysiZKDx0uKyfuas4DtMU
-	 wr/lsx0ZumrC8928UhQsG+4VL9f+3uin5TsFW77O1903yq3tzxBXkYCvYHY0eWypT7
-	 e2mZNqpIeJ+GubKPXRWS541k/7Ix1mL2q3Dk6Lp+698X/NCi0rRpFQnv3wtYUQkbAr
-	 vWw/brA7ZzQYh8pamyL7GzmHXRGBufee35fped1DwpsDQxUGuAJ2m1haBSpEirKVMe
-	 axzzVoRH9IjdaU3kqWGbZxJmqVruK3sIM6QS5Mb+sQ/DBh8Z0YjHprbFUBwZ4H3rxD
-	 Dl/MZTNT3au7Q==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 722F217E07B5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 10:33:18 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 RESEND] avrcp: Poll GetPlayStatus when position changed event unsupported
-Date: Mon, 16 Nov 2026 10:33:08 +0100
-Message-ID: <20261116093308.79430-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F02D606A330
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 10:30:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9F02D606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-4b26d8d2498so3985362b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 02:30:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794825000; x=1795429800;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/1cdmyABstoM351Jd9SchcWWY1DQ8/OQeZxf5NBIclE=;
+        b=dE04LJR5MQjSJlIGy3QSXQ389r4w1xD0vPMS4z19AYAwJmIYeIRYIlnyHSIVpraXkl
+         1BE8GMQU5VIkGTpIuh5oKj6fngwgGyB9x4J/mn0UiGh9MPafIHG57AWDepCm9xmiiGSq
+         xOoTnahXTCoh2S/eZ0NP840495aiz25vd6CSO/dv5SY26v3kKxbWobyrhjB0NLklU7s3
+         c278gG512iwWwDxgq8JAjeypN4SlKA+TNjkifbudEKH9S5NW32BoPfZoWtLo04QLDbGy
+         g/H5sOxvUPbt8KvA30ocN+9E0IhPRjoJlnUoIUUrVlA20O0Sp4EWqhXrFqbdMrYsMjPj
+         oHNg==
+X-Gm-Message-State: APuU4Z8zYgMM6/duqt6ggfN3WLZ9/tmV2/gQhqNbVLTQR4LANE4Qwf6U
+	RXFpygh1dAzbNSY/O9jI5+Xs8mqpSKDhoWH83053iO2SqfYHVn/UwmVTi+toNSi8pM+i2y0Na9p
+	kW3uE4Ba+uDS+9JdcIT95tAA8ktP2IgFUmn+bWaazqxE7mnxixY8m5+0AT3Y=
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,148 +57,198 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:4fce:b0:572:f1d1:d6b3 with SMTP id
+ 5614622812f47-572f1d1e88amr4083111b6e.21.1794825000699; Mon, 16 Nov 2026
+ 02:30:00 -0800 (PST)
+Date: Mon, 16 Nov 2026 02:30:00 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6afadb28.371d364b.254eb1.0017.GAE@google.com>
+Subject: [syzbot] [bluetooth?] possible deadlock in add_ext_adv_params_complete
+From: syzbot <syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Some remote targets do not support the AVRCP_EVENT_PLAYBACK_POS_CHANGED
-notification, meaning bluetoothd never learns about track position
-updates for such devices.
+Hello,
 
-When this event is not present in the capabilities reported by the
-remote, fall back to polling AVRCP_GET_PLAY_STATUS once a second so
-the media player position stays in sync. Polling is only kept running
-while playback is actively progressing (playing) and is stopped
-otherwise, and is torn down on session destruction.
+syzbot found the following issue on:
 
-Assisted-by: Copilot CLI:claude-sonnet-5
+HEAD commit:    6964ff21c5d8 net: mana: Allocate queue MSI-X vectors on de..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=142d103d580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8fbc480f13a2deb8
+dashboard link: https://syzkaller.appspot.com/bug?extid=fc55a609cd9deea4ea37
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/10448f4c9816/disk-6964ff21.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/bd950eb7eaec/vmlinux-6964ff21.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/90c2418ba3c7/bzImage-6964ff21.xz
+
+AI-generated root cause summary:
+An ABBA circular locking dependency exists between hdev->lock and
+hdev->cmd_sync_work_lock in the Bluetooth subsystem. Callers holding
+hci_dev_lock(hdev) (such as MGMT command handlers and HCI event handlers)
+acquire hdev->cmd_sync_work_lock when enqueuing or looking up cmd_sync work via
+hci_cmd_sync_queue()/hci_cmd_sync_queue_once(). Conversely, hci_cmd_sync_clear()
+(and related cancellation paths in net/bluetooth/hci_sync.c) acquires
+hdev->cmd_sync_work_lock and calls _hci_cmd_sync_cancel_entry(), which invokes
+entry->destroy (e.g. add_ext_adv_params_complete) while still holding
+hdev->cmd_sync_work_lock. Because entry->destroy attempts to acquire
+hci_dev_lock(hdev), this inverts the lock hierarchy and causes a deadlock.
+
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=fc55a609cd9deea4ea37
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor/5634 is trying to acquire lock:
+ffff8880298c40b8 (&hdev->lock){+.+.}-{4:4}, at: add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+
+but task is already holding lock:
+ffff8880298c47c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:682
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       hci_cmd_sync_lookup_entry net/bluetooth/hci_sync.c:869 [inline]
+       hci_cmd_sync_queue_once+0x42/0x250 net/bluetooth/hci_sync.c:806
+       hci_update_passive_scan+0x1bf/0x210 net/bluetooth/hci_sync.c:3518
+       le_conn_complete_evt+0xee9/0x18d0 net/bluetooth/hci_event.c:6106
+       hci_le_conn_complete_evt+0x187/0x470 net/bluetooth/hci_event.c:6117
+       hci_event_func net/bluetooth/hci_event.c:8084 [inline]
+       hci_event_packet+0x67a/0xf10 net/bluetooth/hci_event.c:8138
+       hci_rx_work+0x2b4/0x1110 net/bluetooth/hci_core.c:4150
+       process_one_work kernel/workqueue.c:3495 [inline]
+       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3578
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3659
+       kthread+0x38b/0x480 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (&hdev->lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3209 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+       _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:667 [inline]
+       hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:684
+       hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2697
+       vhci_release+0x16d/0x1c0 drivers/bluetooth/hci_vhci.c:704
+       __fput+0x408/0xa40 fs/file_table.c:512
+       fput_close_sync+0x11f/0x240 fs/file_table.c:618
+       filp_close_sync+0x6e/0xa0 fs/open.c:1574
+       close_files fs/file.c:572 [inline]
+       put_files_struct+0x230/0x3c0 fs/file.c:584
+       do_exit+0x6f0/0x2360 kernel/exit.c:977
+       do_group_exit+0x22d/0x2f0 kernel/exit.c:1123
+       get_signal+0x136a/0x1430 kernel/signal.c:3113
+       arch_do_signal_or_restart+0xbb/0x860 arch/x86/kernel/signal.c:337
+       __exit_to_user_mode_loop kernel/entry/common.c:66 [inline]
+       exit_to_user_mode_loop+0x10e/0x770 kernel/entry/common.c:101
+       __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+       syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+       syscall_exit_to_user_mode include/linux/entry-common.h:343 [inline]
+       do_syscall_64+0x32c/0x530 arch/x86/entry/syscall_64.c:107
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&hdev->cmd_sync_work_lock);
+                               lock(&hdev->lock);
+                               lock(&hdev->cmd_sync_work_lock);
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+locks held by syz-executor/5634: 1, on CPU#1:
+ #0: ffff8880298c47c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:682
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 5634 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
+ check_prev_add kernel/locking/lockdep.c:3209 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+ add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+ _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:667 [inline]
+ hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:684
+ hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2697
+ vhci_release+0x16d/0x1c0 drivers/bluetooth/hci_vhci.c:704
+ __fput+0x408/0xa40 fs/file_table.c:512
+ fput_close_sync+0x11f/0x240 fs/file_table.c:618
+ filp_close_sync+0x6e/0xa0 fs/open.c:1574
+ close_files fs/file.c:572 [inline]
+ put_files_struct+0x230/0x3c0 fs/file.c:584
+ do_exit+0x6f0/0x2360 kernel/exit.c:977
+ do_group_exit+0x22d/0x2f0 kernel/exit.c:1123
+ get_signal+0x136a/0x1430 kernel/signal.c:3113
+ arch_do_signal_or_restart+0xbb/0x860 arch/x86/kernel/signal.c:337
+ __exit_to_user_mode_loop kernel/entry/common.c:66 [inline]
+ exit_to_user_mode_loop+0x10e/0x770 kernel/entry/common.c:101
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:230 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:343 [inline]
+ do_syscall_64+0x32c/0x530 arch/x86/entry/syscall_64.c:107
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f35a9f69d0e
+Code: Unable to access opcode bytes at 0x7f35a9f69ce4.
+RSP: 002b:00007ffe3a7895f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: fffffffffffffe00 RBX: 00005555922b8500 RCX: 00007f35a9f69d0e
+RDX: 0000000000000030 RSI: 00007ffe3a7896f0 RDI: 00000000000000f9
+RBP: 00007ffe3a78969c R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000258
+R13: 000000000000002b R14: 000000000006526d R15: 00007ffe3a7896f0
+ </TASK>
+
+
 ---
-v1->v2: Remove polling during seek
-v2->v3: Change commit title to fit max length
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- profiles/audio/avrcp.c | 67 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 66 insertions(+), 1 deletion(-)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index c09a32766..2f214e982 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -247,7 +247,9 @@ struct avrcp {
- 	unsigned int control_id;
- 	unsigned int browsing_id;
- 	unsigned int browsing_timer;
-+	unsigned int position_timer;
- 	uint16_t supported_events;
-+	bool pos_changed_supported;
- 	uint8_t transaction;
- 	struct pending_pdu *pending_pdu;
- };
-@@ -341,6 +343,7 @@ static const uint32_t company_ids[] = {
- 
- static void avrcp_register_notification(struct avrcp *session, uint8_t event);
- static GList *player_list_settings(struct avrcp_player *player);
-+static void avrcp_get_play_status(struct avrcp *session);
- 
- static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *version)
- {
-@@ -2224,6 +2227,59 @@ static const char *status_to_string(uint8_t status)
- 	}
- }
- 
-+static bool avrcp_poll_play_status(gpointer user_data)
-+{
-+	struct avrcp *session = user_data;
-+
-+	avrcp_get_play_status(session);
-+
-+	return TRUE;
-+}
-+
-+static void avrcp_stop_pos_polling(struct avrcp *session)
-+{
-+	if (session->position_timer == 0)
-+		return;
-+
-+	timeout_remove(session->position_timer);
-+	session->position_timer = 0;
-+}
-+
-+static void avrcp_start_pos_polling(struct avrcp *session)
-+{
-+	if (session->position_timer > 0)
-+		return;
-+
-+	session->position_timer = timeout_add_seconds(1,
-+						avrcp_poll_play_status,
-+						session, NULL);
-+}
-+
-+/*
-+ * Poll GetPlayStatus once a second to resync position while playing when
-+ * the remote does not support AVRCP_EVENT_PLAYBACK_POS_CHANGED. Polling is
-+ * paused whenever playback is not actively progressing.
-+ */
-+static void avrcp_update_pos_polling(struct avrcp *session, uint8_t status)
-+{
-+	if (session->pos_changed_supported)
-+		return;
-+
-+	switch (status) {
-+	case AVRCP_PLAY_STATUS_PLAYING:
-+		avrcp_start_pos_polling(session);
-+		break;
-+	case AVRCP_PLAY_STATUS_FWD_SEEK:
-+	case AVRCP_PLAY_STATUS_REV_SEEK:
-+		/* Position already resynced once via GetPlayStatus,
-+		 * no need for continuous polling on seek.
-+		 */
-+	default:
-+		avrcp_stop_pos_polling(session);
-+		break;
-+	}
-+}
-+
- static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
-@@ -2252,6 +2308,8 @@ static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
- 	media_player_set_position(mp, position);
- 	media_player_set_status(mp, status_to_string(status));
- 
-+	avrcp_update_pos_polling(session, status);
-+
- 	return FALSE;
- }
- 
-@@ -4128,6 +4186,9 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 		}
- 	}
- 
-+	session->pos_changed_supported =
-+			!!(events & (1 << AVRCP_EVENT_PLAYBACK_POS_CHANGED));
-+
- 	if (!session->controller || !session->controller->player)
- 		return FALSE;
- 
-@@ -4140,7 +4201,8 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 			!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
- 		avrcp_list_player_attributes(session);
- 
--	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
-+	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)) ||
-+			!session->pos_changed_supported)
- 		avrcp_get_play_status(session);
- 
- 	if (!(events & (1 << AVRCP_EVENT_STATUS_CHANGED)))
-@@ -4470,6 +4532,9 @@ static void session_destroy(struct avrcp *session, int err)
- 	if (session->browsing_timer > 0)
- 		timeout_remove(session->browsing_timer);
- 
-+	if (session->position_timer > 0)
-+		timeout_remove(session->position_timer);
-+
- 	if (session->controller != NULL)
- 		controller_destroy(session);
- 
--- 
-2.43.0
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
