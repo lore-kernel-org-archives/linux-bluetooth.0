@@ -1,89 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794864488;
-	b=fPb7RVwI93SDOhhrEu9KP3oDkCz+qZOH/AjswfEJg+ZZ8D0Z1AtkWtC473EiK3sH+yjj
-	 j+e51OEBFK3NIh0bvGbubwkTGIGk5YkPE0ahd1sDQSsTOmFd5FcxujopF85n78e2Ab39R
-	 iERI2SDLdU6lqmugX1r6SOtawreBdGrBBcDR/k5sUt5WIcXKdPtJPdFUCM9f2d1gpD6V0
-	 b+MRXJtSUTxeUiVbIhrfPKJNyDk86bSB2rluZvPeJ+qHvtySYgBUZdY55pZrkzcnPT3vv
-	 VaLW/8j95KnAUVnehxbDWapM44JiStskBY0jVP0Ld7mbDMhCh0WrSFcFDvNtST5VoyQ==
+	t=1794865130;
+	b=fgq/9Df0mXZRYE2KmHLJwz008cOHX60jDg216qs4/7qwxw/TUm4B8wl35Ilt8qmMsP/G
+	 vTXG3tMz6Op/IZU5FZK5BCCRDFSQYFmIJsYrP7+6vyGKvxZQ4u82wY9sEYwP8EK1+Qcl6
+	 z5TEplLYN3qYFt4bOBOuJ1XguYinm8hFqoLpCC472NigW8CPNcb2BQoVF1asemOe0OsDw
+	 CzUEMER5yAxc+wgjgtdD0JGnuNYt9ynTXpYRbbqp0HgcWz48Du/2GakzF4Y6M12bDo00e
+	 qWJUNfGbkrBK2xRvbQKGQBFiPGD8TmSjDokDyNTM/ntbtlAmN25RUyN5TT0kx6QnwKA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794864488;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865130;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
-	b=1y+azxB0jE28jFy1n2UbO4KFJsdS7GlmWoUQ+WYpXnIA45KkJflZSm+v8hNXnJhg9Vk0
-	 MGQQxWj/U50oscltzfOfuQmn/oAUorjNmtTC5/1TtiOR8CElem7s0zz7d5G2Ohp2HQvpv
-	 Ye3HFT3+skuXyWbgFkF4XfSnghIH2YLTeualpc2H85Uqem+CyH4zfrcmUbyFN9PkPnV1O
-	 CRVnjTHMMthz+0HzsS2fVwFXnKRmuSzfSb4VxPwf7x6eInjShz5DaMTIu1BW2Guqe+57S
-	 13dfL3g71EMqnZDAwzjznUS/m5xEcW27TXVuwMCr6V5JZ41IR2bTkb/5rivTrEDRgFg==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:From:Subject:To:Cc:
+	 Content-Language:Content-Type:Content-Transfer-Encoding;
+	bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
+	b=J3P1ZVOqPCMJbD5AdpXEVxZfy6yNFRWDZ+w8gc8rH7P/vXCdl+ioufpt4ArldQrffYZ4
+	 CxbeuD59ma4fdJ+HbePuxRx0l84hWOJEdWF40Cq9C3FDfZ5oVCtGl9AA0N7h7kcZ/8kPd
+	 zkejSY40d40Fyr7ANffcp2LkKtVK0nLIeboEQyaKBzCgYu9hXVx6JH3InXCwI8IE9M6jw
+	 ROmpU2rL+i+fb9plUp+3y4vxp5ARSM3/CTKRmR8CDCimzyCoBCRv6sWSirKBAOOX3CIJY
+	 Ek+N0McMv81NSdsjzRYNlZ0T89xvf/kyBc3fB8LT8WviT1tEpXItWZSbeLw2kKOIBqg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+6EuEBc;
-	arc=none smtp.remote-ip=209.85.217.51
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tI8DQZF1;
+	arc=none smtp.remote-ip=74.125.224.48
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25E7606A339
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 21:28:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F25E7606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180D7606A33B
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 21:38:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 180D7606A33B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+6EuEBc
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-7d2dbe5c4b0so1069539137.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 13:28:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tI8DQZF1
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-67db89857abso1853412d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 13:38:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794864487; x=1795469287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
-        b=p+6EuEBcdEWsbgWgNendAXI4UQYDsf2NXItRNimHhYVGeCiuBs5u01C0NWsKGuQOSg
-         k/dsqKrgQCaoRrC94jYONR+Oci0kXFwZRWXExmzWHPlTnJE4J5NUdQa2PsXGldhooW+c
-         jDueeRMKkdbVgt7A0EimKTtN0jRyhl33X50GvvlbaoThRq2drO9VGRiHnN+/4/GxGJ8L
-         eko8weIeKirI9jePCW5okG2qm6Ru5TNFmrSyONWM9nIU3tvwacb+q5IFeJv8aaJHnGHp
-         HE7Y9cp3DcncKGcum1LBkRaTLeq2LHazOHHVrn1BPL3Nk+8BnuF69R3KdObGCcrS4GXp
-         TYPw==
+        d=gmail.com; s=20260707; t=1794865128; x=1795469928; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:content-language:cc:to
+         :subject:from:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
+        b=tI8DQZF1ueCSROoR1hS0wRY3UbfDhvHo6IbY5ani6kaucOW3vTxsx6DC6jqr5dWNvk
+         Z+y+ZOEWCBdj3QsPRmYG2xWh9s1TOfDIQ65xYveQknHqaABiBzrW3q6w1O3aFx4rvZ4h
+         +cU/wL6VnCTNUfZEbeR4LZCQK9SBiwopG9RmM2NJ4hwfsmYjhFvAOHNfoC5LJ0f7YE87
+         h9aRQKhwLjVrsatU2452PoWvbI7iKB/T+/O7XppTumbF6NfbRdRm66rYxZ/zSEd7YwQB
+         Xja30Cbn4zxleWKC6R8QIwJSyb14H1Ve2zp/jvZGnxQ1rR/sIDumbAhy5YglnjlDm9cX
+         4lQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794864487; x=1795469287;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
-        b=0o6BpvN21Ka8BicF58sEvflVNj3Yu+GyIrp4H/s686BJ50Izntj6uVkv6u6tC/BvgT
-         9+9VLWbpg4kaIcZpslnO65G8rID1swJ68Q2kGc8NThcbpXPl4KHcYhRrNCPGn+O3qZex
-         UvPjtFSmfaet2gf/ghL68Ljduihev1Le7harAgAi77Q2kDiouh8iawSlBxEJ/moAilXg
-         SlemQfb2s5AQNK1M6R9b40YGGJNbuMo607MyFzu4quVoTh4i64Ye/pp4PdjN6q+P5sLk
-         Fb1E7B3PLfLCdSr1o63rnABTHcj2KYqukzvpAirC428OEU3+5147y9y5rW8gZE/UubbH
-         ctmA==
-X-Gm-Message-State: APuU4Z9nLnATK/yo1ujGpQEh9IoC9EcCGnXFfv34hyArHHzIubmGafmB
-	j47QXNFsPmyoi7kCI0rlsZMgrTrNUU/+ctNeQgRev2+abe5Bs0n6C7iBMcBBYg==
-X-Gm-Gg: AYBFou1t7XhXbkjSMNnEJPWGDAjJMza22ntKziNwuxGFxmwOzoUbG//F6gjBLzyyalB
-	8HPSwL/vwo9ofIyNdhKAgPMfTquHUvT/6VCSMJyGlge/DKxgQx1g2LkJNtfflGFaScceZJeLxnP
-	uHXj1YvvtNkNeO1+p80LTbd7NOrM1DtiBOUueccUF7fhoe05a3rxWXrxemt39iReG2q6HjfaMsU
-	QNzvVPLQduTDkI45GI1lHr/BORL8D9e47KgH7rUhbvgB2BFxsR4P8BjAqCrq2rw54SVhGV/QRBX
-	pBxLZwJVkgMNU0FXjB6g3+OFqjt+/F9Z5/aKcAErcJ48x/OmfgUS0k2XgXT8f/8Y4lb0VhxOdAD
-	eiSlIawnxFMSB3NWWEwxjoP89EezTVbe9gn2FfyGxSmoFD3dDlZsh4oiEoqOZfcNOt3M4VvnAzI
-	66yK+VMGF7QTh2FIx/eTEFnCru7u/WHlPjr3q2pbdAm4a34580I37L/ulrX8+Hh4Bgh9+739hpw
-	Jxeq4GExZKMb50gvP0OMsLb9ehQAfHKLKtlKVH0EqJk1vZH+Mx32/wFfNrLCTnwIU15bn/k/qOy
-	h3bxZpufYUwtW6SwDkkfvzzbKbxttBYdDIGHYjXEkpKP8fm3eQGBrJDVuyB+ttGnlUGB3Fd0w2W
-	Qpu3ajLZsE/hgXVlYVSibSwlsrrnL/hFRxjRjP5BYM2ZybgT4wX4ufaCAQJKwcsfgc3zwByU7l/
-	ofTYLPmJ/XhtZNFxJqGfpfGOHL
-X-Received: by 2002:a05:6102:2911:b0:7ce:78f9:adf2 with SMTP id ada2fe7eead31-7d64d7047e1mr3196529137.9.1794864486991;
-        Mon, 16 Nov 2026 13:28:06 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d69dd55c77sm836010137.2.2026.11.16.13.28.06
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 13:28:06 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/1] emulator: Fix version of 6.2 and 7.0 controllers
-Date: Mon, 16 Nov 2026 16:28:05 -0500
-Message-ID: <20261116212805.3083583-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1794865128; x=1795469928;
+        h=content-transfer-encoding:content-type:content-language:cc:to
+         :subject:from:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
+        b=iwTh4Pls9lcOIVZ+S0dJTrhiAZT31M+RZckH2ZOtRghu3j3tuCTe0RLwKT8Xs6rtqp
+         WtNVzPmuXgpztQ0m5gYdV6PLDcPRng60jUFYgkXs3qKdD5591SOhVfaky1f132ka9bUf
+         fjsKkRQi6MydctzhWkuLbHFzFY/xMrvksknHvVXsBht6unEU+86fJeHcT5DrJStZ4ciQ
+         JySoepLJ1F88WcoeBWLhzwcm5sQIWVK0N09cTXd+69IuutEg09r97hNzk4uWYc14Xur/
+         09roesRt/YYQu05qhEA5o3kGkqxiWpe1euD3EPSpql7NrxoHNABkU1q9XkrsGwmg3XNA
+         Oj7w==
+X-Forwarded-Encrypted: i=1; AL+hErE/xlEnLjAA9E0IRAQrFoptrVCnctiE9upjviaAU5J0S8ewdy8TjE0jVbYLsZbcFespoIZBpAqccQibPH3+f4A=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Wb/v+Lwt6tqTVFJKtma239L6Dy3L0/lgwwGPt/Qfr17mywtZE
+	V1ydFi1+oKshgo/0cMA7CI07lr80umjeEVhjpJecFVpSXFNuBdw+EoKg
+X-Gm-Gg: AZFdTZdloV3zYWSB7D1bMLJ7LJgbdionLTWKbQhtONJFWFlEc2hU954IBB3dV+5/Doa
+	Jz5zdZN9f6w87Mods2IbvvgJ+YnObM0QO1xxKWYL6Sj9K/fgpRNrymZcO+vU57HuhQDOKoGPi9L
+	905U4/FXo6YoB4IH0lCFKp/HlUTuUEb6kEA3q1Lt7NREi8KqlK4wHdKJJLTlRSGVKmGOxrUgIBJ
+	uWgugbSMyLMPHsk45juBOkSeoZ6zHtLZ9uaHh78Jrsc8aF8zyVngVsTb9Qzl2Po+DKB+h87yjVZ
+	jC6u9hxGlS49Vgd6Rbw/S/brWSQfAdu0JPCiWgS8LrpUPpJQ+Loey+W6kIFG6ruwgi+MBCW8ehT
+	Yl1z/HHoYHz8w+yE5GiUs/El2EKzROR1bpiiLE9j3xzrODkDorE6SWqEn15RBTcytPhaOQIhJD8
+	GNSVzGWvPYNyNkTFvW0kKnBtJ5Gn1ZtNhDvHmZYmTFoQdAbYY6lLGuceAbckdSeNSH5NQh8oYWF
+	8lntAFYKCi+U42Jlh6tOuNKduHkWiGQGKm6eyXNTRk7wAZb92QMCcB6mf3wXQllbFXTSolgzN9M
+	1dyCDZAlYaAkaOzYqSEvO00UA12G3E1zA8sMYOdeA0MoiqMuqCEnjsVmZtJ8v+oQGQdioTFQQTc
+	Q6g0pa7OIBRNi7uSvCX0SpiGHNudYXmCIhHSYp/lNANXdQ66roVfjGwE8cNMkpnvdGxrPQyYH0J
+	FX5QcEWkjfQJ8aqIGntyC0SgeXx1bwB2/YpO2CKImcTB9SShatzWZGHI0TuA8/t44=
+X-Received: by 2002:a05:690e:1907:b0:67d:bb23:631e with SMTP id 956f58d0204a3-67dbb236663mr1529423d50.97.1794865128041;
+        Mon, 16 Nov 2026 13:38:48 -0800 (PST)
+Received: from [192.168.207.4] (104-12-105-135.lightspeed.miamfl.sbcglobal.net. [104.12.105.135])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b4ec06ff89sm9325807b3.31.2026.11.16.13.38.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Nov 2026 13:38:47 -0800 (PST)
+Message-ID: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
+Date: Mon, 16 Nov 2026 16:38:46 -0500
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,88 +92,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Jason Perlow <jperlow@gmail.com>
+Subject: [PATCH] Bluetooth: btbcm: Add entries for BCM4364B3 UART Bluetooth
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The BCM4364B3 combo chip on Apple T2 Macs, e.g. the MacBookPro16,1, has a
+UART Bluetooth controller that reports LMP subversion 0x3032 (001.016.050)
+on some units and 0x305b (001.016.091) on others.  Neither has an entry in
+bcm_uart_subver_table, so the controller is logged without a name:
 
-BTDEV_TYPE_BREDRLE62 reported 0x0e (6.0) since it never set a version
-of its own and BTDEV_TYPE_BREDRLE70 reported 0x10, which is 6.2, so
-set them to 0x10 and 0x12 respectively as decoded by btmon.
+   Bluetooth: hci0: BCM4364B3 Trinidad Olympic GEN (MFG)
+   Bluetooth: hci0: BCM (001.016.091) build 0115
 
-The version set for BTDEV_TYPE_BREDRLE70 in btdev_create was always
-overwritten by set_bredrle_features, so fold it into the other
-BREDRLE types. Update the versions expected by mgmt-tester to match.
+and the firmware lookup only tries the generic "brcm/BCM.hcd".
 
-Fixes: a938cf48d083 ("emulator/btdev: Add emulation support for HIDS
-1.1 SCI commands")
-Fixes: a7f03764fa5f ("emulator: Add HDT support to btdev")
-Assisted-by: OpenCode:claude-fable-5.2
+Add both subversions so the controller is named and its firmware is looked
+up as "brcm/BCM4364B3.hcd" first.  Tested on two MacBookPro16,1 with a
+v7.4-rc3 based kernel carrying an equivalent change, one reporting 0x3032
+and one reporting 0x305b.  They now log:
+
+   Bluetooth: hci0: BCM4364B3 (001.016.050) build 0082
+   Bluetooth: hci0: BCM4364B3 (001.016.091) build 0115
+
+Signed-off-by: Jason Perlow <jperlow@gmail.com>
 ---
- emulator/btdev.c    | 10 +++-------
- tools/mgmt-tester.c |  4 ++--
- 2 files changed, 5 insertions(+), 9 deletions(-)
+  drivers/bluetooth/btbcm.c | 2 ++
+  1 file changed, 2 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index b3d13e39741a..1140acd90e7d 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -9151,6 +9151,7 @@ static void set_bredrle_features(struct btdev *btdev)
- 	}
- 
- 	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
-+		btdev->version = 0x10;
- 		/* Shorter Connection Intervals */
- 		btdev->le_features[9] |= BIT(0);
- 		/* Shorter Connection Intervals (Host Support) */
-@@ -9160,7 +9161,7 @@ static void set_bredrle_features(struct btdev *btdev)
- 	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
- 		uint8_t *page_1 = &btdev->le_features[8];
- 
--		btdev->version = 0x10;
-+		btdev->version = 0x12;
- 
- 		/* The data length commands of 7.0 are the ones emulated */
- 		btdev->le_features[0] |= BIT(5); /* LE Data Length Extension */
-@@ -9302,17 +9303,12 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	btdev->revision = 0x0000;
- 
- 	switch (btdev->type) {
--	case BTDEV_TYPE_BREDRLE70:
--		btdev->version = 0x0e;
--		set_bredrle_features(btdev);
--		set_bredrle_commands(btdev);
--		set_le_states(btdev);
--		break;
- 	case BTDEV_TYPE_BREDRLE:
- 	case BTDEV_TYPE_BREDRLE50:
- 	case BTDEV_TYPE_BREDRLE52:
- 	case BTDEV_TYPE_BREDRLE60:
- 	case BTDEV_TYPE_BREDRLE62:
-+	case BTDEV_TYPE_BREDRLE70:
- 		btdev->version = 0x09;
- 		set_bredrle_features(btdev);
- 		set_bredrle_commands(btdev);
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 100e3cd6082c..18dbd3f89096 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -706,14 +706,14 @@ static void test_condition_complete(struct test_data *data)
- 
- #define test_bredrle62_full(name, data, setup, func, timeout) \
- 	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE62, \
--					0x0e, 0x0201beff, 0x00000080)
-+					0x10, 0x0201beff, 0x00000080)
- 
- #define test_bredrle62(name, data, setup, func) \
- 	test_bredrle62_full(name, data, setup, func, 2)
- 
- #define test_bredrle70_full(name, data, setup, func, timeout) \
- 	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE70, \
--					0x10, 0x0601beff, 0x00000080)
-+					0x12, 0x0601beff, 0x00000080)
- 
- #define test_bredrle70(name, data, setup, func) \
- 	test_bredrle70_full(name, data, setup, func, 2)
--- 
-2.56.0
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 065536d4ec..92ba7aeac3 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -519,6 +519,8 @@ static const struct bcm_subver_table 
+bcm_uart_subver_table[] = {
+  	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
+  	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
+  	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
++	{ 0x3032, "BCM4364B3"	},	/* 001.016.050 */
++	{ 0x305b, "BCM4364B3"	},	/* 001.016.091 */
+  	{ }
+  };
+  -- 2.56.0
 
