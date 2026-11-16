@@ -1,124 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.173
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794847291;
-	b=f5Wv+5S42kEY6nWEbQ8YSzPPWpgCRBxym5V2CsRjdjzY7h3lnn3W0lMjAOHxueJQVxmq
-	 7MmnJ2Hhcmjajz9Zf3X0MSAaK2AkpWEqq6eI1OycCQcAqZiO0qfRZpw/GtiI4aHdWL3Jg
-	 hOXPI3Ha+EMAdKlWpG8atF+bJT4wBhvBokMnOm3hcnhwGWJG/aVqE6XbLfmQDC5mfi2AQ
-	 qdCWOy1ymuOVBDMYXKv3GV+Owiuba8cMNHY267iawpM0wEkY95G2UhF75cnDMLWMwZvfe
-	 0AdgmdldfXktIQLYQv5YNssBrflFbSLpmLThQhi0cEgxCT6upwTfjzBA0WCWC0HeFkQ==
+	t=1794848677;
+	b=zbvzDMlLlB+26DfI/Gx2643tx7FzMs2/wM+9WilARdKvWcEP2XGx7jz+YgjLkOK8Txv4
+	 MlZ3dmQODf7shFoxWQ3x4r3qrDf0M+DYpHZOvoQgaIspRX3aPxzH80zyFDjH8Eo1jmtxX
+	 ejiO63Br43U4cvjqz3acBnv9VOqzHl3tezP0REH8qS+X/K/thSuQqREDN1tEJJS/SmgMw
+	 a+uyBm4O2zYSxPsXoY5vxnBd6i71RLks3iDuvUYRnM7s9z8H+iwkUfybtw6sf4RLLVZ02
+	 TLx+7+EYKcMRFGGPn5ZTxzF23SPlLDnkHQAjJD4oHjfu3adhW6P1bqsPMAH6QKL0pXw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794847291;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:
-	 Cc:Content-Type:Content-Transfer-Encoding:X-Proofpoint-Spam-Info:
-	 X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=4qZkLMxYkgUaxwhWD/DbkSL4PS0JBXcFsajsekbEWek=;
-	b=wDDJblwAp6ENPLL9EXy9+FFOXH+Idysc8JXrt0+/e9nC07J82GpVZ3YvbTXRlrVmUtL4
-	 fOscFI5+OhhlUb6yXf32ETliMDtEuTjwyNLCb3Mo5xs893bj7TLh9RkHCBprluNz8Co/1
-	 Nv8r+ID5vdQ2wW+7EVdRpIubLKsJuz8OwFi/O9bBg3+8Upp/WE6el0rFp73kHZkyqK8I+
-	 lL+lH0lTvYQwOSgfNkhnkqFzuvkqxF6SlJcOvlnCMF7WcQtf8jdRpauw28lAM6DuPjXvN
-	 j1cPu8fQCCty+JudgXbaU0PgjIG00/Yw427SlHFRkJm41x+XJnjrHF5krtmPhRZN5ow==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794848677;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
+	b=qTegPXqKL/zD/iB4lIX2l++oQ3VZAUu9Q6RcvIg+S7ZXHVWCFXuOOJNKp2tFfEEgCxNK
+	 qlBVn4+a4JjxpeeMwm96FeP+Vu63YQMPZWihOwVZogc7PoffC0DxeweXds02kEYJ6/ay3
+	 37is9XAcz3Y4XImr8/aEU6iVUrcc+KTJY5LIEfjDl58vkB/Gn6/12oh4ryRIFaCTQXtqL
+	 Y1T56JPvRoQFUtLUH+yAJ0Qkg9dlnsNeFt2xrcTY4Fpu3PJSetCTnE3tuBOnFcylbFZmV
+	 muapaT/eYksGy9w5/ENjffkyvPD3gXPImyUmpRqN598q1ifkbwSUkkB3DgfoFVNUneg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=hdgMF+NQ;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YQT91hEi;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WZYY2r8K;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.173
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97D9606A329
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 16:41:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B97D9606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797AE606A338
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 17:04:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 797AE606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=hdgMF+NQ;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YQT91hEi
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AGGI8QL1110175
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 16:41:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	4qZkLMxYkgUaxwhWD/DbkSL4PS0JBXcFsajsekbEWek=; b=hdgMF+NQZkdok22p
-	J6V91c1iTQKYBMuU583CO+qwTF8p14sGxX5UZJYMWPNi1XnOVTbLw2NlK9XlG+Wh
-	NlyPiwjXl2Yt8P8wJB+hyk6ilZbCqvvNpOWU4GTPBqCLgwQXWx/jbFZAZsuXwcl7
-	OaOvE2zUeNQXnu68HUNqHUpzEYJ8UZQU+u9Ngbt8AjRITg865x7+oavU5TTTERpT
-	q+DY9gM3S+pvafoPt/yYyclOaf9RlLsfh2vyyB3mYoJ5fWg79EY/t/wqtSWneoJv
-	y8gKOYcBex9EOudDoz/cfhSiHvMjVDYAss1R9Ul8sDM86oL+lsA5I2gxCpwGGMP1
-	P+ZmPA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hyyqghgy5-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 16:41:29 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93e92aad34aso734863985a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 08:41:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794847289; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WZYY2r8K
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-8b4bc5b8de5so292687b3.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 09:04:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794848676; cv=none;
         d=google.com; s=arc-20260327;
-        b=qVKqPx9hJBqkNn7Dm56p8R0YLfae/ZOYxcZWRQkFnLAxzg3UP/GU3faGhSiWVqTMlv
-         lUH3TEaMMWNGCLvOvnqcK9JcIcK62vPzFzX4Lhj2zjTWk7jq+atqR6GXa9x0sZLDXkN2
-         hsLAj0LlhUh7BFYZUzQ9tczEnElsyVp0cy+o8SHuy32lAD2D871sGAmsK/h8qC+as0GB
-         QKRWjyByOTd6wecQxttUDZNbcuznq5z/IQZUpIe5mBc/wg4m1RAVDbbReaRPUWY/xQpe
-         ULFq/5cTzzlGMPb7RnJ/5FwSij6ErK9AcKG0NpVKgL0NzPk7AALpbDRvN9ktUprOdvFK
-         r89Q==
+        b=fdaJ8qfi4d9yIfrNYGz+flCQPRiVfmdBV6qFZGxVKyHkvFaVXJekSeMetGx8fQ5sZt
+         GUuEp4Rgfk7eALCMhph0iX4JSb26zhx9GZIGPm+M1XkHJGkCxOgPY8i4JUjztmmh9ebj
+         yazWWHQbzTKH8FQfvvwvk0J4SXHGfd2rwjATu0Cpik1LW14jYsFOlM2LfQK2w3SlyeUf
+         h8g7UX9bCY69QiDh9tXTDrqhQ6ClTeutfO56jn4A4QxCPraaEbnu5EEF2HzincmUbryo
+         4+dwgyFz5eMExeKGP2a7nLdRdSxJpMhnhQbA4w6bmkTT7FyvCCw4lTRV9gS04OWEqKSl
+         59LQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=4qZkLMxYkgUaxwhWD/DbkSL4PS0JBXcFsajsekbEWek=;
-        fh=l8fmy4aJo/9jnyUx4yCCG86gHRQc5hpIJjK/XyUDeZE=;
-        b=sH64oodnHSdiTeIBxfLBpwEg0Z3g6xQvaeYvD3ZfXxdVCUq+nnpk4FqYbG4EOQ+dt0
-         9FYonDEES7R5PHD4iD//eqT34QMk3VOY1PMnNJhfi9mBQYaKomnkEEkkRQBb18diDWIu
-         450OjTwDmtpt3u+N9/jUmknB8of/ISxk+FypbvY8hqdt4sDW2dXK4XO/7aZ4jw3D5u4q
-         P4pfjAde6yJFl6lurh0jFAROCjizXQcWfhGBTpb0bCgk3LdkDUDlOEbhTRDAvA1ggrfE
-         paFVjWuuvmxzk/zkOUVx1x+VEmqqwAhFrteP5egh14FSjRqajOzB/h6io21lIfuq4FhF
-         9EAA==;
+        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
+        fh=cafIMaLk87UFIskGY+saxcyFW18xU3iMYjbTLAq/AU0=;
+        b=G9uFc7q/9BOVBLXuGmP1oFoXOmsut5BKZb20RUOcBWtlZZ7xiDLWxOETnLuwLggYmR
+         cd224WuBczmEsPXG+hnkDoTHLGE7ZmGHRP//ZCO0x1YlqKmtfdZ/N/LdnfS/1y/KZmYW
+         F4o1ZaeDU/P+qpdudSnCEtO377Y6hwzm0ipIee6UxmBesBMylMaPAbqk1FodNGfbRFtV
+         CC92Y0OI3qg8sXhQNbQeglonqHeQMCF99Zi8fL2wX5aQRqn+vt6eNJORRdVPWnaM7obf
+         DS34JrENu8VvUEY9nlili5qccZl8N1cVgMt6Y1Qiy0iU1OgHV007bEN+DepUGzvfSNLm
+         n+WQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1794847289; x=1795452089; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794848676; x=1795453476; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=4qZkLMxYkgUaxwhWD/DbkSL4PS0JBXcFsajsekbEWek=;
-        b=YQT91hEi1mgvC7LHU9A5iqE/RkiCDzcB8l5VCZPHtE2UAutrA2LWHKYjH23ni4LkYa
-         f8oMN+MNHf3SeV+ZbuHBf3bqpZZKsKBWbDzy9hrA+yaegimxMZRQxUjmVQJ2MZwPPRaF
-         tzuyR6vwMy1y+GUVm9mn8LiaGLjGQ4RiLBlqYk/c/m8Wg0r705o5bps2u70dsvf9fbZ1
-         bKG49NF5/6vKOHN7AhoUfgP97rUHjhWa8bMl/wEnBqcTPVs6zD5ELmBcWlUWGBUG7A43
-         K1hxi5dggQhVrc0uo9MFeeon6BqGyKmAmeXjCiJM/VAGYi/mpzQL1wFCRmxev3H+1lAr
-         SU+w==
+        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
+        b=WZYY2r8KgTyJC8YKopk67NlqvwpC1c5dZ4/uebpyAgqgLz7Uc/bMqiwjjrEI3xwkoV
+         +VhQx82XFmQwmTJncIGsGKv4tFZM4AfYO7d0mx/KDjSYKbsSMEexaRRcyS5s26s059Ve
+         TUKHv/A6NpzCtrL7atOzRURA1LFIwh+2swxki0IZzipXDtTzWrQjDbuWmS0LcnOPKnIM
+         mD5Oo2li6ok9yYVXWD7LZugQesJkeQBHppksRD3FRdDmebsc4pu8/VvgC4E3sRjmXcA0
+         7EHqvZbdaQd0Y6JJ/8XcPAEmz3lBpdyDSuT0uRdlKgHOPX7rBgQsA0a7RUSmh9qCJ26t
+         CW+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794847289; x=1795452089;
+        d=1e100.net; s=20260707; t=1794848676; x=1795453476;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=4qZkLMxYkgUaxwhWD/DbkSL4PS0JBXcFsajsekbEWek=;
-        b=v4FQj+oHK+5pJrSocsJzYyadt4zmHsqBfp4POI+fSL3dHeOL1b4SjLfHKcGS3+Tohs
-         zM7skKqfR7IqNY3Bp39rJ0o92yhhj/LarmSm2P4CQoyvJ6KNTibd+pfMRucywCYsn86r
-         g9kj0mWR4/2zU1wqc80pMb+R8weE9xbM3+aUuL3qBR8QkPMeBdQqzSkmCvC+o2k8Ebpr
-         6GopvwDzHRfWcehzqFrecSQ5DuJIqvegPlQBaHWJMo4hpOSpy/K7shDWBh0J1iCJWBfN
-         NHfMfYAlWb1+v2pvIswzRVP2w86qX8benb3xA2aKEhbasKzA8ZQwgyoeF3xMdcM5sqEI
-         4aAg==
-X-Forwarded-Encrypted: i=1; AL+hErG5eVqU1yHH3l9vsIirOV3T4BvVXfpokbgEArd2yyPwP0Act1nS34n0y8a3HqTVuuvlY1AQRoGWf8yVolF1KQk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9yM7Bulv7VskexpyE5bmg5RKupiTD2ahlvPceCrBeyL2xeUWSm
-	IQ3cGorgP9tc/OCSPEn6iZciL0b0ePYInmF4PeWm300XwFQBKi6axvYymGOaFhLzLdAEtKPg0LT
-	c3pLwMTIWeHFP5Ez48fIiPkkyGNAKJpa9uLTHkRNuWMB2DbiaAKg+z7IeR3GZ1jY4O3BfNu5X6W
-	LqdqLco7qAXd2qBoTtgamTpgM0c5HQ6LNBy8CTdH+KcgpXhw==
-X-Gm-Gg: AYBFou2AHtsv2gRTzYXqejlOPNO82v3q80Mt7DhdE+CSGIR466Oi040GWxsUuwZbZ43
-	+2YuImRnvL+B2ZKo5SBfHWl5uR9BAVEtDh7bekAbhgSuaGuyDl2zMiASfepXPut+Hj7xWMkxAtW
-	ASMfHElj3PXaXLnhSCPfJ7JFsCprPkLwHaLnqwbMxWdS7B4bjmaFF3Q0lFJnX/zZ+2pRxkPJwJY
-	A6aR9CJXYP0/DpNT3G/ig8cweheejMeu5+YMOcKImFbQ4j/3svUgQV8iswZ5aBkV7wQqPh2ZCvr
-X-Received: by 2002:a05:620a:4012:b0:93e:6f43:b2c1 with SMTP id af79cd13be357-9494bb85888mr1819994485a.16.1794847288650;
-        Mon, 16 Nov 2026 08:41:28 -0800 (PST)
-X-Received: by 2002:a05:620a:4012:b0:93e:6f43:b2c1 with SMTP id
- af79cd13be357-9494bb85888mr1819990385a.16.1794847288180; Mon, 16 Nov 2026
- 08:41:28 -0800 (PST)
+        bh=OuuyAZ4IWLgVQrPB86XUEajs/Fsetiw6Rysz8jcKkt0=;
+        b=orJD8cfXtBYIUUMh8ZjM1c4lltSOm6mP5KPfBDz1Rd2tUEfwaVrVFdB5RQNrD9LoVl
+         Y1DGblbJkDRzWkBP+v8jiosHapJHAWtTY4E4kD2JC20AxfYeg67kgfU3QjWBKBRenO78
+         LmKFBW9wf67cYK46cqh1CjL5HCQFX/t5GZHcfMjSxmQCvUDX0ByJSWkiKsUgKVSZnHhN
+         9JdRvDNA/zy6rQTgs5Ue3Lpm+HwLxrT5wKgMrnsbpeLaGtQ2W5o2jQL4zGUGBf5Hc3DC
+         jw0qrenPrfAMUK+v/cqFqon9u5ZH0+s8qLQQUDwzuqACf7PDBdw2IDrOM7X3BqF0dgMc
+         2dow==
+X-Forwarded-Encrypted: i=1; AL+hErFD4Ora9CmareBDlegi70JDPprEXYBxBRxR/NXJSVCXotO3YBE8KwDCYcnkNyiz8O/BGqGrXIdjpPmIHLLyDmM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+yoE2DTJlekwrRK8bKhDKHL4DEabk7rqLEiKKx4oYbkwuN4syU
+	FRAKt3mjvsGxPqzVHdKtGFGHolZ9n0msEfFMy4uON1ta4tQNBikJfWZ1BNrePUfr+gqsFRRA+jJ
+	gRQA0lUVEeHhv5expFbz23XrjhnA5roY=
+X-Gm-Gg: AZFdTZeCfujUnFYR4C45sJJhRPYxOY3q0wbvbWagHMS8QyEtUmh/BXFGeFAUVe5kjPV
+	qbeD79DpMVN9Ag4ok7PCPN8ho2hhZynQ3cqkvDgAn8ZGcrdmOJW07Y3x8twK/X7w0wgiCfpfE5o
+	GOG5bqPrpDCz491PPvdkL0CE223+THEwG5B1fA3fQKi8KdWBs9FsXYvShdtER3G5Dlazg8Awlab
+	YmwEysiLTUHgzRO2hFIRF4HouokUnjZrKvcWOoHLVgojKlXTtwIqilgW5aTD4cW2YwAgv8RyqAz
+	s8sgmD4aEbf6f5yjAdcys+SWhAQH73So2QyWjHVeIkkcC+91l9JwJ/2+0k95B51fwDCLfR8O5xW
+	svPAwkeH8jEU8f51GetbGMpFOC3YI4qtSiJYJHY03XJ9L6ANble2o7jRbcNMvliBsyxe5FR6paD
+	qNw74AT87ql4KvLmDlbtz46dOY33OEYR43MFXsmxqytP3L6g6hSicgtMBa
+X-Received: by 2002:a05:690e:4145:b0:679:97d1:439e with SMTP id
+ 956f58d0204a3-67dc76a3aebmr61822d50.2.1794848675703; Mon, 16 Nov 2026
+ 09:04:35 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -128,125 +105,164 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
- <179467295519.97469.5747232754111917783.marvell-serdev-v1-1@michaelmcallister.org>
- <179484691454.54083.14464729860702732145.marvell-serdev-v2@michaelmcallister.org>
-In-Reply-To: <179484691454.54083.14464729860702732145.marvell-serdev-v2@michaelmcallister.org>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 16 Nov 2026 17:41:17 +0100
-X-Gm-Features: AclHuK-gWxq45ZclJ4O6NsxbJ6zdZFq59VI-w6TmYe42xNuv57HyC9kyCgswmyU
-Message-ID: <CAFEp6-1CG9Hah3uobRG1ZHQsmuN0JGhmVg4cXgbrDgz0DWBVgw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_mrvl: Leave the serdev port lifetime to hci_serdev
-To: Michael McAllister <me@michaelmcallister.org>
-Cc: markus.probst@posteo.de, luiz.dentz@gmail.com, marcel@holtmann.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
+In-Reply-To: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 16 Nov 2026 12:04:22 -0500
+X-Gm-Features: AclHuK-7mHIMY0CY3JZllTpHy6nwtTontz9GqLEJ12QCe-O4w2_0-LpJPkaVhfo
+Message-ID: <CABBYNZLEONoqo+mdnNyv19pd3HxyfHAyHTPUpi-et0RFMctN6Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: don't reserve an ident for L2CAP_LE_CREDITS
+To: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Stig Hornang <stig@hornang.me>, 
+	syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE2MDA2NiBTYWx0ZWRfX0kQs04Rzwe7i
- dsXrTVx0F2NWsWI4SFC1v8/3KeAn2gY++ekqp9ssOuHWvTJfHma3ZK7I0VmbuIxmIGtmDw7s078
- 5/+46Lq0UFiWTJiSfQucPxvizdUyac0=
-X-Authority-Analysis: v=2.4 cv=epRKXYpX c=1 sm=1 tr=0 ts=6afb3239 cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=YMgV9FUhrdKAYTUUvYB2:22 a=VwQbUJbxAAAA:8 a=JwJ85b4fAAAA:8 a=EUspDBNiAAAA:8
- a=r5qjpY2wa2NEgfoDGsAA:9 a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22
- a=qg2vb7sgHZQYDKbllo_a:22
-X-Proofpoint-ORIG-GUID: 8NBWo-JtTPT02afirqfJYH8pbAjIdQLF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE2MDA2NiBTYWx0ZWRfXx2wp2vXT8X5n
- +JfIWMRP76xSoakJOVIDXA49HhaFiCjgDljnm38lR0sz+iYVhdz6Jd9s1leW61S0MYnvy2Dcx1l
- x/zsqQ1uE7NkCWDn2hGGUwWQ6kDyoGSJvwrQtW3LLRLlQgBI+n50qM0u16QgEobRN5waeW9U/kG
- pS4ZGiTVjYvNcYLL4RzDfNRhhx3XoJ67UElz41As9an+N8AlvDNlGXrfv32xlvOPO99f9gjgN9M
- Uod0Rgrrhkph4kAMoATz+Jt6rMEfkQzPMADVS7cP5es0K06o1p8jYSISJxCo4KRmaUpet3WyaO5
- UJZfPywaSxMHAOzXjL4fGbXtlWaf5W3VHxCox5h+708Lfeb2CQlKYzQRQ/AWIUCwhZ4b+bX1CRY
- gnmAi9p1crjoOXWs53zca7lw7VnhHLtHY0pXWZYXrYYa8h6O6+vgFGsnss0FifNDWQUvD+/PeJL
- gvLAB2FwkOw92PtAX7A==
-X-Proofpoint-GUID: 8NBWo-JtTPT02afirqfJYH8pbAjIdQLF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-16_05,2026-11-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
- priorityscore=1501 suspectscore=0 spamscore=0 clxscore=1015 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611160066
 
-On Mon, Nov 16, 2026 at 5:36=E2=80=AFPM Michael McAllister
-<me@michaelmcallister.org> wrote:
->
-> hci_uart_register_device_priv() opens the port before calling mrvl_open()=
-,
-> so Marvell opens it twice. Likewise, mrvl_close() closes it before the
-> transport closes it again during unregister or registration error cleanup=
-.
->
-> Remove the extra calls and let hci_serdev own the port lifetime. This als=
-o
-> avoids failing probe when serdev rejects a second open with -EALREADY.
->
-> Fixes: be70e5e774a6 ("Bluetooth: hci_mrvl: Add serdev support")
-> Reported-by: Markus Probst <markus.probst@posteo.de>
-> Closes: https://lore.kernel.org/341e56b1ff7d8a5b109e26e30dfed61faa54d603.=
-camel@posteo.de/
-> Signed-off-by: Michael McAllister <me@michaelmcallister.org>
+Hi Nguyen,
 
-Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-
+On Sun, Nov 15, 2026 at 6:53=E2=80=AFAM Nguyen Ngoc Thang
+<ngocthang2710.1999@gmail.com> wrote:
+>
+> l2cap_chan_le_send_credits() allocates an ident from conn->tx_ida, sends
+> L2CAP_LE_CREDITS and then frees the ident unconditionally, since the
+> command has no response.
+>
+> But the ident is visible in tx_ida while the command is in flight, and
+> the remote may answer it with L2CAP_COMMAND_REJ anyway. The RX path then
+> releases it in l2cap_put_ident() under conn->lock, while the credits path
+> runs from recvmsg() with only the socket lock held. Whichever ida_free()
+> comes second hits:
+>
+>   ida_free called for id=3D3 which is not allocated.
+>   WARNING: lib/idr.c:594 at ida_free+0x24c/0x2d4 lib/idr.c:594
+>   Call trace:
+>    ida_free+0x24c/0x2d4 lib/idr.c:594
+>    l2cap_chan_le_send_credits+0x17c/0x29c net/bluetooth/l2cap_core.c:7113
+>    l2cap_chan_rx_avail+0xb4/0x134 net/bluetooth/l2cap_core.c:7126
+>    l2cap_publish_rx_avail+0x110/0x168 net/bluetooth/l2cap_sock.c
+>    l2cap_sock_recvmsg+0x280/0x7b8 net/bluetooth/l2cap_sock.c:1317
+>
+> Worse, if the ident is reallocated for a real request in between, the
+> credits path frees that request's ident instead.
+>
+> tx_ida only exists to track requests awaiting a response, so a command
+> without one has no business in it. Give L2CAP_LE_CREDITS a plain cyclic
+> ident instead, which never needs releasing. The ident is still never 0
+> and never exhausts the range, which is what commit 6e1930ece855
+> ("Bluetooth: L2CAP: fix tx ident leak for commands without a response")
+> set out to fix.
+>
+> Fixes: 6e1930ece855 ("Bluetooth: L2CAP: fix tx ident leak for commands wi=
+thout a response")
+> Reported-by: syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D9dc8780713b11155dd74
+> Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 > ---
-> Hi Markus,
+> Tested in QEMU (x86_64, KASAN + lockdep) with the syzbot C reproducer,
+> 15 runs per kernel:
+>   base (origin/master 23c62304dde2): 31x "ida_free called for id=3DN ..."
+>   patched:                           0 warnings, 1200 LE credits sent,
+>                                      none with ident 0 (ident wraps fine)
 >
-> This just drops the non-standard trailer that checkpatch flagged. No
-> code changes from v1; still looking for a test on Marvell hardware.
+>  net/bluetooth/l2cap_core.c | 44 +++++++++++++++++++++-----------------
+>  1 file changed, 24 insertions(+), 20 deletions(-)
 >
-> Thanks,
-> Michael
->
-> Changes in v2:
-> - Drop the Assisted-by trailer. AI assistance was used for v1.
->
->  drivers/bluetooth/hci_mrvl.c | 14 --------------
->  1 file changed, 14 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-> index 5798a8db0..def19907c 100644
-> --- a/drivers/bluetooth/hci_mrvl.c
-> +++ b/drivers/bluetooth/hci_mrvl.c
-> @@ -57,7 +57,6 @@ struct hci_mrvl_pkt {
->  static int mrvl_open(struct hci_uart *hu)
->  {
->         struct mrvl_data *mrvl;
-> -       int ret;
->
->         BT_DBG("hu %p", hu);
->
-> @@ -75,17 +74,7 @@ static int mrvl_open(struct hci_uart *hu)
->
->         hu->priv =3D mrvl;
->
-> -       if (hu->serdev) {
-> -               ret =3D serdev_device_open(hu->serdev);
-> -               if (ret)
-> -                       goto err;
-> -       }
-> -
->         return 0;
-> -err:
-> -       kfree(mrvl);
-> -
-> -       return ret;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 7dcb0586a10b..0b861ced5703 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1028,21 +1028,36 @@ int l2cap_chan_check_security(struct l2cap_chan *=
+chan, bool initiator)
+>                                  initiator);
 >  }
 >
->  static int mrvl_close(struct hci_uart *hu)
-> @@ -94,9 +83,6 @@ static int mrvl_close(struct hci_uart *hu)
->
->         BT_DBG("hu %p", hu);
->
-> -       if (hu->serdev)
-> -               serdev_device_close(hu->serdev);
+> -static int l2cap_get_ident(struct l2cap_conn *conn)
+> +static u8 l2cap_ident_max(struct l2cap_conn *conn)
+>  {
+> -       u8 max;
+> -       int ident;
 > -
->         skb_queue_purge(&mrvl->txq);
->         skb_queue_purge(&mrvl->rawq);
->         kfree_skb(mrvl->rx_skb);
+>         /* LE link does not support tools like l2ping so use the full ran=
+ge */
+>         if (conn->hcon->type =3D=3D LE_LINK)
+> -               max =3D 255;
+> +               return 255;
+> +
+>         /* Get next available identificator.
+>          *    1 - 128 are used by kernel.
+>          *  129 - 199 are reserved.
+>          *  200 - 254 are used by utilities like l2ping, etc.
+>          */
+> -       else
+> -               max =3D 128;
+> +       return 128;
+> +}
+> +
+> +/* Ident for a command that has no response: it is not reserved in tx_id=
+a,
+> + * so nothing has to release it and it can't be released twice.
+> + */
+> +static u8 l2cap_next_ident(struct l2cap_conn *conn)
+> +{
+> +       u8 ident =3D READ_ONCE(conn->tx_ident) % l2cap_ident_max(conn) + =
+1;
+> +
+> +       WRITE_ONCE(conn->tx_ident, ident);
+> +
+> +       return ident;
+> +}
+> +
+> +static int l2cap_get_ident(struct l2cap_conn *conn)
+> +{
+> +       u8 max =3D l2cap_ident_max(conn);
+> +       int ident;
+>
+>         /* Allocate ident using min as last used + 1 (cyclic) */
+>         ident =3D ida_alloc_range(&conn->tx_ida, READ_ONCE(conn->tx_ident=
+) + 1,
+> @@ -7081,7 +7096,6 @@ static void l2cap_chan_le_send_credits(struct l2cap=
+_chan *chan)
+>         struct l2cap_conn *conn =3D chan->conn;
+>         struct l2cap_le_credits pkt;
+>         u16 return_credits =3D l2cap_le_rx_credits(chan);
+> -       int ident;
+>
+>         if (chan->mode !=3D L2CAP_MODE_LE_FLOWCTL &&
+>             chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL)
+> @@ -7099,18 +7113,8 @@ static void l2cap_chan_le_send_credits(struct l2ca=
+p_chan *chan)
+>         pkt.cid     =3D cpu_to_le16(chan->scid);
+>         pkt.credits =3D cpu_to_le16(return_credits);
+>
+> -       ident =3D l2cap_get_ident(conn);
+> -
+> -       l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
+> -
+> -       /* L2CAP_LE_CREDITS has no response so the ident is never release=
+d by
+> -        * l2cap_put_ident() - release it right away, otherwise the tx_id=
+a
+> -        * range is exhausted after 254 packets and from then on credits =
+are
+> -        * sent with the invalid ident 0, which some remote stacks ignore=
+,
+> -        * stalling the channel.
+> -        */
+> -       if (ident > 0)
+> -               ida_free(&conn->tx_ida, ident);
+> +       l2cap_send_cmd(conn, l2cap_next_ident(conn), L2CAP_LE_CREDITS,
+> +                      sizeof(pkt), &pkt);
+>  }
+>
+>  void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
 > --
-> 2.39.5
->
->
+> 2.43.0
+
+Sashiko flagged a problem:
+https://sashiko.dev/#/patchset/20261115115341.316484-1-ngocthang2710.1999%4=
+0gmail.com
+
+
+--=20
+Luiz Augusto von Dentz
