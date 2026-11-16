@@ -1,88 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.161.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794865130;
-	b=fgq/9Df0mXZRYE2KmHLJwz008cOHX60jDg216qs4/7qwxw/TUm4B8wl35Ilt8qmMsP/G
-	 vTXG3tMz6Op/IZU5FZK5BCCRDFSQYFmIJsYrP7+6vyGKvxZQ4u82wY9sEYwP8EK1+Qcl6
-	 z5TEplLYN3qYFt4bOBOuJ1XguYinm8hFqoLpCC472NigW8CPNcb2BQoVF1asemOe0OsDw
-	 CzUEMER5yAxc+wgjgtdD0JGnuNYt9ynTXpYRbbqp0HgcWz48Du/2GakzF4Y6M12bDo00e
-	 qWJUNfGbkrBK2xRvbQKGQBFiPGD8TmSjDokDyNTM/ntbtlAmN25RUyN5TT0kx6QnwKA==
+	t=1794865175;
+	b=Qrf6N+iXCjOX93S6b9iSBnYyEG2nf/iTBvmop8A7f1SK7v48sCbB5CgZpg+87Ihqe+FZ
+	 uBum8F5tk5ybWkmETRDTWwN3q2xxNlC9+jNy8JT2et/JSSJjuHDOoE7tW4+WNwlEmGfVR
+	 ZFIIwTQSnB2S/NpTORjGEMIJ51SmkDCufVuo+4P/2Fs1DYx14aDoLLQxrUOEeVWGidS0D
+	 9v8mWshXPfsPdDNhHa+4SphwPbmNSu9vpjGCmLPI1gJoZvePEEWpof5KJRLAn5LhFObsk
+	 Kibs25NWI/+g22Y994VkN6MJbqbAYKMfFYB6K5l4FcMdaQu8ztj/0BVMqxcQmN8Vz/Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794865130;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794865175;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:From:Subject:To:Cc:
-	 Content-Language:Content-Type:Content-Transfer-Encoding;
-	bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
-	b=J3P1ZVOqPCMJbD5AdpXEVxZfy6yNFRWDZ+w8gc8rH7P/vXCdl+ioufpt4ArldQrffYZ4
-	 CxbeuD59ma4fdJ+HbePuxRx0l84hWOJEdWF40Cq9C3FDfZ5oVCtGl9AA0N7h7kcZ/8kPd
-	 zkejSY40d40Fyr7ANffcp2LkKtVK0nLIeboEQyaKBzCgYu9hXVx6JH3InXCwI8IE9M6jw
-	 ROmpU2rL+i+fb9plUp+3y4vxp5ARSM3/CTKRmR8CDCimzyCoBCRv6sWSirKBAOOX3CIJY
-	 Ek+N0McMv81NSdsjzRYNlZ0T89xvf/kyBc3fB8LT8WviT1tEpXItWZSbeLw2kKOIBqg==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=eRYw/3nncinWo9PUSW52jujSpyaNiuMGdc4eZnV97c0=;
+	b=AP2tvaPxgfmYqsuMMPeYh+wXR+dqw/lE8+rdTOcK6iMpnp5s0l2I9fkxjdFpgDY9GfB2
+	 VipSc+tTSSpXYdt+AC94iqvmj59oieJf5nVy5duTddMQnWJBtlYRIWGMxwmZK1yGXLK+L
+	 sVeeTX0GUNkCOa+YTOLITD5Mndq92xKKWZTs93PVLnsW2CHj6wX4+nj9s+QiCF0PJRrxJ
+	 Tff11t/SQja3VyIrGfL91o2rdxo1wUKIIxjob+td8Lj7vs1uaxk2x7NzNE89olYD3wgPA
+	 +FsTQZaNGPcg+j/9fxDSpB25u5apDVg2SKE86jfpKCSfe0AU4bh/te//M+0EL+4HQ0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tI8DQZF1;
-	arc=none smtp.remote-ip=74.125.224.48
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=enCXo+eB;
+	arc=none smtp.remote-ip=209.85.161.48
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180D7606A33B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 21:38:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 180D7606A33B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB87C606A31C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 21:39:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB87C606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tI8DQZF1
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-67db89857abso1853412d50.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 13:38:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=enCXo+eB
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-70bf1671c21so3333661eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 13:39:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794865128; x=1795469928; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:content-language:cc:to
-         :subject:from:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
-        b=tI8DQZF1ueCSROoR1hS0wRY3UbfDhvHo6IbY5ani6kaucOW3vTxsx6DC6jqr5dWNvk
-         Z+y+ZOEWCBdj3QsPRmYG2xWh9s1TOfDIQ65xYveQknHqaABiBzrW3q6w1O3aFx4rvZ4h
-         +cU/wL6VnCTNUfZEbeR4LZCQK9SBiwopG9RmM2NJ4hwfsmYjhFvAOHNfoC5LJ0f7YE87
-         h9aRQKhwLjVrsatU2452PoWvbI7iKB/T+/O7XppTumbF6NfbRdRm66rYxZ/zSEd7YwQB
-         Xja30Cbn4zxleWKC6R8QIwJSyb14H1Ve2zp/jvZGnxQ1rR/sIDumbAhy5YglnjlDm9cX
-         4lQA==
+        d=gmail.com; s=20260707; t=1794865174; x=1795469974; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=eRYw/3nncinWo9PUSW52jujSpyaNiuMGdc4eZnV97c0=;
+        b=enCXo+eBm2N0ImILC6pTzLebjNpUItKxajXXPubhQN24/ScE75w0+w42t3JI46OF57
+         q+RK7BfjLSnTwTSjK9dbxSC4kziyG76p/iW06FGHxY+6feZFT9k8QdhxnVW8RenMoC2F
+         Gq0A1hFzu0zJIWC+X5Eq9p5oxjDp+hByce302lPynzpLziT2voWemNGl0/0HYABwsnK5
+         uqeXzv+qL/XqzlmtBMRA4/CEULnYBB9wdSfhLZdWsB0X07EhPMoA7Rs4CeU7fyrI9c/3
+         cljWfCUMwSjcc1kPrVWDsdHegJC5zZMK6aZ3QESgaWRK1k1DiU4dmn8Glm/ATbqQKQoF
+         lAGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794865128; x=1795469928;
-        h=content-transfer-encoding:content-type:content-language:cc:to
-         :subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=N/IRCZAR2uINU2Yz+quelX7uIQDJ1pWTDySOsZRw7Ps=;
-        b=iwTh4Pls9lcOIVZ+S0dJTrhiAZT31M+RZckH2ZOtRghu3j3tuCTe0RLwKT8Xs6rtqp
-         WtNVzPmuXgpztQ0m5gYdV6PLDcPRng60jUFYgkXs3qKdD5591SOhVfaky1f132ka9bUf
-         fjsKkRQi6MydctzhWkuLbHFzFY/xMrvksknHvVXsBht6unEU+86fJeHcT5DrJStZ4ciQ
-         JySoepLJ1F88WcoeBWLhzwcm5sQIWVK0N09cTXd+69IuutEg09r97hNzk4uWYc14Xur/
-         09roesRt/YYQu05qhEA5o3kGkqxiWpe1euD3EPSpql7NrxoHNABkU1q9XkrsGwmg3XNA
-         Oj7w==
-X-Forwarded-Encrypted: i=1; AL+hErE/xlEnLjAA9E0IRAQrFoptrVCnctiE9upjviaAU5J0S8ewdy8TjE0jVbYLsZbcFespoIZBpAqccQibPH3+f4A=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/Wb/v+Lwt6tqTVFJKtma239L6Dy3L0/lgwwGPt/Qfr17mywtZE
-	V1ydFi1+oKshgo/0cMA7CI07lr80umjeEVhjpJecFVpSXFNuBdw+EoKg
-X-Gm-Gg: AZFdTZdloV3zYWSB7D1bMLJ7LJgbdionLTWKbQhtONJFWFlEc2hU954IBB3dV+5/Doa
-	Jz5zdZN9f6w87Mods2IbvvgJ+YnObM0QO1xxKWYL6Sj9K/fgpRNrymZcO+vU57HuhQDOKoGPi9L
-	905U4/FXo6YoB4IH0lCFKp/HlUTuUEb6kEA3q1Lt7NREi8KqlK4wHdKJJLTlRSGVKmGOxrUgIBJ
-	uWgugbSMyLMPHsk45juBOkSeoZ6zHtLZ9uaHh78Jrsc8aF8zyVngVsTb9Qzl2Po+DKB+h87yjVZ
-	jC6u9hxGlS49Vgd6Rbw/S/brWSQfAdu0JPCiWgS8LrpUPpJQ+Loey+W6kIFG6ruwgi+MBCW8ehT
-	Yl1z/HHoYHz8w+yE5GiUs/El2EKzROR1bpiiLE9j3xzrODkDorE6SWqEn15RBTcytPhaOQIhJD8
-	GNSVzGWvPYNyNkTFvW0kKnBtJ5Gn1ZtNhDvHmZYmTFoQdAbYY6lLGuceAbckdSeNSH5NQh8oYWF
-	8lntAFYKCi+U42Jlh6tOuNKduHkWiGQGKm6eyXNTRk7wAZb92QMCcB6mf3wXQllbFXTSolgzN9M
-	1dyCDZAlYaAkaOzYqSEvO00UA12G3E1zA8sMYOdeA0MoiqMuqCEnjsVmZtJ8v+oQGQdioTFQQTc
-	Q6g0pa7OIBRNi7uSvCX0SpiGHNudYXmCIhHSYp/lNANXdQ66roVfjGwE8cNMkpnvdGxrPQyYH0J
-	FX5QcEWkjfQJ8aqIGntyC0SgeXx1bwB2/YpO2CKImcTB9SShatzWZGHI0TuA8/t44=
-X-Received: by 2002:a05:690e:1907:b0:67d:bb23:631e with SMTP id 956f58d0204a3-67dbb236663mr1529423d50.97.1794865128041;
-        Mon, 16 Nov 2026 13:38:48 -0800 (PST)
-Received: from [192.168.207.4] (104-12-105-135.lightspeed.miamfl.sbcglobal.net. [104.12.105.135])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8b4ec06ff89sm9325807b3.31.2026.11.16.13.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Nov 2026 13:38:47 -0800 (PST)
-Message-ID: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
-Date: Mon, 16 Nov 2026 16:38:46 -0500
+        d=1e100.net; s=20260707; t=1794865174; x=1795469974;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=eRYw/3nncinWo9PUSW52jujSpyaNiuMGdc4eZnV97c0=;
+        b=Cm2NLe7Hx+boe4mPiztRMpzYGPsZonQ6iGwVeeRex6Kdtty6fWr1LioZjK840F0Rrt
+         HlA6vPINIXLFW+wCGxbQy7WVogkwGk7QvUWISH+9IIGvyav4kFCdTvHycJtCWcy+vcDy
+         sBVAWDTu2ndhnBB4PbVeloAmKU/JOgvpk356716j/ZNVIPUsZ0L4ooXtTBmbB+35fYw/
+         +3t6/FK07rwKVMmWCAMQ/fu5fOx+8A9lhEa9YAK4KGXv1XbjqhEkY6yga6VzZa0TzBDS
+         4Hr/Y19qvpsgS8a+lo56N5jldLFRjCpgd4YOHocc0siyr4s+6pdIiO5/BhR39AB6rZYh
+         phpA==
+X-Gm-Message-State: APuU4Z/gV3nihGZ/RbV7nfV0WypzLzjg8DOmFn5Qvjrlkq9I8FrsRZ0H
+	zOTDPxnIsmYXy4RdfsOrJUoLY+uGw2ArfQ3Hr5SvOMfumOkODYMBJ39CWmTlQw==
+X-Gm-Gg: AYBFou2UaExtADYFUt7+Uy6LjxixocsnSvYAnZfuwFWC9C3jrquLha0oMAT+5IT9Ekj
+	pr3Tr/tkoMKByEeYz2J/MDeIb4MwT/JR6Cq7ICw20TGOn1wmkxqkgZQjomZTfPIuQJpn4bhIlQw
+	TrxADXDSo/gNTE2AtbKVO1eVuwnOxetppt9/XE7nGl/3dE7oAp9FvSEi0J9n3JCMKViKmg6s2Ut
+	X255JV+iKzCin/kJBhN4zWV+1YqQYE/88D+iIryGKr76tRJ80dUADENZmu+DUOIB/BjDlu6Fe86
+	PGQFY9Noxruiq/GTwtgZMkDKwwmUgak6csxKY3xirUq1/WsQioeQBo3XvkdokhwO8VichloroRa
+	huNyzZXXm82TO4uqkwHoKdhmM3V9hiEPfEpRuGDLLlxmTTuEBDuJLQZ5DasnFbqjStk+YW6YT/r
+	QdnJnNxwWywPYLS5bomz2ytQyjcZqPs11D9v6A4XkltkL1x3PtIaOdcGXCIbWq7Kq9a40QTtzN1
+	9jMGJmVCj0dP3GDtLxZk+n+zO1SFUsgDIOkbbE4bcZP7BZeuSQU7CO5Fi2KAw==
+X-Received: by 2002:a05:6820:169e:b0:71a:f583:67e3 with SMTP id 006d021491bc7-71af5836f02mr3020721eaf.36.1794865173745;
+        Mon, 16 Nov 2026 13:39:33 -0800 (PST)
+Received: from [172.17.0.2] ([52.154.133.1])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71ab4335912sm9295527eaf.13.2026.11.16.13.39.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Nov 2026 13:39:32 -0800 (PST)
+Message-ID: <6afb7814.a9e78534.3a5257.9542@mx.google.com>
+Date: Mon, 16 Nov 2026 13:39:32 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0972917936113940530=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -92,52 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jason Perlow <jperlow@gmail.com>
-Subject: [PATCH] Bluetooth: btbcm: Add entries for BCM4364B3 UART Bluetooth
-To: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
+Subject: RE: Bearer.LE1: Add ReadRSSI
+In-Reply-To: <20261116071622.35355-2-kevin@simpleble.org>
+References: <20261116071622.35355-2-kevin@simpleble.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0972917936113940530==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-The BCM4364B3 combo chip on Apple T2 Macs, e.g. the MacBookPro16,1, has a
-UART Bluetooth controller that reports LMP subversion 0x3032 (001.016.050)
-on some units and 0x305b (001.016.091) on others.  Neither has an entry in
-bcm_uart_subver_table, so the controller is logged without a name:
+This is automated email and please do not reply to this email!
 
-   Bluetooth: hci0: BCM4364B3 Trinidad Olympic GEN (MFG)
-   Bluetooth: hci0: BCM (001.016.091) build 0115
+Dear submitter,
 
-and the firmware lookup only tries the generic "brcm/BCM.hcd".
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1212358/
 
-Add both subversions so the controller is named and its firmware is looked
-up as "brcm/BCM4364B3.hcd" first.  Tested on two MacBookPro16,1 with a
-v7.4-rc3 based kernel carrying an equivalent change, one reporting 0x3032
-and one reporting 0x305b.  They now log:
+---Test result---
 
-   Bluetooth: hci0: BCM4364B3 (001.016.050) build 0082
-   Bluetooth: hci0: BCM4364B3 (001.016.091) build 0115
+Test Summary:
+CheckPatch                    PASS      1.49 seconds
+GitLint                       PASS      1.01 seconds
+BuildEll                      PASS      13.06 seconds
+BluezMake                     PASS      170.23 seconds
+MakeCheck                     PASS      12.77 seconds
+MakeDistcheck                 PASS      95.77 seconds
+CheckValgrind                 PASS      218.50 seconds
+CheckSmatch                   PASS      176.02 seconds
+bluezmakeextell               PASS      60.31 seconds
+TestFunctional                PASS      895.05 seconds
+IncrementalBuild              PASS      194.47 seconds
+ScanBuild                     PASS      595.52 seconds
 
-Signed-off-by: Jason Perlow <jperlow@gmail.com>
+
+
+https://github.com/bluez/bluez/pull/2832
+
 ---
-  drivers/bluetooth/btbcm.c | 2 ++
-  1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 065536d4ec..92ba7aeac3 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -519,6 +519,8 @@ static const struct bcm_subver_table 
-bcm_uart_subver_table[] = {
-  	{ 0x2119, "BCM4373A0"	},	/* 001.001.025 */
-  	{ 0x2128, "BCM4384A0"	},	/* 001.001.040 */
-  	{ 0x4119, "BCM4384B0"	},	/* 002.001.025 */
-+	{ 0x3032, "BCM4364B3"	},	/* 001.016.050 */
-+	{ 0x305b, "BCM4364B3"	},	/* 001.016.091 */
-  	{ }
-  };
-  -- 2.56.0
 
+--===============0972917936113940530==--
