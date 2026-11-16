@@ -1,131 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794859754;
-	b=ZW85GKnNzirvDW8xMONQ5OCz3G2ytESkg6Bv7KS2Ejctkw3WPWn0y/huPds9NRoRQskF
-	 +HO73Q3eSU9dbmN/o+reSyyLwAznbfhku6mr0BbS0Tn+W7aTu+X5E4EGHfrC3jy/c3yYw
-	 hCUqHhgO36AVZUqdimA2eL18VVwf6c5JRKvQCnKex3IHSJE8kaPeStjfq5+oXgR/De9JJ
-	 7d0ZiKN0y/w9D6Imzf5lCXWuEj/l+Rk0csbODZlHGBcwDNKur5PqG7QvsNMZUC1Umffdu
-	 a+1r1uukOzmnbSVxbY/aWqHR2fIJMV/NHAJAZX8FI2f2aMcWSlTZQFQ3xu39N8Gi2JA==
+	t=1794864488;
+	b=fPb7RVwI93SDOhhrEu9KP3oDkCz+qZOH/AjswfEJg+ZZ8D0Z1AtkWtC473EiK3sH+yjj
+	 j+e51OEBFK3NIh0bvGbubwkTGIGk5YkPE0ahd1sDQSsTOmFd5FcxujopF85n78e2Ab39R
+	 iERI2SDLdU6lqmugX1r6SOtawreBdGrBBcDR/k5sUt5WIcXKdPtJPdFUCM9f2d1gpD6V0
+	 b+MRXJtSUTxeUiVbIhrfPKJNyDk86bSB2rluZvPeJ+qHvtySYgBUZdY55pZrkzcnPT3vv
+	 VaLW/8j95KnAUVnehxbDWapM44JiStskBY0jVP0Ld7mbDMhCh0WrSFcFDvNtST5VoyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794859754;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794864488;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=rIDjnnpHadC4roO6Pjzwfgg43uG+Y6jCh2hpR36q9WA=;
-	b=RHMDElvMMwrikT9MKSuc+JHa8RvBHETcdTazrs/epKdA+8FUpxKY0I/P5perfl6u9/J1
-	 IK7ekdLa+emEVBJDoxwn62BS2KQfJy3QxHlF0wmkNCVwPZOAY/z6F7NIuzZ6bkB7od3yR
-	 Tb1DmGRuh/3rCvPJAd+kMwVx5MwAl++OyV4jO1AcGF4mYq0YTpuyDsGC7qQn9H1cwHdyR
-	 Tc+gNY+TEEhER+tQbFlpOoIMLzn4XUp3bRJyU0898Dx9WLT5cOzKVn841lQ2CkV0HvOei
-	 mptm3AwW+GtvQQpDDmajJojFFNEw2EdqMqzrmEjXMxawAI/8/Gjx+crjUDMJiBpxwAg==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
+	b=1y+azxB0jE28jFy1n2UbO4KFJsdS7GlmWoUQ+WYpXnIA45KkJflZSm+v8hNXnJhg9Vk0
+	 MGQQxWj/U50oscltzfOfuQmn/oAUorjNmtTC5/1TtiOR8CElem7s0zz7d5G2Ohp2HQvpv
+	 Ye3HFT3+skuXyWbgFkF4XfSnghIH2YLTeualpc2H85Uqem+CyH4zfrcmUbyFN9PkPnV1O
+	 CRVnjTHMMthz+0HzsS2fVwFXnKRmuSzfSb4VxPwf7x6eInjShz5DaMTIu1BW2Guqe+57S
+	 13dfL3g71EMqnZDAwzjznUS/m5xEcW27TXVuwMCr6V5JZ41IR2bTkb/5rivTrEDRgFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=ziepe.ca;
-	spf=pass smtp.mailfrom=ziepe.ca;
-	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=nbZUyxTk;
-	arc=none smtp.remote-ip=209.85.160.175
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+6EuEBc;
+	arc=none smtp.remote-ip=209.85.217.51
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F27D606A339
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 20:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5F27D606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25E7606A339
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 21:28:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F25E7606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=nbZUyxTk
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-55d03bfd477so25683671cf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 12:09:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+6EuEBc
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-7d2dbe5c4b0so1069539137.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 13:28:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1794859753; x=1795464553; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rIDjnnpHadC4roO6Pjzwfgg43uG+Y6jCh2hpR36q9WA=;
-        b=nbZUyxTk1xDDi9/JiN9In9kNH24m3xvR3W8MPaMB063K/nb6P74sDih4ebpP83k2np
-         SjqTAYuPLCHW+FRVrjLKSTbDX5aM/IVbZZxu+ASYJ/ssH0gDFbMJvSJmLcdHAAsDSEL+
-         FG47SOuU8PRulqvpOebFRdp+iKyncNtYeoKxWrzhMSjcb9i+1jD4cThvDUO+7PnMd3zc
-         ImV7NXhI8pI4k1LW/eM2oLltJhXP6hUveoFekGEVH6+oWgooyZkYdcVCIAs0jW9hoXxW
-         5IGbSHDAmwoeFMTug5VO+bv+VKknP1f2hoIrUsvWYeNqALAO8eTePO8ZOjSwRNnR3p0b
-         L2qQ==
+        d=gmail.com; s=20260707; t=1794864487; x=1795469287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
+        b=p+6EuEBcdEWsbgWgNendAXI4UQYDsf2NXItRNimHhYVGeCiuBs5u01C0NWsKGuQOSg
+         k/dsqKrgQCaoRrC94jYONR+Oci0kXFwZRWXExmzWHPlTnJE4J5NUdQa2PsXGldhooW+c
+         jDueeRMKkdbVgt7A0EimKTtN0jRyhl33X50GvvlbaoThRq2drO9VGRiHnN+/4/GxGJ8L
+         eko8weIeKirI9jePCW5okG2qm6Ru5TNFmrSyONWM9nIU3tvwacb+q5IFeJv8aaJHnGHp
+         HE7Y9cp3DcncKGcum1LBkRaTLeq2LHazOHHVrn1BPL3Nk+8BnuF69R3KdObGCcrS4GXp
+         TYPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794859753; x=1795464553;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rIDjnnpHadC4roO6Pjzwfgg43uG+Y6jCh2hpR36q9WA=;
-        b=bQv3HgUr4+WhAHM3jQrNIAFxDFztaqoFOi8igYrPNOHB8hhb038kZrpcYY8FQoPgA6
-         UgYOcYKMIbgRa6wUDa7UjUEm612jQaMCxExDBlL+cZg1FISQmgpeGbLu8UWYbSGEs/l/
-         gPm+ypVVcPG8QwcAa9A0Bcnq2gSkek4dc3ktytdc1KTktQYtRU0aLd9D9O8qmMX+fTjN
-         KjB0bys8165rCsUr59PV1ldYF8R5xs+rejk0veu4/4UY3v7pU3bOzIfJKNwgvC4Mw1Lb
-         yKb0mW6rcNLm5wRHjLqwBXtsfEAAaBK60MjNv/iEMzSdXj37uhU8xC5oOq3OM0WR2Kx6
-         91oA==
-X-Forwarded-Encrypted: i=1; AL+hErHsTspD4jPtGvZbU78EDrLgWcc2QcAym5dp/+facUxXlZtEWtjMzAwMnRBVIoLFTSM3WdeEgsujaR5rhxKNUbM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z80DrrfHEKFaglszoSprzjVSnkq1IWAt3FS4szb4mK/2lYgdD6k
-	RabNIU0WW3USBtGmh2dFbK76KsFwENLhn1ZMcQWmixBE6loq8KjSLi5XgoDlRL9dQFY=
-X-Gm-Gg: AYBFou08L9Zlpnec0kn7Sa350rxh4S7k2fqyDtpiun9oq7YQlH6eTtM1duD6bkhyDE0
-	4YuLx1MzfA48JLHn0MRqgGRBEJIOQeiwfxWaSUTsWaRXZna0DCYKHIjEer55NVLCoe0c0ab9l2o
-	MB9eJW3iv38q9RGNXXlSoL2uNS1VcqeYVAQO0TlH3a1VUvU4sKrRT1+aHfndSKtC7WpCK/ba2dO
-	IXfvTg7n2N39gtcjfM7ubnEkOBBYJYSw8/dKucbcjN0UTfSkG5NkF2W4rZCp53w684CXjZ+XUw3
-	blJT41yjhl8Uq10ZzpqsrqMXWj+wqDT01yTezwCTZcS4UtjI2y9pT93pssf9Q1/jNSpw4QGLLbr
-	K52gkFaGwCboFu34Q5m2qxkBpJtTl49QSfLXfhVhzjjjAPm0xByhzgp9X9IU7KE0WrYHi1rYPR/
-	xWsM3aeePiyZrmBZksd8xJ8dhtYoHPsUlF3zM96QQZA35t5lJMK9S+hOgP/OX8p+ifcMqHzSBzE
-	k+o8OeUaA0u+1mQytGAyic7IQizVcWGC/LOFEMteV48d9LGgdUd00+fRoPCNpZEL3uKbgi76CR8
-	b5i5CA==
-X-Received: by 2002:a05:622a:5144:b0:536:98da:f790 with SMTP id d75a77b69052e-55ac43909femr187873791cf.6.1794859753196;
-        Mon, 16 Nov 2026 12:09:13 -0800 (PST)
-Received: from ziepe.ca ([142.166.156.71])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91f23d445d1sm92856046d6.8.2026.11.16.12.09.12
+        d=1e100.net; s=20260707; t=1794864487; x=1795469287;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=cBvHBp6D+dF6IWQXiO/3014YcEvkRMY3zupIAXysnns=;
+        b=0o6BpvN21Ka8BicF58sEvflVNj3Yu+GyIrp4H/s686BJ50Izntj6uVkv6u6tC/BvgT
+         9+9VLWbpg4kaIcZpslnO65G8rID1swJ68Q2kGc8NThcbpXPl4KHcYhRrNCPGn+O3qZex
+         UvPjtFSmfaet2gf/ghL68Ljduihev1Le7harAgAi77Q2kDiouh8iawSlBxEJ/moAilXg
+         SlemQfb2s5AQNK1M6R9b40YGGJNbuMo607MyFzu4quVoTh4i64Ye/pp4PdjN6q+P5sLk
+         Fb1E7B3PLfLCdSr1o63rnABTHcj2KYqukzvpAirC428OEU3+5147y9y5rW8gZE/UubbH
+         ctmA==
+X-Gm-Message-State: APuU4Z9nLnATK/yo1ujGpQEh9IoC9EcCGnXFfv34hyArHHzIubmGafmB
+	j47QXNFsPmyoi7kCI0rlsZMgrTrNUU/+ctNeQgRev2+abe5Bs0n6C7iBMcBBYg==
+X-Gm-Gg: AYBFou1t7XhXbkjSMNnEJPWGDAjJMza22ntKziNwuxGFxmwOzoUbG//F6gjBLzyyalB
+	8HPSwL/vwo9ofIyNdhKAgPMfTquHUvT/6VCSMJyGlge/DKxgQx1g2LkJNtfflGFaScceZJeLxnP
+	uHXj1YvvtNkNeO1+p80LTbd7NOrM1DtiBOUueccUF7fhoe05a3rxWXrxemt39iReG2q6HjfaMsU
+	QNzvVPLQduTDkI45GI1lHr/BORL8D9e47KgH7rUhbvgB2BFxsR4P8BjAqCrq2rw54SVhGV/QRBX
+	pBxLZwJVkgMNU0FXjB6g3+OFqjt+/F9Z5/aKcAErcJ48x/OmfgUS0k2XgXT8f/8Y4lb0VhxOdAD
+	eiSlIawnxFMSB3NWWEwxjoP89EezTVbe9gn2FfyGxSmoFD3dDlZsh4oiEoqOZfcNOt3M4VvnAzI
+	66yK+VMGF7QTh2FIx/eTEFnCru7u/WHlPjr3q2pbdAm4a34580I37L/ulrX8+Hh4Bgh9+739hpw
+	Jxeq4GExZKMb50gvP0OMsLb9ehQAfHKLKtlKVH0EqJk1vZH+Mx32/wFfNrLCTnwIU15bn/k/qOy
+	h3bxZpufYUwtW6SwDkkfvzzbKbxttBYdDIGHYjXEkpKP8fm3eQGBrJDVuyB+ttGnlUGB3Fd0w2W
+	Qpu3ajLZsE/hgXVlYVSibSwlsrrnL/hFRxjRjP5BYM2ZybgT4wX4ufaCAQJKwcsfgc3zwByU7l/
+	ofTYLPmJ/XhtZNFxJqGfpfGOHL
+X-Received: by 2002:a05:6102:2911:b0:7ce:78f9:adf2 with SMTP id ada2fe7eead31-7d64d7047e1mr3196529137.9.1794864486991;
+        Mon, 16 Nov 2026 13:28:06 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d69dd55c77sm836010137.2.2026.11.16.13.28.06
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 12:09:12 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1xT30p-0000000ANtb-30lh;
-	Mon, 16 Nov 2026 16:09:11 -0400
-Date: Mon, 16 Nov 2026 16:09:11 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kameron Carr <kameroncarr@linux.microsoft.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev
-Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
-Message-ID: <20261116200911.GA2473219@ziepe.ca>
-References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
- <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
- <193e4130-9c2f-4a0f-b218-f5fcf0b3d508@linux.microsoft.com>
- <20261116190417.GD2299285@ziepe.ca>
- <2965c691-82fc-49f3-abdb-383860f6e82f@linux.microsoft.com>
+        Mon, 16 Nov 2026 13:28:06 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/1] emulator: Fix version of 6.2 and 7.0 controllers
+Date: Mon, 16 Nov 2026 16:28:05 -0500
+Message-ID: <20261116212805.3083583-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -135,35 +93,88 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2965c691-82fc-49f3-abdb-383860f6e82f@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 16, 2026 at 11:24:17AM -0800, Kameron Carr wrote:
-> >> My scenario is pci-hyperv in a confidential VM with a paravisor. The
-> >> paravisor is inside the guest's trust boundary and owns TDISP. It locks,
-> >> attests and accepts the device, then answers a VMBus query describing
-> >> which BAR ranges are private and whether the device's DMA may target
-> >> private memory. Before a driver can bind pci-hyperv has to:
-> > 
-> > Sounds like a user in such an environment just wouldn't use the trust
-> > level mechanism at all.
-> > 
-> > What use do you see for enabling trust level but having all the
-> > devices unattestable and accepted already?
-> 
-> Previous iterations of device trust used the trust level to make
-> decisions around DMA bounce buffering, etc. Is that no longer the
-> case?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-It is not, this is now just about userspace attestation really.
+BTDEV_TYPE_BREDRLE62 reported 0x0e (6.0) since it never set a version
+of its own and BTDEV_TYPE_BREDRLE70 reported 0x10, which is 6.2, so
+set them to 0x10 and 0x12 respectively as decoded by btmon.
 
-> I am looking for good hook candidates. I was hoping that trust levels
-> would end up directing DMA behavior, etc. but maybe I am
-> misunderstanding the design direction for these trust levels.
+The version set for BTDEV_TYPE_BREDRLE70 in btdev_create was always
+overwritten by set_bredrle_features, so fold it into the other
+BREDRLE types. Update the versions expected by mgmt-tester to match.
 
-I don't know, I broadly expect some flag in the struct device to
-indicate that it can access private memory, but how and when hyper-v
-could get involved to set that flag I don't know.
+Fixes: a938cf48d083 ("emulator/btdev: Add emulation support for HIDS
+1.1 SCI commands")
+Fixes: a7f03764fa5f ("emulator: Add HDT support to btdev")
+Assisted-by: OpenCode:claude-fable-5.2
+---
+ emulator/btdev.c    | 10 +++-------
+ tools/mgmt-tester.c |  4 ++--
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
-Jason
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index b3d13e39741a..1140acd90e7d 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -9151,6 +9151,7 @@ static void set_bredrle_features(struct btdev *btdev)
+ 	}
+ 
+ 	if (btdev->type >= BTDEV_TYPE_BREDRLE62) {
++		btdev->version = 0x10;
+ 		/* Shorter Connection Intervals */
+ 		btdev->le_features[9] |= BIT(0);
+ 		/* Shorter Connection Intervals (Host Support) */
+@@ -9160,7 +9161,7 @@ static void set_bredrle_features(struct btdev *btdev)
+ 	if (btdev->type >= BTDEV_TYPE_BREDRLE70) {
+ 		uint8_t *page_1 = &btdev->le_features[8];
+ 
+-		btdev->version = 0x10;
++		btdev->version = 0x12;
+ 
+ 		/* The data length commands of 7.0 are the ones emulated */
+ 		btdev->le_features[0] |= BIT(5); /* LE Data Length Extension */
+@@ -9302,17 +9303,12 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+ 	btdev->revision = 0x0000;
+ 
+ 	switch (btdev->type) {
+-	case BTDEV_TYPE_BREDRLE70:
+-		btdev->version = 0x0e;
+-		set_bredrle_features(btdev);
+-		set_bredrle_commands(btdev);
+-		set_le_states(btdev);
+-		break;
+ 	case BTDEV_TYPE_BREDRLE:
+ 	case BTDEV_TYPE_BREDRLE50:
+ 	case BTDEV_TYPE_BREDRLE52:
+ 	case BTDEV_TYPE_BREDRLE60:
+ 	case BTDEV_TYPE_BREDRLE62:
++	case BTDEV_TYPE_BREDRLE70:
+ 		btdev->version = 0x09;
+ 		set_bredrle_features(btdev);
+ 		set_bredrle_commands(btdev);
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 100e3cd6082c..18dbd3f89096 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -706,14 +706,14 @@ static void test_condition_complete(struct test_data *data)
+ 
+ #define test_bredrle62_full(name, data, setup, func, timeout) \
+ 	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE62, \
+-					0x0e, 0x0201beff, 0x00000080)
++					0x10, 0x0201beff, 0x00000080)
+ 
+ #define test_bredrle62(name, data, setup, func) \
+ 	test_bredrle62_full(name, data, setup, func, 2)
+ 
+ #define test_bredrle70_full(name, data, setup, func, timeout) \
+ 	test_full(name, data, setup, func, timeout, HCIEMU_TYPE_BREDRLE70, \
+-					0x10, 0x0601beff, 0x00000080)
++					0x12, 0x0601beff, 0x00000080)
+ 
+ #define test_bredrle70(name, data, setup, func) \
+ 	test_bredrle70_full(name, data, setup, func, 2)
+-- 
+2.56.0
+
