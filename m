@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794859212;
-	b=RG1z/QUQ3gpZlonbAwIUMDjIKyHM8wcZVpnVVrMLamyWh7iwTvGqWjYNiNhNkill7K/L
-	 v7vt3EOMhhgM8cgzM75mR7yW/RuhOtuLZ6BicNtIqcMschfjOL0fD39l8aDgMcJQM/OM+
-	 v3PMeKcb2TxenuGTuE/geMZuNKexi5U0ViY9MKkO8+F9HRODd0kfEpUGRvwaRi3X5i2d5
-	 NKPjcfkX0xwl9xuEE+ijr2Ft8jk8IvRiStey0NLUvPhrt+7v7Xaqw3f1Z+yFhA6siNds0
-	 AGcCQm+J2gMe0yGFnA3SdOqll9GOF5HX3H1VdmU7cXaHnvM6JU+uAeb9RHjcjOjVPgA==
+	t=1794859213;
+	b=nme+WfzmB1TDINGjQFE11vUVL66cXPX6MYs6yFJOr8ijO3PS1wug6UrS4IRQ7lqGvL3r
+	 j3+ZxwHtytqgdnoNjdyvuyqkmDwzDBgvLexKd9hP3F2rPc5tabl5inePh1ZZpygJqY9dL
+	 Air7SmdXPUuZZpNJGLDaDZxVCjuTMhbdkJcruS2r+2cnjegARlQBJumhdN44TNAGn+WdQ
+	 lWh4YqDtmKu2ZgiP1syMcuXfN5LL6yQfN1Cmrf/kmRD8Gm8cMQeUJRO1VfmMKHKg580TK
+	 YiFDxnw3cf3bnv3GzoQA6w1zb+c3uUMkps1qckU1NZx9KL83PX4Iz2usTiyHH2T5TwQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794859212;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794859213;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=pGQeZFgVbQPZefupieXTwlqLBLyBWq9EFyGOoqW1BiY=;
-	b=5UOxVj9d7VEjhQUDrZu0GhqwKzAOFx9lz5oH8oOsGTjWZ1m7vD2BVT5m7tnK4DxsWdPb
-	 RS+QUhn2lOKa+g2WbMu6B9L0a087Q4juyHjLj0ZUAvMO57w8f7TCHP/aWEZUa/y3pw3Wx
-	 jZrZ6ank0oAztzuyhXlsuDe7OnC4g+jI0ppA411ZG3S1/weGfI+1SPmz0i2T017/SObY1
-	 XAVCSNsikl1tCEkTh+QLy2ZyX8KjbiA7D9OTWmy7lAApn1GwTB2gaYYrytSOi4kMRAoTJ
-	 hxabUcO87jiTO9nQA6fl06029JLaCLKLVxpwPezrXPXeULQYyF3Sk97NDX1fXdmsytQ==
+	bh=3jOQQAxFAPQrUiv9hNG0pHej8Q3l8zqxtcRuEhbSxCM=;
+	b=JZYElntPalNyjLGqMO8ZMwKKD/YEfVJm8BI9BH6Vjl7+SWUpLwFpKn7ZObpqqEtBgcnE
+	 EWjZ/6zpK2agjDirlIvGQtt9TUKQZYUsDpyrdKM3m1RbjnHOXLmThrhle4BdWHzyGZBKt
+	 ruMzvSVfx3nUT2kxU/219G+xQoQkPedGiUFF+hJyfWx3ClfEMwbIlT07QDzrWregTqUWT
+	 niM6BuRAs7kbQMnA0sWT2/foZ4vtxb5UmzKnbQW11Y7z+EYx/DcYTVrURBkM3I79PtO0T
+	 mDgXoDjyo9l6QalkinSvxtYwctN8/kT+gj1JDXF4Mc8rRypZbroI4MNgcl8CRn1zrjw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCllPTXF;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HeYe8znn;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F20606A322
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 20:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BD9606A322
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LCllPTXF
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076A41F000C4;
-	Mon, 16 Nov 2026 20:00:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HeYe8znn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82C971F000C4;
+	Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794859212;
-	bh=pGQeZFgVbQPZefupieXTwlqLBLyBWq9EFyGOoqW1BiY=;
+	s=k20260515; t=1794859213;
+	bh=3jOQQAxFAPQrUiv9hNG0pHej8Q3l8zqxtcRuEhbSxCM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=LCllPTXF2VUghlF7oN0F3Qra2xrZaNreiNTf3cB0xT5VNRtrzFEkEvH7uYq5jxRCR
-	 CRt39aZMWHJNC9rbVZI4bNCoMkvt8HZagP1E+BoK5MXWoHDEKeqsBTITRvkK9wa+gp
-	 q25KlgkCLShBK1W/pLQW3no8Q/oG+nX437b4Yc6Ao9qYl8+LlbKMUoNtBmxOyjHRCv
-	 QiX/PQgxgBmNu50xgI9ZgQ6q/+/gcBMjgWEYFTluNwVc8O/AGf8sgTiw5zEa7NQEsa
-	 xHfhH5hb1UG3uxNN1EUGxr4kVntjYonzWxhcYdj1DGE4kTMgHcZZJEnJDaxB5ju/AY
-	 yuQRIQ6dZyfBA==
+	b=HeYe8znnQbLlb5ZFQt6dgNZ6w5YZudn/XAWHPNK8EK6JFdXDv+qg5lbsuVuEN+tUg
+	 LuzP2t4ZF3w2CX8tx5tHdsAzjmCrwMbmH3Yo24rLuPiZgfDw4CATcE1iksv5GOTKCq
+	 62MI7OVPbYNSWc+SdYe2/cm65V2oARhkyhwXzIqbaIoMrITxcfryXa9Ybss3Qs/4Iy
+	 JnzwlO1BtWf5oaZVm9X0vbPqc8iwgw+DyEbCTpLnX3XIvufyjDBOQ7/2yomm9OKf7D
+	 CVCS0/1g9zifETrpWdVgUd3Z3Sobi1VpIejdTAIri6B3fN1QsH6NGHP51CghcL82h2
+	 WrKaQfbv1zfwg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F13FA391AFCC;
-	Mon, 16 Nov 2026 20:00:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 773D9391AFCC;
+	Mon, 16 Nov 2026 20:00:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,34 +54,35 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] audio/hfp-hf: Fix org.bluez.Telephony1.Dial reply
- message
+Subject: Re: [PATCH BlueZ v2] advertising: Fix double-free in client_free
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179485921052.3860040.15567379850134557342.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Nov 2026 20:00:10 +0000
-References: <20261115101907.68963-1-frederic.danis@collabora.com>
-In-Reply-To: <20261115101907.68963-1-frederic.danis@collabora.com>
-To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+ <179485921202.3860040.16430372342970958452.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Nov 2026 20:00:12 +0000
+References: <20261113092759.24927-1-pvbozhko@salutedevices.com>
+In-Reply-To: <20261113092759.24927-1-pvbozhko@salutedevices.com>
+To: Pavel Bozhko <pvbozhko@salutedevices.com>
+Cc: luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 15 Nov 2026 11:19:07 +0100 you wrote:
-> From: Frédéric Danis <frederic.danis.oss@gmail.com>
+On Fri, 13 Nov 2026 12:27:59 +0300 you wrote:
+> Unregister, disconnect and a failed RegisterAdvertisement can each
+> queue client_free() from idle. The second g_free(client->owner) aborts
+> bluetoothd. Freeing the client directly while that idle is still
+> pending lets the callback run after the client is gone.
 > 
-> An org.bluez.Call1 object is expected to be returned on
-> org.bluez.Telephony1.Dial() success.
-> ---
->  profiles/audio/hfp-hf.c | 51 ++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 48 insertions(+), 3 deletions(-)
+> Remember the g_idle_add() id and do not queue another free while it is
+> set. Drop the idle source when the client is freed directly.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ] audio/hfp-hf: Fix org.bluez.Telephony1.Dial reply message
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b5deaf496419
+  - [BlueZ,v2] advertising: Fix double-free in client_free
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=de977a4eb953
 
 You are awesome, thank you!
 -- 
