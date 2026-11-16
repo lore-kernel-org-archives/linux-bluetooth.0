@@ -1,131 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.108
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794844785;
-	b=hJ9zg26OaVOcgobULrpo9O2VvyC+JNafcH2vkylEXm/CtnedUXkyonH+8SIXEBb83a9v
-	 TPD4kVaFpSOgJqxxbhIKidpUwpLsBR0ZEODdkhC04Qb93wa2hf/BZsl4HtQgZd6UfA9vx
-	 qcjGfCXjDheipYfLZB0DpQeB8uiOxYnatQ95Ys7s3b8IV0htkC+4ivf4T+zt8E1B9BUun
-	 P/7mKoM+IGtNOXhIjLGloDWJsGXtBNlqjg/YYO+BU5TyDVR8RtXhsWslgCsqp8OYLoZ8/
-	 JIw8dBMFTUlPS2FYLNFDZa4fu8+KvWwTNFjPEQZV2bOHtrY2WsE7KpUhqM4NqY74X9w==
+	t=1794846395;
+	b=m49UYPpYN9hVs9sdND/BDXsMitsEVZ6fxg7fg5kiX/xPieNIXvBKFrLm61QWCSUp7N5I
+	 8i3whWpgjHpPUpip5tm7bHCK/z3gqV4r/QsJ/u3gjx0C9PzFCdBV9Q1fmsr8cmY+wUXkb
+	 JZNAnjDb4k0UTCc1HBdF+N6x0CIg2cquYSRL08Abnxe11+iEQYhF2KHbe7k4GFcukz/EO
+	 Aa0Qz6wZ7CEGTrpdSaBelmFpUDc0ENSB9PModOENwKDvpNVH0/T69liOMqFl0z8cVoXUt
+	 /4huPLhSemB/r8piaCrj1CrFV4EG6nhuddfyRuw+avEx5i8QxiQd7Drf731b+dxB0EQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794844785;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=8zt6BKnr5OMQnoN+jLF5J5ZxUIjEZ6DGHzLguvsf5vs=;
-	b=Uol8kreHRGEcLaDFitH1BlojxpG2bfFcw+MEAQ8wgMmsRbTDQYeGa/SpdPLtOHRPLX2q
-	 y+B+XhKAw9uJC3p7myJdNW0wN0APbko22YayW8wGG6s3QMubQlyTf+yRDKOa7A06Nx2Sx
-	 izllUGfjkcXFLbWAgUV7NqTb6MJb61O4O0B2RClHX86PftQofgo3WtSGEIegzYWximnKd
-	 F40N1WVzhHnXooS/qXCoZ8Vu+H1foV7PGros/eXbmIhfsRCeq9WpmLcFiyPcCk8zaxZb1
-	 JYla9J7Vln1b7TuxjXUFlK0UHUel4KeDuoZwcUPPacIQMDA90HzYpTAbZG6g79HRh/w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794846395;
+	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
+	 Subject:Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=vMf+Yb0CsLok2gkRTe5LcYjNsttCLqgkVtGLQgQa3n8=;
+	b=wW/Nz89c9lrlwFcACxCNyExptEllff8rKFNr4ecX3ZgrFrtUrAzoEsFRHPzHRDtq7AfV
+	 2l96C6be7A/XKGuiNkzB6Bv9IBy4s78x1bEm8eyKs/s4uR8+LmLZOf0+iOHRicgifWVVK
+	 nK7Yv5Tcsi320Fd0gVS5zGdt8zXc9zsPeisprMBYlW7ZUMVJkkB+3TTtnGjKzshHma/+a
+	 F43z0IEFyIyColNKN9D4RgCKFiMsfC89fv4yTyIm/5HHFZ2XG4dBAnsxpucvkES01fRSB
+	 eErFFrzwHVTMWUovz6aOA/xjAbhxlPzdz5SMRVcPB8MZrgs6jsyzMtd35r4qzXRr5rQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=ziepe.ca;
-	spf=pass smtp.mailfrom=ziepe.ca;
-	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b="T4EaFVj/";
-	arc=none smtp.remote-ip=209.85.219.54
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=michaelmcallister.org;
+	spf=pass smtp.mailfrom=michaelmcallister.org;
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Adnreco9;
+	arc=none smtp.remote-ip=109.224.244.108
+Received: from mail-244108.protonmail.ch (mail-244108.protonmail.ch [109.224.244.108])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC852606A322
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 15:59:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC852606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55C2606A329
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 16:26:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A55C2606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=T4EaFVj/
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-91eb7d1478cso45211506d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 07:59:44 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Adnreco9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1794844784; x=1795449584; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=8zt6BKnr5OMQnoN+jLF5J5ZxUIjEZ6DGHzLguvsf5vs=;
-        b=T4EaFVj/Db2Oh0QQIN6fEsneaLWasSmYdaomNevHcWQV9XfC0eku9uiWRA8yiTc/gq
-         beN2zhlEBUDpPwvlJXNnJXYG7SLeGP2RUl/CIxz8vHb+CRPGvwOGP84P37zc/ASqwdCv
-         a2ZImH/j9PEIljcRTrH9YjQx1m9XzvHX9w4v1GGAYhpr16oDLUf0JwGEJPe+tOCosZjE
-         d53ULE5uBklWCIuWvycUfx9hIvJ8w6anXEcNacgC3MbLl4k/Apkhq6kLpk0rmKpAkcTv
-         Trqjo9GQ8ASe6EH/m27mrq6sK/GeD3Uc4wVkpatMXBaBSojYeEkRpq+DgrGx3awVmJv/
-         hg9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794844784; x=1795449584;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8zt6BKnr5OMQnoN+jLF5J5ZxUIjEZ6DGHzLguvsf5vs=;
-        b=iVb1zFdGZ553DWeAWnqO7Ysygmx3WwYBUtjjDiO5rDtZAJQUkz9QL5lf7sYX5gMAEE
-         u1X0Kd2OHtGAowS/HvuPjtaPZz5Q+KYGa4KO2Hp3NXP+kf5UBmOndicwe76bPp2nDFoB
-         0FOogaiw15jgUeyaTF6qRdgrZNN/IqeLdc3qVeY86/YEhL+SV1ThCY7Ve1dlFYMnRxJc
-         QhBiDOMT+oSCwTcKgQUGCmTeZS+dywSdURij4lRJSBuYmMC45dbShNP0955tDrbiQaYD
-         XfWfGF9ZhU+DCU2+/zHvGLRZlH7lFQrW2qSjai6r2LD7BDmNEnjJhYIP9TkdGIv/rOQi
-         naoQ==
-X-Forwarded-Encrypted: i=1; AL+hErGLvUIZZis95QK1rJvZTwVkUdIGntgjbmflnmWNbX7W4XFh9/vMwvLaQ7ozS4cG0PYJvVPqAMaWebUUqFMsOKc=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/+dcAayuZQOg/g1WY0zLUQtJnjFgmkfm2eUVuaZs7g8ZpjKle4
-	y/GRNB5jGMchk5Q3V8p/wAbmkRBef4YYwIArLG92cdS7UyteMA25xwNoLem3isxGvnk=
-X-Gm-Gg: AZFdTZdt7ysbUc5I0I14/fF9px9WHwz5+xj0tWeUR83zDWalX9Lh+hVF877mLMQNKZN
-	lfpEHatlFMTAWMfpAB5ueONNJQm9AIrakx/EsXjG8vHs3pgQ+CZSSJv3Iqb69SwFrWADHfaKibx
-	ae1avK5OXYgCpW7yKDaZJwyZwrpPGPc8/3KYZ6mA8O51JxBr0fRA9f15AeZk3gTEDkDTq5H2J15
-	SkX4OyDSHrnDZ53nMj5TFkhUMj5L9rXkRj2Aj3L4/SOiFIjTami3mgnwLJSvb+UOJ7dRhtng79d
-	LwX3b1v3ayCSkQe2g4TBAXUKX3aMELmt4przuGTsM/DrreFeoHYupwW2x3zQx+AEuKfnU/utamH
-	D6sdQWcEdtQDDWVJTkloYJ6VEGQWZhv9KCEk6mZ5J+RA9tZ9MoOZu5U4t6GPHrX/hDpuy9Pr+GI
-	K/m3wwU+Ly07R9Po6/FxaGXdrvJRCMMXhz6zk06lf8kNVv+x0+baQ80d5y8JlZfstYpXCKr/3ia
-	isBYPj+hLMUWvh3OBi60hlYp4ZBSX3Yzm5j9OTsXSeiIlv9k2yN2ZMXhG6Y22QCLrpLHqf6WCvP
-	WVxBjg==
-X-Received: by 2002:a05:6214:2467:b0:91c:7f1f:2c9e with SMTP id 6a1803df08f44-91f24209db6mr171122396d6.55.1794844783992;
-        Mon, 16 Nov 2026 07:59:43 -0800 (PST)
-Received: from ziepe.ca ([142.166.156.71])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91f23d93f10sm87735096d6.30.2026.11.16.07.59.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 07:59:43 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1xSz7O-00000009eOI-3Mx3;
-	Mon, 16 Nov 2026 11:59:42 -0400
-Date: Mon, 16 Nov 2026 11:59:42 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev
-Subject: Re: [PATCH 17/17] PCI: Replace untrusted state with device trust
-Message-ID: <20261116155942.GA2299285@ziepe.ca>
-References: <20261105-device-trust-core-v1-0-1e536825b4eb@nvidia.com>
- <20261105-device-trust-core-v1-17-1e536825b4eb@nvidia.com>
- <yq5amrr8yldi.fsf@kernel.org>
- <20261116132046.GI2532299@ziepe.ca>
- <yq5aa4n8ydsk.fsf@kernel.org>
+	d=michaelmcallister.org; s=protonmail2; t=1794846392; x=1795105592;
+	bh=vMf+Yb0CsLok2gkRTe5LcYjNsttCLqgkVtGLQgQa3n8=;
+	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
+	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Adnreco9kgzlamRHjFAAu2NOLhNARO1duSFqjommQESa1VqFeW8uYbNNFrMVoNJnH
+	 QNkSywu/7ZaIfUxTAiLTv3hizKIMd2suHIVz4gBPQHfpTC5wBn6TBUl0osRWGVsyXx
+	 zBQSgrCJ3uBw7GHqnPRboFGiLq9t9ROqy9kWzPpn0QIKkSLcffalEA1OM2Wesn9ziP
+	 41tKzpZ26LhW02W1M7M1Hqy0IdGlO9peqtiurMNnUwdWlUJlVxgB+ngoUwkbpGyFRL
+	 tr1zelDi7KFljps3Tf8jnzbbBAPGExTPdqb0JNrrKDM7Jgv0imY+UkvvdbXgEdaZje
+	 eiM8SDKAr/hBw==
+X-Pm-Submission-Id: 4jStXk53pVz1DF5P
+From: Michael McAllister <me@michaelmcallister.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: brgl@kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_bgodavar@quicinc.com, lumag@kernel.org, mka@chromium.org,
+ me@michaelmcallister.org, markus.probst@posteo.de,
+ shuai.zhang@oss.qualcomm.com, enderaoelyther@gmail.com
+Date: Mon, 16 Nov 2026 16:26:21 +0000
+Subject: [PATCH v3 1/5] Bluetooth: hci_serdev: Unregister HCI before freeing
+ the TX buffer
+Message-ID: <179484638195.54009.16928291772826938293.wcn3950-poweroff-v3-1@michaelmcallister.org>
+In-Reply-To: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
+References: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -135,26 +70,78 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq5aa4n8ydsk.fsf@kernel.org>
 
-On Mon, Nov 16, 2026 at 09:22:11PM +0530, Aneesh Kumar K.V wrote:
-> > Once you turn on TDISP you effectively activate DMA, just like turning
-> > on the IOMMU.
-> 
-> We considered two options for doing this:
-> 
-> 1. Via the ->accept() callback in pci_tsm_ops.
-> 2. Via pci_dma_configure(), based on a combination of device trust and device acceptance.
-> 
-> If I understand correctly, you are suggesting that we stick with the
-> former?
+Unregister frees hu->tx_skb before hci_unregister_dev() waits for an
+in-flight HCI close or reset. That path can still flush the same frame,
+causing a use-after-free or double free.
 
-It should still be done in #2, just with nothing to do with device
-trust.
+Unregister HCI first, before clearing protocol readiness and cancelling
+write_work. Skip the HCI flush and close callbacks during unregister;
+the transport teardown frees the frame and closes the protocol and port
+once setup and HCI close have finished.
 
-You can't run a TDISP run device at all if DMA_ENABLE is not done,
-there is no half step here so it has nothing to do with device trust.
+Fixes: 21139b3ac62a ("Bluetooth: hci_serdev: Fix use-after-free in hci_uart_unregister_device()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael McAllister <me@michaelmcallister.org>
+---
+ drivers/bluetooth/hci_serdev.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-Jason
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index d2c48df34..e0e969228 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -97,6 +97,9 @@ static int hci_uart_flush(struct hci_dev *hdev)
+ 
+ 	BT_DBG("hdev %p serdev %p", hdev, hu->serdev);
+ 
++	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
+ 	if (hu->tx_skb) {
+ 		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
+ 	}
+@@ -144,6 +147,9 @@ static int hci_uart_close(struct hci_dev *hdev)
+ 
+ 	BT_DBG("hdev %p", hdev);
+ 
++	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
+ 	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 		return 0;
+ 
+@@ -402,6 +408,10 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	/* Wait for init_ready to finish to prevent registration races */
+ 	cancel_work_sync(&hu->init_ready);
+ 
++	/* Drain HCI setup before clearing protocol readiness. */
++	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
++		hci_unregister_dev(hdev);
++
+ 	proto_ready = test_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 	if (proto_ready) {
+ 		/* Clear HCI_UART_PROTO_READY under the write lock so a
+@@ -423,17 +433,14 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 	cancel_work_sync(&hu->write_work);
+ 
+ 	/* Free any partially transmitted frame left over by write_work now
+-	 * that the transmit path is fully quiesced. hci_uart_close() would
+-	 * skip hci_uart_flush() because HCI_UART_PROTO_READY is cleared.
++	 * that the transmit path is fully quiesced. The HCI close and flush
++	 * callbacks leave transport teardown to us during unregister.
+ 	 */
+ 	if (hu->tx_skb) {
+ 		kfree_skb(hu->tx_skb);
+ 		hu->tx_skb = NULL;
+ 	}
+ 
+-	if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+-		hci_unregister_dev(hdev);
+-
+ 	/* Close the protocol before freeing hdev (intrinsically purges queues).
+ 	 * Some protocol close handlers (e.g. qca_close) may still access the
+ 	 * serdev device, so keep the serdev port open until this completes.
+-- 
+2.39.5
+
