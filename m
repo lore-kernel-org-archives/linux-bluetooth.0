@@ -1,80 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794946847;
-	b=onxIvzjICPmKs7erO/ti0UMkfVe8h3NF6i+ZQi7iOXGQ+PqcEyjdcZWPRHWYj1vztv8g
-	 XzCQZyKb8soxZT2It/B4FOgiL0wcLeB5Yxbsh5uSV7tWD6+1jcgSQf7xF2JEVBi6U94Zm
-	 gEh7MGSKdlKLry8ow6fmHnDjs6+cmihHWiQry7XPfiJTkV1QHus74BgwIfG+gy1lHzkCY
-	 xAchYZi+ENQj2KJBwZdBVvIroFqu4/rddbwc4OJsC8THeTVqscnWpEsnouCiw10qFwLtf
-	 M9lA4P7xy7VrU9G9I4CamxwQA5bPNIBV6n0lgTwvb+8xhlCEpRsLuAl74ocs8dkpHsA==
+	t=1794946848;
+	b=bpq7x7xsIlpGu32WJO8x1LSUDqIf6R06ZpGvwymMtJv6K0hbzoInx/eCBg4KUsZhk48H
+	 hBp6En9EYzaK6RmxyLZ/VinG+kl/uIESBubHw8XNkzME6ETQt+ACgJpGSZmSu3yPwnP10
+	 q2x1RuGP5A1c+2VjPxoRzVmR2xCKuxnuo7B1wKCU33HJgyd+/LCh/VYxoXOo95HRZOm1l
+	 GvWf0QQoWYTI8Qn0TSx1eY/6wa/K7rQpMfpoC3w64VP9ucpiiI3BTRk25dnFSCwYgvN3m
+	 /Bn9X7wByR8Ee9J1j8gUyvEOqXWHbD6k2SYTVuRlnyU0xPt1mURCbAWmcrSvtMqQtAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794946847;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794946848;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
-	b=vd4yHiBkef3u8s+VomzNnjcj7XynFkCRrigpNPyUF2DtM8mUOMNZur3S3n7D84mKNX+z
-	 WgWYOjC/p6DIm3hWZmFWEksEZhcifoHHiKN0xCdUD3pKcR+wAX3Yzi8nCLj9u1SVSOH5h
-	 ioI77qex3OfowLRB24MtCaT0CJagwVZJXqsMx8mM/vN+q/JFMt9as9th8sibLsu3Zqtni
-	 6Pe3URISKMRF5cgM6bdKox3Hm2fV5KjdSurP8GpSN+pusSTA1aawlglNZZlTOXlmw0Enr
-	 v8CXp5wV526w/dztDaJvkx4VODUvBV2qQ/w7+ca+OJZrL+5rK3ZRSo4TCUZEfhtyn2Q==
+	bh=EH+greGPjXlrIRjw8gfjQBQJJwG8L3sDkJtIFbUKrPU=;
+	b=RUakzl3iV1rD5MKCNwGRmUwEwgsimz8tjHgwOaAxLZiPN2HfL5AQeEFhRfnPRPpdJIgR
+	 a16e6NCiNAx3GA6e9oT419rQx+H7NCXk6TBcNSH3mggn7KxGTB7dCwfWfjBkjIeMV/cnS
+	 b7qO2Dqs8CEGJKyhpVm6hlbnGgie1igLkPjpxaB50UT+y9MSqeC+jB//tE/MQ3oCFKJ9e
+	 H2kYz1FmFsoYCG3HJJ4JzDOTblsz6wXjRUV7e08RmESSlyp9Vr2RgouyEdKIWZlMS79Lt
+	 9UYSzvJ68a3bgnJLSBbYAdJY/wl4FC+fIsvNNYzMRWSgnBIQ8jVOYokfHmG0ng8YomQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lAfB4ugG;
-	arc=none smtp.remote-ip=209.85.217.50
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=giFdRhy2;
+	arc=none smtp.remote-ip=209.85.222.42
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4681606A338
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:20:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4681606A338
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3584606A885
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:20:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3584606A885
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lAfB4ugG
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-7cc013095d4so79839137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:20:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=giFdRhy2
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-9905d61449cso77245241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:20:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1794946846; x=1795551646; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
-        b=lAfB4ugGJrNknf5aPzCvTo+T870ZFXtWSA8i1cPqS/fJM1rghkOZjeKk+4k6G/atrg
-         tmHHojhwJfTRwgfDk1ZttJTaH68bQUyfPzq5k6WKXePaqn1VJGouTUXKERFD0+XMbm+6
-         3l6SntZn9Mft32N9FMVt7IBm7zVY2rFfdA8S1yL7zmdY8xitHL2PLYwLBWK0mYb66DjU
-         bBRPNAXjP6+4PH1Ga1SkY5Yca8E8VCavWmILhwAKXqF7FYHXCu99tkBdYLrX1VO3WyDr
-         bVJ+R3uKxbCGRKq5PFx/wwhf3AOjhxdSIsBIz0KZn/kQDb3QHWT/CVgXvtOyoqkzb8dO
-         6+jg==
+        bh=EH+greGPjXlrIRjw8gfjQBQJJwG8L3sDkJtIFbUKrPU=;
+        b=giFdRhy20dwoDNAWIZiZ7gl+MJzU7/9kUGUwoPRwVfRPBm5Bv3hhvRTXgldKfgz2Cz
+         lOkZBkr9tXhvIS7ONBY2TFKsrkFJSG0mK5MdmMNFXzdN3W3RRY9qOmFMORVAgwKYimdz
+         sjjyyJLTEFVKUtP6532tV10oX7RE/38VL4+5WToZx7P6h0eNTRTh2h92AKo+y68ozYCn
+         pERcWzcMrlfcM/tSYcfbZkUoVQPTQ7/1qXyGJEr+OoOQwozVGWQjjhw8M+ANARrbfujf
+         BViy8mu8zWYwTxJV2TAgm/b1xDVT5mFed71vuNVS5ukd5iIe73fcJN3GqKV3LdRc2cYr
+         aW1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1794946846; x=1795551646;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
-        b=PnC07CTSjlanwMg/ythI65GaH+ABzXKeZpnQoR3M/Wz7oyFLsufcC0o6XBU85Scbge
-         jGhUxof0t+QMaZhGL4idGQ7GC491qK8ZFjrLQfCr3D4e6pc7WP8ICxHv7en9IW42vHgo
-         XnW4XwoEmqlekJmvUoReX1W83jK72UbXirUrSjxwI6Rqz8HyBJe8pm73ASqYIt/Sxomr
-         Xmvj7eqhTxNUEJJaUI+buqk1BvVAO1NHKWXtYzkgyUN4DCg16JXkzla6fOhPjhh/634o
-         NGaS0vkTwGsUO79+SbfGHDG2oLQ8ES8yKQhcLncGK/V/nCeKs7eCFxPs/cWMD3Bjw1te
-         YKCw==
-X-Gm-Message-State: APuU4Z9fn0qJOqFgH+xrTavDqrvlnkKH+D4ghVqnaS7glSBn28D6OzIx
-	QfsvzZJCrHqu3NyzlTdAc01pAaTJmlXavkED3XTyZiIkv2TNdEFdD6juQd6K+g==
-X-Gm-Gg: AYBFou3wqVTEsWK7tuL1VOYVMjSMjVvIiEpJ8cNWGGmRy9GsTSoHQ+3C+DGoBqcIhwa
-	bUdC1oI19ZLNRQVFFYHtuliCaMD7NTS1tCP+nk3UuluBQwvXJLa8rnPt6mvpWvEz0x0fNNFdszz
-	PvjzPymUKAbNWKLgmhHbvUDa/YzXVgKeCMMucUrqYBDqwXgfvkuUkJWx/4C3PLZaoX2K8/2fGOH
-	KAZjpEsAyvRWneBUa4U3tbImbBNleVAK0tJIGsXvbNQ3dlPm2Dbq4LP+VvwzyRGVcb8GHLNuY+v
-	MMDDeoH7+XXSrOo36WUqwOmsKbA9oM16AETJSoe030czvas1bZigDvCu69zSiOGGRIdE6HeXm0R
-	qJ7YkuLPdDrqURWqqrRl0DoBYcc+/HcViIUG3DteBrCcrWomLdy0SpUSZ17sCx5ngOlA8K+/d3J
-	Eoi1CmdBm0/D8JIAjoLsN4m1/e/s/U+9Or1eqxaQsb2joZDycSoxX7PZxoy9/FhkDHXHZD8A3Vt
-	YcLNCiX+/WOxYjbt4vVfi3LWNjJKKo8AMd+gU7S8UxluMYjlb/bl78MsSbCSviaMp/XgEPZHIl6
-	KGYEN+fIpmTdBH9A8IAS1DEhRG0q+WhIm27hZoaP9bGHL5K5drOVRLVOzXNYS5Lb90KtBww6Gf1
-	Xhv+suGsPdATSqMgVMTZWRm0T7SNGxlsOQM3WATmdKU/WudIKarbM5KAOIQc6/CiucPPOZrf23v
-	Z2BhI=
-X-Received: by 2002:a05:6102:6897:b0:7a7:198a:c2c6 with SMTP id ada2fe7eead31-7d6ba4dedcbmr46652137.36.1794946845676;
-        Tue, 17 Nov 2026 12:20:45 -0800 (PST)
+        bh=EH+greGPjXlrIRjw8gfjQBQJJwG8L3sDkJtIFbUKrPU=;
+        b=u3NBPLHtCwglTock9TNZgF9/XwmfGFmDC1zP5QeAxeiQam2vB53LD0h/dcfYnR6/Oc
+         RZdi17wGl1S8LnGMENRVlliymJVj/aTD61u9+VUeZwcxAGw01woz5GNnnuHWyKVtQXkN
+         6EF0Q+51CddcIBDbfDfM5etkHePjKHYz0TNIUklWQUduGZ9PXrX5KJcoKcBXpeajyZor
+         CmQ0vdnuSTcT/kUh8cuC94a2oZBYa1p4so1+1K6ysfcZReul7yXoIgkVTYpajT+urCki
+         nZYuuGj7qgDNw0pJB+FtiYYEt1pohRN7AOAXnNwH/xY1g5Hy/lfC5bSq9xviOfE/WNE1
+         oICg==
+X-Gm-Message-State: APuU4Z95kaK+/D7Ckb0LVV/sNod/anrWbj4xJthq2gZK247UwK86WDug
+	Y6aXkOVxA8h0EmO1OeYiIqBI7E929Nna7rv1tTtdeE6s2HRnyHHOAIVPpzCLuQ==
+X-Gm-Gg: AYBFou1V7xk/JqJOpSAa3dnkOggX3upxkvpmXMT7Z1EL7ShQGfNuMt8B0EuoJ3Lkhbo
+	EqXK7OJ+u5kAqMY3O+fYwNZvkiHdLfKDsns1XoXRnloLINsKkv7MkVwr0wnzVzKtEozNmhWe9ZT
+	inTulvb1d+oc4ClgkkPCyTgQrx5DjRr8cmcxMYEZG/hT8l4UV3OAiarbwhEt7DohHWH/DuMIhoO
+	hpbv6gzMRcYUgxZPdEB3B3RYQf5Uksmb5e3da9AagBLlyFC0XbqltHgniNRHzuYbwLEliN2GlIM
+	eddBMZNaREJteztQrzZYrKRVAWR0c6xYy5apjgdCgmNZ8ZUYl7X/dH/bmmq7STZo0aCpMwTDIz9
+	evEyHhf0BzUAshzLT8NvCs2UehjK6R8LxLyvVvdxsTA2thPgkgFU2fGGpeaRQ9VNIzdajTm0m+t
+	eOd2DqAYx2C424vkFeKvg98XoOtv72AmpnLt3ZeuKLwwtpmT16c6QfjDwIhu1Durvx61RGAXbOC
+	bb549QDYtWr8k+wp3GE0hTrV0ie/hw7ccEU4str3zHL1OfXDSPwMlNnoI9vc3RXpP1ig2bcwOnz
+	996D/nCrA/bMsbxbPCHx6LXqeyi49yBm4+hYHLbIvtjVymmkK8cK4XBVuwHypJLVTi6n5vh6OPR
+	05rHnj00KGYI8lZp8hMiq2X9tkDyHdrQeYmy9E81JgISHHaDUIUH4k48VIXOWAKVfmjp/LYMALH
+	ho3j8=
+X-Received: by 2002:a05:6102:6044:b0:7d6:864a:5509 with SMTP id ada2fe7eead31-7d6ba43b12fmr41248137.24.1794946846451;
+        Tue, 17 Nov 2026 12:20:46 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b935ddf3sm303166137.11.2026.11.17.12.20.45
         for <linux-bluetooth@vger.kernel.org>
@@ -82,9 +82,9 @@ Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         Tue, 17 Nov 2026 12:20:45 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 13/17] Bluetooth: MSFT: Protect the event prefix with hdev->lock
-Date: Tue, 17 Nov 2026 15:20:28 -0500
-Message-ID: <20261117202032.3848411-14-luiz.dentz@gmail.com>
+Subject: [PATCH v2 14/17] Bluetooth: hci_debugfs: Fix racy toggling of debugfs controlled flags
+Date: Tue, 17 Nov 2026 15:20:29 -0500
+Message-ID: <20261117202032.3848411-15-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261117202032.3848411-1-luiz.dentz@gmail.com>
 References: <20261117202032.3848411-1-luiz.dentz@gmail.com>
@@ -101,118 +101,152 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-msft_vendor_evt() read msft->evt_prefix_len and compared evt_prefix before
-taking hdev->lock, while msft_do_open() (and the supported features
-reply) free and reallocate the prefix without it, so an event received
-while the controller is being opened could access freed memory. Take
-hdev->lock for the whole event processing and while updating the prefix.
+The debugfs writers checked the current state of the flag, then blindly
+inverted it with hci_dev_change_flag(). Two concurrent writers both pass
+the check and the second inversion undoes the first one, leaving the flag
+out of sync with the actual controller/SMP channel state (e.g. DUT mode
+flag vs controller, or the BR/EDR SMP channel being leaked or removed
+twice).
 
-Reported-by: sashiko.dev (linux-246df501-f32c-46fd-8779-7fa755ed7f9d)
-Fixes: 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle")
+Set or clear the flag explicitly instead, redo the dut_mode check under
+hci_req_sync_lock() and serialize smp_force_bredr() with hdev->lock. The
+same applies to the quirk attributes.
+
+Reported-by: sashiko.dev (linux-442108d5-76ce-44a1-a84d-16b44d6a26a6)
+Fixes: 4b4148e9acc1 ("Bluetooth: Add support for setting DUT mode")
+Fixes: b55d1abf568c ("Bluetooth: Expose quirks through debugfs")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/msft.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_debugfs.c | 32 +++++++++++++++++++++++++-------
+ net/bluetooth/smp.c         | 25 +++++++++++++++++++------
+ 2 files changed, 44 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index 2559c5b1bef0..ab63fee3ef59 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -170,11 +170,16 @@ static bool read_supported_features(struct hci_dev *hdev,
- 		goto failed;
- 	}
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index cd5ef398f238..1af68bfc2257 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -59,7 +59,7 @@ static ssize_t __name ## _write(struct file *file,			      \
+ 	if (enable == test_bit(__quirk, hdev->quirk_flags))		      \
+ 		return -EALREADY;					      \
+ 									      \
+-	change_bit(__quirk, hdev->quirk_flags);				      \
++	assign_bit(__quirk, hdev->quirk_flags, enable);			      \
+ 									      \
+ 	return count;							      \
+ }									      \
+@@ -777,7 +777,10 @@ static ssize_t force_static_address_write(struct file *file,
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR))
+ 		return -EALREADY;
  
-+	/* The event prefix is used by msft_vendor_evt() with hdev->lock held */
-+	hci_dev_lock(hdev);
+-	hci_dev_change_flag(hdev, HCI_FORCE_STATIC_ADDR);
++	if (enable)
++		hci_dev_set_flag(hdev, HCI_FORCE_STATIC_ADDR);
++	else
++		hci_dev_clear_flag(hdev, HCI_FORCE_STATIC_ADDR);
+ 
+ 	return count;
+ }
+@@ -1177,7 +1180,10 @@ static ssize_t force_no_mitm_write(struct file *file,
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
+ 		return -EALREADY;
+ 
+-	hci_dev_change_flag(hdev, HCI_FORCE_NO_MITM);
++	if (enable)
++		hci_dev_set_flag(hdev, HCI_FORCE_NO_MITM);
++	else
++		hci_dev_clear_flag(hdev, HCI_FORCE_NO_MITM);
+ 
+ 	return count;
+ }
+@@ -1303,20 +1309,32 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
+ 		return -EALREADY;
+ 
+ 	hci_req_sync_lock(hdev);
 +
- 	if (rp->evt_prefix_len > 0) {
- 		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
- 					   GFP_KERNEL);
--		if (!msft->evt_prefix)
-+		if (!msft->evt_prefix) {
-+			hci_dev_unlock(hdev);
- 			goto failed;
-+		}
- 	}
- 
- 	msft->evt_prefix_len = rp->evt_prefix_len;
-@@ -183,6 +188,8 @@ static bool read_supported_features(struct hci_dev *hdev,
- 	if (msft->features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
- 		hdev->msft_curve_validity = true;
- 
-+	hci_dev_unlock(hdev);
++	/* Check again now that concurrent writers are excluded */
++	if (enable == hci_dev_test_flag(hdev, HCI_DUT_MODE)) {
++		hci_req_sync_unlock(hdev);
++		return -EALREADY;
++	}
 +
- 	kfree_skb(skb);
- 	return true;
- 
-@@ -648,10 +655,12 @@ void msft_do_open(struct hci_dev *hdev)
- 	bt_dev_dbg(hdev, "Initialize MSFT extension");
- 
- 	/* Reset existing MSFT data before re-reading */
-+	hci_dev_lock(hdev);
- 	kfree(msft->evt_prefix);
- 	msft->evt_prefix = NULL;
- 	msft->evt_prefix_len = 0;
- 	msft->features = 0;
-+	hci_dev_unlock(hdev);
- 
- 	if (!read_supported_features(hdev, msft)) {
- 		hci_dev_lock(hdev);
-@@ -1078,12 +1087,15 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- {
--	struct msft_data *msft = hdev->msft_data;
-+	struct msft_data *msft;
- 	u8 *evt_prefix;
- 	u8 *evt;
- 
-+	hci_dev_lock(hdev);
-+
-+	msft = hdev->msft_data;
- 	if (!msft)
--		return;
-+		goto unlock;
- 
- 	/* When the extension has defined an event prefix, check that it
- 	 * matches, and otherwise just return.
-@@ -1091,23 +1103,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 	if (msft->evt_prefix_len > 0) {
- 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
- 		if (!evt_prefix)
--			return;
-+			goto unlock;
- 
- 		if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
--			return;
-+			goto unlock;
- 	}
- 
- 	/* Every event starts at least with an event code and the rest of
- 	 * the data is variable and depends on the event code.
- 	 */
- 	if (skb->len < 1)
--		return;
-+		goto unlock;
- 
- 	evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
- 	if (!evt)
--		return;
+ 	if (enable)
+ 		skb = __hci_cmd_sync(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL,
+ 				     HCI_CMD_TIMEOUT);
+ 	else
+ 		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
+ 				     HCI_CMD_TIMEOUT);
+-	hci_req_sync_unlock(hdev);
 -
--	hci_dev_lock(hdev);
-+		goto unlock;
+-	if (IS_ERR(skb))
++	if (IS_ERR(skb)) {
++		hci_req_sync_unlock(hdev);
+ 		return PTR_ERR(skb);
++	}
  
- 	switch (*evt) {
- 	case MSFT_EV_LE_MONITOR_DEVICE:
-@@ -1121,6 +1131,7 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 		break;
+ 	kfree_skb(skb);
+ 
+-	hci_dev_change_flag(hdev, HCI_DUT_MODE);
++	if (enable)
++		hci_dev_set_flag(hdev, HCI_DUT_MODE);
++	else
++		hci_dev_clear_flag(hdev, HCI_DUT_MODE);
++
++	hci_req_sync_unlock(hdev);
+ 
+ 	return count;
+ }
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 1c315c9ee7dd..ba3573964803 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -3438,8 +3438,14 @@ static void smp_del_chan(struct l2cap_chan *chan)
+ 
+ int smp_force_bredr(struct hci_dev *hdev, bool enable)
+ {
+-	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
+-		return -EALREADY;
++	int err = 0;
++
++	hci_dev_lock(hdev);
++
++	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP)) {
++		err = -EALREADY;
++		goto unlock;
++	}
+ 
+ 	/* The channels are only registered while the controller is powered
+ 	 * and LE capable. Otherwise just record the flag, smp_register() will
+@@ -3450,8 +3456,10 @@ int smp_force_bredr(struct hci_dev *hdev, bool enable)
+ 
+ 		if (hdev->smp_data && !hdev->smp_bredr_data) {
+ 			chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
+-			if (IS_ERR(chan))
+-				return PTR_ERR(chan);
++			if (IS_ERR(chan)) {
++				err = PTR_ERR(chan);
++				goto unlock;
++			}
+ 
+ 			hdev->smp_bredr_data = chan;
+ 		}
+@@ -3465,9 +3473,14 @@ int smp_force_bredr(struct hci_dev *hdev, bool enable)
+ 		}
  	}
  
+-	hci_dev_change_flag(hdev, HCI_FORCE_BREDR_SMP);
++	if (enable)
++		hci_dev_set_flag(hdev, HCI_FORCE_BREDR_SMP);
++	else
++		hci_dev_clear_flag(hdev, HCI_FORCE_BREDR_SMP);
+ 
+-	return 0;
 +unlock:
- 	hci_dev_unlock(hdev);
++	hci_dev_unlock(hdev);
++	return err;
  }
  
+ int smp_register(struct hci_dev *hdev)
 -- 
 2.56.0
 
