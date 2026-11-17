@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794919690;
-	b=Z84WDz/I0WmWVd8GRrRGhvydDCRgSi1hxkPMR7S5nCuwLalpVzovY+TLj98roxo6OoAJ
-	 020zRL0fqeMb6Tx56r4RLmCzhMfG7cRHumL+SKDPVOpVJvFdDGB/K1SvGtW/lMLrxqEN1
-	 wHGaR4BmDcWbdTBMgvFmN0DTvMv2bpsB5GZDLzpZA0w+BdkWDmo0P8sVErCoROM+1BKdc
-	 irFEsEJbxoTswUrkZ+1ewxl65kCKsPLU+xCSeaJxpFtNnCbvXRu2MqZxigmSPAFYGJ0K1
-	 bCrGkU2FhQZqBVw+2hHOwJXmQAifja6jNn+pJ8JvSIf9JyFYUheqtVXhdmwD0XsHWdQ==
+	t=1794920198;
+	b=W6fWpjNE1zcLG7LmZ0rrh4OaVPsm7Lf9VqzMFqvPGDc1Xq+i1v9OQYedZoZ4sBYfpHoS
+	 DCiMU9rUTnuxpINwuUjnMzsckY7gvBu+TZsE95DRMdBIX6VwRMSit+BRB0DCCMA9OFtQe
+	 C7cFvuFvCA+IJBpeB+ygHFp8AJzIjPJs7q638V7PBfigLfLlUKGy1SkY9kty4kMsXnQkm
+	 ebiHwLu+8UCx2B3+pVijAEUBZSE0dcPrDP6ALMzwzHfkCRn2H7a8IgXBTzkYyScrA5y04
+	 vC2xmD5t6iMfPnrKfa5YEJPfsF2vpqIOvvVHtbkYAbRl/zsfmSyfIMuAiTP/eizfTYg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794919690;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=sHHP4lrQVbjQV4OnOd6y3l0XQnPgN/Sz+31TccHLwkc=;
-	b=KvHXVeQPTJQBa9B9wfnBi8qMv7hvEB7Zk8cZ6FXQGzpxfdxNfgpFqQUH2MavPjhM9Iqw
-	 X5q1h/AAHfv7bTmhialJbce+Sk4U5itOkWI+4GtmIqYyxa6gUBWP6QbEphoTmQT/6PX9B
-	 8LonSaxbR/dnrLJfak9O+BRSdqy5+TFoP3u8eL+nSx7FM1fxCzaM5NbnNCYRN43RxLElg
-	 eTg7nYRpna+XwRMsfji79/wUbw5e62fpVsSGeAWvzOQTriibEXB0sYrHKKGsV7/TpaXxe
-	 ioD+1b241WKvHdbxaMIUnwDkkHzvdeK40kUnUB88ytXhy8t15eoSsKMiK3LU518ZaCw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794920198;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=3haBfEOyKolR1Zjr8sjf9RMgoZ9DodRbmrhIp25/AzM=;
+	b=e3hin/APpiO2ftHPt1f2w4kJR0IX+q3x8/wLdAlUMv3rpOBOhlgL65YrB1/LWw2zLKE3
+	 DITmDmCu/vsMUaxmIrc0hpXVsavqMD8xTgznlucBgiZ9ALp8LfWLapU7oEy7sCRv9mqpQ
+	 d+ACME4AF8vl8sfutxi3Hb15jdUbgB6JFmHIv1+KBjuE+d9YIkUaND1npM+RkAgMIfkb8
+	 XKGsvKWFH4IEqjkTeu4c8aXaNJSa7iGgOl7PSFIi0Ap19UA0/XgtxKhShjX4GEFYaHPxq
+	 fXZuMe6wCAw6jl9eumHuAjkLwxU7R2ywUVuil33TSBiCEOKZgzUeVU35n2qS2XePlAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YHKbFcMn;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XTQ2bUUF;
+	arc=none smtp.remote-ip=209.85.216.54
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C4C606A331;
-	Tue, 17 Nov 2026 12:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C126606A336
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:56:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2C126606A336
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YHKbFcMn
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9751F000C5;
-	Tue, 17 Nov 2026 12:48:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794919690;
-	bh=sHHP4lrQVbjQV4OnOd6y3l0XQnPgN/Sz+31TccHLwkc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YHKbFcMnmmbORQCbLlMN/d6gVnT4XJqvrtWRg+cUmoX1WTtse7Nw3HxwLvSDXopIL
-	 k6zEjl08Eyhhx7lJFNyZwg8DqTaaNM/Y37vvyOiW0NubvkUdOV/YP3b/AbLVDSpYvw
-	 ow64ZOBeqGWrf73HjBfqPMB5aBpCr86DfSZGxtaMgPLJkAfLgXhfepmkTzgR/ecQ6N
-	 wxxJkfTTQz6irDAkfCGqoDQzLVw7JbgD6irSR8EqiMnWDqi+F3m6YaDtk+SmZzD0TS
-	 JhcPaIdcyi6jB/KTuJHjRIHgT2gOL+MtmGW9IwqRQr2PD2rpJ5Bk/lnMk61Yt1RU1N
-	 s3VTQfBntVZ5A==
-Date: Tue, 17 Nov 2026 14:48:01 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
-Message-ID: <20261117124801.GD124972@unreal>
-References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
- <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
- <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com>
- <20261110122237.GG8635@unreal>
- <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XTQ2bUUF
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3b0ae87069dso2604246a91.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 04:56:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794920197; x=1795524997; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=3haBfEOyKolR1Zjr8sjf9RMgoZ9DodRbmrhIp25/AzM=;
+        b=XTQ2bUUFh89N2pmkCW8jhLgjaLz8B54Qpk8hCZVwpTsVirCYjSx6shVJTw+k1bgRpW
+         ySgM9FT1h+K5o4a544dPN1rDKsWSEenpByOCtTFx0swQeR+lNv0lvKQBbZ/rCoYtxhMv
+         gZketsRh522i73TElZHasFUitRJmuWIxdEmKcvZaXj14+R0/Sip3hoOTVgPdSjjFUutQ
+         +1KUPKwO4IeSV+4AHvur6kQKj7RoI6tW+tPE918QLHQ/n1me1XykeuwlkLoT+HAiwv1Z
+         173DoehYCU4YH9qBxAwMDlgdiL1rjnpfuiTgAgIvuLSnCAmzi/SEIdYXP0bnzAVwtQjG
+         uCdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794920197; x=1795524997;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=3haBfEOyKolR1Zjr8sjf9RMgoZ9DodRbmrhIp25/AzM=;
+        b=Bk86jz0b2+z1T7kBw/WPGBE0gRWeo/QfduLDBgfehWrxM/Iaaw4op0pqI9+Ulu6fdj
+         0x0GQzo8xAmZsrSjye18qp5PMWkq8olhMidqMM1qsC4y74mDNaDcEBC+oXYIlv4UBivD
+         hdOdFhM4tvm8bTjOjtLcxymX0NPBz0MU8IYCgsPF9o7GltS0hM8r/CsaA4jw6UhQWNDk
+         c9s0/2+K9iYCQmTbiPyaIqtdcLmFLLp3DMXE3j7UcWK4XE+7iLw0axcALCLil33+RU/N
+         6r60MoUrA9UzFYW8lMwnWVadswtvsriAryLNzYboXbfNqQBP+iB57HEKsmPydpiPlkT7
+         d9Cw==
+X-Gm-Message-State: APuU4Z9Lbo0LQpyl2eE19ebRYOu+fiFIEokPZubhYzPaeqMtfzucXa8h
+	AJjEywhKoIWSzzN+XaSuQto9dAU1fZdGK1iHO//oC7fVOgug5TpQdooYMLZGkg==
+X-Gm-Gg: AZFdTZfyP9rdWjY5xOgJx7NmdA+Q8aHagkdxSeURRd3xCtdVbPwhDJQFqr4EU1c0YDi
+	keFIjQUVP4ik8Krr/dSIVKkdtauPAk5L6P5bDCADvVIQNQ9a28hAXQYdYO0ObvvJK1kYFFYk05F
+	c4OTES/aTFGv9nf7TfZJCrIN9ceJhzLPwz6tGC4b1AWOi4tZvI7/xeE4JT6w6YMvJvzr5RXybvb
+	c/ECoRvTy8FJO9fAr0Fnbcdsn7/ZOfU/Njfybuiwrx1QsNGCTOSq29Gjz7BsyTIZFTdMF5HdqyP
+	opV5fMUvTWEtkbOmooWPnqdu+G8zoqGIhWDigYhhQ7D4A9DhqBMamxT9MtKvMHgFeildJCx/Wnf
+	yIxRziHmF3gyKmrxwQllmfGJMiHEQy+GHQcjyUaV/J3bXbW04SLauSA5j2yOy8uc2Tx53PYQ0w3
+	c2AJOGrJq0XlNtyaOUOoUtlrDoh+aTUDvHQDbvtkt1Wm89k6KRfxXfPJ0KEPx0Hv23BrsA82Ijl
+	QOoJ5Lj58yb+lopTH/FgisZ0P/yNs5HCnGRm94pcouXt8Hil7S3hCwhxh2qtOPKnuYaGIo7h11o
+	IRdagD7ttRAu1MRdFcBgxgDpxefwB4eMGsibaw==
+X-Received: by 2002:a17:90b:1dc4:b0:3ab:b39f:41cd with SMTP id 98e67ed59e1d1-3b1b0b5e500mr13605869a91.60.1794920197366;
+        Tue, 17 Nov 2026 04:56:37 -0800 (PST)
+Received: from [172.17.0.2] (ec2-3-42-157-54.us-west-2.compute.amazonaws.com. [3.42.157.54])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b1b3eaf732sm10770827a91.3.2026.11.17.04.56.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Nov 2026 04:56:36 -0800 (PST)
+Message-ID: <6afc4f04.c1f6a46c.1fcd25.2496@mx.google.com>
+Date: Tue, 17 Nov 2026 04:56:36 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5686755779968549919=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,184 +89,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, MAJO@bang-olufsen.dk
+Subject: RE: [BlueZ,RESEND] adapter: Set Audio service class bit for A2DP sink
+In-Reply-To: <7d8bc3183903a1016c6b69bc64dfd4f275891ada.camel@bang-olufsen.dk>
+References: <7d8bc3183903a1016c6b69bc64dfd4f275891ada.camel@bang-olufsen.dk>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 16, 2026 at 05:13:59PM +0000, Robin Murphy wrote:
-> On 10/11/2026 12:22 pm, Leon Romanovsky wrote:
-> > On Mon, Nov 09, 2026 at 01:53:02PM +0000, Robin Murphy wrote:
-> > > On 09/11/2026 7:33 am, Leon Romanovsky wrote:
-> > > [...]
-> > > > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> > > > index b486b8bbd1fcd..8be2a246d4903 100644
-> > > > --- a/drivers/iommu/iommu.c
-> > > > +++ b/drivers/iommu/iommu.c
-> > > > @@ -1879,7 +1879,7 @@ static int iommu_get_def_domain_type(struct iommu_group *group,
-> > > >    static int iommu_get_default_domain_type(struct iommu_group *group,
-> > > >    					 int target_type)
-> > > >    {
-> > > > -	struct device *untrusted = NULL;
-> > > > +	struct device *restricted = NULL;
-> > > >    	struct group_device *gdev;
-> > > >    	int driver_type = 0;
-> > > > @@ -1901,14 +1901,15 @@ static int iommu_get_default_domain_type(struct iommu_group *group,
-> > > >    		driver_type = iommu_get_def_domain_type(group, gdev->dev,
-> > > >    							driver_type);
-> > > > -		if (dev_is_pci(gdev->dev) && to_pci_dev(gdev->dev)->untrusted) {
-> > > > +		if (dev_is_pci(gdev->dev) &&
-> > > > +		    pci_dev_default_is_restricted(to_pci_dev(gdev->dev))) {
-> > > 
-> > > I think this should be the generic device_is_adversarial(gdev->dev) now - in
-> > > fact probably all the dev_is_pci()/to_pci_dev() stanzas aren't conceptually
-> > > PCI-specific, just an artefact of the current "untrusted" flag being so.
-> > 
-> > I wanted to do the same, but iommu_get_default_domain_type() may be called
-> > before the PCI device's trust level has been set. At that point, we are
-> > still in "disabled" mode, whereas device_is_adversarial() checks for
-> > "adversarial" mode.
-> > 
-> > The below is from AI, I asked to present me the path for that:
-> > --------------------------------------------------------------------------------
-> > For a newly discovered PCI device with an available IOMMU and a new IOMMU group:
-> > pci_scan_single_device()
-> >    pci_device_add()
-> >      device_add()
-> >        bus_notify(dev, BUS_NOTIFY_ADD_DEVICE)
-> >          blocking_notifier_call_chain()
-> >            notifier_call_chain()
-> >              iommu_bus_notifier()
-> >                iommu_probe_device(dev)
-> >                  __iommu_probe_device(dev, NULL)
-> >                    iommu_setup_default_domain(group, 0)
-> >                      iommu_get_default_domain_type(group, 0)
-> > 
-> > For a device whose initial policy is adversary, its state during that call is:
-> > dev->trust_policy          = DEVICE_TRUST_POLICY_ADVERSARY
-> > dev->trust_level           = DEVICE_TRUST_DISABLED
-> > dev->trust_committed_level = DEVICE_TRUST_DISABLED
-> > dev->driver               = NULL
-> > 
-> > device_is_adversarial(dev) = false
-> > 
-> > The active level changes later, during binding:
-> > really_probe()
-> >    device_trust_prepare()
-> >      __device_trust_prepare()
-> >        WRITE_ONCE(dev->trust_level, DEVICE_TRUST_ADVERSARY)
-> >    dev->bus->dma_configure()
-> >    call_driver_probe()
-> 
-> OK, that seems less than ideal. Feels like it would be better if bus code
-> set the initial device state prior to device_add, so then it only ever
-> changes later as a result of an explicit attestation/acceptance process. If
-> the initial IOMMU probe still has to poke into bus-specific code to avoid
-> always making a worst-case assumption, doesn't that rather defeat the point
-> of having a generic abstraction?
+--===============5686755779968549919==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-As Jason said, this is part of a very large series. Each series is an
-adventure in itself. Even Greg's seemingly simple request to convert the
-USB authorization knob to this new scheme has been extremely painful
-because of AI reviews. They keep pointing out bugs and gaps that are
-automatically attributed to me simply because I'm touching that part of
-the code.
+This is automated email and please do not reply to this email!
 
-> 
-> Even with the slightly dubious argument that this series only intends to
-> shuffle the existing PCI code around rather than fully introduce the generic
-> abstraction that it claims to, if the PCI behaviour is still just based on
-> propagating the internal "untrusted" flag plus the new global override, both
-> of which *are* known at add_device time into the common trust state, then
-> there seems little excuse for not doing that up-front so that the new API
-> *can* just work as expected.
+Dear submitter,
 
-I would prefer to keep both PCI and USB out of this series on device trust
-levels. Let's see what people say if I drop them in v3.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1213596/
 
-> 
-> > > 
-> > > >    			/*
-> > > > -			 * No ARM32 using systems will set untrusted, it cannot
-> > > > -			 * work.
-> > > > +			 * No ARM32 using systems select a restricted trust
-> > > > +			 * policy; it cannot work.
-> > > >    			 */
-> > > >    			if (WARN_ON(IS_ENABLED(CONFIG_ARM_DMA_USE_IOMMU)))
-> > > >    				return -1;
-> > > > -			untrusted = gdev->dev;
-> > > > +			restricted = gdev->dev;
-> > > >    		}
-> > > >    	}
-> > > [...]
-> > > > @@ -616,6 +608,28 @@ static inline struct pci_dev *to_pci_dev(const struct device *dev)
-> > > >    {
-> > > >    	return container_of(dev, struct pci_dev, dev);
-> > > >    }
-> > > > +
-> > > > +static inline bool
-> > > > +pci_dev_default_is_restricted(const struct pci_dev *pdev)
-> > > > +{
-> > > > +	enum device_trust_policy policy = READ_ONCE(pdev->dev.trust_policy);
-> > > > +
-> > > > +	return policy == DEVICE_TRUST_POLICY_DISABLED ||
-> > > > +	       policy == DEVICE_TRUST_POLICY_ADVERSARY;
-> > > > +}
-> > > 
-> > > Unless I've wildly misunderstood, I'm not sure this is right - if the user
-> > > has set DEVICE_TRUST_POLICY_DISABLED to explicitly override the bus-default
-> > > behaviour, but that leads to the IOMMU layer special-casing all PCI devices
-> > > as adversarial and thus force-*enabling* all their trust-model restrictions,
-> > > isn't that pretty much the complete opposite of what was asked for?
-> > 
-> > We have two levels: policy - that describes the default of all devices
-> > for that bus. level - actual decision on how that device is going to be
-> > operated.
-> > 
-> > "Disabled" prevents driver probing until the device is authorized,
-> > "Adversary" permits probing and requests the available protections
-> > for operating an untrusted device.
-> > 
-> > Both need conservative initial IOMMU setup: a disabled device may later
-> > be authorized as adversary, and authorization does not rebuild its IOMMU
-> > domain.
-> 
-> Urgh, I can be absolutely certain I'm not the only one who is going to be
-> confused this way... I see "disabled" and instinctively take it to mean
-> disabling the device_trust *mechanism*, as the logical thing that people
-> will reach for in terms of "I don't care what this new thing is, just get it
-> out of my way and let my drivers work like they always used to; I want to
-> disable the new thing."
+---Test result---
 
-I completely agree. I was under the impression that these names had already
-been decided, since I picked up where Dan left off.
+Test Summary:
+CheckPatch                    PASS      0.22 seconds
+GitLint                       PASS      0.16 seconds
+BuildEll                      PASS      13.37 seconds
+BluezMake                     PASS      203.24 seconds
+CheckSmatch                   PASS      180.03 seconds
+bluezmakeextell               PASS      63.95 seconds
+TestFunctional                FAIL      938.67 seconds
+IncrementalBuild              PASS      204.16 seconds
+ScanBuild                     PASS      690.42 seconds
 
-> 
-> From there it then also makes perfect self-consistent sense that
-> "device_trust=full" would be the opposite end of the scale as in "Apply the
-> explicit trust model 'fully', to all devices regardless of their bus-level
-> default."
-> 
-> Now I guess you could name it something like "device.default_trust_level" to
-> attempt to make it clearer that it represents a value the value represents
-> the "trust" *of* each individual device itself, but TBH it's still liable to
-> look backwards to many users - similarly it's hard to guess that
-> FOO_POLICY_DISABLED might mean something entirely different from "don't
-> enforce the policy for FOO.", thus rather than try to contort the naming of
-> everything, I'd still be much more inclined to just flip the meanings to be
-> more intuitive from the outsider perspective.
-> 
-> Say you upgrade your kernel and find your boot is broken because it now
-> flibbles, but at least there is a "flibble" parameter whose values are
-> "disabled", "wibble" and "frobble". Are you really going to spend time
-> straight off reading up on what flibbling is to understand what wibbles and
-> frobbles mean? Or is your instinct just going to be to try the seemingly
-> obvious way of disabling flibbling, and then getting positively annoyed if
-> that only makes it flibble harder?
+Details
+##############################
+Test: TestFunctional - FAIL
+Desc: Run test-functional
+Output:
+FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: AssertionError: Failed to acquire: org.bluez.Error.Failed
 
-What about: blocked, adversarial and unrestricted
-instead of: disabled, adversarial and full
 
-Thanks
+https://github.com/bluez/bluez/pull/2839
 
-> 
-> Robin.
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5686755779968549919==--
