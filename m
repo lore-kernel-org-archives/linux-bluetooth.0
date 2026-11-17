@@ -1,93 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794946848;
-	b=RtwClf2V8d0cPtRqH499mE//sR2nh0DyPw5cSekPf74e/J50yET9w78NCheCiR26Byio
-	 mw364TkoB5Q5N4FiEnnYIM0Nt2guFTFLuAIyMrTAy9UCpBLJjoABo9R4zByp9xogTSJLc
-	 nL+bH/0F4ErJeFviiWlHj8/T/RmUgSpvBVUogHQtGpTLgn4Uh/ovDk4o3ysZysN7FaucH
-	 MLgBbAC+cANzpVh7p0BMHwGszQ+b3AW4YzA1hETZg/c0E7A0zGWYC2FRCp+BrBGK9nTBI
-	 3MBFKcIKth83rqEsZVwxZEZXrb2/V/3Khdp6neAbzZgzJuvr5L+gPSdWdlnyKPspGJA==
+	t=1794947222;
+	b=4HBGLNC/LzOy8xzL/Fd3xBJIUcV2LcWgsRtddGvaPdlxXGYhBbIClfcg4mPXLTvJ/IK/
+	 moxA6r+LRaklLCcaNmZOMBjUs4WHyC1yJgDtWPPoYg+sNVXIPGUAz4wU18kRgGTnLAt8J
+	 35hST50xYWIndN91y5WLFqmtZVZtvY1aEU/1eliU3gQ3VgtUYpZawdXMVigmGOK/v9JIV
+	 x5l6A8uHCs3vs70FjwW9ttjfbrPVd1A//yHSSyiGh7DSkzuPklSzMkq8h82SnezPIZhiI
+	 8/q9JRCij0Lyh4LSQaaMjRbP8AIxt0c86e6Yz2kLJGZNY3HyNJ+uVb5b4UDb+gSGfLw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794946848;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794947222;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-	b=I/JUCu+hWD0mCrKe29HpaWd0vWzztiOVIF/hJ6sE4TdP388JGYewy5yUOeFWkinn6E91
-	 cqKSxAVnAzYt3Xbu/xCZ/e/EMSZ68QH/vgJ5dDcny3yrvnEn+bcg8A8aDv3m4La4kyc1G
-	 TJgi0Bu5uAuqVnNEF4OSO1djT1qSSlC7dJclhVo0vKQ+HW75PxShF6+74NSv2A7yDC2n4
-	 IDJQmQkiUP/7HjUz6I94zfDMnsvoXKp6iy+i37FGoQNmrfroWbx9EHI3HguQJGxRdLD7N
-	 JORNd4DykSQWiGTEKwZSMkUEEmgEX6ozhAUVbTJKDjEPd2wpcirjShV9cIPnCzg9+vA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=NtQRzFm8cV5RodGkfpCY5dyh1Ht76XcmhOuef9Kv3NM=;
+	b=3hWJpRjz4W2yZtmOAXOh3TgJSxI71x+oz7zXxqqARxBQElBC4GlgnYm257GChvFMvPFx
+	 0E1hs+9W9/9JvyQg8phZOvc1h4C9L/EYQxnMQw2+61OHGPxVjdYt3Bhwx3qa6iEo6lr4l
+	 MNQNEnlN1sfYbekwARgA+qKRBD+yQqNIDDrKx7tSgR8rsRVfUpF7dDcKa5n/HZukwVOlH
+	 FqqRFK8zMEssVf5ef7quwL0qPo2kBESRo4i5EJEPyqQTg1YEQHe4102l4a5JrXiG8uzlu
+	 9zCCJutoF6GoDXup/eR/UCUE+LceGH0wLCDPxA4SlmF/UGXR5hn3u4ZfYE5/xr9qbKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GPKbsSN7;
-	arc=none smtp.remote-ip=209.85.222.45
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	dmarc=none header.from=xmousse.com;
+	spf=none smtp.mailfrom=xmousse.com;
+	dkim=pass header.d=xmousse-com.20260707.gappssmtp.com header.i=@xmousse-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=UyByXd7h;
+	arc=none smtp.remote-ip=209.85.128.53
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D3A606A330
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:20:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39D3A606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4207F606A32A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:27:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4207F606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xmousse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=xmousse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GPKbsSN7
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-99e0082c434so80641241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:20:48 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=xmousse-com.20260707.gappssmtp.com header.i=@xmousse-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=UyByXd7h
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so1015425e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:27:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794946847; x=1795551647; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-        b=GPKbsSN7ZRN8g53/Poc3Q3MZ4KlAaB8KuhwGVwzCNTBzYA0T/ChDSeujGwpD9JP9m4
-         N1cpyB6eQpZX2o4zpTapRqd60/vIXliAsY8i7BaYlqiHXgtAKuPSRacuW9RWdDYZTggV
-         LSPnkqi3YvQ9rVdEdxoVf5YwhDF5+diiQl+cTRUIgw8pXo8IYyrxvubrDTnYaT63fDYP
-         v2NGxzZGDg6cVcJUprbG4cLtSOZWXKp09B4Cb1lZmgGERhsyuAye8Vhm7mciXGpqTMve
-         MkwXEJDZ2NKXTomvyRiRlBi3hNowkGIUI69yNAPN6U0rNw4SHmBWFHXX7tNi9/gbetcj
-         SJ0g==
+        d=xmousse-com.20260707.gappssmtp.com; s=20260707; t=1794947220; x=1795552020; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NtQRzFm8cV5RodGkfpCY5dyh1Ht76XcmhOuef9Kv3NM=;
+        b=UyByXd7hxY91bv+iLDzA2vJf9ilC73OmQHq6Bi6EZueN+8cUfFiClzaB2mKX41cX7c
+         SSZXHQ+SbO5oRi4oY2j5/ldm0hqy6ZbSoicvyWVXmG/KhMf7D/ZkUOFYvBe9kXwAs7+x
+         ZdFjxcS/an6+FwHKsRYrbBrm6YtAxpBYu5tXEinUYQar2FMgmnY3nLEx9S27TTSGZzDC
+         5fixvuB54+4cQwhzrFDkq3nrqzgHRJ1U7GfrUiQDGIQe7goN8hN6ccyu9xDeu5Owkf5k
+         /X3eK8a7rUwnrKcAKgAX0wl4hi8ukUAU0qC6hC1ntoQ5o0OqS9927kOK4Pw7JhJRO/mG
+         01Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794946847; x=1795551647;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-        b=AIDrw0ALMJruSwSLPKuia0LvllIrlEMcmcgc6XKUs2ccAbvN0yxKBhIm3Sq/404PBX
-         J5QkI6k0BOB3zXemja3YuXOjEb2XhmcDWCmy302z+7usanLzdriWSyyRu1Z2hafNnMTT
-         YDp5OiGTzy0D7vl8e4lcTusKrecj9mdZ3fdOqgWUyOMbA3Me1u1lDbxZKFlGoIRufgi4
-         om/3Gz3s2ayoYdpN0uiu4cLWvC6VWsyrnW4DnT3sSctSgl7h3aaa4Qpqpn9LnpH3Eee5
-         Y9Le9xHAZmAQ8NAsvfuInGrEXkNylWzXfNIiRsWkz8ex+YNPm/jY+Kb2tuzfeIQmqwDW
-         rl7w==
-X-Gm-Message-State: APuU4Z8Vgz/O2l+TQj4LgZFMrB70LtOlUB6InZqJUn6ftU46cyUqqUJr
-	PpJaribiBTkru5Tlk/pXhAc2BqMXNWHMqUjpVGZ3Yb+rDD+Qb2cEmI/KljtwCg==
-X-Gm-Gg: AYBFou3Jok6hqQ+4W0lqMugqC9/QRWHaHr5H/Pz4cDG/QgGfiSSGsGbdnmv0hEAQ0q4
-	O4bQWupP2aCXKqO0Ty9lFCcIu+R0HfPNLGXgiVBsiGxQD7CmPwTKlRvi1yOF8SX5JJWSQ9bdIfK
-	g1D+3WOFaHeHENp6Ckg+47ONpzQGxAIrRqk5pV8RwPHVjeI0ao+uLR+lndWAbCaMzmVBQyA4qcv
-	rChE/vtmfXhUaXuFawzVzRFC6D7KSKAi3dJ1QFwm/iBcPGA5k3mDc5N7882GGdPZLoKxbtmSr04
-	e/8/CFcxL0HDUhB0TGsGnQk0QnK9eIjPG8b4/hdj535ssmErhtcPcyhZMSMffsIOjMKIA18iPdl
-	hatgQ6KudBFcHEJnPAGchJMAengwUzOgJQv0MUeR2xmceK10OADvkNyQxTiLLB5IBv/Attb/yQy
-	pNdVI2m8s+/CrqLhdtgRYTzFPfbSAKqUUaZpG3QNX4PNtJ8l9bt8goCMmyJ0eGEdkPGQS0c4Nf0
-	XSYgzoCmqfXa/cmkVCicP302BPLlgHq6OkQMVs0AzuyG9pzOD5s0jTmM16rp92EjdxtEuj6gqw5
-	XJto3x1UO9lQ8oVQ9diclxFcuM0ZOxyin9E/Subzxdfz7U6xt4NZ9foxgqxuteqFi1SB9EPA9yU
-	Uzf6CcsMiE2E32+0LJ4ZYjFT8/p/cqrmLFOmbDJ9ZnN24koHxNqf3p/REEvYIPljruyDSMNJuYn
-	CvlyD8bmWNj3Yil0JOsAkrw0ji
-X-Received: by 2002:a05:6102:604c:b0:7cc:174b:f7bc with SMTP id ada2fe7eead31-7d6ba3894c7mr44011137.15.1794946847148;
-        Tue, 17 Nov 2026 12:20:47 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b935ddf3sm303166137.11.2026.11.17.12.20.46
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20260707; t=1794947220; x=1795552020;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NtQRzFm8cV5RodGkfpCY5dyh1Ht76XcmhOuef9Kv3NM=;
+        b=ND0ddeY5Eu8efNQQC7u18pltBcaAco+GDRpp8XIHisipBGBztQrygD6dW14ca22qWR
+         vsxeR9ZbNHH2Nz+PjDJhpNJpI7+Tt5LmKRe4jK7aogWgDEqxanLziEAnNs+2nscJKfrn
+         eumKY22UFGNkiz59Aq89DSeKliA+an/fuMfVZhI5upnSarAPGemV5iBbDOuelCLgjkeR
+         KTjqlf74Wvz2FFWqvtsImne8gyRF2dVWHK50TSNQmLgAkQhCAli6l91O7LsSpBPtdPZs
+         S8jBRZRZRkwjMhlF+uiprQwfaW/pN3ryxmIo7JJNRq8ul+ThWT4BpC4LRtr/GFuyUcA9
+         7fIQ==
+X-Gm-Message-State: APuU4Z+G+ilQawigh+EZIgr75464du+hEon20O4cE2TzJTUgenHJgucS
+	9vfDjsR9DRvP32xUVkcNgiYO2hB0M3/b2fCPaRoq/3SHaLZK1buEToU9HJaA2dww+yLbFGEGcPp
+	DQNs5pG8BrlUM
+X-Gm-Gg: AYBFou3Te2YrCZfwvNHnLN3MdpfSe0klPxsIxfsTf99GnWDrV1Dpod/eA9/tSTuHI1t
+	lGsfBiBBLx4tZfr1sNb3t8g3UhrDUNdY+ABcj1ws9fr0tdJuOC7ofu97ctESCOrTgUefeHzmbdp
+	+SGxakjaiKAcM/Gpw/kA5pLlnb7KiyVk3NiQxlHpWggyAlAI+v0J+6aKr1wLYgBOOl2jDXIzM6b
+	oEU+4cwdGmeB2+dNT6sCtMLGfUUGFrMscjNfeXGQXZ0kfxuMWcIKRQuU0pNblmtIBlbI99ppHfz
+	wkMCj6Oeb9AQjSMRH3CJzQLSkbTjEIZwzJLurIjce1jD3Xhw/rQbkNhRjgbaPxDMvPrfGe9kPSX
+	Yzor+wtttT0scsD8zSBgyvaMjKuS47bRRV3CyZpzcEEBf390hW9OONfawk4n4/gIR0fcu+96J/m
+	I+htJitXFQbvzLP1coo7tt3FWR0AIbQwtMIa/Rts9Jx+rhFrD3r0YZebQdJFB4soQfrt3xzHLY6
+	BVqb2UJxNQEyjoDY/G2qRypvgQ7JI+a7DpCAOWnyaGZ27lFXH86y09ahQkYlD4o2sCmK5JtFL8Q
+	rp8f5yyAfAHOti/CjmlR2w==
+X-Received: by 2002:a05:600c:8717:b0:4bb:5e8c:13bc with SMTP id 5b1f17b1804b1-4bb7da17f77mr6092795e9.7.1794947220106;
+        Tue, 17 Nov 2026 12:27:00 -0800 (PST)
+Received: from peacock.. ([187.15.172.46])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7ad9430asm70271675e9.15.2026.11.17.12.26.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 12:20:46 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Tue, 17 Nov 2026 12:26:59 -0800 (PST)
+From: Ofir Mano <ofir@xmousse.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 15/17] Bluetooth: hci_core: Hold hdev->lock when removing advertisement monitors
-Date: Tue, 17 Nov 2026 15:20:30 -0500
-Message-ID: <20261117202032.3848411-16-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261117202032.3848411-1-luiz.dentz@gmail.com>
-References: <20261117202032.3848411-1-luiz.dentz@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: [PATCH 0/1] Bluetooth: add passive-discovery quirk for Intel 9460/9560
+Date: Tue, 17 Nov 2026 20:22:37 +0000
+Message-ID: <20261117202632.49924-1-ofir@xmousse.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,62 +94,65 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi all,
 
-hci_remove_single_adv_monitor() and hci_remove_all_adv_monitor() only
-require hci_req_sync_lock, yet they look up and free monitors, modifying
-hdev->adv_monitors_idr and adv_monitors_cnt, which Read Advertisement
-Monitor Features iterates under hdev->lock. Take hdev->lock around the
-IDR accesses and the freeing, but not across the HCI commands sent to the
-controller.
+Intel 9460/9560 (8087:0aaa) controllers stop reporting connectable BLE
+advertisements after the first active-scan SCAN_REQ/SCAN_RSP exchange.  The
+controller stays silent until it is reset, even though the host scan is
+configured correctly.
 
-Reported-by: sashiko.dev (linux-8b358899-5ac9-4687-af16-58420a4d9bba)
-Fixes: 7cf5c2978f23 ("Bluetooth: hci_sync: Refactor remove Adv Monitor")
-Assisted-by: OpenCode:claude-fable-5.2
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_core.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+This breaks WebAuthn hybrid (caBLE) passkeys: the phone advertises a
+connectable ADV_IND carrying the FIDO service data, the first operation
+succeeds, and every later operation times out until a reboot or a
+driver/controller reset.  btmon on a failing attempt shows no advertising
+report at all, with `Filter duplicates: Disabled` and the same scan
+parameters as the successful attempt, so the loss is below the kernel.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a6bf806b9206..5522d4397682 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2129,7 +2129,10 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
- 	if (status == -ENOENT)
- 		bt_dev_warn(hdev, "Removing monitor with no matching handle %d",
- 			    monitor->handle);
-+
-+	hci_dev_lock(hdev);
- 	hci_free_adv_monitor(hdev, monitor);
-+	hci_dev_unlock(hdev);
- 
- 	return status;
- }
-@@ -2137,7 +2140,11 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
- /* This function requires the caller holds hci_req_sync_lock */
- int hci_remove_single_adv_monitor(struct hci_dev *hdev, u16 handle)
- {
--	struct adv_monitor *monitor = idr_find(&hdev->adv_monitors_idr, handle);
-+	struct adv_monitor *monitor;
-+
-+	hci_dev_lock(hdev);
-+	monitor = idr_find(&hdev->adv_monitors_idr, handle);
-+	hci_dev_unlock(hdev);
- 
- 	if (!monitor)
- 		return -EINVAL;
-@@ -2153,7 +2160,10 @@ int hci_remove_all_adv_monitor(struct hci_dev *hdev)
- 	int status = 0;
- 
- 	while (1) {
-+		hci_dev_lock(hdev);
- 		monitor = idr_get_next(&hdev->adv_monitors_idr, &idr_next_id);
-+		hci_dev_unlock(hdev);
-+
- 		if (!monitor)
- 			break;
- 
--- 
-2.56.0
+Same machine, same controller, same firmware build: Windows receives the
+caBLE advertisement reliably.  A USB HCI capture shows Windows scans
+passively (PASSIVE, PUBLIC own address, 1M only, ~10-15% duty and an Intel
+0xFC1E vendor command before each scan), while Linux scans actively.
+
+We tested the fix space as module variants in the real flow:
+  - stock (active, random address, deferred delivery): 1st works, 2nd fails
+  - active with delivery deferral removed: fails
+  - active with PUBLIC own address: fails (both attempts)
+  - passive: ~1 failure in 18 consecutive operations
+So neither the kernel report path nor the scanner's own address is the
+cause; the latch is tied to the active-scan exchange itself.
+
+The smallest working fix is therefore to scan passively for this
+controller, and to deliver passive reports during discovery.  The latter is
+needed because the existing passive filter drops reports that do not have a
+pending report action or an advertisement monitor.
+
+The patch adds HCI_QUIRK_PASSIVE_DISCOVERY and sets it for 8087:0aaa only.
+**Other controllers keep active scanning**.  The trade-off on the affected
+parts is that scan-response-only data (for example device names carried
+only in SCAN_RSP) is not available during discovery; that matches how the
+vendor stack drives the same hardware.
+
+Testing: Pop!_OS, kernel 7.2.15, Intel 9460/9560 (8087:0aaa), firmware 169
+(2024-08-13).  With the quirk, discovery runs PASSIVE with a random address
+(verified in btmon) and 18 consecutive hybrid operations produced one
+unexplained failure.  The patch applies to a clean tree and builds
+bluetooth.ko and btusb.ko.
+
+!!! No regression testing was performed on other controllers; 
+the quirk is keyed to this USB ID, so all other devices keep active scanning.
+
+Public reports with the same signature:
+  https://bbs.archlinux.org/viewtopic.php?id=298396
+    (exact 8087:0aaa; scanning works briefly after rmmod/modprobe btusb,
+    then stops again - i.e. a reset clears the latch)
+  https://discussion.fedoraproject.org/t/intel-bluetooth-wont-scan-ble-device-works-on-windows-blank-scan-on-linux/196326
+    (Intel, kernel 7.1.3; btmon shows the extended scan but the controller
+    returns no advertising reports; Windows works on the same laptop)
+  https://issues.chromium.org/issues/41485480
+    (caBLE passkey never completes; worked on 6.3, failed on >= 6.4 with an
+    AX210; closed as "Not a Chrome issue")
+
+Note on scope: ArchWiki reports that passive scanning is broken on Intel
+AX200, so I deliberately did not widen the quirk beyond the tested USB ID.
+
 
