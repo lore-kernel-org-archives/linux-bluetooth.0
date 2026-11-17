@@ -1,87 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794931387;
-	b=eb+wlXWslvL4jXCnpaQQey0d1NTAwdeehDlLHk3a47x/iNjznlZSBjhawSe2RxU+4bmg
-	 F+hZMN+04HEPbd5iXZ2l8lAFHCib/3y19Eeb6AIxqtEdRkMlDKLpx5S1HWaoaz/VfyWwl
-	 H87WI72K6mV89hL5NjxLwEkjJGDvAU7OC0nnPsx6cOMb0xD72HqYnrLBu5BkY2rxbJUMy
-	 lZNOxADxLKrFbMif8O+8BBdoI+j4elo91wJNIwbvtiiqBE3YsAUWYaX4rihPQa7sboC1q
-	 x4bFJHZOrfPmYWZLNjrV09kQ9LUB1zVXkoei2LBtEgpKdKGmCj7Qfx1tatZ/3hfRpJw==
+	t=1794931395;
+	b=W4qnVYawc7+8E6AU3HHr9QClKaQsOnskyOsw0E5oNeJdsyOCs9VTTOAEnfhhfHILgjbc
+	 SRTV8M7gDK66QVtHBFg8RYCPY7lan50x1R/hgRSeWCGX7/GoLANEB7DcBwXnKX2HR44Lm
+	 VISorGnlIN9DSkRHX5zyCVKy9eSMZ9Todl/CdvtoICKI9wqhlKk9L2s4nEJIdIzZkuNHu
+	 FwAwoPzd9XkxMikx5WlzWz7NaHhaGzV8fcQP8Ie4YxxgJskEMRfvdxyBq6VrjezXyMIMb
+	 DJGElsEfN40ZO/ydCb85eZEY06csI3A+FeIaugJL0cNvkP62mEapgSUbS+MonYx5+gA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794931387;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794931395;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=D4uloH17z1ecHM/6wfCzJlseE2hH+6h3/EAZD/WkUow=;
-	b=b3cR5qw6m5AHw0gMxy8VIBT22QsUa0Ppyo4jYCkpzGHttbiYJjdbSv9FUXyEMpWFu5fs
-	 skg/tXlPZWCa2Qr4Sn7LGCd4z4QyL1hFCua/DJu1PeJkvT3ovEyueSOalwUx47rYJ7uvj
-	 8UVhG7o0jzWLS393EXj39oj6n2zxyC86CFWWYEHr2yLjw21Val6z8x13Jnmen9RMjcfNX
-	 apwz+3yAmVkV8XN0pk2BmqOa9LFdfhb1GivaNovWuZ51h524AtTI6MncAx2PWYY1gQRX5
-	 LTNqOvCnRLpnxn8I/vzFcMFS5rYylEA3ue/iBQx/a+OeTq6vf+vFyMgLumO3aaHNzBA==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+	b=bBwtM5+48ok6hxCO5lg1WUxe3uHJosSe5S2AIONRoC+/fjnCH9JJboJpdKrtQh+tRIqO
+	 cOMjlPMYaOxDqhGlT0S3ZG/+frtHp2DrwBsOf6AAjtAzWmPA02ZRyde6Zm4MnYf76DXRf
+	 RWCYlU+T75vBIBdz7vKfVBGJZ/zOvuehBdhd/AxBipyCOv2jWDRGOsZakJVvQkaQGOvuV
+	 bA0TWxzhQq6z5wZEgRB/tFgnX/P30Nn6e1fNNW8esab43NRuUGX46UG65f52Edxk5JLc0
+	 j2HJ9X+CxVjM0nIx0abKMrnBNyijuVgvUATPbpbV6rafNshfWt74AeLiJ8x9R+gBwmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="PWWfA/bZ";
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Egv8/p23";
+	arc=none smtp.remote-ip=209.85.128.45
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33B6606A31C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 16:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A33B6606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B53606A31C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 16:03:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 45B53606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PWWfA/bZ
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4bb5f0c5348so6775e9.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 08:03:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Egv8/p23
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4bb609d9bf4so27855e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 08:03:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794931385; x=1795536185; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=D4uloH17z1ecHM/6wfCzJlseE2hH+6h3/EAZD/WkUow=;
-        b=PWWfA/bZ7xHv/ALXaYXZetkra9KobmgzC2A1LKdOuvN+FPfh3RA9KNiw8eIqPrJfuL
-         B59WwFAu5AMH+3Y4OOj3P7ptcgGHGOWoRpojwGHl/10R0wfUdIsvnKEQJjqyDRmCcYU/
-         8jfcSNzgCAoSrRlq30cK+wHr8iHTaQ3h1aESCkEvt7ojoSlf7Vo2Zpz22Hkh6xNyzZfD
-         P2iEij7NAOJZqTBgGM9ZpfDV1mZQSDKoTiyUhWIiJoQp4x4Wkp/+utjLV6MW9F0tjmiy
-         SufRKCzuQbqHxizYFqM+ny20WvRih5dUwU2JwwGa+oMDxFABehFHGgEtJ4DgFB2+EoNf
-         lFNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794931385; x=1795536185;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1794931393; x=1795536193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=D4uloH17z1ecHM/6wfCzJlseE2hH+6h3/EAZD/WkUow=;
-        b=iZzBjK6xt5F8j0soa2jeVEK3Nl1X7UdcJaLK2Pl+JP5TR+GdKLto9FOnFZnuwWWlOx
-         2COzBr5DEDKQ4BSqNjex67ekzDbbif5rW7Jz8OnEOv2ug3dzsDtPkzNzQaZSI62D3Yp+
-         P228PQnXxGbgiqS/JzMe5N7Rlgz+e6TbYb0xTrtWH6CZMbFx9kknqbdHTEOdLhC8CL7d
-         jnuI/mx/ZFBRgMOkWzkvRmCAva7boDFlbBNgLTAb/+ExQl+0+PIOS2lerieaLTFxAAyL
-         kIoKJcK8j8DdZRiWMxE/QA31oqo10Rw0eD7AUlDLX+smeTf7Vn/SicexOt7E5x05+BJ/
-         aASA==
-X-Gm-Message-State: APuU4Z+DFkPtLMyKtRVAi2Ehg+V7VqOD2kthtFbSXPNEhtfB0Xn5czn8
-	Ak/YA2O1VqV4O6YoGRpqhk5zOA9RwV+1qEVM+qU+KD7vr00cTws/DgFnWvF2XA==
-X-Gm-Gg: AYBFou15WfYrAZt1lmI++a7gqxVgIKLSBDpCsbwYesddrqUFtJkqzsI/h6kz/elpr/0
-	AQG96CPlFiw3YhW6dP113NVwXDsIJvQxFSrwMcWzbEMiJOgs9uXCsoo5BSOMLKkOvA1tUyrCS/L
-	b8KFQ1jjSqGlobHHCU3WqtVIpQTWLcjb5N3OCqVWfuL1MOMl1VEA3pcuJi9zIhBZP5A0rquSt9c
-	9rVCIOVDQZvv6cydhwjWaAE7XXuIxgKhedBSQqPDBghZzKESnOWbpRnUqceFAT0BWKhFWM1br7l
-	R4fjX+RH1JRuBjWeYwbXK6oD4SLNYNK2QrqsQqRssD77WpkbZaOnx2aodA2rH0WBdqQumDa8W39
-	YRrbYEOiGuOtGv64rlq+3td1OXHnpPHJaIKsGTJ6EUoe1xvNBYR/Hmv+A9YC+Ow3aJnceJQFvLv
-	3OiNsSNWIGaciKeWnRToX0wGgdkte7cOY59yDTc5MTgRpmwCq2osXdqC4DYTOzV7+5QOUBTL9Sg
-	pKyq8SmhfqJgxVQz9Of5cU+I2LH4YXUJSVQeu4AFz0cKnIXSOFO2HAqa0H+th/znbY5Z0kB/xJZ
-	iWmq8m22gXXmdznjx6Dg7oykXYaehlXeQ+IkJVVGUhRPRHoYVw==
-X-Received: by 2002:a05:600c:868a:b0:4bb:7ad9:2f22 with SMTP id 5b1f17b1804b1-4bb7ad9386fmr20525035e9.0.1794931384596;
-        Tue, 17 Nov 2026 08:03:04 -0800 (PST)
+        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+        b=Egv8/p23DmpJ7dWGcfNe8ApL7jVxJOaob1MVWhWxate8tPI269U5Itsxlvbpwe1GNx
+         isUhFOvVM7r7Qixv/QsTtqbJ56iFDyaqS6mIsiAgFBE3YJov+uHsHayiuW/Atrekm7WA
+         M76ikSEj1AX0BxLapj3ah8VSPDqajVgGpDCf3mZJXd+4tbUTe1mHHm7hFzjjOIyYKJky
+         qIOEw8GpAobLV5g6TVrIGF0IlgkUvArH3QE5bWE+1Uo1JczjehST55PZdfkiFXOphKH7
+         MNTjK53/fTVhVeB2ZK2GpN22Xdo21Iws+IEBP05z4pwS545ybC7CjXsVcN2TXucN1eAm
+         Kr0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794931394; x=1795536194;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+        b=QzK0eFLaHN5e1AwY+/QiWVo4hFbRKLmKIRPXx1OOx9CNeZL/OvxoO13EIaE5GY3vLZ
+         BnUcEO0Nt4PPdKAO69CvC7IJI0CmCu3xhL+VOPUyVOzRu3cu53+tjU05gZ5jiFQs4zfN
+         SoL/TVZySUzfsNLBpAp0it0V2dPocLuDrFpxNHI1KNDbDNDjqr7i2+P/n/LWknnTrywS
+         N2XrSwR5hMg0axl0tUIoCOTNxtVEpcu0yopHcjLEswU6vzA656TOWvnsT/CFJTW7CJlt
+         6vojycS+C8plc200cdd76cEBBD31M12yg9xr5XQpkeJDjQgYWFAeoITCzh4KdPZDDhMc
+         9Qdg==
+X-Gm-Message-State: APuU4Z8P+A448iEGITB9yPzc2Oilckofb5oVmjZQHFP0L6TkpLWueGRI
+	77DH/r5FGFYHi03F5wZPxM+zxQDWrFoKHRjOw2FcfWmdUMGg12EX3c0crNTiuQ==
+X-Gm-Gg: AYBFou05yHocjwuo88fWiRb4crErlsselCbK09tH88y2gQrmxqWUr0LLD/xPdQ+AV21
+	IHipL8OLP6SZKqn2WYuR34pRcdUtDljkrqw7VSsuklrP1lIfgwJsWn3GarBWvc6X9pwf2Joxd3Q
+	JWbUeYI22a1oT+48Q2oLa5YhRkEbzIY+ZoS6QYzuG1ABCiLm6eIWmfIZkSyPlrtpBeK22VLIcc3
+	V197N2nGup1KoYhAIaTrqkp/Plixff/NfjDUwqC7eSSjrDMnfswd60A+Gr7W02sAcm01sATTgw7
+	HI+DQ4jBgRcf1Bet10e12+B/oSByndHASDHAjzPPNu7+qpPJM+UxNu3QsB1yC9x7fJgdI7zQ+ft
+	Se0WZje3gKCixsYuWssHrnj6pnQ2N6EbGDiVODjdU5+iZKi+PJHd8I2Lz3P4hby7PpLEicSmw9b
+	oj2NJoHRyRQ94V6ZgtamKv7FUTAze0iVJfiIkW881tt+j3TzKO2yZadzs6wIzBNT3yej3cgCpSZ
+	xF+S+YVKLyxDHHK1mzRMwLV5Jboz5nSypzK89m1Oc8MQOcIKGlXtbGyD7ncWoNBdpCUFKydG3Wz
+	VLYqfhSfEOoJEDdnDD269cTxKAe6Iqr8StOidevulZCXAPYADA==
+X-Received: by 2002:a05:600c:3d96:b0:4ad:5ec2:d3b3 with SMTP id 5b1f17b1804b1-4bb55a35c14mr283586425e9.1.1794931393414;
+        Tue, 17 Nov 2026 08:03:13 -0800 (PST)
 Received: from schinder.fritz.box ([2001:9e8:b3a2:d500:342a:4be9:726f:4a50])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7839c5c3sm75158285e9.12.2026.11.17.08.02.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7839c5c3sm75158285e9.12.2026.11.17.08.03.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 08:02:55 -0800 (PST)
+        Tue, 17 Nov 2026 08:03:12 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ 0/4] monitor: Decode Periodic Advertising with Responses
-Date: Tue, 17 Nov 2026 17:02:36 +0100
-Message-ID: <20261117160240.222556-1-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ 1/4] monitor: Fix handle decoding of status_handle_rsp
+Date: Tue, 17 Nov 2026 17:02:37 +0100
+Message-ID: <20261117160240.222556-2-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261117160240.222556-1-rolandschober1968@gmail.com>
+References: <20261117160240.222556-1-rolandschober1968@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,44 +97,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series teaches btmon the HCI commands and events of Periodic
-Advertising with Responses (PAwR, Bluetooth 5.4). Until now they were
-only listed by name in the opcode table and the events were printed as
-unknown.
+status_handle_rsp() decodes the return parameters of commands which
+return a Status followed by a Connection_Handle, but it only reads the
+first octet of the two octets of the handle, so any handle above 255 is
+printed wrong.
 
-It is meant as the first step towards supporting the PAwR advertiser
-role in the kernel and in BlueZ, which is what an access point of the
-Electronic Shelf Label profile needs: being able to read the traces
-comes before changing anything else.
+With LE Periodic Advertising Set Info Transfer returning handle 3585:
 
-Patch 1 is a fix for an existing decoder found on the way: the
-Connection_Handle returned by the Periodic Advertising Sync Transfer
-commands and by LE Remove ISO Data Path was read as one octet.
+> HCI Event: Command Complete (0x0e) plen 6
+      LE Periodic Advertising Set Info Transfer (0x08|0x005b) ncmd 1
+        Status: Unknown Connection Identifier (0x02)
+        Connection handle: 1
 
-Patch 2 splits the LE Periodic Advertising Report decoding into
-helpers without changing its output, so that patch 4 can share it.
+Read the handle as a 16-bit value:
 
-Patch 3 decodes the five commands and patch 4 the six events,
-including the [v2] variants of existing events.
+        Connection handle: 3585
 
-Testing: I have no controller with PAwR support at hand yet. The
-commands were sent with hcitool to a controller which rejects them, so
-that btmon decodes what the host sent, and the events and the
-successful command responses were decoded from hand-made btsnoop
-traces. The output of the existing LE Periodic Advertising Report
-decoder was compared before and after patch 2.
+Fixes: b73d4bb9e3c9 ("monitor: Decode LE Periodic Advertising Sync Transfer command")
+Assisted-by: Claude:claude-fable-5-2
+---
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Roland Schober (4):
-  monitor: Fix handle decoding of status_handle_rsp
-  monitor: Split LE PA Report decoding into helpers
-  monitor: Add PAwR HCI commands decoding
-  monitor: Add PAwR HCI events decoding
-
- monitor/analyze.c |   1 +
- monitor/bt.h      | 174 +++++++++++++++++
- monitor/packet.c  | 487 ++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 626 insertions(+), 36 deletions(-)
-
+diff --git a/monitor/packet.c b/monitor/packet.c
+index eddf8706a..4ff24092e 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -4976,7 +4976,7 @@ static void status_handle_rsp(uint16_t index, const void *data, uint8_t size)
+ 	uint8_t status = *((const uint8_t *) data);
+ 
+ 	print_status(status);
+-	print_field("Connection handle: %d", get_u8(data + 1));
++	print_field("Connection handle: %d", get_le16(data + 1));
+ }
+ 
+ static void status_bdaddr_rsp(uint16_t index, const void *data, uint8_t size)
 -- 
 2.47.3
 
