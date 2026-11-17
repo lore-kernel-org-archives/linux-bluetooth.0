@@ -1,78 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.6.133.218
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.6.128.111
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794882956;
-	b=vZWNXjpgjRrBO87ckz/h1zUE5Oj4ObdR9rFCTqaAznAEH2dwlD3nneUcYZDARDLXiCWA
-	 WjSkO0h0kseGg05y9NdsisyXu79MgM6SsOUExqeF+P2TzCP1StG+rqdIO1BwYXB7ZzZGN
-	 gWAybgctrmcmPDLJNKZgM06t+i/KgsXwu+EfHS+6tewk+Lk2jAoyeQP079oanN9ESgh+P
-	 reeuGOkdT8ji3IlLuVRQrS0SHApNLk0BSQIZaOXbURvFRWYdttV8rz2bhklS/cYms3TP2
-	 tZaKTDgUlFxGJHmqXYMZRNYmwSDzP0IIeLK5Bup2KXnZHCWsjKK+k/HLSdVmpgQSuuA==
+	t=1794882958;
+	b=ealLyZfVVD5hK//treIpAzuHPBG69B6eYeE6dtLu1vsidHoGw8OrXWPuF0Hs5OhVekBe
+	 Z8mHUSKI4web2FOEFq5X9Rs6jTG3ZSpalWa3zlqBMH9wfhOWQYw0P8ZXNNxhwwrhEhaPv
+	 +rm0zQtJsChJz7+JAxuz7Ai3faVfaYYljBxDyjqjGC0kCOfvPmrRqp8t9/oIpwOit770k
+	 Ey/a8mKr5z5IOfQYIm281ryT8eyNP504iJHyORHXuIGhR+EDz1Ya4zsPyDojq4UAy8T8J
+	 RBFiC+Im7d49uXpSLiyOXE23vkRomWfLASXAOMgZ1qPjoe8rxpPVyGEuFGSRQot4j6A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794882956;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794882958;
 	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
 	 X-Sonic-ID:Received:Received:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Os3RvI7DuWiaxJJ79oY6RF74L8oVKu3AXX6k4Pj8mZk=;
-	b=jUt9xNgJAqHrc7hby8gpaRIDnBMVSWeEljoNQVwctknN7PkdpwEMBck6c/Zfd6FslSMr
-	 HfhW+af6aRBXwgBYL5rzR5cl2khWheHywoiO/FTTb8MrOHTFBK/0xRK9UlvUANuqGROni
-	 UyUf8dDEc/6V3jRhA9HV/uA8pWLwazcFFtj/+9HePNcVQi0NipvHn8LUbeht5krA3lHi1
-	 CCiMtS7ZCWDOyPaHM4sHe2/jZ4NHCJz5VBeMCvCd39EO6K2idvL7ZSuUVEHxPzjcGVoDI
-	 OKMpNZ/39dh9Mnibe1BR409aMT6POMTa1kjSryf6QVV8K2pF1BH10CppWtRkcJGmH/A==
+	bh=S/lj0TYqPx4BxSJYXs3qtdNfo9m8HzClzLPKr674ojY=;
+	b=4azd46Woh8CZ8StKJO3MgKXYkk0NHnlmbq8Wn+sAUFij48n2h7sXB4S+0FWzttnjZRJi
+	 NkDtDaSxAST4V3mpTZtBdRGUixNxArRtaPXcplXabQhu7isLuxSoJR6CJJQ4lSuDOuHoJ
+	 Z99ArwS6sV2x8e/05mZJZdoWFXx4dF+5cBLgHSmgn7E3Fz1Xb/5TaTHcxErV20fcAac2g
+	 NH5JRG7ISG7yobOTmCFMk+GGnVmqTUK6zA1Kcg2exvDiMX1OSGYvdi5D+aFW+i+TPKwrU
+	 N02BQYRiphdPAFoxiQrtZ9v00dQQCZR8m76scUpdgWizng9UCyDJhN0RMI+h8HEVreA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=yahoo.com;
 	spf=pass smtp.mailfrom=yahoo.com;
-	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=cweLKKDU;
-	arc=none smtp.remote-ip=74.6.133.218
-Received: from sonic313-44.consmr.mail.bf2.yahoo.com (sonic313-44.consmr.mail.bf2.yahoo.com [74.6.133.218])
+	dkim=pass header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b="CgE3//Ee";
+	arc=none smtp.remote-ip=74.6.128.111
+Received: from sonic312-49.consmr.mail.bf2.yahoo.com (sonic312-49.consmr.mail.bf2.yahoo.com [74.6.128.111])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EA7606A31C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 02:35:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 07EA7606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D85606A32C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 02:35:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 47D85606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=cweLKKDU
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794882954; bh=Os3RvI7DuWiaxJJ79oY6RF74L8oVKu3AXX6k4Pj8mZk=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To:Content-Type; b=cweLKKDUc3aPqSgDFWDehDNqxKdMgnHH+Qm0ovqK3pDhWQK1HVflYoGB4tPq3R4RtZMnuiEWgOD7p/VkMuGT8z3A+g3T53NxRoNCCHaE2jQqu/2MI2OcfXCOkO4T/tZyGRCVd2tAeZYPDatswh5X5bw8L8RPMZFoYr0aUJCzqBTvkfYaLW6UxL8Fxmg6ZPFgnPqAX/aEzXaqOTVLXMyK+hgT2gp9RmgnVgVwXVa1T8XVnpPTS5MjHBy9pOw2sZJ6KyK1LWPgxFlPPI8F4rVeTO4YQ/z+MY3TF7VplyZkuerAYgUdqgv0Nz+p8SiE9DJck0cTym4VchooYUwYT1zAFA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794882954; bh=K5ZCqgUZE2VsPpS2Yp+G4qJYQnJClCX/R9iAGEZRK96=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=hpfVew6eo3EIpbbLWS70vEiIG/v5foKvY3/2CO9+XKH9kuemkermaVOq5/9k1bRkP86L/A20bja35RhDwGqg3tkJU5iGKGY8BA95o0AtHOgiwX9YN1q3jVL3r+XasuKzcLxRKAcuGXaUfbeq0c8s+0iEzSyJYMvTvH7ImenBoCb9XJwfaQe6Milf/QsVJux3pg/7qvkteHVrck72R+4pF02+k14la7UZtwiXX7qFyNkSTzr/PCmOdexkez62wM2JQWSQVebjaA+CVxMmYYAmDVLgV1+5Gp/KWJJpdBFbo4kwOzDYPPOnM33wj702XxO/1KH7wGANGNyoywvUDemJOQ==
-X-YMail-OSG: 39tUaG8VM1lxBb6Y8y5yAudVwIYaLTeiJeKi2d_8oIKk6ahiDOO8.3WAYg5CRVZ
- kErQ1EdLcIuYa1Mml0XIjHGgw44vriOFrzvU9SXHVupmyfRyuRUJFQhZ.Q6kqPApuv2kCxy5HswA
- dMazDX4.vjyboYQ4XFpHF8a4lZ4tbKBz.cFmrwRblKV4T8SLJzZA.07pqtZ2tbWSYlx0W5qaWaxp
- 6ROJ_EXhigj5T40Md.W0qA8aU6mq3u7dZjAqhwQg1s9QclDorCKi187IvamOpbU9JaYMFvyGth0f
- h58oWArj7l.nS8dgKDTXgJBJJ5e9LDAGmEjW3gVhxjg8m9ZlSDa3_drb6x9ZS6Wa0mCn_Cyp9BXx
- klxIJG8.3iRibugB1tQZWujhS97tiMtZq9HeEA4CP7iSWeGQOoZmw_h1FcyrR2w0OX4odwCyXmW9
- 4MkfAq1Ws7JSF1I4bLa1UpeZtFyzlULPtf0ODLqIrIFaVcYSHf7BWXQzVAMQmOUWu8sjLWUZTtEO
- AKmwoms0OT76mwpiCrmhlnAkqWMQOmluQ71U3PYk4_z0uPkBzRa2stKgrpRaJCirxH3m_Z200RZl
- lvuGUO0N3AlMSWYATnjUEuNNW9jUmFYpId5G2_gHdMp.iWHPiBzcaVjEzDdJAz5hcGfcQowjU4I.
- tgqVOIB7SVut_bKIUS73KS.B8Jmclof6R8EIH0X.SX5taY7.ZhBzKxOf0DLbpCbgvHNh98yEE71P
- 1vnQCFUdbpJJgHhzXLeRwjvGYDclHgx4kHRb3nn0OYYVZtAA2GKoIDNG2Q6Pnt7Gfp1sSe1bzHwA
- w1nh9iqCJC.BZspQ6c8sTPYlhwkjRUTaVAoWmMeWd1Oydc3uw7x6JANBHf5d3evF4t5yAzVLjl2.
- MEESmr7tp.CB1BbX3ohsXbZ6J2BTYQhsCRfb9p3bVS3xACeGdhKo3nwyxwC6Ua8O.KNvwjoXy3cz
- eF3KQn7BVQvbfncMnRapXuVzkdFn0hwQt7aE7qUtrZBQ4gt3X2cuyQ.1x6sL_rPems0qbr8J9NnG
- XrG9CdBvMZol_4tY5HkfCzZwV99dsiUVBMBb.Jna4gv9lpCbL1vEJR3TcNYpBVgHtfAXNITf7_eK
- ymlXwayQBogkjIEIPS6K6oJ0EG0Gcv5QBIV349byo4YUdYWaO1kNLutT.rMluSO.niI0XVgqtiXD
- H9YKKHJFNx2IgOX1Xjz012YRXyPNSGf.reN5rhWHaEucbatksRSZDS4B5F_AMKeMv.PmVps7bEpW
- 0ddTRU_AY.Q_leSd2sLkckthswsS9i3THBhj2TC3pLpaI1ukXLtL8DbUDtwrdlkY7BBbHowsJQdb
- dFJfekwVtlb.rv0OUrifxQ6yNpEmmyGyf9yZek8qDuJ0OpFdFf4WHgcPnVxkWvpboddHIe8cRFbM
- d5bzBaUJrWjJTHUlK6GluG4VKzHf31IDClsjTWYlpuM8CEJNaCZ8AYfTUC9ODwhU_MNoiR5AOHq4
- d4QEAWWIJYxGH_pdmq0iBgRE5RtuuQc48GPLZhMAB53AAg5Lo3Hdog6xYS4lX9yy8tUSYyl1yQCh
- H8WyEMggReyM932soONcRvY2dLskL0G5H5zQ0UTIhGrMgLeQTVS6nEFJX3TtbqPTmZVOlBZS3eB7
- Bx0v4ZADJiforv0w82nftQASDo4qM2ygvJ02gPN5KU28S9g88RBAfuxBgGMDp85VXYNG6FHL0pUU
- vG.IlPnuEdTW5dKBVPzYgwUwnkGd8ou2vw2PT3mpOsrW6IRHBwyf3s7KsaKHtvcWit6C7VxbyVy4
- G4DmSMeZvdrm0TzwUljBVEYNkHLjLlTkmGudZ6j.Cm4ftP9YRa.gDY17Q2OhdzfvEeFXStfNAFVm
- 3NpR_WZmCgEqxwnvPm0CvBZIPe0pWU6VXMl32tcAqUec72A0Kk1yqDgNQOojJIw4swtH.Nd4ajSs
- LDx..deHS5.Tb5qBBgtwHg5A585nvvFhV46sHuZCf9cFQGI3IDTT4WRsgexnyp_5hmF480FiUQ6t
- R2tqe3Y4CWkaby4zNdstQ8BB7crS4dMqpf2ka779SBlyAt3pBsvRWZU0GuMF5i1aa2TL_gYPaawi
- LeqH9EkOopYPDC6qOvZHDhSsNRKbvbajGSDuZox4y.j5Qb7CJXY99pIeqzOkY8IylhUNeGjhksv_
- oDZ23nT6eE5VB0t2NiA8S5u03PN0bRAZdkDn0jFU_xbkGMQi7my7omm0xdeXv.MCPTAwaa3b1Oq_
- xhxdahmUW7AgKkYs_VuFNbb5h14THl6kHaMlgbuuPBqMBoe9iDG2xWQFIW.TbHrkpk_qkkcct2vY
- eJbet2gaETItL1Et8afolniF22Z1pA1egiTw-
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.a=rsa-sha256 header.s=s2048 header.b=CgE3//Ee
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794882956; bh=S/lj0TYqPx4BxSJYXs3qtdNfo9m8HzClzLPKr674ojY=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To:Content-Type; b=CgE3//Ee3AxTUUck5zvU4jAL43qz24+8GGfBr/408yU7RAsEYGHARHQhbhWmDu2YNGzUsBHSA/znzCbH/Qy+SBN6tnuzwnZCLNXoQfTtnJZMjUgNAeqnPFErQysHaoM1KOeRXaHqQuYTWkr+h0I8bhHrYGTRRhPEDqBtr+YWE7Mc54bd+M6SfXaxWs9lQs06kBYehDOQhugC99lRXUO6OWDY6po2qRQD6VD+0pFDi8hKERUqKnDhhp9JOf1ZVNIxuytebBhRqVG01NH3vxXH5uuJYxpKVZ1R/s0WDdxVrg2yBxX4iht43QuJgqg/sgMyg4pRbgqzGv2QdH/rSEzhnQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1794882956; bh=xGo+7NnfRNf3kif5eYE8/dSx5SfAtdAteOWL3kreren=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=m0vPitRWs6cF90KHFvOB0toPqbgb45iY2Sg28aj+uD4N4a2vc4kS6iKhlvCF0/PLVZ8ahoqkA5gjdgKrRBWjMfaXVPVVIe+w2PStLBbhlb8CA7kg5iU/67dv7HCskkql0sPZnKgcGETcWhpIaMwgIcFORqO6U38YCZfEpfQ07Li2JV95vaab2xt0kqJFW2fJZHgDYDkcVNFeAL6mUoBWKrQdinXM9lp9ar60It8B3kuTc1j0pCKrzVueiNBAR7g77bJ5Zko+gE9REdJ/ZmseOLjD1VSs0B1ON/JBCEEz7J6uOgYtNxB1T3/ypEjBdr5tPfekZf8jAxuhgD4aU4eoWg==
+X-YMail-OSG: PRJId84VM1kHdqRQwbOubh.mSFMchG63FKAvywJMA40Bs3Js2UOoiIJolTkOvpN
+ daKQZbAaqLnNKGppCcEL1kmlxMazPVhi5dtP5Cii1Gk2EIXuAZR2yVz4JRSWO1KNhmeYahO_LHI7
+ lmlYyeIpFrZoL3Q8iJkTP4aypPX_bzQrQKk_IgxaoMObuBjiOnFnDZwXLYSSvdfODGuNpXrTvuPY
+ aDGsFbGCnlXbxVOmfxOBTK01wz_OrNcrOUjmcv4UofugPARqczzlknlMVhzYU5x_L2z.0L4ikbBQ
+ Y_Av0frWq15_UgESFBsRTo.G8dSK0zqnlLt9.FKyaaV3PTa2HJIrQHw4DgnZg.KqGcdwytZSJY4r
+ q1r0zYtStMyZLJtoHqOH8V_bnNUnMnVBtk3RGh1bhjbIEae3gkot6ToRUFG_DxsApc0l22RqF0dx
+ SJqYsPdsyCu_BuBBlivKvS7Kq2tOdUVpT292dGHyI.JwmpD1dms0KqpyfLL13RJ68Wp1N0TTTAw_
+ rfZLwekujJCnAABlW4.xU2Sj7UmrMz8lhwyPHJAgaLA5fRjq.i_RYvNeCGDR451YqZ4TluVBfNN1
+ y4YBc79FIlb5UPH4ee79K8SCAcDcujbctlfaHq9pkDjnb45BbwPleT3uQC7Ql8wfI5nTGinEF7sw
+ q0zKwZG3yv52gR09_SdYsxJhD2zTURrFQNnX4fVX3Bm2dJqpgxy37M9jqp73a15c7jRdGhSuJehH
+ 8ezuHb0qpgIebhSUzOVyAnxNwZykocvQcbvvYDXoxAeRAfuNyFBJtGRK8U6tr9jLn_E8f3vTAbEL
+ rckIJkSloWqjWwHPTLVHtE0ctJ56SF3zYpFM72jPJRZ.PVlKSnLM.db5fP9diDpHvp2_0jRkasje
+ 10gCQ84zWt0TP1dApZ1yIjgLTC4iQ6MmX8ZL7361qJvz5_C7KjjtbeG.hWO1aOwqlKr7ePNmI003
+ dwOSHKCDv0B2Gv9SBP1fQF_3E3iLS2OM2qwkPheGWDuPAULKxe2..DcppGJrn3R5Y7jT_jXIYSkk
+ dGaBM1qbgoBUKc6hLxHLNYmPYbl5X0sxY0uGCY.FpI28g8WfQgniMS8aWZnF9ijHDs1Yy3dHRa6B
+ RruvEGhLtqL_VGpQM3Y8aOyKQGrxQ1zHswmWjKzAlcFBNAfd94RyrarFi7cprNcRWAeDDnIUHr2l
+ xWtyxZMt4Ca16.6FQ4Rqn0o3WFkg3i5cSp_P6ZY3Gfa4dNGCir2QZoHUU2bjEPiac9OIQ5gyfOmd
+ OeM7KUSqzeOzyxBnDbhK0gQFC_PMRhU6YWcoltqucJUzk7uGP7q4wSWyat8aveufJbjwLdZnrqeE
+ 5P.ObCfRoZHy7gnXWpyK4toT63RXr.MsHhtRalGiEZoHwyAEqVnny4lRWSSuITThslow_Jp7zBM4
+ x1hLJVobd7PufelJP6TM0XnI0MK2fXoi9gMQoRXp8ssCOjFgh_1eWyGpSkxOLqIFoBboeprZ5bx8
+ 9SlJ1007tNEiforshJiipkXYVWjiQB3pb47aqnPsaa.0kZnnF3ado_DB.tjiOSOZb.pnuyee_KrA
+ 1iN28Y242x4hCbnJYyO_X58lsMOWty6uQK3CH2RUED3A9CdLW.emFzo.ymJhW3qLU6J5PPOHwc2k
+ TBn9UkqLrwHrHG.tbNWniyTQ1eYjYCylR7sh6LO76Qyn0q5cVqmP6USTirl7lRlFuatDYCq6rcMy
+ vxklaKkCOBoRZqFwMTz_a2L0srCE3EGNGLvdv9ApJTYWUdZD3Gb6us4m3GKaq0b2xRBy9TtBSPAA
+ O2rPS26X019T9S7tbH9b_XewpYK3SI7FZ5ETIdSsnJPikm8EhDVV8aYx2dQTu2L1xIWH74dJrU0i
+ lgZXu8DqrMwViO_7DJ18drKN0AMwd3VodrSHp3_QK7Xw3QK6CUucyhQrJHGAKzO5Nj574XSR_8s0
+ WqVqIKylQT6qO1W6rRJsLXvMgBkteaBQ7GZso0.NGHK8TfRxuVBwrkdvJgIjEGC1Vaqj3Vj_fP7V
+ hBrXHk5CoQJxBt5b8CidXPXPjPV2vIl411tgDt8bPHYitIYkggXAp6dU5HQMRrzPxDPiDR_lqLH0
+ NETptpclqQQtnt93Bs9uPBdjDEl7.e2C4zS5kjd3UY7PkSSBYJftuW4QLSlKp.pKouXr7jieY4Eg
+ .3Nuy.SCUHVehsXHvb1Pf913UVMrL71TLHbJMXi771z0iJD2Ksipv.6MuNHFXZo3WaQk.XVOcjTx
+ O94G1Z2fHUwFxqlgngUloe6RUxsHolkuhFNpAHCO_Eexv.dW4QftsquJ4btBISAW9zM2slYEhKYU
+ Fc8cN7oba4w1I2Cm7mlDoQsV8dUhFkklis2pYzYOupA--
 X-Sonic-MF: <deaner92@yahoo.com>
-X-Sonic-ID: a527fe53-1549-4fbb-bd3a-a050a5f2d7e9
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.bf2.yahoo.com with HTTP; Tue, 17 Nov 2026 02:35:54 +0000
+X-Sonic-ID: a8e65f9a-d379-43ee-aa75-80067d837425
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic312.consmr.mail.bf2.yahoo.com with HTTP; Tue, 17 Nov 2026 02:35:56 +0000
 Received: by hermes--production-bf1-6d6877594b-c5dh2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 6b4a44673d94ff3e2f092b66bff98f7f;
-          Tue, 17 Nov 2026 02:33:52 +0000 (UTC)
+          Tue, 17 Nov 2026 02:33:55 +0000 (UTC)
 From: Jeremy Dean Clifton <deaner92@yahoo.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -82,9 +82,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	johan.hedberg@intel.com,
 	hdanton@sina.com,
 	Jeremy Dean Clifton <deaner92@yahoo.com>
-Subject: [PATCH v2 1/3] Bluetooth: hci_conn: Free the unset handle when adding a connection fails
-Date: Tue, 17 Nov 2026 02:33:42 +0000
-Message-ID: <20261117023344.278269-2-deaner92@yahoo.com>
+Subject: [PATCH v2 2/3] Bluetooth: hci_conn: Refuse new connections once HCI_UP is cleared
+Date: Tue, 17 Nov 2026 02:33:43 +0000
+Message-ID: <20261117023344.278269-3-deaner92@yahoo.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261117023344.278269-1-deaner92@yahoo.com>
 References: <20261117023344.278269-1-deaner92@yahoo.com>
@@ -99,49 +99,48 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-hci_conn_add_unset() reserves a handle from hdev->unset_handle_ida and
-passes it to __hci_conn_add(). When __hci_conn_add() returns an error,
-no hci_conn exists, so hci_conn_cleanup() never runs and the handle is
-never returned to the IDA. It stays reserved until the device is
-released.
+hci_dev_close_sync() clears HCI_UP and later calls hci_conn_hash_flush()
+to delete every connection. A connection created by __hci_conn_add()
+after the flush has run is never deleted. It keeps the hci_dev_hold()
+reference and the sysfs device taken in __hci_conn_add(), so the
+hci_dev is never freed, and its works can still be queued after the
+workqueue is drained.
 
-The Sashiko AI reviewer found this while reviewing a change
-that adds another error return to __hci_conn_add().
+Check HCI_UP in __hci_conn_add(), which serves both hci_conn_add() and
+hci_conn_add_unset(). All callers hold hdev->lock: the HCI event
+handlers, create_pa_complete() in hci_sync.c, and the l2cap, sco, iso
+and mgmt paths that reach the hci_connect_*() and hci_bind_*() helpers.
+hci_conn_hash_flush() runs under hdev->lock too, so a connection is
+either added before the flush and deleted by it, or refused.
 
-Free the handle in hci_conn_add_unset() when __hci_conn_add() fails.
+Also include lockdep_assert_held() so the locking rule is checked.
 
-Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
 Assisted-by: Claude:claude-opus-5-5
 Signed-off-by: Jeremy Dean Clifton <deaner92@yahoo.com>
 ---
- net/bluetooth/hci_conn.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_conn.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c474263fbab9..d729a72f2f77 100644
+index d729a72f2f77..7f0250653189 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1176,6 +1176,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
- struct hci_conn *hci_conn_add_unset(struct hci_dev *hdev, int type,
- 				    bdaddr_t *dst, u8 dst_type, u8 role)
- {
-+	struct hci_conn *conn;
- 	int handle;
+@@ -1001,6 +1001,15 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type,
+ 	struct hci_conn *conn;
+ 	struct smp_irk *irk = NULL;
  
- 	bt_dev_dbg(hdev, "dst %pMR", dst);
-@@ -1184,7 +1185,11 @@ struct hci_conn *hci_conn_add_unset(struct hci_dev *hdev, int type,
- 	if (unlikely(handle < 0))
- 		return ERR_PTR(-ECONNREFUSED);
- 
--	return __hci_conn_add(hdev, type, dst, dst_type, role, handle);
-+	conn = __hci_conn_add(hdev, type, dst, dst_type, role, handle);
-+	if (IS_ERR(conn))
-+		ida_free(&hdev->unset_handle_ida, handle);
++	lockdep_assert_held(&hdev->lock);
 +
-+	return conn;
- }
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
++	/* hci_dev_close_sync() clears HCI_UP before hci_conn_hash_flush().
++	 * A connection added after that would never be flushed, so refuse
++	 * it. The caller holds hdev->lock, which the flush also takes.
++	 */
++	if (!test_bit(HCI_UP, &hdev->flags))
++		return ERR_PTR(-ENETDOWN);
++
+ 	switch (type) {
+ 	case ACL_LINK:
+ 		if (!hdev->acl_mtu)
 -- 
 2.43.0
 
