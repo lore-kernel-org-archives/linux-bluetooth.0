@@ -1,84 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794920617;
-	b=TRrPU/tUMcQMlha0W+rXeTCYvJEXkkGUc5E0oYMPPN31T7GDC+2BP5qCyb3kH5tzw/wN
-	 mZYMpBcdcAKoUBF96fFHODxVoDipGf0QDrhLdzTQD1Llvu1V31a9i11wPDG06gwlplw4u
-	 oMQz7jmkGuYoxNpaDN8DRYJrz2+oDTQ3ouRAjJpqRaqL0gIkoD48JRnHoOlwgvitxhjhX
-	 tnuasrh996oucdMFO2UauPeteqDjLu/1a/ElWSZMu3OZL8q3/zgkDF6DCezBpZfwH//kK
-	 FbNVXL2rWdOVBelvhkOjhFQYAELy1COd4o+ZyosFSqlTiPfxxLjqVY7N3Zx3UOefs3A==
+	t=1794926984;
+	b=Uj4iD+7/6DKeHpZvZmZY2zwIDgsOG34oj4Q2n5WbMA7xlbDqrVTaaKgsLb3zcp89YL8Q
+	 y5QyZHrNAlKJ2mWxwd/rU8Fv3uROufpXKaWstmJ8uacy0VNXxq4DKJMhmKrmVTkM8YoTs
+	 REedl9xNILP4tBW8mF9a7VWAFkPBhen1kW/QIzB164ucAAsQefgpK1/ltGGItYgZtoUu5
+	 du+THwi+husjV4I3a6t6IM5BWfKaoUuh4B5zHs44NGYRFbGQeX6Cg6XPZw3LuEBH4zh2k
+	 36a4z4QongxGTQeFv7uF4y2G8E819BPrr1p4JeOzYVM3R7kYizzfLkB5GR4AWWb0MOg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794920617;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794926984;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=5U+obujUruSB1soY0TIJd8BHcHtLBILXjdcAE6bO9ZA=;
-	b=mwmoipvS/9Dn105xAn9rv60j+GD32uxPrtGq8T/nBFAr3rFO2IvBdO97ZSOrzIo/W/c1
-	 fFkV6eBNMSxxZN0wLbpeq/4/HLJPnpLLmE7pbQG2wOQB3cKaTqWm3GFjAdsDUGLqZxyBg
-	 bab0T63XDLCwIOEWObeHsB8it84t5ADUQjAW+zsJxz/cxcau0vbCd1f7UDcHqLXyYm3g7
-	 BD7NkM5p71Ncgc+7wKUuVin3CIyBu6vvmwSnXKcLR8TxmU8sU8H/YMmTvH+Debg6WaNBh
-	 ZzByUsHAvyVeGfhSEfSH4tm2szHejTvEZwZElm0hR7L5xe/DAtQfObx0XOOiCcWr/pA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=3sTWPUTlwAcUBnRVcL93zdm48VDNuD84VEKeKVBAxRU=;
+	b=fKrYlKkClGxqAhMLQAgPhW5Ir9MaOAx/Kr559mIKc1dToReG7y6rIWwVqXhDboZvbKff
+	 IEMWo+O3g28QiL7LJ+s3j5BwCylEY5Sg7UnykQJA7M/dZBuat3KMQ1A4pIH7yD2AJSDfO
+	 iulPeg0Mk+WZW4HW3IVmrZD/9EK0OPSmcInhni/0CP6Rcr67TCTuZfwStBPCf0/AU2qfG
+	 moxXr7SKyjHEQWBgXFc9YZ1BijeE/KfHegivQPHTzM0qLyMoAWM7YnldgYSOSW4+U2pGY
+	 j/++v5TQ2RHqxvwPrlRVLfxdUgP3bG5UOGmJZqELXtGDwLmulqXHqzzsbRKbpFK6I4g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WLRi8rVw;
-	arc=none smtp.remote-ip=74.125.82.169
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c+q9gXIV;
+	arc=none smtp.remote-ip=209.85.215.169
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD737606A32A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 13:03:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD737606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02CA606A31C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 14:49:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B02CA606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WLRi8rVw
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-380b40312e2so3671112eec.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 05:03:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c+q9gXIV
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cddc597d062so2998176a12.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 06:49:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794920616; x=1795525416; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5U+obujUruSB1soY0TIJd8BHcHtLBILXjdcAE6bO9ZA=;
-        b=WLRi8rVwZTzb327m7bLiV7QZOcPDmIqKmA1HNcm3zoHoXf2d2KWAgaQvzOphOuMfSl
-         DHtmSR8SUR2YQSUPxKIcYn7CEhGlxQLFFRzok4xiPcPi3pRXwn/N25PyZeV+U1e+Rhkz
-         FytnXmiIwlpa+MQ4zBLw3gU49HDSyH24OeE+QVSMYESUe6oaoOhosBfO3Q7Nxkyp9Oof
-         R2T1EVt07WAK5A7cczF6EuylpfDwwToQV6VbI03JI+JFQomsPTGo+rP2+ejwZk1aPYTH
-         necy/YVz629ROLSBQYyODCdUL7K5mdTYa72ZrZA+X0x/zy1tZib1K29t4qdH8ejpFr/z
-         xFlg==
+        d=gmail.com; s=20260707; t=1794926983; x=1795531783; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3sTWPUTlwAcUBnRVcL93zdm48VDNuD84VEKeKVBAxRU=;
+        b=c+q9gXIVbFD39Pr8RsogKNzLXL/TkHDlBjgA8twtnolwwDOKAYwY22FaeL7L7GcQmM
+         vh2kxx4l9EQuoFpxDQuF7i5ePGgH3wsaKcRRfer6sY3hJUk4je7kT0CcPphm4gpbpxoT
+         fqA3k2CTrEDLJWWRxniAn2dgRDu/EEhM/0HJLFAds6N6LsARCxA2WJAqSHBmpPcyJAz5
+         mk3w3Q50hLq5y3Ys7fBMkH1MUXsFwQzSa6FyyOEUy7wGxwhZmJqpfnUv4aJVt3bwSnot
+         XfEUcl596ql9uv/U3iNTbxIydhU3O4GACxrCTNPlUjwv5WL2Stsaph57EvYLLXonsdDd
+         HxXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794920616; x=1795525416;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=5U+obujUruSB1soY0TIJd8BHcHtLBILXjdcAE6bO9ZA=;
-        b=Mi8n4m/AmjBd+dH11kjkrVVBMfPfxLWUZokxunAB54Fnw3MLcAeJ96opJtcRftChoG
-         JtmZeZDBZ8BijZ5k7BzlBi5M2q0CRS9wg2Jp5P9QKivuitX7qdjPZ6TCgCL+AoHjpJMr
-         DrcMQmUmkWsr8OXWctU2WG5rj1YqtOD6zHcRJzj5QZGWmD1sKZZbAHpSleV2csNKT1ou
-         ucCpzQO8nUGs5FkfG0zjXBcNsP0rd/+Z2pCpEkPhHGHqlWSbIJx9RWcFvOfRmCkVEPgQ
-         e+1D0kHVcTEclIb+sC6pjkuapPJ5WeH+kMN5DhOX6tv4/TiF3kZU5/+LfWY8TUbBteaq
-         jc9g==
-X-Gm-Message-State: APuU4Z9IOnV4f78lVxzY1ru+PImzhYo+YIFM4q50ZTX0K0GQW1ucneNI
-	Zng70sRYZQ+L74moJmQb78FriaO5ydsfdQBNR5d7WYLAmJJDLfDbZwbbBqifig==
-X-Gm-Gg: AZFdTZdQ28u285wXI+0dBRMEhaFjysC7FuRH9kwR/pCtKtc9ZjetfMbBhR/KIL0QHR0
-	FpkNPEAXIgOdqJd6hstnDG3sVhheimjn2YGtE2Xc13XLi61qFqRFetbHFXgruWZY9r17qhR1urL
-	q8H5zbpfsrw1Q54PCU7o+d5dewAOWm15q1qBxi4k9p+XfCcMxcwnSFG5UYNdnVsJ+kFNzkYtMmm
-	A1EOOEc2BwwXobbvnJF6oAaj/hwYz+LBRN685gFcjPMg5HKASaqxZt/zOXoJuAApXm2YCQJC0Hq
-	wHQz68Sav2IhzZlP0XaeFb2uKZOtVruHW8hBSKMypGB4RVgjXnQY5YM8/XfXKZOuPg+5lDkr6fv
-	F2qj7dy/kRKH3l0s1pxNG9uFiUAVH0xSpJmSvkojSLkXg8Nh9rw6n9mNcX8udAPUnUOZRwujwmo
-	txHwvqXXPKkv7rGp8xUH6InovuIiRXq0QSM4UJRLhR2BLWakZ5b8l7ozInQsuQ7VirV/P4jLHEp
-	11k4V5FNvYT0lHusMbC7jA1F/0URITCcZScteg6EZyhW8maXUIZUF1Ligd5vg==
-X-Received: by 2002:a05:693c:88d7:10b0:36c:bf78:967e with SMTP id 5a478bee46e88-379656c93cbmr12482263eec.10.1794920615607;
-        Tue, 17 Nov 2026 05:03:35 -0800 (PST)
-Received: from [172.17.0.2] ([134.33.67.166])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-379560f5e06sm57341639eec.19.2026.11.17.05.03.34
+        d=1e100.net; s=20260707; t=1794926983; x=1795531783;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3sTWPUTlwAcUBnRVcL93zdm48VDNuD84VEKeKVBAxRU=;
+        b=H4tzzjsOUkGW00BTUNvSgKjWQdbhPrRFbpush9jfwpIhBMOxOQMDO2/Zy7ZxSv8iUx
+         NagSZAPlAGN2e7gFmuQYzJsxKVxfgOggqDw9ukDWZ2ZSArJI8WG5PSjj4wNJAGna45ec
+         Vk+OSEnKC2iC7/tLW9E6CAIi9TKYzIYYCrCWVzyeFJ+W5FpJOjglTCQ2rsQriKkg3J9w
+         37P9cGuIQeGpHb2WODMQwKTNPEJiobmGIJ8J09c7x4hr9QK1c+DX32C5O4DelOHAF9gr
+         LcWPoIPspEr8fivC1RYAUiNNIoLGAza+FkLDlztNZeDp7+bjOmW9vubfH4OEckSyQNV6
+         kX/w==
+X-Gm-Message-State: APuU4Z8o7P7/mpCsg79SuDN2W+ttEXf3m63MBgXfFaBhQy8vuT/hNVPy
+	Ud1G21OESOZYIvu7LzI6qtS5OfA9WfezkctbDqyu6XaRFTuyFjD2YGBg
+X-Gm-Gg: AZFdTZcIsXJAhfbLXcJiefhcFfo9t7DmspYNjSI6bqmCMT058qKhai1HdijrzlMBo/3
+	d11N2IGfCl5YQOgbfMPPGEnmx+6qhGuIhQKguEJUVWHpWUapKef4hEKAy5IciNrlEzq63FYuYvX
+	2bf9ry+l8CCee5qcCLAlKwXlHaXAfggD69lXWVsDOPcwP21+V+6GzhJZgHNcR/xitpDDfmlTotD
+	J4z1Yl9paRTWWI1GjbMgqHJLPc7a65i/F/PQd2W/2XxedLcBg0uvTixWaF26hTOA+L/K+q/X3j0
+	NJ5pXeH9a1q/Tfno4afTD8PkNLjfiBmrgbOK+unbev+8sBYJMt+YdT2gvafNsfsVSmOs1WQBLBf
+	soFbnTe987oC1Ya8anP1RjOn3+o3gYAkKB0q+xusT3WVm0eaRhkZ59Rckvd2FIbfVzfXPeFQx5F
+	FxUDe3elBT+sIeF+gMDtt5UsSqzw3fxniftTWQUOiFKCc6jmW9bBamImoDFMc/Uy3Opr9wIquIj
+	ssaKXAb/yM0IhzKQ/radVdkDeg9fc0k3s3qHQ9rIagxfXHcElBpy6gg3Y/fYA/4a2tTLEprjYEQ
+	S3BJylWY4F8Qjc+hx3qbwhagWQuoNA==
+X-Received: by 2002:a17:90b:1dc8:b0:3b1:12ba:867e with SMTP id 98e67ed59e1d1-3b1b0b5b550mr14590958a91.13.1794926982909;
+        Tue, 17 Nov 2026 06:49:42 -0800 (PST)
+Received: from thangnn-ASUS.. ([2a09:bac1:7ac0:50::498:83])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3b6da0fa8sm3491697a91.9.2026.11.17.06.49.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 05:03:35 -0800 (PST)
-Message-ID: <6afc50a7.453d2d35.f339d.30f8@mx.google.com>
-Date: Tue, 17 Nov 2026 05:03:35 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5937923481164737175=="
+        Tue, 17 Nov 2026 06:49:42 -0800 (PST)
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stig Hornang <stig@hornang.me>,
+	syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
+Subject: [PATCH v2] Bluetooth: L2CAP: return LE credits from recvmsg under the conn lock
+Date: Tue, 17 Nov 2026 21:49:37 +0700
+Message-ID: <20261117144938.82299-1-ngocthang2710.1999@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
+References: <20261115115341.316484-1-ngocthang2710.1999@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,74 +99,103 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,1/1] emulator: Fix version of 6.2 and 7.0 controllers
-In-Reply-To: <20261116212805.3083583-1-luiz.dentz@gmail.com>
-References: <20261116212805.3083583-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5937923481164737175==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+l2cap_chan_le_send_credits() allocates an ident from conn->tx_ida, sends
+L2CAP_LE_CREDITS and frees the ident right away, since the command has
+no response. The RX path frees idents in l2cap_put_ident() under
+conn->lock. That only works if the credits path holds conn->lock too,
+so that no response can be processed between the allocation and the
+free.
 
-This is automated email and please do not reply to this email!
+The RX path does, but l2cap_sock_recvmsg() calls l2cap_publish_rx_avail()
+-> l2cap_chan_rx_avail() -> l2cap_chan_le_send_credits() with only the
+socket lock held. If the remote answers the credits packet with
+L2CAP_COMMAND_REJ, l2cap_put_ident() can free the ident first, and the
+credits path then frees it again:
 
-Dear submitter,
+  ida_free called for id=3 which is not allocated.
+  WARNING: lib/idr.c:594 at ida_free+0x24c/0x2d4 lib/idr.c:594
+  Call trace:
+   ida_free+0x24c/0x2d4 lib/idr.c:594
+   l2cap_chan_le_send_credits+0x17c/0x29c net/bluetooth/l2cap_core.c:7113
+   l2cap_chan_rx_avail+0xb4/0x134 net/bluetooth/l2cap_core.c:7126
+   l2cap_publish_rx_avail+0x110/0x168 net/bluetooth/l2cap_sock.c
+   l2cap_sock_recvmsg+0x280/0x7b8 net/bluetooth/l2cap_sock.c:1317
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1213178/
+The same unlocked call also updates chan->rx_credits and reads chan->sdu
+concurrently with the RX path.
 
----Test result---
+Publish rx_avail from recvmsg under conn->lock and chan->lock, taken with
+l2cap_chan_lock_conn() as l2cap_sock_defer() already does, before taking
+the socket lock to keep the conn->lock -> chan->lock -> sk_lock order.
+Assert conn->lock in l2cap_chan_le_send_credits() so that an unlocked
+caller is caught by lockdep.
 
-Test Summary:
-CheckPatch                    FAIL      0.36 seconds
-GitLint                       PASS      0.25 seconds
-BuildEll                      PASS      16.24 seconds
-BluezMake                     PASS      244.61 seconds
-CheckSmatch                   PASS      222.12 seconds
-bluezmakeextell               PASS      79.76 seconds
-TestFunctional                FAIL      1061.02 seconds
-IncrementalBuild              PASS      243.19 seconds
-ScanBuild                     PASS      849.63 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v2,1/1] emulator: Fix version of 6.2 and 7.0 controllers
-WARNING:BAD_FIXES_TAG: Please use correct Fixes: style 'Fixes: <12+ chars of sha1> ("<title line>")' - ie: 'Fixes: a938cf48d083 ("emulator/btdev: Add emulation support for HIDS 1.1 SCI commands")'
-#125: 
-Fixes: a938cf48d083 ("emulator/btdev: Add emulation support for HIDS
-
-/home/runner/work/bluez/bluez/src/patch/14990576.patch total: 0 errors, 1 warnings, 49 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/home/runner/work/bluez/bluez/src/patch/14990576.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: AssertionError: Failed to acquire: org.bluez.Error.Failed
-
-
-https://github.com/bluez/bluez/pull/2838
-
+Fixes: 6e1930ece855 ("Bluetooth: L2CAP: fix tx ident leak for commands without a response")
+Reported-by: syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=9dc8780713b11155dd74
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+v2:
+- Drop the untracked cyclic ident from v1: it could collide with the
+  ident of an in-flight request, so a REJ of the credits packet could
+  free that ident and close the waiting channel (reported by Sashiko).
+- Fix the root cause instead: return credits from recvmsg under the
+  same locks as the RX path. This also covers the unlocked
+  chan->rx_credits / chan->sdu access on this path that Sashiko noted.
+v1: https://lore.kernel.org/all/20261115115341.316484-1-ngocthang2710.1999@gmail.com/
 
+Tested in QEMU (x86_64, KASAN + lockdep) with the syzbot C reproducer,
+15 runs per kernel on 666539eecdf4, credits counted via dynamic debug:
+  base:    10191 LE credits sent, 49x "ida_free called for id=N ..."
+  patched:  9330 LE credits sent, no warnings, no lockdep reports
 
---===============5937923481164737175==--
+ net/bluetooth/l2cap_core.c | 3 +++
+ net/bluetooth/l2cap_sock.c | 8 ++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7dcb0586a10b..12794af1cba4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7099,6 +7099,9 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+ 	pkt.cid     = cpu_to_le16(chan->scid);
+ 	pkt.credits = cpu_to_le16(return_credits);
+ 
++	/* Keeps l2cap_put_ident() from releasing ident before we do */
++	lockdep_assert_held(&conn->lock);
++
+ 	ident = l2cap_get_ident(conn);
+ 
+ 	l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index e5c15c083c1a..3db1608dd71a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1292,6 +1292,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	bool have_conn;
+ 	int err;
+ 
+ 	if (unlikely(flags & MSG_ERRQUEUE))
+@@ -1312,9 +1313,12 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	    pi->chan->mode != L2CAP_MODE_EXT_FLOWCTL)
+ 		return err;
+ 
+-	lock_sock(sk);
+-
++	/* Returning credits must be serialized with the RX path */
++	have_conn = l2cap_chan_lock_conn(pi->chan);
+ 	l2cap_publish_rx_avail(pi->chan);
++	l2cap_chan_unlock_conn(pi->chan, have_conn);
++
++	lock_sock(sk);
+ 
+ 	/* Attempt to put pending rx data in the socket buffer */
+ 	while (!list_empty(&pi->rx_busy)) {
+-- 
+2.43.0
+
