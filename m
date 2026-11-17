@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794946838;
-	b=umcHr24yfTU4iUGdx+GPXr8c5iqB3wAVur8v6ewaXE4jvKmShZN2L/niYknyhijuA157
-	 OnW0gRryf+oEUSD7Xdj06flGUyT55X7/FIjIv8YdMvwvN/S4JWizyhU8nRXtMAhOJRiJV
-	 b7ygwKZGlxt6S5u/SZ73FTi2tZI1/iX4JYwxoHf34f1Q/J2nMb3P9gcW1dzVjr9w3rGR2
-	 a3myOPlzlowLyaHzJp9Mt35KOT/Zic5ZWFOsx64PJqwRqc3vNLXEJTK1TYCWl/VW8Lc2D
-	 pybVYnbq3zoYKEP6Cab/38FqMNdckMeFEsOddc1K+nwsV9s8pyRpZ9Kw4h9jGSQEuSQ==
+	b=ImILsc0DA6N/Z7leiWEheUksKiCuw7yn4hEwoQBoREkOrRdrv7C0QoEYn3+G1+NF3N2t
+	 +Dfo1jXiiKzRDg2MsyWwj4D/LWoVpvahWAMDbPrdK2bcK0kyHG8oHNB5jNIPdu3XJn33P
+	 RTRlj7XvvHlkTk/joiEa0GO2gdLs/IBLG3eCrg8RuazNRQUjS3MJVA9cKE/FNMT9l91j9
+	 GqqbiWOfzZ1jBPsTt0UQeDgjEcBaPr6A31J+V8a3YAhO184KD/heS3WIIBKoSIoRqKC8D
+	 I/cSqLAgwlS8cjZa0V9BjvYjcSesdhf+pHU5Ywd6zVSlQGn0bNq01m7AX6hySb6thww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794946838;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=xKgb9ZS2KNfuSDJtqHp4Vi833hjt+EUPqL7Hov729wk=;
-	b=xsA7P+YXmwBYCO7+jhbM22HUQK6Uub/iOMgu3iXzPU2uqmylZ77d6ZPbBwuWgt7/Gv8d
-	 Gfh2zQw/CO7ndvUPW9BtIjOGwkka8JuJpqhlg3zJdUq3bLZPRTz72KZi+hpaWnxOzTGfm
-	 1lWDVdJ5D/7V9u8L+dzcvYCdZkVLJFRTRxQmVDY54vg+N21hkk3mN1pYlUQYYe9WH0RTZ
-	 34mXxVYmFukOYhbxoJqwFKGU5wq7KU+GgxrOLYZ+fCeXraZYEMduSK2p+mZkSWQWrDzyu
-	 edeOaZ6CHwF6plgMTjG21gOsAS1RmfKzUYlTzdD/4CvI8zAzMJKPR+4ndsom4YnyX/w==
+	bh=euAeN1WMdy9qvi9PqNGBZ1npc81wsumgZy+gwaxwfVs=;
+	b=xuupO5sL3qBc+s7GsHn33FmolBVejBjgrQqUn1i934xOX0EFIvu6GxpmneSCvEdOCesw
+	 0OnV7w5pYtG27qQYa3GsknSxTwuYJoqC0N3P2u+UjQAawKcNvF/W1Q74mYkYVGTdHYyjm
+	 hHZBej8VBAVwnCNCYFW8o0tQiYIoHI+7jgzWcUmyNoQaPSCkSup8oWBfyTgVN4aKXLTDr
+	 h8Jr9yPFCiZJEfY9BQbnuYe7kTYYPWXhbfngxjP5/gmuA7Hw8rSOGpfFcVPkLxdTJmhqV
+	 hMXAC/HLSbwCXel1LzUSDd8c+HH5/b4yOHdg+5z3p1h0dixg3GB9h2jVJVsTzoQsWhQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wlvCynth;
-	arc=none smtp.remote-ip=209.85.217.53
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MMR3eoZj;
+	arc=none smtp.remote-ip=209.85.222.50
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA59606A333
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:20:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9DA59606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55702606A334
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:20:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55702606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wlvCynth
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-7d2eba2b74aso105086137.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:20:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MMR3eoZj
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-99e0b1ee864so84110241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:20:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794946836; x=1795551636; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794946837; x=1795551637; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=xKgb9ZS2KNfuSDJtqHp4Vi833hjt+EUPqL7Hov729wk=;
-        b=wlvCynthS51Fj0hdbKm4Gf2f1WKCc+yMgFKC3Z5tv2Z1/E3Wpd5VDFmhIiBFJWuWHq
-         QOdBoBD0Mpq8YUFoaT2wh6HV7VnKFMPVmLP7vmkJrsZs1WouUO3c6LCnSI3Dd82PpLdt
-         WEU1KI7xX8/ltB2Wy81+74GRbsoQp2w1zS+9tPKY6ggm//KEX0nJVXIDlYQR3M/5ptUv
-         7Obx2kLWmANx8VZ/o+v9NCOFV4kkHs32/tVeu+woouKQtTUvASJ0JV8/dNM0nj8yWT/m
-         o1d0YDVGGcaJtJPQSqobd2//tRsG9dd2kkfTlDvpTMw57565AXhfKdkW3pgh1T6FftjB
-         edcg==
+        bh=euAeN1WMdy9qvi9PqNGBZ1npc81wsumgZy+gwaxwfVs=;
+        b=MMR3eoZjl4vEdxjUfwDTk4KCHuWxcr77qJmkuzX6BI1O5MWIMZ4eKzTuVEDghTGw2I
+         TAdnVz7q8cN/okJ9nW+6RayyrOIiEEy6beTVTYhKl3Ty31uBijHIkmnTaHnFTpZDlf5A
+         6b2lNDG4RPEKInxgbcEzDRM0gokvo2aNFUvyHu6HCDySEFrgs9QiNp1yKNA1O9kcDmg/
+         9CycitBs3AFpkoDN8895e1h8EJ9MBfS0HHbeMvzJkMFmp0TitzeZ9qP5IHeEMGyQjpQT
+         ZyjP23mRUacPEeoLIU30kBFphTBejIbUh7yRFPdZXMxkgim26b+ypuGkJJ+XynOuYuP3
+         PF9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794946836; x=1795551636;
+        d=1e100.net; s=20260707; t=1794946837; x=1795551637;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=xKgb9ZS2KNfuSDJtqHp4Vi833hjt+EUPqL7Hov729wk=;
-        b=YJk4lr1N8aHVpqKTB6z1moGaOPnvw6b0z7dbFzN+US5fd8Yfx5RjkMD3Hp6nVWsRPm
-         rx5ECVGx2XsLft1JvtLWvdbQ4lAm+wMNsFHOK0qkmvl+BBONl4Da1saZX7z61Cst6Rnk
-         yUhbtMpZaViI6idAOAwrCjYn9XXsoD/M4Bhhfsm264AxRzVhTcGLCPOZwrkziJ3bUs5I
-         TxAK7eG3YyY8rDnoN5wtxn12D2ec1uDF9SaO/jTk0FKz4DPfejCOnYjBd8qtrbHnzHaE
-         5hI/lHIG5bvFuxGEnxZ3HoJBl0PBjOQl6mGgqQqIwravDsoE5F7nEoKEYE4jfNGwhFIB
-         MH6w==
-X-Gm-Message-State: APuU4Z+OAAqbgSWymaDNDXKTmWlDgxM5un3KhHHV+H0JI3iW3PO2UoxQ
-	qirgEiw5FbIsE/TYQ6P7o0Wa1+Xl2J95ArU22HnVh5IeUcBNYXZJvcOWg3v46A==
-X-Gm-Gg: AYBFou3D6+Q+3KKIQWcNIBprmgU4aXYM3gg6qPOowryVMJHsN3MeCrXY1yRVcyHlOmP
-	xJe5bGxzFNsQ3fiGXL7VoSFo9XUvLnRb7XqpTX5WWlXWARAvlm0WdFs98fA+b4YtwLpxPlxasdR
-	EKdD3y0NYL1/JL7TkH/nuKLtJgmK1EOO+0OYYcweG8031T9gmdqwPvb7khQ7h/3UWyRzBAxJPsq
-	/ZPS2qg/D+9KV4wcTnle+y8weXxC5j3czkE6lHEotfPLQvx85VtkaVi2qjZSW0/oxjYix4CGNmP
-	EzUYB5BuMaBKEtlvVYCHXNEFpmZHvsXFu9EQyHN8WIdWwbgqWxNzYYAEHCzm5aBbAGDzuChmW+Z
-	4yiBOs/AgNZNre1+/psWyVKmIUFLsl+HFG7CgP1IJgly9CDT5Nohvm2oaWnYQ7NZHsv7ScdXRHY
-	2rj3EZTDMGbWtd+XRN+z/rdwMHKbi8ww8HjA9EuxcoOIgpxZf8fGKDTaihPhTp3iP2f591oo6vk
-	0opUfLzcHpHdsJAHymBeefwYRWneJhlx1CnNH32u97+6DT9EHE5mPB8z+xaIljfpPo93tIicQiA
-	62+9Awe3I6ksuP2et1cpH0duuLBiNsCSjgBGwhRN5kEjxKwuoSl8Qwx400vQBt6+Ch4BT32FWo4
-	s9iyvVHw76vQtYXXKeaAMC9HcLlPN568I0Y9MqUhndWJFrT27+RNlrEFp8ChJ/Leo3CuGjzOEZM
-	qE+qY=
-X-Received: by 2002:a05:6102:4426:b0:7cf:61e8:c508 with SMTP id ada2fe7eead31-7d6ba465f8emr57697137.21.1794946836412;
-        Tue, 17 Nov 2026 12:20:36 -0800 (PST)
+        bh=euAeN1WMdy9qvi9PqNGBZ1npc81wsumgZy+gwaxwfVs=;
+        b=2srpgWTrAGw20q7lr5BFR3pNzZYjtTmqXYfB62zJyKLliTMYB6Z9boANonJAVcu0bd
+         onyx+l3Wx6j1k0hFIqdXmI5OM+Lv5EYoV4Ayd0Q4RRB+DprLeHBwIXWuto04rgAYaiZx
+         qeeTeDFQplRrGq2rMjzdaki/md+J9Xx5V5MPKHEoCC7RadmwXNFMzqof7nWAOboo/pKV
+         5NeUjv7O4qxXJZWFP/jdHdGZ7bJrvN4MybJ/crmYSASVr0dY2ZoTMAQw/YVbMM++ThFQ
+         oqwjseUAljOw1P92PtjTqJLKPGq04+HFzNsxctReh8dOvg04s2TROmujIlZakx2pLvPf
+         hgFA==
+X-Gm-Message-State: APuU4Z8hQ4Mg8JfYpXprmFCi3007OGlC4mBwPW/LRG4tr/K89DEPXISE
+	6FzQbFdHCpzgGVVGTY6K4mdK4WoL4Z8wqDgx0fNrVXg/tfP94S1T+GTmULmFBQ==
+X-Gm-Gg: AYBFou1e8tw5dn+EYSxmiReiS9gQ3X3rui/VkESB5rCVpyomB71N1xZn9SzhjLeo/J8
+	ZHZ7mO7k5r8fLpPaxIG7XYX9KPq/nB8LT5ztd09DfbwENI0YjKVtesnzF8SNro2Du1p2HLb94RM
+	HA4jq3wJ8xu0KwM5G2q0/0gdsserB7ru5HJBAiA2F+n4ZvO6Zv8UUmoLPVzHlkzBHWZMNtkZeVI
+	SggjI1jm9me3Xpf0X4eQ5n/XFR48RctCImkKWXRTTCSaJJmFSQVD0nhAdTqC1l3hSqLkV4UUqRu
+	87qkklsgvpLv+ooKMbcJ6qVcn0+B45xsVbm9MVNqC2ZWzfZLfMa7iOXdzmtgZaSN3Fb4XcwaGZV
+	oi6lmIHcDVxtItiVALfWx9Voy+JnRu47Z/WDGlI8cqWPQ+nk5ts2lR1xIrRQ91Ufdis1rD3OJBC
+	rfI1I0ht5bPibWYgm7htoCF/AYx644MxOoc5+48J68xmmrhhDHggsTgoM04yNdt6KN1PzZWTWPF
+	I7Y5tvLuWB5fW+tWLE9fNoZwKhf5Q9PJJAB78YlJ08TZjbiz+Qe0MVcQ3We5ogo+/tgknpocLQH
+	XOAWhpfrIyzBxpCPdSCLjzZDPCEZrpWkDDPK54iY9X39yv8s3XD3QASBwoUPG2x42LHlNSPShJu
+	f6rMndXcVdElbFPgqCUMM2wqSJAHWDcgUfN62xR72+IcKqEjtyylWm5y3a6jk3N4myY4qhYmcDR
+	Xx2+2LQ5KcuH1i7I6zkQ35Pxca
+X-Received: by 2002:a05:6102:441a:b0:7c3:1898:e8e2 with SMTP id ada2fe7eead31-7d6ba373012mr62053137.13.1794946837195;
+        Tue, 17 Nov 2026 12:20:37 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b935ddf3sm303166137.11.2026.11.17.12.20.35
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b935ddf3sm303166137.11.2026.11.17.12.20.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 12:20:35 -0800 (PST)
+        Tue, 17 Nov 2026 12:20:36 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/17] Bluetooth: mgmt: Fix read_index_list() buffer overflow
-Date: Tue, 17 Nov 2026 15:20:16 -0500
-Message-ID: <20261117202032.3848411-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 02/17] Bluetooth: hci_core: Take req_sync lock in hci_power_on()
+Date: Tue, 17 Nov 2026 15:20:17 -0500
+Message-ID: <20261117202032.3848411-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261117202032.3848411-1-luiz.dentz@gmail.com>
 References: <20261117202032.3848411-1-luiz.dentz@gmail.com>
@@ -101,36 +101,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The first pass counts only configured controllers, but HCI_UNCONFIGURED
-can change before the second pass, which may then write more entries than
-were allocated. Size the buffer from the total number of controllers as
-read_unconf_index_list() already does.
+hci_powered_update_sync() issues synchronous HCI commands but was called
+without hci_req_sync_lock(), racing with other request users.
 
-Reported-by: sashiko.dev (linux-7841362e-9b8f-465f-aa22-e99c315231e2)
-Fixes: 73d1df2a7a10 ("Bluetooth: Add support for Read Unconfigured Index List command")
+Reported-by: sashiko.dev (linux-1baf7393-3aeb-4fa5-806f-19cea743b9f3)
+Fixes: cf75ad8b41d2 ("Bluetooth: hci_sync: Convert MGMT_SET_POWERED")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/mgmt.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6ed3bf6f1738..fc0be4ca033f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -444,10 +444,8 @@ static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 	read_lock(&hci_dev_list_lock);
- 
- 	count = 0;
--	list_for_each_entry(d, &hci_dev_list, list) {
--		if (!hci_dev_test_flag(d, HCI_UNCONFIGURED))
--			count++;
--	}
-+	list_for_each_entry(d, &hci_dev_list, list)
-+		count++;
- 
- 	rp_len = sizeof(*rp) + (2 * count);
- 	rp = kmalloc(rp_len, GFP_ATOMIC);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0c0180a616d1..9acfee486be0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1010,7 +1010,9 @@ static void hci_power_on(struct work_struct *work)
+ 	    hci_dev_test_flag(hdev, HCI_MGMT) &&
+ 	    hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF)) {
+ 		cancel_delayed_work(&hdev->power_off);
++		hci_req_sync_lock(hdev);
+ 		err = hci_powered_update_sync(hdev);
++		hci_req_sync_unlock(hdev);
+ 		mgmt_power_on(hdev, err);
+ 		return;
+ 	}
 -- 
 2.56.0
 
