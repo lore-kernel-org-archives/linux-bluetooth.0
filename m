@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794941414;
-	b=suA05oXadIPQpWde6gpJDeGAMnP+tcbqnxYDxt2btimg1Nrb4DV9Yk31AuTXUjZvm526
-	 vvfJJkH9weew02BzX40iRjCov+g6UJR+YVdn1D5fQ6BH0CBqZaG3Uq9MkOIKvrWA7Yx5v
-	 NNz1Do3wsvemiDRRDE8J7vwdWlk3mPwIC58pM83vD9+CE0V1k+V2cqBw3slIKnPOh787s
-	 5rRI/+GD/6tD668S6NKDrS31l1RxllINCBUUVB3MfnQpyuEII/0mApMLkwCYR0GzJ/FJb
-	 aHskgGFbAmWz7yyRvexxuq8puDU/aGv3rI9j66BoPYfo6EShX6btz09ymVPdh/dk81Q==
+	t=1794941415;
+	b=AMOfxqod9wAEO2x1CeA+QNw6V48xYgsVAwSZw1iCr/ZXNAqkRweKm+KgvRA6y1bmUhT/
+	 c6eutop/xe39TtYW0/z4KWF8eChM+e9SrAFkKl0Tzqsh6cCpbKFsoYBqHL+IhYOf78qQL
+	 9/7kiAAsBXn99X/iZBX8VzgF9vb3w2E6VwTRw02Gog5AJCzZ/T6MqlFxHA1k32gKmsw4l
+	 ht35CQsjwsw5q/Z1vFdX2EQaWVl9RYa7JDLAN3nEHF/AiX2aFCdXBCYqrBimn8fqDifxk
+	 0mw6qZEQMcv+7ievVsmfsj3Mx8FWyD8g+PC5YoXtmoInXKgjdEw8GKgTJqwGvAojiJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794941414;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794941415;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=QxzREoDXRU8UXLM18HXJinaU3FjQibYCOqYsQMrJezo=;
-	b=S/cZLaUhiDDOQjJ7UXpWakLYI+xMZXu8g3Isf6SP5elRfWSxKeGdNusaGlSWEOddEiRZ
-	 E4bExkuypGqhrHzux/Ki+TcRp3KZBdzThFOycRlAGTq/PsigVqEAyBZI5T1BGizpNMEZ/
-	 4hJewF3FNUUVxb40eEhnVo2ee2M3tbcqNKVT0fa4d9M2/6MuSlrZZAuXG53goQ2hdXn5P
-	 cGTBZ+rC6BHjoJYL4NQLT6JSFlOXFFUpPYvHFTgqAW7Di62IWfDjwW75Tzkqsw65K0l+E
-	 L77Z2Abd38+vOcwvGhdLIBhMi4qAR80Ch+KkrwxxdnY2CclY6iixhEkNVzBxHZzxncA==
+	bh=vvkpdhsm5tPTWkh49V+/y5Fhff280Shcoe+LvIm2ScQ=;
+	b=gZ3Dn6xOzN7ffmNHzDRg28d/m3uv4E+74Q9qDR7cIBb5nGa0M28lmK4zdy86o8cr60eu
+	 8Saszgj8AP8Jz4QLuGqa4AWwZxjUFInPEyB/l7jD/UObiwQZxFVE22SMJUArHaXbPNhyy
+	 wzWM20ZpE0PoGUMCj4cjeghyCmVXzUzFiZ98scuGMXjF2QmimF95gV9FUNRzLEEns4MsB
+	 lDQ6WPBqbhdLjKC4hx06btL0WyB48G94tJV4EBXxVRMPUIl7Vhw0CeVKco0GIy/lEyPnl
+	 2jA3Qir3lNdnaNqZ6ZKivQQlhzdOiB3RHsE+xZfTofAYolXDTQsk+z3UkLISztLLoyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RlRzSe7g;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eRr3Qyt2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1737606A33A;
-	Tue, 17 Nov 2026 18:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666D6606A338;
+	Tue, 17 Nov 2026 18:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RlRzSe7g
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF00C1F000CB;
-	Tue, 17 Nov 2026 18:50:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eRr3Qyt2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 445E81F000C4;
+	Tue, 17 Nov 2026 18:50:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794941413;
-	bh=QxzREoDXRU8UXLM18HXJinaU3FjQibYCOqYsQMrJezo=;
+	s=k20260515; t=1794941415;
+	bh=vvkpdhsm5tPTWkh49V+/y5Fhff280Shcoe+LvIm2ScQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=RlRzSe7geL9EIXsMFSV4unw8ZCDToRTUU1aWDw6SbUZgNVjSoMQvOuYMo21t5tjjg
-	 V/0peS1kKw40LUbB5ZtHdPwegOAXmmfS7k+nLUeSX4a52kYEvS8+XipzjkSb7k3ogK
-	 qA+LX/AqyXkot+U/lTwb2O6ksvrocDHpfUaz1jrCZ8XXcLlYb9RjDNA0mzdWYl/Xmm
-	 wFmkeqEQvjr/ZuZmzHTplxf38DseAnEiz9oJdCLKApdeo+2PUkAObdSr5XfgDyqMYk
-	 00cTdrgzWu1kyNz1iqJmL4W5zloEhhUnMebpXuDJwMgSaaI4+v92DOTX+OrSIhtPJ8
-	 sU9wKFGmsB6iA==
+	b=eRr3Qyt2x5oY5PgAr+kIsZVyTGkatQLAPrINh4DZgN4fYlpvLt40T6lbCbHO5AZ7b
+	 Wy/H5YVYXbZNyJMg1coEC0HHqNdDxfbRGfXLLayjlAhA8LzOppsQrdispOMQpKgG6W
+	 BcQ/qo71QEkN6S4mzWEhztW/zAh0K4KGLd0Y4PeAsCDWw9wm9rJuScRLYgkoaJUNjl
+	 TFTXsH/RiF6rbQCoSsobVQBTj/xtrd66zaIJs03siPMFIhq9lE2UY5lV+NBtcGyG+7
+	 kQ3o9b4W7S/YnFt9rS6rQESxkjjVwUadvYgz1O5FEr5YPrQDFtvZewfDDujgJ5o0ca
+	 3b8XLLNR1xV5w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B45BB392B1C5;
-	Tue, 17 Nov 2026 18:50:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A2C6392B1C5;
+	Tue, 17 Nov 2026 18:50:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,39 +54,39 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btintel: Don't log unsupported debug features
- as
- an error
+Subject: Re: [PATCH 0/1] Bluetooth: hci_mrvl: Fix duplicate serdev open/close
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179494141227.761488.17080097216959438759.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Nov 2026 18:50:12 +0000
-References: <20261113222024.1123279-1-hex@freenixos.com>
-In-Reply-To: <20261113222024.1123279-1-hex@freenixos.com>
-To: Hex Lindqvist <hex@freenixos.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, pmenzel@molgen.mpg.de,
- abhishekpandit@chromium.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <179494141377.761488.13075669936833601821.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Nov 2026 18:50:13 +0000
+References: 
+ <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
+In-Reply-To: 
+ <179467295518.97469.12346516231160594592.marvell-serdev-v1-0@michaelmcallister.org>
+To: Michael McAllister <me@michaelmcallister.org>
+Cc: markus.probst@posteo.de, luiz.dentz@gmail.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 13 Nov 2026 14:20:24 -0800 you wrote:
-> Since commit af395330abed ("Bluetooth: btintel: Add Intel devcoredump
-> support"), setup sends Read Supported Features (0xfca6) to decide
-> whether to register devcoredump. Older controllers such as the 8260
-> and 8265 reject it with Command Disallowed, so every probe logs:
+On Sat, 14 Nov 2026 16:15:55 +0000 you wrote:
+> Hi Markus, thanks for flagging this!
 > 
->   Bluetooth: hci0: Reading supported features failed (-16)
->   Bluetooth: hci0: Error reading debug features
+> You're right, hci_serdev already opens and closes the port, so the extra
+> calls in the Marvell driver aren't needed. This removes them as a
+> separate fix.
+> 
+> I've build-tested it and checked that the duplicate-open reproducer
+> passes with the fix, but I don't have Marvell hardware to test on.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btintel: Don't log unsupported debug features as an error
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b05fb50e255a
+  - [1/1] Bluetooth: hci_mrvl: Leave the serdev port lifetime to hci_serdev
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c9eb955c4fe2
 
 You are awesome, thank you!
 -- 
