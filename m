@@ -1,130 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794873921;
-	b=X9fN6g80qZklmIAEWoNn48d4lq6bLF3/DxF+tLye6+YnJ4tW3zw8nxtyv0V/LUYC5sO9
-	 ZeUu9r3qSleJ0JWtRGHF2p81Es0AO80zNykZ+FEh5OAGMxl963dsztwpVXcQFiWOiZRLi
-	 POu2ImOlRaU1w22wQA0Z78gM14BiG1U+He3jHh8/is8wBH4R4CMu1qEowiXyWVZTKSJDE
-	 wh8luoCyO27OLqupXsRBdu81LhI5tqbKbeM1CGZIHW8J/IuUDxtIdPF3cQvFa55N7cNKl
-	 +/TXHnDxq7eAL75G8nvYRyZsMdIPaimAIJROZWWEzmPzv6WjXS57taQy/o0dq3b74ew==
+	t=1794882330;
+	b=k9Red9oFDsAjTjfuyUBQ55n7PhvJaJGgqEi7qB+v3TLvHnmEZ1AE/BHO9sWYUUVYAyWM
+	 w5TtJIMuSTuL+4GJfHirtzmGMHEJKurjRTytjvdqXtdQzfh3A0wurZng+H1QFJKJlYCn2
+	 DRZSHTV6A/qs3oxoNiIDQpOOH6XNfzZc0h8+Bzf4i3i0NqC4CFENmvhMtrVDUnG2RgW/S
+	 kkmQTle6wuG2aDxYEmT8CDFhxvKP5Sd4SGHEPXiJkn9J+IFq3/cp+kg9Ei1bV8P1Dhk9B
+	 QO350p805KjRzwrKjHTiM7R9K6KoBNs/hWUwKf10U2yjYmGLSpMMlLDBWwX8PdP4QnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794873921;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794882330;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=eMx+CTkXv1VoOtSvi+6D1nYsmWu0vpvPd8N8huVVt6c=;
-	b=pYaD+DkrMxVgmSaYnaKYmqtrMULIAFmDYNpkNe7pMJ5eXcDu4qP2dWh7kxSo5PiZeGK0
-	 huJkwP6VosWTJdljgpW0bykRRuq5KfzWcP6+3SACmX6D9EWVh0eEX9Ac2ev2sz+zQ7eop
-	 p0TImQfQXSBC+jZ0N10mfjHcp3ZKT3F4Cs9ZTQgvMKiwliQwk7EXDsYW2peNyVBPHloai
-	 trXhTSuE4WXJ6xBgXDiGvgwX7wf8aaQbfY7Dfty/23ROcY4b3xta3tnnFDIWd1W7KEUTI
-	 21brs4faW2of057Q0ZqobEW1dO0Y1ereb5WW8ZvzHhu2ert93MthhC84ykndVK5qO1A==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=nFOZLGQq/PunJ0Ald+0DDA0LnWkNjUnddIJs/2UKqmw=;
+	b=SspJqK0ap0iR8Yx33ciTja71l2b6APVIOeqiDDOZNaXlCRQgjWEyoGB0D67naWJVFUT5
+	 94o1Ef4/2t15Oz4W151Wi4I98BaI7T5ynqY+1HTwuAVlGtGzvPB6u5Qk859EyaP0hqLob
+	 bJsxbIGMznC1jEeEePZFE1e/VZzBWFMwcstiE7tXcDu47fR8YppfHTlPoN3TiVU/zlP3q
+	 +WxAS0AeIWj+dlaQpY3NJC1uaR992fZbTPe/s80GVcdIRiY3mzd1xAgH5XFYuymi8Yj+E
+	 xoHZ2ZBFoDD/cq6jTQH7po4NjW+Olg8D0Kx9XKwHhBYav5vy0KxbKSpEDIU8SWdQfgw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=ziepe.ca;
-	spf=pass smtp.mailfrom=ziepe.ca;
-	dkim=pass header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=o+1molFf;
-	arc=none smtp.remote-ip=209.85.222.180
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Hf+qOxMO;
+	arc=none smtp.remote-ip=209.85.210.54
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EB9606A334
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 00:05:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37EB9606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4BE606A31C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 02:25:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB4BE606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.a=rsa-sha256 header.s=google header.b=o+1molFf
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-949589c1495so334703085a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 16:05:20 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Hf+qOxMO
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-862b3a39d0dso1112392a34.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Nov 2026 18:25:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1794873920; x=1795478720; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=eMx+CTkXv1VoOtSvi+6D1nYsmWu0vpvPd8N8huVVt6c=;
-        b=o+1molFffc9e6T9ddIDnNeseSjzEf2bQKujHs4vpOVw4OzSSGS4YQo8BJrSN9kd667
-         k9JFBOotGGRYa0PkAFx2E0FiQp1pgsnwgn6pcnUL3Eya4+1ObVIZXwVWtTnGOXsLpAKM
-         Qm4w4F5jBIoZdwaJAnrycuNhvr/nMKvlaRPWeoY+KemZwqtCHlIRV3pKlOZAan8ZiPyk
-         dg+rWFVtziAEodqueYjujOY8FQIiLOIqi0nCOki4SNuEx/vo4myxz/px2YhfTxnQyYx8
-         5SnT2fX1BMMsw9KBqqyDMrnK6kEETUe11lAAN+nPzvpxO9VlnJiaiLVZSGU+NSdcdbag
-         q8ig==
+        d=gmail.com; s=20260707; t=1794882329; x=1795487129; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=nFOZLGQq/PunJ0Ald+0DDA0LnWkNjUnddIJs/2UKqmw=;
+        b=Hf+qOxMO5XAIxzFU8PddY0R1DNAeHSAXG7p9OEtY1MHZeh9d3je1/OMNmUMUpvTqmE
+         0T/1u7TiZegzPPsqXfhAJUjP9Q2Uum9nD8M+blwMNEChRjWFeaQHvMxNFj4zv7AYCCq6
+         6iH9TZ1m/MM3HkHUs1dEL2G5go9riynsqg7zMb6t9+nDn/w6TWLjz9FQ1KVL7F2GF9Ho
+         0hi1n8o8uUh0+ILovY+UwgWQgKTXWdxobf5d/vV2sdMzcmhH8lHPBsXCJOEr3fWo5QeT
+         zEc0B0vrCWE9q8D8GzVLvm7hSIdGuAXxMy4XlOhpKtHNz/3XfuBmPGiviipcmn5bZcAG
+         x6dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794873920; x=1795478720;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=eMx+CTkXv1VoOtSvi+6D1nYsmWu0vpvPd8N8huVVt6c=;
-        b=EI9BlMqAc5V8e+Q6Oq02q4zvzo4RYeQOVLZ2/R1hpelB/o+Jc/DOcycxDicebCLuAh
-         Ky7DWouW/uwTjRypW/3uyvid+5fPrEAQISpOCOwCHPAmuaFSKTvO6j05cMA0rFpXchob
-         jm3ITclFSrVustJgiKL7/2fGYi2jlEm3oJBRlZ7yGZZqowxLyAA5UBdP2i63dRG/VIoc
-         Vq4avJw8SAh4hGymsuTptZGvTrnov/uHdNyBfA7adxJArojVY4FT0tx9p4F2GwjRuhTV
-         YZTodXgVPFdoPd/+1iH8ld0DKPberrr24jfbp7/XvoN6DO6PbAoQ18KBhymC3ZU0re3R
-         kQ9A==
-X-Forwarded-Encrypted: i=1; AL+hErESX8wjLLLFKJc2YSdttVwcwHenM4QpFGxMA/qRi1VcK5bgBGHUZsWbmyfA+B4SLyMSQYOfAQcTyaFjzt/eCRg=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/su3XtBqLiPiWZ8YqBO5IN1Ahyg6Gx9F23qIc50mNHcaFu3Nh8
-	3VOkVn3qZ5t37Ohzk7YSvBRcOoeX3GrDaBf+Fyj+tkyd94dzR75TeuOETsv3YrfYPCs=
-X-Gm-Gg: AYBFou3p4u/Hm1lWtn+hizrO8jAuDRA/oZXWCd7ojsZHGaCF+MAtMyTUmFd6O2cCEE2
-	fQ+Lt7gr//+r7wLAJdEG6+gGByiTbdhnOPyqaBsguOgcvUiLJ+JnA0QxR6UNp07d7ripTustWuo
-	cXbi3dDmidFVoppNm46IMGxp5dYhVJ/TG3G2xTu33imHsWmGXDST6znU/hbNwRDicCAJs758wVU
-	WPVo1STuK/F3KHFaZ7KRW/8cbMca722nhLpVNmsbjNdFnKEc+4gYLsVlQIFlaQzvQTGUKuvcOpj
-	Yv42VrKn2jfpDXbiefYfMjFl9Yr2DpCV0lZZzG8hJr7uhhgzg1tXgaIzKV+y1isXxPnSmww9zzM
-	Mwf39kHUgzV7TYNKFVFsjsDOnDtltTDX7Dpt4NZ/QCv0kaYlQE7BnsnnNimNVyBzca8F5AinLZK
-	UhdiahExjjcGwippZG+iteRP+K+uyoZZ4JDJkSc0vHYehkBSTF5Y1uxpyoOhaTpfNYgFlO3ZbEY
-	cFY+Bxnhzu6PDVkHH1B5YI93rZUn7suP/1r/yIrXhFxgE/3VSgqmS9voQ23bGc6Eku7fvJ9fbmS
-	OUvLdA==
-X-Received: by 2002:a05:620a:aa0b:b0:949:7473:b1a5 with SMTP id af79cd13be357-9497473c077mr807892285a.55.1794873920005;
-        Mon, 16 Nov 2026 16:05:20 -0800 (PST)
-Received: from ziepe.ca ([142.166.156.71])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-9494c8b889csm969866585a.32.2026.11.16.16.05.08
+        d=1e100.net; s=20260707; t=1794882329; x=1795487129;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=nFOZLGQq/PunJ0Ald+0DDA0LnWkNjUnddIJs/2UKqmw=;
+        b=Pp7dyp+ZXfzTR7lrKePKsWef+3bVYSGIeYJ2U7raJdZdluACv5lGDxQLNGMq9BLIPA
+         tz89mPm65nfq6AXfTs3Br/ptWoufSeRa6/GdF39Ne6a5EOXru91VVYZv4+pWpym6i6tI
+         sadFq0EbMua7I2CwGsRcCzEWiktIhQvxcBlgOJ8qZRE3AtCe02B8tp4AKivbC6Yan59b
+         Sgu2UHx/xZaBjxh0MSZmLGW7F5NOaCKve1OCQgOTfbyuZgSSRS+IJx3ta2VMFDW1wXx5
+         cP9V11MPQNu/OO6zyYd8KnyBytWuxsWIyRZ4M7nsBu/jlg4Qvs09cMEAxTNESFRNlqrU
+         QUNA==
+X-Gm-Message-State: APuU4Z91ImLDicPc4+Wvv3f4fVLx3Oz27A9QSzhaShFsHyd95AGCmSos
+	77+tkjtKopBe9DC6jkJObVPcRcJpuDDI5QVNUdsZ/IMA/4IjZSdQT9yK1XHh0Q==
+X-Gm-Gg: AYBFou39R+jC3htoRvvtwcOA8ZSbuotlBgQeTmHaDs/LfjeyIm5K730n2Y0ztLkZOAC
+	IvTB+7ntjW6vPO7HcMPZppvS1UXeNOU0yg9eUcF0RcpRbVAp5DrUyIc6GWTV7aw+gVWO76kKPKK
+	EUrgcaSXvQjhJtoAhxLp0abtjyNY+bVaFIYmpXoclTcT6YlKSb6qyMSyWzQPeuAGySKbghbtgsZ
+	ARw8E16U6NdaSVjhapTrAQ2GzYGrntI539npXTeMXgwyKXwmZyHNTGP56nCmGzSvglPB1aRMsoN
+	AcwlvE7ZLoS3JBeV9tSJkz5eQ0G0aJpSxs6kFe4oUc6eKi0ykML7aT4hKX4jtIncGX9eUjfLXhH
+	XxjJHZetCRd5NmFSM29rHSniZgYTTzgktZbDsbvfWNkYxcva/2I/ND5bQinnfvAof5JORmOfPjK
+	88AfhMGbIa5kzG8uckftZoz9FUtMix0bDMmyyYw4N8iniKs+xXt1WTKuTLjITqeDeNGCgapV67F
+	J0VJ4UPzKv9nE08Ned3unsDudKeBM2jNCIJxStb4TCi7fdabBc7MRuHhU2r9g==
+X-Received: by 2002:a05:6830:2b0e:b0:823:38f9:ea5d with SMTP id 46e09a7af769-8628983bae2mr13210419a34.11.1794882328749;
+        Mon, 16 Nov 2026 18:25:28 -0800 (PST)
+Received: from [172.17.0.2] ([20.80.78.129])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-862ae607cf4sm7782589a34.18.2026.11.16.18.25.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 16:05:10 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1xT6h7-0000000Apgy-1pGN;
-	Mon, 16 Nov 2026 20:05:05 -0400
-Date: Mon, 16 Nov 2026 20:05:05 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev
-Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
-Message-ID: <20261117000505.GA2488304@ziepe.ca>
-References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
- <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
- <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com>
- <20261110122237.GG8635@unreal>
- <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+        Mon, 16 Nov 2026 18:25:28 -0800 (PST)
+Message-ID: <6afbbb18.dff45fae.2cfb6a.d46f@mx.google.com>
+Date: Mon, 16 Nov 2026 18:25:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7260908193788994406=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -134,53 +88,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jperlow@gmail.com
+Subject: RE: Bluetooth: btbcm: Add entries for BCM4364B3 UART Bluetooth
+In-Reply-To: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
+References: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 16, 2026 at 05:13:59PM +0000, Robin Murphy wrote:
-> Even with the slightly dubious argument that this series only intends to
-> shuffle the existing PCI code around rather than fully introduce the generic
-> abstraction that it claims to, if the PCI behaviour is still just based on
-> propagating the internal "untrusted" flag plus the new global override, both
-> of which *are* known at add_device time into the common trust state, then
-> there seems little excuse for not doing that up-front so that the new API
-> *can* just work as expected.
+--===============7260908193788994406==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The desired iommu flow is to start out as blocking and create the
-default domain only right before driver binding when we have the
-correct trust level.
+This is an automated email and please do not reply to this email.
 
-If we try to do that without this series then we have to do it all the
-time, which I'm really scared will break some embedded thing that
-expects scanout to work or something like that. My hope was this
-becomes opt-in based on the new command line stuff in this series.
+Dear Submitter,
 
-On the other hand this series works properly on systems without an
-iommu, which is pretty much all CC VMs today.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-There are probably around 15 series to complete all of this PCI device
-attestation. Without everything it isn't really usable, IMHO. I'm not
-that worried about the series ordering.
-> > We have two levels: policy - that describes the default of all devices
-> > for that bus. level - actual decision on how that device is going to be
-> > operated.
-> > 
-> > "Disabled" prevents driver probing until the device is authorized,
-> > "Adversary" permits probing and requests the available protections
-> > for operating an untrusted device.
-> > 
-> > Both need conservative initial IOMMU setup: a disabled device may later
-> > be authorized as adversary, and authorization does not rebuild its IOMMU
-> > domain.
-> 
-> Urgh, I can be absolutely certain I'm not the only one who is going to be
-> confused this way... I see "disabled" and instinctively take it to mean
-> disabling the device_trust *mechanism*, as the logical thing that people
-> will reach for in terms of "I don't care what this new thing is, just get it
-> out of my way and let my drivers work like they always used to; I want to
-> disable the new thing."
+----- Output -----
 
-Maybe "isolated" is a better word?
+error: corrupt patch at line 12
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
 
-Jason
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7260908193788994406==--
