@@ -1,93 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794947252;
-	b=po1WBo1UbV0k38xOMeMMbKzO57/0lWu/X+Seea8F8OkYGbq3UHS8jEx+1/0mZoNYAmDn
-	 e9K0CaqccDBqOhA5h09m7IHHZGPD5R600b9aeYxZNwB9bRiDeVcZ0m/hDSIcbTqBJFLSF
-	 SWtC4bDFXq+N2ZMYV6Vftwe3BhQucTaEATOWS7DSZyV8J3EtO5w2phGyNO8WwvXK9Z6N5
-	 ch6yrkHs3hh5+NF7Q8BiW2oxQtMpbCiKgFIZHGyKStrrcA7Jf56jma34hGrrw+XOp1whP
-	 QC8AoXhPK0Ql3G3L9y403MjkNjBnPevGPhybyfLC1nkRkySbtv7OQGAavo1q5Y09QEg==
+	t=1794953432;
+	b=TAtGoe9ysVgy5/zLPDMwRsOv4HNAqnt51G2p0sZzQBVRupbTYkfqaHqUofWhJmMfUvZM
+	 XIbM0G7ba8nq5JodukzqL09qG7DmFNkBamgVyNxSRKSs4ivKQScjqH1Qd1pvOHYkInJqK
+	 BTFOvrFFnsEI7hjQsENMuZv2yEIrQkS2OScVmgJbpnjSULn4D6pZA5uPNDLejeIYSOGDf
+	 wsyFkA55XVX2JtLaiV8yHM7ZQ9GQIFGZqBvgrdEdNXTtxmNNDlLzzyRGU7s9YyGVmaLFh
+	 STB0aci9FfULhkum01A9N4iVhjH7JZoQat88n+4i6dpP8J6WMQ9kPS3kjqva6ND+yng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794947252;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794953432;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=xlii55PJlBK9f4JtEmyFOBZI3GfQrEGvE6w7xWesQCA=;
-	b=oAqnB+QemClJvE4c9S58Ggxe7I2msUQHkBq9ExgDuVnjy7TcdjwOw0xOyymxtjIp+BXU
-	 96G3HZcz4QKnhmxsAIRyIkF4oAroeB457OBxF6sshCiaEqgjySGg4vWz7VedS0/ajBnCI
-	 98aW0Gbbu77fAYIbao8W4aW9gY9yPNNJpv/62AOlIv5hVxgBvY+YyOYXetsfnTD+s+yvf
-	 Nl160nQaew+jRycQ1/w6Dv9kYvGEluwyqZIer7bEQVEE6SmTjM1lXEKTZYR/1Zh6KxZWD
-	 PNlpEI70DIyv6AfVMHcrPQpEsS7LvWj3Ei5XAtAdchvcP/JM0tV6aiTmQh88+/qQSqA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=tevPNpbLUtGzuRTTREPKimnUj1hX7z+s0TkWFyFrOaI=;
+	b=5SkmtDl+wPYjoNOiBsubFFRqWWhjl+Vv0tepX+X/sRKvZcKlL58fUk5XKDXUL068Pnln
+	 JtYKJQtXttimfPekm+ZlZfk3OrC9C3I338qekBV/SOPgrgiqfOxJsDLeZj4q/sfFP4wEt
+	 4HFhtLunB8XM7LMX5bOGavXXlvJ5SIDR0UEwbfzip/RAQb2qR1lqGwpdMD4jST964Dksb
+	 rvrbqKAiliM1/4MNJSl8o4xiWrVBAG8U+/WKO/FYfaG8BGcxvPuRyMukB5YSxC/geV5Ps
+	 CYAbGNuC8hf4Vjf4tVBLnXBw4OMT2/WuJhbyvu87LcnInE++C/kuv6iaV4zH49kewVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=xmousse.com;
-	spf=none smtp.mailfrom=xmousse.com;
-	dkim=pass header.d=xmousse-com.20260707.gappssmtp.com header.i=@xmousse-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Riq1XDiZ;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ya2sesyX;
+	arc=none smtp.remote-ip=74.125.82.171
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED817606A32C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:27:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED817606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xmousse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=xmousse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B56D606A333
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 22:10:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B56D606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xmousse-com.20260707.gappssmtp.com header.i=@xmousse-com.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=Riq1XDiZ
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-49412eb1474so93201f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 12:27:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ya2sesyX
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-3704d30b84fso626883eec.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 14:10:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=xmousse-com.20260707.gappssmtp.com; s=20260707; t=1794947250; x=1795552050; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xlii55PJlBK9f4JtEmyFOBZI3GfQrEGvE6w7xWesQCA=;
-        b=Riq1XDiZLm7MbwbVecxvibtHqUujYcVP6kH63Iqkf3JG0rtZI+x1J3ZmsXppsR4AhX
-         4nzE0tCg3u7qdOJM9Xr8Pau6QuogEqETzuNMLN3D+ILWYQWfa5wmNLWl2bEPIsA0iEQH
-         lmyPtSfpfm8J2CrdmDlt19pHG8Q6yLZfgps0DMDNe96G2SpsGGaaPuic0/11tet1MFKB
-         K0TLJT75/Qx42psIiH+7yXgOfoY7Oa4XtHDEs7PsAqQ29eTEBHye19XGiPma3O3YgEIJ
-         Txv+RrFSomWuxTxgZdsUmbUyRRZ3ClGhKZwYtUKlb2qSHDhz80fwFEelzDPJmZ/CMA0n
-         /wUw==
+        d=gmail.com; s=20260707; t=1794953431; x=1795558231; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tevPNpbLUtGzuRTTREPKimnUj1hX7z+s0TkWFyFrOaI=;
+        b=Ya2sesyXxLcrv58BRtonv8jTH8JSXrjfktHhQAb6DzgPPJpSsKqanAofBtRpqf+67C
+         BZ0k1kyFKOziUPsneNlpWHd5UJTdMnu+MFmyjRQOs1p/2qgQRPMnsjxDp9/KBfQAOlx0
+         usDIbdnRBYVssOZEnXiAb/5XcY+b0/W/hVk3dleO+iUw8YBvpGrmVQo0KxuWi7HLyohn
+         60lwvunmWHF8YXEsi9AhcO+Y3NwwLPASTJES2aDRwON2N3XpuojUpuIkEkqthbXsoCXu
+         pzedy+1n3m+Td99eRvz7ItfhjkyQqbcWz++jv/3T3Wasuo7omnI4NbCh+iGHUGR8JpEY
+         RH5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794947250; x=1795552050;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xlii55PJlBK9f4JtEmyFOBZI3GfQrEGvE6w7xWesQCA=;
-        b=JWLBMxOugJwLuD0y+43pNAdGHnwcK8o+2q5jTSsO2DMs+T5SKFJ3dKloiYJUGhV43p
-         I0pLtxlw6yutV204rW1ASeSJUj6Ma0qpLWIdj0DuENl6RnaxOVn9V3uk4QJovW2NPeHM
-         5vPJkyW6zV+fW/k+4PVZZqkcwMd3Rr9J5ypDD0ZudvXocf4UDRpyl+IsaK78F60G/zhw
-         Q04MMq1VvWVreO5D4sh6XUnB+xoNfgMyi/usrrnYvfUtZs2G9q2DMj8epvGdphe07e3u
-         Tq4R1IO6fZmTeV/T7o/0WU13wci+bu1E+Ic5mrZM4w4zLWBb1okmDFYhIdQJyIU4DkEA
-         W3Rw==
-X-Gm-Message-State: APuU4Z/Ck4N5CHYE/dQYvHmkiVeKB0u57ssKzUPzhBlTchPbNtWuXJe7
-	uRk3C3Sc9RGtE73cIi5MVSXewVgGdUoZoM98QQWM56W5cboMRNV7ENtuD45BtULh8mXztB1Iq7e
-	BkM21o+U13ZiR
-X-Gm-Gg: AYBFou1lavojAL3o0mPzFcTk1YTeAIumXYMVqqSrbeuc6CuZLzQ001doJB1Gq/Tqj4H
-	k49m45P7slEH1iZ0rYJVkLmlEp2XHIlJ4dRK7a1t4RPaG2m/F2tKEiSwvSYOzB/JKlLV1q4GPLY
-	ZzxctPxKpLB7llyN2bDltb4azyScLhVqnSuEy17AicGDTc8ci3Jjzc0eow+kpQqx3H31b9E4A4P
-	m/Uwjk/HTm2o67gkIJ2ZFun7dj+WudKf18NlRjWApJeHilECD/VzF6bv16DtELwypNNdjMJyw9G
-	qm88895s1Cqa1OnLNOts9VKiRf+lOFOkdrMFPkjMAew1HQ1o3EJCQeHZ3xemDa0Xmpw8pylkcsA
-	QesBimxcfUINLZfLBLC1kheqUhTM5OSd40UhuuMfVr69czT8DzYq3W10J1TS7gT52VfNWvJO4gf
-	52+k7sObczmx5iMAWArHP2XQe/nQId5Wzw9nF74zr//hCFJdTbTDjMgxnL3uyuFwLos7AZmq19d
-	hxoqo9hCMk52a7ZipkFZRHsbqZhvSHx8RznkiRFNN6adDm1M4yl7/NnGX5SDIDhf3f1n0J3fdFk
-	JbGHDnRltpZYRohOrPeab1yqmV5FXmt2wRhivoyo+Q==
-X-Received: by 2002:a05:600c:1553:b0:4a2:677:ad8e with SMTP id 5b1f17b1804b1-4bb7da48319mr4867065e9.34.1794947250237;
-        Tue, 17 Nov 2026 12:27:30 -0800 (PST)
-Received: from peacock.. ([187.15.172.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7ad9430asm70271675e9.15.2026.11.17.12.27.29
+        d=1e100.net; s=20260707; t=1794953431; x=1795558231;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=tevPNpbLUtGzuRTTREPKimnUj1hX7z+s0TkWFyFrOaI=;
+        b=bw2H9VQi1pYOtBCtAfmqWhf5D9uQx+yoSoKOyucPd7fe4O76y3WHZ239nJY10q3gKe
+         aekqK+BDzQbThTZZH63tvYKiZQdykf8tP8gsMbtx7G824uYQlvq93EkXqI6agG8EyNS0
+         r1ysZ3fWa1wi4VKmXCoehnVZvzF+/6bJDq7jq7ScU0J766J9Eoz3wbRg4IiRMjFikYd7
+         MiadBaxp5sFcInM+xDV0LDsllO0VH8d0rhLEQl5FaVYtW4I1frqTvHT/JDOnDl4IFM8H
+         pFSE6LY8GiozZmgFoyLwbvHN3pnwxzRaazwRQXUYjl04kfbNHNmiD+jq41e95018j/oM
+         g2mQ==
+X-Gm-Message-State: APuU4Z9Dy7DutPj8HjUODNj2fu1moIMvUVlScV4Ie4KGitbH2pvezScn
+	zSn4OjKSbI6BstlvcakKOlhn/4mB8gbnjc1DiuUwctXKnc9Buc56yib1Cvtwcg==
+X-Gm-Gg: AZFdTZfrYzM2FtNcFZ892EA4h06nc3mxf0F2/UsHldIK+m5bPqbLHe6TNrPSZOSFJzZ
+	n5WSyYVzqWpzhMDmMIZU/n5Jouj5RbU+VirQDtN+mGKISPL4OJdR1sAmjIe9syX+PhaP7xHJe0G
+	jM4RV0jmpIF1zXRb/TkgS1Wb6gviaePnwX0sbXfijExT2f1giUiHQBXGaLH15lWVEPpwo/uWrJW
+	BB5PW/UVy/fDdMQuWjdPUbD55M3Fffg4H/Udq6FTdlnUjzggH+HGeO4qavUueUlIC7PKd0HKHLs
+	vM1UchyyX9ZeG+iar90h79pjpSC9cgV22gcpA6uw9FtR8tgQB8vAB1C5aj3p4yeZvFZG4uVqE7Y
+	GIyvzOJtADpCESp1H/bqMZaHAkbj3ZiRgILzTzUAAkrM95LVUNX+9sBU6Y6qtbML+6IksOrEcYQ
+	xrX434zkmccx+DRloWwWN86aRhdrrUStYDK23ipRPi5RDz6kD4tjohllPGKmnNKYU07iXRiwnMk
+	UPlMXARVMqu3zIqBzT42HfdtC2Ex9Ns3t/E/0oxs63XUnZSHg8o6PUcPG5z
+X-Received: by 2002:a05:693c:87c5:10b0:369:d8e1:7bb6 with SMTP id 5a478bee46e88-38281427766mr661322eec.25.1794953430519;
+        Tue, 17 Nov 2026 14:10:30 -0800 (PST)
+Received: from [172.17.0.2] ([4.236.88.118])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-382a630517asm869746eec.8.2026.11.17.14.10.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 12:27:29 -0800 (PST)
-From: Ofir Mano <ofir@xmousse.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Ofir Mano <ofir@xmousse.com>
-Subject: [PATCH] Bluetooth: add passive-discovery quirk for Intel 9460/9560
-Date: Tue, 17 Nov 2026 20:22:38 +0000
-Message-ID: <20261117202632.49924-2-ofir@xmousse.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261117202632.49924-1-ofir@xmousse.com>
-References: <20261117202632.49924-1-ofir@xmousse.com>
+        Tue, 17 Nov 2026 14:10:29 -0800 (PST)
+Message-ID: <6afcd0d5.e5646aef.317ab9.d0da@mx.google.com>
+Date: Tue, 17 Nov 2026 14:10:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2938008888875114968=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,151 +88,49 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kevin@simpleble.org
+Subject: RE: Bearer.LE1: Add ReadRSSI
+In-Reply-To: <20261117182151.73722-2-kevin@simpleble.org>
+References: <20261117182151.73722-2-kevin@simpleble.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Some Intel 9460/9560 (8087:0aaa) controllers stop reporting connectable
-advertisers after the first active-scan SCAN_REQ/SCAN_RSP exchange, and
-do not report them again until the controller is reset.
+--===============2938008888875114968==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-With WebAuthn hybrid (caBLE) this is fatal: the phone advertises a
-connectable ADV_IND carrying the FIDO service data, the controller
-reports it once, and every later operation times out even though the
-phone keeps advertising.  btmon shows the controller emits no
-advertising report at all on failing attempts, i.e. the loss is before
-the kernel's report path.
+This is automated email and please do not reply to this email!
 
-The same controller and firmware build work on Windows, which uses
-passive scanning for discovery; Linux uses active scanning and hits the
-controller state.
+Dear submitter,
 
-Add HCI_QUIRK_PASSIVE_DISCOVERY and set it for 8087:0aaa.  When set,
-discovery requests LE_SCAN_PASSIVE, and process_adv_report() delivers
-passive reports during DISCOVERY_FINDING -- the existing passive filter
-would otherwise drop them before they reach userspace.  Other controllers
-are unchanged.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1214175/
 
-Trade-off: on affected controllers, scan-response-only data (device
-names, service UUIDs carried only in the SCAN_RSP) is not available
-during discovery.  This matches how the vendor stack drives the same
-hardware.
+---Test result---
 
-Tested on Intel 9460/9560 (8087:0aaa), firmware 169 (2024-08-13):
-  - before: first hybrid operation succeeds, subsequent ones fail until
-    a controller reset;
-  - after: ~1 failure(timeout) in 18 consecutive operations.
+Test Summary:
+CheckPatch                    PASS      1.64 seconds
+GitLint                       PASS      1.07 seconds
+BuildEll                      PASS      20.03 seconds
+BluezMake                     PASS      299.11 seconds
+MakeCheck                     PASS      14.27 seconds
+MakeDistcheck                 PASS      151.49 seconds
+CheckValgrind                 PASS      366.42 seconds
+CheckSmatch                   PASS      303.24 seconds
+bluezmakeextell               PASS      102.59 seconds
+TestFunctional                PASS      1228.02 seconds
+IncrementalBuild              PASS      331.98 seconds
+ScanBuild                     PASS      1143.51 seconds
 
-Link: https://bbs.archlinux.org/viewtopic.php?id=298396
-Link: https://discussion.fedoraproject.org/t/intel-bluetooth-wont-scan-ble-device-works-on-windows-blank-scan-on-linux/196326
-Link: https://issues.chromium.org/issues/41485480
-Link: https://bugzilla.redhat.com/show_bug.cgi?id=2267051
 
-Signed-off-by: Ofir Mano <ofir@xmousse.com>
+
+https://github.com/bluez/bluez/pull/2843
+
 ---
- drivers/bluetooth/btusb.c   |  7 ++++++-
- include/net/bluetooth/hci.h | 15 +++++++++++++++
- net/bluetooth/hci_event.c   |  9 ++++++++-
- net/bluetooth/hci_sync.c    |  6 +++++-
- 4 files changed, 34 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a6ab059..f7e3018 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -69,6 +69,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_ACTIONS_SEMI		BIT(27)
- #define BTUSB_BARROT			BIT(28)
- #define BTUSB_BROKEN_EXT_SCAN		BIT(29)
-+#define BTUSB_INTEL_PASSIVE_DISCOVERY	BIT(30)
- 
- static const struct usb_device_id btusb_table[] = {
- 	/*
-@@ -517,7 +518,8 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
- 						     BTUSB_INTEL_BROKEN_SHUTDOWN_LED },
--	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_COMBINED },
-+	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_COMBINED |
-+						     BTUSB_INTEL_PASSIVE_DISCOVERY },
- 
- 	/* Other Intel Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
-@@ -4356,6 +4358,9 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 		if (id->driver_info & BTUSB_INTEL_BROKEN_SHUTDOWN_LED)
- 			btintel_set_flag(hdev, INTEL_BROKEN_SHUTDOWN_LED);
-+
-+		if (id->driver_info & BTUSB_INTEL_PASSIVE_DISCOVERY)
-+			hci_set_quirk(hdev, HCI_QUIRK_PASSIVE_DISCOVERY);
- 	}
- 
- 	if (id->driver_info & BTUSB_MARVELL)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 50f0eef..94c36c6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -340,6 +340,21 @@ enum {
- 	 */
- 	HCI_QUIRK_BROKEN_LE_CODED,
- 
-+	/*
-+	 * When this quirk is set, LE discovery uses passive scanning.
-+	 *
-+	 * Some Intel controllers stop reporting connectable advertisers after
-+	 * the first active-scan SCAN_REQ/SCAN_RSP exchange, until the
-+	 * controller is reset. This breaks caBLE (WebAuthn hybrid) passkeys:
-+	 * the connectable advertisement is reported once and then never
-+	 * again. Passive scanning avoids the exchange and reports the advert
-+	 * reliably.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_PASSIVE_DISCOVERY,
-+
- 	/*
- 	 * When this quirk is set, the HCI_OP_READ_ENC_KEY_SIZE command is
- 	 * skipped during an HCI_EV_ENCRYPT_CHANGE event. This is required
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b39eac1..3aa4c8b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6310,7 +6310,14 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		if (type == LE_ADV_DIRECT_IND)
- 			return;
- 
--		if (!hci_pend_le_action_lookup(&hdev->pend_le_reports,
-+		/* Controllers with HCI_QUIRK_PASSIVE_DISCOVERY use passive
-+		 * scanning only because they stop reporting connectable
-+		 * advertisers after the first active-scan exchange; deliver
-+		 * those reports during discovery instead of dropping them.
-+		 */
-+		if (!(hci_test_quirk(hdev, HCI_QUIRK_PASSIVE_DISCOVERY) &&
-+		      d->state == DISCOVERY_FINDING) &&
-+		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
- 					       bdaddr, bdaddr_type) &&
- 		    idr_is_empty(&hdev->adv_monitors_idr))
- 			return;
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 1101358..9da2404 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6182,6 +6182,7 @@ int hci_inquiry_sync(struct hci_dev *hdev, u8 length, u8 num_rsp)
- static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- {
- 	u8 own_addr_type;
-+	u8 scan_type = LE_SCAN_ACTIVE;
- 	/* Accept list is not used for discovery */
- 	u8 filter_policy = 0x00;
- 	/* Default is to enable duplicates filter */
-@@ -6234,7 +6235,10 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 		filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
- 	}
- 
--	err = hci_start_scan_sync(hdev, LE_SCAN_ACTIVE, interval,
-+	if (hci_test_quirk(hdev, HCI_QUIRK_PASSIVE_DISCOVERY))
-+		scan_type = LE_SCAN_PASSIVE;
-+
-+	err = hci_start_scan_sync(hdev, scan_type, interval,
- 				  hdev->le_scan_window_discovery,
- 				  own_addr_type, filter_policy, filter_dup);
- 	if (!err)
+
+--===============2938008888875114968==--
