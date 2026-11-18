@@ -1,77 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795003458;
-	b=L2Vn5/Yb/kvHC9XdSPvZzcsbl0/cBUwqhN1IuaKxDS9RfEKL8kjNlZNe5AZEDCLsL3Yr
-	 h64w6TYT6x7osMSCMBESx6q/o71Y0l4QMZ9qtP3eHWofWB2THrF4I3jThjzkHu4B/IDnv
-	 JCvKoITkqI8hGA8NB4Ys2ZjcUxzdhH+364SfOHmdsox8B/DpifSy62+KpHVuxL8HLfWia
-	 kFW60i4q2vRmiL8MWf+dzclycFykMgxESeSYoE1oqa4ka9anx8mkjQKAAKFe5VjDnk379
-	 oOwP5JjKZIyML709HNfa0ZyOCUn3JA9ZI08AcIH50RiuCaTQuew+gu4nkIJ58X0XU1A==
+	t=1795005339;
+	b=2hutWG7N6nRs/Aw0GiF254dxHrAskmolK1sTzt4cZm3Xd4aDnhJVR1kE6J4H7l2WYXow
+	 pVHP/JUao55dS6gHiRCBJN2Iys0VFfVvZ29Hsqt5X/ydZA8IxJvJ2rm98oqybS+XEqoNW
+	 C3Ges8k0o8PkEgbO329huVp6LLTxrY9OqsyUUqMej+2iFIM1rklQ3xFpB5zOJC5tp5lL/
+	 5I+p2fo1hRdcH5Aj0fFtjl76StPEQla2YqdeH3bdQJU2+Lz727BC4q7CxGm0CtAFfb2uZ
+	 4JRgqRMU7/Ut5vkstalSTNf5UC5rUyWfHLInStkZT64SMTEJY6DM26a22NaOJ3gYPDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795003458;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795005339;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=DEwCRguiZE3z63KGMStvhTtUY9y5olKkcyufxEvBuO0=;
-	b=gSTM5VbxwrV86o+ekEYQN6470d6nILqM5yj+wt1z+lVc33NISZuzSGmplkYBy1lR2Jyl
-	 ybVlXjJvunLoxTASWGBLE23gpVFHbFiis0MDgfox+UUBxYkHxavHcCE55QvYGbTU3/rwY
-	 0pRExw6mpyMx4ScO5G7tx6LrB3VKrkNfqtANbsNTHZHISpjQudiMaSVyIQx5jXnqsJsWs
-	 S3NezAFRm2Tl++svBrVWDSD/CxtToMJ2HqM8dvh1gk3YaacvDkGz/t2pSW/VJADYJbGW+
-	 2Hh0MZbpaLBL6Rdsi1kE+PEEIzTiISWqj6IYPkWXwG0i/PfssxXrn5ppil+5avAlwCQ==
+	bh=LJABUKTN7kpkN8XdhP9ka8xCIsWxRGSyyuS9ICn+GoM=;
+	b=qCcjCw69R3lZM9QpaLOZ+UMBHhB+qruxkKM8eUT8e9jgvZM31C7Kv+xclyEOvpQgXzqh
+	 LKXaC8QQ4rvByntdkHSWwpkA3wdgWjBwrqurL21NeyfHJVUjjVYbKw0PFfib4kpsmml1d
+	 7Nz9LGbZNdk1vCdV7oG2TsBxbT0yO/Y4jTDkrreQMok4aS7apqZqf3DYVHMEnsz3mWreT
+	 j3na/2SmPoqiVIIpcsLDcr1rVay/DUGQqlPCqWWcobopTG9UeEZh71b5a0/G0mkbKWtxT
+	 Lrn4kqX/5ZffIuvdFsNvJ4gJ2HFpIhGkqahfyKulVFaaxJnjg77ibsTmOHOq61fepUA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jTMcmwO7;
-	arc=none smtp.remote-ip=192.198.163.16
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Nnfms0QW;
+	arc=none smtp.remote-ip=209.85.216.45
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2018C606A320
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 12:04:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2018C606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFDF606A325
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 12:35:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ABFDF606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jTMcmwO7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795003458; x=1826539458;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mvQ1XR/xKtqx0E3V+jyRGZAQ4vKdmFHNBRmTTXpidV8=;
-  b=jTMcmwO7XZhZIjxmRp0keyXF9smCRl4XFZjpv5CRg70oeptPvEG3PHXK
-   eZkqgif6F80z6fdAjmIPQzUQg8V1IsT9gfuP2CRm3w/46Foz0OtsCsnCr
-   zqiv+hYRCaJ82ncGC9K4+fiawHYiqZGhK6qIRmypewBYES/NsxGe95zSA
-   PvrlxByB1oSb3qoNZtZEPcPWRaeYeF/jkvEDrc91VJVc0aqlONWuHGjiu
-   FXgPXvzcGhyQgSl/tGHhe3EJF2apt0g36drFDNXesBYvhhl0vzdSTCqUX
-   AYtMsXk2qb3m54P+a8SRDqjeRU8FCImknixxdfcGoAR6NPlPGvUzREKg1
-   g==;
-X-CSE-ConnectionGUID: d36GMcMeRoaP7wrp6At/pA==
-X-CSE-MsgGUID: 9OjxN4SUQrmM8ZAis6srOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11969"; a="3835160"
-X-IronPort-AV: E=Sophos;i="6.27,219,1787036400"; 
-   d="scan'208";a="3835160"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2026 04:04:17 -0800
-X-CSE-ConnectionGUID: Bz/1/EtoTUiy6EJvs3b9YQ==
-X-CSE-MsgGUID: GsikkHVNTmePNR3ZTESrNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,219,1787036400"; 
-   d="scan'208";a="10116605"
-Received: from weba0534.iind.intel.com ([10.66.226.131])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Nov 2026 04:04:16 -0800
-From: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Sai Teja Aluvala <aluvala.sai.teja@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel: Add UEFI standalone static SAR support
-Date: Wed, 18 Nov 2026 17:25:42 +0530
-Message-ID: <20261118115542.3167414-1-aluvala.sai.teja@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261108093656.3857961-1-aluvala.sai.teja@intel.com>
-References: <20261108093656.3857961-1-aluvala.sai.teja@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Nnfms0QW
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-3b09cc7ed1aso67401a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 04:35:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795005338; x=1795610138; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LJABUKTN7kpkN8XdhP9ka8xCIsWxRGSyyuS9ICn+GoM=;
+        b=Nnfms0QWxkSnJSNcwXez2Rq4hDfI4LE4q0O4T3nrnT9N2vxM5XjmE51txUY4vvVpk1
+         dIW1i/VLRko8c4e2FzvgD1hIbluIr9hCf+NGB50cn+k8qPAYo0ugXCrnOktT35smLh1L
+         MCwsKAjjWbbt6kP1ZlMsfl507Rl4nfgwS+wcDtUUH7zktgpngCCU5XW+A+/JVoyS8HB/
+         KBUfXFXdGO6lgsXD+yB+jz3UW0HkHfXyXUXkEl4vvhG66UvVMp8LWzVNF8wGqR3TrZE0
+         SbDivfHfIsB5zB5v360TeSJ+GNlRRho8Y3ufNVybu9k81AQyR+I/We60nEx36/iJfN1D
+         Qe4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795005338; x=1795610138;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LJABUKTN7kpkN8XdhP9ka8xCIsWxRGSyyuS9ICn+GoM=;
+        b=gHxdnNMX73FSsQddFP3bBn61ks0AHnaUu7jRxuFrZCVyXq7Uoyhb7LJxzHSUMkN38r
+         pO73Zvicg4FJDQKkAznuOMtVeZf1car9hjNb79jI9KEmd+OFmZ40+zQwZEGK3P4vCN3n
+         r4QM/i6SySLXV+5X9thd9jev7UCq7PvIdlWdA3NZV6VNzdktppB58PY2lEUzTsTsv/Mu
+         5mxJED1VkCynmLN/FtSE6tDIa5OJyp0f/pLPTAiz95PM9qZO6cTrlyJKZW3tCtVmGUyw
+         yT3Sb0fff3pTY2ce/5pgoVkN+B+La7ObfejZ82Q70JDReBbcD1QOhDZQtKAhdHcU7ll6
+         liuQ==
+X-Forwarded-Encrypted: i=1; AL+hErH5yKKcs8lM8McNF+oDqgLvjTgJqPHJkbJ4BzyB0nYQN0393ekip+IAgPji9vusFN9HQwsT3qyJc+1oDU8PpEs=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Kf6r4cuJaQtoXR5x//XGRbudrIuQ4wzeaJvneuyvWtu9vZk9U
+	6X45aKY7NS55rZN76yDW1+I0Gih9K6rRW3rgIUnf2w61U0VomBIrl46d
+X-Gm-Gg: AZFdTZcNWMo45qqIZqR2OoLvQpnuLyFXCrKdVtND7bGIoAPRGBJEcWprrSRxhLTgadk
+	i49IpogmL/l4dynrNNuLquymziazZ9ovHBc7QgADZhPaigY4NMtXZA+an3UIqnFzwcsc50UEeCQ
+	30pYdRVL+HqpWjpsebYnh+tzfwFz2vxwPH9lmRXT2W4d3qulahSWe6qfhdeOXXMCU2NQpNjW8NB
+	AoXfu0tXUQctHlkeT7J2YQty5dviif0s+c5vocw52bhuwAU2w76u4yFCBwfBlgOdulW/0yOVWJ/
+	BPkHQxOC7h8yFRyjZJCWtz/m09orOGKmwHf2W+8zxZ2fO/g7wYma/0XXQfR4tGiUhnTrlsVz//x
+	Q2o5wPmhvn6RWyOSoe5bZPjUUtRo1HGHUaH2BKLHvNWJkpb6RxkM9rEAEpGqTBgpvCgyP+9mDRq
+	GDGwWg/QvkUAalqUqz4zD4El28qPGEk56GslWQO3wbCiju7xW+ebIUi6rI2ZAYekWQcAwwWBL7P
+	YTlOjPuNHtd12xCPcPYE7nwa3CLo0rdEuOuXaGzltkbX7o5hTNhzp9O1MpwpXLxxAhAQguJhTh+
+	q9c0W737j7QeQthi3ppo8eK7J8STM1ZQ8nR66FKLySYujqpTUA==
+X-Received: by 2002:a17:90b:1d47:b0:3b0:975b:2256 with SMTP id 98e67ed59e1d1-3b3d07a8e0fmr4090356a91.4.1795005337818;
+        Wed, 18 Nov 2026 04:35:37 -0800 (PST)
+Received: from security.datascience.hku.hk ([175.159.181.20])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3d5570208sm1700937a91.0.2026.11.18.04.35.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Nov 2026 04:35:37 -0800 (PST)
+From: Yu Junzhe <junzheyu1@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Yu Junzhe <junzheyu1@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6] Bluetooth: hci_core: lookup hci_conn on RX path
+Date: Wed, 18 Nov 2026 12:35:33 +0000
+Message-ID: <20261118123533.25-1-junzheyu1@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -83,434 +102,398 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Scorpius Peak2 and later platforms, excluding BlazarI and BlazarIW,
-provide Bluetooth standalone static SAR sub-band limits (BSSS) through
-the UefiCnvBtBSSS UEFI variable. There is no corresponding ACPI BSSS
-configuration. Applying these limits requires SAR to be enabled in
-UefiCnvBtBRDS as well as in BSSS.
+Bluetooth: hci_core: lookup hci_conn on RX path
 
-Read revision 2 UEFI BRDS and BSSS variables using their shared layout.
-Program the BRDS 2.4 GHz limits, then enable standalone SAR and write
-the BSSS per-chain sub-band limits. Send SAR initialization complete
-after any UEFI DDC attempt, including failures, while preserving the
-original error.
+Backport of 79a2d4678ba9 ("Bluetooth: hci_core: lookup hci_conn on RX
+path") for linux-6.6.y. Adapted to this tree: 6.6 still pulls ACL, SCO,
+and ISO headers with skb_pull(), and sco_conn / iso_conn have no kref,
+so the SCO and ISO paths take hci_conn_get() under hci_dev_lock and
+hci_conn_put() on every exit. The L2CAP change matches upstream: look
+the handle up under hci_dev_lock, call hci_conn_enter_active_mode()
+there, and take l2cap_conn_hold_unless_zero() before dropping the lock.
 
-Reuse the existing SAR DDC helpers and configure UEFI SAR before the
-existing ACPI BRDS path. Keep the ACPI platform and revision checks
-unchanged and run ACPI handling independently of the UEFI result.
+hci_acldata_packet() looks the connection up, drops hci_dev_lock, and
+calls l2cap_recv_acldata() on the raw pointer. The first access there
+is hci_dev_lock(hcon->hdev). The hash lookup takes no reference, and
+bt_link_release() frees the object with kfree() from hci_cmd_sync_work.
+SCO and ISO have the same shape.
 
-Signed-off-by: Sai Teja Aluvala <aluvala.sai.teja@intel.com>
+CVE-2025-68304. Only 6.6.162 was checked.
+
+Tested on Linux 6.6.162 KASAN with /dev/vhci. A userspace racer does an
+outgoing high-security L2CAP connect, floods ACL data while the
+connection is still hashed, then completes HCI_Disconnect with status
+0x1f so hci_conn_del() runs on hci_cmd_sync_work. The unpatched
+campaign kernel (6.6.162 #3) printed:
+
+  BUG: KASAN: slab-use-after-free in l2cap_recv_acldata+0xcc8/0xe60
+
+Read of size 8 by kworker/u17:0 on hci_rx_work. Allocated in
+__hci_conn_add from hci_connect_acl / l2cap_sock_connect, freed in
+bt_link_release from hci_cmd_sync_work, last related work
+hci_cs_auth_requested. The same program on the patched kernel
+(6.6.162 #1) finished 99 connect/auth/disconnect rounds and 1589888
+ACL frames with no KASAN report.
+
+Cc: stable@vger.kernel.org # 6.6.162
+Signed-off-by: Yu Junzhe <junzheyu1@gmail.com>
 ---
-Changes in v3:
-- Check GLUI/ACPI GLAI lock status before applying UEFI SAR data, following
-  the iwlwifi policy, with a write-protection probe on non-x86 when unknown.
-- Add debug diagnostics for expected UEFI variable skips and retain warnings
-  for unexpected read failures.
-- Report setup and completion failures together while preserving the original
-  setup error.
-- Clarify BRDS/BSSS semantics, DDC 0x019e handling, and UEFI/ACPI BRDS
-  precedence; remove the redundant BZRI exclusion and use kernel comment style.
-- Expand BSSS in the commit description and clarify that it has no ACPI
-  equivalent.
+ include/net/bluetooth/hci_core.h | 19 +++++++----
+ net/bluetooth/hci_core.c         | 69 ++++++++++++++--------------------------
+ net/bluetooth/iso.c              | 29 ++++++++++++++---
+ net/bluetooth/l2cap_core.c       | 23 +++++++++++---
+ net/bluetooth/sco.c              | 36 +++++++++++++++------
+ 5 files changed, 105 insertions(+), 71 deletions(-)
 
-Changes in v2:
-- Attempt SAR initialization complete after any UEFI DDC attempt, including
-  error paths, while preserving the original error.
-- Clarify BRDS/BSSS DDC semantics, initial mode independence, ACPI coexistence,
-  and CNVr coverage with firmware-confirmed comments.
-
- drivers/bluetooth/btintel.c | 348 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 331 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index a0aa110f4cddd91bcc73bb6f453aca95db995273..a20330c429510aa32cf3a9a5dbca6e080874992e 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -29,6 +29,38 @@
- #define ECDSA_HEADER_LEN	320
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 62804d98d..7a2729f86 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -837,11 +837,12 @@ extern struct mutex hci_cb_list_lock;
+ /* ----- HCI interface to upper protocols ----- */
+ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int l2cap_disconn_ind(struct hci_conn *hcon);
+-void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++int l2cap_recv_acldata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb,
++		       u16 flags);
  
- #define BTINTEL_EFI_DSBR	L"UefiCnvCommonDSBR"
-+#define BTINTEL_EFI_BRDS	L"UefiCnvBtBRDS"
-+#define BTINTEL_EFI_BSSS	L"UefiCnvBtBSSS"
-+#define BTINTEL_EFI_GLUI	L"UefiCnvCommonGLUI"
-+
-+static efi_guid_t btintel_efi_sar_guid =
-+	EFI_GUID(0x42780dd5, 0x9a7d, 0x404c,
-+		 0x80, 0xe4, 0x7f, 0x70, 0x94, 0x36, 0x03, 0x94);
-+
-+static efi_guid_t btintel_efi_glui_guid =
-+	EFI_GUID(0x6c5bed75, 0x0ee8, 0x4d45,
-+		 0x98, 0x0b, 0x4d, 0x81, 0x31, 0xba, 0x84, 0xb5);
-+
-+enum btintel_uefi_lock_status {
-+	BTINTEL_UEFI_LOCK_UNLOCKED,
-+	BTINTEL_UEFI_LOCK_LOCKED,
-+	BTINTEL_UEFI_LOCK_TEST_MODE,
-+	BTINTEL_UEFI_LOCK_UNKNOWN,
-+};
-+
-+struct btintel_uefi_glui {
-+	u8 revision;
-+	u8 guid_lock_status;
-+} __packed;
-+
-+/* BRDS and BSSS revision 2 use the same 19-byte UEFI layout. */
-+struct btintel_uefi_sar {
-+	u8 revision;
-+	__le32 mode;
-+	__le32 inc_power_mode;
-+	u8 chain_a[5];
-+	u8 chain_b[5];
-+} __packed;
- 
- enum {
- 	DSM_SET_WDISABLE2_DELAY = 1,
-@@ -3093,6 +3125,123 @@ static union acpi_object *btintel_acpi_get_bt_pkg(union acpi_object *buffer)
- 	return ERR_PTR(-ENOENT);
- }
- 
-+static int btintel_acpi_get_sar_lock_status(struct hci_dev *hdev, u8 *lock_status)
-+{
-+	union acpi_object *buffer = NULL, *pkg;
-+	acpi_status status;
-+	int i, ret = -ENOENT;
-+
-+	status = btintel_evaluate_acpi_method(hdev, "GLAI", &buffer, 2);
-+	if (ACPI_FAILURE(status))
-+		return ret;
-+
-+	if (buffer->package.elements[0].type != ACPI_TYPE_INTEGER ||
-+	    buffer->package.elements[0].integer.value != 0) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	for (i = 1; i < buffer->package.count; i++) {
-+		union acpi_object *domain;
-+
-+		pkg = &buffer->package.elements[i];
-+		if (pkg->type != ACPI_TYPE_PACKAGE || pkg->package.count < 2)
-+			continue;
-+
-+		domain = &pkg->package.elements[0];
-+		if (domain->type != ACPI_TYPE_INTEGER ||
-+		    domain->integer.value != BTINTEL_BT_DOMAIN)
-+			continue;
-+
-+		pkg = &pkg->package.elements[1];
-+		if (pkg->type != ACPI_TYPE_INTEGER ||
-+		    pkg->integer.value > BTINTEL_UEFI_LOCK_TEST_MODE) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		*lock_status = pkg->integer.value;
-+		ret = 0;
-+		break;
-+	}
-+
-+out:
-+	kfree(buffer);
-+	return ret;
-+}
-+
-+#endif /* CONFIG_ACPI */
-+
-+static u8 btintel_uefi_get_sar_lock_status(struct hci_dev *hdev)
-+{
-+	struct btintel_uefi_glui glui;
-+	unsigned long size = sizeof(glui);
-+	efi_status_t status;
-+	u8 lock_status = BTINTEL_UEFI_LOCK_UNKNOWN;
-+
-+	if (IS_ENABLED(CONFIG_EFI) &&
-+	    efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE)) {
-+		status = efi.get_variable(BTINTEL_EFI_GLUI,
-+					  &btintel_efi_glui_guid, NULL,
-+					  &size, &glui);
-+		if (status == EFI_SUCCESS &&
-+		    size == sizeof(glui) &&
-+		    glui.revision == 0 &&
-+		    glui.guid_lock_status <= BTINTEL_UEFI_LOCK_TEST_MODE)
-+			lock_status = glui.guid_lock_status;
-+	}
-+
-+	if (lock_status == BTINTEL_UEFI_LOCK_LOCKED ||
-+	    lock_status == BTINTEL_UEFI_LOCK_TEST_MODE)
-+		return lock_status;
-+
-+#ifdef CONFIG_ACPI
-+	if (btintel_acpi_get_sar_lock_status(hdev, &lock_status))
-+		bt_dev_dbg(hdev, "Unable to determine UEFI SAR table lock status");
-+#endif
-+
-+	return lock_status;
-+}
-+
-+static int btintel_uefi_check_sar_variable(struct hci_dev *hdev,
-+					   efi_char16_t *name,
-+					   struct btintel_uefi_sar *sar,
-+					   u32 attributes, u8 lock_status)
-+{
-+	efi_status_t status;
-+
-+	if (lock_status == BTINTEL_UEFI_LOCK_LOCKED ||
-+	    lock_status == BTINTEL_UEFI_LOCK_TEST_MODE)
-+		return 0;
-+
-+	if (lock_status == BTINTEL_UEFI_LOCK_UNLOCKED) {
-+		bt_dev_dbg(hdev, "UEFI SAR variable is not locked");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (IS_ENABLED(CONFIG_X86) || IS_ENABLED(CONFIG_X86_64) ||
-+	    IS_ENABLED(CONFIG_X86_32)) {
-+		bt_dev_dbg(hdev, "UEFI SAR variable lock status is unknown");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (!attributes || !IS_ENABLED(CONFIG_EFI) ||
-+	    !efi_rt_services_supported(EFI_RT_SUPPORTED_SET_VARIABLE)) {
-+		bt_dev_dbg(hdev, "Unable to verify UEFI SAR variable lock");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	status = efi.set_variable(name, &btintel_efi_sar_guid, attributes,
-+				  sizeof(*sar), sar);
-+	if (status == EFI_WRITE_PROTECTED ||
-+	    status == EFI_SECURITY_VIOLATION ||
-+	    status == EFI_ACCESS_DENIED)
-+		return 0;
-+
-+	bt_dev_dbg(hdev, "UEFI SAR variable is writable or its lock is unknown");
-+	return -EOPNOTSUPP;
-+}
-+
- static int btintel_send_sar_ddc(struct hci_dev *hdev, struct btintel_cp_ddc_write *data, u8 len)
- {
- 	struct sk_buff *skb;
-@@ -3107,6 +3256,25 @@ static int btintel_send_sar_ddc(struct hci_dev *hdev, struct btintel_cp_ddc_writ
+ #if IS_ENABLED(CONFIG_BT_BREDR)
+ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
+-void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
++int sco_recv_scodata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb);
+ #else
+ static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  __u8 *flags)
+@@ -849,23 +850,29 @@ static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
  	return 0;
  }
  
-+/*
-+ * btintel_send_sar_rev2_band - send DDC command for one Rev2 sub-band
-+ *
-+ * Each DDC 0x0311-0x0316 carries 2 bytes: [ChainA_value, ChainB_value].
-+ * cmd->len = 4  (2 id + 2 data)
-+ * HCI total  = 5 bytes (1 len + 4)
-+ */
-+static int btintel_send_sar_rev2_band(struct hci_dev *hdev,
-+				      struct btintel_cp_ddc_write *cmd,
-+				      u16 id, u8 chain_a, u8 chain_b)
-+{
-+	cmd->len = 4;
-+	cmd->id = cpu_to_le16(id);
-+	cmd->data[0] = chain_a;
-+	cmd->data[1] = chain_b;
-+	return btintel_send_sar_ddc(hdev, cmd, 5);
-+}
-+
-+#ifdef CONFIG_ACPI
- static int btintel_send_edr(struct hci_dev *hdev, struct btintel_cp_ddc_write *cmd,
- 			    int id, struct btintel_sar_inc_pwr *sar)
+-static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
++static inline int sco_recv_scodata(struct hci_dev *hdev, u16 handle,
++				   struct sk_buff *skb)
  {
-@@ -3260,23 +3428,6 @@ static int btintel_set_mutual_sar(struct hci_dev *hdev, struct btintel_sar_inc_p
++	kfree_skb(skb);
++	return -ENOENT;
+ }
+ #endif
+ 
+ #if IS_ENABLED(CONFIG_BT_LE)
+ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
+-void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags);
+ #else
+ static inline int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  __u8 *flags)
+ {
  	return 0;
  }
+-static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
+-			    u16 flags)
++
++static inline int iso_recv(struct hci_dev *hdev, u16 handle,
++			   struct sk_buff *skb, u16 flags)
+ {
++	kfree_skb(skb);
++	return -ENOENT;
+ }
+ #endif
  
--/* btintel_send_sar_rev2_band - send DDC command for one Rev2 sub-band
-- *
-- * Each DDC 0x0311-0x0316 carries 2 bytes: [ChainA_value, ChainB_value].
-- * cmd->len = 4  (2 id + 2 data)
-- * HCI total  = 5 bytes (1 len + 4)
-- */
--static int btintel_send_sar_rev2_band(struct hci_dev *hdev,
--				      struct btintel_cp_ddc_write *cmd,
--				      u16 id, u8 chain_a, u8 chain_b)
--{
--	cmd->len = 4;
--	cmd->id = cpu_to_le16(id);
--	cmd->data[0] = chain_a;
--	cmd->data[1] = chain_b;
--	return btintel_send_sar_ddc(hdev, cmd, 5);
--}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 84d9a445e..defa61803 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3798,13 +3798,14 @@ static void hci_tx_work(struct work_struct *work)
+ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_acl_hdr *hdr;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	hdr = skb_pull_data(skb, sizeof(*hdr));
+ 	if (!hdr) {
+ 		bt_dev_err(hdev, "ACL packet too small");
+-		goto drop;
++		kfree_skb(skb);
++		return;
+ 	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -3816,31 +3817,21 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hdev->stat.acl_rx++;
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
 -
- static int btintel_set_sar_rev2(struct hci_dev *hdev,
- 				struct btintel_sar_rev2 *sar)
- {
-@@ -3544,9 +3695,172 @@ static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *
+-	if (conn) {
+-		hci_conn_enter_active_mode(conn, BT_POWER_FORCE_ACTIVE_OFF);
+-
+-		/* Send to upper protocol */
+-		l2cap_recv_acldata(conn, skb, flags);
+-		return;
+-	} else {
++	err = l2cap_recv_acldata(hdev, handle, skb, flags);
++	if (err == -ENOENT)
+ 		bt_dev_err(hdev, "ACL packet for unknown connection handle %d",
+ 			   handle);
+-	}
+-
+-drop:
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "ACL packet recv for handle %d failed: %d",
++			   handle, err);
  }
- #endif /* CONFIG_ACPI */
  
-+static int btintel_uefi_read_sar(struct hci_dev *hdev, efi_char16_t *name,
-+				 struct btintel_uefi_sar *sar, u32 *attributes)
-+{
-+	unsigned long size = sizeof(*sar);
-+	efi_status_t status;
-+
-+	if (!IS_ENABLED(CONFIG_EFI) ||
-+	    !efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE)) {
-+		bt_dev_dbg(hdev, "UEFI runtime services unavailable for SAR");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	status = efi.get_variable(name, &btintel_efi_sar_guid, attributes,
-+				  &size, sar);
-+	if (status == EFI_NOT_FOUND) {
-+		bt_dev_dbg(hdev, "UEFI SAR variable not found");
+ /* SCO data packet */
+ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_sco_hdr *hdr = (void *) skb->data;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	skb_pull(skb, HCI_SCO_HDR_SIZE);
+ 
+@@ -3853,33 +3844,28 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hdev->stat.sco_rx++;
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
++	hci_skb_pkt_status(skb) = flags & 0x03;
+ 
+-	if (conn) {
+-		/* Send to upper protocol */
+-		hci_skb_pkt_status(skb) = flags & 0x03;
+-		sco_recv_scodata(conn, skb);
+-		return;
+-	} else {
++	err = sco_recv_scodata(hdev, handle, skb);
++	if (err == -ENOENT)
+ 		bt_dev_err_ratelimited(hdev, "SCO packet for unknown connection handle %d",
+ 				       handle);
+-	}
+-
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "SCO packet recv for handle %d failed: %d",
++			   handle, err);
+ }
+ 
+ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_iso_hdr *hdr;
+-	struct hci_conn *conn;
+ 	__u16 handle, flags;
++	int err;
+ 
+ 	hdr = skb_pull_data(skb, sizeof(*hdr));
+ 	if (!hdr) {
+ 		bt_dev_err(hdev, "ISO packet too small");
+-		goto drop;
++		kfree_skb(skb);
++		return;
+ 	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+@@ -3889,22 +3875,13 @@ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
+ 		   handle, flags);
+ 
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	hci_dev_unlock(hdev);
+-
+-	if (!conn) {
++	err = iso_recv(hdev, handle, skb, flags);
++	if (err == -ENOENT)
+ 		bt_dev_err(hdev, "ISO packet for unknown connection handle %d",
+ 			   handle);
+-		goto drop;
+-	}
+-
+-	/* Send to upper protocol */
+-	iso_recv(conn, skb, flags);
+-	return;
+-
+-drop:
+-	kfree_skb(skb);
++	else if (err)
++		bt_dev_dbg(hdev, "ISO packet recv for handle %d failed: %d",
++			   handle, err);
+ }
+ 
+ static bool hci_req_is_complete(struct hci_dev *hdev)
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 217ba98b0..cbb315922 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2059,13 +2059,29 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ 	iso_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+-void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
++int iso_recv(struct hci_dev *hdev, u16 handle, struct sk_buff *skb, u16 flags)
+ {
+-	struct iso_conn *conn = hcon->iso_data;
++	struct hci_conn *hcon;
++	struct iso_conn *conn;
+ 	__u16 pb, ts, len;
+ 
+-	if (!conn)
+-		goto drop;
++	/* 6.6 has no iso_conn kref. Hold the hci_conn across the recv. */
++	hci_dev_lock(hdev);
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
 +		return -ENOENT;
 +	}
-+	if (status == EFI_BUFFER_TOO_SMALL) {
-+		bt_dev_dbg(hdev, "UEFI SAR variable has unsupported size");
-+		return -EOPNOTSUPP;
-+	}
-+	if (status != EFI_SUCCESS) {
-+		bt_dev_warn(hdev, "Failed to read UEFI SAR variable: 0x%lx",
-+			    status);
-+		return -EIO;
-+	}
++	hci_conn_get(hcon);
++	conn = hcon->iso_data;
++	hci_dev_unlock(hdev);
 +
-+	if (size != sizeof(*sar)) {
-+		bt_dev_dbg(hdev, "Invalid UEFI SAR variable size: %lu", size);
++	if (!conn) {
++		hci_conn_put(hcon);
++		kfree_skb(skb);
 +		return -EINVAL;
 +	}
-+	if (sar->revision != BTINTEL_SAR_REV2) {
-+		bt_dev_dbg(hdev, "Unsupported UEFI SAR revision: %u",
-+			   sar->revision);
-+		return -EOPNOTSUPP;
-+	}
-+	if (!(le32_to_cpu(sar->mode) & BIT(0))) {
-+		bt_dev_dbg(hdev, "UEFI SAR is disabled");
-+		return -EOPNOTSUPP;
-+	}
-+
+ 
+ 	pb     = hci_iso_flags_pb(flags);
+ 	ts     = hci_iso_flags_ts(flags);
+@@ -2115,7 +2131,8 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 			/* Complete frame received */
+ 			hci_skb_pkt_status(skb) = flags & 0x03;
+ 			iso_recv_frame(conn, skb);
+-			return;
++			hci_conn_put(hcon);
++			return 0;
+ 		}
+ 
+ 		if (pb == ISO_SINGLE) {
+@@ -2191,6 +2208,8 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 
+ drop:
+ 	kfree_skb(skb);
++	hci_conn_put(hcon);
 +	return 0;
-+}
-+
-+static int btintel_set_uefi_sar(struct hci_dev *hdev)
-+{
-+	/* 5G8 and 5G9 share a limit but have separate DDC identifiers. */
-+	static const struct {
-+		u16 id;
-+		u8 band;
-+	} bands[] = {
-+		{ 0x0311, 0 },
-+		{ 0x0312, 1 },
-+		{ 0x0313, 2 },
-+		{ 0x0314, 2 },
-+		{ 0x0315, 3 },
-+		{ 0x0316, 4 },
-+	};
-+	u8 buffer[sizeof(struct btintel_cp_ddc_write) + 2];
-+	struct btintel_cp_ddc_write *cmd = (void *)buffer;
-+	struct btintel_uefi_sar sar;
-+	struct sk_buff *skb;
-+	u32 attributes;
-+	u8 lock_status;
-+	u8 enable = 1;
-+	int ret, i;
-+
-+	lock_status = btintel_uefi_get_sar_lock_status(hdev);
-+	if (lock_status == BTINTEL_UEFI_LOCK_UNLOCKED ||
-+	    ((IS_ENABLED(CONFIG_X86) || IS_ENABLED(CONFIG_X86_64) ||
-+	      IS_ENABLED(CONFIG_X86_32)) &&
-+	     lock_status == BTINTEL_UEFI_LOCK_UNKNOWN)) {
-+		bt_dev_dbg(hdev, "UEFI SAR tables are not trusted");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ret = btintel_uefi_read_sar(hdev, BTINTEL_EFI_BRDS, &sar,
-+				    &attributes);
-+	if (ret)
-+		return ret;
-+
-+	ret = btintel_uefi_check_sar_variable(hdev, BTINTEL_EFI_BRDS, &sar,
-+					      attributes, lock_status);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * UEFI BRDS uses only the 2.4 GHz limits; BSSS supplies sub-band limits.
-+	 * Firmware accepts this BRDS write regardless of the existing 0x019e
-+	 * value, including a value previously set by the DDC configuration.
-+	 */
-+	ret = btintel_send_sar_rev2_band(hdev, cmd, 0x0311,
-+					 sar.chain_a[0], sar.chain_b[0]);
-+	if (ret)
-+		goto complete;
-+
-+	/* Standalone limits require both BRDS and BSSS to be enabled. */
-+	ret = btintel_uefi_read_sar(hdev, BTINTEL_EFI_BSSS, &sar,
-+				    &attributes);
-+	if (!ret) {
-+		ret = btintel_uefi_check_sar_variable(hdev, BTINTEL_EFI_BSSS,
-+						      &sar, attributes,
-+						      lock_status);
-+		if (ret)
-+			goto complete;
-+
-+		cmd->len = 3;
-+		/* UEFI BSSS requires 0x019e = 1; inc_power_mode is not used here. */
-+		cmd->id = cpu_to_le16(0x019e);
-+		cmd->data[0] = enable;
-+		ret = btintel_send_sar_ddc(hdev, cmd, sizeof(*cmd) + 1);
-+		if (ret)
-+			goto complete;
-+
-+		/*
-+		 * After writing 0x019e = 1, firmware interprets DDC 0x0311-0x0316
-+		 * as BSSS limits.
-+		 */
-+		for (i = 0; i < ARRAY_SIZE(bands); i++) {
-+			ret = btintel_send_sar_rev2_band(hdev, cmd, bands[i].id,
-+							 sar.chain_a[bands[i].band],
-+							 sar.chain_b[bands[i].band]);
-+			if (ret)
-+				goto complete;
-+		}
-+	} else if (ret != -ENOENT && ret != -EOPNOTSUPP) {
-+		goto complete;
-+	} else {
-+		ret = 0;
-+	}
-+
-+complete:
-+	skb = __hci_cmd_sync(hdev, 0xfe25, sizeof(enable), &enable,
-+			     HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		if (ret)
-+			bt_dev_warn(hdev,
-+				    "UEFI SAR setup failed (%d), completion failed (%ld)",
-+				    ret, PTR_ERR(skb));
-+		else
-+			bt_dev_warn(hdev, "Failed to complete UEFI SAR setup (%ld)",
-+				    PTR_ERR(skb));
-+
-+		return ret ? ret : PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+	return ret;
-+}
-+
- static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
- 						struct intel_version_tlv *ver)
+ }
+ 
+ static struct hci_cb iso_cb = {
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 94fddc456..5b5a9e763 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7752,13 +7752,24 @@ struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
+ }
+ EXPORT_SYMBOL(l2cap_conn_hold_unless_zero);
+ 
+-void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
++int l2cap_recv_acldata(struct hci_dev *hdev, u16 handle,
++		       struct sk_buff *skb, u16 flags)
  {
-+	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++	struct hci_conn *hcon;
+ 	struct l2cap_conn *conn;
+ 	int len;
+ 
+-	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
+-	hci_dev_lock(hcon->hdev);
++	/* Lock hdev for hci_conn, and race on l2cap_data vs. l2cap_conn_del */
++	hci_dev_lock(hdev);
 +
-+	/* Supported SCP2+ platforms use this UEFI DDC map regardless of CNVr. */
-+	if (hw_variant >= BTINTEL_HWID_SCP2 &&
-+	    hw_variant != BTINTEL_HWID_BZRIW)
-+		btintel_set_uefi_sar(hdev);
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
++		return -ENOENT;
++	}
 +
-+	/*
-+	 * Platforms with UEFI BSSS do not provide ACPI BRDS. If UEFI BRDS is
-+	 * available without BSSS, let the existing ACPI BRDS path run after
-+	 * this path so its later write retains the existing precedence.
++	hci_conn_enter_active_mode(hcon, BT_POWER_FORCE_ACTIVE_OFF);
+ 
+ 	conn = hcon->l2cap_data;
+ 
+@@ -7766,12 +7777,13 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		conn = l2cap_conn_add(hcon);
+ 
+ 	conn = l2cap_conn_hold_unless_zero(conn);
++	hcon = NULL;
+ 
+-	hci_dev_unlock(hcon->hdev);
++	hci_dev_unlock(hdev);
+ 
+ 	if (!conn) {
+ 		kfree_skb(skb);
+-		return;
++		return -EINVAL;
+ 	}
+ 
+ 	BT_DBG("conn %p len %u flags 0x%x", conn, skb->len, flags);
+@@ -7885,6 +7897,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ unlock:
+ 	mutex_unlock(&conn->lock);
+ 	l2cap_conn_put(conn);
++	return 0;
+ }
+ 
+ static struct hci_cb l2cap_cb = {
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 75609dbd5..98fd0c89b 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1432,22 +1432,40 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ 	sco_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+-void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
++int sco_recv_scodata(struct hci_dev *hdev, u16 handle, struct sk_buff *skb)
+ {
+-	struct sco_conn *conn = hcon->sco_data;
++	struct hci_conn *hcon;
++	struct sco_conn *conn;
+ 
+-	if (!conn)
+-		goto drop;
++	/* 6.6 has no sco_conn kref. Hold the hci_conn so the lookup cannot
++	 * be freed before sco_data is read. The lookup stays under hci_dev_lock.
 +	 */
- #ifdef CONFIG_ACPI
- 	return btintel_acpi_set_sar(hdev, ver);
- #endif
++	hci_dev_lock(hdev);
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon) {
++		hci_dev_unlock(hdev);
++		kfree_skb(skb);
++		return -ENOENT;
++	}
++	hci_conn_get(hcon);
++	conn = hcon->sco_data;
++	hci_dev_unlock(hdev);
++
++	if (!conn) {
++		hci_conn_put(hcon);
++		kfree_skb(skb);
++		return -EINVAL;
++	}
+ 
+ 	BT_DBG("conn %p len %u", conn, skb->len);
+ 
+-	if (skb->len) {
++	if (skb->len)
+ 		sco_recv_frame(conn, skb);
+-		return;
+-	}
++	else
++		kfree_skb(skb);
+ 
+-drop:
+-	kfree_skb(skb);
++	hci_conn_put(hcon);
++	return 0;
+ }
+ 
+ static struct hci_cb sco_cb = {
 -- 
 2.53.0
