@@ -1,80 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795010734;
-	b=0g7gcnlbM1JK7JcJSjvvH/li38YsHMXuDa8OUhZpP3wq71BRNwvKs0/JYfVhueU/PU5K
-	 VVzzOMIzeLIOu5dX8Dxk6Z/S8g3u2Hoiv4Po+HBIiqfaBz6MEz27Jk8c+uPL6FT8b1Uee
-	 37yiYSWcVzUC/vJy2n29bBQXTgNMpr6DBOYtVpcett8GR7NutSomdDzrhtmgyZUk4DbGn
-	 jmBjyzVonQXOFgTbt38o+G5TnVlhntACys5qMQDPsB4xxw7IbCIhShWRNJD0d9IHZ78dA
-	 LCkM7VdobQTyVQsVgy6vFN38KLk3jhlCEr0/eBx3GU8ASD60cK1XORt2+l+b/MFG3yg==
+	b=k0EYSqFU/Xvz9W4F4ZO+MFjOpcJ3LlNRF2q79suJDG+qCBP36jNQevLuWFsJpaMeYJnz
+	 LOE8BCl3WaondMrDdqP96cLBLda57IkvuhJst5Be5TsDGzorbLRfh/W5/vzEsXE5tzgdI
+	 y8/PuG1QmMqZTewE1Gls14w2ixZCNaDXemGxeEbMm2z3gooiaCvR0THEGr+0c3nszHNNb
+	 YisjXVfdBZUBj/Wa1E/+F+EbMdE7SmJD1RPS1ntCvI+V3x+GOiaCuiHaob0+BBE+Sei9b
+	 9PBSQaYVUqlfwJS8IWrshBAD5S7M6Z3eqWYIxHdUZvpeNm+qmB7+hhkz33siddQPXVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795010734;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-	b=OiX6Or5+NNk+FVcZ/I1BdOYSJctQRUHqB1mbSEpGBvcHWCoA+sUebcaYVEMNm1S1D6KC
-	 urN6yea/T1R4PKb61CbGoMgGUP42W3p075LAF0pTlUoC5vjFFodwvaJQgCq6wvC4XQHte
-	 8LPQnwrRe6Me3o3JRaRnnUSwOjOjjSqdGgrzMrXpRUac3bKb+QQp0PekkZc93TQRNmral
-	 r3wtv7XZ3XiPWqtYRSnp+WngPS4IfUVj8oJqVAx8G4As/OcF6nGqzoe6insAeu79+saKV
-	 PgnJInf//Ywkqe7onAkuhPveG3bAfGiRKrHEDVFW4axKdKvn6wzQ5doIy/QNAJPv08g==
+	bh=uhEC/UOj6TVVZOcxeoIaB5iLf8swhIFH3WtiXvlWqGc=;
+	b=w+RqQOc4A2k7Q1lPnWVnmcmnpIq1AD9sYSSG5sLgNbY9gICFX0H4LSEOlczo4bmA6Q3X
+	 ndjjiaSL5V/3d1CYUTUJDKi3Fk80iPTb8O5kv6oXIrG7fSmtpv4vt/po135U+mSrWcdP+
+	 CkkHDAL3IWZhxBECR3mHWNt9oeJk6Mo291LsGjvpNxELLUWAxA1jIr7ptOvnpxitn6VVI
+	 a2J3H3O22OB1E2kkawWpNZToyLKI+ce1v1NUEAxeZZNaFY/3drK70WMze0/jcZI0g+Soo
+	 /LdRnjDaeMSfpPCcA+7TaHPqPDHb5/Cm9X+lyFAF1RiRRTI3ENvU3Q5Uor4L6drA3zg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrqyvuZw;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=UhYERK+y;
 	arc=none smtp.remote-ip=209.85.217.47
 Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDCB60A260F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:05:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBDCB60A260F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6462860A261C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:05:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6462860A261C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrqyvuZw
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7d2da166818so548671137.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:05:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=UhYERK+y
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7cc91ddf447so382108137.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:05:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795010733; x=1795615533; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-        b=ZrqyvuZwob06PsB5ua5XZMEz9lYMatCW+QH7ix2INFMhlVQVLF3kS9kQj7dDjvbS6s
-         vqJmx5be4ZhX+z3WbunUk0hcHLGUr6ZGB1Q/vFZXntnbnPO6xctTMOAUyTV8jOqqolcg
-         Z9CvsX3uG07iYAN0Op76cBVG5TmP7o/5YPdM77UlwxXf/R19xA5TRuBzl8LAEJJmVx2W
-         yspv3YcOJHkRZNNXD3SdnCcPwLEymLsocfBIB7z0DScMMuYEbTNedNp9tSfTtN004vg6
-         20MSY2BNgRJdn98vgoltIe49gp3CfC0oUbfYTRdyGT22fgRTgZMDjReU52SW5rfekpJA
-         dPww==
+        bh=uhEC/UOj6TVVZOcxeoIaB5iLf8swhIFH3WtiXvlWqGc=;
+        b=UhYERK+ysx3hIUm1pExbkMfpblqECJNQrFdkF91No89xivRpv54L6xuFFq/snYE7Q6
+         KnKk4v0It8Nm0ruvKryF/3++UMgRlE9dwJgIlkKwYJE6U7+Fi4Vg5E0Hj7mu4dNvJmRm
+         L8lVv1IFPpp/4DMJ0PLEUOgylhDhWrRzSX3gyOOeznseFYFAzyL+dYCFKZlHFxOFfbnE
+         cAPmrCIjhMMLiuq1Y9Uds8kkXkfRc/vBT2rFzPYFVUWkHaR6V1X16bUr75LrfgvTMN/R
+         /z2yElwHW+GmveAJuHohtvrx7hmfAtjT/R11wGiDZVdpKDXxjG9a8SsIwo0MepmYrfY+
+         7EeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795010733; x=1795615533;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=5Z8SPxdj5ODVAQEi7lg+Gv07rpjrRS53E/dvwi0KsyE=;
-        b=aUbOzjHCggaVdZqSzC7lR0tZlZwA+U3S0nFuOyWsJzK8wFzFlvbcxayPUhI6UNEkcH
-         SI9AIw9WJub+22CXdPegvMWYC5fFaVU1xnjk5B4WKD0AdV8VKYsJz2cN7ID8C4OXd3RZ
-         Jj9oljPL+d7GRUmAJn5522bbEOsAUY4jmF4Ewi3ctXFR4evOst/jBlzoCHIyb4iuCv+Y
-         bXW3hLRoWlLTgNJcq9HGV2f+7YSR8zgpGNtyWkUbu2WeBMEen4HNTN0nc/CPM53MoOom
-         wBb4YjYyCxWl2C+4lQDQhg1ORkjQvH69Eg24EiMct+OXVNaIgEjCDkp4buL+xC/BDsUN
-         kJ9A==
-X-Gm-Message-State: APuU4Z8j+LDWEX7DOw40xvza0HbETblGJBryxVf/VRh2T9mIDyMvoeW0
-	oDq/BJgMLsf5fzQn70IIwVRIjDZZPRQt2hYd8Ns8ImvnPenCH/udYKEbm1luJV5N
-X-Gm-Gg: AYBFou0WpueMjRnLGuJOqVa9gekT92V8xBph8hiNdGgpiBOCw/zEffnHdUdpqNcA3jY
-	UYROGCnDnj7TzVY+9cbwSvf+yxwm4dyIce6MW6+2X1cFYMtivra7Xcz2izcjR8QYo0y15bFNM71
-	kgAGf6yiDAoENJvm2fWXWaNb2+6pbLpfXgCS0XAfwI+mL2S/EzPrPcQOaEcUL89FCowyZfSryH6
-	iQavnU8vxXqX91euOzfwyIgrWBBUayLhCknN2trJdmLU9ejo46GnhY1VXqgcTIUne3ll+OZkPom
-	gN3OGv1u5YZrbIQ6NRPx3vZBCI7EplLD/Wo4VMC4N0Btd6+Fv1jPAW1ohr0GXlzFGhcw980eNTG
-	yr2HAla26l69AtPDRDV9QTzhvmUB9VB6/UDdYIH50MaoQEKWq7SfU9x4u/6qWFQjnlWU5UtgkbJ
-	zKwIuwHDVzeepiJh+Gli9GvCEKe07BUmlH+lf2Sd45MCQDDu5QfRwrSDbyyU0c/MqNowJJiS3TQ
-	TxfG0Xb747DWfEuuqo/nMruvp9vzmG6BnFg/0D37lsVnskmknINQtRs+Fi2j1mpN1LYvMAZk1xW
-	gp+Y4AChDPWRr+8n+yP8iHh51rRCyIVBFJTM8g1Kiyz979QC0uFxXSGsuRNB57N4H5isfp0Zpda
-	xFHPDK8Jm2rP/ScrmcTyGd/ptJG1BtvTuoc8OpszqR9XUMlLzuOkKkVdULfjHpPvodixKLtFHe5
-	qV1Sk=
-X-Received: by 2002:a05:6102:4448:b0:7d2:7266:2c8a with SMTP id ada2fe7eead31-7d6ba4e3cdbmr772510137.32.1795010732630;
-        Wed, 18 Nov 2026 06:05:32 -0800 (PST)
+        bh=uhEC/UOj6TVVZOcxeoIaB5iLf8swhIFH3WtiXvlWqGc=;
+        b=MkoeNGQUQh3atpSZ9BL0kue3JiOdFm7s+Mrf53mHXGXrjFCMoDKLTDgpZOTnY2vWzf
+         QiL6V8yIAvH6BdfBJ0e9T5Yrk7pZ1EzzgvWAstdVS8dcGazo6AMdbLnGh9SY48X17W2d
+         7nvnOcvDemXZRl9qp8kMdRdgBI4WHbxwFMkYi0UW78XcZlDZxFzeyuv/TS/dMOYP0LMy
+         bx5Kmbh2lt6ksEjqcRvAb30oUu4KoyyKBWVSdkJK4t1hrS/vUjXCKVi74ywo89igCwiQ
+         f8pWn73wl5Tc2mfYfPGbq/nBhuqHtbRV56U2qhz63/P56O0fK6+vjY7IIYV3WQjbpv6X
+         ktmQ==
+X-Gm-Message-State: APuU4Z803Cp70e48ajI+8U4HqBA5Sur2142oyflxtKVOosDEn8Go5CsL
+	P2tx1B2hFAtW1cgWHjCdkNp0TYxhi/5jh4YBmy2gSfckJpsUc6PA6oQvn8Ls7V19
+X-Gm-Gg: AYBFou0vDWEGXht+fTDgFTSywQsUVbs/EiFBEklaibet3qz/eJxuFlxl1c8ft4ke0YG
+	B12q8c86r6M+Dpjg96OS86SlG6jC+StR2rGVvkVSLrpvhB+Dmbs7QlmmE+bPu3KIBF8Q+MXsl9V
+	nqqz61fSHZYTg8YAGCv/qglANzbGKmWKZvdVUkaabrHRF5Cuss6QSbvMCzpqXdK+GW1TgIbamsT
+	n36ETKQjPGDaVscj43aDzyF+YsEMVsJyxQ9dVd1IF1cP5kC+mka3aqT548tUYrLxnWOn44JKhKv
+	r9rULve4wE1I+1dutC/XTJm3kf8ilkAcsTPxzakelREMRnUUHaQ/TtHtsDrkYPIzku+bcxL34+g
+	b5MZlfTg+lc/JAQWItjzb2PVit5GQgM29m2s5hW+CUhlj+GtL+dONoeZQV7oKKW3ODJFU+iF5PV
+	YHFX7AbjcezrYlu7r0y1XR+BYVjV6g9Jvf0YI59630nSfURo+SkzLSrLNZOQXkGH1gJnkAnvKgU
+	rUp1SET3M4A22A7dh86cQYzIpAxJP55Ozoac3UM44e5cJllMtKyHtidMvUGKReLFZPAuEEV7gqJ
+	+LZudrRRGOY/Rxf5rcxRhst1uDaFXOF3xU+qurDIOB9leKcNmH2JnZLp3p71VQlgv4oJ9uyQkxJ
+	/kH+CuH8EiBcREjlPZ/PeTDLaD7pdDr06ehkG8YMb/kJi6r6U5BkY0POCLjdx+t9F/sd5gH1JlZ
+	WCiPw=
+X-Received: by 2002:a05:6102:370c:b0:7b5:7cd5:2a1b with SMTP id ada2fe7eead31-7d6ba3bbbe8mr693339137.10.1795010733294;
+        Wed, 18 Nov 2026 06:05:33 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b914e10esm1697639137.3.2026.11.18.06.05.32
         for <linux-bluetooth@vger.kernel.org>
@@ -82,9 +82,9 @@ Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         Wed, 18 Nov 2026 06:05:32 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 15/17] Bluetooth: hci_core: Hold hdev->lock when removing advertisement monitors
-Date: Wed, 18 Nov 2026 09:05:16 -0500
-Message-ID: <20261118140518.59878-16-luiz.dentz@gmail.com>
+Subject: [PATCH v3 16/17] Bluetooth: MSFT: Free the response of the monitor commands
+Date: Wed, 18 Nov 2026 09:05:17 -0500
+Message-ID: <20261118140518.59878-17-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118140518.59878-1-luiz.dentz@gmail.com>
 References: <20261118140518.59878-1-luiz.dentz@gmail.com>
@@ -101,60 +101,103 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hci_remove_single_adv_monitor() and hci_remove_all_adv_monitor() only
-require hci_req_sync_lock, yet they look up and free monitors, modifying
-hdev->adv_monitors_idr and adv_monitors_cnt, which Read Advertisement
-Monitor Features iterates under hdev->lock. Take hdev->lock around the
-IDR accesses and the freeing, but not across the HCI commands sent to the
-controller.
+msft_add_monitor_sync() and msft_remove_monitor_sync() send the MSFT
+command with __hci_cmd_sync() and pass the returned skb to the callbacks,
+which only parse it, so it is never freed. Free it once the callback
+returns.
 
-Reported-by: sashiko.dev (linux-8b358899-5ac9-4687-af16-58420a4d9bba)
+While at it initialize the RSSI fields of the handle data when it is
+created instead of after the command completed, so they are never exposed
+uninitialized, and do the lookup of the handle map in
+msft_remove_monitor_sync() with hdev->lock held.
+
+Found by the sashiko.dev review of this series.
+Fixes: b747a83690c8 ("Bluetooth: hci_sync: Refactor add Adv Monitor")
 Fixes: 7cf5c2978f23 ("Bluetooth: hci_sync: Refactor remove Adv Monitor")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_core.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ net/bluetooth/msft.c | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a6bf806b9206..5522d4397682 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2129,7 +2129,10 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
- 	if (status == -ENOENT)
- 		bt_dev_warn(hdev, "Removing monitor with no matching handle %d",
- 			    monitor->handle);
-+
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index ab63fee3ef59..7a06c2b8974b 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -297,6 +297,10 @@ static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
+ 	handle_data->mgmt_handle = monitor->handle;
+ 	handle_data->msft_handle = rp->handle;
+ 	handle_data->cond_type   = MSFT_MONITOR_ADVERTISEMENT_TYPE_PATTERN;
++	handle_data->rssi_high	= monitor->rssi.high_threshold;
++	handle_data->rssi_low	= monitor->rssi.low_threshold;
++	handle_data->rssi_low_interval	  = (u8)monitor->rssi.low_threshold_timeout;
++	handle_data->rssi_sampling_period = monitor->rssi.sampling_period;
+ 	INIT_LIST_HEAD(&handle_data->list);
+ 	list_add(&handle_data->list, &msft->handle_map);
+ 
+@@ -438,23 +442,30 @@ static int msft_remove_monitor_sync(struct hci_dev *hdev,
+ 	struct msft_cp_le_cancel_monitor_advertisement cp;
+ 	struct msft_monitor_advertisement_handle_data *handle_data;
+ 	struct sk_buff *skb;
++	int err;
+ 
 +	hci_dev_lock(hdev);
- 	hci_free_adv_monitor(hdev, monitor);
+ 	handle_data = msft_find_handle_data(hdev, monitor->handle, true);
++	if (handle_data)
++		cp.handle = handle_data->msft_handle;
 +	hci_dev_unlock(hdev);
  
- 	return status;
+ 	/* If no matched handle, just remove without telling controller */
+ 	if (!handle_data)
+ 		return -ENOENT;
+ 
+ 	cp.sub_opcode = MSFT_OP_LE_CANCEL_MONITOR_ADVERTISEMENT;
+-	cp.handle = handle_data->msft_handle;
+ 
+ 	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, sizeof(cp), &cp,
+ 			     HCI_CMD_TIMEOUT);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	return msft_le_cancel_monitor_advertisement_cb(hdev, hdev->msft_opcode,
+-						       monitor, skb);
++	err = msft_le_cancel_monitor_advertisement_cb(hdev, hdev->msft_opcode,
++						      monitor, skb);
++	kfree_skb(skb);
++
++	return err;
  }
-@@ -2137,7 +2140,11 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
+ 
  /* This function requires the caller holds hci_req_sync_lock */
- int hci_remove_single_adv_monitor(struct hci_dev *hdev, u16 handle)
+@@ -519,7 +530,6 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
  {
--	struct adv_monitor *monitor = idr_find(&hdev->adv_monitors_idr, handle);
-+	struct adv_monitor *monitor;
-+
-+	hci_dev_lock(hdev);
-+	monitor = idr_find(&hdev->adv_monitors_idr, handle);
-+	hci_dev_unlock(hdev);
+ 	struct msft_cp_le_monitor_advertisement *cp;
+ 	struct msft_le_monitor_advertisement_pattern_data *pattern_data;
+-	struct msft_monitor_advertisement_handle_data *handle_data;
+ 	struct msft_le_monitor_advertisement_pattern *pattern;
+ 	struct adv_pattern *entry;
+ 	size_t total_size = sizeof(*cp) + sizeof(*pattern_data);
+@@ -571,19 +581,7 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
  
- 	if (!monitor)
- 		return -EINVAL;
-@@ -2153,7 +2160,10 @@ int hci_remove_all_adv_monitor(struct hci_dev *hdev)
- 	int status = 0;
+ 	err = msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
+ 					       monitor, skb);
+-	if (err)
+-		goto out_free;
+-
+-	handle_data = msft_find_handle_data(hdev, monitor->handle, true);
+-	if (!handle_data) {
+-		err = -ENODATA;
+-		goto out_free;
+-	}
+-
+-	handle_data->rssi_high	= cp->rssi_high;
+-	handle_data->rssi_low	= cp->rssi_low;
+-	handle_data->rssi_low_interval	  = cp->rssi_low_interval;
+-	handle_data->rssi_sampling_period = cp->rssi_sampling_period;
++	kfree_skb(skb);
  
- 	while (1) {
-+		hci_dev_lock(hdev);
- 		monitor = idr_get_next(&hdev->adv_monitors_idr, &idr_next_id);
-+		hci_dev_unlock(hdev);
-+
- 		if (!monitor)
- 			break;
- 
+ out_free:
+ 	kfree(cp);
 -- 
 2.56.0
 
