@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795031933;
-	b=MPHnSEloV7LhkHh2/XAu028ax/LUUculecwbYFi572TCRO5rwcHDB+9ooHGTMvOX3/g8
-	 +FcomdUaeqZGp7TAHffVFqXjAuhxZP9fbCwxgwJHBH8UX6GFf4tf8Gzm0zQvwZFD6g6bQ
-	 iOSr0n+pRC7s9wnadr6Ry9r50C7/HibXjH+3G0CbZgpDqC+5wpDg65PTzY4cJO8vdJQ3s
-	 ttYEkpdc/PeHzn/0ppvRGV84yyrCuLm9ThMgkRawAv+F4oNhRIEOAEKYUGrtKJ3gpIqtU
-	 zRothHLvtlBUhLQanj67B/kBEIkALR3ilBXUTsJPssjgZhUGxdChYHWWDJIO6gEwkNA==
+	t=1795031934;
+	b=T8KRw34fdiB9S1/vCIDf/k9kAZ3Ww/j5zt+XlBx6vAoqLq8loveIC5G9IvkS9csNWBmR
+	 TfClv8634Z7N9ziMaFHJW6HSD/JzvCuTKaB+Mq8kijgpQOwKp0vegZGFFdZRSbyHPfm+f
+	 vdK2wJvt4NU/JtrMgvyEupQrhjDUFTtd+Tx/RscLTCviAOC9G0mVlXN9wadvg8VHGstTl
+	 YBDclbB64KSugUy4rbs0RumjBNBGKE4Ryj3jERhjFvbcGfGT6NvRUSp3vKnoyR+UC2vKv
+	 BrEoRe6U0Wd0IZM78lPmcVU4W11nQ2O8I3ziFbAp4D/YIuyelTov5EzEOyrUGxNhvgw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795031933;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795031934;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
-	b=JkQj9jcBcY8uTj0AH8TnfIbGSPSD7/FLGDu336nHvIvSEuto1fuqi0mzfacyafM8iKvR
-	 VL8I7p+LAZli0xWCxSc9O44EgPMJYg54ENKn73C4lfLJxnN/7V9JxecvVRyhNXzMmiG7E
-	 dXnqZJw4lIBK9chAgJ31LedXL7eu6lnaGyiiWss+QXBhTR5pr5EAD8FeW0EuQcm993dey
-	 d+zNrJkMTdHpmAe5JWowZ+hMHmzLUQDg/iy4l1QGEFK3OrmdMJYuPsR12NX0wjlNq7QSM
-	 VfumiOJiJu2bYoQM0vpDYGBWhJw8j2FCa6LcesKmad12YZWGWI1GC0zE6xKGlJh98qg==
+	bh=S+A+tHoWTxzv1Ecb5EM0HYITMJOtYSb2KXWl/kr6btc=;
+	b=ffZJ4GJVjHk19gprazZFQVTtp1lAYtd4Nk6yiMkoSG8AKHDs9f8YlwoX/h3WbKjdOBmH
+	 KioOZATiRQR2sGBKXE4leQPO/BkcNkeG+/f1dJ+dMkCMxODCLWmPrm1IXZUcR6VRZKWrX
+	 u0ZSCgzbSRN4G96rSSxfNZIUYFb8VcXoDq1/dvIKVEe6bHp7/8r28xXESMV5j578m/z3J
+	 gv8o3NxML/gRRvOBKP6nq+EaLeB7+7GVywK7gOhHlODxBF0hNCXyX7QUs12hSOfqm/pw8
+	 XGfZ7cmuUApILqkv7u7N26XNH0euvRQCjZByOzuChJJ+KGWF4Yzl0D5j+Om5ZfStt2w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="P/TZxlRI";
-	arc=none smtp.remote-ip=209.85.217.41
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ml0ehPvw;
+	arc=none smtp.remote-ip=209.85.222.48
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2245160A2602
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91A9606A337
 	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:58:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2245160A2602
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C91A9606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=P/TZxlRI
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-7d2d18f1bf5so955556137.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ml0ehPvw
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-9906a5410f5so175056241.0
         for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:58:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795031932; x=1795636732; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795031933; x=1795636733; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
-        b=P/TZxlRI1RLe+6r0eQ5H33AmJzBtQP9ewNAhPttyziLv9GwGLIVsW4Tc6dORExHH5q
-         5hhYsUklS6sxIx8iWf2KTQXt6QQQBPgv5CpGnz/ban2UTKFIooaFnJTQYDmVIKDMAe2L
-         iApgkq6trfdN/JczGFrppIC+yVw9FG6SVbvuO4CvFqTU/LAsW9qXJtkG28I2gVXzU0G1
-         3yld4OU+po9D7CDO8FJNFjfo6GvR6jTuYRbZ7YxRzoJF4TqnP6pvgcuejnTnQ6YTsB+e
-         qFZueBYuPv6yQpEidslt4N9x0O6ACyliLQ26I6Lf86wDE+o7wAqY5z1T43iDmvowiYyl
-         eArw==
+        bh=S+A+tHoWTxzv1Ecb5EM0HYITMJOtYSb2KXWl/kr6btc=;
+        b=Ml0ehPvwqQc85/Wp6cb8z73uPHmC1tJOKwCWblv69pE6aphPWQwDQ3vpAcEi8Ro05S
+         e6M7etlgVS3sXZHNtH6AKIakCNlRHLJzJTqzZc1QB26AbvWLAGICixOC55IZFx/l5x/K
+         r6wDLTDgbz0aFBhw2XYto7IiHH3JzEfY6yuLNR2jrJ5Slw4T3DvE/qP3ecTajzRfslW8
+         XaUbH56ObycWiurUzt4Q87SqgwsoP978xVw9G5Y8kemCoDnb8vUtFHsrBqZ8PPYbEM1N
+         wuPKLHhwMUDiWD4HOidMNCa8vvdTjZhL6pKo4HVwJsW1MdT4ysk86FcjqHSLpvEU4pkA
+         TqYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795031932; x=1795636732;
+        d=1e100.net; s=20260707; t=1795031933; x=1795636733;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
-        b=qhQX6GRWaSqwcjgHkC/zdFexVq9C7+Yvbipu9+NyBJ4/CAfvGB2FwUH66lKSAsb8Yy
-         bOQLqGj7RjbDEhubBCdqN5iIvYrJs2HtKyQr6vrC3Sdk1ZES6wzVzgnmJImvJKw7unsj
-         1DBbVG3SG3MZDncR1XG/7L0n5pNsooerTS7aPYlUi3ILMDemlEQi3DI64UFF3N77bQvf
-         f+zbfieB5r5VkECI7G+25AsiDGGBwcpboVRZTFyrFqrmrWUZteBZYZdfXr62TtxRDszK
-         7/TZZWqdVVHe41dpwn8palbzGYeO92FZTKtGUJ0U6DzRAj+/sKST/wJcdYRV0aBh9aYN
-         RlYg==
-X-Gm-Message-State: APuU4Z8055YdYLcjNNSFixldVY2Srj1pwToYFMBruME5Jtt83SRGvyAM
-	pGUMbJuLHsxmcgBvwo32uNeRrMYdyPgAb5Aw7c++TShb8su5YIxdnpfaoNHLDMjk
-X-Gm-Gg: AYBFou2h4retrepL0kkzFtAQ2t2Z9EZGlw4C+F2TLR+DuCZ4KfLbs5J5UyYVtxR7fRC
-	7zyxgmtC/g0mW/qPVWJlJyTp+CbjNXpSMpbeJn9VPNiXq/inNV8credMubsPOdrk7MdneN0kFjt
-	l/JI/CC7Breu6aJm+Q+fMI4k15kCHSwHDT4X5hhDIN6f5lRYXs3jcHsAb97IjSZLMHlNowT+is6
-	1SuLQyhjjsNLM9IVlKGVIrapqQJK01YKL1I8cYu+YLehg/0+H1cxo/Ai2eJ5tNv3sTXlc1NP+06
-	DehvP00u/A9zUsfIf8+dp1qmvey7oJHLT1SQCIZkxHv6AOESCWRnY8YWEihw53sSe9DszrA2F91
-	E9lzxZ3nqtIWnbOpWajVL3X90awaWpdMIC/q+DFfO8WsK6ip+FcXsumrnDsPLXUGW2sagEJdbkC
-	WbBBoKq28nwhltlrcLw3XNesn8dFlN3jWtx+vtjIrEuuHsQ679GXG5X2QXzUf9g3l1RCj2xtMxZ
-	GN1pUlNmUR7rju5B4X3NK/2KTPmOstjaIA58cUzpj60582gDIJmDhSHMYBexAnre+ErOrG28T7h
-	d9K/TXEK+Wswhx2SS+7bVlKVK0XCbvYJ99vCRJ5pu/4Wm4Y0jTnQekhwVeFUHOAmvONdR4kyuqu
-	qcKYIQazruZr0SbMuYJUNHqhEC/DWuhLjZyPeeo7Mpy3ZXwY8Hw7hUXJYj6paYlMrmyhtUVcsIv
-	XfH34=
-X-Received: by 2002:a05:6102:6f08:b0:7d0:5688:f507 with SMTP id ada2fe7eead31-7d6ba3e4955mr1251422137.20.1795031931981;
-        Wed, 18 Nov 2026 11:58:51 -0800 (PST)
+        bh=S+A+tHoWTxzv1Ecb5EM0HYITMJOtYSb2KXWl/kr6btc=;
+        b=20Ik3tyQngouAz8Ks5HXN9FP2mjcS13sqeg1JDs43SmGH4aaqqfMur+qSZXVvicd7J
+         EtlKWngJPGbV6QFrIkqqzZvOfZDNiz+V3QWCBwydX3DCUgdz2BZ3cWrbPEdhE/U12AFL
+         SxbKKBNr5U6/gyTF5idSlW0BLa/zq9KDxoxuo5BVIEv5N2Sf+rTM7B5N7/+j4K0/4I8y
+         XnOIP3QC3FfaRKmRSTY9ATtw8hVXVUCRzARQHShzPtn9/UEgNAMpF29+RbU/0b69yn8q
+         4gQQhJLYmwawfltwokxf1VP+NQEMC578NWbJ5qxCwW2e6lU0ugBnIBIGJSBK4eTn0nr/
+         rFsw==
+X-Gm-Message-State: APuU4Z82MITl56WT86DwQovrDGBYWGcaTOwoFhrL5e1NMDuIYGvctZp1
+	9UbHWLprEoXa2vu86GBhF+sZZMmjZyYyXbsFckKK7WK9JQGN/F5K4XtuFRGkMku+
+X-Gm-Gg: AYBFou0Iw67LswcoK0g1L7KAfwQiEWiple/wvfowqTmvevRoufxbJSgcCSn1tbM65mt
+	1P4xoIrNX0Ecr4FNhQiTTfFphoa+YEZHto+SvuYOr5O8Ayrj4sYJtps1GADtPdcwHfcv4hD0cnB
+	D5ZdeyaqViQ2UK3IqQW14wTjJAMBKqXRIL3iVfA2EI0DokMcCKLPA6bch4ZKtqliB5yw6ep6Pqt
+	K3x+V5N3CEC4nNYHQ7QgStXkDy/jyFVpHG/L/IjMBzykM7jb82DYHkaldxDH4NHAT8akgalZDdI
+	hCTpclJsy2k3C6AUBciEpBNDct9uIHwzW3CFE/Sc4KRoXy4fWkyReCX598FGBMuUSvSzF8aTN0d
+	ZCWExJ4+7/FYwJV55xn7N9gmYAg+12m32pS6GJdf/SucBRbQp/vILc0MD9ymYukdMan/7fmXFET
+	CpaTpMulWwQ7v9i842aIj4TsgGhgF+K1luD0moZgNighJORsclK+xvOfZRawBGsLtj4fSD2iVhq
+	dJsvplKYUO91G6iXBD1yfIzm0eq+ANYv+U5UvuRWKfT48RJM/bPAySn/Bb8gPAMGnCbZll8C0L9
+	cWKzp0uiqZcKkdTaC+B09B+2gYP0ZRmETDrMyTdbjOdARDcl0c8p7yLTgH31WBp/dNmUa6rvcn4
+	29yhUSG7UhRxvYMzPQKGurheuu9WbGKHE1WNZh55JZlVkIpbzkSLmz1JBbsSIg8c44joAbCIEFE
+	W+Z6Y=
+X-Received: by 2002:a05:6102:548e:b0:7ba:b5ea:c4b8 with SMTP id ada2fe7eead31-7d6cb42f39emr188237137.1.1795031932749;
+        Wed, 18 Nov 2026 11:58:52 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b91e87f4sm2685571137.7.2026.11.18.11.58.51
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b91e87f4sm2685571137.7.2026.11.18.11.58.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 11:58:51 -0800 (PST)
+        Wed, 18 Nov 2026 11:58:52 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 04/16] shared/rap: Subscribe to Ranging Data when a measurement starts
-Date: Wed, 18 Nov 2026 14:58:32 -0500
-Message-ID: <20261118195846.393710-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 05/16] client/cs: Fix use-after-free in stop_measurement_reply
+Date: Wed, 18 Nov 2026 14:58:33 -0500
+Message-ID: <20261118195846.393710-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118195846.393710-1-luiz.dentz@gmail.com>
 References: <20261118195846.393710-1-luiz.dentz@gmail.com>
@@ -101,108 +101,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-Reading RAS Features subscribed to Real-time Ranging Data whenever
-On-demand ranging was not configured. The subscription also arms the
-5 s first segment timer, and at connection time there is normally no
-CS procedure running yet, so the timer fires and writes 0x0000 back to
-the CCCD. The connection-time subscription therefore only adds an
-enable and a disable write that no application asked for, and a test
-that expects the IUT to enable Real-time Ranging Data only when told
-to (RAP/REQ/RRD/BV-01-C) sees both. It also subscribed to nothing when
-the peer does not support Real-time Ranging Data, although the RREQ
-has to enable On-demand Ranging Data then (RAP v1.0 4.4.2).
+The daemon emits the Active=false property change before the
+StopMeasurement reply, so cs_measurement_stopped() frees the session
+first and the reply callback then read and freed it again.
 
-Subscribe at connection time only for the configured On-demand mode.
-When StartMeasurement() is called and SetRangingDataMode() has not
-subscribed to either mode, subscribe to the configured one, using
-On-demand if the peer lacks Real-time Ranging Data.
+Pass the proxy as user_data and look the session up again in the reply
+callback, returning if it is already gone.
 
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: Claude:claude-sonnet-5-5
 ---
- profiles/ranging/rap.c |  6 ++++++
- src/shared/rap.c       | 28 +++++++++++++++++++++++++---
- src/shared/rap.h       |  5 +++++
- 3 files changed, 36 insertions(+), 3 deletions(-)
+ client/cs.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-index f1717d932eab..2d8b1a7a1364 100644
---- a/profiles/ranging/rap.c
-+++ b/profiles/ranging/rap.c
-@@ -843,6 +843,12 @@ bad_type:
- 	if (settings.role == 0x02)
- 		return dbus_message_new_method_return(msg);
+diff --git a/client/cs.c b/client/cs.c
+index 4c181e74300e..e029da881898 100644
+--- a/client/cs.c
++++ b/client/cs.c
+@@ -1369,7 +1369,8 @@ static void cmd_cs_start(int argc, char *argv[])
  
-+	/* Nothing is subscribed at connection time unless On-demand is
-+	 * configured, so subscribe now if SetRangingDataMode() was not called.
-+	 */
-+	if (!bt_rap_ensure_ranging_data(data->rap))
-+		DBG("Unable to subscribe to Ranging Data");
-+
- 	if (!bt_rap_start_measurement(data->hci_sm, data->conn_handle,
- 							duration_secs))
- 		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
-diff --git a/src/shared/rap.c b/src/shared/rap.c
-index 1c4b5239e1ba..bc6f133b5da9 100644
---- a/src/shared/rap.c
-+++ b/src/shared/rap.c
-@@ -4712,6 +4712,28 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
- 	return rap_subscribe_ranging_data(rap, mode);
- }
+ static void stop_measurement_reply(DBusMessage *message, void *user_data)
+ {
+-	struct cs_session *s = user_data;
++	GDBusProxy *proxy = user_data;
++	struct cs_session *s;
+ 	DBusError error;
  
-+bool bt_rap_ensure_ranging_data(struct bt_rap *rap)
-+{
-+	enum bt_rap_ranging_data_mode mode;
-+
-+	if (!rap || !rap->client)
-+		return false;
-+
-+	if (rap->realtime_notify_id || rap->ondemand_notify_id)
-+		return true;
-+
-+	/* The RREQ has to enable one of the two (RAP v1.0 4.4). Real-time
-+	 * Ranging Data is optional for the RRSP, so fall back to On-demand
-+	 * when it is not supported (RAP v1.0 4.4.2).
-+	 */
-+	if (rap->ondemand_mode || !(rap->ras_features & 0x01))
-+		mode = BT_RAP_RANGING_DATA_ONDEMAND;
-+	else
-+		mode = BT_RAP_RANGING_DATA_REALTIME;
-+
-+	return rap_subscribe_ranging_data(rap, mode);
-+}
-+
- static void read_ras_features(struct bt_rap *rap, bool success,
- 			uint8_t att_ecode,
- 			const uint8_t *value, uint16_t length,
-@@ -4771,9 +4793,9 @@ static void read_ras_features(struct bt_rap *rap, bool success,
- 		return;
+ 	dbus_error_init(&error);
+@@ -1380,7 +1381,15 @@ static void stop_measurement_reply(DBusMessage *message, void *user_data)
  	}
  
--	if (!rap_subscribe_ranging_data(rap, rap->ondemand_mode ?
--				BT_RAP_RANGING_DATA_ONDEMAND :
--				BT_RAP_RANGING_DATA_REALTIME))
-+	if (rap->ondemand_mode &&
-+			!rap_subscribe_ranging_data(rap,
-+					BT_RAP_RANGING_DATA_ONDEMAND))
- 		DBG(rap, "Failed to subscribe to requested Ranging Data mode");
+ 	bt_shell_printf("Measurement stopped on %s\n",
+-			g_dbus_proxy_get_path(s->proxy));
++			g_dbus_proxy_get_path(proxy));
++
++	/* The Active=false property change may already have dropped the
++	 * session, since the daemon emits it before this reply.
++	 */
++	s = cs_find_session(proxy);
++	if (!s)
++		return;
++
+ 	cs_sessions = g_list_remove(cs_sessions, s);
+ 	g_free(s);
+ }
+@@ -1425,7 +1434,7 @@ static void cmd_cs_stop(int argc, char *argv[])
+ 
+ 	if (!g_dbus_proxy_method_call(s->proxy, "StopMeasurement",
+ 				      NULL,
+-				      stop_measurement_reply, s, NULL))
++				      stop_measurement_reply, s->proxy, NULL))
+ 		bt_shell_printf("Failed to send StopMeasurement\n");
  }
  
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index af4fab057e97..7ee51143c0ef 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -322,6 +322,11 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
- 			enum bt_rap_ranging_data_mode mode,
- 			enum bt_rap_ranging_transport transport);
- 
-+/* Subscribe to the configured Ranging Data mode unless one is already
-+ * subscribed, falling back to On-demand if the peer lacks Real-time.
-+ */
-+bool bt_rap_ensure_ranging_data(struct bt_rap *rap);
-+
- /* Initiator role: stop receiving Real-time Ranging Data. The GATT client
-  * disables the characteristic CCCD when this is its final subscription.
-  */
 -- 
 2.56.0
 
