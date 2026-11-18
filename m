@@ -1,82 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794975716;
-	b=UwU6vMEpNMmbq3POLcInx1ud+EQfDuGsSFVhwiuAnWMMpu6o/W/jaOXWTDD0Z0pVk642
-	 5Z8lXuA2tOJ5B62e4uQy878W6hqGVIljOXOq8zrVoTVEKQOHQiUTkESZRscruoMoBZGRj
-	 W12y+a4UoKtPqUeWdU+6ADNSRkftexWyv9Kce6HCCuo3j5kmJWdPNx6DcfWb5aDEYajaN
-	 93EGZg+nVH6uBEOkbUPrhA14VEaWIbWnHqtCGhlFQtc+tZ4leu/O0aEF3jtHR7AeX/PMr
-	 uaXzvOJZhdTCpCXM1QytA1U41zT50bFMztFvO/eT28KlNIVmWdGhgDxUiMkUZ+HaB/w==
+	t=1794975711;
+	b=pbgZb1m2MgsLqs/Wdtk+/LC2peQX0A1Yy6wJ4pgwpPQZdA1TwbZyZUvOfUmXdlifYCpY
+	 xdEJz4nFXDqtr+d0Cd6KM/5tMHpZRhnmeGNLowJzJjfVBt7j1egMFh7oDHSBK6mGAUruW
+	 vYRPuT49v5LoZ56EfbOF+QU7rIiHYO/dYe4wk+yJM8t2ULG3OdQy+1WjtjiBZcQh7OlrQ
+	 /YtMFvonhetSvXgjIGHM+8j8L2KanEKRm2LZOPaSmNJkiV+EivRpWO54gPTYWUfIZ5DNY
+	 j7CcG1hvcRnrEfddlPE+IpbZZ3yoPzkTMOiafFP4mzff01dQmcSH0YsMZHuSB3wNH1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794975716;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794975711;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=5FjZ6WhHQk3C5UxN5EckOwOWr0Pet54k2c653v4aiuo=;
-	b=J8yOgf1uHmiXfV9s2rGNdkAPSiPyPsvIm4r5k0aMRPIS4WSnkiunf+HPLAqwIkGX+p2F
-	 cYqjf/KRHppvWfr/Nq4m2ySAx4h8kjIEHKpvT3YWyM3UwdolA+FdclikxZuPO+dJ1/DVU
-	 7/opIDs45AuhOUwXEuGgY47iilPOoi+Kb9L+hIlh9H96FpsrVX2WJWjqy0w4tCFtqUgpj
-	 j5au+9GlTRiedAKZlDvaKmAUGhQxJQy7WdUAhz1x1TO43i8QQPw435j/hMMGOXVtqWTA1
-	 I00kYzM+U4yy9TqoWKRHBGSAdcgal6zBeLcyaUqc0ghjQlAoI+TI7cb6FVDbVhgKxqA==
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=EgWW/8tTggMrSKDZfyyG8vdUOL5ZUz6+50xvEDNKnOE=;
+	b=klsgkpmWuQ1tlduYfc88N53EJTRF0U62AZvdsYtXfWZW+OVYY2V/RUgzyNuRmdVO+ayi
+	 Kpl4euxLclPcoEUnSspiJl7ypa1dYRvHo079NlBrcMSkGdZW8tIO8K/FvQlNGPcHAosii
+	 vQyC6iO8XtIv0UabbvgCATCoLiNIlTdmX7x4UwEfYOv+CKuSNSS1Ev46Sq7cqZk3yQers
+	 3JNVwXSgX/ddd1BxRnxatZ6IKtcvVx6qq5CCaMvhNrs5cRdfwsKA14WenJabLwUfYB9lB
+	 myMFCyWwpXX+cS3zvqawQ/gw6e/CPvJjsudMOIE6pOr0aGUj3v9Q++eFRVy+98g0nUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GDpjUlh3;
-	arc=none smtp.remote-ip=209.85.210.174
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gA4NZHpr;
+	arc=none smtp.remote-ip=209.85.210.178
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251A0606A32C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 04:21:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 251A0606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457CC606A325
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 04:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 457CC606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GDpjUlh3
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8b5a6f2f27fso256967b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:21:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gA4NZHpr
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8b66d1a08ccso457319b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 20:21:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794975715; x=1795580515; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5FjZ6WhHQk3C5UxN5EckOwOWr0Pet54k2c653v4aiuo=;
-        b=GDpjUlh3WxtUt7TB0bO1Ya/dzT+z9CelVYZvoJQt9gsRJpCgesn+84i8VsvP1zjoEd
-         JkyL6lWDEdZgywkga/whCbfanuIb+1VBLANvFCtbnH02qEfBb/yr7X2iCUmD2ojdHPHU
-         qqq2RqACS0imNCqrnWkhglN8xvXuq8SPrRjRsstLqVahTqtmX5pSHnI7dLVOAXEQpCLa
-         0JAcrZ4MlDzdJo7XTCLguhVjueU1Jbx9RIzxLs3YgCblDQS4QfLbzFO/JsCAvGG7aBrh
-         l8PweLcTCvHIMWifUHBl7k/Po7TuybhHvWe7rcHd97GXc6e99IDAG9Lkdpx4ykqnMqNA
-         E6vA==
+        d=gmail.com; s=20260707; t=1794975710; x=1795580510; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=EgWW/8tTggMrSKDZfyyG8vdUOL5ZUz6+50xvEDNKnOE=;
+        b=gA4NZHprEeYkTP/6D69vqa8UNiJAMv9duN4yD+EivK0VhX/LapyjkM7e6RB0PE3bEr
+         4JfdsFLXmwrk/UDnbnmvwwxO8MeewAcx2bSLGpTriTKCqm8Uv4J1UB1uiNuEHkFYnJNE
+         VLAPRyGxJsEijKzKY/RaB0y+zWeoqjXC2x7h3MZ+REqV01erU9eeoXANWFfpbqtdaCj2
+         4O7KUAT5L2sA/0LjoSyk30KVo6ohkobBxic4+eOMw4BsAwJxLYQCzOOh4XsQPGw5GOQk
+         4MaeHqMwL6Q1C5806JZzmyyQ/v1J0TTnzJAGekuqPhoRA78Mt87/VinpPZxIgFz2v1A9
+         91pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794975715; x=1795580515;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5FjZ6WhHQk3C5UxN5EckOwOWr0Pet54k2c653v4aiuo=;
-        b=d4kishPBznVglE2sTr7FkVPpXaYpBJL8Er7MPCDRSn4/0Sb9rNWzaCWWz/Txdueguy
-         8sC8/on5wWldpVfbDRuKFzGTDN6yXEu8mEwM2vFQCxnN1sJBwF4aTk951lpxZE/yId/c
-         4tgBzGhhG0pTfBMogQFja4FXjcNcRERiytVZ/k+6q/Nhn68Z3anNWbFIKiq1hLZ/3Z/J
-         TPijpOPpurlAcnq2pimsa9BGubQn0XZYmAdwKHdV/10E5mpZLxmU0cF5BZo2+Xbfs2St
-         JMtHq+p9TgS2LMqaaWTDZ4PZo0Zd71fpO9kbhH3QQZI8hEiDwGGY5ww7/v9GpnpcQBI4
-         B/1A==
-X-Gm-Message-State: APuU4Z9ZfOR6yckiQv/uy0skQlJRfBpVB3SGPG67u+IuzCBDtpMG9TXW
-	96eztaRlRm9Gnp8w63xfUzlbwrC6iTVbZaENlfc9kxR+E1XBus/m1ULj
-X-Gm-Gg: AYBFou0HY5joTzsNnEFiG9DD8bwlR3tMrp6LG/MKXRCY82M0CTQ/PwiocKvuWq2EZnW
-	dTNkhNlFHH9d4/5fH27+JGsuk2QSkaYUJOsRIu/StkuZgpuSdvSlFBibsdy+GIuzitQau2OQhti
-	y8RmTwMqY+YqT5YeHYfFjcP4DksnXor/7P3O8ci1+vATxOQeqKR6e78V/fl5iDVKnuJNRhVFT4X
-	3Gr7HW2pQSV6p+2MIeqoFusIrsOoduIJyAmHucPBL2qAyV5ZlvSDLl3ErOb7aQRUCpLrpLYp8lm
-	jHI597nRo5V2qKj1VPhT4mR7wvIhwjrRYuqf8OVSDX868UrwP+dYaiYMoQ6/0vf/vdw/9Af1lnU
-	T50Z6DC71Y6mqSZy02JJ63RB1kI0bspIovY/QmzInejyGkKxbq964pGRNqAXg7+JqxPzkdA2jAc
-	VFRxLB7tc0rjJ3rUlYqKLi+npX9YuE89VuTVibbtZ0rNvGd4ybaI8EM0hsx5wIFwZatBGxDWagV
-	IqwM60Wfmr+t6WzKjE3vDWup2p5JayNCorAps077h8SesGyirWv56xRN1n7a9T2epSdVJJnsDmZ
-	jq2Glr0saftZUEOUNQYVAOa/
-X-Received: by 2002:aa7:930b:0:b0:883:904e:da56 with SMTP id d2e1a72fcca58-8c5d4101715mr1030823b3a.36.1794975715272;
-        Tue, 17 Nov 2026 20:21:55 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794975710; x=1795580510;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=EgWW/8tTggMrSKDZfyyG8vdUOL5ZUz6+50xvEDNKnOE=;
+        b=nUo7owPM0h3ki/lY8OIPSNQjauw7rp6f81v+uCIFV8W2Way066+RU8d24PxFCM8j8G
+         mt/7sHlD45KNk1SexWcQ8ioeOMHEJC8ptKokdv/UOCe4NgknoawfKNC4mQB9OMwq+SMS
+         99fAVesgnfwLcgGkWGSDlQPgujGnCH+wCTaHtiRoA/0cNzmGg5qvWwEJhLeH88v2u8Z1
+         QrtLZKDI2ZKc4mYghxzdOA8pfv/pE72MY3NbwFT1zNs9zNLe2JAKbeIUnogaXWRsGSMv
+         crwuqYkOzvtTq93Z5foYIf6KKwXjoCgkGBkpQCL6z4z5XR9DI3zZpwKrlxcTLgoyn5zR
+         LDVg==
+X-Gm-Message-State: APuU4Z9htdCyAdP+CIetaeFh2vdfqUbC5IuumBNxBqVxdA077gQ1gI0Z
+	mJsUbfMFWPtfBv8Xq68oWQ3aptt1bfqTl8SxsqYRb4aAwF3vGYm4U5p4zYuqdD52LQU=
+X-Gm-Gg: AYBFou2hBid4ibKpEGc5zaF2BxN6Hr/gvG10EsP1Fw8DnA2PVoBXycIoQxfKp0aGGiB
+	0V9Da5lbNl7fyb+jyA6bZT1/1SYBM9FhsYeSn7NkdwOIj/Cw+v6GM/BMl3PirNie3yY+Ov0q2D3
+	xEp1PRCjQsI3nRoPLDgwR7uzP1ypo7MeutVSpJMyzEMUJ3JYJPeZAKsoiaxLy1HqWYbNOs4X0G2
+	GXt8o/1rweejD13FNfzlGyNM6f4QekuBDuRlIozsIa+IqWp2p2VYiRtRFaIY+8dFM5awO1dTiGV
+	sjNZlNEsQvyFTo/q2i3f2nJyPwq1zp7vyqcWQQtRMS+KlfNn5W5pDAoT/FUgR7z1DHarAHSW2ic
+	DaO+GtOi7qxQ6oG+QwOmnaBiHIinm3XIjP0lceTXgCkCM5yuIvGTiexo7dC44FjHdw9AJ8SwQAL
+	C29R1NBvKx2RxVzkb3yTYZ7Efa7pBJZe8RSN2wZaFhnwFX7dbPJqwLmGt6X1X6Mcfygb9Zw79IV
+	n+5na5uFnD9ZUduMmybPOMj7dCZqJhSjZQNVx6PmrN9UH2joi1X1SWni2Lbh7z7GWQ5WqekN55l
+	O7aH/8d+rqsIX7dgARtx4E9Jg1qcVwH9+dTKCyvzjwEIOQ==
+X-Received: by 2002:a05:6a00:22d2:b0:880:b709:cefb with SMTP id d2e1a72fcca58-8c5d4cbd63dmr1158086b3a.45.1794975710241;
+        Tue, 17 Nov 2026 20:21:50 -0800 (PST)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c5ca7aaa8dsm455003b3a.10.2026.11.17.20.21.50
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c5ca7aaa8dsm455003b3a.10.2026.11.17.20.21.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 20:21:54 -0800 (PST)
+        Tue, 17 Nov 2026 20:21:49 -0800 (PST)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -85,12 +83,10 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH v4 1/4] Bluetooth: SMP: Publish root channels after initialization
-Date: Wed, 18 Nov 2026 12:21:35 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0184-v11-900043ed2303656c76fe-1@gmail.com>
+Subject: [PATCH v4 0/4] Bluetooth: SMP: Serialize root channel updates
+Date: Wed, 18 Nov 2026 12:21:34 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0184-v11-900043ed2303656c76fe-0@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <pm-bluetooth-objects-candidate-0184-v11-900043ed2303656c76fe-0@gmail.com>
-References: <pm-bluetooth-objects-candidate-0184-v11-900043ed2303656c76fe-0@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -102,85 +98,71 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smp_add_cid() marks a channel as fixed before setting its operations,
-address and parent nesting level. Once it also sets BT_LISTEN, a global
-fixed-channel lookup can select it before the remaining stores finish:
+SMP root changes must serialize with their users. Publish BT_LISTEN only
+after the root is initialized, under the global channel list lock,
+so another controller with the same address cannot select a
+partially initialized root (patch 1).
 
-  Controller A                     Controller B with the same address
-  smp_add_cid()
-    l2cap_add_scid()
-    chan->state = BT_LISTEN
-                                   l2cap_global_fixed_chan()
-                                     select A's root
-                                   l2cap_new_connection()
-                                     call chan->ops->new_connection
-    chan->ops = &smp_root_chan_ops
+The force_bredr_smp writer takes hdev->lock and changes only its flag
+while the controller is down (patch 2). Power-on holds the request lock
+for its auto-off update (patch 3). Registration then runs on the ordered
+HCI workqueue under hdev->lock (patch 4), excluding both HCI event users
+and SMP receive callbacks from root replacement. Patch 4 depends on
+patch 3. Patch 2's exclusion from power-on also needs patch 4.
 
-A per-controller mutex cannot exclude the second controller. Finish
-initializing the listener before setting BT_LISTEN, and serialize that
-state change with global lookups through chan_list_lock. Keep the fixed
-channel type assigned before publishing BT_LISTEN so connection-oriented
-PSM lookups cannot select an untyped channel in between.
+The old mgmt_powered() called smp_register() synchronously under the
+device mutex before submitting the HCI update. It did not run in the
+receive worker. SMP receive callbacks began using root-owned OOB data in
+March 2015, before the synchronous HCI update conversion that November.
+The shared root transform use was added in September 2018. Patch 4
+corrects that history and tags the earlier root-data access as well.
 
-Fixes: 70db83c4bcdc ("Bluetooth: Add SMP L2CAP channel skeleton")
-Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
+The WARN_ON() for replacing an already registered root remains. The
+separate HCI_CONFIG auto-off shortcut issue mentioned in the review
+also predates this series and is outside these root lifetime changes.
+
+Validation: GCC modular and Clang built-in Bluetooth builds, including
+Clang context analysis; every prefix and the combined tree with the six
+new Bluetooth series build successfully. No new kernel runtime test was
+run; the quoted reports are from the earlier instrumented test kernels.
+
+Cen Zhang (4):
+  Bluetooth: SMP: Publish root channels after initialization
+  Bluetooth: SMP: Serialize forced BR/EDR channel changes
+  Bluetooth: hci_core: Hold the request lock for the power-on update
+  Bluetooth: SMP: Serialize root channel replacement
+
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/hci_core.c      |  3 +++
+ net/bluetooth/hci_debugfs.c   |  2 ++
+ net/bluetooth/l2cap_core.c    |  8 ++++++
+ net/bluetooth/smp.c           | 46 ++++++++++++++++++++++++++++++++---
+ net/bluetooth/smp.h           |  3 ++-
+ 6 files changed, 59 insertions(+), 4 deletions(-)
+
 ---
-Assisted-by: LLM
+Changes in v4:
+- Address the cross-controller root publication and powered-off debugfs
+  concerns raised by Sashiko:
+  https://netdev-ai.bots.linux.dev/sashiko/#/patchset/pm-bluetooth-objects-candidate-0184-v9-4094fa28af7bd56a283a-0%40gmail.com
+- Publish fixed roots only after initialization under chan_list_lock, and
+  change only the force flag while HCI_UP is clear.
+- Correct the registration history and early root-data Fixes reference;
+  state the dependency between debugfs and power-on serialization.
 
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/l2cap_core.c    | 8 ++++++++
- net/bluetooth/smp.c           | 3 ++-
- 3 files changed, 11 insertions(+), 1 deletion(-)
+Changes in v3:
+- Address the hci_power_on() path that reaches smp_register() without the
+  request lock, raised by Sashiko: https://sashiko.dev/#/patchset/99158
+- Add patch 2, which takes the request lock in hci_power_on() again, and
+  correct the locking description of patch 3; the code of patches 1 and 3 is
+  unchanged.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index cf5c2df68af8c..e3d826772db66 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -982,6 +982,7 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
- int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid);
- 
- struct l2cap_chan *l2cap_chan_create(void);
-+void l2cap_chan_listen(struct l2cap_chan *chan);
- void l2cap_chan_close_unlocked(struct l2cap_chan *chan, int reason)
- 	__must_not_hold(&chan->lock);
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0d4f3341bd47f..319016eff9689 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -456,6 +456,14 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 	l2cap_chan_put(chan);
- }
- 
-+/* Publish a fully initialized listener to global channel lookups. */
-+void l2cap_chan_listen(struct l2cap_chan *chan)
-+{
-+	write_lock(&chan_list_lock);
-+	chan->state = BT_LISTEN;
-+	write_unlock(&chan_list_lock);
-+}
-+
- struct l2cap_chan *l2cap_chan_create(void)
- {
- 	struct l2cap_chan *chan;
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index f8f86b8f73f05..948a847c0dc23 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3400,7 +3400,6 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 		chan->src_type = BDADDR_BREDR;
- 	}
- 
--	chan->state = BT_LISTEN;
- 	chan->mode = L2CAP_MODE_BASIC;
- 	chan->imtu = L2CAP_DEFAULT_MTU;
- 	chan->ops = &smp_root_chan_ops;
-@@ -3408,6 +3407,8 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 	/* Set correct nesting level for a parent/listening channel */
- 	atomic_set(&chan->nesting, L2CAP_NESTING_PARENT);
- 
-+	l2cap_chan_listen(chan);
-+
- 	return chan;
- }
- 
+Changes in v2:
+- Address the CheckPatch and GitLint long-line failures reported by the
+  Bluetooth CI: https://patchwork.kernel.org/series/1197223/
+- Trim the crash reports in both commit messages to the headline, call trace
+  and allocation/free stacks; no code changes.
+
+Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0184-v7-c26e53b52c260063ab6a-0@gmail.com
+Link to v2: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0184-v8-60106ad0c49170f5bfb4-0@gmail.com
+Link to v3: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0184-v9-4094fa28af7bd56a283a-0@gmail.com
