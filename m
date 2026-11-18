@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795029089;
-	b=mt9v6SNHq9pJMJ9nbpi2LJFy1KDo9i9QUrJM+vdYrK1Y9EK/R8A7g/4UlHvTz1d9ZUjK
-	 GZb8vDvxXHctDKr6cdumXNRxzypfT5UbuDKHcywDbgmbwDGdlUgXoYVNZlc9TvW75uYXH
-	 NhSh+xF2KtuLUw+Fb5xum1OMzzNeIWob9GIc0iapNQR8Yn5YZkGXn30zDm2PwcMLnk+1g
-	 fQFzj0kud6bWxTAZujrCm/7akzhivVBx1oHnXpqfjtXmZAGJuTilO3cSNovoQA02iOJQ0
-	 AhMQOKNHlyftqiHLsSZP3kPJptx35v1D/vwWiGevAIToh5hiVZlCYzvkJxl2GpHPTXA==
+	t=1795029090;
+	b=kFvAIk/G/frgUxCWzGd1FdezwPsQnTwQ3Ym2xSqUuowOQzMtNtBdg8PvAdxPDFcTDzxH
+	 I5EQUqzhsUurjLH+nPar0k787bBH4z1Ibk/ZuXeK1sBGbh4JiuN9ROf/+rJaVV2WLjkco
+	 lwCduMnoorDyzUuHTwHLLwFj2YqkDxTbp8SZDCAgnjO+nxGmfAyNfeZcLehh/A7+q1qNV
+	 nRAS2KY7MlDtgY104gZ3JJnUtWGckEkXR6ssC+0E/BGML5aTKF9hF2+og572WLquZns5F
+	 59/1BdKWs1jlFhl49jnghmglMlRVY2ZGyx4V+TM7QXbvr3yPQqgs9jGJuHCTOZ3JVow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795029089;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795029090;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
-	b=tpLLh37/G4pACSui57WYPnjg65lpfD3r3GNXw7IBRCFZVF5NCmHYw0sn57HN/N0tPh8f
-	 tnYV/URMbRMOxYc+TOXXroISMckQ2cu+Efq7yYu6iv+sYbnzTZnjicSIFXrYeZ8jHbl8o
-	 qXCJ0mL/tC1eMZSsxxuo0TBb/iYD80aZelrthzMZVDm1I8OhIyYB1HPZmyBcJwjc9RTN5
-	 PInFvjVWjbw3gKgXqOfFG4N+eHcj+4rWaPKmOwgqXD76d+HBEdrmO2cSDq02iRFM1IhXB
-	 Ts+aAE/NyL3NKhfAWQ2T6TQ7bsBViTczE6Jl1mYOyRjahg7bFtUfQ4xKY/uZE0R6+3Q==
+	bh=vtxpwpuGtInRr5gt07Rg6EoXYRMP/GTxLvl77pRX2aw=;
+	b=a+L4q8BhjfGdDVURxB5n9xY2J8c/hRomG6Nqt/Sv0Zd6L32JrThEcsUw+JLJ1u46ymcj
+	 OU9Y9GkEAO4OAVZgp3WjarRmzN5549jhgNyrn8s95rpgC5jM0UXfEP7uc8qftmGNiNB6K
+	 mXFFQViUXCegrABaO1Dll6TRO5HLzH1u49L4PkPRjt+dqbTjcnsrUxV+xugIx/ahNYDva
+	 h/4xigIXSvCk3CJaxCSn2D+oHCLYw984qHnJtN+OOcK8L6FQKr3ce03Z994X2pmrjQQmn
+	 zCC5uTyKMliEV3HvgWKFyVRwtZqo91iyHHMmJit11xe8SEgxjK6rPIAcjyJkGmx1k3w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K72Y7Rbb;
-	arc=none smtp.remote-ip=209.85.222.47
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yi6AUyfN;
+	arc=none smtp.remote-ip=209.85.221.177
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867FB606A32A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 867FB606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F61606A325
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41F61606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K72Y7Rbb
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-9907a58f14dso425362241.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yi6AUyfN
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5eac01ff101so512219e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795029088; x=1795633888; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795029089; x=1795633889; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
-        b=K72Y7RbbBvMXbhiv92w40M3EWln0w5HK9V9ORu/JkpF8G48aFkodHUCM84NniedVHb
-         Bfwj2UqbYS86VIkrr2ggiia9KS/4pQ7vCSePr+Dt690eAMhzHfuyhSWU8rdC/+nhA/zb
-         HEY79PZ+KlrvQ7QlIFDD/6b97lk/xQ1m3QRLGt5idbu5wS6ETVizc6VMbnmfplVHCjmN
-         avsXmA4XIUNb47zzIzvK7jbse9yig0qVX577H3384wcSqx4vfci3CEh+wSHTGMQdepXE
-         sR+U2aisyFFBYN41eXNUFUtU+R9LhgQDlW5lKGeFTji8Wf86zfReP/bqoWOBNptns5Yi
-         v9Zw==
+        bh=vtxpwpuGtInRr5gt07Rg6EoXYRMP/GTxLvl77pRX2aw=;
+        b=yi6AUyfNc2PkWzMlF2JPE2cyYIrThud3yeJrSGdxxK2zYw28mb7Nkd0R0c/LF3dfeJ
+         UsQ/eS+Zgnq2HqS/eTO3QKJ0RANx63TV/L5+bL438Gc3gpVjov6T805c1IxM4Qae+C6w
+         QoPHNwNFB0V0z8oQCwAu1p3pHPs1RuyyJZKX7Lx2egKk3lqx6WmIsLmC0B6njLDtm8ZK
+         rvsKGMVJRKyTWx/RoRPYBwCnpA5Xg1SgHVjQryCsflIbgEITYaVXFjOJaxIkZKA9rVWt
+         OWOaqODkQYuPDHJ/y5c7B/BCchVEzMXRFtep8gRYG0ildX2zs2PMQiosX2Shq1kSLVeB
+         aXUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795029088; x=1795633888;
+        d=1e100.net; s=20260707; t=1795029089; x=1795633889;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
-        b=VkGOGkZ+JzSZNZFaw/lQs0UCnmTf9yUGPoOexp2H8if9Kr/UmPfmYASS+zPV2JOMWR
-         5I1twLc0nw1rededEleB71q615lg57zrTmSp+MQSQRz5H0xqreuYHyWgBPrZHINc09A4
-         CqVUJ+64KVt8aIsqHoY/L1Nr80x+YwpB/mlUlihIwnlv8ublj3CTmM9f+JDrtOT+JbhU
-         R0IMvsEq3OrUJbTLRTBzjhBhXDT7O+gjbcqh/QomnE2CKMYpcl9llzGXhvr89SOyHEha
-         zWGXomvgJvTuXNu5ZV5ER/oSmZcEXMHTVilnmS9Kq2tp3IA4fWf4j8gKUMAFqvRGSfV7
-         /PiA==
-X-Gm-Message-State: APuU4Z+YDB9B+q37VizWgOA1th0hjcOTRHiEzwuKI9xtPjQsAMdS+Tzy
-	SPpcqssuy8P96pmYh3lIwFNNhvB5r543qPaAzhFJgXet2sRbSIL4bHsbmfT/IwJe
-X-Gm-Gg: AYBFou2KKgjUy5Y1yrDWQIzqfqwLy//14jq0NxFOUlbtn1LDffPeC0X0p1Tf4APszMF
-	O+aifb1AkcZlVKfzIjykscGSeu2FpsYN9vpONCZART7AEEJtQvm9CI627zDcbY4q70wTbmt5Ohf
-	zi2WYDNtUAU1mw+v4pOoKFaoth2QvDEqsU+5Ji8SwTtWBaQFWMRaEGH+JfCLzI7g6dYsImSyKGp
-	EZvA0r/ojChPDzFkUaFePtsfVQxSsttFxG8UEslRudCuIaAShQShXJ1YDE/vTM8c2xHyn/h51YC
-	X+Qq0rDb+ToOLj1CiO98ghP0/+4OQttfOxwkdq2JuxZZ1+PQEypc8ehZmqHdKst8GNP/lswOurL
-	lSBl+ptJxNmuiV+iwcbDMwa0PmBzlx+RHv3Zvm6dnphkRrQsWeakk5nVuUSbXhwri7kRV5HdAVy
-	JlUKYBYR4i0EBdQZBY1e552s00+TFJKzP44yWsBt1ft2WtbkxtZ30cn44OvsuRlWNZthdzZWajU
-	thsLikgydACQKz/yltx0wufiFm+MdxHQEd6lzXXJ04iQPXh4+s9O8TdmraxIVHhOw5Hr5dSOkJ3
-	uq4VJbE0Kw8HDfSLvy/AxFD5ccEmZimqE1OeXx5hPUDk4C7/Cl06gWHi202pJxsBxMoSVpqTpnO
-	aQrFVnTWTGVKlTLu+Pd0dIkji8STV2oHATOJgzMvarTyCqWFdjmvos6GsOxsd3u5rfYjqJIA/4S
-	KXaEg=
-X-Received: by 2002:a05:6102:508b:b0:7c3:9a36:bbda with SMTP id ada2fe7eead31-7d6ba22a9e6mr1433040137.5.1795029088397;
-        Wed, 18 Nov 2026 11:11:28 -0800 (PST)
+        bh=vtxpwpuGtInRr5gt07Rg6EoXYRMP/GTxLvl77pRX2aw=;
+        b=VBGUD7iY2jP3AY48NzMCVr81Y5BLrIwgJ3WfeoqxGeIB2g1eF3GnmOL3mK2Rku8vwQ
+         iHYq75bg6x/+/DOvAMewXRXFajxk8LMYHFYf4zknmqEeUa+z9rmCRetb+d3xnzxHbM45
+         oRA5fsSqBvRjUJQliAe5YocLCYH2zZgrqACUFZqwum/sNIq1dYMA2dLjg8kjlH9g2qe0
+         YnOkrFl0l3DZiDxpD/AMwDqXzftVZvjCFgeMWorZC5SJNMFFPZeYPwLPSq3gQBkdmpUz
+         iLVpTHIxwrXliydrRLxD6ZSvzsl5qB+p5fKNf7N9apUdpCEsgsfHPBF0xl/RwXsTMFOi
+         xYOw==
+X-Gm-Message-State: APuU4Z+CpiBC7vZyeFq0r0Sn83EoWMPvfRdG43aYBCaPQXapRveWvSmF
+	m5c6NvJ31c7BoRayHuOD8rZXQEE82tmy2fOkccLHq0D6vGoszcaQasqlsW5a9yzh
+X-Gm-Gg: AYBFou2tZM4a/1hleUHS1QtyhIUKvNy2lfjTG+7+qT7MkK6/u4DP7Hx92sw6ChmOBca
+	66ODr9t1QcRyJY7huN+rIOXlKNFDGdXzXcPVaYwLw3ZeLQcdntUoRhWslF1aNBrypaX30/vyyf6
+	OgWyGAHddIOEy0BON8DTYbLfY4U1YR0euINsGiCIMw+drfhoSzYBqa6n6+UyX3bgbcqnPNqDnhO
+	1w7/v+h/8jE8sJH7ELM0YXsk546b/zTpiRBRD0WjJhZ9J+tMqsKdXL3S3ABJ3Frll8+idUyWT28
+	3Eu3l6BUWDGDhF2ezkWZg1V9Wnatfexn/oaX9HF2EhBl6F8VH0P4Q1x3KuMXRnRuv/7+mBX3QpR
+	E6+ECZ5aWsZmJCIN6NfWh6zDjclG6rK+wYmzjpPEiUC8plMN8J0XNSTR5EqILrjitz7sSxfD4gv
+	UO0BMKfF8BG2LzKHfEwt3QoA5wJA8QBWCTP4FsMQIbIM2CN1vhdRUkcUY2qUxoTLx2a95fgx8ar
+	hJgD1oUXCpMGgP5BP9gKxQr05JBVcYNmSHb1uQkmq0zP4+DUUDr7jCf8jw3QOx/THsEe4XYDXiI
+	A+gSpO6EUw4dOpRq1qDGrh5868FYLhru5SVhS10ETmt59JQrjRijM9ryShEqAQbXsWNJbxtGbgv
+	lY+WkQfVb1gIEDOUSQNxOBgJevBaCo2cyFctkyg+U7mIjCM5uCfeCOAYuEnLKHAmz0D4fUkXN/c
+	CbMNU=
+X-Received: by 2002:a05:6122:1801:b0:5ec:4112:6839 with SMTP id 71dfb90a1353d-5ee647160b9mr1780314e0c.15.1795029089118;
+        Wed, 18 Nov 2026 11:11:29 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.27
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 11:11:27 -0800 (PST)
+        Wed, 18 Nov 2026 11:11:28 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 07/17] Bluetooth: SMP: Don't create the BR/EDR channel while unregistered
-Date: Wed, 18 Nov 2026 14:11:08 -0500
-Message-ID: <20261118191118.318779-8-luiz.dentz@gmail.com>
+Subject: [PATCH v5 08/17] Bluetooth: hci_event: Validate sent command length in LE Set Ext Adv Enable
+Date: Wed, 18 Nov 2026 14:11:09 -0500
+Message-ID: <20261118191118.318779-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118191118.318779-1-luiz.dentz@gmail.com>
 References: <20261118191118.318779-1-luiz.dentz@gmail.com>
@@ -101,76 +101,40 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-smp_force_bredr() created a BR/EDR SMP channel even when the controller
-was powered off or not LE capable, leaving a stale channel that
-smp_register() later warns about and leaks. Only create it when SMP is
-registered and guard the removal; smp_register() creates it on power on
-if the flag is set. Since smp_unregister() runs with hdev->lock take it
-around smp_register() as well so they can't race with each other nor with
-smp_force_bredr().
+hci_cc_le_set_ext_adv_enable() read num_of_sets and the set entries from
+the last sent command without checking its length.
 
-Reported-by: sashiko.dev (linux-a921c99c-0b41-485c-91a4-1c6e54b45b0b)
-Fixes: 300acfdec916 ("Bluetooth: Introduce force_bredr_smp debugfs option for testing")
+Reported-by: sashiko.dev (linux-42bcc244-62e6-4295-802c-f9a512ca49a3)
+Fixes: de181e887ac2 ("Bluetooth: Impmlement extended adv enable")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c |  2 ++
- net/bluetooth/smp.c      | 20 ++++++++++++++------
- 2 files changed, 16 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_event.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a1f272c14a1e..b1925153c2c7 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3892,7 +3892,9 @@ int hci_powered_update_sync(struct hci_dev *hdev)
- 	 * registration is required so that LE SMP can clearly decide if
- 	 * the public address or static address is used.
- 	 */
-+	hci_dev_lock(hdev);
- 	smp_register(hdev);
-+	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7908d920c67f..ab875b90a143 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1685,14 +1685,16 @@ static u8 hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev, void *data,
+ 	struct hci_cp_ext_adv_set *set;
+ 	struct adv_info *adv = NULL, *n;
+ 	struct hci_ev_status *rp = data;
++	size_t len;
  
- 	err = hci_write_ssp_mode_sync(hdev, 0x01);
- 	if (err)
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 7e0be869cc74..1c315c9ee7dd 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3441,20 +3441,28 @@ int smp_force_bredr(struct hci_dev *hdev, bool enable)
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
- 		return -EALREADY;
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
  
-+	/* The channels are only registered while the controller is powered
-+	 * and LE capable. Otherwise just record the flag, smp_register() will
-+	 * create the BR/EDR channel on the next power on.
-+	 */
- 	if (enable) {
- 		struct l2cap_chan *chan;
+ 	if (rp->status)
+ 		return rp->status;
  
--		chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
--		if (IS_ERR(chan))
--			return PTR_ERR(chan);
-+		if (hdev->smp_data && !hdev->smp_bredr_data) {
-+			chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
-+			if (IS_ERR(chan))
-+				return PTR_ERR(chan);
+-	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_ENABLE);
+-	if (!cp)
++	cp = hci_sent_cmd_data_len(hdev, HCI_OP_LE_SET_EXT_ADV_ENABLE, &len);
++	if (!cp || len < sizeof(*cp) ||
++	    len < sizeof(*cp) + cp->num_of_sets * sizeof(*set))
+ 		return rp->status;
  
--		hdev->smp_bredr_data = chan;
-+			hdev->smp_bredr_data = chan;
-+		}
- 	} else {
- 		struct l2cap_chan *chan;
- 
- 		chan = hdev->smp_bredr_data;
--		hdev->smp_bredr_data = NULL;
--		smp_del_chan(chan);
-+		if (chan) {
-+			hdev->smp_bredr_data = NULL;
-+			smp_del_chan(chan);
-+		}
- 	}
- 
- 	hci_dev_change_flag(hdev, HCI_FORCE_BREDR_SMP);
+ 	set = (void *)cp->data;
 -- 
 2.56.0
 
