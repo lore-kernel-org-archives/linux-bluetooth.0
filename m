@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795029086;
-	b=4zzVD6hmI83oF4LMinUxibgS+FmJTVLbJ7aSZ3ebpygV6m10EfvgYRCVfA9/JVEd+5lV
-	 vJSDFNVDPfUWGyUHdoVFYP7r8POexOVMgjJ9bNnIUVeZp9kaAd7iroal1TBt+SyiTIrej
-	 kFmmPmoNoSoOYPeZ/is/3UBavJDw/rrV4iiyoAaT+m4TymDldY5UvyyJ7EOUBI3lzejZc
-	 Pbz/iKgYxlEG8WXicXKrso4RbWQ8puGFB6ORz4CTGCvy+246J2vF6hqQQbuYscI+iR674
-	 ncH+938Gjg5gAiL99HXX83vwcLNwxzqKhIVkARP3dV6pSS5VV8EKePsWFPtPfoTzQNQ==
+	b=w7qdIzFFiUQ9nAFDDwd9k5Emk0I/8sMG1bgsNAoj5BpBaqJ9GN/nEP9xD52NkNkyaWIt
+	 vNgI7c5xG6TjYYWf9mDJtOMsuidEH3Q3aplK2qHC6bHyFlPGj9DvBe8mn/d7ZltvSazxI
+	 r3jv+Uj2jMx615IoDLMeVsZ2SohQHyb/pZv2jY5rJxjb8Tc6uIdyopEdsNBECJHGSkkOL
+	 QvMUPhLXBSit9gO5sJ8dGMqJdw3m8sKqtrQTm6K/weuCEMjJtfa0svqtHfP67zAXQM034
+	 4ktYQSh1doAhVfWoiVfVnpfReVCGvjqAPSbn0orF6NiZitIhh6Vfnxsh04VrxmVu+kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795029086;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=n0pqOByGajxzAGxQIu938+LZbHpvZ5anXF1/+ic+foA=;
-	b=JBXq2qK3JbRlA729dOMxQpCH6cU/et5H2EEcdjWzSPJMQSrmTyAdMPweV0Gfkb7ZeKl9
-	 2rLwDFGRbTcEChHSpTo+S5scfH8fIn4UxxC9d1HES9srhiLTijwz72LLSCV8BrbBE8vnz
-	 a8HQaasTCmTbAnEHsmFgBgzdX78DLSvsG4POnErKoFuUXbOMUV0R+Iwi2CHD5yoU5iMIZ
-	 4v9tPJ5W/rVFA+dEd5PyGZnsf7pnCnKdqNlsG+ZAUPspw20FZ7AiQF4cNubBflgvUgP7w
-	 ph67bXIXdtyiizUpbz3bWs6yD7P/L8a2atIKV18fsS2SI4w7Lw7QzSmF1y46Edk82dA==
+	bh=HrU8Bh5T1SPlOOXv7Kk39fzwLPRearCIicsjvDtC2VE=;
+	b=YEAsF8WITE6MrHy7vW9/jRv4tGAQ+kOVIrvc2N8BlyZr1Bfn3W5R2Ex+c9wxjX2bTug+
+	 i/sEYoMBedxwPQm/57zKiSvunkzHzbC3up8P0C/QjWyJg3PDglVYLiCEUidfRRM2wxqeD
+	 4G0YSJbBCXapbRHLivvpArJELQNtTgMoVgNvYR745X5TmjrhAhnKQJXp4JZ5xlefH3HvD
+	 UuMoJc0xviYaEPADRUWEx0sCLEs5lo3KN+H6UdJH2N8N/IYvbgBuTcYCYh475X5y9rSeH
+	 PiUXHP5BEyfiTu1A70F5nsoeHxJAZBX91g6Ne794ksESyDeRMrOMJpVV4+gG2zCvgyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="rKhK/mB3";
-	arc=none smtp.remote-ip=209.85.221.180
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J8kDKCg2;
+	arc=none smtp.remote-ip=209.85.221.171
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3C606A320
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2F3C606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CC2606A32A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89CC2606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rKhK/mB3
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5ecda93627eso408950e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J8kDKCg2
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5ebf39def3aso501579e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795029084; x=1795633884; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795029085; x=1795633885; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=n0pqOByGajxzAGxQIu938+LZbHpvZ5anXF1/+ic+foA=;
-        b=rKhK/mB3SKRmaaWjBg+VXNLmHbpyE0nMN0vNKX7wdPFw8keDJadFQTy94CGWSEl8xx
-         Yh+78EJ1bL1lmK4Bjn+KU7qjPlicncaDSDRWEcQU90dsKyvBcndxzvnLS3nkUrnprrbO
-         M6Ot/vwDxwrDkZ+f0tb8uze97LQdlGOwk8YnI2PLOtsnp5aBop9mWLHUGe47YnudwwKe
-         xUig+ggsfgbACG/R45ayg39BKH7OuNKJA8F+TdTy5GTIey9ejEvF8T4UDzI3qa6ewNYB
-         +F+SG2h5j5Du+5EmAyEXhP9i4AXPejMfHEVU2B6gFme5UQME4X8lzGncwdGr7duQJ3I9
-         dL4Q==
+        bh=HrU8Bh5T1SPlOOXv7Kk39fzwLPRearCIicsjvDtC2VE=;
+        b=J8kDKCg2nb+Nm4jR6/dG9K5rZp9QE0WBMAL3RQpWzsGdLuC+X81UpQMFKpQODJMOjw
+         Rwcs0IVSNkOsCUDS6R1i8uV3UfC7hAN+NBYZh3x9etWxI0a6lA4KiriRHnxt6tq48OCC
+         g9dbx2lF0oTN49bV6X//zNq+g9sxF+uAZQlDFfqQOETu+K2aF4+tvIZ2rC+OqLtJTCry
+         CSPFvFtsnjTfgTiEY+UAADyy47c2X9C7e0yZ817a8lmNcMWDqfJHK7cJLgcBoofraRbm
+         DFFnX7ItOAPbu/Uujn+TSYqTdY0qiWNXzRe09Pp90yj/rp/cDTA0cEhjqWxG4hQWpPua
+         VUgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795029084; x=1795633884;
+        d=1e100.net; s=20260707; t=1795029085; x=1795633885;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=n0pqOByGajxzAGxQIu938+LZbHpvZ5anXF1/+ic+foA=;
-        b=lZlEAyXZ58FbZKpaG1AHkWONRIEcsCC45pTFU507LewDroPlXJkQRS1PtF9xiSYX4g
-         ggEshnmxMtkZt2zDbjgoBVZUKIQBhgoQNpHROcGMS3PX37nNv+EkxL0Y3MuzV+bMWBnI
-         lr7H1JI7I38NGooSj+ucw/r8pP93X8reGiXrMP1Qbm0iXLd1WMAdnjJY6/cz4L2xITWM
-         JPmkzIppsCazJjl+23V8BswGQshVV/ALGB0SDlXiVmaNDjRQ1yvJ6qTpWFsGkxtBHjC8
-         XweHo4H2pm7eXOTEPlPaLuKgfnNat3nJJc05NdGD0hJy6X98WOgJWN4q2zGDtPPdd2FT
-         LdOw==
-X-Gm-Message-State: APuU4Z/SlK9NJTBXT69AxhzWG4w9j59ukg4khyLLBznNk1McelWO77tc
-	HENMqpSIR+fgp8d5KkXzuHEubyHPmB6PVJ+d0aUvi+dmzhlIl73YCcINlpwECP4Z
-X-Gm-Gg: AYBFou0QkPzW1aMavTIwAXVUORuqVcm5r9sgfewiSuCM7yfGfiCXQUOmRQnDv5hZ2Qs
-	iXHebxQ479qqYbc5Oqsou39xHeH1y2NxaZCT7UxBwDTBlKB9KHYhzTy1B9/AjKU021n/8ev6nuK
-	4YnTkFqk/o1QDVWGyIK7/gt64BVTggx2ahXOxCkrjOPMmyhJJ3AQ/cgajuoZzlyXQbWC29rqwEL
-	BPqYLOv6bLX4dvArp5w68ErrmEBafK43yVLHIyzRRhdfQkTdUMjfAzsG8XSTUQfsNJya4IChiRD
-	gOU8XDdEBniYV1Jhm8ZoxryT4tRdurFem9nGYaILo0389vscJP2TC25eSonQe1UslJMPw+FLCM6
-	Q9RplfOieTURsPW82EdxoyDynUBLIQQmsUyTuf3e2Xju4I3kgZp9bxgGheC9+KcBUZZMBLzCau2
-	yVYpufKeOJmCyXSdawC8NDG3xxICaS9QF1YHlQOJPS+/t986kRYpjPQBKJ/LQ4G4b4M1lFgpuer
-	AqC7MWoR6mbkB4aHI4D/Z4iq2k4NA2JEmABGNjahnDTb8Uyjov2mr3JaNYrVt1qI3o4GaGgC4th
-	W2I+iTyf/vKSaDkUnWL1N8GkKXF2kHwhS2Lttxjw4Im+TM2m4ydTpyLCcsRfcAI4Me5SgI8qWUQ
-	mHaKaBdLsFsUXjArvWcFeLFpfcmlFsZdyfCLfEhFB3Lxv7TwrbJxSHzvijG0p7zkqs5vP7wT9YQ
-	0BVg4=
-X-Received: by 2002:a05:6122:62a6:b0:5d0:e3b7:334f with SMTP id 71dfb90a1353d-5ee64742a68mr1706481e0c.18.1795029084579;
-        Wed, 18 Nov 2026 11:11:24 -0800 (PST)
+        bh=HrU8Bh5T1SPlOOXv7Kk39fzwLPRearCIicsjvDtC2VE=;
+        b=Hs+r08NGmkzkeopOwcvGfZcHn2rlYh2l3AI6B/1+NeWapqZXySjcYTzHtzUZK6OzDp
+         6orzXJp2zt62o0PvGJvvW8f+plMDMi1ojm27LF+BVwpEaGSq29eEv1SoRmbJuLmj12bN
+         ydFZQdrr45nBwlNXCPaGvtitSYpqRCBs5bvtC3ZHyjzqqecaYnwQ910s0AoRODgDxBB9
+         DJsfkYp2dmuAAM4p3hJmGsIx8gtfg1pwkDWiLb4Dhe/hKzJHnNh+N62AIt0KoA92sEut
+         IbmP4FVSfN2tNy29O3i07xZxXcMbONn95OW5GeNgUzpvCcSIGn3LU1M2vYyIbL9DRd26
+         C4AA==
+X-Gm-Message-State: APuU4Z/p4kk3uxKjRmUVhb7tjBU7FlUEmrnpStTUTe/NHBcVhzIRMGMP
+	Ob7o9aEQ2tdgUGDVkYdUeKkEdtA4CBfdXmNKta6zUw1MTy2YFV5FOLqFchXeL3TX
+X-Gm-Gg: AYBFou2R1H4qWQGV0flOjmQQyY9hew8bFmglj/s9OamoVVyH2P6aSxxA04aHogZI8QJ
+	mA////OXigcXZy5jTeJ8mTwBQlyhe0rnAngAaarqTUHNnQwrRzAVnktlP+mraSv9RBFLEBlqveH
+	cSW5k3S18H6NPgUecKB083oTvyQM+K5ahcedzlB99ZK+zEsevRorirlWutjOMEt/rykvQqoNWyU
+	A5XkZmbScqqaAd5JSBthDzFjvODClF/+xgeDx2w0BWNCatdvOncpMJhuMtZI4H3W+1S9mps8tR4
+	g5YKeHi0J/TAVR/blu6VEzWeTRbLhF5gvTwMRfhnsopzFt7IL140KyzThTJMj4pnGVedH1VpIsB
+	HdMowRssuLg3r/TRqZtWIZosDcGzezxfhhh/sWpI6bRizzBm5w8EYMiPd7GE+DmYET/bhxnECtW
+	49dwIUUMyhxYHpHQ3uVsOd7liL0BLh/xRQ8tQYrdGx8pzaTkP2rExYOLqaDDtZQNeqkXARX7XSf
+	tGf6A/exVNXtgr7lwj/KwYLGrkzwtsYegJd7Vc6Fd6ey5p9CrjLCcAjiBkq0xaNHiJEy6KQqoFK
+	lxr/wr4VGTRVjFuZ29J9ndwdi3znTBqZX5h8dgqfaPLmwhGlKmDPI5QOxDDlChgh+69LiyNJQCQ
+	xeTzlqIpcCl2TrvPur5HsYx5aWVZe8x01aytaz61Uydesba1ZUZOLbeoP7RRbBebmvY9yos/yL3
+	gsyHA=
+X-Received: by 2002:a05:6122:328e:b0:5ea:d14a:ef8f with SMTP id 71dfb90a1353d-5ee646af6a4mr1701056e0c.4.1795029085418;
+        Wed, 18 Nov 2026 11:11:25 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.23
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.24
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 11:11:23 -0800 (PST)
+        Wed, 18 Nov 2026 11:11:25 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 03/17] Bluetooth: hci_sync: Lock the lookup in hci_disable_ext_adv_instance_sync()
-Date: Wed, 18 Nov 2026 14:11:04 -0500
-Message-ID: <20261118191118.318779-4-luiz.dentz@gmail.com>
+Subject: [PATCH v5 04/17] Bluetooth: hci_sync: Hold hdev->lock in hci_schedule_adv_instance_sync()
+Date: Wed, 18 Nov 2026 14:11:05 -0500
+Message-ID: <20261118191118.318779-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118191118.318779-1-luiz.dentz@gmail.com>
 References: <20261118191118.318779-1-luiz.dentz@gmail.com>
@@ -101,61 +101,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hci_disable_ext_adv_instance_sync() calls hci_find_adv_instance() and
-dereferences the instance without hdev->lock, racing with the removal of
-the instance. Look the instance up under the lock and only use the values
-copied while it is held.
+The advertising instance returned by hci_find_adv_instance() was
+dereferenced without hdev->lock and could be freed concurrently.
 
-Reported-by: sashiko.dev (linux-a364929c-cd00-492a-a83c-5425d042b09f)
+Reported-by: sashiko.dev (linux-616b1f8e-06ec-4634-a907-5eb4e82f66df)
 Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_sync.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 3fe179d649d0..9cbf2e3009ac 100644
+index 9cbf2e3009ac..a1f272c14a1e 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -1226,16 +1226,26 @@ static int hci_disable_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
- 	struct hci_cp_ext_adv_set *set;
- 	u8 data[sizeof(*cp) + sizeof(*set) * 1];
- 	u8 size;
--	struct adv_info *adv = NULL;
-+	u8 handle = instance;
+@@ -2207,9 +2207,13 @@ int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 	if (hdev->adv_instance_timeout)
+ 		return -EBUSY;
  
- 	/* If request specifies an instance that doesn't exist, fail */
- 	if (instance > 0) {
-+		struct adv_info *adv;
-+		bool enabled = false;
++	hci_dev_lock(hdev);
 +
-+		hci_dev_lock(hdev);
- 		adv = hci_find_adv_instance(hdev, instance);
-+		if (adv) {
-+			enabled = adv->enabled;
-+			handle = adv->handle;
-+		}
+ 	adv = hci_find_adv_instance(hdev, instance);
+-	if (!adv)
++	if (!adv) {
 +		hci_dev_unlock(hdev);
-+
- 		if (!adv)
- 			return -EINVAL;
+ 		return -ENOENT;
++	}
  
- 		/* If not enabled there is nothing to do */
--		if (!adv->enabled)
-+		if (!enabled)
- 			return 0;
+ 	/* A zero timeout means unlimited advertising. As long as there is
+ 	 * only one instance, duration should be ignored. We still set a timeout
+@@ -2239,6 +2243,8 @@ int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 					       secs_to_jiffies(timeout));
  	}
  
-@@ -1248,7 +1258,7 @@ static int hci_disable_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
- 	cp->num_of_sets = !!instance;
- 	cp->enable = 0x00;
- 
--	set->handle = adv ? adv->handle : instance;
-+	set->handle = handle;
- 
- 	size = sizeof(*cp) + sizeof(*set) * cp->num_of_sets;
- 
++	hci_dev_unlock(hdev);
++
+ 	/* If we're just re-scheduling the same instance again then do not
+ 	 * execute any HCI commands. This happens when a single instance is
+ 	 * being advertised.
 -- 
 2.56.0
 
