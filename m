@@ -1,111 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.126.126
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.229.8
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794968810;
-	b=Xh6/1rZi+HRUtCb2LC+IiZV7T2n9D0nKvRr35kDLl9404JzsyckGnFfeZCf3dkR3tqrE
-	 J/ooelb6NNVRI2MzMjEXEcLsk0ZdbnvbFHhGaO9eVXB/8S/omKXeVFKgc1At1k7/jU79c
-	 +zbaz7EmI6TM6RhJZ0bsn0UsA6x5yTCb+PQ3N3KNoh7oTpkmamp1f0Gvd5itjcKE66OOW
-	 hRze7D6VY3alud0b+sJNVCET0enSIY6/c6pBUx11sYqvROMaCQs+MDNHaFDP7bGKz7Ezm
-	 QH8W/Q0V/a08bS4zBEyZq8Cri9yAxOqsPbXQqbCYsDuWy3Jy2J37Ui8J5Glr4mK4dmg==
+	t=1794969246;
+	b=bOGFWviDKBjW4YF+XZGDVEad0CvOLFSclfyEtQmjZPC2iz3VgLGICRA+q4RODs4G8pFW
+	 WHkhMq1mCtyVwaT12vbsIo0Io/+N38sliFCDvTFVrxXB2JW8PFbYQ+h+R+2vLWwf4srxc
+	 uMCgN7MmmxLx5Fy+6tq/So7oMYxJI/HSZNtKL8Xar6R32Hg89Bv/A56rkNlkhUfJe8WBI
+	 Cvla2Q8TGzW2o8PGhgrqalFSSrDHF/yMocHez+it2QI3sdaBE8Ys8kP0sI+mI2QschHn0
+	 xm73J5axVoAGvn8LPB/Qgb54arTppSseq5Cy0kQnkRGGCArecjHyLc433L6H9anSjLw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794968810;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:From:To:CC:Subject:Thread-Topic:Thread-Index:Date:Message-ID:
-	 Accept-Language:Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
-	 x-originating-ip:Content-Type:Content-Transfer-Encoding:MIME-Version:
-	 X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=iGy2iFQ6kfqYNMpbjzvBQTdM25mE/7Ei4jil4TRrNqg=;
-	b=f28Lp60V4vALB/mg1o7E1AA7OCxKqh8XTgN1j7CYKvxcnouvX5DB1PRPVDCa0Dm6xpi0
-	 R9V2YIIkjnvZg/ToVow7uXThUXa5f6AfIUb1x0LhidERR99Vf7rX/VsAUZ+/jv9DUIlds
-	 cskR5pLDVjIdd4fxmX+6xmHizkoBOmLu27fd9uy6N4TCxRD7YaBd8xkJyZ/SV4Xnc9I92
-	 /+ESeyYo2VDew848V52GqjrIy/49B/Ck8hP6Z+XTBp3sodbY2SVvVfqjZlOVT4xJK2ZMq
-	 +9t9aH2xKQMVnNG5SRfyC74Qc1tsTp/PyaGAKw8WlkNQz+V7enWhAYjst4vZ76m6dAg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794969246;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=vfERvSbLKQVx2/pRS1U49cTa/EfH2SnyGAp5xqkhniI=;
+	b=JRtGzyawH3GSAnBxVmMFP/bd361XLYwddsRYI58SITId4doEUYHf9yzzQiH891JWClUH
+	 qEz22aRj8KOL6xExoW5NqcvHuLXKOc04RJYHD706zNvYkZz3Q72MedkmA1P13/fXZutYW
+	 tfCEFoUsI3GU7RBoQ2DpvwCLeaQASp5//hQiWDzcy6pm15gmXllcMRVBJ5q2FVbfXP89s
+	 977PdVmoLbm7Wwha9F0zD4X5u8dDy3Xa555112bjyjF99lJgkahGvIjJY6Sxkvxeh8gAk
+	 wGTiMcFS02a4BAGxxgIteax9J1zxiWVS3doXql19VCUlfyvCBidOHsK9h5JVNO9FHow==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=tymphany.com;
-	spf=pass smtp.mailfrom=tymphany.com;
-	dkim=pass header.d=tymphany.com header.i=@tymphany.com header.a=rsa-sha256 header.s=selector2 header.b=gMiJWAjF;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.126.126
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022126.outbound.protection.outlook.com [52.101.126.126])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gac3E7di;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.229.8
+Received: from mail-dy2-f8.google.com (mail-dy2-f8.google.com [74.125.229.8])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3A8606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 02:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F3A8606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tymphany.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tymphany.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00862606A31C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 02:34:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00862606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tymphany.com header.i=@tymphany.com header.a=rsa-sha256 header.s=selector2 header.b=gMiJWAjF
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WBeugPItWZlOSd+3YzSysAwU5T7akxrh/VxbeSLorZ5NZC9xHsEWMyIHxH1J/wigdVD64ZGvJcXNwEFhcwA21tC44ChIlVckjT5PRt4FpO+bxkaE7bBhpwtN7JyrVsjbPETXcgSopsEHgSVseusMO9jWEFd1TnxZIctYPvO9e9t7g1RwFCY5LnPToof2QlpjLXVguHHrqGV+XXLhIHTBbHKFHLpbpqNCNwNSucJBPv+iyW/dGFeohFVH5wYiPD++BFVCN6M97+WjEkm8tBYYmlxeFX8qzNpHNvKzwE6GRXN7/FPOxYNFh1YEzG0JZfdnK/eP1LYuQcvtxK5tXqp4IA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iGy2iFQ6kfqYNMpbjzvBQTdM25mE/7Ei4jil4TRrNqg=;
- b=DBuRIlSFxururZdVDrhsyqJ+VhXfT4jmXaSo0EJ9yt2i+ZoTRjQV5XhEKO5wdQOXZDwK8pK6oS6UfSnGhoObu2uRoW+poG0KDLrd4JeojkOyiNAyTnRyxUfKhG4x1QYkt0N3HLkDafax2feBQuMCQ3ZC3/m1F8+7l5u+K3OSr1+BUtma0ZwqVTbT/pC2LEHUYnvmb8aJRPISlxgTS+l+e0r3tmRdfLCK3LWKqobLVvyNQdg1uTsW32i7kD4LTZ8PMATMOgfkeG/Os1vaqH92odo7pDYl2Bt62kSD13yDwtCLN4DxnmL40AT42v3rcOArzPj0l/TUsh35kgy4IE2ntg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 103.165.80.2) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=tymphany.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=tymphany.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tymphany.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iGy2iFQ6kfqYNMpbjzvBQTdM25mE/7Ei4jil4TRrNqg=;
- b=gMiJWAjFKYvsMeYdIHD4Kli3EKCQCBIU/Ro45mkkgf+Sj5IcM/1OVUv9X0HRLUqPJySTRNLXeA+jJFNsB/Q3Ks/A7qKmYTSxhE66DVnEgveFw0+9ngo1W1zYZBTSGfz9E0C3Hyd208dY9kj7KVK274PrTgPIHk6OS9e7ujoWpwTeaNOubMycYkyf9ERtjIS0uYMvn0xVDZ70JjAmm8JsTnHWJjISMOgG/Lw5gbpjpKcPAjDI4BAiJIlF2sVCO1aAmBMygtDWV9SqMEy1GC4Ym2CPQeAguhLbPUbGESBqvJsw1YxrbHqdwmLndymoNjrswHsQFceFj8YRtsdetuYOQg==
-Received: from SI2PR01CA0018.apcprd01.prod.exchangelabs.com
- (2603:1096:4:191::7) by SE1PPF5117CCFBC.apcprd04.prod.outlook.com
- (2603:1096:108:1::514) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.13; Wed, 18 Nov
- 2026 02:26:46 +0000
-Received: from SG1PEPF000082E1.apcprd02.prod.outlook.com
- (2603:1096:4:191:cafe::97) by SI2PR01CA0018.outlook.office365.com
- (2603:1096:4:191::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.615.13 via Frontend Transport; Wed,
- 18 Nov 2026 02:26:46 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 103.165.80.2) smtp.mailfrom=tymphany.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=tymphany.com;
-Received-SPF: Pass (protection.outlook.com: domain of tymphany.com designates
- 103.165.80.2 as permitted sender) receiver=protection.outlook.com;
- client-ip=103.165.80.2; helo=mail.tymphany.com; pr=C
-Received: from mail.tymphany.com (103.165.80.2) by
- SG1PEPF000082E1.mail.protection.outlook.com (10.167.240.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Wed, 18 Nov 2026 02:26:45 +0000
-Received: from TYHZEXCPAP2.tymphany.com (10.12.20.26) by
- TYHZEXCPAP2.tymphany.com (10.12.20.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 18 Nov 2026 10:26:43 +0800
-Received: from TYHZEXCPAP2.tymphany.com ([fe80::240a:7d57:2653:1478]) by
- TYHZEXCPAP2.tymphany.com ([fe80::240a:7d57:2653:1478%14]) with mapi id
- 15.02.1748.039; Wed, 18 Nov 2026 10:26:43 +0800
-From: =?gb2312?B?SGFuayBGYW4gKLeyur0p?= <Hank.Fan@tymphany.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: =?gb2312?B?SGFuayBGYW4gKLeyur0p?= <Hank.Fan@tymphany.com>
-Subject: [PATCH BlueZ] audio/avrcp: allow early VOLUME_CHANGED register
-Thread-Topic: [PATCH BlueZ] audio/avrcp: allow early VOLUME_CHANGED register
-Thread-Index: Ad13A5nNGymH7yU5RLCpQoUZGsfWJA==
-Date: Wed, 18 Nov 2026 02:26:42 +0000
-Message-ID: <8ddc3991712943d8bb45bb4512075ea7@tymphany.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gac3E7di
+Received: by mail-dy2-f8.google.com with SMTP id 5a478bee46e88-3818b9f0083so270636eec.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 18:34:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794969245; cv=none;
+        d=google.com; s=arc-20260327;
+        b=PkhDAOWnRLgTU4mlmm+RlWXLspzNRcH+YJOaHVPs+OAhoZJgsMUMoXGisKwncBGxuD
+         QjvMpMpeMrx672hDn8tJ+NTCaaz77whuk+902EqT+nkiTGiQzHRgNbZFRbopBSDkF3cB
+         Ci3c6Auk8Vd+ePKj1DDm8E4tDQP9J05esN8lMe9XJ8lgtgfR2OWkAGsH5OK2XbuW3zT2
+         a9WKJf1km2bLcLwUVPzFO1moxyb8/w2BgU20wn787xKslJ94Znreg4klkT7JVMc//zb2
+         E/m5pWT0ikDbEqO/K0Jiov4X1/Czhj9gmr6Z5PHMqJYDKGGXOlbXJB3FJCdeNsK11DZQ
+         Mmow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=vfERvSbLKQVx2/pRS1U49cTa/EfH2SnyGAp5xqkhniI=;
+        fh=+kT/Xrv19FyZSJDN+clPnX0NaPUgFHxaD+n+mwaMUws=;
+        b=oxMelldXwOngbpZ6GQSa0fOnmD1bLj5flckAr/wwrWaMkalQyvnGjjrxrqzDlLkMIy
+         FnlirXnY2tHmmEFbpL4Ka6t5L4IQyVQf1D0jrSN/wZEaizmst5t7JdzCMoBFmVJwfDVA
+         zqVTRRKPSLl4DZ2lhxYMxoAttLHZiJ3bWBCA/kAcF36gRzuEqLbfcrhmKGkjE573UbDi
+         4JofsQVydPpUXnmS0zePKUWsfIqtJDAXjP594FAfiCb+pcgKMxznT1IpotBsTTxkW3t8
+         AkaiTzzEFsvUOLk/s08xR4QI0IfbHNTTGFJn+RLJh6R1QS0RyULAKr6iQeZy8ukfh3DV
+         F/pA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794969245; x=1795574045; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=vfERvSbLKQVx2/pRS1U49cTa/EfH2SnyGAp5xqkhniI=;
+        b=gac3E7diDhI77CxrnWcaVxp7A7V8hA9gpeDzoYEZ0mJicCqSfy434UiqYwr6OYe9aa
+         6B1Ku+sBIR94H9U1Rd5+OOIdCBBXMvSOkvMQa7AmsPX6gdIvOW/gv/+4ea3A1ImuMetf
+         FYBuFTwMW4SP1vGUp3xBt7r9zmZN71XQ4UxaJccPomuWW3+6Bj6YiH+v4Pl6q3wZG28G
+         ZCzRX3r8xLVfBJ9Fz4GEuv7Il08oCIhLAtd4zjoI1C+xsWafy7VL0422ov0h2mZtUnzV
+         h8UAwojKNui9gVJCCbQCSnJazMYyVgloTMHbs6PZ2J1m5vIy2yvZ78a/UqiM1ylaSU8b
+         1Zzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794969245; x=1795574045;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=vfERvSbLKQVx2/pRS1U49cTa/EfH2SnyGAp5xqkhniI=;
+        b=n+Wzi46csFrAnw868AFuxptsc9fU9RLjPSwV4YjMgASX37pd6Xg+j2FT5oszAPcqrh
+         bOH5wjJEi/Y1xPknBL4JTZ3liD66TldS41a49VYogICGjTZLqsnH7uAWGlexoQTvj21m
+         Q4CwtbyeVVaLIBLkTeTkWbvNekafm7sYxK9AomJMwnHwbIhtbYSmzfhvf5La6ck17MEf
+         rC/SY8ietfuLFIUGMKjMePn2hdFFAcBFyQKEwVLVtZhFVph+P7Zx6rZk9AHiqZDvuyot
+         pp7xEzOTj0ucLQQiUOEEKKERk+ZOsoXzZ5qvAwVvDr2F1WHr2FBi5d1ipMmfF+RTAmTj
+         F/Jg==
+X-Gm-Message-State: APuU4Z/SXTIBmQenrvb72xP3w7POHPca2tbyqeGV2Fug5N8C/cOOF7Yt
+	MLDoQpR0xUIfE/IoW1QVAYYrnwOZ7QvFl2BItEIxyCaPzGRwl7BofvW8sh+sP3U5nlP1hRtvlKZ
+	rZ5KRebw3e5YlSbBZJCPAkNANHN1gWyMIZ6R10Qzgo9hKEcxFOw==
+X-Gm-Gg: AYBFou2ljqQZpnrDSbToTBPCv8Gg1xatrYzsys7u96NbPYFuUE7HzZNnnKVy9qLGpWE
+	0I/IXvs0Xdcp69ZXY0UfJIY6S/hCq8sFCwFc/NeqX6Rz3DjIJNSLjhaVA7T01jc8Ailh7QyWG/y
+	jNy1vNKexQN4qQtVXJuDlvStY5/6dd9ghtnB/cXWbKUjKYioaFFjJ/3TIllOZb4RvpJ+U0e9EUa
+	JVY+m6Oxim++WScQTMf31NAoEqRrmnP/bM5YC/bN5zHMBgvWNsndaYGv8nCTHKjsRTXS2FQDQtW
+	ADUa+X5JgMIJxOS6Z7bvfeqNBTaLdTuALSO4QQ0FLdQ/kQmtfv5bzrKlEk//s0hUNsq7jemUljd
+	ZCxt+rZzgJ1SHTW2XGms3yunpEgQuvi9zwQYiC09OskY7OyZ1GSkXfYCJmyFeEkFbbKYe+RaFPl
+	74Fbx8ioT10g==
+X-Received: by 2002:a05:7022:ea44:b0:1b2:3e9b:3dcd with SMTP id
+ a92af1059eb24-1b543be9924mr1290293c88.10.1794969244871; Tue, 17 Nov 2026
+ 18:34:04 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -115,66 +100,101 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG1PEPF000082E1:EE_|SE1PPF5117CCFBC:EE_
-X-MS-Office365-Filtering-Correlation-Id: 423e6e7e-a039-4150-9262-08df451b645a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|82310400026|36860700016|376014|1800799024|18002099003|13003099007|56012099006|261022075727099003|261028144727099003|10067099003|261021121427099003|261021123027099003|261009223027099003|261102123227099003|261021135927099003|261026140227099003|261022105027099003|261026121527099003;
-X-Microsoft-Antispam-Message-Info:
-	9QUmQ9JFcA8q7xnWlRGRZyT/g2aLt97akg+chERlNW+KZWppfzI1xfqH29g+Jcsj48xaxtzrMPFAB0yQo6vK/XMl2FhT+kVReuKtc51YO9oeinrf9SvwJugMrEuvsTJAXTtleWVd38/nhRaUgsxmDeca4aHkNRp99okMwRrO9ChF6H3dYuBo20dGhZd0I6xm2he51Nll/QeY5xPsyWiAMgxmdUE7tOuRXjo2vYLYj+mQfwHwT38A03ISWd0GJOD4gIs+oA+tOSACZCqPuaJzzozWrXVkppQACh/CwzRqf1pd9F9hu+zeVdTRuzXac/AH5nRaxT184FZBGEtfNeh5Xcld0Bj5SumSCRfYPRAZW5gzOMuMwjswexmhvtVTFfHI9RUhbRNjl50OBTIjLFu6yYVDF7ma62vmBqYaekK7QskVQjpBZAsGm0n3fPZ0BIZzYEhpyvIO7wa1Z6DtxyC05iqSYr38SvXvityG0vkGL6k8TjuUhJwJv1ns5sHof03yCDsYr9vZfZzmO7+SwOZRYch4U4ug9dmIuIVt8fcCuMfCvbVvCHJrYoPJfseTXUuKOx8TMr6O5Pk7ixRzfQXecYxTTEzubDq2BpjRqKVZfM5CNA9uHruPUdQP3LEPP78uq5GnR13pE4dvsQ+MplQCqI08pxoqdI8vmtbrymGu+wPnl8DNrxz9XREx7ma34Z+M3sc7vCoUVVyFUwfbqQfaSQ==
-X-Forefront-Antispam-Report:
-	CIP:103.165.80.2;CTRY:HK;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.tymphany.com;PTR:mail.tymphany.com;CAT:NONE;SFS:(13230040)(23010399003)(82310400026)(36860700016)(376014)(1800799024)(18002099003)(13003099007)(56012099006)(261022075727099003)(261028144727099003)(10067099003)(261021121427099003)(261021123027099003)(261009223027099003)(261102123227099003)(261021135927099003)(261026140227099003)(261022105027099003)(261026121527099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	QBWiWUoDU3aMF6lKy06csQYkzQ1uGpJq+jXAuZt5WM3L1iJBmoVFie8boctTjJfZTGWAri9IBCBponyGDsNuagC91nJVk9P8u84U88LRiRTSleehDzEwOrI81MeZyb7B7A3DoOw+M79bb+J2qA+k0EL8+20a/fAOssQGddJWbOWv77t4lJv49xTMsNaHKr7a3kZltXnkcuz+Ql7t0ZVZHJ7GAjeCjNS3BLxIKuwfBJZDfYhvL27qUlm0lqBJGgh1aJtKUBr7zn4x9cVvbtAmRfD3W/fWnNwcSlAZtmsLQ5vnMAwYU95c3P0l9mvzbD5eH1pNDUQEvTdm+68pvwHvVN25n362r23puii9QGbRLe0Xd8M4BBU3La1k5ZWCK3yVDFDekvtDqWF1K/UCLRx/A0QhqFdk1ohNfSxMZ8yRgnw1ZDk9WER+8UNNVRea4ShL
-X-OriginatorOrg: tymphany.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2026 02:26:45.8805
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 423e6e7e-a039-4150-9262-08df451b645a
-X-MS-Exchange-CrossTenant-Id: a0771152-a77a-4639-b170-34d5a9f863d1
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a0771152-a77a-4639-b170-34d5a9f863d1;Ip=[103.165.80.2];Helo=[mail.tymphany.com]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-SG1PEPF000082E1.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SE1PPF5117CCFBC
+From: Kelvin You <weyou.dev@gmail.com>
+Date: Wed, 18 Nov 2026 10:33:53 +0800
+X-Gm-Features: AclHuK8FXhROSfHW6A7v44ubXBT7WqwXtcReM8OlPtWd9atny8fMmkX3zCEXpBc
+Message-ID: <CABqFBbCA+S_pcKmxqbQtjZOELudcBHK+=wTEngk5Kz5c08BPzQ@mail.gmail.com>
+Subject: [BUG] Bluetooth: ISO: BIG creation with 1M PHY fails on 0x203e and
+ leaks active ext adv handle
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-RnJvbSA2MGI0YjUzNTZkZmVjMjIyOWI0YzNkZjhiY2MzZmVhYjA3NWQzZDNkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQ0KRnJvbTogSGFuayBGYW4gPGhhbmsuZmFuQHR5bXBoYW55LmNvbT4NCkRh
-dGU6IFR1ZSwgMTcgTm92IDIwMjYgMTQ6NTI6MzggKzAwMDANClN1YmplY3Q6IFtQQVRDSCBCbHVl
-Wl0gYXVkaW8vYXZyY3A6IGFsbG93IGVhcmx5IFZPTFVNRV9DSEFOR0VEIHJlZ2lzdGVyDQoNClJl
-Z2lzdGVyTm90aWZpY2F0aW9uIGZvciBFVkVOVF9WT0xVTUVfQ0hBTkdFRCByZWplY3RlZCB3aXRo
-IEludmFsaWQNClBhcmFtZXRlciB3aGVuIG1lZGlhX3RyYW5zcG9ydF9nZXRfYTJkcF92b2x1bWUo
-KSB3YXMgc3RpbGwgPCAwLiBBVlJDUA0KQWJzb2x1dGUgVm9sdW1lIENUcyBvZnRlbiByZWdpc3Rl
-ciBhcyBzb29uIGFzIEFWQ1RQIGlzIHVwOyBzZWVkIHRoZQ0Kdm9sdW1lIHRvIDEyNyAoc2FtZSBh
-cyB0YXJnZXRfaW5pdCkgYW5kIHJldHVybiBJbnRlcmltLg0KDQpBc3Npc3RlZC1ieTogQ3Vyc29y
-OkNvbXBvc2VyDQpMaW5rOiBodHRwczovL2dpdGh1Yi5jb20vYmx1ZXovYmx1ZXovcHVsbC8yODQx
-DQotLS0NCiBwcm9maWxlcy9hdWRpby9hdnJjcC5jIHwgMTEgKysrKysrKysrLS0NCiAxIGZpbGUg
-Y2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEv
-cHJvZmlsZXMvYXVkaW8vYXZyY3AuYyBiL3Byb2ZpbGVzL2F1ZGlvL2F2cmNwLmMNCmluZGV4IDJm
-MjE0ZTk4Mi4uOGRmNTY4NWQ4IDEwMDY0NA0KLS0tIGEvcHJvZmlsZXMvYXVkaW8vYXZyY3AuYw0K
-KysrIGIvcHJvZmlsZXMvYXVkaW8vYXZyY3AuYw0KQEAgLTE2NDksOCArMTY0OSwxNSBAQCBzdGF0
-aWMgdWludDhfdCBhdnJjcF9oYW5kbGVfcmVnaXN0ZXJfbm90aWZpY2F0aW9uKHN0cnVjdCBhdnJj
-cCAqc2Vzc2lvbiwNCiBicmVhazsNCiBjYXNlIEFWUkNQX0VWRU5UX1ZPTFVNRV9DSEFOR0VEOg0K
-IHZvbHVtZSA9IG1lZGlhX3RyYW5zcG9ydF9nZXRfYTJkcF92b2x1bWUoZGV2KTsNCi1pZiAodm9s
-dW1lIDwgMCkNCi1nb3RvIGVycjsNCisvKg0KKyAqIENUIG1heSBSZWdpc3Rlck5vdGlmaWNhdGlv
-bihWT0xVTUVfQ0hBTkdFRCkgYmVmb3JlIHRoZQ0KKyAqIEEyRFAgdHJhbnNwb3J0IGV4aXN0cy4g
-UmVqZWN0aW5nIHdpdGggSW52YWxpZCBQYXJhbWV0ZXINCisgKiBicmVha3MgQWJzb2x1dGUgVm9s
-dW1lOyBzZWVkIG1heCBsaWtlIHRhcmdldF9pbml0IGRvZXMuDQorICovDQoraWYgKHZvbHVtZSA8
-IDApIHsNCittZWRpYV90cmFuc3BvcnRfc2V0X2EyZHBfdm9sdW1lKGRldiwgMTI3KTsNCit2b2x1
-bWUgPSAxMjc7DQorfQ0KDQogcGR1LT5wYXJhbXNbMV0gPSB2b2x1bWU7DQogbGVuID0gMjsNCi0t
-DQoyLjUzLjANCg0KDQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KDQpUaGUgaW5m
-b3JtYXRpb24gY29udGFpbmVkIGluIHRoaXMgdHJhbnNtaXNzaW9uIG1heSBjb250YWluIHByaXZp
-bGVnZWQgYW5kIGNvbmZpZGVudGlhbCBpbmZvcm1hdGlvbi4gSXQgaXMgaW50ZW5kZWQgb25seSBm
-b3IgdGhlIHVzZSBvZiB0aGUgcGVyc29uKHMpIG5hbWVkIGFib3ZlLiBJZiB5b3UgYXJlIG5vdCB0
-aGUgaW50ZW5kZWQgcmVjaXBpZW50LCB5b3UgYXJlIGhlcmVieSBub3RpZmllZCB0aGF0IGFueSBy
-ZXZpZXcsIGRpc3NlbWluYXRpb24sIGRpc3RyaWJ1dGlvbiBvciBkdXBsaWNhdGlvbiBvZiB0aGlz
-IGNvbW11bmljYXRpb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3QgdGhl
-IGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGNvbnRhY3QgdGhlIHNlbmRlciBieSByZXBseSBl
-bWFpbCBhbmQgZGVzdHJveSBhbGwgY29waWVzIG9mIHRoZSBvcmlnaW5hbCBtZXNzYWdlLg0KDQqx
-vuBdvP4ouqzL+dPQuL28/imw/Lqsyty3qMLJsaPXb9LUvLCZQ8Pc1q7ZWdONo6yDSLmpsb7gXbz+
-1ri2qLXEytW8/sjLyrnTw6GjyOe5+8T6gUu3x9a4tqi1xMrVvP7Iy6Os1YjBory00tTritfT4F28
-/s2o1qq8xLz+yMujrIFLjKKxvuBdvP68sMv509DRfdOhsb6EaLP9oaPViNei0uKjrLfHvZvK2png
-o6yHwLjxvfvWuemG01uhosmisqWhosmigdG78tF90XWxvuBdvP68sMbkg8jI3aGjDQo=
+Hi,
+
+I ran into two related issues when creating a broadcast ISO stream
+(BTPROTO_ISO) with 1M PHY (BT_ISO_PHY_1M) on Linux 7.0.0-34-generic,
+and checked that the same logic is still present in current upstream
+net/bluetooth/hci_conn.c and net/bluetooth/hci_sync.c.
+
+1. create_big_sync() triggers legacy advertising PDUs for 1M PHY
+
+When setting up a BIG via BTPROTO_ISO with out.phys = BT_ISO_PHY_1M
+(0x01), create_big_sync() in net/bluetooth/hci_conn.c only sets
+MGMT_ADV_FLAG_SEC_2M when out.phys == BIT(1), leaving flags = 0 for 1M:
+
+    if (qos->bcast.out.phys == BIT(1))
+        flags |= MGMT_ADV_FLAG_SEC_2M;
+
+That flags = 0 is passed into hci_start_per_adv_sync() ->
+hci_start_ext_adv_sync() -> hci_setup_ext_adv_instance_sync().
+Because (flags & MGMT_ADV_FLAG_SEC_MASK) is 0 and the advertising set
+is non-connectable and non-scannable, hci_setup_ext_adv_instance_sync()
+sets cp.evt_properties to LE_LEGACY_NONCONN_IND (0x0010).
+
+The controller accepts LE Set Extended Advertising Parameters (0x2036)
+with Properties=0x0010 and enables Handle 0x01 via LE Set Extended
+Advertising Enable (0x2039), then rejects the immediately following
+LE Set Periodic Advertising Parameters (0x203e) with Invalid HCI Command
+Parameters (0x12), since periodic advertising is not allowed with
+legacy advertising PDUs:
+
+  < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036)
+      Handle: 0x01
+      Properties: 0x0010 (Use Legacy PDUs)
+      Primary PHY: LE 1M (0x01)
+      Secondary PHY: LE 1M (0x01)
+      SID: 0x00
+  > HCI Event: Command Complete (0x0e) - 0x2036: Success (0x00)
+  < HCI Command: LE Set Extended Advertising Enable (0x08|0x0039)
+      Enable: 0x01, Handle: 0x01
+  > HCI Event: Command Complete (0x0e) - 0x2039: Success (0x00)
+  < HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e)
+      Handle: 0x01, Min/Max interval: 10 msec (0x0008), Properties: 0x0000
+  > HCI Event: Command Complete (0x0e) - 0x203e: Invalid HCI Command
+Parameters (0x12)
+
+dmesg logs:
+  Bluetooth: hci0: Opcode 0x203e failed: -22
+  Bluetooth: hci0: Unable to create BIG: -22
+
+Using BT_ISO_PHY_2M on the same host and controller works as expected
+because MGMT_ADV_FLAG_SEC_2M sets MGMT_ADV_FLAG_SEC_MASK and produces
+Properties=0x0000 (extended non-connectable non-scannable).
+
+2. hci_start_per_adv_sync() error path leaves ext adv handle enabled
+
+After 0x203e fails above, hci_start_per_adv_sync() jumps to:
+
+  fail:
+      if (added)
+          hci_remove_adv_instance(hdev, instance);
+
+Since hci_start_ext_adv_sync() already ran hci_enable_ext_advertising_sync(),
+removing the in-kernel adv_info without disabling the advertising set in
+the controller leaves Handle 0x01 active. Any subsequent attempt to create
+a BIG (including with BT_ISO_PHY_2M) then fails on 0x2036 with Command
+Disallowed (0x0c):
+
+  Bluetooth: hci0: Opcode 0x2036 failed: -16
+  Bluetooth: hci0: Unable to create BIG: -16
+
+until an HCI reset.
+
+Reproducer summary:
+- Open an AF_BLUETOOTH / BTPROTO_ISO SOCK_SEQPACKET socket.
+- setsockopt(SOL_BLUETOOTH, BT_ISO_QOS) with bcast.out.phys = 0x01
+  (BT_ISO_PHY_1M), interval = 10000, sdu = 600, rtn = 2, latency = 256.
+- bind() to local BD_ADDR with bc_sid = 0, bc_num_bis = 1, bc_bis[0] = 1,
+  then connect() to BDADDR_ANY.
+
+Expected behavior:
+- create_big_sync() should set MGMT_ADV_FLAG_SEC_1M when 1M PHY is
+  requested (or when neither 2M nor Coded is selected) so
+  hci_setup_ext_adv_instance_sync() uses extended non-connectable PDUs
+  instead of LE_LEGACY_NONCONN_IND.
+- hci_start_per_adv_sync() fail path should disable the extended
+  advertising instance before removing adv_info.
+
+Regards,
+Kelvin You
