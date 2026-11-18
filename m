@@ -1,74 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.15
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795042840;
-	b=3gRCATMuRkaMsYli8RGGjAxkLDj07WIR80VsQ1OViovorwIr/vQfaqoSi8my1W9Ih+J+
-	 zTChAfvZcs0ugIj9dcFNL2Brx1gA+K1uaYuCuiVyTQjJJQZKwxZgBglKo1apVhj6SAhV9
-	 4dz/ZzTT9hzyEWLsb0/jxqpoJ8GX7m+kOoBSt62ZV4bKvBDvjYardtpw//SOmAylphUCR
-	 DqmGDCQTF4r4QlR21TwMuYztsRGtUNlwSFVO3KKVu0nFGkhuRvDLI5irGClUIWfqMNeWs
-	 XcEtVpg32J8LsTvhThENKTyEOjeTRQXVVglcZ3KI6Eu+IZ3LDeCOHlrSURoFKRyLy6g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795042840;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=JodqEzLe/8ZipBgPigEZQ3E3H3/tXsz6ZMcAbkUIsy0=;
-	b=sYDfadNpA/MBdfDIUBGQ9WlHIklK12rzDqLZLrpevCwjkrUdn6uze9Cn3p+S+EJzTN6f
-	 wkd6zxeSatZclabeClFx8G6elrsSE4WQlFoB9PIFAwkuZIXIVeyX84cuawqOENuNH85ym
-	 ziFiDa0r8OYLOyz8cFjzx2ZGJ8t0/PEyiWN0/ZSV0Yr0CqaA6IaRmtco8rPJrCHFucMpx
-	 eSUF4aqDUl6FBkjCneoT6XZJeajmvhqPYmteJLAn6XAj/QikmWAyT78XVYysZOEhNiXx/
-	 c0uKvugchZxTluQpXqUn054CF3s+FsgNo7q/TNkIZpa5cenyUyotPETA2H2YkOSBJ8Q==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=AwnLH8Hq;
-	arc=none smtp.remote-ip=192.198.163.15
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795043093;
+	b=2oecFUZmHT9kzCTwxADMosYjVWd8CZ0bxcQbChTH99K2xS18VHj9fHOccMqS43bN9O72
+	 ZNjfZBqLoz5itrbUG6EW3RjKoVu5AYI3c8KNc+35Iw/QhX0MxAiYcHgITGidZ2elbOEXr
+	 +7G25X7RMv+zNY5Api20p7+3dAKUqMTkKdhXvRKn/DXCckRgPGqXpjeJ2eAnhlAh1StHA
+	 prfQ89Dgc3vWa6qyrcQw1RSIwiBJScRxL2AWwLtCezOoC1yu5VnTXdF+IlwIODVMfYGki
+	 LPMvkxTrRBzkKQ8F4Pw5vQ5IQXWkdpYy2V979QrL+lQzIi4gPdzeHIXO4wPmrXytHvA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795043093;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
+	b=SqgNs80z+uU4a0AaMI1Ji55+2n8/4OX28PL7mIqJEh7OdTVyQOOu/WjQxhC9hMOJJu7Q
+	 PV4rOY5X1IcyWspbflMzuo074G1v8FJvlZmhyXGl8/IThSnYbemz/Fjyu9vkX45d8S9A/
+	 1igJeymwipliON6NwyRICaXIwNZemj6GkazoThnjBQenOnxR8pZZwkisFpS7iXWHn+XIk
+	 yR76sfGIg22UKzWpge/PQbU6BBwKU0gKgQaiJra3EGbNrcjcINXbU7cj4dH0McIcGE9Ht
+	 uCT+C7Zp8iyESxZ4rNMvQHpyUOusjBjvvDNHpzIQ7pkFPqsvL84owf1xLLwn4DYYRGw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Fk7F4CVz;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E09606A32A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:00:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 82E09606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4960606A32F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:04:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E4960606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=AwnLH8Hq
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795042839; x=1826578839;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pABnLkEKKwrsu/GhOC28SMA4+gjwvMsJdvdONGIQXPw=;
-  b=AwnLH8Hq+6Q0Oetq7ZW9EE1QOUUNwh026YnAmv/BsBUV/9Ezu6k2P2Jk
-   /7sRz47UKxpvyOrbswWBz0pRPBwEawZ4GgDiUIguw6UCUTnnof1G4xt8C
-   FfUyxXoMpxC2wgAHrmknV/nnHOiKh486TkhD9rEpV+a7fcg4VaPQpypBz
-   CK8WOkXWf+Z3e+6OJvLrX7zaCGKJedkbFqBnB3CKlnJmsKFnvLUPOlW1D
-   Pz8VQOmzeCA1toXvqD4QE2Fy01thCkGLnmGpM8FREkbzIGS369lkUYQn/
-   xnSOUBXedRezLwai1bRPaKhQVK+d/8t5/REdPgdrpY4DJk/BUPmxJ/ZQk
-   w==;
-X-CSE-ConnectionGUID: dlwNTmQITBWIY8Teaz3yJg==
-X-CSE-MsgGUID: sYU6fvhfTKO3Ep3yEQqFvQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11970"; a="3887835"
-X-IronPort-AV: E=Sophos;i="6.27,219,1787036400"; 
-   d="scan'208";a="3887835"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2026 15:00:38 -0800
-X-CSE-ConnectionGUID: IM2a+TplTxyobLNSBkU8xQ==
-X-CSE-MsgGUID: fo6KICpDTO2YI2lSiEoXsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,219,1787036400"; 
-   d="scan'208";a="10516138"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa008.fm.intel.com with ESMTP; 18 Nov 2026 15:00:36 -0800
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Reject user coredump until firmware is operational
-Date: Thu, 19 Nov 2026 04:50:43 +0530
-Message-ID: <20261118232043.1987049-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Fk7F4CVz
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-67dabd38cdfso1869325d50.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 15:04:52 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795043092; cv=none;
+        d=google.com; s=arc-20260327;
+        b=hyV0IUQrV10u8phDQe4E3UDo7namv5TFGVzQqSVtkprrl9IfIXSgsZGLnv3JJ+8Jf+
+         GPSC3OmyDlfWgrF2/BHOv9qLhIE076ado7ShoJHmXhMZjo2p9n5S6kIHrxyb2kMppA+C
+         ffRcPn/2FN8sysH+QSbehP4ao1/rrmgn7SYqtXjeVWIcaYEjNpv2GRKkg6H9vvTKeQ5u
+         uhOPJ/1tmC39/Yoxdhf0s/qW9ZU9/mwun2wwYXPjdoOqOEKUHjic27NjbClZ+eH9bazm
+         KqmOzCSyeBD9IPutzWwAhBWjRcGDL7e8l30j6Si1EPQgx/H4yPAU3Qpdx5WS1OZDdNRq
+         lGsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
+        fh=epaCqHH5oWjBKJrh9YScy5IbnruG0DtPxVaTp4+ZegY=;
+        b=jTM8DZioYD6ITC8J+oc+x1CqXncINpCC5hFuheW9jWb1HFnVj6hMltLIxA9Pv/bt/V
+         aqGQvKH1bv5+ADaGBAAEKgHYfPsWuRqa3SmW6t5aBwJioGr2LopBNwgKc+SNpBH0pcke
+         +cChK3QlKsRqchurBIR/iiG54NwzCimtTQ9t7zWdET4dpU5JJuYAdAygnQn2CbJ9Ha1J
+         uho3F8DB9Z8Eg6RMCf6JIynspB5PBrXWlWo0IU8CIhzrDpQKiKSUncKSZqpl36whxMcw
+         Du27bGS0udGTkYOq/nBGI552OgdupPJxJKCgX7P59N+rdSZWAY93gk9vELqKhNQ+N10X
+         /SRQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795043092; x=1795647892; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
+        b=Fk7F4CVzIqTVpBYAzrvf0DhPem4rMGXqFCTAbCqTTl4z67X4xNwlAGDndr5BqH51ft
+         LKGecTsrb0y1pnpukSvjvXLetjlRaFkXGUN6avocCGpK2gOYpB9YXYWlWLW/3cawXhca
+         fAS6gWBmJujv/mEChv+vsaCONpyijeSbjLLkAykNNop8mwz/9HDKo4fbiklZtb7bBTjc
+         IShiTtGpUenlO8tazBgBdu7IR7B7EkNtVTIdCxD8JBasbDAsCiuApqk47LFEbawrjA6a
+         NBM//6juStVXcvNpiKZQhz4ToUey9Pcd8WJ9m2UZzSgSBWxT024VsZ3u9FFUCZzlXGfj
+         fAsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795043092; x=1795647892;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
+        b=GwH6zIxLVz8pgd+FlniZsJio6fShNou2jpOuMKm4YC33EPiTXv6dMtBGT7ERG/rCg3
+         wyZb/lvTQee0ctrhPoz453ac3iNOlNCt3/wmhh0/Ml0vKVbsBOeIy2rd2lShnyYHku3F
+         +FUHjhh1aSGaAcWrmJ4mKKC2ONOdqI2X4cGX5BLrYkjHKKaNAbi/gZ9bKN4gLTH7vkjd
+         vwZRUrcVdrQu8MszlMZDtjKs+vuTvUZ7KVPr3dHB2W6AcyxMRl44XoCqjIM9mB5omF+5
+         UqeaICYqOrOeG5CV3HDYgcghZL/S8mCLoWi8Y6Tw1TRiS48+5cXQecL3E7TNKQImvrvW
+         Z6eg==
+X-Gm-Message-State: APuU4Z+NW/X0rFZkOsqi57bIE+6ys0cCt0cwMTloqjasaZLoY2lL79Kx
+	g47x70OnWSzhKQhF0zAk9ycrxjmn7Whf88rHOhQqM2jdWpBIZDFRs73E82OZinModaki9uvVEaR
+	8soEb/jdxH+QFXfeWN7fILqH3HT1ZzZ0=
+X-Gm-Gg: AZFdTZfj5L2nn7uuZ6/Fd1y5JwKg2hObX2Xmhvd5oz3YK1GQiPc8+D1/4pAcXJ6nCrg
+	fCPfAcuGmmIlB0QWSq4vSL9Euk5p9zsQ42NfiLByL3NzV6OF1BnoTE9dFfD2lWl0/IywDAhony0
+	O/ewkk4kpT/RfNGDaFPyt1A4OBcKp3U3HQ0yPvLEpzlT8JMrQN7EgTwMoI6jI+4aGJC7QSG/wsr
+	c1xkMu2LzgahU8oGfIBnaabclbz3/igBfBn8pFwgQKKJ/AzITT6MpIVrLbfRZI/eu5Y381z9pfN
+	oXZ0sQN7j/KLYoAp2yOaXzy8zVuVl2hKo0axEdAoEkmE8CJVT5BZQkBipx2VhDIysb2UMwWcSFO
+	MxvGTBEq1BX1+cTUnrNeI6VRoU0nlADmSbRhM3XfVtcsIPFfshM31LgbFGDjx2avkDk2LCoKdy8
+	/Q9TIzDwcoPCG0zT6k2fMnRvCVnYWTLnd/ZMVQfEd4cSQoobOGM1VNslOl
+X-Received: by 2002:a05:690e:408d:b0:67d:b472:88a8 with SMTP id
+ 956f58d0204a3-67dd4025a14mr2161968d50.82.1795043091673; Wed, 18 Nov 2026
+ 15:04:51 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -78,204 +104,172 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
+In-Reply-To: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 18 Nov 2026 18:04:39 -0500
+X-Gm-Features: AclHuK-21xvoF1R7FRBUL1DF35OsNzAIO8RSAqbqE4KfBM5RlmzDAc_5P9bd6dI
+Message-ID: <CABBYNZJvzYd98m9rosF2m+nP50tTUf1MwHBPThpcUYHNoUxKzw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: check security before completing a
+ deferred BR/EDR accept
+To: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A user can request a device coredump through the PCI coredump sysfs
-attribute at any time, including while firmware is being downloaded
-from btintel_pcie_setup(). The request then rings the DBGC flush
-doorbell on bootloader firmware that does not service it, or, if the
-core halted, reads debug regions under MAC access while the setup
-retry path is resetting and re-enabling the device.
+Hi Mohammed,
 
-The same applies once recovery has been requested. The sysfs callback
-runs synchronously and can ring the doorbell while
-btintel_pcie_reset_work() is quiescing the device or while the ACPI
-_PRR reset runs. A flag check in the callback alone cannot close this,
-as recovery can be requested right after the check.
+On Wed, Nov 18, 2026 at 4:34=E2=80=AFPM Mohammed Alquraini
+<mohammed.saad.alquraini@gmail.com> wrote:
+>
+> A BR/EDR L2CAP service that listens with BT_DEFER_SETUP asks the kernel t=
+o
+> enforce its BT_SECURITY level and only decides which peer to admit. The
+> deferred-accept completion path does not honour that.
+>
+> The child channel is placed on the parent's accept queue at CONN_REQ time=
+ and
+> is reported pollable (bt_accept_poll() returns EPOLLIN for a BT_CONNECT2 =
+child
+> on a BT_DEFER_SETUP listener) before the link security procedure resolves=
+.
+> When userspace recvmsg()s the deferred child in that window, l2cap_sock_d=
+efer()
+> moves the channel to BT_CONFIG and __l2cap_connect_rsp_defer() replies
+> L2CAP_CR_SUCCESS with no security check. If the security procedure then f=
+ails,
+> l2cap_security_cfm() has no branch that matches a failed result on a BT_C=
+ONFIG
+> channel, so the channel is never torn down: a peer that failed the servic=
+e's
+> required security level keeps a connected, data-passing channel.
+>
+> The sibling setsockopt(BT_SECURITY) path already rechecks with
+> l2cap_chan_check_security(), and the non-deferred incoming path denies wi=
+th
+> L2CAP_CR_SEC_BLOCK; only the BR/EDR basic/ERTM deferred-accept path was
+> missed. This is the BR/EDR counterpart of commit 522e9ed157e3 ("Bluetooth=
+:
+> l2cap: Check encryption key size on incoming connection").
 
-Make the callback only check that the firmware is operational and
-queue a work item on dump_workqueue, so all device access happens in
-that worker. The worker rechecks the state and is drained by
-btintel_pcie_reset_work() before the device is quiesced, and by
-remove(), probe cleanup and suspend, so the doorbell can no longer race
-with reset.
+That is encryption key size, not security level, and why is it
+mentioned here and doesn't have a Fixes tag if that was missed?
 
-The firmware is considered operational once BTINTEL_PCIE_SETUP_DONE is
-set and until BTINTEL_PCIE_RECOVERY_IN_PROGRESS is set. Neither flag is
-cleared for the lifetime of the driver data, as recovery re-probes the
-device. Firmware-initiated dumps are not affected.
+> Gate the deferred completion on the security state. In l2cap_sock_defer()=
+,
+> before completing a BR/EDR deferred accept, call l2cap_chan_check_securit=
+y();
+> if the level is not yet met, mark the socket BT_SK_ACCEPTED, leave the ch=
+annel
+> in BT_CONNECT2 and send nothing. l2cap_security_cfm() then resolves it: o=
+n
+> failure the existing BT_CONNECT2 branch denies with L2CAP_CR_SEC_BLOCK; o=
+n
+> success, a channel the daemon already accepted is completed through the s=
+ame
+> path a non-deferred accept takes (state -> BT_CONFIG, CONN_RSP SUCCESS +
+> CONF_REQ) rather than re-signalling an accept already made, so exactly on=
+e
+> CONN_RSP is sent per channel and the on-air sequence stays strictly monot=
+onic
+> (AUTHEN_PEND, then AUTHOR_PEND for a not-yet-accepted channel, then SUCCE=
+SS).
+>
+> Validated on an arm64 QEMU rig with a BR/EDR peer emulated over /dev/vhci=
+:
+> with the patch, an early accept followed by a genuine Authentication_Comp=
+lete
+> failure is answered with CONN_RSP result=3D3 (SEC_BLOCK) and no data is e=
+ver
+> delivered, identical to the non-deferred control; an early accept followe=
+d by
+> a successful (keyless) auth completes only after the security chain finis=
+hes,
+> with exactly one CONN_RSP SUCCESS and no trailing PEND; a deferred listen=
+er
+> that accepts only after the security resolves goes through the designed
+> CR_PEND -> recvmsg -> SUCCESS path with the link at the required level.
+>
+> AI assistance was used in finding and preparing this patch.
+>
+> Fixes: f66dc81f44d9 ("Bluetooth: Add support for deferring L2CAP connecti=
+on setup")
+> Signed-off-by: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |  1 +
+>  net/bluetooth/l2cap_core.c        | 10 +++++++++-
+>  net/bluetooth/l2cap_sock.c        |  7 +++++++
+>  3 files changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -407,6 +407,7 @@
+>         BT_SK_SUSPEND,
+>         BT_SK_PKT_STATUS,
+>         BT_SK_PKT_SEQNUM,
+> +       BT_SK_ACCEPTED,
+>  };
+>
+>  struct bt_sock_list {
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -8011,7 +8011,15 @@
+>                         __u16 res, stat;
+>
+>                         if (!status && l2cap_check_enc_key_size(hcon, cha=
+n)) {
+> -                               if (test_bit(FLAG_DEFER_SETUP, &chan->fla=
+gs)) {
+> +                               bool deferred =3D test_bit(FLAG_DEFER_SET=
+UP, &chan->flags);
+> +                               struct sock *sk =3D chan->data;
+> +
+> +                               /* Complete inline if the daemon accepted=
+ early. */
+> +                               if (deferred && sk &&
+> +                                   test_and_clear_bit(BT_SK_ACCEPTED, &b=
+t_sk(sk)->flags))
+> +                                       deferred =3D false;
 
-Fixes: 07e6bddb54b4 ("Bluetooth: btintel_pcie: Add support for device coredump")
-Assisted-by: Copilot:claude-opus-5.5
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 60 ++++++++++++++++++++++++++------
- drivers/bluetooth/btintel_pcie.h |  1 +
- 2 files changed, 50 insertions(+), 11 deletions(-)
+I read this thru a couple of times and I still don't get how can you
+get !status when security hasn't completed? Are you perhaps forcing
+invalid behavior from the controller or something similar?
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 382e02851758..12a2cca09d7d 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -658,6 +658,7 @@ static inline void btintel_pcie_dump_debug_registers(struct hci_dev *hdev)
- }
- 
- static inline bool btintel_pcie_in_d3(struct btintel_pcie_data *data);
-+static void btintel_pcie_user_dump_req_worker(struct work_struct *work);
- 
- static int btintel_pcie_send_sync(struct btintel_pcie_data *data,
- 				  struct sk_buff *skb, u32 pkt_type, u16 opcode)
-@@ -4116,6 +4117,7 @@ static void btintel_pcie_probe_cleanup(struct btintel_pcie_data *data)
- 	btintel_pcie_disable_interrupts(data);
- 	btintel_pcie_synchronize_irqs(data);
- 
-+	disable_work_sync(&data->user_dump_req_work);
- 	disable_work_sync(&data->coredump_work);
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
-@@ -4596,6 +4598,8 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	if (!data)
- 		goto out;
- 
-+	disable_work_sync(&data->user_dump_req_work);
-+
- 	btintel_pcie_mask_hw_rfkill(data);
- 	btintel_pcie_synchronize_irqs(data);
- 	disable_delayed_work_sync(&data->hw_rfkill_work);
-@@ -4632,6 +4636,7 @@ static void btintel_pcie_reset_work(struct work_struct *wk)
- 	}
- 
- 	if (btintel_pcie_perform_flr(data)) {
-+		enable_work(&data->user_dump_req_work);
- 		enable_work(&data->coredump_work);
- 		enable_work(&data->hwexp_work);
- 		enable_work(&data->fwtrigger_work);
-@@ -4947,6 +4952,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	INIT_WORK(&data->fwtrigger_work, btintel_pcie_fwtrigger_worker);
- 	INIT_WORK(&data->mbox_work, btintel_pcie_mbox_worker);
- 	INIT_DELAYED_WORK(&data->user_dump_work, btintel_pcie_user_dump_worker);
-+	INIT_WORK(&data->user_dump_req_work, btintel_pcie_user_dump_req_worker);
- 
- 	data->boot_stage_cache = 0x00;
- 	data->img_resp_cache = 0x00;
-@@ -5039,6 +5045,7 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	 * the disable counters stay >= 1 even after reset_work()'s
- 	 * balanced enable_work() (counter 2 -> 1, never reaching 0).
- 	 */
-+	disable_work_sync(&data->user_dump_req_work);
- 	disable_work_sync(&data->coredump_work);
- 	disable_work_sync(&data->hwexp_work);
- 	disable_work_sync(&data->fwtrigger_work);
-@@ -5088,7 +5095,6 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
- 	pci_set_drvdata(pdev, NULL);
- }
- 
--#ifdef CONFIG_DEV_COREDUMP
- static u32 btintel_pcie_ipc_ctrl_toggle(struct btintel_pcie_data *data, u32 bits)
- {
- 	unsigned long flags;
-@@ -5115,13 +5121,26 @@ static void btintel_pcie_trigger_fw_dump_collect(struct btintel_pcie_data *data)
- 		    "IPC doorbell sent to FW for DBGC flush (IPC_CTRL=0x%08x)", reg);
- }
- 
--static void btintel_pcie_coredump(struct device *dev)
-+static bool btintel_pcie_fw_operational(struct btintel_pcie_data *data)
- {
--	struct  pci_dev *pdev = to_pci_dev(dev);
--	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
-+	return test_bit(BTINTEL_PCIE_SETUP_DONE, &data->flags) &&
-+	       !test_bit(BTINTEL_PCIE_RECOVERY_IN_PROGRESS, &data->flags);
-+}
- 
--	if (!data)
-+/* Drained by reset_work() before the device is quiesced */
-+static void btintel_pcie_user_dump_req_worker(struct work_struct *work)
-+{
-+	struct btintel_pcie_data *data = container_of(work,
-+					struct btintel_pcie_data, user_dump_req_work);
-+
-+	if (!data->hdev)
-+		return;
-+
-+	if (!btintel_pcie_fw_operational(data)) {
-+		bt_dev_warn(data->hdev,
-+			    "coredump rejected: firmware not operational");
- 		return;
-+	}
- 
- 	if (test_bit(BTINTEL_PCIE_COREDUMP_INPROGRESS, &data->flags) ||
- 	    test_bit(BTINTEL_PCIE_FWTRIGGER_DUMP_INPROGRESS, &data->flags)) {
-@@ -5143,9 +5162,8 @@ static void btintel_pcie_coredump(struct device *dev)
- 		return;
- 	}
- 
--	/* Only a halted core cannot answer the doorbell. FW services it
--	 * regardless of host setup or recovery state, so no other state
--	 * needs to be excluded; collect directly here.
-+	/* Only a halted core cannot answer the doorbell; collect directly
-+	 * here.
- 	 */
- 	if (test_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags)) {
- 		btintel_pcie_queue_coredump(data,
-@@ -5163,9 +5181,8 @@ static void btintel_pcie_coredump(struct device *dev)
- 	 * runs with the flag clear and leaves it set without a timer.
- 	 *
- 	 * The flag/arm/doorbell sequence is not atomic against the interrupt
--	 * handler or reset. A firmware trigger while the request is pending
--	 * may take the user-dump reason, and a reset in it may leave the flag
--	 * set until the next reset. Both are rare and do not affect the dump
-+	 * handler. A firmware trigger while the request is pending may take
-+	 * the user-dump reason. This is rare and does not affect the dump
- 	 * contents.
- 	 */
- 	set_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
-@@ -5179,6 +5196,26 @@ static void btintel_pcie_coredump(struct device *dev)
- 
- 	btintel_pcie_trigger_fw_dump_collect(data);
- }
-+
-+#ifdef CONFIG_DEV_COREDUMP
-+static void btintel_pcie_coredump(struct device *dev)
-+{
-+	struct  pci_dev *pdev = to_pci_dev(dev);
-+	struct btintel_pcie_data *data = pci_get_drvdata(pdev);
-+
-+	if (!data)
-+		return;
-+
-+	if (!btintel_pcie_fw_operational(data)) {
-+		bt_dev_warn(data->hdev,
-+			    "coredump rejected: firmware not operational");
-+		return;
-+	}
-+
-+	if (!queue_work(data->dump_workqueue, &data->user_dump_req_work))
-+		bt_dev_warn(data->hdev,
-+			    "coredump rejected: request pending or workqueue disabled");
-+}
- #endif
- 
- static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
-@@ -5290,6 +5327,7 @@ static int btintel_pcie_suspend_late(struct device *dev, pm_message_t mesg)
- 	 * request, then let an in-flight timeout worker and any queued dump
- 	 * finish before the device enters D3.
- 	 */
-+	cancel_work_sync(&data->user_dump_req_work);
- 	clear_bit(BTINTEL_PCIE_USER_TRIGGERED_DUMP, &data->flags);
- 	cancel_delayed_work_sync(&data->user_dump_work);
- 	flush_work(&data->fwtrigger_work);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index b60e24ca558d..28acc20eefdf 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -818,6 +818,7 @@ struct btintel_pcie_data {
- 	struct work_struct	fwtrigger_work;
- 	struct work_struct	mbox_work;
- 	struct delayed_work	user_dump_work;
-+	struct work_struct	user_dump_req_work;
- 
- 	struct dma_pool	*dma_pool;
- 	dma_addr_t	dma_p_addr;
--- 
-2.54.0
+> +                               if (deferred) {
+>                                         res =3D L2CAP_CR_PEND;
+>                                         stat =3D L2CAP_CS_AUTHOR_PEND;
+>                                         chan->ops->defer(chan);
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1274,6 +1274,13 @@
+>                         release_sock(sk);
+>                         __l2cap_le_connect_rsp_defer(chan);
+>                 } else {
+> +                       /* Defer completion until security resolves. */
+> +                       if (!l2cap_chan_check_security(chan, false)) {
+> +                               set_bit(BT_SK_ACCEPTED, &bt_sk(sk)->flags=
+);
+> +                               release_sock(sk);
+> +                               l2cap_chan_unlock_conn(chan, have_conn);
+> +                               return err;
+> +                       }
 
+Why wouldn't we do it earlier? This is too late, the userspace has
+been awaken by the likes of l2cap_sock_defer_cb when the client socket
+should really have been rejected not accepted.
+
+>                         sk->sk_state =3D BT_CONFIG;
+>                         chan->state =3D BT_CONFIG;
+>                         release_sock(sk);
+> --
+> 2.43.0
+
+
+
+--=20
+Luiz Augusto von Dentz
