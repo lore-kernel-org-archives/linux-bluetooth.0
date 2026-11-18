@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795031938;
-	b=MaC0ahNFyp62zGr5K8zLIcnhk2JsXtkGILvln7hk9ovu1+xhjmXM9Tfw95GP/O4S3D1/
-	 2MHySLIpnRgoiL0HQYG/kJp7SQOF6MZe/V+dUDhTuZfOk+dNgXMPX5vDAPwp93S/HQGyr
-	 Y8/LjIg8qixoC2Q69+H5gGP73DD+32CJyOisHtW/AZTWBIJuB+eAeneb/oIk4jFY/FJKV
-	 8SZp2mk4UIYBTHtDO5nXsy4ybS0ft+dsoRrEyFagxqzQcM1zMq7mRY+n/Y6p8MSElPUx8
-	 bNo9y4e7yQMgkSClgzJibCs8YfRPNI9U0NYxxqInDCvoAxAZdZ4J8c/PoK6uDLZpgOQ==
+	t=1795031939;
+	b=2YhQyd+uCPLdFsBqK9izca1ptJDVq7MlPVkWr+XnsqOrP5i070FJUbwKzMuhe4PXhUmL
+	 za8sFbG6ilekGDSFLI812yT4GQS34u4e5mc3Zhy4nBdRXGjmwH3ucB03h/b5tbxNn0cCs
+	 q0UN28IWSSsggJuioyZPw01Oij+l+poDL25GfGlcBEN33Kn7ZomzOu5qqh8urJzXbRIiK
+	 scnkp1jIE8IhZRQJOz+QV2OhXsFVym3Ocyt8s/2J0qHLOAZdwhSEtxEGSrzu3CbXBDWdn
+	 cYvDJymKL1cHNOddXfx7YcYEJLjtNLHcfPdlUGpEW9RD28aI4WLjvsdnqrUQUPsPRZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795031938;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795031939;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=qXTKYjpFrai6v8rLGD0yMT2Tbvm8Nml9BdSrw5HdnKk=;
-	b=wX0HUzuf0Tu6VGr7KyHs7MW8RiYMsGD/XDLpvQJh7mb4oSUT2RsBUYSXne2UGr46ZYVU
-	 Ya+ayqiU+G1nH+9/UyqCXfFbd7foYJR++bLiNQseJB3pmD0k1XApFIV4Yu7LFQV9wk541
-	 M+ItZdFmb4YTRGRjTTnfE5DeKrWk9SlYfZALqe4cUQT8TJiNle5QDhtHorvpdh1JJfMYC
-	 HyfLZ6YwZGKCjNEuBAKvmpqqCpdps9jmcmCqmMV6n9HRoYkRAGlDy0UnxjvOIWW2lTOeB
-	 DKsV1kEcqqHL2NCvk5i7s+iVSILYCgc1sUzanpIm5057RMP5W5b/4uHohbSiJCAz/7Q==
+	bh=022eQo8h9kU9nIHXfKYYOnp23W79u+iHIo1dSmOaVqQ=;
+	b=zcoWqQCuk+Gf7NoQ74qUx80R8/Se9OiVirU/PhEt7s64SSkAiiK5TcdJ7N3OabM7L77P
+	 cyVGqgy9+3Lv7pFfKFZCfzQPAOaRXiEgB1Z5K9H/XEoDqio2G7zyQWg3411GjGnStxUyl
+	 0195diQjYkJzA7UeiqjvlttFpVz9O4Lvb2pft9gA6f3h/rYqpb0AzXD8fm2YXmKgtzGQo
+	 dK68fC2L8UwKV+1SQS/c0ucNPog3/TIv3opph8YUtY7bUdbCL6sLMyeTCKYoHQecIbq5X
+	 aIRBok86bN9w6KVuR8AidZ/Pb55F7qFGnsRunBDbTImbspiCd1HnAgW53D4+ydo7VaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=y8sgx+ei;
-	arc=none smtp.remote-ip=209.85.217.52
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YbbpmiGj;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEF1606A32A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:58:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FEF1606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD2B606A336
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:58:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FD2B606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=y8sgx+ei
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7cc0ccc2fddso519319137.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YbbpmiGj
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-99e145569c6so381108241.2
         for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:58:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795031937; x=1795636737; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795031938; x=1795636738; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=qXTKYjpFrai6v8rLGD0yMT2Tbvm8Nml9BdSrw5HdnKk=;
-        b=y8sgx+eigQGOfnWKxdKnmTJ5SyW4KnGJ1V4TrjnIzfP4IRZ2TvGhbkqrWZupGD3Lak
-         aFKjT7B1J41ME9xdn/RErmnO0zc56SKLb59kXRSGcovfUVCQimxS/N95+cy80lakyR3w
-         jzr6DGEl+RXngk61nY15l0ULV0oQc6SLK+zfWCpSmHT4omOzN8OVB2Rr3Dx+I28g9ybD
-         wmLLuosYOxM2vNtYSB59SZW+DLPO1OqE80jGYhTPuS7Z9B86RO2c/Lz6zIPSdAamzJsq
-         OgVUFwRrYdp5erqvqzMCY366RD/TK5qcSWbyfgW6TFeL05UHre1hhesPuzO+WLD58F0H
-         Ad0g==
+        bh=022eQo8h9kU9nIHXfKYYOnp23W79u+iHIo1dSmOaVqQ=;
+        b=YbbpmiGjo1i8kBJ/AWMhp3hiFEOkeBEIpVcOpo/w7nO5kteMkDmIQwY/7/y4F4Srf1
+         SyUNaRZVzLgWz2aQBYBwVBOstKxkIV4TkItlrm7VxoDl2mz33oX/HWzkjpoDQh8a2TkR
+         Ea+bMVrsjIQhEhS7F4GPH+/n9Jn30B7xtXEQxjSiF7MHuTUzZroc764n38wzB+bacdd/
+         NsTH6Yf29HcD6WbaR5Y++R49P/fG4e0Vk/bb+mN8X+sOuYdPy3qPtP12Qj5yz0CX59/8
+         kqc7TVeM3/g1WUcXYFzveyz4VjuD2TMBuunsdW1D+u4ljrBKq8HGB44Wp4AF7NK5miWZ
+         0ALA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795031937; x=1795636737;
+        d=1e100.net; s=20260707; t=1795031938; x=1795636738;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=qXTKYjpFrai6v8rLGD0yMT2Tbvm8Nml9BdSrw5HdnKk=;
-        b=d+D9gcCJC131cS4CBgB7HMxDGD+H75vHl1/2/8qgdxppDoL/MANQhd9jES578oz4jF
-         IoezyAQdzkvhDVjAiEqUdpe2ykUqBfoc1sXTEYNJpSMz5ls+waeXoXnPfgIGBwbdncE0
-         IOp5v2HOO6i7pfkWBs2gBYgc+kEIXIdJHLadtQEMlsmtgtAiZYJhlo7JW48JlEai6Eix
-         9YOXMhX66N7NZkAUASNMV1pb2Uj78/qDmoOpzcxfP/kOTyVj8sTYC4tp7ApaW7zk/sXM
-         4nyQgx8GbPhBRWDFoTncMT63sCv44WVGRPA6YtvL1y5T8O78ZnACWBIrMVXHytMgUPFC
-         eqUA==
-X-Gm-Message-State: APuU4Z8um5zMh47WyFkk9vT2RW9alZb+1s1FF5LSXROc4HC3KeyqOL9s
-	sDIZBch0Ye0Ibq8jgqUhD+jmorWcP+xkuf1i+r5nNLKo6bUMCykMpWx2F8SSSunB
-X-Gm-Gg: AYBFou0wRnjfozOy4+hFZcz28yQWG+LmObyHmIO10K40mSEtp8fjsMBG8H80Wuw0vjd
-	1bAerHufovi8JztVmmgDUI6XGgnE/IsKeg4JbSqQoLMbMyomAGlq1voyCYsAYIStXvZ9vDzu5vW
-	QhZI+z4U4AII+m4hlNcQeBpC0RxSzzy8xzkGBvuTKpQQyOhrY/qeWDPeF4EE6czGstgU1ZXD1uH
-	8807pyAIShIYDHLG9iBNymGFX82CCOtAHUjCn2DPWgOKx+bKBjtTiKqwvu7Wpx/1rBTYW7fORFz
-	t0SRvI/Yl7iX6N/QecZEgA05mexOoQcc0akw3T4mRQ6w89MOQSBSVt2QIK/8ue/0moLvxMfjlMX
-	ITyGY+2G8oQjSEq0Suov0SvDX4IV4y7wHSZQMJzWD8Jv8w3QxWOuqM6Qxxorb7BmZBk2GhJtTD+
-	q3bquIVRKFJQguYnTJ3Nm53wN+zQHqX3Bs/WY2biLo+a4t4eMoPfbD/YL9pFFTwdhP7m9grgR6h
-	pTOmZECHgCQw1VOAm8QQvGqbo2VMJbGlcET3ToZj9YSpUubRpAIsV9Lywo3Gr0x13wTCmvYFUl6
-	/n0scbHwOjPTH8FVUFvTcVYQZhRiRiZmpT1xyclBJkQwgiJgAHQLiuOpM3epI3Eu0B7FbhKMUB3
-	NaV899yMwI72f0EnIuJmCB+ndnjBb8PnvQ/UxUwTSJRqL5GsenU/PauFCisjvngLaPppL9bj5g1
-	YY0FQ=
-X-Received: by 2002:a05:6102:3ed4:b0:7a8:2a34:432e with SMTP id ada2fe7eead31-7d6ba39306amr1734856137.9.1795031937175;
+        bh=022eQo8h9kU9nIHXfKYYOnp23W79u+iHIo1dSmOaVqQ=;
+        b=enfIJaMWMNml8HWs+DkTeHRx1yC8uc6cGVzY6SBGPHNZMRUVSXKiTxMzVL3zM+j6xy
+         wESs3SurIczZUiTTg+z0Qt5QZWhMNcerxeW3uhY6VV4itQz6+NoRVUcBmu6A6bym13Y7
+         EnLgLwT1G8dWyxSK12jzJtak6nTEgVCD8dEgeffM2iPM955moFtdY2xTqjvp0vPQjY7Q
+         cW4lcXjSZrh4PNKgflz8bLbS65aeOe0OKNpjBL92uQGKtl3pRsltT1oRmiWbU9R3Qlzg
+         62ATW/rnioFqKlBLdQE0EJm0Sd9Czz9OxtPKn5+L4oGwQyBt1nJzs2uxooySAW9/ez+a
+         lLIg==
+X-Gm-Message-State: APuU4Z/9+wjC+yG1rck0tJj1cgKWlGoadH18yEtqUGnczIKPfQ5NeoIF
+	M3bAzxxMo/f8YLocPPVW9sN9cj8u4/Rp1WW2pz+PU7fpQKfGiJfgWi8nYtQqwW0j
+X-Gm-Gg: AYBFou1MZYSaqJFwCkGLiref2D/t1CigujsjsIfKEBbMZmpZVB5JHnoybGiJs7N9KPr
+	vKivu8rj4McwSf9Zvk3XGldqs60nluIyYY7Fn/kj9fHY84PwvdIKf8ZQ6DahlnaCCMPyBNI9dB8
+	MzydYBgP2lcreMh4GuOa9/kx4vAdBDd9C5n/lcb7TmUu6KPUjgYO2omx73GrdNF6OM7K4VSKeK3
+	AxuVD9FZBFv+pRqHOlMof2G4s2q8qBFkNQOuDpiJMZDV8bb20WyECXmoiG1SNOO1KiT4R72HmOg
+	RYC+tgzn7mKYAWwSr7vJ6GMym2oxlihe4ry53D1kytRTeZu4It/bEfqK99ghPpr9JA5mMS2r4J6
+	BF0cAferA8Tpn1sajmJ63KNYQJJaBOntghwf7rhCxM6FnSPbWqapCd245pEYcPLxMOeggbf9XI0
+	9lLzsB40Kv6HRJg2eJD0OXC2OPdYwvQnCoZV0P9768hVTICZ59BqD0nbG1EsdI48BmaMOj9BU3x
+	B1und165u2vm1lUQji5iXYj30+zNf3dcyhRajq5lRAMVgPvX41zSk9qyKbC52idh8e0fyw/uWSO
+	oMjs1o3nwsv8Hpfo0QQpKav+3zufbeQCBNVviOPtYhi9Ia+M0pPatZTOG0zzphJ0UDiqbYA/A8M
+	I2f+lKQe7JcNSzToYYWAutP+wel8OEOy82Fgqju6EJ+uNDw6xIWDapoRYY2PflHzMRaNfHYIB5L
+	XpbKpBHT0ABAiat5tLyzuQuvG9
+X-Received: by 2002:a05:6102:91b:b0:7d0:9587:1b99 with SMTP id ada2fe7eead31-7d6b9ee48fcmr1531882137.0.1795031937886;
         Wed, 18 Nov 2026 11:58:57 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b91e87f4sm2685571137.7.2026.11.18.11.58.56
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b91e87f4sm2685571137.7.2026.11.18.11.58.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 11:58:56 -0800 (PST)
+        Wed, 18 Nov 2026 11:58:57 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 11/16] profiles/ranging: Keep a peer-driven setup from being rewound
-Date: Wed, 18 Nov 2026 14:58:39 -0500
-Message-ID: <20261118195846.393710-12-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 12/16] profiles/ranging: Defer CS Security Enable until the link is encrypted
+Date: Wed, 18 Nov 2026 14:58:40 -0500
+Message-ID: <20261118195846.393710-13-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118195846.393710-1-luiz.dentz@gmail.com>
 References: <20261118195846.393710-1-luiz.dentz@gmail.com>
@@ -101,67 +101,166 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-The Set Default Settings response moved the state machine to
-CS_STATE_WAIT_CONFIG_CMPLT unconditionally. A remote Initiator does
-not wait for the local setup phase, so its configuration can complete
-while the capabilities are still being read over the air or while
-this response is pending, for instance when the local Controller still
-has a CS role enabled from an earlier StartMeasurement(). Its Config
-Complete now advances the state on its own, so the response put the
-state back and, on an Initiator, created a second configuration.
+LE CS Security Enable is only valid on an encrypted link (Core v6.2
+Vol 4 Part E 7.8.133, which fails it with Insufficient Security
+otherwise). On the Central, the Config Complete handler checked the ATT
+security level once and put the state machine on hold if the link was
+not yet encrypted, so a configuration completing before encryption
+never got its Security Enable.
 
-Only advance from CS_STATE_INIT, the state the setup phase is in until
-then.
+Defer the command instead and send it when the HCI Encryption Change
+event reports the link as encrypted. Track the encryption in the
+connection mapping, so the check no longer depends only on an ATT
+instance being attached, and keep the ATT security level as a fallback
+for a link that was encrypted before the state machine was attached.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/ranging/rap_hci.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ profiles/ranging/rap_hci.c | 78 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 65 insertions(+), 13 deletions(-)
 
 diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 39b167ba80d1..1d59eaa6efb1 100644
+index 1d59eaa6efb1..ad9c4c0feb9b 100644
 --- a/profiles/ranging/rap_hci.c
 +++ b/profiles/ranging/rap_hci.c
-@@ -458,9 +458,6 @@ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
+@@ -75,6 +75,8 @@ struct cs_state_machine {
+ 	bool procedure_active;
+ 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
+ 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
++	bool sec_enable_pending;  /* Security Enable deferred until encrypted */
++	unsigned int encrypt_evt_id;  /* Encryption Change registration */
+ 	/* Negotiated CS role for this config (CS_INITIATOR/CS_REFLECTOR), taken
+ 	 * from LE CS Config Complete. Unknown until that event arrives, which
+ 	 * is why it is kept apart from role_enable: the latter is the bitmask
+@@ -99,6 +101,7 @@ struct rap_conn_mapping {
+ 	uint8_t bdaddr[6];
+ 	uint8_t bdaddr_type;
+ 	bool is_central;  /* true if local device is BLE Central on this link */
++	bool encrypted;  /* set from the HCI Encryption Change event */
+ 	struct bt_att *att;
+ 	struct bt_rap *rap;
+ };
+@@ -902,7 +905,8 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 	 * the ones for other links: acting on them would overwrite this
+ 	 * link's negotiated role and advance its state.
+ 	 */
+-	if (!find_mapping_by_handle(sm, evt->handle)) {
++	mapping = find_mapping_by_handle(sm, evt->handle);
++	if (!mapping) {
+ 		DBG("Not for this link, ignoring");
+ 		return;
+ 	}
+@@ -1010,26 +1014,62 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 	/* Success - proceed to Security enable complete */
+ 	cs_set_state(sm, CS_STATE_WAIT_SEC_CMPLT);
  
- 	bt_rap_set_local_sw_time(sm->rap, rsp->t_sw_time_supported);
- 
--	/* Transition to INIT state before reading remote capabilities */
--	cs_set_state(sm, CS_STATE_INIT);
+-	/* CS Security Enable may only be issued by the BLE Central */
+-	mapping = find_mapping_by_handle(sm, evt->handle);
+-	if (mapping && mapping->is_central) {
+-		if (bt_att_get_security(mapping->att, NULL) <
+-						BT_ATT_SECURITY_MEDIUM) {
+-			error("CS Security Enable skipped: not encrypted");
+-			cs_set_state(sm, CS_STATE_HOLD);
+-			return;
+-		}
 -
- 	DBG("Sending read remote capabilities for handle 0x%04X",
- 		sm->active_conn_handle);
- 	bt_rap_read_remote_supported_capabilities(sm, sm->active_conn_handle);
-@@ -537,6 +534,16 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
- 	}
- 
- 	if (rp->status == 0) {
-+		/* A configuration created by the peer may have completed
-+		 * while the capabilities were read or this response was
-+		 * pending. Do not rewind its state.
-+		 */
-+		if (cs_get_current_state(sm) != CS_STATE_INIT) {
-+			DBG("Setup already advanced to %s",
-+				state_names[cs_get_current_state(sm)]);
-+			return;
-+		}
-+
- 		cs_set_state(sm, CS_STATE_WAIT_CONFIG_CMPLT);
- 
- 		/* Only the Initiator creates the config; the Reflector waits
-@@ -1834,6 +1841,12 @@ bool bt_rap_start_measurement(void *hci_sm, uint16_t conn_handle,
- 		sm->measurement_timeout_id = 0;
- 	}
- 
-+	/* Enter INIT before the asynchronous capability reads, so progress
-+	 * made by a configuration created by the peer in the meantime is not
-+	 * rewound by their completion.
++	/* CS Security Enable may only be issued by the BLE Central, and only on
++	 * an encrypted link. The LE role comes from the connection mapping
++	 * (set from the LE connection event), not from the CS role in rap_ev.
++	 * If the link is not encrypted yet, defer: the Encryption Change event
++	 * retries it (rap_encrypt_change_evt).
 +	 */
-+	cs_set_state(sm, CS_STATE_INIT);
-+
- 	if (!bt_rap_read_local_supported_capabilities(sm))
- 		return false;
++	if (!mapping->is_central) {
++		/* Peripheral link: the Central's Link Layer starts CS Security
++		 * Start (Core v6.2 Vol 6 Part B 5.1.23). The local controller
++		 * reports completion with LE CS Security Enable Complete when
++		 * it responds to the peer's request (Vol 4 Part E 7.7.65.41),
++		 * and that event continues the procedure. Do not stop here.
++		 */
++		DBG("Peripheral link: waiting for peer CS Security Start");
++		sm->sec_enable_pending = false;
++	} else if (mapping->encrypted ||
++			(mapping->att && bt_att_get_security(mapping->att,
++					NULL) >= BT_ATT_SECURITY_MEDIUM)) {
+ 		DBG("Central,encrypted: Sending CS Security Enable command");
+ 		rap_send_hci_cs_security_enable_command(sm, evt->handle);
+ 	} else {
+-		DBG("Peripheral: Waiting for security enable event...");
++		DBG("Central, not yet encrypted: deferring CS Security Enable");
++		sm->sec_enable_pending = true;
+ 	}
  
+ 	/* Send callback to RAP Profile */
+ 	bt_rap_hci_cs_config_complete_callback(size, &rap_ev, sm->rap);
+ }
+ 
++static void rap_encrypt_change_evt(const void *data, uint8_t size,
++					void *user_data)
++{
++	struct cs_state_machine *sm = user_data;
++	const struct bt_hci_evt_encrypt_change *evt = data;
++	struct rap_conn_mapping *mapping;
++	uint16_t handle;
++
++	if (!sm || size < sizeof(*evt) || evt->status != 0)
++		return;
++
++	handle = le16_to_cpu(evt->handle);
++	mapping = find_mapping_by_handle(sm, handle);
++	if (!mapping)
++		return;
++
++	mapping->encrypted = (evt->encr_mode != 0x00);
++
++	if (!sm->sec_enable_pending || !mapping->is_central ||
++						!mapping->encrypted)
++		return;
++
++	DBG("Encrypted: sending deferred CS Security Enable");
++	sm->sec_enable_pending = false;
++	rap_send_hci_cs_security_enable_command(sm, handle);
++}
++
+ static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
+ 					 void *user_data)
+ {
+@@ -1799,6 +1839,14 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
+ 		queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
+ 	}
+ 
++	/* Encryption Change is a plain HCI event; it lets a deferred CS
++	 * Security Enable be sent once the link is encrypted.
++	 */
++	sm->encrypt_evt_id = bt_hci_register(hci, BT_HCI_EVT_ENCRYPT_CHANGE,
++					rap_encrypt_change_evt, sm, NULL);
++	if (!sm->encrypt_evt_id)
++		error("Failed to register Encryption Change handler");
++
+ 	DBG("HCI state machine attached (role=%u, ant=0x%02x, power=%d)",
+ 		sm->role_enable, sm->cs_opt.cs_sync_ant_sel,
+ 		sm->cs_opt.max_tx_power);
+@@ -1943,6 +1991,7 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
+ 	remove_conn_mapping(sm, handle);
+ 	sm->procedure_active = false;
+ 	sm->cs_role_known = false;
++	sm->sec_enable_pending = false;
+ 	sm->current_state = CS_STATE_UNSPECIFIED;
+ }
+ 
+@@ -1991,9 +2040,12 @@ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
+ 	/* Cleanup the per-instance state machine */
+ 	if (sm) {
+ 		/* Unregister HCI events */
+-		if (sm->hci)
++		if (sm->hci) {
+ 			queue_foreach(sm->event_ids, unregister_event_id,
+ 								sm->hci);
++			if (sm->encrypt_evt_id)
++				bt_hci_unregister(sm->hci, sm->encrypt_evt_id);
++		}
+ 
+ 		if (sm->measurement_timeout_id) {
+ 			timeout_remove(sm->measurement_timeout_id);
 -- 
 2.56.0
 
