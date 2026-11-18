@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795029089;
-	b=2IV4Y+3V0hBS5xHbCiUyJfljvOkCLaty00/VyEui+6iSYEXsbzHkinn/9jtSzUtSnPbK
-	 By5nuC6hrKxdij7M4o5ZX0k4jmRvy/Mly4bFrzwMfm9CPINJeSDC1Ahd0g/yK39mGfJGe
-	 X3HasCG9MrA+JmtDcGob8ZRIUmyTz7ZDEPTR6Rg9RmyNyBqVrgz3YlqhGv8AqrTI+fygG
-	 Lch2yPFIuJOwjpksWQhDutv6hO7zp345fSkDlDBwfSuQU/oC2h+lXqtwVzMvIxV9rHzaY
-	 IscMNJzY9BLhonqjgAcOs227OkD3efs6F875I0XmSGCFLQmit2M7x114xrxcTLjhHyA==
+	b=mt9v6SNHq9pJMJ9nbpi2LJFy1KDo9i9QUrJM+vdYrK1Y9EK/R8A7g/4UlHvTz1d9ZUjK
+	 GZb8vDvxXHctDKr6cdumXNRxzypfT5UbuDKHcywDbgmbwDGdlUgXoYVNZlc9TvW75uYXH
+	 NhSh+xF2KtuLUw+Fb5xum1OMzzNeIWob9GIc0iapNQR8Yn5YZkGXn30zDm2PwcMLnk+1g
+	 fQFzj0kud6bWxTAZujrCm/7akzhivVBx1oHnXpqfjtXmZAGJuTilO3cSNovoQA02iOJQ0
+	 AhMQOKNHlyftqiHLsSZP3kPJptx35v1D/vwWiGevAIToh5hiVZlCYzvkJxl2GpHPTXA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795029089;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=u3bgwvMTpuj3L74/b7gj9opF2Rxh5Ms6OYbjAz3EnU0=;
-	b=V7g8mjrBur10B5F82riR+3VCsvdT8NESC79J29Y9w/jwuvVg70vUEmPmTNs/Up0YUUxA
-	 fFniECeB4US325BKxsoQM3kAtauQ6LBvjpwMG0Z9suzwXVEP+zYlPxEKc9RM9VWPwIuim
-	 0gMBjv2p6LCa0hKZTal4Qi5jGDwtP8lP+DRjKF9NrjPwimopHcs8XJiqYAtbaHce5xz8i
-	 RWhzOFvpV4Cj1kJcbRTPZIbBOrrbWp1CSIgF81dIfG3U/mD7H+YuotMXe5spdXiVcblz7
-	 Lz4aOHTij17m+DnNJbTHqH6NsQvlMpprB4eqVtOXCPRLb8UrOjDgNFkBaIWEDkgvvww==
+	bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
+	b=tpLLh37/G4pACSui57WYPnjg65lpfD3r3GNXw7IBRCFZVF5NCmHYw0sn57HN/N0tPh8f
+	 tnYV/URMbRMOxYc+TOXXroISMckQ2cu+Efq7yYu6iv+sYbnzTZnjicSIFXrYeZ8jHbl8o
+	 qXCJ0mL/tC1eMZSsxxuo0TBb/iYD80aZelrthzMZVDm1I8OhIyYB1HPZmyBcJwjc9RTN5
+	 PInFvjVWjbw3gKgXqOfFG4N+eHcj+4rWaPKmOwgqXD76d+HBEdrmO2cSDq02iRFM1IhXB
+	 Ts+aAE/NyL3NKhfAWQ2T6TQ7bsBViTczE6Jl1mYOyRjahg7bFtUfQ4xKY/uZE0R6+3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tTiZH8KQ;
-	arc=none smtp.remote-ip=209.85.221.169
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K72Y7Rbb;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D43606A325
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6D43606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867FB606A32A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 19:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 867FB606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tTiZH8KQ
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5eafb65e169so782804e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K72Y7Rbb
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-9907a58f14dso425362241.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 11:11:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795029088; x=1795633888; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=u3bgwvMTpuj3L74/b7gj9opF2Rxh5Ms6OYbjAz3EnU0=;
-        b=tTiZH8KQwzZ1bwUxInetWwcJRb4qprd7YEhSA/QbHWL/YvFr1rWOVdfli9QTrBsHmC
-         edCvCYqoJcsQ1PHG9NT1WqGJB1Y3yZXmWks6L0h+E5bnypJ7scQQjG8KD7Kgn07MCh3k
-         dlgu/te5++hjoDdTrD3TGTLhFjqooa44yaTfFbvJkPzO2HTj6wEkvsRlclerP8gg4Qhj
-         9Ouj0ZhEMJrQbLbslpLRAsIES2SqwxDP88avjWeq+qoVOhsaruQMNCZFF21O6+4VHBd4
-         px1pkgQGur3Y6st4CDTRHQfcBkARffHbzKqTn9kAy3enn0P3COLQirlL4035kbUYBpOs
-         PoOQ==
+        bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
+        b=K72Y7RbbBvMXbhiv92w40M3EWln0w5HK9V9ORu/JkpF8G48aFkodHUCM84NniedVHb
+         Bfwj2UqbYS86VIkrr2ggiia9KS/4pQ7vCSePr+Dt690eAMhzHfuyhSWU8rdC/+nhA/zb
+         HEY79PZ+KlrvQ7QlIFDD/6b97lk/xQ1m3QRLGt5idbu5wS6ETVizc6VMbnmfplVHCjmN
+         avsXmA4XIUNb47zzIzvK7jbse9yig0qVX577H3384wcSqx4vfci3CEh+wSHTGMQdepXE
+         sR+U2aisyFFBYN41eXNUFUtU+R9LhgQDlW5lKGeFTji8Wf86zfReP/bqoWOBNptns5Yi
+         v9Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795029088; x=1795633888;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=u3bgwvMTpuj3L74/b7gj9opF2Rxh5Ms6OYbjAz3EnU0=;
-        b=NVWqKEzcI3CIst3BeVAHAAU8rXpnosj4RtuCcf0K46OyPIRPsiR7ju+yDi3aNQc3Ay
-         N9DD0eweNk18DdtBsi41fGtUcGkgWNcVO9v7BJWwoKVfnavfdV3UEzO81GjAZ/tih9Yb
-         Sl7z96TLxZ15fYqwQmX4bzgea5X2xVg48TWF/XXjnw+b4DHDoUYWlyb8uQca6X7MgENe
-         zt2u/WMcA/sc4T1Ccu/yrFa3BFkNBodNtCJM2g3JlGvqQxjRiSbnUfOq672dUB4luRYo
-         IRYWtC7jMu1AF5gGZMimEBQ3v7TVPhxl4oXRlNTvaSpygbmeet54Opcg8ll5DXNKfufd
-         KGgA==
-X-Gm-Message-State: APuU4Z+zbDoOUByrEl7H5H77jqeiSJai+7OfYK9HY7tzUgPr2WHbkJlP
-	ebfqg+M7RFAeAU/9Kbbb7wvkSi/mKx2i4+E44TKvFkSAneThzlbZocskK/R5uATM
-X-Gm-Gg: AYBFou1eTHkm1r12RCU+qmqZqhqtAomy5wcwikdwRKJTc1vKazsISOphUqd8xFI63BI
-	7lWDO0VOHr9f/IDshhDB1aQ3zaDA8m5/I790qYVclLAjUdkTngwWhImRR8k1bzGjFvnZ9NgT4Ml
-	1uAB5iMRq/0IDXII21tKKGQq+3eGehZqsp977JRsVfWjZk7e82KniVBzIU/XY8mV4Yx+htOmmxg
-	1h08g2DiiUH84Elc1r/h25zupDijddoIBO8wuNu2u++FY9pC1A67AcjvIdw8proymnx4S1JfJD8
-	JsQQo7tY61OQLL60GAGIfnJj4gAi3gzwc1RRKRXT59GtGloTIr6lD9gGsRSqBIlRF0KJwHa+a8H
-	UPAkQF2nv4UBCfarE/lf8hxXH+xVDyqxS94sm7BwhQ2g8EBToWLxM/dMwdvuRCK6WcNzdH3JYTS
-	sQEK7zXoqKOY1vHO8f6Kdli++IuPGG8EN5wZk7/nJN+u32rFXvqwN0Bce6VteqrRHiNsrT7pf8x
-	bpxIdSfhPn2cK7dEY5pBD4beO1mWWAIM6iylU5yGSrino1MMpeAmZfqQQi1Fq+drxFnwizxzrEh
-	ng+nrzl8FJaqEkWSA4EPXnbpImGGv+AteHa7ZKs9poTnlxYjFycb2Fslcb+EfD4vh+08DHBWt+A
-	WRKBHtdBSRhxnfCHLoQkFH+h3LcBAMURq4WTBD+X97tdg797fPCOxIQu07mFk2Pn8ZDLJyK3RJg
-	ZpFKc=
-X-Received: by 2002:a05:6122:32cd:b0:5c9:ae70:e784 with SMTP id 71dfb90a1353d-5ee645f8252mr1991441e0c.3.1795029087649;
-        Wed, 18 Nov 2026 11:11:27 -0800 (PST)
+        bh=Ee4kAIRs3JTF8kr+7NV3oiv/WTEJGArGMNXdSUwp2RQ=;
+        b=VkGOGkZ+JzSZNZFaw/lQs0UCnmTf9yUGPoOexp2H8if9Kr/UmPfmYASS+zPV2JOMWR
+         5I1twLc0nw1rededEleB71q615lg57zrTmSp+MQSQRz5H0xqreuYHyWgBPrZHINc09A4
+         CqVUJ+64KVt8aIsqHoY/L1Nr80x+YwpB/mlUlihIwnlv8ublj3CTmM9f+JDrtOT+JbhU
+         R0IMvsEq3OrUJbTLRTBzjhBhXDT7O+gjbcqh/QomnE2CKMYpcl9llzGXhvr89SOyHEha
+         zWGXomvgJvTuXNu5ZV5ER/oSmZcEXMHTVilnmS9Kq2tp3IA4fWf4j8gKUMAFqvRGSfV7
+         /PiA==
+X-Gm-Message-State: APuU4Z+YDB9B+q37VizWgOA1th0hjcOTRHiEzwuKI9xtPjQsAMdS+Tzy
+	SPpcqssuy8P96pmYh3lIwFNNhvB5r543qPaAzhFJgXet2sRbSIL4bHsbmfT/IwJe
+X-Gm-Gg: AYBFou2KKgjUy5Y1yrDWQIzqfqwLy//14jq0NxFOUlbtn1LDffPeC0X0p1Tf4APszMF
+	O+aifb1AkcZlVKfzIjykscGSeu2FpsYN9vpONCZART7AEEJtQvm9CI627zDcbY4q70wTbmt5Ohf
+	zi2WYDNtUAU1mw+v4pOoKFaoth2QvDEqsU+5Ji8SwTtWBaQFWMRaEGH+JfCLzI7g6dYsImSyKGp
+	EZvA0r/ojChPDzFkUaFePtsfVQxSsttFxG8UEslRudCuIaAShQShXJ1YDE/vTM8c2xHyn/h51YC
+	X+Qq0rDb+ToOLj1CiO98ghP0/+4OQttfOxwkdq2JuxZZ1+PQEypc8ehZmqHdKst8GNP/lswOurL
+	lSBl+ptJxNmuiV+iwcbDMwa0PmBzlx+RHv3Zvm6dnphkRrQsWeakk5nVuUSbXhwri7kRV5HdAVy
+	JlUKYBYR4i0EBdQZBY1e552s00+TFJKzP44yWsBt1ft2WtbkxtZ30cn44OvsuRlWNZthdzZWajU
+	thsLikgydACQKz/yltx0wufiFm+MdxHQEd6lzXXJ04iQPXh4+s9O8TdmraxIVHhOw5Hr5dSOkJ3
+	uq4VJbE0Kw8HDfSLvy/AxFD5ccEmZimqE1OeXx5hPUDk4C7/Cl06gWHi202pJxsBxMoSVpqTpnO
+	aQrFVnTWTGVKlTLu+Pd0dIkji8STV2oHATOJgzMvarTyCqWFdjmvos6GsOxsd3u5rfYjqJIA/4S
+	KXaEg=
+X-Received: by 2002:a05:6102:508b:b0:7c3:9a36:bbda with SMTP id ada2fe7eead31-7d6ba22a9e6mr1433040137.5.1795029088397;
+        Wed, 18 Nov 2026 11:11:28 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.26
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64c1801fsm2479672e0c.0.2026.11.18.11.11.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 18 Nov 2026 11:11:27 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 06/17] Bluetooth: SMP: Check smp_data before using SMP_DEV()
-Date: Wed, 18 Nov 2026 14:11:07 -0500
-Message-ID: <20261118191118.318779-7-luiz.dentz@gmail.com>
+Subject: [PATCH v5 07/17] Bluetooth: SMP: Don't create the BR/EDR channel while unregistered
+Date: Wed, 18 Nov 2026 14:11:08 -0500
+Message-ID: <20261118191118.318779-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118191118.318779-1-luiz.dentz@gmail.com>
 References: <20261118191118.318779-1-luiz.dentz@gmail.com>
@@ -101,42 +101,76 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hdev->smp_data is NULL when the SMP channel could not be registered, so
-receiving a Pairing Request/Response with the OOB flag set would
-dereference NULL through SMP_DEV().
+smp_force_bredr() created a BR/EDR SMP channel even when the controller
+was powered off or not LE capable, leaving a stale channel that
+smp_register() later warns about and leaks. Only create it when SMP is
+registered and guard the removal; smp_register() creates it on power on
+if the flag is set. Since smp_unregister() runs with hdev->lock take it
+around smp_register() as well so they can't race with each other nor with
+smp_force_bredr().
 
-Reported-by: sashiko.dev (linux-9bc9da90-02a8-4a87-a603-87d0a4cf464c)
-Fixes: 94f14e472812 ("Bluetooth: SMP: Fix trying to use non-existent local OOB data")
+Reported-by: sashiko.dev (linux-a921c99c-0b41-485c-91a4-1c6e54b45b0b)
+Fixes: 300acfdec916 ("Bluetooth: Introduce force_bredr_smp debugfs option for testing")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/smp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_sync.c |  2 ++
+ net/bluetooth/smp.c      | 20 ++++++++++++++------
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a1f272c14a1e..b1925153c2c7 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3892,7 +3892,9 @@ int hci_powered_update_sync(struct hci_dev *hdev)
+ 	 * registration is required so that LE SMP can clearly decide if
+ 	 * the public address or static address is used.
+ 	 */
++	hci_dev_lock(hdev);
+ 	smp_register(hdev);
++	hci_dev_unlock(hdev);
+ 
+ 	err = hci_write_ssp_mode_sync(hdev, 0x01);
+ 	if (err)
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 88cd86f742a6..7e0be869cc74 100644
+index 7e0be869cc74..1c315c9ee7dd 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -1766,7 +1766,8 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 * successfully received our local OOB data - therefore set the
- 	 * flag to indicate that local OOB is in use.
- 	 */
--	if (req->oob_flag == SMP_OOB_PRESENT && SMP_DEV(hdev)->local_oob)
-+	if (req->oob_flag == SMP_OOB_PRESENT && hdev->smp_data &&
-+	    SMP_DEV(hdev)->local_oob)
- 		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
+@@ -3441,20 +3441,28 @@ int smp_force_bredr(struct hci_dev *hdev, bool enable)
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
+ 		return -EALREADY;
  
- 	/* SMP over BR/EDR requires special treatment */
-@@ -1962,7 +1963,8 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 * successfully received our local OOB data - therefore set the
- 	 * flag to indicate that local OOB is in use.
- 	 */
--	if (rsp->oob_flag == SMP_OOB_PRESENT && SMP_DEV(hdev)->local_oob)
-+	if (rsp->oob_flag == SMP_OOB_PRESENT && hdev->smp_data &&
-+	    SMP_DEV(hdev)->local_oob)
- 		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
++	/* The channels are only registered while the controller is powered
++	 * and LE capable. Otherwise just record the flag, smp_register() will
++	 * create the BR/EDR channel on the next power on.
++	 */
+ 	if (enable) {
+ 		struct l2cap_chan *chan;
  
- 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
+-		chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
+-		if (IS_ERR(chan))
+-			return PTR_ERR(chan);
++		if (hdev->smp_data && !hdev->smp_bredr_data) {
++			chan = smp_add_cid(hdev, L2CAP_CID_SMP_BREDR);
++			if (IS_ERR(chan))
++				return PTR_ERR(chan);
+ 
+-		hdev->smp_bredr_data = chan;
++			hdev->smp_bredr_data = chan;
++		}
+ 	} else {
+ 		struct l2cap_chan *chan;
+ 
+ 		chan = hdev->smp_bredr_data;
+-		hdev->smp_bredr_data = NULL;
+-		smp_del_chan(chan);
++		if (chan) {
++			hdev->smp_bredr_data = NULL;
++			smp_del_chan(chan);
++		}
+ 	}
+ 
+ 	hci_dev_change_flag(hdev, HCI_FORCE_BREDR_SMP);
 -- 
 2.56.0
 
