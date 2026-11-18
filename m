@@ -1,91 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.49
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795037648;
-	b=xWCJwBAvhxAcrlYA0qokP34rwO959Bx+vl16L3f3kmypuLPR+LmbsaF3HFXdbVO6xIl+
-	 iACfK2gqUvotri6VqfKJBOdyRERywwSRaqygF4O837bDAVQeRphrZKZhLOV5YND4mxcHW
-	 hFWK70QWKhH9GIui6bvT/DqsEftXYdP0qaE2WK8A23cjaT+YONbJfoW/eGyuleFWVoSRs
-	 26BwTBQ9hLIrE5fZRSEIR2iFS9VjH9w517FyARubvzZI5ErShTO/iqrNpoV0PuADiIibS
-	 LaevIRkwhNVpX/fBmI87CnObWDT4jgCbN8rwz9AFHzPsu92svoxWphPZ+MRmKAAJACw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795037648;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.44
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795038136;
+	b=t5M7icdTGE7hMMSIeDLoK55ZfGIvpYHAaQa5vRv42oQIc7ruR1giaHKO8dQpVymnST1j
+	 cB9liGrvkmFqA/Y8lzxVcRo0B96rLU3KqTSCeaYU3nUB3W71fEjjhDJksAVQgPYXPanS3
+	 mzB3IP0ascVXwEhi1aTO0gTQgCvJyCswtq/4AQq6QxMhjEFA1Nm9PtaMwtf5u1oabZS+c
+	 xw8a7pt15m8rztF9LrO7KaYoVGBLrMZ/u4HKAfqVOU3w7QBrFMWQJo6q1hroYuD/rny4L
+	 ZGXChh9mQwzOOACWko2Fcy+qLKGXweMsZvPY93vhaVKhtvBoeJ9gOj2DYiEE9SSxLMw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795038136;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=7wkVVAr94vmiTO/mQBiU6goP09UpUl9nKX+foqCxc40=;
-	b=ZwngipQw5qoZIJR+dij1rmoqvygKVq6oGO+bUIWdcev01tq8P+8CYU7XKkyFq9ingF9D
-	 TQUexRel0hBHvwxSr2EbOAlcGMyWMJCH7pzkJYzq1mXljbBwaUrdloE4TLgTaLJQAlC+I
-	 s6XhR9amU7IWYP5RsqQBB3yw7sXmcJ0Xb+WGDf0gxndRH2Crwz42FE9Lf2yxKyJrZjsvI
-	 bE+3Zh5ZUfhVOdmnHPeAvNOnVvC4+9H9ZNVExjdhuwgo6/WOx1l6I+S25jONjlPznSinU
-	 dDSvMaADJ+CUwNUO3z6E9NGFGz5agyQNO7S6VDTtEAiIsGSjNgIXeIM/GhYCMgzY0NA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=PZgo81B8EGyu5VfS6QLYCOE/jAo1hC2voCDqRZt9O28=;
+	b=Ipv+IBNufwPJXkCuvsqUM8yna2rFONbvJppZgRx+gcoFZSSNLBZvTCDoqaPVt8eqAL5V
+	 tcIJHEDjZo+H2kf3N7OioJQIgjfEDjEizSg+69R9gf6zXpuqeL+3TrfNszRM548hCHQhI
+	 dfvDLNNc1SUE2fpcOUOIBOKiUaYUjeA37E5i4I2GPdLffgMcF46YZtbJsISJ8poEXZbeb
+	 qdlyh9/qVV4DQzvitdZCYEG9XfPSZ0PSOgtfNJ5/aY5nK0RZWyObZN/iwdtjINkuG3NbK
+	 PMHBIfL9JX83ZFRw1N/cuHzbNGv1avCDeAYDsECjh2aq8ySYs//XVQ8jSEzUVqIDrHg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=odREYZc1;
-	arc=none smtp.remote-ip=209.85.221.49
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0TPOHJ37;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.44
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13218606A32A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 21:34:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13218606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38456606A320
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 21:42:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 38456606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=odREYZc1
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4a32576da88so850652f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:34:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0TPOHJ37
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-921159376efso15710646d6.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:42:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795038135; cv=none;
+        d=google.com; s=arc-20260327;
+        b=BeG9nd4tDHg7dQtWZnq+tVsj6rBoYekq0zhOROQPAjLKgdB7hZLM4NOuR+gX99c4Kp
+         oy4L8NQCl2xcRhX3gSJlCMeTdnp4CHo0LIKWU1EbSru2I611KDCfZfkMU2xNdvEzRppU
+         en6onUbapnrdh1xQ8zVWHSbUpl17d3C5dpl0ncPKqQn+a/enZhg9x6G5WM3p7fHJ5v++
+         lVwkTRfM/afVkcsBsrpsl12nVwdnLJzmwlSVrkANN7BmmIrQxLie5/j7TLMdKIuTJ8Lj
+         jPl70mB+tOo90wRspFw3FLlFTJjHLQV/cX/nztQXfOBPw2BVZokMCefqyCPzOL04YdvU
+         3AVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=PZgo81B8EGyu5VfS6QLYCOE/jAo1hC2voCDqRZt9O28=;
+        fh=3zox18dqDCGaPmRDESZJibZNi//mDrPmh2xUysL4PvU=;
+        b=DQ60TaWkSYEQ6FhmBOBRCAGoVGRv4nh8o/ZX6Q0kYej+zQvgWzzTak/kcqMIeHJWeM
+         EI4UBRiBZZbvM5qvxcvrqND93Mh7QUBW4U8vWM7fclgGjeD6ar2Cvb0+IKhsWOTeUPej
+         nlCt0edfrF9YEfqHwr7j8qb6npEXOxK5TBEJ1QPXU0sijGOsEx1VXocJmFYczHfoTJ2i
+         zXXxcYxITganASks5acz/KI3hlAlx82DXXn+sdjdS7LDFJov6svhS5zc/TOTfK12Egh3
+         wWhVpdLkS9s4RrIvFvXgspGTf9HBbJnQPcYr7GFfoYskH06pR67mjZjKX43TldSOnj04
+         MgQQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795037646; x=1795642446; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7wkVVAr94vmiTO/mQBiU6goP09UpUl9nKX+foqCxc40=;
-        b=odREYZc1/GbDh/eSmuR6NoDDRRevw5GoM+eP3X4LTbkbVZwjGOglEoprh/KYAjM2Ib
-         xvMJWQjUWhLso90cQ/VeXPK/eznybWngj1FdSb4Seo0mDR/dpBsPzwIcBrD4Ca4Muh6M
-         MnfdPQdtEmln31VcIRfu4kiDrqXnZfGzgap3H8o5rJ7HdvrvjvdsVH3uyzjVCK98sK9B
-         Ot3wbzIgQ2gXiSs5lamvnnfvUjFmyzdOSS/OoYlGx2mzmh1EEevsM5PutNK3fwByc/Rb
-         CJY8DxL4HsSUJ479ETk5I7yNqUFoQZM84zZ681XQN09VSKW10YqPsEuLt8DA35m32LY9
-         3Eyg==
+        d=gmail.com; s=20260707; t=1795038135; x=1795642935; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=PZgo81B8EGyu5VfS6QLYCOE/jAo1hC2voCDqRZt9O28=;
+        b=0TPOHJ37XvJrDGvKELG6mnYb7+AcidW6HDT78Dx02U4yS3hPOLZxgnODdBbqL3nh4m
+         SW28bUjN9Or3laH5JXQoNN9Naps3HsSAMXl6qGRDzdq69L113+3L25OKdAauS7mfad2X
+         kzrjROz38OmMqmbTYlNEe8iKnGz7GPqmB/9YnE6PAHBCijAFjhfUUKCIbp0HyzPh702h
+         E3sqA4bALgV9jiUe/NqbJ3I0yDLaRz+lskPBe4PxLEyhW6dVZ1Djc1sdkSLco74tOvQt
+         POYAFuKuX1MCV3k92oePrGh4QSVlS5qFDIH3I55+RwCL8167HdJHg4TdPkD8aKHTZcss
+         dJrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795037646; x=1795642446;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7wkVVAr94vmiTO/mQBiU6goP09UpUl9nKX+foqCxc40=;
-        b=XZS56m9sfIupZZqHTatVsl3nquW7J1EKoD1I7Yjx+QnF77TrDfeYDfJnOHyoNLJopl
-         2mWonfR5r7gsPGXPTGVjIT0ScZLtxd9026lbWvavxQOivd0oBMN3Hy9xBixBQzT+XdHk
-         V0zPphLQLXes2nGDESe/paiZsD+knWEe15L+ajHkhZopaHsSN3+o2jEO78A578Czc0QU
-         5g5YDphP8TnM3g13DFSEU9exZQqQIcKTSpcqCzmpuyZLKP9G0qhfKitzSuJANC86ch3Y
-         nSbE459ys+l54ZgGFYsKZ3SCUabIcju8I34UqqIxtIbZh8X0zbOx++W1+0botz2AduIr
-         SwhA==
-X-Gm-Message-State: APuU4Z9ls7rhDA115KNGT/zyfQKs339EEC/JSbEWRPGcbv6BenBnUf3Q
-	WpHblmT3EcF8WmyhoMQSGgqrpxR7aGAy3Ig/8mFoPDE/QYqsIqJZacP2MkrlNoKA
-X-Gm-Gg: AYBFou1zexYvtXbje099Y4VUs1PvuzfzdBIC1WuBAUgvQyALSxfTVi58y8W+jfPJxGr
-	fv5de5aH4/4H/GuRWGrQicV3vXNVKPKJBhEM9mMncBrcvH3WQG4SIEFVv+ryY3h113LufNSRwjd
-	UJe/zx8t1pNQ6Vm+965WgnYYL7wBX6z4vpbCaVNopKHZFbHEvng2u7blz8DAyZ7WwC8sTXUpE19
-	4czOSg1VULpfR3pse7HMXQXcVtcZElY+mt+yDwfg9C1ZCKvRNIzQUTpipGvx4m/h3z48QL9JhTw
-	gRmP+82C1Rh6MW1cNk0cEWvOMNCucQujE8uvsbiLmWTtXxcu+n/GhgGqbeb73HP+Fea0+4V2hFm
-	ItyS5/EHGAIWiT2Qh4aRdh1GVA8fSiXwS3EKArH/BbA1Bqq1dDyQb6KoXZHKhZotFZL5IA3aLO8
-	NN1hIY2Z1S30bybOzNNAQvAhmyaj4H7uACc5zWF3cRHeOtScIJ5DZ+it75dRHfO78HxnZAg0QU9
-	RvNOMwqkXP2vRQZxupJDqxQeA35D1a9O1KBTBo1oVeeD4qHjX/GaZe8V5UQkn0oD1CbjnibbjvQ
-	0F/Wq2nqgXDxST+05yuCveh6ufCFL7xoi6TNu6kq7+54eLOtYRDch9JTbTTiKjsQFnaRdLaGQ8o
-	3797sOyA=
-X-Received: by 2002:a05:600c:3ac5:b0:4b2:3c81:d1 with SMTP id 5b1f17b1804b1-4bb7da0f7e5mr78512745e9.5.1795037646220;
-        Wed, 18 Nov 2026 13:34:06 -0800 (PST)
-Received: from localhost.localdomain ([2001:16a2:c01c:327c:c4:b89d:8df9:7d38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb844ef1adsm527625e9.14.2026.11.18.13.34.04
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 18 Nov 2026 13:34:05 -0800 (PST)
-From: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-Subject: [PATCH] Bluetooth: L2CAP: check security before completing a deferred BR/EDR accept
-Date: Thu, 19 Nov 2026 00:33:22 +0300
-Message-ID: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        d=1e100.net; s=20260707; t=1795038135; x=1795642935;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=PZgo81B8EGyu5VfS6QLYCOE/jAo1hC2voCDqRZt9O28=;
+        b=QjYbGUnt74C+JSD1p5MfYbB0A3bY1fjy8VgwRxHZIliuRXeKgfzPBAJnDnAbJcoAAt
+         6IQ7sozOWyGPa/29onuBbu9qiRtcd4yEBhbymmhsriZmRg2JN53IlhRXxKNf1yH8Fjqu
+         z735g2aAeXZWAKPd10be7anGRi7CXc4BEGYPKIih0e5YcHREHz1q3BAPx8L0XGqAJJ59
+         NSeTxiSgwnHup8AEUW0ggx475BPhghd2L5PK+dAY9ENKmOv1EWJTgkf61LdO93xvIUpW
+         kG6Zacz6k9FZ1KVh8p+kuuBKD+XohzDLs82SrXRHUmn2w7yuPSGF714fdbxPnLX6I6Ms
+         WKPQ==
+X-Gm-Message-State: APuU4Z/Kq5mjuxMaBs34/YOLesb7DunG0SUHIxf3/6CMrmi52DE5boD/
+	TZZBbHVOulJmrSzoyY0Fv3bu411ZQnz/5J1Oxa9y5sP4PFE3e8FBdiYnOxrvKw2G/9S2BEndA8Y
+	vly6YT2MnOBM8L3DiCTNvOW/b+f5y2lYnrddOwKM=
+X-Gm-Gg: AZFdTZcneOKOIs7IpJKk/EFFJ3LKBvBhBgmYcPW0/uQm9N59Ht2lKpbckR42KrdOv5g
+	d1PQSeSZoSbNuqUR+iWNrI24prGnqB8nbtI8Xe3XTruV95elwByTN6evHr+rfi5oliJi+A4k+zc
+	XeshCnXfIwaGAPsPJbEiQfF6ADMkv3rffmqHibkRgBChGxrya/XPk9/nJLselFTmdeRKfVWu+Ip
+	c9q6hE/VB1Fp8OGOGgivPcJCJFC2MvzD7q7c4k1gV08cx2RCXR/Wq6E2n8LPpN0QX6HXy6GlKPP
+	J4yqo4ewgtUaRy9P/14MMmWDiUHXCc0E8sSjeR0n24psJt7lLUyxhWJiE7Mk0BcWEgi7aEzKbZ1
+	10Bsakib2tlbIU+wsrrVFTB1EkfZM/Y7rOe9rkuzCPX8LSDMV35BK8aQ+a6uEtQ1o1yO4GQ==
+X-Received: by 2002:a05:6214:2262:b0:91e:a540:e60f with SMTP id
+ 6a1803df08f44-92114f00647mr64339846d6.21.1795038134975; Wed, 18 Nov 2026
+ 13:42:14 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -95,105 +99,220 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Mohammed <mohammed.saad.alquraini@gmail.com>
+Date: Thu, 19 Nov 2026 00:42:03 +0300
+X-Gm-Features: Aa3M54pvmImI4VqiA8qenh-mRCIzcgE05rspDsxx4DTFedD1DGFdUeykOQkAgi8
+Message-ID: <CAD37_9i7A+M9159MoSw8rjAzkGVOagZmgkPrxJsAtQH_7NjGJg@mail.gmail.com>
+Subject: [Security] Bluetooth: L2CAP: deferred BR/EDR accept bypasses the
+ required BT_SECURITY level
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-A BR/EDR L2CAP service that listens with BT_DEFER_SETUP asks the kernel to
-enforce its BT_SECURITY level and only decides which peer to admit. The
-deferred-accept completion path does not honour that.
+Hi,
 
-The child channel is placed on the parent's accept queue at CONN_REQ time and
-is reported pollable (bt_accept_poll() returns EPOLLIN for a BT_CONNECT2 child
-on a BT_DEFER_SETUP listener) before the link security procedure resolves.
-When userspace recvmsg()s the deferred child in that window, l2cap_sock_defer()
-moves the channel to BT_CONFIG and __l2cap_connect_rsp_defer() replies
-L2CAP_CR_SUCCESS with no security check. If the security procedure then fails,
-l2cap_security_cfm() has no branch that matches a failed result on a BT_CONFIG
-channel, so the channel is never torn down: a peer that failed the service's
-required security level keeps a connected, data-passing channel.
+I'm reporting a vulnerability in the Linux kernel Bluetooth L2CAP layer
+(net/bluetooth, deferred connection setup). A fix is posted separately as the
+patch "[PATCH] Bluetooth: L2CAP: check security before completing a deferred
+BR/EDR accept".
 
-The sibling setsockopt(BT_SECURITY) path already rechecks with
-l2cap_chan_check_security(), and the non-deferred incoming path denies with
-L2CAP_CR_SEC_BLOCK; only the BR/EDR basic/ERTM deferred-accept path was
-missed. This is the BR/EDR counterpart of commit 522e9ed157e3 ("Bluetooth:
-l2cap: Check encryption key size on incoming connection").
+Affected: present in torvalds/linux 666539eecdf4 and unchanged at
+mainline master
+as of 2026-11-19 (no net/bluetooth change since then touches
+__l2cap_connect_rsp_defer
+or the deferred completion path). Reachable in a default
+configuration: BlueZ's own
+BR/EDR profile servers listen this way through its standard
+bt_io_listen() API, so no
+bespoke daemon is required (details below).
 
-Gate the deferred completion on the security state. In l2cap_sock_defer(),
-before completing a BR/EDR deferred accept, call l2cap_chan_check_security();
-if the level is not yet met, mark the socket BT_SK_ACCEPTED, leave the channel
-in BT_CONNECT2 and send nothing. l2cap_security_cfm() then resolves it: on
-failure the existing BT_CONNECT2 branch denies with L2CAP_CR_SEC_BLOCK; on
-success, a channel the daemon already accepted is completed through the same
-path a non-deferred accept takes (state -> BT_CONFIG, CONN_RSP SUCCESS +
-CONF_REQ) rather than re-signalling an accept already made, so exactly one
-CONN_RSP is sent per channel and the on-air sequence stays strictly monotonic
-(AUTHEN_PEND, then AUTHOR_PEND for a not-yet-accepted channel, then SUCCESS).
+Summary
+----------------
+A BR/EDR L2CAP service that listens with BT_DEFER_SETUP asks the
+kernel to enforce
+its BT_SECURITY level and only decides which peer to admit. The deferred-accept
+completion path does not honour that. The child channel is pollable before link
+security resolves, so when userspace accepts and recvmsg()s it in that window,
+l2cap_sock_defer() replies CONN_RSP result=SUCCESS with no security
+check. If the
+security procedure then fails, l2cap_security_cfm() has no branch that matches a
+failed result on the now-completed channel, so nothing tears it down:
+a peer that
+failed the service's required security level keeps a connected,
+data-passing channel.
+No MITM-protected pairing is required; an auth failure is enough.
 
-Validated on an arm64 QEMU rig with a BR/EDR peer emulated over /dev/vhci:
-with the patch, an early accept followed by a genuine Authentication_Complete
-failure is answered with CONN_RSP result=3 (SEC_BLOCK) and no data is ever
-delivered, identical to the non-deferred control; an early accept followed by
-a successful (keyless) auth completes only after the security chain finishes,
-with exactly one CONN_RSP SUCCESS and no trailing PEND; a deferred listener
-that accepts only after the security resolves goes through the designed
-CR_PEND -> recvmsg -> SUCCESS path with the link at the required level.
+Details
+-----------
+1. The child channel is enqueued on the parent's accept queue at
+CONN_REQ time, and
+   bt_accept_poll() (net/bluetooth/af_bluetooth.c) reports it pollable
+while it is
+   still in BT_CONNECT2, specifically when the parent has BT_SK_DEFER_SETUP:
 
-AI assistance was used in finding and preparing this patch.
+        if (state == BT_CONNECTED ||
+            (test_bit(BT_SK_DEFER_SETUP, &bt->flags) &&
+             state == BT_CONNECT2)) {
+                mask = EPOLLIN | EPOLLRDNORM;
 
-Fixes: f66dc81f44d9 ("Bluetooth: Add support for deferring L2CAP connection setup")
-Signed-off-by: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
----
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/l2cap_core.c        | 10 +++++++++-
- net/bluetooth/l2cap_sock.c        |  7 +++++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
+   A poll-driven server therefore takes the connection while the link security
+   procedure is still pending.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -407,6 +407,7 @@
- 	BT_SK_SUSPEND,
- 	BT_SK_PKT_STATUS,
- 	BT_SK_PKT_SEQNUM,
-+	BT_SK_ACCEPTED,
- };
+2. l2cap_sock_defer() (net/bluetooth/l2cap_sock.c), reached from
+recvmsg() on the
+   deferred child, completes the BR/EDR setup with no security consult:
 
- struct bt_sock_list {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -8011,7 +8011,15 @@
- 			__u16 res, stat;
+                } else {   /* BR/EDR basic / ERTM */
+                        sk->sk_state = BT_CONFIG;
+                        chan->state = BT_CONFIG;
+                        release_sock(sk);
+                        __l2cap_connect_rsp_defer(chan);
+                }
 
- 			if (!status && l2cap_check_enc_key_size(hcon, chan)) {
--				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
-+				bool deferred = test_bit(FLAG_DEFER_SETUP, &chan->flags);
-+				struct sock *sk = chan->data;
-+
-+				/* Complete inline if the daemon accepted early. */
-+				if (deferred && sk &&
-+				    test_and_clear_bit(BT_SK_ACCEPTED, &bt_sk(sk)->flags))
-+					deferred = false;
-+
-+				if (deferred) {
- 					res = L2CAP_CR_PEND;
- 					stat = L2CAP_CS_AUTHOR_PEND;
- 					chan->ops->defer(chan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1274,6 +1274,13 @@
- 			release_sock(sk);
- 			__l2cap_le_connect_rsp_defer(chan);
- 		} else {
-+			/* Defer completion until security resolves. */
-+			if (!l2cap_chan_check_security(chan, false)) {
-+				set_bit(BT_SK_ACCEPTED, &bt_sk(sk)->flags);
-+				release_sock(sk);
-+				l2cap_chan_unlock_conn(chan, have_conn);
-+				return err;
-+			}
- 			sk->sk_state = BT_CONFIG;
- 			chan->state = BT_CONFIG;
- 			release_sock(sk);
---
-2.43.0
+   __l2cap_connect_rsp_defer() then hardcodes rsp.result = L2CAP_CR_SUCCESS. The
+   sibling setsockopt(BT_SECURITY) path in the same file *does* re-check, via
+   l2cap_chan_check_security(); the non-deferred incoming path denies with
+   L2CAP_CR_SEC_BLOCK. Only this deferred BR/EDR path is missing the check.
+
+3. On an auth failure, l2cap_security_cfm()
+(net/bluetooth/l2cap_core.c) only denies
+   a channel still in BT_CONNECT2:
+
+        } else if (chan->state == BT_CONNECT2 && !(... FLOWCTL)) {
+                ...
+                } else {
+                        l2cap_state_change(chan, BT_DISCONN);
+                        ... res = L2CAP_CR_SEC_BLOCK;
+
+   The early accept in step 2 already moved the channel to BT_CONFIG,
+so neither this
+   failure branch nor the !status success branch matches it: the
+failed result is
+   silently dropped and the channel stays connected.
+
+This is the BR/EDR counterpart of CVE-2025-39889 ("Bluetooth: l2cap:
+Check encryption
+key size on incoming connection", commit 522e9ed157e3), which added a
+SEC_BLOCK gate
+for the same class of problem at the non-deferred incoming site; the
+kernel CNA rated
+that one High (CVSS 8.1). The deferred site was not covered. The LE
+connection-oriented deferred path is being given equivalent handling separately
+(Kyle Pepper's "Keep credits from completing security upgrades"
+series); this report
+is the BR/EDR basic/ERTM piece that series does not touch.
+
+Default-configuration reachability: BlueZ's bt_io_listen() enables
+BT_DEFER_SETUP
+whenever a confirm callback is supplied (btio/btio.c), and BR/EDR
+profile servers
+listen that way with a security level -- e.g. the HID interrupt channel,
+profiles/input/server.c: bt_io_listen(NULL, confirm_event_cb, ...,
+BT_IO_OPT_SEC_LEVEL,
+...) on L2CAP_PSM_HIDP_INTR (A2DP/AVDTP, AVRCP and BNEP use the same
+pattern). On an
+incoming connection BlueZ runs the profile's confirm callback and
+bt_io_accept() does
+the completing read() while security is still pending. The kernel
+inherits both the
+defer flag and the security level onto the child (l2cap_sock_init).
+
+Reproduction
+------------------
+On an unmodified build of commit 666539eecdf4 (CONFIG_BT=y, BT_BREDR=y, BT_LE=y,
+BT_HCIVHCI=y, debugfs on), driven over /dev/vhci in a QEMU arm64 guest. A local
+service listens with setsockopt(BT_SECURITY, HIGH) +
+setsockopt(BT_DEFER_SETUP, 1) and
+poll-accepts; the harness is both the controller and a BR/EDR peer that holds
+Authentication_Complete:
+
+- The service accepts during the pending window: the kernel sends CONN_RSP
+  result=PEND, the service accepts and recvmsg()s, and the kernel then
+sends CONN_RSP
+  result=SUCCESS with the link still unauthenticated (the service
+reads security level
+  0 on its own socket).
+- The peer's Authentication_Complete is then delivered as a genuine failure
+  (status=6); the kernel emits MGMT_EV_AUTH_FAILED but sends no
+Disconnection Request
+  and no CONN_RSP SEC_BLOCK. The channel stays BT_CONNECTED and keeps delivering
+  attacker data; the only teardown in the trace is the service process
+being killed.
+- Boundary control: the identical attacker against a listener
+*without* BT_DEFER_SETUP
+  is refused with CONN_RSP result=3 (SEC_BLOCK) at the auth failure and receives
+  nothing. The deferred path is the hole.
+
+A self-contained reproducer (fake controller plus attacker) is
+available on request.
+
+Impact
+------------
+A remote BR/EDR peer in range, via a connection whose security the
+kernel was asked to
+enforce and which fails, ends up with a connected, data-delivering
+L2CAP channel to a
+service that required the kernel to deny it. In a default install that
+service is a
+bluetoothd profile server. The authorization decision the service
+delegated to the
+kernel is never applied. Access that the admitted channel may
+subsequently reach at
+the application layer was not exercised and is not claimed.
+
+Severity: CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:N = 7.1 (High).
+I:H because the
+security level the service required is bypassed and never enforced. C:L for the
+attacker->service data flow shown (service->attacker confidentiality was not
+demonstrated); A:N. UI:N because the kernel completes and keeps the
+channel with no
+user interaction, and the failing peer never needs a pairing prompt.
+This matches the
+kernel's own High (8.1) rating of the non-deferred sibling CVE-2025-39889.
+
+Fix
+------------
+A suggested fix is posted separately (the patch named above); the
+final form is of
+course yours to decide. It gates the deferred completion on the
+security state, in
+two small parts:
+
+- l2cap_sock_defer(): before completing a BR/EDR deferred accept, call
+  l2cap_chan_check_security() -- the same check the
+setsockopt(BT_SECURITY) sibling
+  runs. If the level is not yet met, mark the socket BT_SK_ACCEPTED,
+leave the channel
+  in BT_CONNECT2 and send nothing. The existing BT_CONNECT2 failure
+branch then denies
+  with SEC_BLOCK on failure.
+- l2cap_security_cfm(): on success, a channel the daemon already accepted
+  (BT_SK_ACCEPTED, read before the branch) is completed through the same path a
+  non-deferred accept takes (state -> BT_CONFIG, CONN_RSP SUCCESS +
+CONF_REQ) instead
+  of re-signalling an accept already made, so exactly one CONN_RSP is
+sent per channel
+  and the on-air sequence stays strictly monotonic.
+
+Tested on the affected commit over the QEMU/vhci rig: before the patch, the
+early-accepted channel survives a genuine auth failure and delivers
+data; after it,
+that case is answered with CONN_RSP SEC_BLOCK and no data flows,
+identical to the
+non-deferred control, while an early accept followed by a successful
+auth completes
+with exactly one CONN_RSP SUCCESS only after the security chain resolves, and a
+deferred listener that accepts only after security resolves completes
+via the designed
+CR_PEND -> recvmsg -> SUCCESS path with the link at the required level. The test
+kernel was built without lockdep; a PROVE_LOCKING run before applying
+is worth doing,
+though the added l2cap_chan_check_security() call takes no lock that
+l2cap_security_cfm() does not already hold.
+
+Credit
+-------------
+Mohammed Alquraini, HUMAIN. Found with an AI tool (an LLM-based code analysis
+pipeline) and validated by hand with the reproduction above.
+
+Thanks!
