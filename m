@@ -1,90 +1,90 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795017567;
-	b=h72BRtXVnXEPP3QE072gEHNu8qFSC+fWvRrh0CTj3gluGUCwXR2ws//cFrq3UGsBlNbs
-	 7wsE5HoMXSBhMR8ZDAnn152AnoU0zv0QxlQ6XaLF/SXs8a2THvB9GynsEHAlpHaFPs8rk
-	 ZqEnmr7JAL0cbmeV670szZiU2iDqnVkZJuo6B4X6d7izNV8GYA3bIKTVu6S4LV7th58CA
-	 Hhb5Clm45SrmkWWYNvj/XTVWVqGRYMimoHkZ+49ZGnYC7gbMDkpy5EXl8vwIftuYMsmQd
-	 AdPD5lYySzdLWsf5l5b+xb/G2Mxd6aQ8TcIK6HElfbuExXs7RvtcjkmnalePr4E3spg==
+	t=1795017568;
+	b=fnWb5OeKAB4cLv5764zf8w7OBJf6L2ATod6KVd7d+DkxBRRsHpujzVej6hLEWExL+XwK
+	 XBKF1Ba2tymv1vucilx9HobZfcTXAVJ+Kg39hdPHrGB6TuZi9p1dDhymuXBLh2lswoorg
+	 lMkets9ocVY7SHzQiRpZQteAtZFmpOkJ/3M7EGXdKM/Svf3299r1laFBxBZdEjjGhWoz9
+	 yxOtcD9Ucqh5rS7OkODqc9gJ+bDygaakHuBMcQaI8RS4wf+VmBZ51I7j4CdmMtTmu7kA+
+	 rVSiZgd+FnEolvOi20s0xgx9H4TGazKj9SfwbbVJOQehoL3hcVZFPgO5AuoPS89l5vA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795017567;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795017568;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=VcFHfmCRLVj7oU8mZXuF0owGfxfcjsI6QJ89yOdo7vg=;
-	b=plNzsdfUDnQZdFSrStJZO84vzCFflHHxm17aMSfNbnw9FmhE6+sGLjaS0UxuW/k/7Zjo
-	 Noy1NyjXn8J3dRCN4qYvnVXwwxPrn+r+nEX7gxDRQOZxoMsHoxG8DA6+dq21wrEKfQBO+
-	 SjoqNhky7Lym4pd40RcUs+u0leTgVLEDSwnbef1p4BnRpVGxWn06ZtaWkXBxAtrHdoU0q
-	 MKPnOUxyg+TMb1EZlKB19OtiZO8xu7Jto3HIl50pF1KXPmWfS0Riu8184J7rThimseN6d
-	 JvUa0wuiY7n/QiA7mTWhbpilsAdvCi1JOspyffENMfsWUJ1i7B8wSzK/Wcf8qTuhwuA==
+	bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
+	b=45A1SUVrxwmwdjzYo90CcDNBt1BUAGyN4akN+oKnot1MmpeFy4B538wFUR1aUQOOWis3
+	 iNVACbH1Su0cQ4PRtc4nqzm5PChrPwAHW+zgOmERLQYc9cZr/Ha3apZjOgaJh3XY2LW5b
+	 6CDk/FZNloJFfpRI//8F4U4KUohJoQ3JyLX8fPYnYCrxTFDuIPLgjbDsRFaiOfB/VryFl
+	 4ZhOEH/MAF0Kqe88FG13pFVMzWBBU1fLkjV9hX6u4j/IsNGl9IOocqdwd4WmhKudsm1VC
+	 SmhsIN+QFRjJGUrqEeRpW4MtTRioKTtCDbnUoRNYmhwG6XNv9l4sfV+GiAQ0Wy71aXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lDLiy2cf;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B8JgSyPR;
 	arc=none smtp.remote-ip=209.85.221.180
 Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643ED606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 15:59:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 643ED606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39174606A32C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 15:59:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39174606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lDLiy2cf
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5ee1e4e3abcso340252e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 07:59:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B8JgSyPR
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5eac7220e9cso397480e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 07:59:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795017566; x=1795622366; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795017567; x=1795622367; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=VcFHfmCRLVj7oU8mZXuF0owGfxfcjsI6QJ89yOdo7vg=;
-        b=lDLiy2cffNTibc7b+AUj+dBq9PhmlNqJi6IeC9US+PjUlRwLlaxS6dFanN45vmqRTU
-         5sXmJZI6yGifqT9FRYJYeSdgX7Pv3WggvbDaWIeVg/FTu0WVPZQfb9Vo0Jt7tJBnB6xW
-         xu4qbzh9qfLRRrOb2VPpWrHkmXUMbVH27WdUJC9sNW9mCbuGLhysLz/fCqdt6J7uIXwD
-         4h7Jd0eSrwgHIrQmTwDozB3VYoIx69BWhKAju0x/FqaJxRXXJF5B/oHH1zRqFwUB9uAB
-         apWV619nz0xDfk3+sXAzf7ZXrc7teYS+k31BxMzYchKi2ztbSUfQh4xHci3BEFefZC5X
-         XaMA==
+        bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
+        b=B8JgSyPRA8j/kU6G7Myp3obirrXS+UoORfZ0mQMgr2Es5axZur2Wg+hzL/V42wANZA
+         Vyy4vByM8vZoVO+Z+NZ2sdXHpb+AdoH9pI9YK4ugsPVSQRNK8rmMPLs3TPqK/xJGIW1/
+         ZG77X2dSnFPJ0vwJln2948iX4TdpmYrfWGWi53Qs/iSWJK/SL4I5G6b0pRts9hT0yirT
+         omi16zIdMPj+4Mv0y/+Z5bbeV88m05rp50VPBkCMvuKpWpcfvC/ro+z3l0AVH1yxAvM/
+         llXV7CY4NKScYPPxzVW/7s6ztd3t6k/JEFCZe6vVtYiRvgPJrsWmJUSUe60DG+6mlBNf
+         oatw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795017566; x=1795622366;
+        d=1e100.net; s=20260707; t=1795017567; x=1795622367;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=VcFHfmCRLVj7oU8mZXuF0owGfxfcjsI6QJ89yOdo7vg=;
-        b=nGB9XHivCgk8QGEQKeqTVuxHxoovOekEkSacnib9Z3rdhWN4/cU6L21OK1qOMA+dJb
-         kDiAoXlpHwkBV+u4AiMO6g+Sa8W6xl2du+BscYitKsNqnv0bZLd+csONMr8TB3GaIrWd
-         7h09nAurEvrzwjD9Uy2NHfUfBwvDX0QXQWOp8iWvK3yYIdVTT1TomsQVWFsGVuiIeKwT
-         6+F4zkcD85DEUKIvQiT0OJXukXzttALwA8by3TloiOsFhjH367dYqtb4OYJBpM4Q3Jku
-         jPry3su3HzNMXi+z1b2XcXOyuC60HS6zINoALvDNf3agpCZhT8OO7cQE5YaF8cTZEiYJ
-         4Gyw==
-X-Gm-Message-State: APuU4Z9EtNmycspOW/DIBfSAu53EetP+05OmFoB5RQrXBFqqq8SEvOcu
-	XvXRXh9Bk9cTLYKpjdIjzjlp4iSA/hlyrFsqftBt9CS0Y1fte4+cAEyfMBk+wbc1
-X-Gm-Gg: AYBFou1FThlxWeq8fJEtDMOlaKJVqHJ4c1gB5CmYGpsft/0M2gzjElKZbpNRLR0g141
-	ga+Xjq638Y4uAH2QE8czo5mxpdMeadH8gBLCN/CgZRXfmpqL5bX9p86RA+4vIlPLRNLgX7EOWCY
-	ln1n7jnHyGbBj5bf3ZWrECKSsF+gLlL7453Qpbpcz59Wk3mtP26I3Mzichk07iq3ezo+Q4yOZS8
-	04E8mN9fkKeLMitJ/0xXKVnd1/OpzpmmqfOthwIOGNRea7iuV7KwhRgbtqu+Ms4/h8ZZ+GqrzLa
-	84GsAVwlm+I/VviFNj1rOQiTDNnbwnnCyDeNQbWfHr/vX74p/wKDxSH4xKTqLFcXx4Kq+0wWwRc
-	2Pf/t0bvyFv33uG6WBNW5fYYHbW638o5HX+xW36C+2j233oNsjYaT1vUwaNh7DKKs4Hr/UzO3dO
-	aUhtGxWEULpCPLF4WGqgwIIXvsJsSxiZ6yMV7fryx64CWNsdsYai18C7u3ESdoPwX5J1XSw6ozV
-	MR754iM00Zk72AvE1JJhM9t1vAhwC+gSusTtp+OI/dmMPT1XbOw6zlF4w7PAaJ7Mm0oXDRr7rpi
-	Lcd3E4rXKVsno8Wmzw78mSDbT9wlLUPOnl9jb7H62FvJ1qnpXypRR0xh8RBfh1HgqogDZZg2FZm
-	fuJ3rhuSB/N5EVX5D4EjLWEmxhuqBkmv2m3kg9zxgDo/VXlQmcllZGpxiHJrMzJLwxJk7ayuC7H
-	XCVqI=
-X-Received: by 2002:a05:6122:2904:b0:5ea:c330:77c9 with SMTP id 71dfb90a1353d-5ee645fda5emr1544282e0c.1.1795017566178;
+        bh=AIzgNC9ZqBB9vI7kV0tGdGLWimQoDYCdfioHgH2gHuQ=;
+        b=lLsW40cH++0kmgwIl1+wZDf8cYYr1hwdl3aAVr/UgpQy4A7NekfyTigOSB+GDZbPZR
+         3jJYjhYzx9qmX2YwitWoZKS5Fcnc38IA8mmFOoykNcxIOStD101YM6qoUjKhQc9wTWOn
+         /i1q9t0bj6ftRL1gPejySa8f7ya6AMTahJdeqbv6a8WIkZX7Je7CPBxYKA1cXY3uFln3
+         EvwW6l7+9mFlR7SJ2l56UOOy+/CpQ+23vomKKDqD9tmUNBgbHR44eRCTA7iSC8Vwnjb5
+         RStRIzAXI2nFlorfq9wRwET3oqXsj2zGq52ov+fhGFCz2R+sGX00TaNWmqPA19jGuUoI
+         sExg==
+X-Gm-Message-State: APuU4Z+j1/c5+TzBRCd1jaPgHDYXeGHW0j+LjW54uMXh/4HlTaE8dvqW
+	qBzgudDo8ATPP2QqwU+AYn+dG/r3BP0K2syWt6wxqe1lh/AvxEz+gPi0MDzJ8jhg
+X-Gm-Gg: AYBFou0idE2tI5rhwx0U7GWjhMg4R0UXdc7RouifGuyykKJG5d8lE1vw/wiPJpwHTAj
+	+leolb7r1cm6tLH0Ukd48H4/dvmEDxS7KwdPFQsRDVsDtz5FUeKmhvuo3Z6oYhlbrL1KA+o2AyC
+	RhHch8d/+sy+EDKvER0ycaL7HyfGlJQvb7bEjEMC5WMR/K1WIYkFAid/zzgEjbt0e5/t8+9fa/m
+	kFC+Z7Mg0i/XZJqLpmNWrQGRJIH+66KlfZAeTrttbXHN7/hgFDhmBCNIxwspJM03yPGZ5eLNPJC
+	eZE+4Nrpkfb5Xmq3yuWz37s5Spfpl8H2oG9mI6/sFhluzP3dvDq0jL1ZXg/DwPzd9SNq08N7m3H
+	W5PTr2JpO6L7MOMTzsagz24yUpWMtUX2JLIbry99LbNGN3t64c0LdHl6ZPk3409+/Kysd001JZK
+	lEcPz+Ei4EqiP0riHpEZwI+KFBT1tgcHTxrAk2uGBrPWXxAmHvaZNuatTFtlCEXZmMfiQkz6tkx
+	n5jkWqdQ4lD+OM5eLoUrOQPaOqNdso4OI88YQyZb3zG9rXFL2CrZAyeqi2m7XfRnWz5Bg7ye5Vi
+	B0uE/tomyk33cIxhMfZRi30QRvlL2wtfG+D29AZOjV/L6ZNJQZr58ol88GNU+T1NdiEnpUYddPA
+	FTEwfZoH10ErcXHDr4PRdYZtVOOF7QnC28xmm5kmCGPg3X7aMfMZnw1u6nDA0GqQe8W9XYkxNTm
+	Wa17M=
+X-Received: by 2002:a05:6122:1da1:b0:5df:682a:5d14 with SMTP id 71dfb90a1353d-5ee6468f6acmr1432861e0c.4.1795017566930;
         Wed, 18 Nov 2026 07:59:26 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64e4dfe3sm1919266e0c.5.2026.11.18.07.59.25
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee64e4dfe3sm1919266e0c.5.2026.11.18.07.59.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 07:59:25 -0800 (PST)
+        Wed, 18 Nov 2026 07:59:26 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 12/17] Bluetooth: MGMT: Fix use-after-free in mgmt_powering_down()
-Date: Wed, 18 Nov 2026 10:59:09 -0500
-Message-ID: <20261118155914.178050-13-luiz.dentz@gmail.com>
+Subject: [PATCH v4 13/17] Bluetooth: MSFT: Protect the event prefix with hdev->lock
+Date: Wed, 18 Nov 2026 10:59:10 -0500
+Message-ID: <20261118155914.178050-14-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261118155914.178050-1-luiz.dentz@gmail.com>
 References: <20261118155914.178050-1-luiz.dentz@gmail.com>
@@ -101,58 +101,118 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-mgmt_powering_down() looked up the Set Powered command and read its
-parameters after mgmt_pending_find() dropped mgmt_pending_lock, so the
-command could be unlinked and freed in between. Do the lookup and read the
-parameters while holding the lock.
+msft_vendor_evt() read msft->evt_prefix_len and compared evt_prefix before
+taking hdev->lock, while msft_do_open() (and the supported features
+reply) free and reallocate the prefix without it, so an event received
+while the controller is being opened could access freed memory. Take
+hdev->lock for the whole event processing and while updating the prefix.
 
-Reported-by: sashiko.dev (linux-e45413fa-48a6-43f1-90be-638841567534)
-Fixes: 302a1f674c00 ("Bluetooth: MGMT: Fix possible UAFs")
+Reported-by: sashiko.dev (linux-246df501-f32c-46fd-8779-7fa755ed7f9d)
+Fixes: 5031ffcc79b8 ("Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle")
 Assisted-by: OpenCode:claude-fable-5.2
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/mgmt.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ net/bluetooth/msft.c | 29 ++++++++++++++++++++---------
+ 1 file changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7985332b6623..bce6d086cb9a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -10401,19 +10401,27 @@ bool mgmt_powering_down(struct hci_dev *hdev)
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 2559c5b1bef0..ab63fee3ef59 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -170,11 +170,16 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 		goto failed;
+ 	}
+ 
++	/* The event prefix is used by msft_vendor_evt() with hdev->lock held */
++	hci_dev_lock(hdev);
++
+ 	if (rp->evt_prefix_len > 0) {
+ 		msft->evt_prefix = kmemdup(rp->evt_prefix, rp->evt_prefix_len,
+ 					   GFP_KERNEL);
+-		if (!msft->evt_prefix)
++		if (!msft->evt_prefix) {
++			hci_dev_unlock(hdev);
+ 			goto failed;
++		}
+ 	}
+ 
+ 	msft->evt_prefix_len = rp->evt_prefix_len;
+@@ -183,6 +188,8 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 	if (msft->features & MSFT_FEATURE_MASK_CURVE_VALIDITY)
+ 		hdev->msft_curve_validity = true;
+ 
++	hci_dev_unlock(hdev);
++
+ 	kfree_skb(skb);
+ 	return true;
+ 
+@@ -648,10 +655,12 @@ void msft_do_open(struct hci_dev *hdev)
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
+ 
+ 	/* Reset existing MSFT data before re-reading */
++	hci_dev_lock(hdev);
+ 	kfree(msft->evt_prefix);
+ 	msft->evt_prefix = NULL;
+ 	msft->evt_prefix_len = 0;
+ 	msft->features = 0;
++	hci_dev_unlock(hdev);
+ 
+ 	if (!read_supported_features(hdev, msft)) {
+ 		hci_dev_lock(hdev);
+@@ -1078,12 +1087,15 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
  {
- 	struct mgmt_pending_cmd *cmd;
- 	struct mgmt_mode *cp;
-+	bool powering_down = false;
+-	struct msft_data *msft = hdev->msft_data;
++	struct msft_data *msft;
+ 	u8 *evt_prefix;
+ 	u8 *evt;
  
- 	if (hci_dev_test_flag(hdev, HCI_POWERING_DOWN))
- 		return true;
- 
--	cmd = pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (!cmd)
--		return false;
-+	mutex_lock(&hdev->mgmt_pending_lock);
- 
--	cp = cmd->param;
--	if (!cp->val)
--		return true;
-+	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-+		if (hci_sock_get_channel(cmd->sk) != HCI_CHANNEL_CONTROL ||
-+		    cmd->opcode != MGMT_OP_SET_POWERED)
-+			continue;
- 
--	return false;
-+		/* cmd can only be freed after it is unlinked under the lock */
-+		cp = cmd->param;
-+		powering_down = !cp->val;
-+		break;
-+	}
++	hci_dev_lock(hdev);
 +
-+	mutex_unlock(&hdev->mgmt_pending_lock);
-+
-+	return powering_down;
++	msft = hdev->msft_data;
+ 	if (!msft)
+-		return;
++		goto unlock;
+ 
+ 	/* When the extension has defined an event prefix, check that it
+ 	 * matches, and otherwise just return.
+@@ -1091,23 +1103,21 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 	if (msft->evt_prefix_len > 0) {
+ 		evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
+ 		if (!evt_prefix)
+-			return;
++			goto unlock;
+ 
+ 		if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
+-			return;
++			goto unlock;
+ 	}
+ 
+ 	/* Every event starts at least with an event code and the rest of
+ 	 * the data is variable and depends on the event code.
+ 	 */
+ 	if (skb->len < 1)
+-		return;
++		goto unlock;
+ 
+ 	evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
+ 	if (!evt)
+-		return;
+-
+-	hci_dev_lock(hdev);
++		goto unlock;
+ 
+ 	switch (*evt) {
+ 	case MSFT_EV_LE_MONITOR_DEVICE:
+@@ -1121,6 +1131,7 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
  }
  
- u8 hci_to_mgmt_reason(u8 err)
 -- 
 2.56.0
 
