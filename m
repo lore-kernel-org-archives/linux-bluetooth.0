@@ -1,95 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.45
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795018604;
-	b=cgSheknt5CPJqhCoqoa5PxO4lNvowKeo8fGhkaVo7YWh5334Eg2ZD8BABEDqsWzAEatp
-	 2ie3ZRTM57GAsz0cjekmPTCxXjcCj2itObohJUcqTRd0vD1BHEZMarqydndtsG25UCiVN
-	 rBKOxWsyEAdMXSrzqUeP9x12SPQBWs4GF9TZg9aoSp0ozBlA2kYilG4ISnxTZPCw1eOTm
-	 IFyoTlk7w0UXdRczw4aGRcvd9r1QoSd68Np/c95UkGIW3PdOEuGx470gwG2nQzAI8dkx2
-	 eGuRaePt0qdUH0qycPSSub7renoOi3RgLuVchW9e5VRvrYKD2iuKHRb01iZoYuGR4XA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795018604;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
-	bh=0s4ek5vnxvvbCN5S1DfqY5qzuROwFD8ntTn1dH2RDMk=;
-	b=KWRztYJzhJLOlOp/gcfIfwR1I35qdPigbcHROOmDOMDmQcYYDWvc81eVKl+C47de7NU0
-	 Nq1aGKE69Jsg8ZB/sztbZywJc8m8lUWKsA8/pqh/F4+8zXhR1+MZEVLWoi5pIjpnBccRi
-	 6DIEYgfCPb4k85IBJOGb+kTWbCC0krY2sp1eFPjItyFiW+UE7y6i2ykuK+2BgNtKYpFpZ
-	 BQyIjNeB28wk9Z2xWWOOTdEVVBXId6POyntkbvkcmETraTvFvxV5WnJJDAqNeUW7F8Ynk
-	 3/LnxO0DQT6R6BB3zqRgTS7hhQUeJAd/A825becgk2uyHQ1WUZ/FabDgayG6P5Qzg6w==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MYA73y4C;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.219.45
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=212.227.15.3
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795018699;
+	b=ZQjgb7kIfG339R+duVXoMHwm1Grm9ThRGcyXNAAmEYZJY3rbx56USt78Y53vu5VzROK8
+	 Y4OYrGI67MITiz8Az2Us+ld9eZnxAD2sAANZpta8r4dzxDavBKkZLwtBBwu70dkI6fwtd
+	 +Qr+h5SSrQPQ8H3Lg/iIrq8C91u4NbfHCnVOLE7gGVIeOiljQR2dIOWt3l93GzXGZ02t1
+	 /u/a8OFIQX+EuQEnOcswMQhtDXMjQBaeh2rT5y8RTsFoHzg+qaQxN7e8xyI4wM+j6CbBy
+	 9lUDqgmrR8NP3Rbbf6LlCIvMV8sE0Reu6DTAexBCQatk6e6a9LDw4Pg0qgXX7AH38SQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795018699;
+	h=DMARC-Filter:DKIM2-Signature:Message-Instance:DKIM-Signature:
+	 X-UI-Sender-Class:Received:Message-ID:Date:MIME-Version:User-Agent:To:
+	 Cc:References:Subject:Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Provags-ID:X-Spam-Flag:UI-OutboundReport;
+	bh=m/bYAf+dZPqaYiTr9U4wbR60qvam9O91KPznC9SM+Rw=;
+	b=kQ62tsVE5QdcpW4VS9K6sm4WJFftsf1/94vxoJGA6U0cbuZ1WaavHPAGPBE3ICB1UZMB
+	 9zY2JRBTaSDfCOm47E72jG3iYoW3qMOhYfvFektBmrzBRplxQNjPbqNIQwYMxK95DCRFc
+	 8i5SWRiQHW2Cw6tyTesGQxNrM8x66s1/38MeJrCZ1vq9T9zOvc93GSYZLFWzqjQkQC2yv
+	 rOYaTKjla23XIiVE5eOe5vVd5WtUNdzkZTWUPaSIsXMZxrn9TXeH5ylGF88UCexpeouZv
+	 98qJSybL48EZTxCZ1bPN52dELlgIZk0+xeyCU+ORzoHCIGEMpw133go1VOqMo0p32Pg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=web.de;
+	spf=pass smtp.mailfrom=web.de;
+	dkim=pass header.d=web.de header.i=markus.elfring@web.de header.a=rsa-sha256 header.s=s29768273 header.b=Sq2pZ4fJ;
+	arc=none smtp.remote-ip=212.227.15.3
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4EF606A33B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 16:16:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A4EF606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBD7606A333
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 16:18:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEBD7606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MYA73y4C
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-91ec2d42231so6234476d6.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 08:16:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795018603; cv=none;
-        d=google.com; s=arc-20260327;
-        b=T/UpjjnvQHtTZaHpJJEOJX+ZUtL261Le8sJFYbMFoQN3bH4KMqw+APHTX3Uwz0n8uD
-         ZjZsDSlyPXFlg/Nszg2ZOqQQ7RSASqxpG/1NyMT71PQder0QghrV0rOGueYiYeAsiZr0
-         XxqynbeaF6SvdE3mz/CcXfb4VnzEM1jrfFsIo8w5gKzVU47qV7e7cSKgleEMkrPQhsaW
-         AbjPFJSt8wx44Z4l9Kku5bfnb1FGfsPBbxvbPIgDgPGc+6xHzPEaAcZQIeeOdZq1+ENW
-         NEuwrkO9VjVx+Wmt83r02fzVXtpJOxYqZeKE8LVkDFlxFv45SbrvJQfGmG7qHKc7WFvb
-         zFZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=0s4ek5vnxvvbCN5S1DfqY5qzuROwFD8ntTn1dH2RDMk=;
-        fh=BYmJYYrzNkcsHw//JR1Bfw3zo6Y5IQv28VtVshOmLU0=;
-        b=CgdYlaGxxW9IGS6zQAgstffEerWi0T7dN0iOgqtgwApcG1JGtiN3Ou4D0fhmhvnVCR
-         tLywGUSj/oxqzN7rR/scM+RTomjltppKfMezdEmsFBvMG20hjN9PAazqQHrNkF9xuhXo
-         urcsRko5SWU5WgCuWaKtL5DBLaE27B2APyABLeHW1HisnKyVaVzLw94gAUrlEC1quaCH
-         sQL3cDZuo13efBQjE0E5mQoe7r0p+Nw5CSQsc7zz2zPoKCGPrmt8bnwQQE534cIHrjvy
-         g4gOO1H6C6z+jS7awoOulCm7UNs+Xxs2pDV5oqk4Vt703YHLQdMyjLk7kVUZk7Kz4BaP
-         58uw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795018603; x=1795623403; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0s4ek5vnxvvbCN5S1DfqY5qzuROwFD8ntTn1dH2RDMk=;
-        b=MYA73y4C69Y4nHidMevejLIxogcvqMyqdcV1DiFUFXiLX6IqK6JCpDCkpsNbWPslbd
-         bME8SqodabgKvKjug5Vd9f6+xAe6tlbliMtf/bcaqoSyesnlDOSucl0npUtwBMNQZQKY
-         nwPxNjg1VxxXgG3zOiLt/x8u6N9eiDk+c+4ax/XnDUL5TdQzi+sj8si4q/XSWC+0Uv+d
-         4CmuBFaiNcabyrugT0hQx4KaNh20odP87X0tOBlfTpQOHz/yKZGmdfFYR6t61RgCj9sR
-         SvKBhSEuWYqsWTiQ6LN/z9Pvk+De6D6NzGPW4unnK7Zfmawl5l3AUUg5lRsIwa5puVTD
-         5Mqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795018603; x=1795623403;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=0s4ek5vnxvvbCN5S1DfqY5qzuROwFD8ntTn1dH2RDMk=;
-        b=Crj0sF8cZ9sNC5RrRne6Ftx9A/5MimcbLe3m5+/RHfwItWg86hHyyXrJPUIapCMhFd
-         7vppJ5x2SEs2YF6nBA0Gk3FtOl5yJfj2SfdnxkwJB/T8+M9MUv6aDc2VgoiE4oLkiVWJ
-         ijlNKZR5Dkf2sZiG1uqHosttTty9PFLYuX821gOSonmINxUcXEvWEnln+1fPquF7EPEk
-         VbDVaN9jF5OSX6gXFDfUq8m0GWubiriXiDBqCCHHZZhQLNxumxxS4hhewS6xFfycHDSg
-         4M7kmql4x0nuoT+ZAnu4izGkcWl4Miv2yKJSPbh42SYiDAXJWVTli1F3l0TbD07b0Fg/
-         a5bA==
-X-Gm-Message-State: APuU4Z8Hc40z+VXqnWe8He6GQwmIMdiTkUAEsoCl8Jady/fLqAz3kVUO
-	QGGPc3xHJWHAWc84UmesXvKzvbrUbVB/KMrQihhLaZZY2rcGO3grxYIrNaOtpAwB4YdQGsyGOe/
-	lDSYayT3AGazrb20atYHJToS/z/hWX4WkTXog
-X-Gm-Gg: AZFdTZc1jNm9WxpQVkORbDVZ0MB1xzncyKEqpTyaQKC+oTzgJG4HL3ou4uKnr6G2pRx
-	COWKGJSW6Vr3tBgJBOAKwMlOA9miView/apmDnLdaq8oMxpwlbads/qOACaYou02YiU88ghbJdu
-	hHl8G4i/nFrqIxmlfcAAJTHoXdvl05pk0MYCSKYAO7zNqnptlL/TEdkRqC1Ru26AFjuoehTOqrW
-	JHY4cPVVpaLO6iZgMSP7bAD0adn3u9DfDM+I/ES4CtrW2UAM+nOExDsAs4bJZmiq9ZHasr9zPkE
-	STcjtNEYBpRZSFxUIloRw0Vx7wRikfT3fJZUlKf3FcNuT25QwntM++UZVp/0SlSw10fcq8FOfZz
-	agZPNgqhF95bJtptno59vc5hX8QC6cV0gOiABC3LXLT7TLIp734eRcaDIEd4oMTM+jQdaQ+I=
-X-Received: by 2002:a05:6214:4112:b0:91f:ee9:c557 with SMTP id
- 6a1803df08f44-92114ea4b99mr46512826d6.44.1795018602863; Wed, 18 Nov 2026
- 08:16:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.a=rsa-sha256 header.s=s29768273 header.b=Sq2pZ4fJ
+DKIM2-Signature:  i=1; m=1; t=1795018697;
+ mf=PE1hcmt1cy5FbGZyaW5nQHdlYi5kZT4=;
+ rt=PGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc+;
+ d=web.de;
+ s=s29768273:rsa-sha256:VVNFbyDJAzamge5d+5jMEertX3sR
+   WiWuGnc2G+hX8zAcvHjpYMFsbPA5ZYwsBOhwW6niaiVF/k4r1Z247kVZTduITl8bJ5RnzTs3zh6
+   DCCdh7ujDXvCvzS9v0oTf4uotaY7hp52gnH7LY9/JafRWfMp+00G25nux+2NMLVmllGwg3kQHhI
+   2nIWlxkKz+agdOSGDE/aRXuDtNp615nVhDRLrF35SY2no1trk8eS7UzZaGWKjx+fTSa1Zi9ZvrS
+   Z9JeiMT4Z9hdcDFK2c/LsGU2rNjl5tFurqMEGEb0Ja8oCmc+VgsaAjJPzTeJF7Vc/cUJpHARKhL
+   3XvfwyM9YXcyrA==;
+Message-Instance:  m=1;
+ h=sha256:
+   nmDQmRUZN+uSb6f41n1+u/twAW/9MOE+IlpKSrhtQ2c=:
+   m/bYAf+dZPqaYiTr9U4wbR60qvam9O91KPznC9SM+Rw=,
+  sha512:
+   zX2+2XXbx3o4gU2xku4GB4cqxrBOQp8b36AIme9KhpF2+Tfpfrq7eCVISoNBJrVOiHre2EOgPDAktIpuxKNcAA==:
+   zNQth83cxu+7P+zsMCoEGFA85dRG3Im3HA+UQSy2I1SSJBBxQex5ejV+UkYztj2FOXZaJDLzv8zHaeVc4P9ZvA==;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1795018349; x=1795623149; i=markus.elfring@web.de;
+	bh=m/bYAf+dZPqaYiTr9U4wbR60qvam9O91KPznC9SM+Rw=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Sq2pZ4fJs+BzhaIwvm8e/3/0HpxFCg7jQWws+b1dZ/6qneTU1yz+ROx/uwCCMRvJ
+	 6cvWqldKmn6ywVqDff9eoYeX+ZZmuPtD+rqT5QpvJT1FEobai3gW6WyNsPOwtIK5F
+	 gRHMeEL5J0/L5eFXiR1Ket8FnWRSbAtsEtA+BBRauRBAI2gDigW+LsPd9k5tRfvc/
+	 qluUE5UgtiNgvQOgZkgFpXPuCZynTDrXUouM5kVYdwyYoz9McgjoD1I/3HZXlxx/V
+	 DlsWkS0mG29EnRpCb72pLiglo7982hrmwcLVpI9gnFm21ve6N5p8BvpVAqJjc/uOn
+	 Mfr3yY0ERjq5An+ogw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MSqXS-1x0Vzm49l8-00SiyN; Wed, 18
+ Nov 2026 17:12:29 +0100
+Message-ID: <bfe10f1f-443e-4286-8172-6f941663c86e@web.de>
+Date: Wed, 18 Nov 2026 17:11:53 +0100
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,251 +79,210 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: Mohammed <mohammed.saad.alquraini@gmail.com>
-Date: Wed, 18 Nov 2026 19:16:31 +0300
-X-Gm-Features: Aa3M54ph2pHrTR8AZKDe2mu-qwvZOPF0oSxhtWK6gpVJbV7voWNsNirjfsXyB-U
-Message-ID: <CAD37_9j+G03rRiUXCJD6+7ULxnxrc6=cJRBsNogpPs9tuNvR6Q@mail.gmail.com>
-Subject: [Security] Bluetooth: SMP accepts a peer's claimed identity over an
- RPA link and overwrites another bond's IRK
-To: marcel@holtmann.org, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: Bence Csokas <bence.csokas@arm.com>, cocci@inria.fr,
+ linux-hardening@vger.kernel.org, Julia Lawall <julia.lawall@inria.fr>
+Cc: GR-QLogic-Storage-Upstream@marvell.com,
+ James.Bottomley@HansenPartnership.com, Jes.Sorensen@gmail.com,
+ airlied@gmail.com, andrealmeid@igalia.com, andrew+netdev@lunn.ch,
+ andrii@kernel.org, arm-scmi@vger.kernel.org, ast@kernel.org,
+ bcm-kernel-feedback-list@broadcom.com, bharathsm@microsoft.com,
+ bleung@chromium.org, bpf@vger.kernel.org, brauner@kernel.org,
+ cem@kernel.org, christian.koenig@amd.com, chrome-platform@lists.linux.dev,
+ cristian.marussi@arm.com, dakr@kernel.org, daniel@iogearbox.net,
+ dave@stgolabs.net, davem@davemloft.net, decui@microsoft.com,
+ dri-devel@lists.freedesktop.org, dsahern@kernel.org, dvhart@infradead.org,
+ eddyz87@gmail.com, edumazet@kernel.org, emil@etsalapatis.com, g@b4.vu,
+ gnoack@google.com, groeck@chromium.org, gustavoars@kernel.org,
+ haiyangz@microsoft.com, hansg@kernel.org, herbert@gondor.apana.org.au,
+ horms@kernel.org, huangjunxian6@hisilicon.com, idosch@nvidia.com,
+ ihor.solodrai@linux.dev, intel-gfx@lists.freedesktop.org,
+ ipsec@lists.linux.dev, jack@suse.cz, jani.nikula@linux.intel.com,
+ jgg@ziepe.ca, jmorris@namei.org, johannes@sipsolutions.net,
+ jolsa@kernel.org, joonas.lahtinen@linux.intel.com,
+ kalesh-anakkur.purayil@broadcom.com, kees@kernel.org, kuba@kernel.org,
+ laurent.pinchart@ideasonboard.com, leon@kernel.org,
+ linaro-mm-sig@lists.linaro.org, linkinjeon@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-xfs@vger.kernel.org, luiz.dentz@gmail.com, lyude@redhat.com,
+ maarten.lankhorst@linux.intel.com, marcel@holtmann.org,
+ martin.lau@linux.dev, mchehab@kernel.org, memxor@gmail.com, mic@digikod.net,
+ mingo@redhat.com, miriam.rachel.korenblit@intel.com, mkp@kernel.org,
+ mripard@kernel.org, netdev@vger.kernel.org, nicolas.palix@imag.fr,
+ njavali@marvell.com, nouveau@lists.freedesktop.org, pabeni@redhat.com,
+ paul@paul-moore.com, pc@manguebit.org, perex@perex.cz, peterz@infradead.org,
+ phasta@kernel.org, pkshih@realtek.com, rodrigo.vivi@intel.com,
+ ronniesahlberg@gmail.com, samba-technical@lists.samba.org,
+ selvin.xavier@broadcom.com, serge@hallyn.com, simona@ffwll.ch,
+ song@kernel.org, sprasad@microsoft.com, steffen.klassert@secunet.com,
+ sudeep.holla@kernel.org, sumit.semwal@linaro.org, tangchengchang@huawei.com,
+ tglx@kernel.org, tiwai@suse.com, tom@talpey.com, tursulin@ursulin.net,
+ tzimmermann@suse.de, tzungbi@kernel.org, viro@zeniv.linux.org.uk,
+ wei.liu@kernel.org, willemdebruijn.kernel@gmail.com,
+ yonghong.song@linux.dev, zack.rusin@broadcom.com
+References: <20261118-offsetof-v4-1-95b385c10b22@arm.com>
+Subject: Re: [PATCH v4 1/2] coccinelle: Add offsetofend() variant of
+ struct_offset()
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20261118-offsetof-v4-1-95b385c10b22@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:6EPveX8Ri1t77eUHD87iadI+dVaiRGmKrcwX0pgqshl6eE/PUfu
+ U/grdzqZeabqS0kEnnjyRXEVSYDjlvBsjC2oZG3t3rvYXHw3tr9N9kjJJpqOAEsA2vHBJqN
+ AR+JHHmlfVSnKcJYWSJp1TR8Y5+Zu/geNXBYWb0YhnSvyDMYofveGe0n8eBYJD9wGvHxA8z
+ U1kcbkwxGmL25oJsNUZfg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:rM0ETHJyGqI=;7bapq5lffTVvrvQuskQh/L6Ng5n
+ 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
+ PVQaXLpHYtdr+cU6hxQLaJ5A8jw==
 
-Hi,
+=E2=80=A6
+> +++ b/scripts/coccinelle/api/struct_offsetof.cocci
+> @@ -0,0 +1,18 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/// Use struct_offset() family of macros
+> +///
+> +// Confidence: High
+> +// Options: --no-includes --ignore ./tools/
+> +
+> +virtual patch
 
-I'm reporting a vulnerability in the Linux kernel Bluetooth LE Security Manager
-(net/bluetooth SMP / IRK handling). A suggested tested fix is inlined
-below the scissors
-line at the end (git am --scissors).
-
-Affected: present in torvalds/linux 666539eecdf4 and unchanged at
-mainline master
-as of 2026-11-18 (no net/bluetooth change since 2026-11-09 touches these paths).
-Reachable once LE privacy / RPA resolution is active, which userspace
-(bluetoothd)
-enables via mgmt Set Privacy whenever LE privacy is in use; not
-reachable on a bare
-kernel with no userspace privacy setup.
-
-Summary
-----------------
-During LE pairing key distribution, smp_cmd_ident_addr_info() accepts
-the identity
-address a peer claims in its SMP Identity Address Information PDU without any
-ownership check when the connection is over a Resolvable Private
-Address, which is
-the normal LE-privacy case. hci_add_irk() then stores the peer's IRK under that
-claimed identity and overwrites any existing entry in place. A peer
-can therefore
-claim the identity address of a different, already-bonded device and
-replace that
-bond's stored IRK (and the LTK distributed in the same pairing) with its own key
-material. No MITM-protected pairing method is required; Just Works is
-sufficient.
-
-Details
------------
-1. smp_cmd_ident_addr_info() (net/bluetooth/smp.c) rejects a mismatched identity
-   only when the connection address is itself an identity address:
-
-        if (hci_is_identity_address(&hcon->dst, hcon->dst_type) &&
-            (bacmp(&info->bdaddr, &hcon->dst) ||
-             info->addr_type != hcon->dst_type)) {
-                bt_dev_err(hcon->hdev,
-                           "ignoring IRK with invalid identity address");
-                goto distribute;
-        }
-
-   hci_is_identity_address() is false for an RPA/NRPA connection, so under LE
-   privacy (hcon->dst is an RPA for a fresh pairing) this check is
-skipped and the
-   claimed (bdaddr, addr_type) is accepted. The in-code comment above this check
-   states the intent to drop a peer that provides a different identity address,
-   which is the guard the RPA path is missing. The sibling that does enforce an
-   identity property is the type check just above (commit e12af489, discard IRKs
-   whose address type is not public or static random); the mismatch check itself
-   (commit 1d87b88ba26e) was added as a workaround for one device and
-only covers
-   the non-RPA case.
-
-2. hci_add_irk() (net/bluetooth/hci_core.c) is find-or-create and overwrites:
-
-        old_irk = hci_find_irk_by_addr(hdev, bdaddr, addr_type);
-        irk = old_irk;
-        if (!irk) { ... allocate ... }
-        memcpy(irk->val, val, 16);
-        bacpy(&irk->rpa, rpa);
-        if (!old_irk)
-                list_add_rcu(&irk->list, &hdev->identity_resolving_keys);
-
-   If an IRK for the claimed (identity, type) already exists, that
-bond's key value
-   and cached RPA are replaced with the attacker's.
-
-3. Nothing requires the distributed IRK to resolve the connection's
-RPA before it
-   is bound to an identity. smp_cmd_ident_addr_info() records the
-connection RPA but
-   never verifies ah(IRK, prand) == RPA.
-
-4. On completion, smp_notify_keys() exports the entry (mgmt New IRK)
-and, for an LE
-   link, rewrites hcon->dst to the claimed identity; the LTK and any
-CSRK from the
-   same pairing are stored under that identity. hci_find_irk_by_rpa()
-then resolves
-   an RPA the attacker forges from its own IRK to the claimed identity.
-
-This is distinct from CVE-2025-62235 (Apache NimBLE) and the BLERP
-re-pairing work,
-which concern the LTK via the SMP Security Request / re-pairing path
-in other stacks
-and do not touch IRK or identity-address handling.
-
-Reproduction
-------------------
-On an unmodified build of commit 666539eecdf4 (CONFIG_BT=y, BT_LE=y,
-BT_HCIVHCI=y,
-debugfs on), driven over /dev/vhci in a QEMU guest:
-
-- Establish a legitimate bond: a Just Works pairing from an RPA, distributing an
-  IRK for identity B (a public address). debugfs
-identity_resolving_keys shows one
-  entry for B with that IRK.
-- Poisoning pairing: a second Just Works pairing from a fresh RPA whose Identity
-  Address Information claims B's identity. No rejection fires. debugfs shows the
-  same single entry, its IRK value overwritten in place with the attacker's; the
-  attacker LTK is stored under B's identity (mgmt New Long Term Key for B).
-- Impersonation: an RPA forged from the attacker's IRK is resolved by
-the kernel to
-  B's identity (mgmt Device Connected reports B's address).
-
-A self-contained reproducer (fake controller plus attacker pairing) is
-available on
-request.
-
-Impact
-------------
-A remote peer, via a pairing the kernel accepts, overwrites the stored
-IRK and LTK
-of a different already-bonded device in hdev->identity_resolving_keys,
-which breaks
-that legitimate bond, and the kernel then resolves addresses the
-attacker forges to
-the victim device's identity. The destruction and redirection of an
-unrelated bond
-do not depend on the host trusting the attacker's own device; the only
-interaction
-required is that the host pairs with the attacker. Access that bond
-resolution may
-subsequently authorize at the application layer was not exercised and
-is not claimed.
-
-Severity: CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L = 7.1 (High).
-I:H because a
-trusted bond's key is overwritten and the attacker is then resolved as
-that device;
-S:U because the impact stays within the host's own Bluetooth bond
-store (no crossing
-into another security authority); A:L for the denial of the
-overwritten bond. UI:N
-because the kernel performs the overwrite with no user interaction:
-the SMP state
-machine accepts the Identity Address Information PDU and overwrites
-the IRK, and Just
-Works bonding with a NoInputNoOutput peer is auto-accepted with no prompt.
-
-Suggested fix
--------------
-The patch below is a suggested fix; the final form is of course yours
-to decide. It
-refuses, in smp_cmd_ident_addr_info(), to replace an IRK that is
-already bound to an
-identity when the peer connects from an unresolved RPA
-(hci_bdaddr_is_rpa(&hcon->dst) && hci_find_irk_by_addr(... info->bdaddr ...)). A
-genuine reconnection of a bonded device has its RPA resolved to that
-identity before
-key distribution, so hcon->dst is the identity and the existing check
-applies; an
-unresolved RPA claiming an already-bonded identity means the peer is
-not that device.
-First-time bonding and reconnection of a bonded device are unaffected;
-changing a
-bonded identity's IRK now requires removing the old bond first.
-Requiring the IRK to
-resolve the RPA was considered and does not work, since the peer
-controls both and
-derives its RPA from the IRK it sends. Tested on the affected commit: before the
-patch the poisoning pairing overwrote the bond's IRK and the forged
-RPA resolved to
-the victim; after it, the pairing is rejected, the stored IRK is
-unchanged, and the
-forged RPA no longer resolves.
-
-Credit
--------------
-Mohammed Alquraini, HUMAIN. Found with an AI tool (an LLM-based code analysis
-pipeline) and validated by hand with the reproduction above.
+Can further coccicheck operation modes become more interesting here?
 
 
+> +
+> +@offsetof depends on patch@
+> +expression ptr, member;
+> +@@
+> +- offsetof(typeof(*(ptr)), member)
+> ++ struct_offset(ptr, member)
+> +@offsetofend depends on patch@
+> +expression ptr, member;
+> +@@
+> +- offsetofend(typeof(*(ptr)), member)
+> ++ struct_offsetofend(ptr, member)
 
------------------------- >8 ------------------------
-From: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-Subject: Bluetooth: SMP: don't overwrite a bonded IRK from an unresolved RPA
+How do you think about to use the following SmPL rule variant instead?
 
-smp_cmd_ident_addr_info() stores the IRK a peer distributes under the
-identity address the peer claims, via hci_add_irk(), which replaces any
-existing entry for that (address, type). The only ownership check, added
-by commit 1d87b88ba26e, is gated on hci_is_identity_address(&hcon->dst)
-and is skipped when the connection is over a Resolvable Private Address,
-i.e. the normal LE privacy case.
 
-A peer can use this to claim the identity address of a different,
-already-bonded device and overwrite that bond's IRK (and the LTK
-distributed in the same pairing) with its own key material. Just Works is
-enough. The legitimate bond then stops resolving, and an RPA the attacker
-forges from its own IRK resolves to the victim device's identity.
+@replacement depends on patch@
+expression pointer, member;
+@@
+(
+-offsetof
++struct_offset
+|
+-offsetofend
++struct_offsetofend
+)(
+-typeof(*
+-(pointer)
++pointer
+-)
+ , member
+ )
 
-Requiring the distributed IRK to resolve the connection RPA does not help:
-the peer controls both and can derive its RPA from the IRK it sends.
 
-Refuse instead to replace an IRK already bound to an identity when the peer
-connects from an unresolved RPA. A genuine reconnection of a bonded device
-has its RPA resolved to that identity before key distribution, so hcon->dst
-is the identity rather than an RPA. First-time bonding and reconnection of a
-bonded device are unaffected; changing the IRK of a bonded identity now
-requires removing the existing bond first.
-
-Fixes: 1d87b88ba26e ("Bluetooth: Add SMP workaround Microsoft Surface
-Precision Mouse bug")
-Reported-by: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-Assisted-by: LLM
-Signed-off-by: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
----
- net/bluetooth/smp.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b7015e37e1f1..6a417e3c9041 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2634,6 +2634,16 @@ static int smp_cmd_ident_addr_info(struct
-l2cap_conn *conn,
-      info->addr_type != hcon->dst_type)) {
-  bt_dev_err(hcon->hdev,
-    "ignoring IRK with invalid identity address");
-+ goto distribute;
-+ }
-+
-+ /* Don't let a peer connecting from an unresolved RPA replace the IRK of
-+ * an already-bonded identity: it has not proven it is that device.
-+ */
-+ if (hci_bdaddr_is_rpa(&hcon->dst, hcon->dst_type) &&
-+    hci_find_irk_by_addr(hcon->hdev, &info->bdaddr, info->addr_type)) {
-+ bt_dev_err(hcon->hdev,
-+   "ignoring IRK for an identity already bound to a bond");
-  goto distribute;
-  }
-
---
-2.43.0
+Regards,
+Markus
