@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795030066;
-	b=yz0YLaNJh/MRi0Hgr/EzqTcGTt1IVpUUFhTFmObumSZJb9Za9190LCaI3iM8K18JNgV1
-	 8rjzi1MJj81FPlHUtxBaEqfQZHmoNm2mBxBt/zBoBn1mm/PLm5KS6CnPcNJ3CDlDSt2ye
-	 QO/+II0GaLf045zHg0VqRSo4gpLU4w++kChpbNtxJD9VuUPdBfawJK62NQ3y2LXhkOku3
-	 Z5xNGoi7ZsigiyAMKTUOQ0H0GEG6BZJwFQHG7oBH9VM6jBlwo2PiEr8PG+BmYJrDOmyOH
-	 9JL8ZWnc9rfbPl9dlECfmlxhrYL5UZzzHEVm/KdzK2z7b8h8vYySSxJGFy7JuYXBfgQ==
+	t=1795030082;
+	b=vg9jpTUuGLP9BFou0Dni1r7OETSzUak/4tmUQbdyRHHbXrLqgD1Sulc85oJQXECGcjWU
+	 l1ppExuM6uNKKvkuH8AUM3mjj9btA3nmfRKkhCtPWKpELOTJKAEmPfomE1sP5EX5CHWwi
+	 UiiPGjv73VQJ1dV6IPLDTfRVs73qNHHOHl/ifc5WoJ3PxwXFhD+jaUlr2EIqB4tXWrBqN
+	 IctNdZe3xN2Tytei1SYq9E7pWeDLnG8L+0cVgZIkGJbVncBhQ5Z3I3Fwf04cOOsyl7tO1
+	 6/qvpXxFYJJAGtjw6g6NNPmaK9mk80zXsEIWs8IWYC++mEuOnis1fKl/dvZCSGhGlRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795030066;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795030082;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=Z/yKhrxLxY5/QLlKEzAf373V1QSOWce0k8iO5P+HaBs=;
-	b=FXaRw/nk/YOJT3FO+BkfaK8x+mgTm2cfGHYMXws4ImCl2KBRO4KBxULO+HtO0Y5M1mxx
-	 /bA5YPbkHtF7sIkG3jRgXK8LKLliYUr74HCiQxyBhBs+poKPyD6ClLHoUSFDVk9B3uSOk
-	 unZtoWGXTe/JmRt6CnzwO1vfY5Nw1hU9icYBX4QMyXh3ymCDT6tiBzW8LzKbYO4IN8fya
-	 nu6wEH/lA/1pRB5PL/7pTpDVnODUKBQXYY2xIeGMjPsq8/YeF9N2pnd9oKGy+QupBxvnk
-	 YdnmAImyKK4ls2kIG3aPmjLQa/DnlqF0+VaL54SbYg5EEdm3RY7vo/P12aa5Zxmom5g==
+	bh=YIoF29/HLGxivKo9y9Umvo7WdoqaNvqRS3anqksW2+E=;
+	b=zotAHFrzw+FPfxQFGbfzyZHPaXJVIVLpLPN1TkdXHf4CsuAt2ije5m9FeTasOea6TpXm
+	 yQGtTjkh/tKZGlJHmoS3AnLWaCmpPPLdVesZspynOzDhdg7QxjXCfu0vuHKsTofeWpYMD
+	 pGiSCjuC49IRhPwbToxPbotgD8FWC+3zaGzJuvVEXv5SdT558I9+qCjtOHJMHHFjeHDmy
+	 Ykv/yfIguuhyll0XHln1NVJItQMXflC5ANwa+TCPoyrwXDLfLQLEFPK815uNAYHb08mwC
+	 gkS5F5IPtD33+Zr0COHareh/Y//LApXMTa8xPE49/kMRMm0k7SiKllmoBDfAKUR4i+g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DY78JipM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GRZV72CP;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499D2606A7E4;
-	Wed, 18 Nov 2026 19:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CEC606A7E4;
+	Wed, 18 Nov 2026 19:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DY78JipM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B8611F000CC;
-	Wed, 18 Nov 2026 19:27:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GRZV72CP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBEA81F000CD;
+	Wed, 18 Nov 2026 19:28:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795030066;
-	bh=Z/yKhrxLxY5/QLlKEzAf373V1QSOWce0k8iO5P+HaBs=;
+	s=k20260515; t=1795030081;
+	bh=YIoF29/HLGxivKo9y9Umvo7WdoqaNvqRS3anqksW2+E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=DY78JipMgP+vOpyauGUGl2mB3jhx3Nu9So6YsoE/1eiKzLgjO91sWehBucvfbScsw
-	 9L/YSO3/27XCyHQOs9O8Ylu0IvfIe9bLJxBKQkyLbq4lzjbUgBgiSAwYrxg4nJDz9F
-	 kH20O63ggrUQyN5pHqP4c3vn+ghLeX3qWvuaykzSy5znn6efz6V0i9oRa5hoFXltxe
-	 AamHO42vQYCzpnewQgp3dXfwCtQ9tZYR1Ojaks4vjPr5pFUaW8PYriawUckaYX7Kcn
-	 HMvdb21DTuWso54liwHmmoHvgulXyhfk/gE6usf8OG1t6cIBwd/L4TlnaYM7Om0boS
-	 V6MJz0ewGC3TQ==
+	b=GRZV72CPjqMFDz8QVvFaDzm4LVKAGO1cB/qlcrZnlS+aSNN6dyhiAHzc7/Iuazi1G
+	 E0+HoqJ35Lv7sBXo/FIcUJd2exYCi2hqwuURJZBJBZldug/vwUmFY3kO+fAcQ4wg+q
+	 /j0H4tydBClBdMwpvshpct6bF3mbB2fVgJbBRIXWSFAEL1kw+U1Fjoohcmu1dgOk0w
+	 mk5tarzoqyQbkocZUsOikIW25i//qizQMtr19cD/8MJiauMsTWUJQFr9y7yKWVNyiz
+	 t259FRj7GvUVWH/K2dML1UyuCkdGAgufckIztJb7hXSUUALe+sxnopyvIi1cbG5YQr
+	 jJhaay2TAN8kg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -96,9 +96,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@suse.de>,
 	linux-sound@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v3 02/31] Bluetooth: btusb: Fix MediaTek ISO claim locking
-Date: Wed, 18 Nov 2026 21:26:32 +0200
-Message-ID: <20261118-device-trust-core-v3-2-d655875c4bfb@nvidia.com>
+Subject: [PATCH v3 12/31] PNP: Attach card devices through the driver core
+Date: Wed, 18 Nov 2026 21:26:42 +0200
+Message-ID: <20261118-device-trust-core-v3-12-d655875c4bfb@nvidia.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
 References: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
@@ -117,114 +117,64 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-MediaTek ISO claims are performed from HCI setup work outside USB probe.
-Locking only the interface does not protect the claim against teardown
-of the parent device. Unconditionally waiting for the parent lock can
-deadlock with disconnect while it drains the setup work.
+pnp_request_card_device() calls the PnP bus probe directly, bypassing
+the driver core's supplier checks and power management setup. If
+device_bind_driver() then fails to create the sysfs links, the device
+remains attached and may stay active, but the caller receives NULL and
+cannot release it.
 
-Resume the interface before acquiring the parent lock and use bounded
-retries to keep the interface locked while claiming it. This change
-propagates claim errors to setup together with -EHOSTUNREACH which means
-that the parent is suspended, since subsequent controller setup requires
-the parent device.
+Use device_driver_attach() for synchronous probing with the driver
+core's setup and error handling. Preserve the card link until binding
+completes, so probe cleanup and CONFIG_DEBUG_TEST_DRIVER_REMOVE cannot
+clear or free a link still owned by the enclosing card probe.
 
-Fixes: ceac1cb0259d ("Bluetooth: btusb: mediatek: add ISO data transmission functions")
+Fixes: bfc7ee207078 ("[PATCH] PNP: handle sysfs errors")
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/bluetooth/btusb_main.c | 55 +++++++++++++++++++++++++++++-------------
- 1 file changed, 38 insertions(+), 17 deletions(-)
+ drivers/pnp/card.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index 92a78a7e60396..8307fd819cc2e 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -2993,40 +2993,57 @@ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *skb)
- 	return hci_recv_frame(hdev, skb);
- }
+diff --git a/drivers/pnp/card.c b/drivers/pnp/card.c
+index df5e3d3cbf6c0..9aaaa03d5ffa9 100644
+--- a/drivers/pnp/card.c
++++ b/drivers/pnp/card.c
+@@ -52,13 +52,17 @@ static const struct pnp_card_device_id *match_card(struct pnp_card_driver *drv,
  
--static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
-+#define BTUSB_MTK_ISO_LOCK_TRIES	5
-+static int btusb_mtk_claim_iso_intf(struct btusb_data *data)
+ static void card_remove(struct pnp_dev *dev)
  {
- 	struct btmtk_data *btmtk_data;
--	int err;
-+	int err, i;
- 
- 	if (!data->hdev)
--		return;
-+		return 0;
- 
- 	btmtk_data = hci_get_priv(data->hdev);
- 	if (!btmtk_data)
--		return;
-+		return 0;
- 
- 	if (!btmtk_data->isopkt_intf) {
- 		bt_dev_err(data->hdev, "Can't claim NULL iso interface");
--		return;
-+		return 0;
- 	}
- 
--	/*
--	 * The function usb_driver_claim_interface() is documented to need
--	 * locks held if it's not called from a probe routine. The code here
--	 * is called from the hci_power_on workqueue, so grab the lock.
--	 */
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err)
-+		goto err_clear_iso_intf;
-+
-+	/* Disconnect may hold the parent lock while waiting for this work. */
-+	for (i = 0; i < BTUSB_MTK_ISO_LOCK_TRIES; i++) {
-+		err = usb_lock_device_for_reset(data->udev, data->intf);
-+		if (err != -EBUSY)
-+			break;
-+	}
-+	if (err)
-+		goto err_put_interface;
-+
- 	device_lock(&btmtk_data->isopkt_intf->dev);
- 	err = usb_driver_claim_interface(&btusb_driver,
- 					 btmtk_data->isopkt_intf, data);
- 	device_unlock(&btmtk_data->isopkt_intf->dev);
--	if (err < 0) {
--		btmtk_data->isopkt_intf = NULL;
--		bt_dev_err(data->hdev, "Failed to claim iso interface: %d", err);
--		return;
--	}
-+	if (err)
-+		goto err_unlock;
- 
--	set_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
- 	init_usb_anchor(&btmtk_data->isopkt_anchor);
-+	set_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
-+	usb_unlock_device(data->udev);
-+	usb_autopm_put_interface(data->intf);
-+	return 0;
-+
-+err_unlock:
-+	usb_unlock_device(data->udev);
-+err_put_interface:
-+	usb_autopm_put_interface(data->intf);
-+err_clear_iso_intf:
-+	bt_dev_err(data->hdev, "Failed to claim iso interface: %d", err);
-+	return err;
+-	dev->card_link = NULL;
++	if (device_is_bound(&dev->dev))
++		dev->card_link = NULL;
  }
  
- static void btusb_mtk_release_iso_intf(struct hci_dev *hdev)
-@@ -3169,7 +3186,11 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 	/* Claim ISO data interface and endpoint */
- 	if (!test_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags)) {
- 		btmtk_data->isopkt_intf = usb_ifnum_to_if(data->udev, MTK_ISO_IFNUM);
--		btusb_mtk_claim_iso_intf(data);
-+		err = btusb_mtk_claim_iso_intf(data);
-+		if (err) {
-+			btmtk_data->isopkt_intf = NULL;
-+			return err;
-+		}
- 	}
+ static void card_remove_first(struct pnp_dev *dev)
+ {
+ 	struct pnp_card_driver *drv = to_pnp_card_driver(dev->driver);
  
- 	err = btmtk_usb_setup(hdev);
++	/* The card probe still owns its link until this device is bound. */
++	if (!device_is_bound(&dev->dev))
++		return;
+ 	if (!dev->card || !drv)
+ 		return;
+ 	if (drv->remove)
+@@ -331,16 +335,12 @@ struct pnp_dev *pnp_request_card_device(struct pnp_card_link *clink,
+ 
+ found:
+ 	dev->card_link = clink;
+-	dev->dev.driver = &drv->link.driver;
+-	if (pnp_bus_type.probe(&dev->dev))
+-		goto err_out;
+-	if (device_bind_driver(&dev->dev))
++	if (device_driver_attach(&drv->link.driver, &dev->dev))
+ 		goto err_out;
+ 
+ 	return dev;
+ 
+ err_out:
+-	dev->dev.driver = NULL;
+ 	dev->card_link = NULL;
+ 	return NULL;
+ }
 
 -- 
 2.56.1
