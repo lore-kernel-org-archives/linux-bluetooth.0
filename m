@@ -1,89 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795012055;
-	b=UKFmEyY7H469FyUcFiKUSJ/39kcQBteNEaWdO7fxKIL9DhoyN3XFyiul+EblPfQAq0f9
-	 0AyxzbGNnDrqNbnT8ff/WCihmrUJjRA8jlnDgRJvT6wB29zC9XW+TagtVKqOc3GHox1kJ
-	 at4ekHycfrkESMJMhFW+A6HrcvTkQsKwcjKAZo/ZrpD4WFdWIOS6whOMT/ID1M1PQwgEg
-	 QniVf1kGDIUv2YME+HbOx/E9YQwAB9mTf+u2GVRroxUx+bKRPwix2iXyhv9w79VRqq5gL
-	 2m2gvYsB22uQ2UBsMCEz+4gVFJKEAJRd+uXfPznnLPj3B3UPUDgYwdd/Gh0vuNawUwg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795012055;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.45
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795014291;
+	b=Ib4BD61AO9BsxaI0beAOhVdIDMKmBPnwDmxZB5Wk91gR06vfzssZngA3ufMO6wELTnQi
+	 P1xjIn95N/g0lffCwjJKarU9VEoI9qT8dB2VaoboyMpZDbTLU9Wqva3/Hc/JIe5YrFhbY
+	 g0jGAad8JwS4RShXHBfB8lgVfg9GspGlw81Id4cLmLr3W5SJAiv30wyNw6mRJxGFami6F
+	 yqRJ91pZX6K1Tctz69E6R/rqCpgYm3xPY96li1nkOlknOzIyeT2eanE6gM8L/iXmhdmVX
+	 /zgAkkFC+roQirQPcH9hs41S915jN0XGRXnGbytptBLRS+cFGeOo4fePDlFiGC6mazw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795014291;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
-	b=S8x3FrjPBcjYOk2hvWZd7Rbsgb3WAa6apyQWxrDGLdYmI+WI5c1SF14eWmXO7TYYtTEe
-	 tD/PMnl3kML8A+pbOGaIOX9RXahm1ioMUF11322uWX8gWyMRx3u/kwCAFEDN4xX7HpjWv
-	 JPpuZtzjODkVYVyCC65LUkVE97KMPZCrvD1aG69vsnYuLKNtuz8MKizR/iXR2NonYG7Tr
-	 yb+EWyjm59i/RQ33Y9H95jpT1up1sUhAGCGwxJccJcNiwky60OT44c4++JTUTf1p0Pxxb
-	 60LoVnUXdH+Uett1WsGdybw2yUeXBn9mkUwhg8+LnMKBr9XggO/KKqIE4vzePuL+BUw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=aVkgZI5WzXBjI0U2/Ez70OukDr3k+IEZoOwPZzKltZE=;
+	b=k5x8ubE899UOut1ql9Mxhys2I2v1qx6tL6u3UtwGc301tLbwDMB6VEBZonuOQ7TFil+0
+	 c8dQ0cs3Vbz5GQ9vJW6ERGDr5yZKYlyLuQMAnrPZH7SFYEofxy3tlntIcMI62N2hJ4POV
+	 H2sUyp0RnDD/awYSlmEDlTUM+zGFXRnbOEUbwL1eH+elFGfRc9CIVbyGpYbaNVS/3lgMh
+	 yEJGIz8RfVCVWzYIHFwdQ5wi9At9ix2zp33CODMdMtEWqhnwMXXLrVPivVCQ9AeTLStaZ
+	 pZZ6IW0bCW1FDW9Zu17MYFls0oD5Ao9zB+zBuGHXH3P0UXT3Op8L+DiwqInMZXF7znA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rcDjcNNH;
-	arc=none smtp.remote-ip=209.85.222.47
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pZ+Zyh9v;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.45
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AF960A2607
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:27:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2AF960A2607
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BE5606A339
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 15:04:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8BE5606A339
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rcDjcNNH
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-9906a5410f5so1622442241.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:27:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pZ+Zyh9v
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-67be9601f31so950962d50.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 07:04:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795014290; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MOlb5LrrNTLV1WumsI86uLTzvoUQTXFVDzU7AImbxgqwz+8sOsTWljLIdajVTL2Mjk
+         vmw8aeLtNrlYvMjccZ/aCskc2zvueo7SA1tfaMp4gTsnbhmtivuFA3nOgqqzYxM3YbDy
+         5EIuZHuSx8e9miHQ9fzWqtv+ysgqC0/QjdCIWcjXTtMAaY3RJ+v4p+QEHbj5xQK4y4yA
+         9uVK8cho0rlF1DRxuBwoCMglT1bdmWi4IRyw5TDgwk9AZ3SbeHx+r08SRlB+61DuRDjT
+         AJ60uvUwugWU67qJf68l7O6jlMXrtbamdLY54J+XtkQKh2RYm1xEMBCAfQeepruHTloG
+         8OqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aVkgZI5WzXBjI0U2/Ez70OukDr3k+IEZoOwPZzKltZE=;
+        fh=rCBNvKLXfITj05b+lml9g3UPSEjZhZdMrKcAykGPjDo=;
+        b=VCjMnFsSCBPt2nC7rw8ynyTRp4Hy9vZ9wdqGbtxmAlpAUP5H8REHU0CJdkIR3HGI6P
+         XSqRBfYHiMzXd5A/gLj9kCYAZhTcTmcM4+woNJSo/FFxF8A2060YeWXCPKPx6TZlyPGD
+         M+NO2wnr0L6lDIXoiTh80iHYzZekdj9rmhLu93VvgcXX/X/jnOWUpmqVq6AN1/XzZ5w7
+         K0b0CfqdTQIGih7dAM0ZZ8xHZ+c27Lgxwp8xL2399TupR0tnSUUOR9TguByo2Mb/cY15
+         /1tkuxOqGDr2mGlVYdOX9/8zc6upWpYQuRq81p4jU7f4uQmAR8Kwt3FKPwhaFW+uUrzs
+         MoEQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795012053; x=1795616853; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
-        b=rcDjcNNHAtcM7TrqMnWvUKzFJulqwyEMzhBcEpD3E6OX8nqfuXyyoOvTFTz04kxLEK
-         a2BzAXouP2f5kW/w+9L0zCOyWcG7t87HqCNMPXYHVAHXG1f58Esr0cTU20+OoQo6gaoF
-         fHWwuijLTeh7oGCWPFblVHz7xTbG6O6DE3RFm8xuADJ/FttKsuFpfk40ym+kI7HIc4Zk
-         FEIQUzh5vBolQqpUgp7brFN39J6fa8bIuR46KjKd/T+6748sB02R9E28BjZ7Um0/gFuh
-         +E6fRRZb6XNMt4yf+JpneMzGhVrt9WUPTjnWr+bm8y5/wfMv1WdjLJSj0CePZg5iJW/r
-         tfZw==
+        d=gmail.com; s=20260707; t=1795014290; x=1795619090; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=aVkgZI5WzXBjI0U2/Ez70OukDr3k+IEZoOwPZzKltZE=;
+        b=pZ+Zyh9vuL4v0OstGRwNpz/3FR4eWlGndF30aLm4+wsFMJvg+WY/N8Dp4U+flhDoo3
+         pxsLSANXntDdfvBY+JcZXIKzpW/55jOL/5Mu5ZDxOdU6EVASJQ4mD+RoE+/5fskY7T+M
+         jCji7pU3hfNUodfKll6jgxeC2d7VZP5VUGPAvH20HNYDNapTL7qOaLQtxmk0AI7SrxFs
+         bhmF5Ol4ItCl9hDdIWd2OPXhvitHhwVerNx4iaAZnOecAOs2rajOZ0XMhk8nqvhdMFDR
+         x/tB6Lo7LR7dAaEIi2rVBXhCYz94j+/FCwKOGJCHiCQa7maID3DivPu1eq7NGnAGX9gc
+         HYmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795012053; x=1795616853;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
-        b=cnQ1slh1BPCunVIlpLVOmI+sJIbvc46VVp4cxUjBZu8eJV+4mo0xsAfqui7S75ptOt
-         7dYbAmPTubN/EMpU9LqKB1hKayRNal29Lk5kanMKrPQ/gFiCLr7rSsIGCFonwFDMC7HX
-         pL5PC1dR2961iw1wNAMlwh2e17WLZHACu5cFiunU4JfI2jDDNnIwzOfZEXw1DJ3vSQ1+
-         wu4IjiOdWd1viZ1WDAWbrn45gOFFA2/QgtFndbS0MbdInWkwD+1d+o8ggBJBT5tMBh3N
-         pbRWg4Zis072TQm453AvsM5MPKGqmirC2Zhfw6EYoDwhzVbZf2LB/DFOP2FGKf1rYizx
-         rlgQ==
-X-Gm-Message-State: APuU4Z+6IU4/9U2mklC4/39ddwAP1XT73/YT9XbmLswkIw86FvfbCW/9
-	v8rjjAundg0Ea7ZX2ghTxjDpOqLtQWXyVBdlskHWup3VlVWamEXrIHJYYF3OmVx3
-X-Gm-Gg: AYBFou0UC8g3jM/FiXp+RHOUYwNdYxG5du0tDMqCiYF9OF8JV3sSPGmP1YLSb9wStvs
-	8KJbY3KsFQED2rfYzBWJQmtlFvaKv3nsNGYdio6uXRA1TQ4n1N1QfcBH+t4/1H+rDAx+zd8F9S2
-	vcndfS3m3G07ND9W+HGpxJDntSLz/cTRc9PShsonVF5UNlNGKn66G9fYMWTakXc+LJSaHGRfqxx
-	7O0imO6NRDqDqRZAyjUYrmyVVJWFkar4/v5VUKbeVhhlt8sgksXJHmZBxjMWPoi98Q3s/PIf+1v
-	BC2uSaxz/P2Fg7UZjpZ7KJ9go4rVytCHW2Qr2qWsEGoZf58hd0T20J8GglENhwGZ87lFaDcZ401
-	CRO8wM7Bhy5FvSXXDKt1frflIbqDKH+OhenRg95SNPMduo4RPAYrtzqUG0zCKRge0/PijTVO9mi
-	HTRhZbSe5ZjuFiBaq/BZ3+7iL/9NpI/njim9Qq/Uyfy+8HkVZgBzyF533G3QaD72TxkdTqnSLjz
-	sB6J5c6awYatwhMD2CGP8k2E2gOimO+3VknFTjPkAuRuIISmlIzkti9Uuz2LQLl2kMZMnrumAVq
-	4d6FzbwnSp84hjVwMe1a8Fgz5ZWqmXajIhb5zLD9ubM1CQN4SOP/7STZ7keWaju/Z/8sPGMqoOp
-	uxdstaqu8GG5lLZeZUkl7TkozHejwpyqAv+quqIXSbE0ys+9/LeMZ+xdY2LRb6Mc1UYgyvmRw3L
-	VpDa8=
-X-Received: by 2002:a05:6102:512b:b0:7b4:db17:bca4 with SMTP id ada2fe7eead31-7d6ba43eba4mr649827137.9.1795012053511;
-        Wed, 18 Nov 2026 06:27:33 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b9185bc3sm1745946137.5.2026.11.18.06.27.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 06:27:33 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: L2CAP: Use a reserved ident for L2CAP_LE_CREDITS
-Date: Wed, 18 Nov 2026 09:27:32 -0500
-Message-ID: <20261118142732.102749-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1795014290; x=1795619090;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aVkgZI5WzXBjI0U2/Ez70OukDr3k+IEZoOwPZzKltZE=;
+        b=cAUrAfil1PqUBjISO8P7y8JQJ/bcfXbMrkbqxo2qUhLEiyccLc3Vf+WKtnt2fKWKq/
+         IFLX+92pM/JNlk9qWR4ZtTcFyjl0H8/mQfWVHf02uDTf417dPUMesBDOkoPcm4FtBe/R
+         205nL/XMPGTrQaEh/Mhk4+P66NnJSsZv/5cw2Owk12Ve9AC0sbMcv/fOEHOa9J/uTPEE
+         NaC5fFeziQSPTEKf1x6LedGOgxd6jqfVo502aQu9ysybiRtvbDQPwHkuSap12Eczui7Y
+         Ou7M0gAqBNhI01GtXTkoJTbOwD5Odv9cd7XhM8OCGa8+sqNNjhxQTeTyxrK+EmGE0bUb
+         HKRg==
+X-Gm-Message-State: APuU4Z+iPKlyEC3wMnQikUHupBPg85W8uTfb6CRbGEDVC6gDx8zJ9fAW
+	+dcuarV/gOkrDX0XVPToL8mctN3CnuaLliDqQH9Mb7VGAgH9wCuODhAfy4WalRwYaDA0OfSHO12
+	UkaEFC7kbghjUQprfepr7FnWMlqdo6ec=
+X-Gm-Gg: AZFdTZeIXy0+nORKwXqizPKEc66Eoyz3ZTAd8TmpZ/1f/OgJomWqgek0na00dNF+t7c
+	hN/BLOQwzV52ZVIr7z8tQUalQm1HqU3kZ1C404SCgecFNEIfs/W2a/2cWtQGtcRWjEwtjhfg5bX
+	UBn7Ny2yroiLsYek8vpv1Pt9gORjYSE72bQ5bkx0WFZhfSOHYf5KLxrmHxfL/cXBabhHORYHTmV
+	oE0rHqIwY/nv3BnojLZPTyMPQCWDGPceNmh1gK1jykku0h6ODFQ2tMIXVlwJmUwsk6/rnsIxF9h
+	2y7X9x+M0GuaMqd9P3hv6ozD9Z/OBb4ztJeXREuwdWZwk5/BkkEpI+QBsci4aVTRums9jlJsZ0j
+	VTA9veGBAmsTeHUNBho1K7FXFmbHV9jN664Ptmf49pRET36tZgblVUlrdeRvONFquosEX1IaL1h
+	8sRzU2hp9c1r7lkIJtHSGQdSfiXo7Nn4FgUKOJNIx6N6anVJyUaO0SuyCVbYc=
+X-Received: by 2002:a05:690e:4002:b0:67d:a6fc:6bb0 with SMTP id
+ 956f58d0204a3-67dd401f905mr1132743d50.89.1795014289981; Wed, 18 Nov 2026
+ 07:04:49 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,116 +104,170 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261118141438.308232-1-khidarlaminehamdi@gmail.com> <20261118141438.308232-2-khidarlaminehamdi@gmail.com>
+In-Reply-To: <20261118141438.308232-2-khidarlaminehamdi@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 18 Nov 2026 10:04:38 -0500
+X-Gm-Features: AclHuK9oD8iIMCr--oNs7MUjBcqE5215_v-lErq2F3YgMK2gIudPLmjFYn0vJac
+Message-ID: <CABBYNZ+Xo9MjLWQX6SZv2wprzpyKfPnGZYjkV_S1yHsYM+o6aQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] profile: Add paired_only flag
+To: AuthenticSm1les <khidarlaminehamdi@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Hi,
 
-L2CAP_LE_CREDITS has no response, so an ident taken from conn->tx_ida for
-it is never released by l2cap_put_ident() and l2cap_chan_le_send_credits()
-has to free it right away after sending, otherwise the range is exhausted
-after 254 packets and credits would be sent with the invalid ident 0, which
-some remote stacks ignore, stalling the channel.
+On Wed, Nov 18, 2026 at 9:18=E2=80=AFAM AuthenticSm1les
+<khidarlaminehamdi@gmail.com> wrote:
+>
+> Some profiles talk to remote services that need an encrypted link.
+> When an unpaired device connects to us, for example a phone checking a
+> GATT advertisement, those profiles still get probed, their reads fail
+> with Insufficient Authentication and bt_att bumps the security level.
+> The phone then pops up a pairing request the user never asked for.
+>
+> Add a paired_only flag to btd_profile. service_accept() skips such
+> profiles unless the device is paired, on either bearer, or bonding.
+> device_bonding_complete() accepts them once pairing is done, so there
+> is no need to reconnect.
+> ---
+>  src/device.c  | 29 +++++++++++++++++++++++++++++
+>  src/profile.h |  7 +++++++
+>  src/service.c | 13 +++++++++++++
+>  3 files changed, 49 insertions(+)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 36a980d1e..9b410a913 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4922,6 +4922,28 @@ static void device_accept_gatt_profiles(struct btd=
+_device *device)
+>         g_slist_free(services);
+>  }
+>
+> +static void device_accept_paired_only_profiles(struct btd_device *device=
+)
+> +{
+> +       GSList *l;
+> +       bool initiator =3D btd_device_is_initiator(device);
+> +       GSList *services;
+> +
+> +       if (!device->client)
+> +               return;
+> +
+> +       services =3D g_slist_copy(device->services);
+> +       services =3D btd_profile_sort_list(services, get_service_profile,=
+ NULL);
+> +
+> +       for (l =3D services; l !=3D NULL; l =3D g_slist_next(l)) {
+> +               struct btd_service *service =3D l->data;
+> +
+> +               if (btd_service_get_profile(service)->paired_only)
+> +                       service_accept(service, initiator);
+> +       }
+> +
+> +       g_slist_free(services);
+> +}
+> +
+>  static void device_remove_gatt_service(struct btd_device *device,
+>                                                 struct gatt_db_attribute =
+*attr)
+>  {
+> @@ -7582,6 +7604,13 @@ void device_bonding_complete(struct btd_device *de=
+vice, uint8_t bdaddr_type,
+>
+>         device_set_paired(device, bdaddr_type);
+>
+> +       /* Profiles that require pairing were turned away while unpaired.
+> +        * They are GATT based, so start them once the LE services are kn=
+own,
+> +        * whichever bearer the pairing was done on.
+> +        */
+> +       if (device->le_state.svc_resolved)
+> +               device_accept_paired_only_profiles(device);
+> +
+>         /* If services are already resolved just reply to the pairing
+>          * request
+>          */
+> diff --git a/src/profile.h b/src/profile.h
+> index 270f09ea2..add55fdef 100644
+> --- a/src/profile.h
+> +++ b/src/profile.h
+> @@ -61,6 +61,13 @@ struct btd_profile {
+>          */
+>         bool testing;
+>
+> +       /* Indicates the profile shall only be accepted on devices that a=
+re
+> +        * paired or being paired. Use it for profiles whose remote servi=
+ce
+> +        * requires an encrypted link, so that a peer that connects to us
+> +        * unpaired is not prompted to pair by our attempts to read it.
+> +        */
+> +       bool paired_only;
+> +
+>         /* Indicates the profile should be ordered after profiles providi=
+ng
+>          * these remote uuids when connecting. The callback function is c=
+alled
+>          * when all uuids have finished connecting (successfully or not).
+> diff --git a/src/service.c b/src/service.c
+> index 8301b1ead..6b35a407c 100644
+> --- a/src/service.c
+> +++ b/src/service.c
+> @@ -301,6 +301,19 @@ int service_accept(struct btd_service *service, bool=
+ initiator)
+>                 return -ECONNABORTED;
+>         }
+>
+> +       /* Pairing on either bearer counts: the user chose to pair the de=
+vice,
+> +        * so a missing LE key may be completed when the profile needs it=
+.
+> +        */
+> +       if (service->profile->paired_only &&
+> +                       !device_is_paired(service->device, BDADDR_BREDR) =
+&&
+> +                       !device_is_paired(service->device,
+> +                               btd_device_get_bdaddr_type(service->devic=
+e)) &&
+> +                       !device_is_bonding(service->device, NULL)) {
+> +               DBG("%s requires pairing: not accepting yet",
+> +                                               service->profile->name);
+> +               return -ECONNREFUSED;
+> +       }
+> +
+>         service->initiator =3D initiator;
+>         add_depends(service);
+>
+> --
+> 2.56.1
 
-tx_ida only exists to track requests awaiting a response, so a command
-without one has no business in it: every credit update allocates and
-frees an ident, and the ident is visible in tx_ida while the credits are
-in flight, so an answer to them (a L2CAP_COMMAND_REJ) is processed by
-l2cap_put_ident() like the answer to a request.
+Nack, on demand pairing needs to be supported beside this probably
+breaks server role as well since it won't be probed until the device
+pairs but that is not what you are really doing here instead it just
+doesn't call the accept callback, that perhaps can be done by checking
+if btd_opts.gatt_client is false then the connection cannot be
+accepted, but that is already the case so I suspect the problem is
+that you are initiating the connection (aka central) thus why
+disabling the GATT client doesn't work:
 
-Using a counter that doesn't consult tx_ida is not an option either, it can
-return the ident of a request still outstanding, and a reject of the
-credits would then release that request's ident and close its channel in
-l2cap_le_command_rej().
+if (!btd_device_is_initiator(device) && !btd_opts.gatt_client) {
+DBG("GATT client disabled: skipping GATT client");
+return;
+}
 
-Reserve ident 255 for L2CAP_LE_CREDITS instead: l2cap_get_ident() never
-returns it (the BR/EDR range already ends at 128), so it can't collide with
-any request, it doesn't have to be tracked in conn->tx_ida, and a reject of
-it matches no outstanding request.
+For this to work as intended you will need to be the peripheral, or we
+need to remove the check for btd_device_is_initiator but it may have
+other implications since that would stop the central from resolving
+services, etc. We can try changing [GATT] Client to accept role as
+well, so you can say Client =3D central (disables peripheral requests)
+Client =3D peripheral (disables central requests) and Client =3D false
+(disable all requests).
 
-Fixes: 6e1930ece855 ("Bluetooth: L2CAP: fix tx ident leak for commands without a response")
-Reported-by: syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=9dc8780713b11155dd74
-Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
-Assisted-by: OpenCode:claude-fable-5.2
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/l2cap.h |  5 +++++
- net/bluetooth/l2cap_core.c    | 28 +++++++++++-----------------
- 2 files changed, 16 insertions(+), 17 deletions(-)
+Anyway, this all seems way too complicated compared to just disabling
+all plugins that you don't need to use.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index cf5c2df68af8..72d9d56c6f2a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -45,6 +45,11 @@
- #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
- #define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
- #define L2CAP_LE_MIN_MTU		23
-+
-+/* Identifier used by L2CAP_LE_CREDITS, it has no response so it is not
-+ * tracked in conn->tx_ida and is never allocated for any other command.
-+ */
-+#define L2CAP_IDENT_LE_CREDITS		255
- #define L2CAP_ECRED_CONN_SCID_MAX	5
- 
- #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 977b41229a7f..3ff40565a05f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1046,9 +1046,11 @@ static int l2cap_get_ident(struct l2cap_conn *conn)
- 	u8 max;
- 	int ident;
- 
--	/* LE link does not support tools like l2ping so use the full range */
-+	/* LE link does not support tools like l2ping so use the full range,
-+	 * except for L2CAP_IDENT_LE_CREDITS which is reserved.
-+	 */
- 	if (conn->hcon->type == LE_LINK)
--		max = 255;
-+		max = L2CAP_IDENT_LE_CREDITS - 1;
- 	/* Get next available identificator.
- 	 *    1 - 128 are used by kernel.
- 	 *  129 - 199 are reserved.
-@@ -7204,7 +7206,6 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
- 	struct l2cap_conn *conn = chan->conn;
- 	struct l2cap_le_credits pkt;
- 	u16 return_credits = l2cap_le_rx_credits(chan);
--	int ident;
- 
- 	if (chan->mode != L2CAP_MODE_LE_FLOWCTL &&
- 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL)
-@@ -7222,21 +7223,14 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
- 	pkt.cid     = cpu_to_le16(chan->scid);
- 	pkt.credits = cpu_to_le16(return_credits);
- 
--	/* Keeps l2cap_put_ident() from releasing ident before we do */
--	lockdep_assert_held(&conn->lock);
--
--	ident = l2cap_get_ident(conn);
--
--	l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
--
--	/* L2CAP_LE_CREDITS has no response so the ident is never released by
--	 * l2cap_put_ident() - release it right away, otherwise the tx_ida
--	 * range is exhausted after 254 packets and from then on credits are
--	 * sent with the invalid ident 0, which some remote stacks ignore,
--	 * stalling the channel.
-+	/* L2CAP_LE_CREDITS has no response so it uses the reserved ident rather
-+	 * than one from conn->tx_ida, which would have to be released right
-+	 * away or would be exhausted after 254 packets, and could otherwise
-+	 * collide with the ident of a request still outstanding. A reject of it
-+	 * can't match any request either.
- 	 */
--	if (ident > 0)
--		ida_free(&conn->tx_ida, ident);
-+	l2cap_send_cmd(conn, L2CAP_IDENT_LE_CREDITS, L2CAP_LE_CREDITS,
-+		       sizeof(pkt), &pkt);
- }
- 
- void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
-
-base-commit: f42f5cae154b90a0cb6d8232dc84c7614ca2e6a0
--- 
-2.56.0
-
+--=20
+Luiz Augusto von Dentz
