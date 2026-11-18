@@ -1,93 +1,140 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.134.164.83
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795010735;
-	b=mygkVos9WO4hYIyjj8yyBursu2B3QZBNt0eP3R/P9Wjz4a5YoPg9a4T/6RxJd8SoB0I1
-	 QZlUKlbXljOtnYg9aqrZDHn+L/U5uA92kwdEjAtZzXpQbTAUXtXmduYXXLAzBs2T9aozH
-	 XUNvOYSpSW9YNifRTfUj/eiawVQ+LXydSwGehDk9LoWuqPurU59ecylcqd8Ot1xr+Nyse
-	 SZU3GdcLUvdOROpe65X4KmWgmasIWkWiCaY1Cv4uqTuPaTDkMWo9mbFDIQVYO3C4B04UI
-	 ZN2tLwGp4hv74Cy5k2YgVN2itcRwiki6JjE37WcdDWmxCuKv5fq/fAvQQBpSQbLGbeQ==
+	t=1795010894;
+	b=KWbMdUxZStBczeeoNgIZb9SScHt4ybvJ/FYtaFQ19RPVG2XuuKKOe0HsPpvgoYaFhvgT
+	 E/rnp0dc6NfRB8aeUIgQtKnrjO5/MzghY40eobaZHhAY4pGilaTxRZbuuVHgxhBhue0VI
+	 H16K9UXrFY46KOOu1YTuZD6pAlET6UhKqQu4XEqMJHlvovqc9xHHTkuy15SMSGBmum8T6
+	 0vUFbi5ChCnwDrEHspR3yOKZWoNPISefxodaHiPLt8AZBf4ApBW7x+TpDP+NDuZTFrRnL
+	 CvNnr+c7ThoCzUMfcSRqJWpVkdEYfk5BUUIM4EjPmVeylgg/KDmmTvcacHSrYDTyC9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795010735;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=lqRxdXDZwkoBIUpQiKDSxdBxhOqNT2G/FU1odLMr7P4=;
-	b=uzequrneQnHBQhuqnBxm9t1HOBHjlJbyi20Suw1qMW9cYnK12RexINM1dbC/jTDpdwTs
-	 zxfYgE5EY44Mwshi49xRb8Pl209NqG0BWlxeSK967k4w7GpZGGQ83upxwCL65ZuJaUqnG
-	 KdUibCNqtmIkokZHe5TKa6u3QJDFTdAFleYUv/qvAQfzvIEbMqa6n6h00eTXcRijpUr/2
-	 DbUYf0UQ6o+tNiCfuBDTvTAI0Fu+cDGlxIJOtYtsxHpsJbCdaHWMSPzGAMzV0gmlzx3kf
-	 gSdHtoi0yeKheOhver3XKlOSxY8aNTEJuU5y57kR1iTqmYP9xZCKZIqYMdqq4vA+/BQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795010894;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:Date:From:To:cc:Subject:In-Reply-To:Message-ID:
+	 References:MIME-Version:Content-Type;
+	bh=kSUE/o5CqDYurph69R6wpud9Np7SIjoEFQ7s0L3TdZE=;
+	b=4EMIilZ8cQtQTU/9VXo4mmb8fbzLhKV+0okgLf0eKcOJXybmFA9VHsYRhNlbxqjq4+r9
+	 LWB2NKL62TBtc5gSUJVelUH9mxw3kwCj0gq+I1ejZItlHBAxodJUo+tzzaxLGQqnv6y2R
+	 OTOubtdXh1IT87QU24bIMWOfVggy+ObAODJZ4Ro71J4bTd0UZxjIckWs3GLj8vt/UhcF3
+	 kwfgkw+8Jx1wpv4BeCUD3WQGWsS1k4KUbOCsjoXtHiTnV02MgNTPmXWZ3/jAKSiKIPhOf
+	 YWcmltS3oip51jspxf3tqTjJnvMihuC6xyliU2UP8NmTvu6kwtuEfpbNzdj+kTsNeKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WVkjMZ2G;
-	arc=none smtp.remote-ip=209.85.217.52
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=inria.fr;
+	spf=pass smtp.mailfrom=inria.fr;
+	dkim=pass header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=lO8vUGAB;
+	arc=none smtp.remote-ip=192.134.164.83
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5844D60A381D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:05:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5844D60A381D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3878B606A31C;
+	Wed, 18 Nov 2026 14:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3878B606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WVkjMZ2G
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7cc91ddf447so382121137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:05:35 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.a=rsa-sha256 header.s=dc header.b=lO8vUGAB
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795010734; x=1795615534; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=lqRxdXDZwkoBIUpQiKDSxdBxhOqNT2G/FU1odLMr7P4=;
-        b=WVkjMZ2G6DYHxTBiYy5aghiS61Pu6cH6cMOa7BajBVrqIq7rjJGxMPJm4rhdiyo0P6
-         5T2pyWePUMxRz7BwnVK/Ons2QArxp54TLcQtHYyKTTZybh/ocDPzGxBd++EZDqKmF5H6
-         qobCUbcL/y/qaVBE8WAa1BFfoKBdpTRAGJZWq7i12rkpG4l2V/V83TOcHoxe1yUQnCqU
-         FLgepI4U4TDvkHXsEGb3BCUxmGvJw9dOO2/bmpdhGVyEbEJUhq44m2RjQszX6+cXjSqC
-         ppwUMHAE3j+LipUyKTWxBytH6bzpEknrx8Sh5TU+y4+hBML8arSPZGM0awAsB9BoBqFH
-         6Shw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795010734; x=1795615534;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=lqRxdXDZwkoBIUpQiKDSxdBxhOqNT2G/FU1odLMr7P4=;
-        b=gZ7dACHpw95DVXxEIoYWId7xWr4LybgwSjS6kmLOeBPoNBfA06Rh12/UFK4s8R5Z9b
-         Pf4jiaOGQ0Avom31epPDrQoAbMgkA74pkoVWB+zVY2y0lISxu/KladZu8XbtZDWWOLgF
-         cE4SSF7AvU+VQsiZCAAhiFc8I8S5VUtQ+RO1QbALjGKAzto6qsbtkzqrUi9JWAImNwBh
-         J0d3qF7Sh6LEWNdttptTTMt6e85URe/C6oxZmfhQcHfQ2Wx57xjiBtPmRhzasKzQbNMJ
-         cQbFeJwEYiHYP/IE2l/2YmvZ965DORNp7m0YAvTWVBqP1lLAod3Z4883yLnUzYm9sFul
-         brzA==
-X-Gm-Message-State: APuU4Z/gL8Xxsccn/Uwith6bhzRXgOK4Zg+bm18eHQ9O/brytXh2qbbY
-	lFv5uYZZDrdi+j+pw8hib1zGepXGatvqtJMBc3xkjM5vwcfGHZSo7J1aRRxlG9Oj
-X-Gm-Gg: AYBFou2Z6CsuyKF3Ay/NbbCOvVVb58Ez6pCE/JSPmr9rmr8CbyWN2C3zwOMdCqZwkkb
-	jAct9gKu9V8C1L+x9JswgwljrBoh48EFOgD1GmrYuZgVdDQ3zEea+XEyX9n1J9yYdIbamrnyh2m
-	zYxjrKaZZ36hndMuRWoPE3usZLt91lyLaLmCS/vVxRi/TVZSFiNDtt+9TORU1gZCFw/BlL8+P5s
-	WuEL6GYe0aqw/JXzpvJE45EDBIc3Fv8p9E4po+BbuQTaqyu7Zs/8g082j4HuZXB9/NJ8dIv/I5u
-	ZzWrqw7D0pVCespeZ9JqYOv2CK2+RIONtLqrpFjhbndwSESAJ33uxp/qVV+Mzmuf3zIuvw6gazN
-	NZ4u3x+jkDGctW1u25Sfc91OSpN2Sf6tgobPFu2PxetetiM978fbedWp1sY5udHugQeQkbzzEZk
-	foabje4imusrIMT5LoWuwENgz4lAWU4SxoLptJi79E0BlX/OraxsVxTE3ABlSR6el9nPnJVq1GJ
-	+XK3mY1cf4zoOpESSm+Q4Y5xW/L5kZtYE+ta+sjLW0yZ9MP0+50GKHAJfNrxUysmMZQWq7XxKTo
-	ft21nkNlcDiQTPHHkcn6EQJzlbPYadezHBZwlV+ktwn2aCTK7EMvNpcEqHQUKWA4DUWXYLpyAig
-	kNHO1pH8insoRVrmnASOAzkVD7QzXi3c8IdIykRSI65NIo7fJGc9f8iDL5/YaZk188+Dr0ueqE+
-	WIWCU=
-X-Received: by 2002:a05:6102:290b:b0:785:c39b:6a1 with SMTP id ada2fe7eead31-7d6ba3b91d7mr855053137.6.1795010734013;
-        Wed, 18 Nov 2026 06:05:34 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b914e10esm1697639137.3.2026.11.18.06.05.33
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 06:05:33 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 17/17] Bluetooth: hci_core: Don't fail removing a monitor unknown to the controller
-Date: Wed, 18 Nov 2026 09:05:18 -0500
-Message-ID: <20261118140518.59878-18-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261118140518.59878-1-luiz.dentz@gmail.com>
-References: <20261118140518.59878-1-luiz.dentz@gmail.com>
+  d=inria.fr; s=dc;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=kSUE/o5CqDYurph69R6wpud9Np7SIjoEFQ7s0L3TdZE=;
+  b=lO8vUGABN3SRz8stmFI6GOw5EdtNndRF+CQvv0/fdjATmxkGTAFZQyyX
+   q3S3Iji9niTjJuaRWhbudJSEAZZKtnIYWDJnU5+hLPXuIFXtC4McFue5K
+   zJmH9mSahEE3uuCKvqXtwc7RUVjEQny86msZaIn/W22PRg53MToih5RN6
+   4=;
+X-CSE-ConnectionGUID: NpDResvMRHWEoFCgk5A11w==
+X-CSE-MsgGUID: tkj3zeBCTZKFS5tJsQM2+w==
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.27,219,1787004000"; 
+   d="scan'208";a="306121450"
+Received: from 72-255-236-003.static.imsbiz.com (HELO hadrien) ([72.255.236.3])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2026 15:07:35 +0100
+Date: Wed, 18 Nov 2026 22:07:31 +0800 (+08)
+From: Julia Lawall <julia.lawall@inria.fr>
+To: Bence Csokas <bence.csokas@arm.com>
+cc: Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+    Marcel Holtmann <marcel@holtmann.org>, 
+    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+    Sumit Semwal <sumit.semwal@linaro.org>, 
+    =?ISO-8859-15?Q?Christian_K=F6nig?= <christian.koenig@amd.com>, 
+    Philipp Stanner <phasta@kernel.org>, 
+    Sudeep Holla <sudeep.holla@kernel.org>, 
+    Cristian Marussi <cristian.marussi@arm.com>, 
+    Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+    Maxime Ripard <mripard@kernel.org>, 
+    Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
+    Simona Vetter <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, 
+    Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+    Tvrtko Ursulin <tursulin@ursulin.net>, Lyude Paul <lyude@redhat.com>, 
+    Danilo Krummrich <dakr@kernel.org>, Zack Rusin <zack.rusin@broadcom.com>, 
+    Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+    Selvin Xavier <selvin.xavier@broadcom.com>, 
+    Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
+    Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+    Chengchang Tang <tangchengchang@huawei.com>, 
+    Junxian Huang <huangjunxian6@hisilicon.com>, 
+    Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
+    Hans de Goede <hansg@kernel.org>, 
+    Mauro Carvalho Chehab <mchehab@kernel.org>, 
+    Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+    Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, 
+    Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
+    Jes Sorensen <Jes.Sorensen@gmail.com>, Ping-Ke Shih <pkshih@realtek.com>, 
+    Johannes Berg <johannes@sipsolutions.net>, 
+    Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>, 
+    Guenter Roeck <groeck@chromium.org>, Nilesh Javali <njavali@marvell.com>, 
+    GR-QLogic-Storage-Upstream@marvell.com, 
+    "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+    "Martin K. Petersen" <mkp@kernel.org>, 
+    Julia Lawall <Julia.Lawall@inria.fr>, 
+    Nicolas Palix <nicolas.palix@imag.fr>, 
+    Alexander Viro <viro@zeniv.linux.org.uk>, 
+    Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+    Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+    Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+    Bharath SM <bharathsm@microsoft.com>, Carlos Maiolino <cem@kernel.org>, 
+    Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+    Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+    Davidlohr Bueso <dave@stgolabs.net>, 
+    =?ISO-8859-15?Q?Andr=E9_Almeida?= <andrealmeid@igalia.com>, 
+    Alexei Starovoitov <ast@kernel.org>, 
+    Daniel Borkmann <daniel@iogearbox.net>, 
+    Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+    Kumar Kartikeya Dwivedi <memxor@gmail.com>, 
+    Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+    Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
+    Emil Tsalapatis <emil@etsalapatis.com>, 
+    Ihor Solodrai <ihor.solodrai@linux.dev>, Simon Horman <horms@kernel.org>, 
+    David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, 
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+    Steffen Klassert <steffen.klassert@secunet.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, 
+    =?ISO-8859-15?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>, 
+    =?ISO-8859-15?Q?G=FCnther_Noack?= <gnoack@google.com>, 
+    Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+    "Serge E. Hallyn" <serge@hallyn.com>, "Geoffrey D. Bennett" <g@b4.vu>, 
+    Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+    linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-bluetooth@vger.kernel.org, linux-media@vger.kernel.org, 
+    dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+    arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+    intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+    linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+    netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+    chrome-platform@lists.linux.dev, linux-scsi@vger.kernel.org, 
+    cocci@inria.fr, linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
+    samba-technical@lists.samba.org, linux-xfs@vger.kernel.org, 
+    bpf@vger.kernel.org, ipsec@lists.linux.dev, 
+    linux-security-module@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] overflow: Add offsetofend() variant of
+ struct_offset()
+In-Reply-To: <20261118-offsetof-v4-1-95b385c10b22@arm.com>
+Message-ID: <c6fbb025-8de-b716-5d32-877c3d3fa2a6@inria.fr>
+References: <20261118-offsetof-v4-0-95b385c10b22@arm.com> <20261118-offsetof-v4-1-95b385c10b22@arm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,40 +144,78 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hci_remove_adv_monitor() frees the monitor when the controller has no
-matching handle for it but still returned -ENOENT, so callers took it for
-a failure of a monitor that is gone, and hci_remove_all_adv_monitor()
-stopped at the first one leaving the others behind. Return success since
-the monitor was removed.
 
-Found by the sashiko.dev review of this series.
-Fixes: 7cf5c2978f23 ("Bluetooth: hci_sync: Refactor remove Adv Monitor")
-Assisted-by: OpenCode:claude-fable-5.2
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Wed, 18 Nov 2026, Bence Csokas wrote:
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5522d4397682..024960e9af66 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2134,7 +2134,10 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
- 	hci_free_adv_monitor(hdev, monitor);
- 	hci_dev_unlock(hdev);
- 
--	return status;
-+	/* The monitor is gone, not having been known by the controller is not
-+	 * an error for the caller.
-+	 */
-+	return status == -ENOENT ? 0 : status;
- }
- 
- /* This function requires the caller holds hci_req_sync_lock */
--- 
-2.56.0
+> Many call sites of offsetofend() use it for the purpose of pointer
+> artihmetic. Thus, a common usage pattern is:
+>
+>   offsetofend(typeof(*ptr), member)
+>
+> Capturing this in one macro helps keep lines short and terse, while
+> still making the purpose clear. It also helps discourage spelling out
+> the type name on every callsite, leading to more maintainable code.
+>
+> A similar struct_offset() macro already exists, so add an offsetofend()
+> variant in the same spirit.
+>
+> Signed-off-by: Bence Csokas <bence.csokas@arm.com>
+> ---
+>  include/linux/overflow.h                     | 12 ++++++++++++
+>  scripts/coccinelle/api/struct_offsetof.cocci | 18 ++++++++++++++++++
+>  2 files changed, 30 insertions(+)
+>
+> diff --git a/include/linux/overflow.h b/include/linux/overflow.h
+> index d0f04436343e..c029d68daeca 100644
+> --- a/include/linux/overflow.h
+> +++ b/include/linux/overflow.h
+> @@ -464,6 +464,18 @@ static __always_inline size_t __must_check size_sub(size_t minuend, size_t subtr
+>   */
+>  #define struct_offset(p, member) (offsetof(typeof(*(p)), member))
+>
+> +/**
+> + * struct_offsetofend() - Calculate the end of a member within a struct
+> + * @p: Pointer to the struct
+> + * @member: Name of the member to get the end offset of
+> + *
+> + * Calculates the offset of the end of a particular @member of the structure
+> + * pointed to by @p.
+> + *
+> + * Return: number of bytes to the end of @member.
+> + */
+> +#define struct_offsetofend(p, member) (offsetofend(typeof(*(p)), member))
+> +
+>  /**
+>   * __DEFINE_FLEX() - helper macro for DEFINE_FLEX() family.
+>   * Enables caller macro to pass arbitrary trailing expressions
+> diff --git a/scripts/coccinelle/api/struct_offsetof.cocci b/scripts/coccinelle/api/struct_offsetof.cocci
+> new file mode 100644
+> index 000000000000..5a30647d3787
+> --- /dev/null
+> +++ b/scripts/coccinelle/api/struct_offsetof.cocci
+> @@ -0,0 +1,18 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/// Use struct_offset() family of macros
+> +///
+> +// Confidence: High
+> +// Options: --no-includes --ignore ./tools/
+> +
+> +virtual patch
+> +
+> +@offsetof depends on patch@
+> +expression ptr, member;
+> +@@
+> +- offsetof(typeof(*(ptr)), member)
+> ++ struct_offset(ptr, member)
+> +@offsetofend depends on patch@
+> +expression ptr, member;
+> +@@
+> +- offsetofend(typeof(*(ptr)), member)
+> ++ struct_offsetofend(ptr, member)
 
+Coccinelle script
+
+Reviewed-by: Julia Lawall <julia.lawall@inria.fr>
