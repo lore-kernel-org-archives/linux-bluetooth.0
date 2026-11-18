@@ -1,84 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795032418;
-	b=SMFTE3lkWPpf58M1xXQIdFvqURCtNByrHPJHt+lzRrDEg0kp72lMNIQuJpvSzeNWOQmj
-	 lL2Wy7VOWSCRNUEhwq7o8GtF+LTEcy5Ug/qgEXkdnkmW6mRoxGSzIiNtvtqWmem6JFpC9
-	 gWSR1OCDVLeSGV68Y7E9CQ2+e7K672EgfEsiq7JyoKh2oYO7fNOwFrPyiQnUeA5AhkntV
-	 F6bsFTGXrBu3C6oB4tH15cVwwSv3qf4lw19bQbWcHy17wE1rhPbgEftAAarnGdU8KdBcX
-	 2eQnPlFlPxLL0Uk/crPXi8Jhw7iX7B23UyVompqP9IzzwznjC3ExnielpZsIiY969kQ==
+	t=1795033360;
+	b=mZlSlaww0QcPTFEv0D57H59aVHpgj3PPnVFMudMQZvfeP+KD6ZGkagSM8OCopWmWEu/6
+	 QFP9ezCUCUof7aI1GqrbRjkgG+TH/mJkCqJ/wEvtlYANyb6B1hypFbkYBeOnpjCOOyhZo
+	 wrdwwXPjXU9qke02DziOtzUOzhbGYUCAvNZHQA/ZGLekMSULm9vloNrAMft4sbpFhcrnF
+	 tlL5lVCShA0ZOzUbP5XrQwmGlXPJqlkpYoiJWUaIAxVmzLmbeg5Mze71ouznUVnqTZBXV
+	 9/Q5vgeEQgYppjmPC/Pr2jGcjDQZ+E4jHDTDEHh908CnB0u6n9+cFyOXFx6XZm9ccqg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795032418;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=Eo4zfIyzQiNQac1rrLg2Coxls1edA4Yxec6nEWygMiQ=;
-	b=qmxZK/7755tsXv1AWzkZSfXolxuC4X4ILFgDNBEWqculZZeI8kEKKas1+Zoy6Y74HvpD
-	 TsWJgC4/hDixoOwYaJ0gJLM/VwPWNMBxKEoytPFhf5V+ssES7H/pZBY/00JBF7EEIHITS
-	 O3mQU4PJQ1ukBQaWZmkxWS09O/kXXKjq7UAwrzCaG6FJzlSYqcOgx2Q9v3sABubKjZNoH
-	 nYsuToZEQSnOPOWgHkyB3+ycOgSVijELOmARJ8ZIjRKLS7VQOn5x4BPO26PPoen9iEBgY
-	 zL1d9Eyg0rpXO0SOu7QgcUPz4UtAdJpVYcqOSwasPF2lUwpIjpI+RsS9OjK0QGNSIPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795033360;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=83WZjXw0m9X3Ou7HW+EzfUQVbMPBRYNOgGwn1hvvtI4=;
+	b=h+LwGdqoCMwaQVDZ45kdQSCBT6jz7n2m6Y4WRlF5U7gA0MGGVHMDVTnKCfHnIoEPyzo5
+	 kbc+Hd5Kdw7b4K2FbQQJMVigT1aP84DOy0A16vIyj2SBFiNtSoOZRMVXfOn0H0C13QtRD
+	 JFoorYSTXrG019wYdFBErcuOzqOKP6ibnMxQOfO1wN7TPcjh/6S1Bccx940oRBttPCR6o
+	 kgN5CxT6R8g8IGShx2xZJJPLq5rmMIsZ1plhNI1Y7qy3mhjenNcd0JBlBSagXL7fhpLrl
+	 JqLgvJyBg7LtDT05asLI/snmvk+mvQyqAHCYGg6wM8fP/1kUiuNMV+FQSrzHHURH+Cw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vSP99EA6;
-	arc=none smtp.remote-ip=74.125.224.44
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=lunn.ch;
+	spf=pass smtp.mailfrom=lunn.ch;
+	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=PDzvVA0d;
+	arc=none smtp.remote-ip=156.67.10.101
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4365606A85A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 20:06:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4365606A85A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627FC606A31C;
+	Wed, 18 Nov 2026 20:22:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 627FC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vSP99EA6
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-67dc7eb1442so1481229d50.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 12:06:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795032417; x=1795637217; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Eo4zfIyzQiNQac1rrLg2Coxls1edA4Yxec6nEWygMiQ=;
-        b=vSP99EA6ExDjdukd2LsL4TbGXKWcg0ImqvqPxnJkgPxedNB+6/d09MxPoTQoDHcCvf
-         L+ZNksa5CHkF8MftZqfPZoxMlhDjXAkcA0gFELirPYOp+7ymbTE4b4mC4ZXYFJVQ+UVt
-         JUGItsZIpvCOKARiJ0S2smhi8t3jU9Z5+64fVjFCkACThku8oZr1n8nL4rjXZU4t72/L
-         XLzvACM/983TPExdMM82W80azX5WxcuOImeruE7ZWEEEwRNd0UxxJK2moWP+A7UGYhki
-         ktpOqYp5TI5fDw8zUzH6NTN/yTQHQqq3TvQcCIZlxDknk76SYWlLJuw0OSMVbP7EsX7J
-         vNTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795032417; x=1795637217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Eo4zfIyzQiNQac1rrLg2Coxls1edA4Yxec6nEWygMiQ=;
-        b=xngCwymRrUPzuPWmwOboJq1mI971JLhpn8W0Cu+bbI9jE73tiDrt6myNcQtZ4cZS4O
-         tu1oiz6HfAq0T0c4XX8btn8UFaqSqRbcsA2Z9Rjgna3IbqpiPox2xDUDodIutrxguBb5
-         Hc/G4feCSeimOsq/b31DEA7UxuLvkSi3itVJCxuJDgqIEEMPsP9tL+ru76TObrn0+1P6
-         ItBbafXfidZZjvQJ/kUz//v+CfjQGLn7h1xAln73y2B4zQqJIukU6u9+tkfoD2ur9ioz
-         lvCXVHw6HMlnVof6rLxASDryzl0UA7acN8DVR+YCPoNMeLnxuhEWxqxbDUsHNSJ4P02Y
-         rDsQ==
-X-Gm-Message-State: APuU4Z/EF3T+hFXQaOkGQ6iOGaOHwR29WrS1/WG9g9rylqiEUjYb53zd
-	w3B7AN3hZ0pUvUlHltw9Xnsth4Ap/Oj0Z0G5dcRvjyEl05qiMaGXfRK0aAvCSw==
-X-Gm-Gg: AZFdTZeVVlO/s1zxlZAYuCv4LReVecyELlDyJCI7osh/AFDuUXl/h4cL6LiKaKTlazi
-	IWDsAzvpj2oeBoQc/evWcAQNHFY3DiypIGNoD9rCoTbOar9UHu8j3EUTl1wHniMashi+2QL6eF3
-	GGHH2115nEuiyRcS2NhvAhd+2k8z3pM4ApJLKGl3emIJc4aq6tGg+iXEZqb725gaikXyFVIdsX8
-	56f3aTOVVsBfqJKaWMns0/dZv1DMHNRx+Lsy9wK4siLoAw3H5X9NpfSUKJdPF33+UAKT9KxdA/O
-	9D/rE8Rz3zMOxkPVe7QxD7vrvMwGDcdo6ZrHkHRdBSqFUJeB92U53zGTnTvDJ3HbjXO98uDeLvn
-	onCox5SvarjGthBylpTjk/XJuMhXNxz66RfQXda+hl31MJRrnDmBd41ttE7oJqTnC+lg64DnUCC
-	ArdiMLKa3Y1RatG0ESvI24IjCcT3mkK9OGMB7luL4eYF5Hc0wGblrfcMwuiH8LW677As8V+v2uw
-	D142O+3dIH5JaycjJ0tmPzT9g71Z0P2+irPMvFWA6krChjcY3vXqp63wc5jLlyq
-X-Received: by 2002:a05:690e:4886:20b0:67d:bbf9:11d5 with SMTP id 956f58d0204a3-67dd3f83317mr1365102d50.55.1795032416761;
-        Wed, 18 Nov 2026 12:06:56 -0800 (PST)
-Received: from [172.17.0.2] ([134.138.41.153])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-67dd58733aasm2217085d50.12.2026.11.18.12.06.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 12:06:56 -0800 (PST)
-Message-ID: <6afe0560.1caeda21.38a6e9.21fa@mx.google.com>
-Date: Wed, 18 Nov 2026 12:06:56 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7017627988419444980=="
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=PDzvVA0d
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=83WZjXw0m9X3Ou7HW+EzfUQVbMPBRYNOgGwn1hvvtI4=; b=PDzvVA0dUL6X8a07m7W3FtiHvq
+	LePg1RVFpWzznF0js/ikqR1IzilBKVSOUmy8h9aKRnAwxpYoxqprli7vjNifq9IrxVN+EUiCgaPNG
+	4rQZEsMDX0Xmbd6Ah6hLNSO3HY0lLWTY1/+eE0gbxcfsyM8B16K+idR7+paawH6C6Uiw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1xTmA5-00HVa7-0i; Wed, 18 Nov 2026 21:21:45 +0100
+Date: Wed, 18 Nov 2026 21:21:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Chris Lu <chris.lu@mediatek.com>, Mans Rullgard <mans@mansr.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Cornelia Huck <cornelia.huck@de.ibm.com>,
+	Andrew Morton <akpm@osdl.org>, Jeff Garzik <jeff@garzik.org>,
+	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+	linux-input@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, linux-sound@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v3 18/31] net: phy: Use the compatibility driver
+ attachment API
+Message-ID: <71c1b931-c553-46e3-b49a-51167f168ac4@lunn.ch>
+References: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
+ <20261118-device-trust-core-v3-18-d655875c4bfb@nvidia.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,55 +102,22 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, khidarlaminehamdi@gmail.com
-Subject: RE: Don't probe LE Audio profiles on unpaired devices
-In-Reply-To: <20261118141438.308232-2-khidarlaminehamdi@gmail.com>
-References: <20261118141438.308232-2-khidarlaminehamdi@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261118-device-trust-core-v3-18-d655875c4bfb@nvidia.com>
 
---===============7017627988419444980==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+> @@ -3813,6 +3809,8 @@ static int phy_probe(struct device *dev)
+>  	int err = 0;
+>  
+>  	phydev->drv = phydrv;
+> +	phydev->is_genphy_driven = phydrv == &genphy_driver ||
+> +				 phydrv == &genphy_c45_driver;
+>  
 
-This is automated email and please do not reply to this email!
+Why do this here?
 
-Dear submitter,
+It also makes the code asymmetric. If you set it in phy_probe, you
+should unset it in phy_remove. At the moment, it is symmetric,
+phy_attach_direct sets it, phy_detach clears it.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1215085/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.97 seconds
-GitLint                       PASS      0.65 seconds
-BuildEll                      PASS      17.87 seconds
-BluezMake                     PASS      265.62 seconds
-MakeCheck                     PASS      3.56 seconds
-MakeDistcheck                 PASS      136.21 seconds
-CheckValgrind                 PASS      144.07 seconds
-CheckSmatch                   PASS      245.57 seconds
-bluezmakeextell               PASS      90.92 seconds
-TestFunctional                FAIL      1168.70 seconds
-IncrementalBuild              PASS      276.67 seconds
-ScanBuild                     PASS      959.21 seconds
-
-Details
-##############################
-Test: TestFunctional - FAIL
-Desc: Run test-functional
-Output:
-FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: AssertionError: Failed to acquire: org.bluez.Error.Failed
-
-
-https://github.com/bluez/bluez/pull/2845
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7017627988419444980==--
+	Andrew
