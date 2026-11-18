@@ -1,121 +1,153 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795010166;
-	b=bHM5qsJ9KAzr0Q4rbten8K7TgJfy0+rz8/V2BRZ+lodvTEjreqcqE/mDg6n7pYf6NJLV
-	 HW6v+oXVcihvNcObx25K8jM6V0fLfCaTJviJLemY4dtvZqXriuk7FQ2G/Qg02TY43bIGT
-	 tA4bMZaFlqP0d5f9rlNcGATviJwNSPq3LG6UcPs3p7GUcDyu9tl7HsyAtXIyQWuIGRpTu
-	 6NiIVV3kSItOcffArNzU6FcvfjQxomvZzJ/71I2JDNGcciEWnF/GpZCd+q6ATcLAZBMyd
-	 reZM8C9/TbVPafIwZR3JQXFysxdlkqa4Tp4dyK7qzB0DZES6EoCEEhg/6RB34tsXWhg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795010166;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:
-	 Cc:Content-Type:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
-	b=lVtpeEN7HhJwWz0+JqqBCgJgStKGq1Gl2spMrG9EO82drcGKhaxxu6cP4KuL78Of75lQ
-	 2oKUJnOlX0n5RsqEhEowYDXIH1Ny8RPeRqwd7R4u9s8SJplpM111e7tEl+saBTE+fLqCv
-	 tqbj214sbRuMz6ocpU5WtMHubaRqH3J/zexYfT+upVj262jfC+JEG6GbtcU/ay+UciCYh
-	 CoDx5+tvT0X65fkaeTBB7QEyavaFa2wAVvg8sE71eP7bupcAQU/c9qcLDQKRU8XlNJO56
-	 we9ZwQTiH7Tjm0mWBxW/FZyx2EAvOuG3UKlBNfKYeWZawX2LWMieHJA9vBmNIqsEu2w==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Nliv5tDJ;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=MWTSqLy0;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795010717;
+	b=ZZE2dZnFqBBKXE3nmqAN7i41jopByNWuWPBZuY+MysN+zEuAmuL4rKNXbNCrNjv+MLKP
+	 deuevMLQK2aTQ+HtMVSWWMdS/WuHBFmNJP967YBTobLQ7lccTb9ebA3sYH2t56jIMvjwT
+	 RTFflDRUv3AaUm94yofdzOUXRBtEHd/Bjxa7tzQYz2sN8gW+O2OpVceW4HhK7z01VVhpY
+	 ppopPZm4BbnLXEcPmEfxN8coKi9JY/W9i/oHoBKOytgM447rAZbx01DRarntWHR8d/Qwd
+	 DTkTk7sEOHVujFjPIZUjfaZOoRHpOoOaThBPkfG070S3Ba7PetC6Z7zsgOx/6QT8ahw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795010717;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=foydl+Nk9ZmJviej/30gV1cygoCTSVCceGPI7w/fow0=;
+	b=QHs332L/Lr/gu6dQT6PYAhWtr9koXWUTXm9HUZ3CIdzTbdjlgmdVKYIdNOpjUxioWNJS
+	 prSOWcxyr9Gf1hUYQoTZ88l/pehKB91vYx7n05m0LRvK5Qx4IFLfE67SdQYFQG/8W5S1f
+	 V4JdipqJPT5QcU9uYZv+KH7DBh+C4IzOXNW1aLz4Fp0AcMc1mgeo9xMy0fkfXJ+K5OYBe
+	 WVkQ1CMN45rgRl4y9q4i3XJ4v8bhmsK7jsMAHWzfNZ0Y9rxKFLZMJ++9axQLlXLHUwD3i
+	 aXP+J/9ARPMhP54W6OEWWikYXpBogwbEfnfL48xD2lfDZN0CebiHih2wRifXAwBYpcQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=WOhR5yIs;
+	arc=none smtp.remote-ip=90.155.92.199
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5126606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B5126606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14112606A31C;
+	Wed, 18 Nov 2026 14:05:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14112606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Nliv5tDJ;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=MWTSqLy0
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AIDQ9WT2225983
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=+M/mVoNgd24/u3erUknt3BRB
-	qjOOmARFcn4tY8lzAAk=; b=Nliv5tDJG5sJhnO9K/ccvpMiq8JenueCiqB9EUPI
-	Tr2JefRt57dpEYMA5qlDgakkG+enis9tiS1IFWeF1g7un+7AQCxtpCJwYS59z8Lw
-	Y3WC/lEGYOL9X/YjJUE6u6ULQV4+AZ+qwQK7l/PwJgxIwgaEBNrfZtNxFM+Ae0RD
-	vykbzcM+R9p9iUvdOCRneU2NMO3sRVt47+LstAQ7cZh6FphFV4yd/QAdhtLjHTe6
-	bWIvwToV26yQJKKYd6uvYQAYOvLsZ3KvgUnJH/wF/ZefHBTsv+Dj9kSYW3QDKcSC
-	Qq2Mnfp69+WYHzghoTpm1IjbL9y4QcZwuEJXrGDNR7WTYA==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j0yvbb8mv-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:04 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3b08aee6b3eso935743a91.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 05:56:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795010164; cv=none;
-        d=google.com; s=arc-20260327;
-        b=JDpKgA35CiP+8HMyY/n2DguXlKAm/XTz4iSI9VFpAu9wJZAHdO+V3rSt5l28DjKjUA
-         egVDbm07ZwEiggyXnMRgslGf6wyv21a85h+NtjLiFegj49TLkL9GX6JbwE3652EsxrOD
-         yH/8vc13LIdpuSaYFqEJKwjL2VR1RNL4lb20SWVQt7GOZ/4CQIGQh9zO53N+qoL6FINy
-         hHIBYcT73Po5Qf4YThta9i0RAgP9m7hqdbVO2CMcOIoXMsduEg36kuM8qX+V8gsH9emJ
-         zTlKGJXKbtqQwj/RvlqMymym5e4UdfP94sFJmWnCrxQ9myX7mq3zI+nD/zhb6aqDNmjV
-         aIqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
-        fh=Z4V6s8WYzGaBBiSYdfL74x55wecY7z8o3HQs+cjFwzY=;
-        b=TLbuo1CVy/HVjzkPOzzsF/Z2nwEgAcYtfeOkm0xVTL1CQ1VGg17djYhol52cPFm4wG
-         akuJMpxl68nduCsg8yWxS4ym8FPr+40r35Is/h1N6xn7iLkTcA6ceFoyriZ37l8vAhb1
-         zUXa9y57tIybePU+74H7U/8UA1tToNfmuxirqKrEDk9xPc+tBrr5ABNmMuJlWvxlWBSe
-         +TS5OO8kYojIh58tP5cWwyt0L4RxfyG8PNFdOqGeC6LL3iBFX/wGAUMPrYl722nLaWP1
-         WioSlTHuu2E3n1AHh9jrEAZyFe30u6mtbgqb7IBeO63lGxWI4GjlwCBJSejlSuFnp4Ax
-         zdFA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795010164; x=1795614964; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
-        b=MWTSqLy0lCB24cr/Qb5S9xSmhJBb9bU/3/L2UwYv0u5qs7Jo6TLO5C4w37monj0XKD
-         PBj88emEc9xRAmDkhtZLWLz3vNI/lTzseHyRK3ELTUIq05F8tEEhL45WLON2X7ebeE+s
-         uJ79rBj87dlFb9eRqMZQ1mVueqHvEJ12+n4Z4KjEdvZ8dnnQKkpMWerrC5Ad8MIyYNN4
-         nCrAUgtOjW8DW3tST7xVzZ6+2ewkW6YGZx1l/nT9mjO1O2C/hIpJ5x308p4Yk8sugvAa
-         b8JaIL0VdT6x7d6a9N+cJnsVDbIo+zAaoIxGqtQXmbktDZOLW6IAOJaIhZNCyhAOnUsz
-         jjcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795010164; x=1795614964;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
-        b=gIBc53k57g025dfhKFfzOoqnIiOOfwgzVyxR1zSNtvtRqmi6sNsnSc6jMhm7dHcP6a
-         pV+XFRg5ov/oPGyalC3nPRQTo6WFBEithLPwOPrqUDbR5WcxbImW9ZHB+w1uezSxk55+
-         XOqbcjefVzraYhftjQrCjSYuIopg37Lp8CoPkLg0PqPpZ/KF6exOgqJwuXRO+544PRuF
-         JxWe58VuOQFoq/33jH+jV6RPS6meCD6CJQq6gLAzBgPtpFsdxNr+MzwnRxbAxmFa0Cjr
-         7uPJrh0gD6GhOFXB3JzSlhODMRcd79y6nLFJhFpi3Equ1hbdMHsX3oU2H5yk4CCClvGO
-         rMLA==
-X-Forwarded-Encrypted: i=1; AL+hErHeQdsESaAmxVECdBqn/MdG/fal1GsH1i8DagVR/Wu6m7tfr2XYO2szAdp5PrkVKX6oLcEg5m8fHlns7jWg7ew=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/pEVRj6ytRUjPcBqcg6BLWZ2VFVKZFSmTnI4HjmFs0tZT+DmaW
-	KgRD4N8+kLHsX4ioevt6tefZtRpNAFecPH4YsyzREA8J1DyWZZDe7pnYDl4JAiYC9H+cm3UpCFV
-	QizdWctaqG6jnv+0HZ/ICwSK4NIQExYWVTexv90rH8DpPc6HUpGBPsmGWlwb+D3x9fwgw/JrfQK
-	U+/jEyYFVP76fp3qGAjkGq8+Egcmz3H2tvhT7uOBswLvHNVle8bcGvNp6X
-X-Gm-Gg: AZFdTZdSyB64M0L115xsXcqK47o631kX4cB5k2cDrK5iEGAd6mq6VJZqq+QO+nHzO9B
-	AvaCTIy4FTrFoWWG4qVOVwsbV9UlLJ4FVNZEVQx97BI0jaHCAOwAKzL3A7R1BH2OE7Y1gWfBhe3
-	xUIX8bvrDFBLPw3B0zQVYHXgTc84wPazwfZWrGO9QWpCmESTaYBmMLhw==
-X-Received: by 2002:a17:90b:17ca:b0:3ac:9772:8da3 with SMTP id 98e67ed59e1d1-3b3d0765d40mr2571667a91.31.1795010164071;
-        Wed, 18 Nov 2026 05:56:04 -0800 (PST)
-X-Received: by 2002:a17:90b:17ca:b0:3ac:9772:8da3 with SMTP id
- 98e67ed59e1d1-3b3d0765d40mr2571643a91.31.1795010163479; Wed, 18 Nov 2026
- 05:56:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=WOhR5yIs
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=foydl+Nk9ZmJviej/30gV1cygoCTSVCceGPI7w/fow0=; b=WOhR5yIsaTPEeHWfDnVfXLmpTK
+	p2fdJUW95t55sxIMgLSjl77d2uFvCfu73mU98Ke2aNCntsKl6aVpkbYBm1Cx/VDmluo1BPNv7+OAu
+	tMoiX8BqQCyAo2LwGhBzWEtPnp6VCu494v+ZfDj7WbrayOV27fzo8fNM8HJjP8LHTkd9iaNFApzsE
+	lk4vuXuzbMGP9cd4HMq3g6UiNuqhVUDjcimTbrMVwrnHALwefYKVv8Cm8jLfaq4XNJkH9YBTHZln7
+	mXEN4VZW1Q1cyhZ4ngMZSOGFp8d6zXJFUUQZrn2EA8U/U3Fygy9Q03FgvLOc+ZshQqvdAFwW3JiIj
+	8W5+1yxw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xTgHj-0000000G6tZ-0guj;
+	Wed, 18 Nov 2026 14:05:15 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id E2EC13005AF; Wed, 18 Nov 2026 15:05:13 +0100 (CET)
+Date: Wed, 18 Nov 2026 15:05:13 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Bence Csokas <bence.csokas@arm.com>
+Cc: Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Philipp Stanner <phasta@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+	Zack Rusin <zack.rusin@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Selvin Xavier <selvin.xavier@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Chengchang Tang <tangchengchang@huawei.com>,
+	Junxian Huang <huangjunxian6@hisilicon.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Jes Sorensen <Jes.Sorensen@gmail.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Guenter Roeck <groeck@chromium.org>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Carlos Maiolino <cem@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	"Geoffrey D. Bennett" <g@b4.vu>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, linux-hardening@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, arm-scmi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	chrome-platform@lists.linux.dev, linux-scsi@vger.kernel.org,
+	cocci@inria.fr, linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+	ipsec@lists.linux.dev, linux-security-module@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] treewide: Use struct_offset()
+Message-ID: <20261118140513.GO1813469@noisy.programming.kicks-ass.net>
+References: <20261118-offsetof-v4-0-95b385c10b22@arm.com>
+ <20261118-offsetof-v4-2-95b385c10b22@arm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -125,64 +157,14 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <680aeb35-74d2-478a-a1da-4d70983b7431@oss.qualcomm.com>
-In-Reply-To: <680aeb35-74d2-478a-a1da-4d70983b7431@oss.qualcomm.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Date: Wed, 18 Nov 2026 14:55:52 +0100
-X-Gm-Features: AclHuK-lW07UCrKTUn_Yy3xa8rksP2okQnUgkwD1J2iUMd5qOmHH7e4tjD-y5Us
-Message-ID: <CAO9ioeVJcPKjpq1rtVTS5JwCGi0aSZd+srPFNSbdrUzyBO1Gng@mail.gmail.com>
-Subject: Re: [GIT PULL v2] Bluetooth: btusb: Update Qualcomm QCC2072 and
- WCN685x 2.0 firmware
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: linux-firmware@kernel.org, Josh Boyer <jwboyer@kernel.org>,
-        Zijun Hu <zijun_hu@icloud.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Proofpoint-GUID: JzpsC1g1ReE2P-kMPn39lXn9saiSoWsc
-X-Proofpoint-ORIG-GUID: JzpsC1g1ReE2P-kMPn39lXn9saiSoWsc
-X-Authority-Analysis: v=2.4 cv=YfgodARf c=1 sm=1 tr=0 ts=6afdae74 cx=c_pps
- a=0uOsjrqzRL749jD1oC5vDA==:117 a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
- a=DJpcGTmdVt4CTyJn9g5Z:22 a=NEAV23lmAAAA:8 a=p0WdMEafAAAA:8 a=EUspDBNiAAAA:8
- a=wjw7POpTTtnhsxlADrUA:9 a=QEXdDO2ut3YA:10 a=mQ_c8vxmzFEMiUWkPHU9:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE4MDA1NSBTYWx0ZWRfX8T5pYrWfRJQw
- 17cHBYG90dLJ+ygKmmPxeofLCUtevijgBydgOLZLqZkbJMLR4GiVBDLfhmsV4/YaHbXDvKgSbbG
- TyjEBnHJURkEQUMtZDRQlgS7kDo6exs=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE4MDA1NSBTYWx0ZWRfX3NTvnfheD/nP
- gjSl+qpIsmQ7W1ligwUsiVEeO9oLNCZq3RzGMY2hcrXJZlSlchddJstsh1RY0VFbR4Gw7+SxOtC
- q0Y4YK+mZHgMPKAhds4aVVkuZqZvIny8+JzvumPyYC+PBI9f7BUvy5w2YqP58IZgsoqZgZfWOY1
- xfkZKw5ISLNLw7/kF8rPbM6s3Gc39X8nYkThEvH8ffOUPdb1u5rcpp3PMHHl1MPjpoLr+YMiE6A
- OfySkX2JRtRGwbfOdMyF82ufaXdg/SOz8CQ5WkbUhdkR7mXXxp5ZcIwmeRyJ8qfuMsEqiexiEAQ
- Kde++sO2b6g5wmQrYOdnm3dTFnnF6pIb7JmtqP+SoDMYf/2YSpdAbocCB++vG5CN78jUlLoZwW5
- BGTIZ9oEmOotaELfLMXsaVoMvi977f9i3o2uPq1/tRI4y1S8XXE20eALozCXTxy4CtryNABpS6a
- nzsLUwST/rr0cEzlNEg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-18_04,2026-11-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0
- adultscore=0 priorityscore=1501 spamscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611180055
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261118-offsetof-v4-2-95b385c10b22@arm.com>
 
-On Tue, 17 Nov 2026 at 12:53, Zijun Hu <zijun.hu@oss.qualcomm.com> wrote:
->
-> Hi linux-firmware maintainers,
->
-> This is v2 of the pull request for Qualcomm USB Bluetooth firmware
-> updates for QCC2072 and WCN685x 2.0.
->
-> Changes since v1:
->   - QCC2072 BT: keep the ORNE.1.1.0.c1 line and update to
->     ORNE.1.1.0.c1-00038, instead of switching to ORNE.1.1.0-00391.
->   - Pull from the new repository https://github.com/zijuhu/qcom_btfw.
->     Please ignore v1.
+On Wed, Nov 18, 2026 at 12:50:09PM +0100, Bence Csokas wrote:
+> Generated with a simple Coccinelle patch found in
+> scripts/coccinelle/api/struct_offsetof.cocci
 
-Merged and pushed out:
-https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/1386
-
-
-
--- 
-With best wishes
-Dmitry
+I think this is a good example of why we don't need this. It adds yet
+another macro to remember, and doesn't actually save many characters at
+all.
