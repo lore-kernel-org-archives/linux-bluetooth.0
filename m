@@ -1,88 +1,121 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795007551;
-	b=FqNHS0r5MbZYNonJNKDyJhoyk1retrJXfM8lIDUg+Ik/Z63i0hV/jtOJavh7pSblcHR5
-	 o+4pzFtj/SYC622ttnKmL0U0yVtZC4k8ibf4qNZvYzKazJnlqq1J8JHa2nCIasIdTx/s6
-	 0xqRq8hLNWz7xrGmrNKnzbFMwxHfsb+LJnU6VeLMvmI8k6VSFOf5LiyVWOKyommJ6m8l4
-	 6CO4RxvGKVUXRkaJPXc6YnTbalRxgBzCUnBDBvLiMF9UqA9kMnDlVxaHrXGph5l8HK/ok
-	 uQ2W0jDTiRJBCaBhFUalEVtOSqSUnpvJmUurjtIEx8+lnVPpjO1T95HSr1iwBnJINIw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795007551;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=I1vWLb4kBx/eVsIs5pdih0gN+x99z2ISx2RwkUP35zg=;
-	b=QyyIgpeIeGl8YT7ejNDYm27R3BgjsXqNZU4At67t3sVDkMZ8bTn6GlkTrOywqoumWdh4
-	 WIusQT4XHCKOGm3dFaG479wfyCt2Y3PKZihZMFkrhKhWf1LSnOWeuDU0TIL4e3wLwqStM
-	 c1Yk9asuMNJzAjGTKG7lQ8/04s0As8TviYAnfBwOTR9yiwq1F4UsO/NudCu3p36+ws3Lz
-	 oFeg51dmtsaaIhoDk2MlNVhKKj7KWoK/nQKT7cZmWcvG+iIMWfEBP8NsT3iw6hifPXi2e
-	 mTbAI3srNMQfcTW4DtAJuSghFEGuqa0/+bw3tEZXXnVZmKwG+kd1+wHdqqqN6XnItKQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzEQGEef;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795010166;
+	b=bHM5qsJ9KAzr0Q4rbten8K7TgJfy0+rz8/V2BRZ+lodvTEjreqcqE/mDg6n7pYf6NJLV
+	 HW6v+oXVcihvNcObx25K8jM6V0fLfCaTJviJLemY4dtvZqXriuk7FQ2G/Qg02TY43bIGT
+	 tA4bMZaFlqP0d5f9rlNcGATviJwNSPq3LG6UcPs3p7GUcDyu9tl7HsyAtXIyQWuIGRpTu
+	 6NiIVV3kSItOcffArNzU6FcvfjQxomvZzJ/71I2JDNGcciEWnF/GpZCd+q6ATcLAZBMyd
+	 reZM8C9/TbVPafIwZR3JQXFysxdlkqa4Tp4dyK7qzB0DZES6EoCEEhg/6RB34tsXWhg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795010166;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:
+	 Cc:Content-Type:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
+	b=lVtpeEN7HhJwWz0+JqqBCgJgStKGq1Gl2spMrG9EO82drcGKhaxxu6cP4KuL78Of75lQ
+	 2oKUJnOlX0n5RsqEhEowYDXIH1Ny8RPeRqwd7R4u9s8SJplpM111e7tEl+saBTE+fLqCv
+	 tqbj214sbRuMz6ocpU5WtMHubaRqH3J/zexYfT+upVj262jfC+JEG6GbtcU/ay+UciCYh
+	 CoDx5+tvT0X65fkaeTBB7QEyavaFa2wAVvg8sE71eP7bupcAQU/c9qcLDQKRU8XlNJO56
+	 we9ZwQTiH7Tjm0mWBxW/FZyx2EAvOuG3UKlBNfKYeWZawX2LWMieHJA9vBmNIqsEu2w==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Nliv5tDJ;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=MWTSqLy0;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B94606A31C;
-	Wed, 18 Nov 2026 13:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5126606A31C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B5126606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzEQGEef
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9EC01F000C4;
-	Wed, 18 Nov 2026 13:12:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795007551;
-	bh=I1vWLb4kBx/eVsIs5pdih0gN+x99z2ISx2RwkUP35zg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=SzEQGEef4Q5ibf23T4lKW8nd/bWvXR3SKus+tk9JqTx/RBbroWEwaw8n1qjKt8tqh
-	 D6toOaficzYKJohi6nFFPdQ0dHHOo0lmScOntNtVSnnZkOUdRuBTbwOh3EZ67r0Ghq
-	 otw4njjF6x8O8SsPuoJHdf4ULJkvht7GS4f/qL4YSAjbwiYgEezzcgXniZGY6CMdYN
-	 z6UTvn/0ksbMaDGL3PbPu6qlubTctcCsiCIBM4Zx07AT0NE/nXRht/lIRWhRSZ7vXx
-	 da0sBTZToeWs1oL/si/pp9zSk1tMjSHqIGAh70OtVJHSqc3IAzQwiC3A2TCrF8pzjI
-	 yGMfwzc8mXi0g==
-Date: Wed, 18 Nov 2026 15:12:27 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Robin Murphy <robin.murphy@arm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
-Message-ID: <20261118131227.GF162713@unreal>
-References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
- <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
- <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com>
- <20261110122237.GG8635@unreal>
- <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
- <20261117124801.GD124972@unreal>
- <fd25ed52-e3ea-41a2-9f62-2397d5d9e8c8@amd.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Nliv5tDJ;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=MWTSqLy0
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AIDQ9WT2225983
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=+M/mVoNgd24/u3erUknt3BRB
+	qjOOmARFcn4tY8lzAAk=; b=Nliv5tDJG5sJhnO9K/ccvpMiq8JenueCiqB9EUPI
+	Tr2JefRt57dpEYMA5qlDgakkG+enis9tiS1IFWeF1g7un+7AQCxtpCJwYS59z8Lw
+	Y3WC/lEGYOL9X/YjJUE6u6ULQV4+AZ+qwQK7l/PwJgxIwgaEBNrfZtNxFM+Ae0RD
+	vykbzcM+R9p9iUvdOCRneU2NMO3sRVt47+LstAQ7cZh6FphFV4yd/QAdhtLjHTe6
+	bWIvwToV26yQJKKYd6uvYQAYOvLsZ3KvgUnJH/wF/ZefHBTsv+Dj9kSYW3QDKcSC
+	Qq2Mnfp69+WYHzghoTpm1IjbL9y4QcZwuEJXrGDNR7WTYA==
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j0yvbb8mv-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 13:56:04 +0000 (GMT)
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3b08aee6b3eso935743a91.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 05:56:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795010164; cv=none;
+        d=google.com; s=arc-20260327;
+        b=JDpKgA35CiP+8HMyY/n2DguXlKAm/XTz4iSI9VFpAu9wJZAHdO+V3rSt5l28DjKjUA
+         egVDbm07ZwEiggyXnMRgslGf6wyv21a85h+NtjLiFegj49TLkL9GX6JbwE3652EsxrOD
+         yH/8vc13LIdpuSaYFqEJKwjL2VR1RNL4lb20SWVQt7GOZ/4CQIGQh9zO53N+qoL6FINy
+         hHIBYcT73Po5Qf4YThta9i0RAgP9m7hqdbVO2CMcOIoXMsduEg36kuM8qX+V8gsH9emJ
+         zTlKGJXKbtqQwj/RvlqMymym5e4UdfP94sFJmWnCrxQ9myX7mq3zI+nD/zhb6aqDNmjV
+         aIqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
+        fh=Z4V6s8WYzGaBBiSYdfL74x55wecY7z8o3HQs+cjFwzY=;
+        b=TLbuo1CVy/HVjzkPOzzsF/Z2nwEgAcYtfeOkm0xVTL1CQ1VGg17djYhol52cPFm4wG
+         akuJMpxl68nduCsg8yWxS4ym8FPr+40r35Is/h1N6xn7iLkTcA6ceFoyriZ37l8vAhb1
+         zUXa9y57tIybePU+74H7U/8UA1tToNfmuxirqKrEDk9xPc+tBrr5ABNmMuJlWvxlWBSe
+         +TS5OO8kYojIh58tP5cWwyt0L4RxfyG8PNFdOqGeC6LL3iBFX/wGAUMPrYl722nLaWP1
+         WioSlTHuu2E3n1AHh9jrEAZyFe30u6mtbgqb7IBeO63lGxWI4GjlwCBJSejlSuFnp4Ax
+         zdFA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795010164; x=1795614964; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
+        b=MWTSqLy0lCB24cr/Qb5S9xSmhJBb9bU/3/L2UwYv0u5qs7Jo6TLO5C4w37monj0XKD
+         PBj88emEc9xRAmDkhtZLWLz3vNI/lTzseHyRK3ELTUIq05F8tEEhL45WLON2X7ebeE+s
+         uJ79rBj87dlFb9eRqMZQ1mVueqHvEJ12+n4Z4KjEdvZ8dnnQKkpMWerrC5Ad8MIyYNN4
+         nCrAUgtOjW8DW3tST7xVzZ6+2ewkW6YGZx1l/nT9mjO1O2C/hIpJ5x308p4Yk8sugvAa
+         b8JaIL0VdT6x7d6a9N+cJnsVDbIo+zAaoIxGqtQXmbktDZOLW6IAOJaIhZNCyhAOnUsz
+         jjcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795010164; x=1795614964;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=+M/mVoNgd24/u3erUknt3BRBqjOOmARFcn4tY8lzAAk=;
+        b=gIBc53k57g025dfhKFfzOoqnIiOOfwgzVyxR1zSNtvtRqmi6sNsnSc6jMhm7dHcP6a
+         pV+XFRg5ov/oPGyalC3nPRQTo6WFBEithLPwOPrqUDbR5WcxbImW9ZHB+w1uezSxk55+
+         XOqbcjefVzraYhftjQrCjSYuIopg37Lp8CoPkLg0PqPpZ/KF6exOgqJwuXRO+544PRuF
+         JxWe58VuOQFoq/33jH+jV6RPS6meCD6CJQq6gLAzBgPtpFsdxNr+MzwnRxbAxmFa0Cjr
+         7uPJrh0gD6GhOFXB3JzSlhODMRcd79y6nLFJhFpi3Equ1hbdMHsX3oU2H5yk4CCClvGO
+         rMLA==
+X-Forwarded-Encrypted: i=1; AL+hErHeQdsESaAmxVECdBqn/MdG/fal1GsH1i8DagVR/Wu6m7tfr2XYO2szAdp5PrkVKX6oLcEg5m8fHlns7jWg7ew=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/pEVRj6ytRUjPcBqcg6BLWZ2VFVKZFSmTnI4HjmFs0tZT+DmaW
+	KgRD4N8+kLHsX4ioevt6tefZtRpNAFecPH4YsyzREA8J1DyWZZDe7pnYDl4JAiYC9H+cm3UpCFV
+	QizdWctaqG6jnv+0HZ/ICwSK4NIQExYWVTexv90rH8DpPc6HUpGBPsmGWlwb+D3x9fwgw/JrfQK
+	U+/jEyYFVP76fp3qGAjkGq8+Egcmz3H2tvhT7uOBswLvHNVle8bcGvNp6X
+X-Gm-Gg: AZFdTZdSyB64M0L115xsXcqK47o631kX4cB5k2cDrK5iEGAd6mq6VJZqq+QO+nHzO9B
+	AvaCTIy4FTrFoWWG4qVOVwsbV9UlLJ4FVNZEVQx97BI0jaHCAOwAKzL3A7R1BH2OE7Y1gWfBhe3
+	xUIX8bvrDFBLPw3B0zQVYHXgTc84wPazwfZWrGO9QWpCmESTaYBmMLhw==
+X-Received: by 2002:a17:90b:17ca:b0:3ac:9772:8da3 with SMTP id 98e67ed59e1d1-3b3d0765d40mr2571667a91.31.1795010164071;
+        Wed, 18 Nov 2026 05:56:04 -0800 (PST)
+X-Received: by 2002:a17:90b:17ca:b0:3ac:9772:8da3 with SMTP id
+ 98e67ed59e1d1-3b3d0765d40mr2571643a91.31.1795010163479; Wed, 18 Nov 2026
+ 05:56:03 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -92,160 +125,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd25ed52-e3ea-41a2-9f62-2397d5d9e8c8@amd.com>
+References: <680aeb35-74d2-478a-a1da-4d70983b7431@oss.qualcomm.com>
+In-Reply-To: <680aeb35-74d2-478a-a1da-4d70983b7431@oss.qualcomm.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Date: Wed, 18 Nov 2026 14:55:52 +0100
+X-Gm-Features: AclHuK-lW07UCrKTUn_Yy3xa8rksP2okQnUgkwD1J2iUMd5qOmHH7e4tjD-y5Us
+Message-ID: <CAO9ioeVJcPKjpq1rtVTS5JwCGi0aSZd+srPFNSbdrUzyBO1Gng@mail.gmail.com>
+Subject: Re: [GIT PULL v2] Bluetooth: btusb: Update Qualcomm QCC2072 and
+ WCN685x 2.0 firmware
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Cc: linux-firmware@kernel.org, Josh Boyer <jwboyer@kernel.org>,
+        Zijun Hu <zijun_hu@icloud.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-GUID: JzpsC1g1ReE2P-kMPn39lXn9saiSoWsc
+X-Proofpoint-ORIG-GUID: JzpsC1g1ReE2P-kMPn39lXn9saiSoWsc
+X-Authority-Analysis: v=2.4 cv=YfgodARf c=1 sm=1 tr=0 ts=6afdae74 cx=c_pps
+ a=0uOsjrqzRL749jD1oC5vDA==:117 a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22
+ a=DJpcGTmdVt4CTyJn9g5Z:22 a=NEAV23lmAAAA:8 a=p0WdMEafAAAA:8 a=EUspDBNiAAAA:8
+ a=wjw7POpTTtnhsxlADrUA:9 a=QEXdDO2ut3YA:10 a=mQ_c8vxmzFEMiUWkPHU9:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE4MDA1NSBTYWx0ZWRfX8T5pYrWfRJQw
+ 17cHBYG90dLJ+ygKmmPxeofLCUtevijgBydgOLZLqZkbJMLR4GiVBDLfhmsV4/YaHbXDvKgSbbG
+ TyjEBnHJURkEQUMtZDRQlgS7kDo6exs=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE4MDA1NSBTYWx0ZWRfX3NTvnfheD/nP
+ gjSl+qpIsmQ7W1ligwUsiVEeO9oLNCZq3RzGMY2hcrXJZlSlchddJstsh1RY0VFbR4Gw7+SxOtC
+ q0Y4YK+mZHgMPKAhds4aVVkuZqZvIny8+JzvumPyYC+PBI9f7BUvy5w2YqP58IZgsoqZgZfWOY1
+ xfkZKw5ISLNLw7/kF8rPbM6s3Gc39X8nYkThEvH8ffOUPdb1u5rcpp3PMHHl1MPjpoLr+YMiE6A
+ OfySkX2JRtRGwbfOdMyF82ufaXdg/SOz8CQ5WkbUhdkR7mXXxp5ZcIwmeRyJ8qfuMsEqiexiEAQ
+ Kde++sO2b6g5wmQrYOdnm3dTFnnF6pIb7JmtqP+SoDMYf/2YSpdAbocCB++vG5CN78jUlLoZwW5
+ BGTIZ9oEmOotaELfLMXsaVoMvi977f9i3o2uPq1/tRI4y1S8XXE20eALozCXTxy4CtryNABpS6a
+ nzsLUwST/rr0cEzlNEg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-18_04,2026-11-16_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0
+ adultscore=0 priorityscore=1501 spamscore=0 bulkscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611180055
 
-On Wed, Nov 18, 2026 at 06:33:45PM +1100, Alexey Kardashevskiy wrote:
-> On 17/11/26 23:48, Leon Romanovsky wrote:
-> > On Mon, Nov 16, 2026 at 05:13:59PM +0000, Robin Murphy wrote:
-> > > On 10/11/2026 12:22 pm, Leon Romanovsky wrote:
-> > > > On Mon, Nov 09, 2026 at 01:53:02PM +0000, Robin Murphy wrote:
-> > > > > On 09/11/2026 7:33 am, Leon Romanovsky wrote:
-> > > > > [...]
-> > > > > > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> > > > > > index b486b8bbd1fcd..8be2a246d4903 100644
-> > > > > > --- a/drivers/iommu/iommu.c
-> > > > > > +++ b/drivers/iommu/iommu.c
-> > > > > > @@ -1879,7 +1879,7 @@ static int iommu_get_def_domain_type(struct iommu_group *group,
-> > > > > >     static int iommu_get_default_domain_type(struct iommu_group *group,
-> > > > > >     					 int target_type)
-> > > > > >     {
-> > > > > > -	struct device *untrusted = NULL;
-> > > > > > +	struct device *restricted = NULL;
-> > > > > >     	struct group_device *gdev;
-> > > > > >     	int driver_type = 0;
-> > > > > > @@ -1901,14 +1901,15 @@ static int iommu_get_default_domain_type(struct iommu_group *group,
-> > > > > >     		driver_type = iommu_get_def_domain_type(group, gdev->dev,
-> > > > > >     							driver_type);
-> > > > > > -		if (dev_is_pci(gdev->dev) && to_pci_dev(gdev->dev)->untrusted) {
-> > > > > > +		if (dev_is_pci(gdev->dev) &&
-> > > > > > +		    pci_dev_default_is_restricted(to_pci_dev(gdev->dev))) {
-> > > > > 
-> > > > > I think this should be the generic device_is_adversarial(gdev->dev) now - in
-> > > > > fact probably all the dev_is_pci()/to_pci_dev() stanzas aren't conceptually
-> > > > > PCI-specific, just an artefact of the current "untrusted" flag being so.
-> > > > 
-> > > > I wanted to do the same, but iommu_get_default_domain_type() may be called
-> > > > before the PCI device's trust level has been set. At that point, we are
-> > > > still in "disabled" mode, whereas device_is_adversarial() checks for
-> > > > "adversarial" mode.
-> > > > 
-> > > > The below is from AI, I asked to present me the path for that:
-> > > > --------------------------------------------------------------------------------
-> > > > For a newly discovered PCI device with an available IOMMU and a new IOMMU group:
-> > > > pci_scan_single_device()
-> > > >     pci_device_add()
-> > > >       device_add()
-> > > >         bus_notify(dev, BUS_NOTIFY_ADD_DEVICE)
-> > > >           blocking_notifier_call_chain()
-> > > >             notifier_call_chain()
-> > > >               iommu_bus_notifier()
-> > > >                 iommu_probe_device(dev)
-> > > >                   __iommu_probe_device(dev, NULL)
-> > > >                     iommu_setup_default_domain(group, 0)
-> > > >                       iommu_get_default_domain_type(group, 0)
-> > > > 
-> > > > For a device whose initial policy is adversary, its state during that call is:
-> > > > dev->trust_policy          = DEVICE_TRUST_POLICY_ADVERSARY
-> > > > dev->trust_level           = DEVICE_TRUST_DISABLED
-> > > > dev->trust_committed_level = DEVICE_TRUST_DISABLED
-> > > > dev->driver               = NULL
-> > > > 
-> > > > device_is_adversarial(dev) = false
-> > > > 
-> > > > The active level changes later, during binding:
-> > > > really_probe()
-> > > >     device_trust_prepare()
-> > > >       __device_trust_prepare()
-> > > >         WRITE_ONCE(dev->trust_level, DEVICE_TRUST_ADVERSARY)
-> > > >     dev->bus->dma_configure()
-> > > >     call_driver_probe()
-> > > 
-> > > OK, that seems less than ideal. Feels like it would be better if bus code
-> > > set the initial device state prior to device_add, so then it only ever
-> > > changes later as a result of an explicit attestation/acceptance process. If
-> > > the initial IOMMU probe still has to poke into bus-specific code to avoid
-> > > always making a worst-case assumption, doesn't that rather defeat the point
-> > > of having a generic abstraction?
-> > 
-> > As Jason said, this is part of a very large series. Each series is an
-> > adventure in itself. Even Greg's seemingly simple request to convert the
-> > USB authorization knob to this new scheme has been extremely painful
-> > because of AI reviews. They keep pointing out bugs and gaps that are
-> > automatically attributed to me simply because I'm touching that part of
-> > the code.
-> > 
-> > > 
-> > > Even with the slightly dubious argument that this series only intends to
-> > > shuffle the existing PCI code around rather than fully introduce the generic
-> > > abstraction that it claims to, if the PCI behaviour is still just based on
-> > > propagating the internal "untrusted" flag plus the new global override, both
-> > > of which *are* known at add_device time into the common trust state, then
-> > > there seems little excuse for not doing that up-front so that the new API
-> > > *can* just work as expected.
-> > 
-> > I would prefer to keep both PCI and USB out of this series on device trust
-> > levels. Let's see what people say if I drop them in v3.
-> 
-> 
-> I'd rather you did not as it is going to make experiments with CoCo VMs harder.
+On Tue, 17 Nov 2026 at 12:53, Zijun Hu <zijun.hu@oss.qualcomm.com> wrote:
+>
+> Hi linux-firmware maintainers,
+>
+> This is v2 of the pull request for Qualcomm USB Bluetooth firmware
+> updates for QCC2072 and WCN685x 2.0.
+>
+> Changes since v1:
+>   - QCC2072 BT: keep the ORNE.1.1.0.c1 line and update to
+>     ORNE.1.1.0.c1-00038, instead of switching to ORNE.1.1.0-00391.
+>   - Pull from the new repository https://github.com/zijuhu/qcom_btfw.
+>     Please ignore v1.
 
-I haven't dropped it yet :(, but it's unlikely that you need USB there.
-Regarding PCI, these patches convert the ->untrusted knob, which is
-orthogonal to your experiments.
+Merged and pushed out:
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/1386
 
-<...>
 
-> > > Urgh, I can be absolutely certain I'm not the only one who is going to be
-> > > confused this way... I see "disabled" and instinctively take it to mean
-> > > disabling the device_trust *mechanism*, as the logical thing that people
-> > > will reach for in terms of "I don't care what this new thing is, just get it
-> > > out of my way and let my drivers work like they always used to; I want to
-> > > disable the new thing."
-> > 
-> > I completely agree. I was under the impression that these names had already
-> > been decided, since I picked up where Dan left off.>>
-> > >  From there it then also makes perfect self-consistent sense that
-> > > "device_trust=full" would be the opposite end of the scale as in "Apply the
-> > > explicit trust model 'fully', to all devices regardless of their bus-level
-> > > default."
-> > > 
-> > > Now I guess you could name it something like "device.default_trust_level" to
-> > > attempt to make it clearer that it represents a value the value represents
-> > > the "trust" *of* each individual device itself, but TBH it's still liable to
-> > > look backwards to many users - similarly it's hard to guess that
-> > > FOO_POLICY_DISABLED might mean something entirely different from "don't
-> > > enforce the policy for FOO.", thus rather than try to contort the naming of
-> > > everything, I'd still be much more inclined to just flip the meanings to be
-> > > more intuitive from the outsider perspective.
-> > > 
-> > > Say you upgrade your kernel and find your boot is broken because it now
-> > > flibbles, but at least there is a "flibble" parameter whose values are
-> > > "disabled", "wibble" and "frobble". Are you really going to spend time
-> > > straight off reading up on what flibbling is to understand what wibbles and
-> > > frobbles mean? Or is your instinct just going to be to try the seemingly
-> > > obvious way of disabling flibbling, and then getting positively annoyed if
-> > > that only makes it flibble harder?
-> > 
-> > What about: blocked, adversarial and unrestricted
-> 
-> yes, that's better.
-> 
-> > instead of: disabled, adversarial and full
-> 
-> may be simplify: blocked, restricted, unrestricted? Thanks,
 
-"adversarial" is Dan's legacy, let's keep that name.
-
-> 
-> 
-> > 
-> > Thanks
-> > 
-> > > 
-> > > Robin.
-> 
-> -- 
-> Alexey
-> 
+-- 
+With best wishes
+Dmitry
