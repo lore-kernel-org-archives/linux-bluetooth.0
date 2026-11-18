@@ -1,110 +1,118 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794984948;
-	b=WF8Y+0OmNaqbDoF+hdqlB2QKqQ6cm9Aw9IAC6WRx6Cx0I7f+x8/pnP+jxnuOwFnGGv8F
-	 N958SBj8N7Xp/FeTjgP4QZLvQC5H/YobWujEA+jubzgSrmSjvhzPQnGxFGdjdWEpHwwmR
-	 cON74iICvf7ljyJW0jUy2+CX0TSyai6V8oPAJSqqqog/j+qKV0MwgaS20qZKNy6WjuJ4o
-	 OGlescLMp8/1q+zgdxtmFqrRdQebcOLH6y7eixFNx9PwLv6doB+vT04m7WmEBgRI3B9Sb
-	 MVeT2l0OfXH2dzsz5rjFI0crvJQdSKOivfj5UVtkD2edjjLpVkEGLWfu5b8ZBq/b9bA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794984948;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
-	 X-Received:X-Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Proofpoint-Spam-Info:
-	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=2YjN6HDSb5JreDhsAk99dgu0/WlUIetoSEDsPxefwx0=;
-	b=PxtDc1TvSNI5FknD6cYbojxlvG8AhtZEirclnvAiegSn0t/p8JkRhDfRgiUavxm7O8sB
-	 zO77pBwwjLY5634XC4uqbRVgzihCO+0G7yqtlrRcGUAgxl2xGnvsf4U7uIm9gWqxLowBx
-	 JJR0f556PskCFqabWnFdvIq8GlcdwhVJcBG+JjCsuad1StOTH56kfVUtyh+lVLVeNv9uk
-	 YD+bFO8MWKhN83soRklHjFcApjljd1/TzeKYY6z26eBz3n+K2b6X8VwRFOETqXFWGEyhz
-	 UuFJZyRqr51+9Nrq35Uh3o82/L74bbTfd4dYQT3Rldpam7sYOPlZstB9IL/U5LfRlNw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=JYkx+mP+;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YSQ1rSI0;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.70
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794987246;
+	b=OLKTijIE+awogd6egd1TZWsnwIEh9wqKn0zbKQUTGTq84MuMaNxYbKISBKtZeAiPKxwh
+	 feHo3hTJxkk5b5ecm1mLf0H3hKktt4DxmBPetWLI+lhbjy9evq5x47COVySOTf6/1b7rT
+	 +NYsZxUfaTBlhBbD+R7gWJ7xGbx4Rz6PAVU5vur0x5SsuvGHpMt4duaxtbyBmXZ7tzgbH
+	 foTrFb1bGzknqeaYJyvQELR2H+lCE/If/nZTjv8bwlsXQIT0d78u8AB9VodgNg4sxKzN0
+	 +n/UZtUXozMEdjGCIRQs50/EqQdGryOH1TwpqQnMv5FzdOeFZN17KzuLmm+cz701tGA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794987246;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
+	 User-Agent:Subject:To:Cc:References:From:Content-Language:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=71OmnO+FWbA4EhJ7EN+OTkAqWLzkAt6SqNvR5q45ls0=;
+	b=eWFzZylNDUN9G/EPJL1xJTIJ9NectpbAuXk2oFVzMpwEqdVPKO01h6RMNDog5v7/dd3K
+	 VxbojwFCH8+k68MU2r46Y41xgYmaBtxav9S0WK5B0Be3CjAxSITohoHOtkYfgBdq46kr1
+	 7Ima2+J7ytlOjn8wNKZNbTJVKbQtColiBh5eRNH3bECTxd4BcnX3oci0io1tOUp9DDdX0
+	 mko2FY4ikOmB+P3n1oApbCifrGd9tUGrieVvhO6WSaXpaODz5o5Jc+BjgjI/pAVegz736
+	 IeofS5CTHrjuqiTPwuTTnogqz7HSX8dmR5+kCpNcIcHalFf1N9G+ge/D2qYfI2zYxYw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=amd.com;
+	spf=fail smtp.mailfrom=amd.com;
+	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=oKSIu2Qc;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.70
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013070.outbound.protection.outlook.com [40.93.201.70])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04110606A31C
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:55:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 04110606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EBA606A31C;
+	Wed, 18 Nov 2026 07:34:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85EBA606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=JYkx+mP+;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YSQ1rSI0
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AI2UumB2453536
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:55:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	2YjN6HDSb5JreDhsAk99dgu0/WlUIetoSEDsPxefwx0=; b=JYkx+mP+bY3mbbx+
-	c8gO1XLgOLS/PWZCG9GCUCokwVQtmcsi/vSXHeknvx0S0+GHTE+L9/MWouqIsMXj
-	kxxoIqUHa70WbWa6LPCMnCV02aTVjMRTCXNiuhZTDYTpy0JnAHkT49TspV7z9L3w
-	Vb4Ywv/WQr/+uguRPdHbzMwdMUB6UdLsucDwF9YbhkrF0hxPrA4M1/73vlTOkHgn
-	txceOsU+vv4nGx8FhxoOaLvWPrdxJyx6bjscq2pikqb7PJAg1MoNwkK0h3gO6XWr
-	hUONrzh4f1YELIzStqHmbwrlkE2/QpZ9cAA+VYvXLlHu3uLM4EhqaGPgKAWObmMg
-	WNZZ6A==
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j0yv99nj5-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:55:46 +0000 (GMT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8a073778890so649607b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Nov 2026 22:55:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1794984946; x=1795589746; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2YjN6HDSb5JreDhsAk99dgu0/WlUIetoSEDsPxefwx0=;
-        b=YSQ1rSI0xiIZrBGs8VHVq4qy2RyKNQ4iD8fT8OD4WrhrlDZ9ByRVvIZBxA6Sco7d1c
-         7oAIhxuC+Rddzqkxu5SlS2fbaHYf1K9KinMU1e5+u/AYeCncetTCq6rRuO8t0XWG2wKL
-         hNypTjoln0Jtx34HUGJDo3s6/w3aJzOoQoJtq+A7jeokxcZCgIgTzsAXbSEbVKKwIfTT
-         W6I9EQ3Qg9ctJ8u6WfVK9Or10Ey1bSWOs2qhdF22zamT3IZ33favdppSLN5fI3J14U//
-         h8UHC0I18CXyzVBB09hlitUWHyLZJ+0gsE6TM/sbL8DZ87K/w45elNkvwN1cBmIXiru2
-         npfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794984946; x=1795589746;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2YjN6HDSb5JreDhsAk99dgu0/WlUIetoSEDsPxefwx0=;
-        b=DRbBBS6ESIUypTpQ+rqCbAv29lVU+GrUyZilE3XdaPEjzUBSeXnC4RNqIm06xgt5M/
-         WStAhwVHrboh1KLxbAYHlPch1aLHPQm4Me2Iy9u/0tO2NTRO6pN9y54myvh0yKql+WNT
-         RFJzH9Ab4/6pTrFk6G7mCvlYKqIwe2JR0H7BkVkQ+8E7nV45ZML/YAuxzds+csXRNLxg
-         KLoFUjfEh4JOsuSUUNfzUqRkNdc5d+FtTNmnNhgM2oEpxxDEEODAad+ZyOdOAxYmc6ss
-         gmrtSgzqOnWzRWnfa/keQBAGr3XIqYv1JyA9p75y9C5XfpCAtNUIMa3FIaXPWyKewPYI
-         a9WQ==
-X-Gm-Message-State: APuU4Z+LZGRtdhmTA+84MlK84xrnfVB0WpfE85jEsD8UGlRAZ0Un825v
-	lemQx9HTLJeomLWbY6MaIeyR2pVv/MoFDri2XJ9/XoMar0d3imLZyr49eGgztNKfy/KcL21BbmD
-	b1bMDTYtSmavV0VJjPGaqFFu9naxXZqvS6AL9ipItfu6+zdomkxYxPa3Bi+LZy8XZQ+fbbBc=
-X-Gm-Gg: AYBFou3BNrlzHR9tHVK4pC1LBIOrI5jefWz+bMV7jGdRoadN1NvfxU4M9hsyQN/BrCv
-	nU5B3sW9ihRAtazjKj+n1OyHp7Foll9wkzQz0HYl3dqbVfqsSSFS8la+QdjqHd4WQMHjc57sbMN
-	XKxqTTcDAPHMGSlXEPqSndmyEj83kkRWcGtXWMsofVApwmK19txdW3/ELKJmU7pQfiYI5UQN0HL
-	IGfFX9zTOElYOKh2DSLyRpQfKJmn6hfLoKxgznizulX61ciBkyiEl+HK+jKjqW/1+USMgz9lINR
-	UGLb3oeu1lvjCO61MQzGRBGQ6BpLd+GQxY4rUo4BhVv1bivN95baEbK+XmusW5tPW32CUF3MEnB
-	X7x5JAcxB8/0vUpTdX19PscD+q4IM3JsWT+ZyIgsoeQkNDzZyU/CRAl4y5u45ijzaFH/jdREr8R
-	bsAOQwd+e2uUJU3FcrwBSwyXA=
-X-Received: by 2002:a05:6a00:4217:b0:8bb:1a7b:bb8 with SMTP id d2e1a72fcca58-8c5d0278603mr1425599b3a.3.1794984945518;
-        Tue, 17 Nov 2026 22:55:45 -0800 (PST)
-X-Received: by 2002:a05:6a00:4217:b0:8bb:1a7b:bb8 with SMTP id d2e1a72fcca58-8c5d0278603mr1425574b3a.3.1794984945021;
-        Tue, 17 Nov 2026 22:55:45 -0800 (PST)
-Received: from [10.110.93.171] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c5cad8cf28sm675939b3a.32.2026.11.17.22.55.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Nov 2026 22:55:44 -0800 (PST)
-Message-ID: <1a1ad8e3-4aff-4b54-9b9f-47e63e7f514e@oss.qualcomm.com>
-Date: Wed, 18 Nov 2026 14:55:40 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=oKSIu2Qc
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wdKAIEGnqdhU/EHEpEmLwUWftF30FTizR18CjiJZl5OBIk0Mt9CG67kYJR7Gk6R4buzoOL87F3MjSjywAeZS093GSZZSUk+vaIR1zn0ny0+uCoW5e+cr8PfgmP6mOvgkc1DJIXmN0cXEme6LPs6hBcSED8TWSjSVE1zwYRxXP4CqSA94cthB3bYSfbtHFvR75mVyAWA34Yc5M9WEb5AadMEcyr5j+ThXOjxGw6X1pqWl0YDncXC65EE4l4ZBhgQbFwZHzwgWdT8iBJYJcDalRyI6SX0nN3oNNT5J9Yq8ty83n1RxQiyDhuYolL9TtFgC3J1YLxuyDfDtlXUs5Zjbew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=71OmnO+FWbA4EhJ7EN+OTkAqWLzkAt6SqNvR5q45ls0=;
+ b=PFJQTaorj+btu/GQHbdEdVWzRzrAdxnBaERWNdmr7kgPjY5VAd0aYP52PJObcll1c52ye2vQmfVuiusrB/R1yKMWTd2j1N93dL/3pSSEnt7z5J1C564dcgDEARaK9gCRy448OInC9kpTqvIA+E65nsl0+Xt6dGNdpYVYr/XnUCTNigBIX0GPzp8HP/C5aO4bOfbIyViVc5T0jEKRZ69h7DHso00WLVuJQZVN6JH+ikur98bH3Jk7dcjVFves2a3PRZA8l+W7G5dN95mMKuBELdVrlRGyaHbDYCDmIJhouZeFJx4gnuJt3JNNfWqn6zd69w2XW7z6rgAJoWBDnFCKyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=71OmnO+FWbA4EhJ7EN+OTkAqWLzkAt6SqNvR5q45ls0=;
+ b=oKSIu2QcuIBY3gBoAslJAehQIUbvqoFOn3cbCza/8IKjn4ieDrICYeaK9yZQKCjJwJRoBNEdSeDR1UrRMfis5tYqVwhvBj913hy0sRevca8+7okw961lmfbzmJllF/Um0IqrFliEZEpdmLrRpNKGpW+VQxiitsfyZHTk1N+OLm0=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SA1PR12MB999228.namprd12.prod.outlook.com
+ (2603:10b6:806:4db::10) by SJ2PR12MB7866.namprd12.prod.outlook.com
+ (2603:10b6:a03:4cc::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Wed, 18 Nov
+ 2026 07:34:01 +0000
+Received: from SA1PR12MB999228.namprd12.prod.outlook.com
+ ([fe80::4dba:119e:8e7c:37b3]) by SA1PR12MB999228.namprd12.prod.outlook.com
+ ([fe80::4dba:119e:8e7c:37b3%6]) with mapi id 15.21.0615.013; Wed, 18 Nov 2026
+ 07:34:01 +0000
+Message-ID: <fd25ed52-e3ea-41a2-9f62-2397d5d9e8c8@amd.com>
+Date: Wed, 18 Nov 2026 18:33:45 +1100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 18/19] PCI: Replace untrusted state with device trust
+To: Leon Romanovsky <leon@kernel.org>, Robin Murphy <robin.murphy@arm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ "Joerg Roedel (AMD)" <joro@8bytes.org>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Nipun Gupta <nipun.gupta@amd.com>, Nikhil Agarwal <nikhil.agarwal@amd.com>,
+ Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+ linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-pci@vger.kernel.org, iommu@lists.linux.dev,
+ Jason Gunthorpe <jgg@ziepe.ca>
+References: <20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com>
+ <20261109-device-trust-core-v2-18-3b12d9a9f861@nvidia.com>
+ <d0999161-3b27-4c3b-9d66-1d117c4836fd@arm.com> <20261110122237.GG8635@unreal>
+ <b4c2538f-8021-4abc-be2e-fcd1596f84ca@arm.com>
+ <20261117124801.GD124972@unreal>
+From: Alexey Kardashevskiy <aik@amd.com>
+Content-Language: en-US
+In-Reply-To: <20261117124801.GD124972@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY6PR01CA0131.ausprd01.prod.outlook.com
+ (2603:10c6:10:1b9::7) To SA1PR12MB999228.namprd12.prod.outlook.com
+ (2603:10b6:806:4db::10)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -114,173 +122,259 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ v3 00/20] obexd/pbap: Update PSE support from PBAP
- 1.1 to 1.2
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, cheng.jiang@oss.qualcomm.com,
-        wei.deng@oss.qualcomm.com, shuai.zhang@oss.qualcomm.com,
-        xiuzhuo.shang@oss.qualcomm.com
-References: <20261116090634.1222593-1-jinwang.li@oss.qualcomm.com>
- <CABBYNZ+jCVzF9TNjk9EAGiaOfejVcz3g1PNEKGq2Gy6=B-p=pQ@mail.gmail.com>
-Content-Language: en-US
-From: Jinwang Li <jinwang.li@oss.qualcomm.com>
-In-Reply-To: <CABBYNZ+jCVzF9TNjk9EAGiaOfejVcz3g1PNEKGq2Gy6=B-p=pQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE4MDAyNyBTYWx0ZWRfX2cXB0uuLZHhP
- 2Vnsbi+3G3SndOuv8uSXVE1Q2P4znXKrlDwQwXw6FRMSruYtGQxm5tdPlxlQst6E4MsqWKzG+KD
- SWRsa2anmWxCwH28rVNUaF1BB+744aA=
-X-Authority-Analysis: v=2.4 cv=acT0Dhot c=1 sm=1 tr=0 ts=6afd4bf2 cx=c_pps
- a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=NEAV23lmAAAA:8 a=wzBUqQYaaH6XuHbcFzQA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=OpyuDcXvxspvyRM73sMx:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE4MDAyNyBTYWx0ZWRfX1fnxePwrJWHw
- pOx2c6b9pcC+nw0XwW7Ed/U2Nc2Q0fJ62Z0HUGC+UYZcaIPgf4POLFXXE2aoIKE4Cq8qvqbbg2X
- ISU7Jb2knwuBF8HQ9AxAUXwntE2DpOcH0/eTUAC0NJ9pTBSQa790PzMQOKMIKCF5Ek/fAkXNjUH
- FUcMskdbsHNRVCci8Dh6EgAJmidd+iMrj4F1ggWkx0QSlsFEHPZWzAGB05ElVGl69524zj9eIif
- AHXH27JtPCfUd9CN8Gk+BcCbg8xoyRdEbNqt29TvtNoGjMko2DOVZEeroa8QddwiHhYXD78UWYZ
- LF5gTPTsUPmE+AV3huUBZP0S8Ra6gH8IGjco+yTCW6T22Z1+q3cXKngjHB9a9ixPNpV8OXrEdHe
- 8VQyKqDIlz3TOhjLUJ9SFMwZJr7VIbmcA7EJq6yjBkBTpHQewYvEX8RMk9xlBYm0hOZPbZ0/m8k
- PYsnhRn0IHnZAzOFO0Q==
-X-Proofpoint-ORIG-GUID: 4gCBs-pZGQK_Y_i7xioJQXMJmrC-QM4C
-X-Proofpoint-GUID: 4gCBs-pZGQK_Y_i7xioJQXMJmrC-QM4C
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-18_01,2026-11-16_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 spamscore=0 clxscore=1015 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611180027
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR12MB999228:EE_|SJ2PR12MB7866:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd85bdef-bc7f-4f4b-6fb7-08df454650ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|376014|23010399003|366016|261026140227099003|56012099006|10067099003|11063799006|261009223027099003|261026121527099003|5023799004|4143699003|261028144727099003|261022075727099003|261022105027099003|261021121427099003|261102123227099003|261021123027099003|22082099003|18002099003|3023799007;
+X-Microsoft-Antispam-Message-Info:
+	kZxqGkqBkyBWGddz7J43Pl2uxsBLycER/2T8xvGeAlMFBYBrqILCeo2xLkvd7irsvHU3dkvMSuLYf8YFAGzYLW5ITQqs7VrwHfg6ge9RLBWA2rmzvXDJfIi+MQarPcP8BLXI5lLOEReRYrxmkgxEKTO5X4dRXJvXy9iYHC+W3Q3eIKuc7qPScMtYS4mt4k5ydQcu8Gmn0ZrZ1gnFrMQGDEvMhHZGJh/GzQyYtkuxknydptTCtMEIcOgbvKz9911rwFxWWvBgWpCgHkn6yQYLvXdEXuE4EG2OZWZ6fx7xSL+UyyUFQVtUgjP9539uPO/lf6g+GMFPTFgT6VoNqio9L1ZqJmf9ABYL4V8mkKK5SLCrJSWdWD9+wzlmgOnk0mY5zbVQMj7ICC5KgJBsg0h5eTNtOvza4IjsxYwVqWTNzsm9c7XbeppZdFHC9gP1RAKywD/PeHoJjmWA9d3jLvRViv6LihiaFYlzln9Cv+HOgLXkUcenh6cZcL48JPafpaRfO4RVUE5qUEuXvt54ePYY5SslDAT/VJ8+zA+uS/FoZE+zXfqT2RV7Ad9CclhY7Zkb5Ofs587wGOoiFn4CdF1cEkDeJXpN+6Mormj5WThJej3v0ZlWEKW1kyMxVysEzZuGCt8Z9uWhM0Xji146/E8TgFiYQfla2tgcOJxcOPKtbZk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB999228.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(23010399003)(366016)(261026140227099003)(56012099006)(10067099003)(11063799006)(261009223027099003)(261026121527099003)(5023799004)(4143699003)(261028144727099003)(261022075727099003)(261022105027099003)(261021121427099003)(261102123227099003)(261021123027099003)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?djU3N2JoaG5SRnpKelptR3lmL2dSdG4zTEE5enJuUVhWQ3ZIa0dpYmQzekdC?=
+ =?utf-8?B?NGhLM1AxN2tWV0hFNnJJZW51cnNGS1dLeFY2d1lxQVlsNG1YeDhjT044RTFa?=
+ =?utf-8?B?aWxhSjRCUHNERXJPczJFZDZaU056UkJEZUFFYlFMbEdqWDVIbElsZG1PUTls?=
+ =?utf-8?B?MVRZWEJGbjlQSzE4M25qeENiNXhpaHBmYVVOT3QzQi9QZm0rYmxCbnMvM2FW?=
+ =?utf-8?B?UmpBSWRZSUwxTjJMM2RsNzJtYzBrZmJJZCt5UkhFRVo1OEZjTXF4TmJ2anI1?=
+ =?utf-8?B?V1hrQWRTUjkzMHZYenh5UVlrYkdPNHVUNTVGWFZSUnNUYyt0ekh5d0loUzRu?=
+ =?utf-8?B?K0NUcm10TENvekVtWTNjZlUwMjlaL0cwQmp3VlNsSzJBbHFpUW5CNFlnOWNH?=
+ =?utf-8?B?eHNuQWhCMWdJVGpWTzBmek9qeStINTFWR1k1OUxia1RzUkxrRFQwSzRpRnZS?=
+ =?utf-8?B?NW5RNHhsd254Qm1UcFM2OUhiUWphdVZxU1Jzbi9vK2xTa1pMU01iRXR0c210?=
+ =?utf-8?B?NGpzNmlaS1RCdHUwYmVLWDdsSHNCc2tWbWF1NWhrZkFJbWV5UFRMMDhKMFN4?=
+ =?utf-8?B?MUxOWW5mTjhwYitQMXpCdDRYSFc4Rm9CaWtqTjBVUEd2SzlROU83NGhQdjlG?=
+ =?utf-8?B?bVZ5c2hBNmI5NCtLTHY1QkFRTldKVlJzeHYwNFAzS0M0Mkk5OGNScTg0M1Bo?=
+ =?utf-8?B?Zlp6anduTUFjUVFUeGVtYVc1RzRXMlZQSHFoSTlVQlZGTVA0a2xxWldJRkI3?=
+ =?utf-8?B?NG5zL1IrREZLWU1PZ3RIQ1F3T3Zmd3Z5Mjl0cHh1S05xSno2NlNHTTBWVWJ0?=
+ =?utf-8?B?OUl1V2srdkJzai8xbS9BcUlGWUFRalJKTVZtM2NCMUYvM08yc2FIUVFjSzFJ?=
+ =?utf-8?B?Q2JKcVlQMnVHMXd5ZG5xRzdFb2x0ZVVWNHRxcE1kU2hsMEQySHpwQ1JFemcy?=
+ =?utf-8?B?Mkg3V3I0MkZScVVJSEhjb2YySDI1L0NiTmlNSnU2NlUvTHR3TFJxbFFsSXAr?=
+ =?utf-8?B?d1RIaTB2NzBrNjlCR1hDZ0k0NVd3MFRDRjRWWXdLTVVyWGdkNGpIRDRNODF5?=
+ =?utf-8?B?bXk1VmJ5NVFKR1BGbm1NRkRpM0VnNjlBakRYQ2twZG1GRTV2Z1dJQ1Z1WXJj?=
+ =?utf-8?B?bGRMeGsrWnpnYzFQTnVkUnZSMEl5YWs2bmpiZjZ2TUNyMjV0aTAxb0tqWXV3?=
+ =?utf-8?B?Z3lPcEZpdzZIR3FUMmg4eXpyaHdBdmEzTGZSMFZ0ZzM1dWloMnlMR0FGa21z?=
+ =?utf-8?B?N3laVWhZZU9vcGpTQitqS2xydzJhQ3VLeW5GRzR2VXZUa1NmZmhISWNldDZB?=
+ =?utf-8?B?cUpDT0d1cXpIckpjT3AyNE1UNW81dVdEZ0dhaHlldmh5NFVKcmNhOEZ2VFRX?=
+ =?utf-8?B?L0REb3QxSnR6aTVucXJ5elZvcXZGTHBxUHFnWTJEQkowbjFDdG5FQkp4dE5q?=
+ =?utf-8?B?NWhlb1AxSGNwVVk4ZGJKcU1hd3NlRWNNTHRmMFZ5cVBROEhvdUxocjk0bmNu?=
+ =?utf-8?B?NVBUOUpkMTNQd3YwZFJ2MkxXK3YvWnh6UGhETDAwNmZtNGxOei9Oak5pY3Mx?=
+ =?utf-8?B?L3lOVWZSdVZiekZhUnFlak9tZFovbVRJLzJGcDB5c0ppOTNmbDhFbzB3WnJx?=
+ =?utf-8?B?bmRXYllkYjJoUEZTa0tjOU0zbVVpL0MrdXRtUHJVSWFJT0VRc0N5TGhoNElT?=
+ =?utf-8?B?VFBQQk5ZZXJlbjAzcnVuem1qT3JFMGhoMjZmS3pFR1AvTHBibVQ1Q3FEbmsv?=
+ =?utf-8?B?M05tZERoZWxyVjUvbUhNRHRuOFMxaFc4VVI3R0V2dHpiK1FvYjhvU0E3ZDJz?=
+ =?utf-8?B?MTRSUmVUTDlsbFp4WkFOM211UUtyMU9mckllRFM5M054a1I4YXlWQmJMUGM4?=
+ =?utf-8?B?SnNhVTdlbUxrYVFyNVVUNVZuN0VNVGlqc3lhdk5GYWp1Y2ZvWEJjN2hSSHhI?=
+ =?utf-8?B?aDd6WG1NajdIVWtiSGRrejBSL3U2K2pITmsxNWJYcHRobjFxMGI3ek5FWk9O?=
+ =?utf-8?B?aXUzYjdGZU5FV21veUxidXpVN3IyNkpxeExGOS83eEZXaWcrd2V1Q3pxYUVI?=
+ =?utf-8?B?RUE2SjJ2M1paWTRPbndkS3JmVTlNOWhXMEpRTzltVlh0TS9qYlNzclh4amhO?=
+ =?utf-8?B?eGFteFZDZlhHN3BmT2xoaG14d00ycTF0enB1ampSL3VYNUlIa2ZJNVF3OVF3?=
+ =?utf-8?B?aFlRV0Zxa2UrZEM4SjBkT3FZd1JMTkhuQmtTaEtCb1VkdnN6UkdnVjVyVDFG?=
+ =?utf-8?B?ZXNnYXQxS243MkwxTjhvVTU4akRremwyemlkbjE5OUdLVkhsQlFvQVZibjdj?=
+ =?utf-8?Q?2pFLH8CnXLePCKoejg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd85bdef-bc7f-4f4b-6fb7-08df454650ad
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB999228.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2026 07:34:01.4690
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1CclyQk6YPOQ+Exb7LflDSdMYo57jIk9mtHPrVn1FJzl+16k1BeAm8LItqcpegYfmjW3EVUh2jaWqFXUiteQxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7866
 
-Hi Luiz
-
-On 11/18/2026 12:41 AM, Luiz Augusto von Dentz wrote:
-> Hi Jinwang,
+On 17/11/26 23:48, Leon Romanovsky wrote:
+> On Mon, Nov 16, 2026 at 05:13:59PM +0000, Robin Murphy wrote:
+>> On 10/11/2026 12:22 pm, Leon Romanovsky wrote:
+>>> On Mon, Nov 09, 2026 at 01:53:02PM +0000, Robin Murphy wrote:
+>>>> On 09/11/2026 7:33 am, Leon Romanovsky wrote:
+>>>> [...]
+>>>>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>>>>> index b486b8bbd1fcd..8be2a246d4903 100644
+>>>>> --- a/drivers/iommu/iommu.c
+>>>>> +++ b/drivers/iommu/iommu.c
+>>>>> @@ -1879,7 +1879,7 @@ static int iommu_get_def_domain_type(struct iommu_group *group,
+>>>>>     static int iommu_get_default_domain_type(struct iommu_group *group,
+>>>>>     					 int target_type)
+>>>>>     {
+>>>>> -	struct device *untrusted = NULL;
+>>>>> +	struct device *restricted = NULL;
+>>>>>     	struct group_device *gdev;
+>>>>>     	int driver_type = 0;
+>>>>> @@ -1901,14 +1901,15 @@ static int iommu_get_default_domain_type(struct iommu_group *group,
+>>>>>     		driver_type = iommu_get_def_domain_type(group, gdev->dev,
+>>>>>     							driver_type);
+>>>>> -		if (dev_is_pci(gdev->dev) && to_pci_dev(gdev->dev)->untrusted) {
+>>>>> +		if (dev_is_pci(gdev->dev) &&
+>>>>> +		    pci_dev_default_is_restricted(to_pci_dev(gdev->dev))) {
+>>>>
+>>>> I think this should be the generic device_is_adversarial(gdev->dev) now - in
+>>>> fact probably all the dev_is_pci()/to_pci_dev() stanzas aren't conceptually
+>>>> PCI-specific, just an artefact of the current "untrusted" flag being so.
+>>>
+>>> I wanted to do the same, but iommu_get_default_domain_type() may be called
+>>> before the PCI device's trust level has been set. At that point, we are
+>>> still in "disabled" mode, whereas device_is_adversarial() checks for
+>>> "adversarial" mode.
+>>>
+>>> The below is from AI, I asked to present me the path for that:
+>>> --------------------------------------------------------------------------------
+>>> For a newly discovered PCI device with an available IOMMU and a new IOMMU group:
+>>> pci_scan_single_device()
+>>>     pci_device_add()
+>>>       device_add()
+>>>         bus_notify(dev, BUS_NOTIFY_ADD_DEVICE)
+>>>           blocking_notifier_call_chain()
+>>>             notifier_call_chain()
+>>>               iommu_bus_notifier()
+>>>                 iommu_probe_device(dev)
+>>>                   __iommu_probe_device(dev, NULL)
+>>>                     iommu_setup_default_domain(group, 0)
+>>>                       iommu_get_default_domain_type(group, 0)
+>>>
+>>> For a device whose initial policy is adversary, its state during that call is:
+>>> dev->trust_policy          = DEVICE_TRUST_POLICY_ADVERSARY
+>>> dev->trust_level           = DEVICE_TRUST_DISABLED
+>>> dev->trust_committed_level = DEVICE_TRUST_DISABLED
+>>> dev->driver               = NULL
+>>>
+>>> device_is_adversarial(dev) = false
+>>>
+>>> The active level changes later, during binding:
+>>> really_probe()
+>>>     device_trust_prepare()
+>>>       __device_trust_prepare()
+>>>         WRITE_ONCE(dev->trust_level, DEVICE_TRUST_ADVERSARY)
+>>>     dev->bus->dma_configure()
+>>>     call_driver_probe()
+>>
+>> OK, that seems less than ideal. Feels like it would be better if bus code
+>> set the initial device state prior to device_add, so then it only ever
+>> changes later as a result of an explicit attestation/acceptance process. If
+>> the initial IOMMU probe still has to poke into bus-specific code to avoid
+>> always making a worst-case assumption, doesn't that rather defeat the point
+>> of having a generic abstraction?
 > 
-> On Mon, Nov 16, 2026 at 4:06 AM Jinwang Li <jinwang.li@oss.qualcomm.com> wrote:
->>
->> This series updates the obexd PBAP Phone Book Server Equipment (PSE)
->> from PBAP 1.1 to PBAP 1.2, following the PBAP 1.2.3 specification.
->>
->> It adds PbapSupportedFeatures negotiation, Database Identifier and
->> primary and secondary Folder Version Counter response parameters, and
->> vCardSelector filtering for phonebook and vCard listing requests. It
->> also advertises Contact Image Default Format and updates the SDP profile
->> version to 0x0102.
->>
->> The dummy backend persists the Database Identifier and folder counters.
->> The ebook and Tracker backends report zero values to indicate that these
->> values are not persistent. vCardSelector is implemented in all three
->> backends.
->>
->> The series also fixes phonebook backend and request handling issues,
->> refreshes the listing cache for each request, and adds NewMissedCalls to
->> vCard listing responses. NewMissedCalls is limited to mch responses.
->>
->> Testing was performed on the OE-Core wrynose branch (Yocto Project 6.0),
->> together with prerequisite patches already merged upstream. The dummy,
->> ebook, and Tracker backends were all functionally tested. The dummy
->> backend was also tested against the PBAP PSE PTS test cases covered by
->> this series.
->>
->> Changes in v3:
->>   - Rebased the series.
->>   - Patch 6: Shorten the subject without changing functionality.
->>   - Patch 7: Preserve quoted-printable PHOTO continuations and correctly
->>     parse quoted parameter values while filtering unselected photos.
->>   - Patch 16: Associate persisted metadata with each virtual phonebook
->>     folder and reject incomplete folder scans when computing digests.
->>   - Patch 17: Move folder-specific metadata handling into patch 16. Keep
->>     this response patch limited to emitting negotiated counters.
->>   - Patch 18: Apply vCardSelector when calculating a PullPhoneBook size
->>     response with MaxListCount set to zero.
->>   - Patch 19: Handle folded headers, quoted parameter values, and
->>     quoted-printable continuations when validating default-format photos.
->>     Clarify that returned photos must use the PBAP default image format.
->>   - V2 link:
->>     https://lore.kernel.org/all/20261111094425.1444893-1-jinwang.li@oss.qualcomm.com/
->>
->> Changes in v2:
->>   - Rebased the patch.
->>   - Patches 1-2: Add the PRODID fixes.
->>   - Patch 7: Also remove the unindented BASE64 body of an unselected
->>     PHOTO property from dummy backend responses.
->>   - Patch 16: Do not refresh the folder version counters for
->>     PullvCardEntry.
->>   - Patch 18: Use PRODID in the vCardSelector property table.
->>   - Patch 19: Send only PHOTO properties that are BASE64 encoded JPEG
->>     images of at most 300x300 pixels and 50 KiB.
->>   - V1 link:
->>     https://lore.kernel.org/all/20261104083429.4111632-1-jinwang.li@oss.qualcomm.com/
->>
->> Jinwang Li (20):
->>    obexd/pbap: Fix PRODID property name
->>    doc: Fix PRODID property name
->>    obexd/pbap: Fix crash counting vCards in dummy backend
->>    obexd/pbap: Fix Tracker contact grouping across requests
->>    obexd/pbap: Include directly bound Tracker telephone numbers
->>    obexd/pbap: Reject listing without Name in telecom folder
->>    obexd/pbap: Fix unselected PHOTO in dummy responses
->>    obexd/pbap: Refresh cache for each vCard listing
->>    obexd/pbap: Limit NewMissedCalls to mch responses
->>    obexd/pbap: Add NewMissedCalls to vCard listing responses
->>    obexd/pbap: Separate vCard entry response handling
->>    obexd: Parse application parameters in CONNECT request
->>    obexd/pbap: Parse PbapSupportedFeatures in connect request
->>    obexd/pbap: Add persistent database identifier
->>    obexd/pbap: Include database identifier in responses
->>    obexd/pbap: Add folder version counters
->>    obexd/pbap: Include folder version counters in responses
->>    obexd/pbap: Add vCardSelector support
->>    obexd/pbap: Support Contact Image Default Format
->>    profile: Update PBAP PSE version and features
->>
->>   Makefile.obexd                         |   2 +
->>   doc/org.bluez.obex.PhonebookAccess.rst |   2 +-
->>   obexd/client/pbap.c                    |   2 +-
->>   obexd/plugins/pbap.c                   | 778 +++++++++++++++++++++++--
->>   obexd/plugins/phonebook-dummy.c        | 745 +++++++++++++++++++++--
->>   obexd/plugins/phonebook-ebook.c        |  88 ++-
->>   obexd/plugins/phonebook-metadata.c     | 257 ++++++++
->>   obexd/plugins/phonebook-metadata.h     |  52 ++
->>   obexd/plugins/phonebook-tracker.c      | 367 +++++++-----
->>   obexd/plugins/phonebook.c              |   8 +
->>   obexd/plugins/phonebook.h              |  84 ++-
->>   obexd/plugins/vcard.c                  |  71 ++-
->>   obexd/plugins/vcard.h                  |   2 +
->>   obexd/src/obex.c                       |  42 +-
->>   src/profile.c                          |   4 +-
->>   15 files changed, 2209 insertions(+), 295 deletions(-)
->>   create mode 100644 obexd/plugins/phonebook-metadata.c
->>   create mode 100644 obexd/plugins/phonebook-metadata.h
->>
->> --
->> 2.34.1
+> As Jason said, this is part of a very large series. Each series is an
+> adventure in itself. Even Greg's seemingly simple request to convert the
+> USB authorization knob to this new scheme has been extremely painful
+> because of AI reviews. They keep pointing out bugs and gaps that are
+> automatically attributed to me simply because I'm touching that part of
+> the code.
 > 
-> Copilot flagged 2 problems:
+>>
+>> Even with the slightly dubious argument that this series only intends to
+>> shuffle the existing PCI code around rather than fully introduce the generic
+>> abstraction that it claims to, if the PCI behaviour is still just based on
+>> propagating the internal "untrusted" flag plus the new global override, both
+>> of which *are* known at add_device time into the common trust state, then
+>> there seems little excuse for not doing that up-front so that the new API
+>> *can* just work as expected.
 > 
-> https://github.com/bluez/bluez/pull/2833#pullrequestreview-5942549908
-
-For these two comments, I don't think changes are needed: the first is 
-not an issue, and the second is acceptable.
-
-1. Restrict default-image filtering to negotiated feature
-PBAP 1.2.3 §3.1.6.2 ties the default-image restriction to the PSE's 
-advertised feature, not mutual negotiation. Section 4.1 excludes this 
-feature for the PCE, so using negotiated_features here would be incorrect.
-
-2. Invalidate cached metadata after a failed digest scan
-This can happen if a vCard becomes invalid or unreadable after its 
-metadata is cached. This only concerns the dummy backend, where the 
-phonebook files are expected to remain valid and readable, so I think 
-this case is acceptable.
+> I would prefer to keep both PCI and USB out of this series on device trust
+> levels. Let's see what people say if I drop them in v3.
 
 
-Best regards,
-Jinwang
+I'd rather you did not as it is going to make experiments with CoCo VMs harder.
+
+
 > 
+>>
+>>>>
+>>>>>     			/*
+>>>>> -			 * No ARM32 using systems will set untrusted, it cannot
+>>>>> -			 * work.
+>>>>> +			 * No ARM32 using systems select a restricted trust
+>>>>> +			 * policy; it cannot work.
+>>>>>     			 */
+>>>>>     			if (WARN_ON(IS_ENABLED(CONFIG_ARM_DMA_USE_IOMMU)))
+>>>>>     				return -1;
+>>>>> -			untrusted = gdev->dev;
+>>>>> +			restricted = gdev->dev;
+>>>>>     		}
+>>>>>     	}
+>>>> [...]
+>>>>> @@ -616,6 +608,28 @@ static inline struct pci_dev *to_pci_dev(const struct device *dev)
+>>>>>     {
+>>>>>     	return container_of(dev, struct pci_dev, dev);
+>>>>>     }
+>>>>> +
+>>>>> +static inline bool
+>>>>> +pci_dev_default_is_restricted(const struct pci_dev *pdev)
+>>>>> +{
+>>>>> +	enum device_trust_policy policy = READ_ONCE(pdev->dev.trust_policy);
+>>>>> +
+>>>>> +	return policy == DEVICE_TRUST_POLICY_DISABLED ||
+>>>>> +	       policy == DEVICE_TRUST_POLICY_ADVERSARY;
+>>>>> +}
+>>>>
+>>>> Unless I've wildly misunderstood, I'm not sure this is right - if the user
+>>>> has set DEVICE_TRUST_POLICY_DISABLED to explicitly override the bus-default
+>>>> behaviour, but that leads to the IOMMU layer special-casing all PCI devices
+>>>> as adversarial and thus force-*enabling* all their trust-model restrictions,
+>>>> isn't that pretty much the complete opposite of what was asked for?
+>>>
+>>> We have two levels: policy - that describes the default of all devices
+>>> for that bus. level - actual decision on how that device is going to be
+>>> operated.
+>>>
+>>> "Disabled" prevents driver probing until the device is authorized,
+>>> "Adversary" permits probing and requests the available protections
+>>> for operating an untrusted device.
+>>>
+>>> Both need conservative initial IOMMU setup: a disabled device may later
+>>> be authorized as adversary, and authorization does not rebuild its IOMMU
+>>> domain.
+>>
+>> Urgh, I can be absolutely certain I'm not the only one who is going to be
+>> confused this way... I see "disabled" and instinctively take it to mean
+>> disabling the device_trust *mechanism*, as the logical thing that people
+>> will reach for in terms of "I don't care what this new thing is, just get it
+>> out of my way and let my drivers work like they always used to; I want to
+>> disable the new thing."
+> 
+> I completely agree. I was under the impression that these names had already
+> been decided, since I picked up where Dan left off.>>
+>>  From there it then also makes perfect self-consistent sense that
+>> "device_trust=full" would be the opposite end of the scale as in "Apply the
+>> explicit trust model 'fully', to all devices regardless of their bus-level
+>> default."
+>>
+>> Now I guess you could name it something like "device.default_trust_level" to
+>> attempt to make it clearer that it represents a value the value represents
+>> the "trust" *of* each individual device itself, but TBH it's still liable to
+>> look backwards to many users - similarly it's hard to guess that
+>> FOO_POLICY_DISABLED might mean something entirely different from "don't
+>> enforce the policy for FOO.", thus rather than try to contort the naming of
+>> everything, I'd still be much more inclined to just flip the meanings to be
+>> more intuitive from the outsider perspective.
+>>
+>> Say you upgrade your kernel and find your boot is broken because it now
+>> flibbles, but at least there is a "flibble" parameter whose values are
+>> "disabled", "wibble" and "frobble". Are you really going to spend time
+>> straight off reading up on what flibbling is to understand what wibbles and
+>> frobbles mean? Or is your instinct just going to be to try the seemingly
+>> obvious way of disabling flibbling, and then getting positively annoyed if
+>> that only makes it flibble harder?
+> 
+> What about: blocked, adversarial and unrestricted
+
+yes, that's better.
+
+> instead of: disabled, adversarial and full
+
+may be simplify: blocked, restricted, unrestricted? Thanks,
+
+
+> 
+> Thanks
+> 
+>>
+>> Robin.
+
+-- 
+Alexey
 
