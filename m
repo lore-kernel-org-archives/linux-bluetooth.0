@@ -1,87 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795011306;
-	b=3wjbgwwEObXnxr50cUwJT5fWfDIZxVKEf+Kw1rXTy3p4ldrXJbmQXswEnfw1Wib1npUz
-	 ceJq8l2WFCFmGv7RtwwPdRlhUEb3jhn3ZOw0G1uhXh6MXxc5oLv9V41KDpcMZQhcF6z7a
-	 ZD1yyXXmBeZ5jHBNq+9YtP/Ac+XNt0leclaspS+pSpUZfvoXKJMfwfc1zKqv1loDOlLZw
-	 vtaZqzsESlkwNe3HGDo4nT/uc70frfZzIRlwJUKAHsY1VFoT9NA5rQQccEw9zr0DYaAQf
-	 aGsDz+Xh3dFvKEqyG3e/cpfIQ90Y/VKgI/SayJ/wV6Pdnq1L+jxmVqIZFonKTKHjuUw==
+	t=1795012055;
+	b=UKFmEyY7H469FyUcFiKUSJ/39kcQBteNEaWdO7fxKIL9DhoyN3XFyiul+EblPfQAq0f9
+	 0AyxzbGNnDrqNbnT8ff/WCihmrUJjRA8jlnDgRJvT6wB29zC9XW+TagtVKqOc3GHox1kJ
+	 at4ekHycfrkESMJMhFW+A6HrcvTkQsKwcjKAZo/ZrpD4WFdWIOS6whOMT/ID1M1PQwgEg
+	 QniVf1kGDIUv2YME+HbOx/E9YQwAB9mTf+u2GVRroxUx+bKRPwix2iXyhv9w79VRqq5gL
+	 2m2gvYsB22uQ2UBsMCEz+4gVFJKEAJRd+uXfPznnLPj3B3UPUDgYwdd/Gh0vuNawUwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795011306;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795012055;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=2sl2UYato9PST07e2NHUUDKpmyZiHhJhxergzADRXcE=;
-	b=saSOpMp7IvBkF4naQvAJlgFldHotjEOdtwK1n1Z2ZYNmx1biz6+5OWf9Gkt3WgBcqKAV
-	 7aWBBUbvr1fdChefUHrpFVNEkn16yoXXSpFoj0MHjOi5Gh+QO4dKW55zhCSi4VkPdxxMM
-	 MlKdmyzMyYbbhw9ibEiZApAcb57ib/kIvimSaD0/OCMgbhKBheEHOI0QqcfA+zh8kFsyQ
-	 x1r7JdSGyM7fDVG7WMru3pTvuoiSrIJVGZeDWMFgqfEMntOAq71lAtlGA/TyODPEOeWuL
-	 jYcZLSuTADh3WvM4cuzhR8m/Wh1MJ0dXQ8t8gc91ootN92kC8SVEooCPtrCr8/mctXA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
+	b=S8x3FrjPBcjYOk2hvWZd7Rbsgb3WAa6apyQWxrDGLdYmI+WI5c1SF14eWmXO7TYYtTEe
+	 tD/PMnl3kML8A+pbOGaIOX9RXahm1ioMUF11322uWX8gWyMRx3u/kwCAFEDN4xX7HpjWv
+	 JPpuZtzjODkVYVyCC65LUkVE97KMPZCrvD1aG69vsnYuLKNtuz8MKizR/iXR2NonYG7Tr
+	 yb+EWyjm59i/RQ33Y9H95jpT1up1sUhAGCGwxJccJcNiwky60OT44c4++JTUTf1p0Pxxb
+	 60LoVnUXdH+Uett1WsGdybw2yUeXBn9mkUwhg8+LnMKBr9XggO/KKqIE4vzePuL+BUw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Lo3b99Kg;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rcDjcNNH;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91A1606A331
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:15:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E91A1606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AF960A2607
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 14:27:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2AF960A2607
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Lo3b99Kg
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4bb68c197c7so14267095e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:15:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rcDjcNNH
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-9906a5410f5so1622442241.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 06:27:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795011300; x=1795616100; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2sl2UYato9PST07e2NHUUDKpmyZiHhJhxergzADRXcE=;
-        b=Lo3b99Kgcxzt4xKOm6wJvpQMoqmyuCMvRsWY8ijt+XOVboJb5WKy6qNg/fJ7OHa8cx
-         aWCX+m2/AklAVFtjxk04SBhmZPFSvy7LlI/6occjqrJ4s3gYLH0WKvVG2sGc3IrMbBuI
-         O6NtBFe+MmfCnXZ7k2oHFMROIEqWkxzBiiVE0zj8nqCRMpvEZMTkX4apzebk5+HswicL
-         aPFN9PGwl3JjSgEBK4mqgVbwcYLGSU0kNCfustM0yLMPnYZnkEC5+EUhDDDm586fuo6G
-         zFXi6MDEAsPULQ16Xi6VQS8qLhKUCHgStAHC5MQ6M0foCXlHs2LQmR73ir4FcPEkyTFT
-         fwgw==
+        d=gmail.com; s=20260707; t=1795012053; x=1795616853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
+        b=rcDjcNNHAtcM7TrqMnWvUKzFJulqwyEMzhBcEpD3E6OX8nqfuXyyoOvTFTz04kxLEK
+         a2BzAXouP2f5kW/w+9L0zCOyWcG7t87HqCNMPXYHVAHXG1f58Esr0cTU20+OoQo6gaoF
+         fHWwuijLTeh7oGCWPFblVHz7xTbG6O6DE3RFm8xuADJ/FttKsuFpfk40ym+kI7HIc4Zk
+         FEIQUzh5vBolQqpUgp7brFN39J6fa8bIuR46KjKd/T+6748sB02R9E28BjZ7Um0/gFuh
+         +E6fRRZb6XNMt4yf+JpneMzGhVrt9WUPTjnWr+bm8y5/wfMv1WdjLJSj0CePZg5iJW/r
+         tfZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795011300; x=1795616100;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2sl2UYato9PST07e2NHUUDKpmyZiHhJhxergzADRXcE=;
-        b=C5YVDEDlFXhqsUUWS1ppiww4FIOEoDVmNgnlRn5mFGa5WuU/KitDGaacoeYpgq5JEk
-         VIPQqXxdTSBoq/Z02CrHT5gYPPVU6tzuVWIpf/r2tKNCOlK4RHplORPUyeu/S3o9F6fV
-         0VlG9CVNMI8xWJXUQLdVFl+p0Fz0zxL8lsCxCV9Q81zQMmo47W068mLuAFf+tbIH6xKq
-         WtmVpGxpmRPvVs/TVK0qikbxgy5wBqDqq5YE1VHcNzFv2S+vSK9fnAbud/g3/QddUQl9
-         GufDip986KQs8JSoSPhZiCfk5QjwYpBz75TsVhLB+GAhshZrNimmdYON2H2mezF0SS8F
-         4SMg==
-X-Gm-Message-State: APuU4Z9+ivcwnCbdYU15N0u1K2XzHmlMy3xzmNB9eL11VqalhLHgvr7j
-	l+DYBrKHPvAGt+zE3bV6PYXmN6GXiFpZKeNY8mXdcOaPuWE5BQbdtANnxAP8BEpbU7I=
-X-Gm-Gg: AYBFou1vGmgdG1zXWpxbBMWv+3FJyosAU5x5y1xxZ+t3nTdtT+iMAIT1tBQmWtAeZJn
-	bUAWNAgxWvQlVpFv9b2YrnlPCox27am2786rA8+SCBeWcxK8c2XLIL5/V9tE12u1njUxRvPOxbn
-	EI518OJy1Y8tQstiNOG8yGAnL0++Y1xDecHn8QlYKKuuTWjDFD0/5Eiw8xJjcfvZVflNmXbsa8s
-	eSnc9EEq0yWvdqMUCN4Tgdi+sWvAkFRPh5ZyXJhmED8lMdrjeEnC1piAyBwTlWCjZPSTToTNt32
-	+EBCQSSMUP86RQqbPzzQWgI8OgBKFn24cYumvFtzFwezedcnG+i6B6QZZaqkY8JixGqXqGu2tcP
-	MDRuDRoz1T7JE6ZGiMN85nG0OfNw/SflZfilMF4Oyb5+44hkLnqWN1okpTyCVUdQkCQcBqMG8T3
-	JW9Ftg7YLcSQrvMqvYcrA2mKc0yFtD38j+lGPufD8Y9eOOg1+GDa61183auKAFvnsyOpkk2pBc6
-	/mjz8OfINtqgAdekByCVdhRrJ1+lw77Zmsr8Bqm9v5WLgfLaFtXugMW86iSpAlNn3NmIKMg1y3q
-	eONCISNKmrySp9nP8Lt4BG9lOkjZigpV9ctkwFf8RlU8UODSXOYZ
-X-Received: by 2002:a05:600c:470a:b0:4bb:6fd3:5ac0 with SMTP id 5b1f17b1804b1-4bb7da2b98fmr53502785e9.28.1795011300146;
-        Wed, 18 Nov 2026 06:15:00 -0800 (PST)
-Received: from localhost.localdomain ([197.119.251.96])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7e588884sm20894275e9.2.2026.11.18.06.14.59
+        d=1e100.net; s=20260707; t=1795012053; x=1795616853;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=qKw5OUKAtP3pAm6iyjRuAjdpu6coiCZ3X5PuWwGgIWA=;
+        b=cnQ1slh1BPCunVIlpLVOmI+sJIbvc46VVp4cxUjBZu8eJV+4mo0xsAfqui7S75ptOt
+         7dYbAmPTubN/EMpU9LqKB1hKayRNal29Lk5kanMKrPQ/gFiCLr7rSsIGCFonwFDMC7HX
+         pL5PC1dR2961iw1wNAMlwh2e17WLZHACu5cFiunU4JfI2jDDNnIwzOfZEXw1DJ3vSQ1+
+         wu4IjiOdWd1viZ1WDAWbrn45gOFFA2/QgtFndbS0MbdInWkwD+1d+o8ggBJBT5tMBh3N
+         pbRWg4Zis072TQm453AvsM5MPKGqmirC2Zhfw6EYoDwhzVbZf2LB/DFOP2FGKf1rYizx
+         rlgQ==
+X-Gm-Message-State: APuU4Z+6IU4/9U2mklC4/39ddwAP1XT73/YT9XbmLswkIw86FvfbCW/9
+	v8rjjAundg0Ea7ZX2ghTxjDpOqLtQWXyVBdlskHWup3VlVWamEXrIHJYYF3OmVx3
+X-Gm-Gg: AYBFou0UC8g3jM/FiXp+RHOUYwNdYxG5du0tDMqCiYF9OF8JV3sSPGmP1YLSb9wStvs
+	8KJbY3KsFQED2rfYzBWJQmtlFvaKv3nsNGYdio6uXRA1TQ4n1N1QfcBH+t4/1H+rDAx+zd8F9S2
+	vcndfS3m3G07ND9W+HGpxJDntSLz/cTRc9PShsonVF5UNlNGKn66G9fYMWTakXc+LJSaHGRfqxx
+	7O0imO6NRDqDqRZAyjUYrmyVVJWFkar4/v5VUKbeVhhlt8sgksXJHmZBxjMWPoi98Q3s/PIf+1v
+	BC2uSaxz/P2Fg7UZjpZ7KJ9go4rVytCHW2Qr2qWsEGoZf58hd0T20J8GglENhwGZ87lFaDcZ401
+	CRO8wM7Bhy5FvSXXDKt1frflIbqDKH+OhenRg95SNPMduo4RPAYrtzqUG0zCKRge0/PijTVO9mi
+	HTRhZbSe5ZjuFiBaq/BZ3+7iL/9NpI/njim9Qq/Uyfy+8HkVZgBzyF533G3QaD72TxkdTqnSLjz
+	sB6J5c6awYatwhMD2CGP8k2E2gOimO+3VknFTjPkAuRuIISmlIzkti9Uuz2LQLl2kMZMnrumAVq
+	4d6FzbwnSp84hjVwMe1a8Fgz5ZWqmXajIhb5zLD9ubM1CQN4SOP/7STZ7keWaju/Z/8sPGMqoOp
+	uxdstaqu8GG5lLZeZUkl7TkozHejwpyqAv+quqIXSbE0ys+9/LeMZ+xdY2LRb6Mc1UYgyvmRw3L
+	VpDa8=
+X-Received: by 2002:a05:6102:512b:b0:7b4:db17:bca4 with SMTP id ada2fe7eead31-7d6ba43eba4mr649827137.9.1795012053511;
+        Wed, 18 Nov 2026 06:27:33 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6b9185bc3sm1745946137.5.2026.11.18.06.27.32
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 06:14:59 -0800 (PST)
-From: AuthenticSm1les <khidarlaminehamdi@gmail.com>
+        Wed, 18 Nov 2026 06:27:33 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: AuthenticSm1les <khidarlaminehamdi@gmail.com>
-Subject: [PATCH BlueZ 0/2] Don't probe LE Audio profiles on unpaired devices
-Date: Wed, 18 Nov 2026 17:14:36 +0300
-Message-ID: <20261118141438.308232-1-khidarlaminehamdi@gmail.com>
-X-Mailer: git-send-email 2.56.1
+Subject: [PATCH v3] Bluetooth: L2CAP: Use a reserved ident for L2CAP_LE_CREDITS
+Date: Wed, 18 Nov 2026 09:27:32 -0500
+Message-ID: <20261118142732.102749-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,46 +95,114 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
 
-When an unpaired phone connects to us over LE, for example Android's
-Quick Share checking a GATT advertisement, bluetoothd probes the LE
-Audio client profiles. Their reads fail with Insufficient
-Authentication, bt_att raises security and the phone shows a pairing
-dialog. That's the issue reported in #1789.
+L2CAP_LE_CREDITS has no response, so an ident taken from conn->tx_ida for
+it is never released by l2cap_put_ident() and l2cap_chan_le_send_credits()
+has to free it right away after sending, otherwise the range is exhausted
+after 254 packets and credits would be sent with the invalid ident 0, which
+some remote stacks ignore, stalling the channel.
 
-In the "Don't auto-bond on reactive GATT security elevation" thread
-Luiz suggested fixing the plugins rather than the elevation, so this
-adds a paired_only flag to btd_profile and sets it on the LE Audio
-client profiles whose services need encryption.
+tx_ida only exists to track requests awaiting a response, so a command
+without one has no business in it: every credit update allocates and
+frees an ident, and the ident is visible in tx_ida while the credits are
+in flight, so an answer to them (a L2CAP_COMMAND_REJ) is processed by
+l2cap_put_ident() like the answer to a request.
 
-Tested on an Intel 8265 (BT 4.2) with a Samsung phone. Quick Share
-from the unpaired phone no longer gets a pairing dialog, and tmap still
-reads the phone fine. Pairing over BR/EDR from bluetoothctl still works
-and an A2DP/HFP headset reconnects as before. Unit tests pass.
+Using a counter that doesn't consult tx_ida is not an option either, it can
+return the ident of a request still outstanding, and a reject of the
+credits would then release that request's ident and close its channel in
+l2cap_le_command_rej().
 
-I couldn't test with real LE Audio hardware, pairing while an LE link
-is already up, or a dual-mode device paired over BR/EDR and then
-connecting over LE. Testing on any of those would be appreciated.
+Reserve ident 255 for L2CAP_LE_CREDITS instead: l2cap_get_ident() never
+returns it (the BR/EDR range already ends at 128), so it can't collide with
+any request, it doesn't have to be tracked in conn->tx_ida, and a reject of
+it matches no outstanding request.
 
-Link: https://github.com/bluez/bluez/issues/1789
+Fixes: 6e1930ece855 ("Bluetooth: L2CAP: fix tx ident leak for commands without a response")
+Reported-by: syzbot+9dc8780713b11155dd74@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=9dc8780713b11155dd74
+Signed-off-by: Nguyen Ngoc Thang <ngocthang2710.1999@gmail.com>
+Assisted-by: OpenCode:claude-fable-5.2
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/l2cap.h |  5 +++++
+ net/bluetooth/l2cap_core.c    | 28 +++++++++++-----------------
+ 2 files changed, 16 insertions(+), 17 deletions(-)
 
-AuthenticSm1les (2):
-  profile: Add paired_only flag
-  audio: Mark LE Audio client profiles paired_only
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index cf5c2df68af8..72d9d56c6f2a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -45,6 +45,11 @@
+ #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
+ #define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
+ #define L2CAP_LE_MIN_MTU		23
++
++/* Identifier used by L2CAP_LE_CREDITS, it has no response so it is not
++ * tracked in conn->tx_ida and is never allocated for any other command.
++ */
++#define L2CAP_IDENT_LE_CREDITS		255
+ #define L2CAP_ECRED_CONN_SCID_MAX	5
+ 
+ #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 977b41229a7f..3ff40565a05f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1046,9 +1046,11 @@ static int l2cap_get_ident(struct l2cap_conn *conn)
+ 	u8 max;
+ 	int ident;
+ 
+-	/* LE link does not support tools like l2ping so use the full range */
++	/* LE link does not support tools like l2ping so use the full range,
++	 * except for L2CAP_IDENT_LE_CREDITS which is reserved.
++	 */
+ 	if (conn->hcon->type == LE_LINK)
+-		max = 255;
++		max = L2CAP_IDENT_LE_CREDITS - 1;
+ 	/* Get next available identificator.
+ 	 *    1 - 128 are used by kernel.
+ 	 *  129 - 199 are reserved.
+@@ -7204,7 +7206,6 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_le_credits pkt;
+ 	u16 return_credits = l2cap_le_rx_credits(chan);
+-	int ident;
+ 
+ 	if (chan->mode != L2CAP_MODE_LE_FLOWCTL &&
+ 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL)
+@@ -7222,21 +7223,14 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+ 	pkt.cid     = cpu_to_le16(chan->scid);
+ 	pkt.credits = cpu_to_le16(return_credits);
+ 
+-	/* Keeps l2cap_put_ident() from releasing ident before we do */
+-	lockdep_assert_held(&conn->lock);
+-
+-	ident = l2cap_get_ident(conn);
+-
+-	l2cap_send_cmd(conn, ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
+-
+-	/* L2CAP_LE_CREDITS has no response so the ident is never released by
+-	 * l2cap_put_ident() - release it right away, otherwise the tx_ida
+-	 * range is exhausted after 254 packets and from then on credits are
+-	 * sent with the invalid ident 0, which some remote stacks ignore,
+-	 * stalling the channel.
++	/* L2CAP_LE_CREDITS has no response so it uses the reserved ident rather
++	 * than one from conn->tx_ida, which would have to be released right
++	 * away or would be exhausted after 254 packets, and could otherwise
++	 * collide with the ident of a request still outstanding. A reject of it
++	 * can't match any request either.
+ 	 */
+-	if (ident > 0)
+-		ida_free(&conn->tx_ida, ident);
++	l2cap_send_cmd(conn, L2CAP_IDENT_LE_CREDITS, L2CAP_LE_CREDITS,
++		       sizeof(pkt), &pkt);
+ }
+ 
+ void l2cap_chan_rx_avail(struct l2cap_chan *chan, ssize_t rx_avail)
 
- profiles/audio/bap.c  |  1 +
- profiles/audio/bass.c |  1 +
- profiles/audio/ccp.c  |  1 +
- profiles/audio/csip.c |  1 +
- profiles/audio/mcp.c  |  2 ++
- profiles/audio/micp.c |  1 +
- profiles/audio/vcp.c  |  1 +
- src/device.c          | 29 +++++++++++++++++++++++++++++
- src/profile.h         |  7 +++++++
- src/service.c         | 13 +++++++++++++
- 10 files changed, 57 insertions(+)
-
+base-commit: f42f5cae154b90a0cb6d8232dc84c7614ca2e6a0
 -- 
-2.56.1
+2.56.0
 
