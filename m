@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795030086;
-	b=3xpwO3ad0whQ3GQF3du/663Rqa+5okaf6FxKzuD3q+ApayMVKWeUT4bZxsmF9SyN+v3H
-	 VyDTU3dhts6DSfGtYW28Ifgp7qu8qd2Rbe4KYrYP7qRpYIZ+AfNdphCeA9gqJdbNRkeuw
-	 66Fi38mgFDgNOsWtIbcsxKJR2aDaMnWnUuRp3OiibvfnxJalYURpH1AGfT7qh1amlVbuf
-	 VnHUdwYGI9GlcIne/odHJ4a8fL9X0eFP0kciiz9FHXvjJnn0HBIbh12hgOk713kaGGJWf
-	 Jjbrste6EkCUHFC0LEDtRzqxiImTp0HNPvy2BJDckQIjtdHsWmiybMDLxieSwIwMNjQ==
+	t=1795030098;
+	b=Ri7/181pGujhKCeo8Scx/un0F6CSbX2tiZPm3e1C7De3hjBOdBBm1t4vV/+t0nr7VDuA
+	 EZ1u+InFWXTu2oly4hxvuhozL3GXle6yf7OC4DEDG5C6jDkg8R8QkBjIA29mWJpn1KKCM
+	 I6cyZeOi6xbhNbTss1jjAL09SGBJgqSssHcTY1Nb9ueymFLztW6fIfoGgo3KKvy3CSZrv
+	 pycJpVQk2u9re6EBDH02pM7tFCRGtktYzvvxUXaka69tjYqULoxMGMWVaozZjccEQjBcp
+	 jiLss/dvSjXyeAftqPR6RVDBAL7g7VUZpBDPGLDqAgU45vnisfp15fhKYl5Ju0FXw1A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795030086;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795030098;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=SnrsLB5kZ1UeQnsG8kHcQUsE97ktcTSiGi8C0w4swCU=;
-	b=rZfrqhPTXixghYiwMysAWvgHtWL0NY5ZKsXalE5AMT+o17RLZqEWb9KACtrAwnLDBJUL
-	 vYH8ZlfDpx0MhoP3MrljmSlZhrnUWshmfZOPTM2wL0C8PoRgIW36hF5pNQzqU0PsYoGze
-	 3jMV7nZCUs7A7sPjz7+Lts/57x7WpBQ9P7mMNQC6+zmNfIUdblMW/u3jbGDCpT2FcjzJO
-	 A4wNj+GiEaArgf2b4b1ZXgYMUZ4F1ITe5IspyNEJepDTP+a6fwCOLvbZ912X5GMRGz+R6
-	 UqNPedD6hxFLrw7z9cmGeCOKKowiXCSr4CujRsFNX8TjBrm1MaOgyRWK+PlVrnVLLMw==
+	bh=LHYj5RNi7XvfXBnbm1SbTiMtiCmXpIiLuGJrR2GJWwc=;
+	b=II1NqQUhaIjIqmiTZnWOHSlN0yZxKZCXYSI6ZHdUXF4jd414kFf2RXlxBmAvxjFUHI7d
+	 7IlYaqUGcCNbnHPIp7dqvhGipOOi8SnzR15JkE+JSpFwRlBR5guqkQ2o7LwTU21Qr4Zge
+	 zgt+2KIBVBNlR7oWgjDc8hOmR5zujyFhYQVm9XDZCJPRQGNrcyNQtWI2gFWYOC2kJM/Ao
+	 tkq8SS92GFdknqomO+h/Ltzfww4POjoVGwFCMPRAZYTRgmlHO/5sLHr0iAP07GoSL8BIX
+	 um+guRBVgQrPmf7Jzz2rhuGswWmpsaK4djNRPCmKxrrsSA7bVBuZBjmxclsTAizwuvQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cCPIYzfv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YMTKy2f5;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F29E606D35E;
-	Wed, 18 Nov 2026 19:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435DD606F50B;
+	Wed, 18 Nov 2026 19:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cCPIYzfv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9ABB1F000C7;
-	Wed, 18 Nov 2026 19:28:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YMTKy2f5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C8221F000C4;
+	Wed, 18 Nov 2026 19:28:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795030085;
-	bh=SnrsLB5kZ1UeQnsG8kHcQUsE97ktcTSiGi8C0w4swCU=;
+	s=k20260515; t=1795030098;
+	bh=LHYj5RNi7XvfXBnbm1SbTiMtiCmXpIiLuGJrR2GJWwc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cCPIYzfvOpSaWxW7MQKpro4h15QnMMJVwSPJdZjOFqzBIZxjciSgPHzGsK9vib1jQ
-	 GgM2hLkK6ypMYv2W5GOZK/JttsXsLjTBYaDSIjFCgj3ipveP9BPs0YBMeBNOH5j5Zi
-	 BTlhM+g0yA3T8aR0EOmXh98niJGxJWpx/mxLtW+Zqih0yhCSDGfODnlAB1TLKykznB
-	 aBoTEK8SdW9Mj7lJxQXZnTSgaYdNAM4bvwpAi/7UVEu8AHgbp7TYN7e/eH7P3H5iMp
-	 POOX9gwWkG08D9sHpw0jcnMIUgEQrruGvkEMZpuEJ297tqzaw9P29HTipyqVJ/63y8
-	 Q//VtVqkfDpYQ==
+	b=YMTKy2f5hOajpdVsxT7Z/qw0cQ+SUGAGAfoQht9oGCzvVeXtU0969ho9alvjVOJBc
+	 Ihu0HHC9GpuR3MVLz4y1bbjoodIDEDbtnYI68gnxsp/MQ4zitgMllGoWybTniZ/DKV
+	 uet44X/q63U5kdP2oIqk6X6+Shay3RFoig5U8qPFbaIXiPJo8vRYBcvxUeV4cF6BJu
+	 S4lD0thMtGD+spztVFCEAPrGZwZQr9wcDlXm0hCyMa9G5qLrPTpVLRDLvlPE2ykNDN
+	 9C8Ad4rK6ch3gVlw/2rApQEzvJcbCGzlft5XztqnVDGv0GI+X5tMEd/0OBln8vg3m4
+	 DwQwNNsNcbbGg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -96,9 +96,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@suse.de>,
 	linux-sound@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v3 08/31] ALSA: usb-audio: Release interface claims when probe fails
-Date: Wed, 18 Nov 2026 21:26:38 +0200
-Message-ID: <20261118-device-trust-core-v3-8-d655875c4bfb@nvidia.com>
+Subject: [PATCH v3 16/31] Input: gameport - use the compatibility driver attachment API
+Date: Wed, 18 Nov 2026 21:26:46 +0200
+Message-ID: <20261118-device-trust-core-v3-16-d655875c4bfb@nvidia.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
 References: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
@@ -117,38 +117,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-If the first control-interface probe fails after claiming streaming or
-MIDI interfaces, freeing the card leaves those claims behind. Module
-unload can then race with registration of the claimed interfaces and
-leave dangling driver pointers.
+Manual gameport binding calls the driver's connect callback without the
+device lock, allowing it to race with generic sysfs probing. Normal
+probing would run CONFIG_DEBUG_TEST_DRIVER_REMOVE under gameport_mutex;
+a disconnect callback that unregisters a child port would then deadlock
+trying to acquire the same mutex.
 
-Release auxiliary claims when discarding a newly created card. Preserve
-them when a failed secondary probe leaves an existing card in use.
+Use device_driver_attach_unrestricted() to centralize binding and failure
+cleanup without the debug removal cycle. Take the device lock with
+device_trylock() to serialize attachment with generic probing. Return
+-EBUSY on contention because waiting while holding gameport_mutex could
+deadlock with probe cleanup that needs it.
 
-Fixes: 9ad3d6ccf5ee ("[PATCH] USB: Remove USB private semaphore")
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- sound/usb/card.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/input/gameport/gameport.c | 22 +++++-----------------
+ 1 file changed, 5 insertions(+), 17 deletions(-)
 
-diff --git a/sound/usb/card.c b/sound/usb/card.c
-index 59979b793fe91..56ebdd61f72e7 100644
---- a/sound/usb/card.c
-+++ b/sound/usb/card.c
-@@ -1090,6 +1090,13 @@ static int usb_audio_probe(struct usb_interface *intf,
- 		atomic_dec(&chip->active);
- 		if (!chip->num_interfaces) {
- 			usb_audio_disconnect_components(chip);
-+			for (i = 0; i < dev->actconfig->desc.bNumInterfaces; i++) {
-+				struct usb_interface *iface = dev->actconfig->interface[i];
-+
-+				if (iface->dev.driver == &usb_audio_driver.driver &&
-+				    usb_get_intfdata(iface) == USB_AUDIO_IFACE_UNUSED)
-+					usb_driver_release_interface(&usb_audio_driver, iface);
-+			}
- 			snd_card_free(chip->card);
- 		}
- 	}
+diff --git a/drivers/input/gameport/gameport.c b/drivers/input/gameport/gameport.c
+index 9707b155bc947..88b1a3464bf3e 100644
+--- a/drivers/input/gameport/gameport.c
++++ b/drivers/input/gameport/gameport.c
+@@ -216,24 +216,12 @@ static int gameport_bind_driver(struct gameport *gameport, struct gameport_drive
+ {
+ 	int error;
+ 
+-	gameport->dev.driver = &drv->driver;
+-	if (drv->connect(gameport, drv)) {
+-		gameport->dev.driver = NULL;
+-		return -ENODEV;
+-	}
++	if (!device_trylock(&gameport->dev))
++		return -EBUSY;
+ 
+-	error = device_bind_driver(&gameport->dev);
+-	if (error) {
+-		dev_warn(&gameport->dev,
+-			 "device_bind_driver() failed for %s (%s) and %s, error: %d\n",
+-			gameport->phys, gameport->name,
+-			drv->description, error);
+-		drv->disconnect(gameport);
+-		gameport->dev.driver = NULL;
+-		return error;
+-	}
+-
+-	return 0;
++	error = device_driver_attach_unrestricted(&drv->driver, &gameport->dev);
++	device_unlock(&gameport->dev);
++	return error;
+ }
+ 
+ static void gameport_find_driver(struct gameport *gameport)
 
 -- 
 2.56.1
