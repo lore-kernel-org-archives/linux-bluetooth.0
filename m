@@ -1,49 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795114209;
-	b=36KQJt8BTI5R3czfiVxKZUF0GVvPGiCvqelW18Q/QXOHto8CNPZG59QM2pxHZ1czUY/0
-	 yMkWzebcyK5Nk16uc7tryB5cJZ5AvXP5EFBlK9mJTO71ySawUjD36wEYFeJIkXzIXX9KK
-	 Da8wQKdegv0fIaFhz9NhNAEJ5l58tdZDhK1YZtHWd/ZpSyMnujV7wxnMMWLe+f17t7gEd
-	 Pu7obDvohKL3h1EpZMQuHotLZupju8gQdU883Tc74uZrck9OtfP4iTHiiVTO22WZERzqz
-	 3DXUiKlkaasCP4ecr0Hd5EZ/aFcIhwPJjEovNa7l7J91r+lx4zw/xEvfUvqb7wqWarA==
+	t=1795124538;
+	b=RN+mJJVqHhB12nwK8gngjGOneFMByB0AUAJCEoZU916vquZe3xjqVNmcl5eKk/Ai/D5w
+	 bVG0Uyk9rOku17ywiaarWw6xNnx8Yp7z4LzE1SUdR3UcrJbOaHUYO1qEhNn43oh18V/4V
+	 VHfUvZp13ddc9OuUGRPfZczxAZI0dO3DbcJfuzGhR8rwwWz5wQ/OOzDlAZN1DVVW4CIac
+	 FW1fXe/bcHeRU8FCyUDEjWfFxvcPS+cvemSX0numbsVjjVpHibbBjmr6JNoImd6SwuE2F
+	 K8SQpttTFvNMyc2F+k/7X8vceNJYTyRrC7Vh2g/EcnbwY7g1uFb4zAy6MI3MUC+vAnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795114209;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=OR37dFwRN8krG9Wro/JI0lB2csWUrGFL5eB1dazV5AE=;
-	b=4KpVr2G/GtexcfJbI+zqf8kS3BH8w4MrUGbEdJQSE454GFsdh1w4tW3fZCSYp5d0Aj2K
-	 CKbt0PcD1gvedH9+sksdq18gWPlKNviYlYgNFBlpxy+TW6eYUFFt70eNiJoeISqj4W3+M
-	 5H9PPk8EHMKSdISNA02wwzKae7KjnqGWVqxHr+BzY8FsQz86m6dOeNd1ti7Jb+IRGyVrj
-	 +y9NYCWHM+lCbfW6mjfP2cv+IMPBl4y5l9rVn7kdZsj5U/gFKY9jAQ6v3tR8NAttMP+9D
-	 BA4PnXl11svjFOkyySn0feR3NRjE4YQKBuSHPyuLGzCE5a/uUi1oHupDlJJwaNdMGJw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795124538;
+	h=Received:DKIM-Signature:Date:From:To:cc:Subject:In-Reply-To:
+	 Message-ID:References:MIME-Version:Content-Type;
+	bh=RweZj/1TUoc4rtIBYfUS/HLl+WylhOgLLsA47vbDTKE=;
+	b=TJWPrKpnOH2A9gh3aAo31mmxOmKRuG203o5Qk7FDhrWJDhWDAgP6ghDxYRLxOKHvfcyj
+	 /VV85m0Nul0or1EXPB9cn3W6gMT8B2fa+JiEwPtWnl8au1HPwTfayHW/FR5cEqaSegVzz
+	 pWxie158j8mgbvvyf077TrtexQx39JXVcWDPdnIJR9xHC/j+TxvoKK09T0d5BcvDgMWv5
+	 C7Y+0E9I/WrG2KLBSc4Au1hqSZHjuQBDC82z2bHEhC5FhaIfPdD+ZA67OsMzxwZ++qyl6
+	 dteBNS4OTX6E2UHAuVy1nUfpq0pWdxyqvGNz+ywMXZJtdrU25YQlE0VweDqGgvQkw1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=D5ZHhYu7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPDtNyt2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BED606A336;
-	Thu, 19 Nov 2026 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFD5606A325;
+	Thu, 19 Nov 2026 21:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=D5ZHhYu7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDC71F000C5;
-	Thu, 19 Nov 2026 18:50:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BPDtNyt2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC4C1F000C0;
+	Thu, 19 Nov 2026 21:42:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795114208;
-	bh=OR37dFwRN8krG9Wro/JI0lB2csWUrGFL5eB1dazV5AE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=D5ZHhYu7twlYu0ZRDXpQ3PRVp1YNKsmb4+zoLaJCTnFRJ00rzxil/D82bhgiusNa3
-	 Mf1XQ1uPg+LhiOqpz+qQkpkdiJ3DScKd2KmR39srGAbRDQ0E/C2tWwppDsq3CigIal
-	 At2i/LRCdmX4dsxJDCbgbMSWrBviOcNY12BBqH/5LtAJcYAASOv7yWmBRUlxRg9FpK
-	 qVf2s3FhjC4Z0HcOHf0uHcnQnagWZe6XtO4LM0rd1w3CLNxYlhFWkX8CPJ5Jo5MDCg
-	 Ao3tyBIAQyJOb/LPIA3HVyPazi3ZLpbd/swlkhXbj7iIWNYJ1UjH4IzQCapav+ix8Y
-	 TBcQf75WS+5Rw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B44843808210;
-	Thu, 19 Nov 2026 18:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20260515; t=1795124538;
+	bh=RweZj/1TUoc4rtIBYfUS/HLl+WylhOgLLsA47vbDTKE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=BPDtNyt2N8IH0c9dksntcJoOQmJyIJ+iNPs5wjWF8UnWCK/QvKCfUlcy4WmNJfsKQ
+	 wLYkV5w2UqjFyk1Y0r0JmDr/iz8SVpR3WOejweKFHYgENVkdkBovcX7G2qilT9meF/
+	 OyLm1FbAQrCk3510O7fnEY9KS5sVypHcpARqr8RKbdAZe/iF8na7YoNfg5I/3sUL3m
+	 hNFSSjepDX6xz0Q5ck6er0Gx9Pi1QyT4WhJtkhHmBNo0TYgqyIXKnH7tvBjAAQFKfb
+	 S5+kfeHTVIGuktwdNwWuNTPr4NW/JXst9Z+rc6RXCE3XtYBR6wPFeWrHvF1kMyFbYf
+	 3CmmoZohqzfVQ==
+Date: Thu, 19 Nov 2026 22:42:15 +0100 (CET)
+From: Jiri Kosina <jikos@kernel.org>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+cc: Benjamin Tissoires <bentiss@kernel.org>, 
+    Marcel Holtmann <marcel@holtmann.org>, 
+    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+    Michael Zaidman <michael.zaidman@gmail.com>, 
+    Rishi Gupta <gupt21@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+    Andrej Shadura <andrew@shadura.me>, 
+    Johannes Roith <johannes@gnu-linux.rocks>, linux-input@vger.kernel.org, 
+    linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] HID: hidraw: Encapsulate struct hidraw and make
+ hidraw.h private
+In-Reply-To: <20261016-test-hidraw-base-v2-0-153f67a20cad@gmail.com>
+Message-ID: <99s2r0r2-pprp-o100-p5o2-op9n64r9qr90@xreary.bet>
+References: <20261016-test-hidraw-base-v2-0-153f67a20cad@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -53,47 +64,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/2] Bluetooth: btrtl: Fix NULL return on errors in
- btrtl_initialize()
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <179511420733.3743161.1888737096932815865.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Nov 2026 18:50:07 +0000
-References: <20261119032415.4010732-1-tzungbi@kernel.org>
-In-Reply-To: <20261119032415.4010732-1-tzungbi@kernel.org>
-To: Tzung-Bi Shih <tzungbi@kernel.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, max.chou@realtek.com,
- linux-bluetooth@vger.kernel.org, tfiga@chromium.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 
-Hello:
+On Fri, 16 Oct 2026, Dmitry Torokhov wrote:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Thu, 19 Nov 2026 03:24:13 +0000 you wrote:
-> In btrtl_initialize(), the `err_free` error path frees `btrtl_dev` and
-> returns `ERR_PTR(ret)`.  Because earlier calls in btrtl_initialize() set
-> `ret` to 0 on success, any subsequent failure path that jumps to
-> `err_free` without setting `ret` to a negative error code causes
-> btrtl_initialize() to return `ERR_PTR(0)` (`NULL`).
+> This series cleans up internal HID core and hidraw header boundaries.
 > 
-> Since the caller btrtl_setup_realtek() only checks `IS_ERR(btrtl_dev)`,
-> a `NULL` return bypasses the error check and causes a NULL pointer
-> dereference in btrtl_download_firmware().
+> First, internal HID core declarations and unused symbol exports are
+> moved out of include/linux/hid.h into a private drivers/hid/hid-core.h
+> header. Next, a hidraw_instance() accessor is introduced in
+> include/linux/hidraw.h so HID drivers that only need the hidraw minor
+> number for naming or debug logging no longer dereference struct hidraw
+> directly. After converting the drivers and dropping unused
+> linux/hidraw.h includes, hidraw.h is moved to drivers/hid/hidraw.h and
+> struct hidraw along with its internal buffer and list structures are
+> made private to drivers/hid/hidraw.c.
 > 
-> [...]
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> ---
+> Changes in v2:
+> - Rebased onto latest linux-next (next-20261016) / hid.git for-next
+> - Updated hidinput_connect() declaration in drivers/hid/hid-core.h in
+>   patch 1/5 to use unsigned int connect_mask instead of unsigned int
+>   force to match upstream changes
+> - Link to v1: https://patch.msgid.link/20261014051326.3784498-1-dmitry.torokhov@gmail.com
 
-Here is the summary with links:
-  - [v2,1/2] Bluetooth: btrtl: Propagate errors if btrtl_vendor_read_reg16() fails
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c3cdaaa5cb5b
-  - [v2,2/2] Bluetooth: btrtl: Return -ENOMEM if bt_skb_alloc() fails
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fc4527d1e1b6
+Now in hid.git#for-7.5/hidraw. Thanks, and sorry for the delay.
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Jiri Kosina
+SUSE Labs
 
