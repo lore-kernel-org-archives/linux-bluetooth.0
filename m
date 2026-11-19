@@ -1,100 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795043093;
-	b=2oecFUZmHT9kzCTwxADMosYjVWd8CZ0bxcQbChTH99K2xS18VHj9fHOccMqS43bN9O72
-	 ZNjfZBqLoz5itrbUG6EW3RjKoVu5AYI3c8KNc+35Iw/QhX0MxAiYcHgITGidZ2elbOEXr
-	 +7G25X7RMv+zNY5Api20p7+3dAKUqMTkKdhXvRKn/DXCckRgPGqXpjeJ2eAnhlAh1StHA
-	 prfQ89Dgc3vWa6qyrcQw1RSIwiBJScRxL2AWwLtCezOoC1yu5VnTXdF+IlwIODVMfYGki
-	 LPMvkxTrRBzkKQ8F4Pw5vQ5IQXWkdpYy2V979QrL+lQzIi4gPdzeHIXO4wPmrXytHvA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795043093;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795048374;
+	b=sdV66CdbsecOoUsqzuS51Zj2ujk1r553Wu8GkvT3PEhjUUTZEC+CBBPHsbouQds6Iaag
+	 2NFMbn5Resq0smq4UPRpeNcZHUxAq3x7z0o8WvZUfzNfH7mFAVD4h6qrpiBxiLXxJLyL0
+	 gJ81AO2Cz0ONpCcpaTmZDm5aQYTWMQ83maxWaMvADIvmyUVV5JKvWo3oL+l3EMLC9ynHh
+	 7BYgE8GZ0LR9dQPfqJ2Nvypi2aNRgPXvvVBEQM5EBerQNnEuWjw9bqLxyKK5ONnhNOZJ2
+	 PYDVi/4vOiGPO5sn7g4V7fdflWNoBhR5qU6yH8n1CYVxlDVNmhonK+ac1s+rHuK0ZKw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795048374;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
-	b=SqgNs80z+uU4a0AaMI1Ji55+2n8/4OX28PL7mIqJEh7OdTVyQOOu/WjQxhC9hMOJJu7Q
-	 PV4rOY5X1IcyWspbflMzuo074G1v8FJvlZmhyXGl8/IThSnYbemz/Fjyu9vkX45d8S9A/
-	 1igJeymwipliON6NwyRICaXIwNZemj6GkazoThnjBQenOnxR8pZZwkisFpS7iXWHn+XIk
-	 yR76sfGIg22UKzWpge/PQbU6BBwKU0gKgQaiJra3EGbNrcjcINXbU7cj4dH0McIcGE9Ht
-	 uCT+C7Zp8iyESxZ4rNMvQHpyUOusjBjvvDNHpzIQ7pkFPqsvL84owf1xLLwn4DYYRGw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
+	b=DgunNlMlGSgGYpOm2a/BdmRLBRhpSnewIucFVHXoKTl6fauV6aJ3HNRK2g2X+2eEjab+
+	 xBPFDRYaL2doUWD7txpiSUiSSGH0Iiw7zzcnzRomlSwkzSrgfm9/YBMZrMUAte+fAyfaJ
+	 4Aj2qC+E9RiNHZ41W+cSelkvpTOkXagQ4UxBZ2QJ/rvgtrn4Q30+6I4LBtEb6SnmY7im/
+	 bTXJ3JPI7q//osXjdeIIDn/7diCn/gwQr6gEaJjubjlBbkop6lsn0T1fpYbFXJrZ8BypW
+	 DSBQ15+5zbnXSTio9rn7l4eRHzCaRKnn9XHnCuCk0P58mF4SQUC+0M13pzUUyeYR9lQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Fk7F4CVz;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OnEZLQvm;
+	arc=none smtp.remote-ip=209.85.210.175
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4960606A32F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:04:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E4960606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9846606A33B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 00:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C9846606A33B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Fk7F4CVz
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-67dabd38cdfso1869325d50.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 15:04:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795043092; cv=none;
-        d=google.com; s=arc-20260327;
-        b=hyV0IUQrV10u8phDQe4E3UDo7namv5TFGVzQqSVtkprrl9IfIXSgsZGLnv3JJ+8Jf+
-         GPSC3OmyDlfWgrF2/BHOv9qLhIE076ado7ShoJHmXhMZjo2p9n5S6kIHrxyb2kMppA+C
-         ffRcPn/2FN8sysH+QSbehP4ao1/rrmgn7SYqtXjeVWIcaYEjNpv2GRKkg6H9vvTKeQ5u
-         uhOPJ/1tmC39/Yoxdhf0s/qW9ZU9/mwun2wwYXPjdoOqOEKUHjic27NjbClZ+eH9bazm
-         KqmOzCSyeBD9IPutzWwAhBWjRcGDL7e8l30j6Si1EPQgx/H4yPAU3Qpdx5WS1OZDdNRq
-         lGsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
-        fh=epaCqHH5oWjBKJrh9YScy5IbnruG0DtPxVaTp4+ZegY=;
-        b=jTM8DZioYD6ITC8J+oc+x1CqXncINpCC5hFuheW9jWb1HFnVj6hMltLIxA9Pv/bt/V
-         aqGQvKH1bv5+ADaGBAAEKgHYfPsWuRqa3SmW6t5aBwJioGr2LopBNwgKc+SNpBH0pcke
-         +cChK3QlKsRqchurBIR/iiG54NwzCimtTQ9t7zWdET4dpU5JJuYAdAygnQn2CbJ9Ha1J
-         uho3F8DB9Z8Eg6RMCf6JIynspB5PBrXWlWo0IU8CIhzrDpQKiKSUncKSZqpl36whxMcw
-         Du27bGS0udGTkYOq/nBGI552OgdupPJxJKCgX7P59N+rdSZWAY93gk9vELqKhNQ+N10X
-         /SRQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OnEZLQvm
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8a05b210703so983274b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 16:32:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795043092; x=1795647892; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
-        b=Fk7F4CVzIqTVpBYAzrvf0DhPem4rMGXqFCTAbCqTTl4z67X4xNwlAGDndr5BqH51ft
-         LKGecTsrb0y1pnpukSvjvXLetjlRaFkXGUN6avocCGpK2gOYpB9YXYWlWLW/3cawXhca
-         fAS6gWBmJujv/mEChv+vsaCONpyijeSbjLLkAykNNop8mwz/9HDKo4fbiklZtb7bBTjc
-         IShiTtGpUenlO8tazBgBdu7IR7B7EkNtVTIdCxD8JBasbDAsCiuApqk47LFEbawrjA6a
-         NBM//6juStVXcvNpiKZQhz4ToUey9Pcd8WJ9m2UZzSgSBWxT024VsZ3u9FFUCZzlXGfj
-         fAsQ==
+        d=gmail.com; s=20260707; t=1795048373; x=1795653173; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
+        b=OnEZLQvmypkXI0fCPVOTYeVsYe04BE/wZwfijxBKm+wf1XTpsWoFLSKyn1/ECm9RIm
+         74s8mPa+jbznMVZnl+MXtFrnPBozlh0sslG/hB8csWVv1e7metma2CCxtnkA+a3IXxTe
+         kEVIqFsqexO1tep/NN0wCuNj2zDI/aBDiRRIBUCXFBpMz5reJ4/z3SClxaZ0opV6/uLT
+         CAPXSxGIVG1KskfhzRv2mhZdkxLlAoMgvKalYm3b1JQ/ZrZg2E/FFVyNoSf6ltwVolyz
+         YY94U2woXU6syO7BzHGFt2AtxrMWcfPmMntPz5SlBqSNyrxfvmKNDXmTqwS+Q8RKdpWd
+         u1eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795043092; x=1795647892;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KZTFDK7wToVuIFH9xLlz+M7Y14/N8hcRBkBM/5LM+64=;
-        b=GwH6zIxLVz8pgd+FlniZsJio6fShNou2jpOuMKm4YC33EPiTXv6dMtBGT7ERG/rCg3
-         wyZb/lvTQee0ctrhPoz453ac3iNOlNCt3/wmhh0/Ml0vKVbsBOeIy2rd2lShnyYHku3F
-         +FUHjhh1aSGaAcWrmJ4mKKC2ONOdqI2X4cGX5BLrYkjHKKaNAbi/gZ9bKN4gLTH7vkjd
-         vwZRUrcVdrQu8MszlMZDtjKs+vuTvUZ7KVPr3dHB2W6AcyxMRl44XoCqjIM9mB5omF+5
-         UqeaICYqOrOeG5CV3HDYgcghZL/S8mCLoWi8Y6Tw1TRiS48+5cXQecL3E7TNKQImvrvW
-         Z6eg==
-X-Gm-Message-State: APuU4Z+NW/X0rFZkOsqi57bIE+6ys0cCt0cwMTloqjasaZLoY2lL79Kx
-	g47x70OnWSzhKQhF0zAk9ycrxjmn7Whf88rHOhQqM2jdWpBIZDFRs73E82OZinModaki9uvVEaR
-	8soEb/jdxH+QFXfeWN7fILqH3HT1ZzZ0=
-X-Gm-Gg: AZFdTZfj5L2nn7uuZ6/Fd1y5JwKg2hObX2Xmhvd5oz3YK1GQiPc8+D1/4pAcXJ6nCrg
-	fCPfAcuGmmIlB0QWSq4vSL9Euk5p9zsQ42NfiLByL3NzV6OF1BnoTE9dFfD2lWl0/IywDAhony0
-	O/ewkk4kpT/RfNGDaFPyt1A4OBcKp3U3HQ0yPvLEpzlT8JMrQN7EgTwMoI6jI+4aGJC7QSG/wsr
-	c1xkMu2LzgahU8oGfIBnaabclbz3/igBfBn8pFwgQKKJ/AzITT6MpIVrLbfRZI/eu5Y381z9pfN
-	oXZ0sQN7j/KLYoAp2yOaXzy8zVuVl2hKo0axEdAoEkmE8CJVT5BZQkBipx2VhDIysb2UMwWcSFO
-	MxvGTBEq1BX1+cTUnrNeI6VRoU0nlADmSbRhM3XfVtcsIPFfshM31LgbFGDjx2avkDk2LCoKdy8
-	/Q9TIzDwcoPCG0zT6k2fMnRvCVnYWTLnd/ZMVQfEd4cSQoobOGM1VNslOl
-X-Received: by 2002:a05:690e:408d:b0:67d:b472:88a8 with SMTP id
- 956f58d0204a3-67dd4025a14mr2161968d50.82.1795043091673; Wed, 18 Nov 2026
- 15:04:51 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795048373; x=1795653173;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
+        b=aizcgkyOP7/1Z0N0XiEgpffDyLduu4hNZvmXv71NLfcUIIj5h9vY1ceGcVgepvTXae
+         lsegqvW4R8jl/3+Ghkhbc2Os6wkERYr9aiizwvGlZmJEG7uGOq+agRtBS5UKvRqpbbNZ
+         DfcNAF2EKNiKsETFl/W6nO31/Shs/r4Cz48bIPNRad2/HWWl24YRrWyCM6nwbr7JICFd
+         TW5vKiv9JjE6vqQa913SVdnmQ7CvRARIndoIWQLxloQbIzkpNeFWFE8tAFcfqayFr4YK
+         SO7yk+JBsSN5jKudwgr4OIV7zm9dI0upqqy7PNqwnZbttj522ijvhlyKcEevTfnWuHE9
+         40Ig==
+X-Gm-Message-State: APuU4Z9yF0ObjQbm7ht46+q/nEZFQhgG23yKvSf+Wf4tlML89IxSRDPo
+	oXyzYjxJeGOIoXKDxxBEtTQliez6RGExahx5wOILq9Vw7cHe5uKX5zIc
+X-Gm-Gg: AYBFou1KMqRLcGbLv9Jplx/A+00sIR68deeBADBd4wodxiofyPVNmZkcXKcH3rWr4NQ
+	NhsjXNQMElFkn6z4pONOxgoIdlbMEKXGyIN3eDuL60Z8Vj4aCBoCxNJEHDdXQf6L1pvLa+blJQQ
+	qTKhIWtPb7+ad3TixscTXD+Y/vX0l56ambDX23DRCycnC5Fs2lUj1A/EwiCZxR5dhWqCNfVTkK/
+	lq/Nx36b53GBFf29DJv3QM/uioXsd4q6MjDs8T2sDFCsaA99kgQdhS7kzYRS0QIuT1JGom54Sup
+	wzTfr4XjqjdrEumRC/LZ/73rQVSpDt4uMCn5mKJAjUxoSHHTlEAKRF2+uJ7mU8JqteFWHE200KI
+	rBCcNNlQrD6xPfqa6qWSn+gYj7NKy/Wy7fM9gP5Md9NDvxcIH/CKt5xlKfmp6TW574HdN73e0hu
+	hXASvJELX6Lb1PiPbM9yYt7vZPK/CqdsFyKRj5lUGDLOWQRO0SGW8P4OG9//1FBBpx7XpjD0bq9
+	GeICg72SompKzeR8ZIsESyfr+K29WHC0iSS0LnvS2RadFaoZr9Ou6Iu+72Q6niYxbJUXORKa0O8
+	JvG1Sfa4/3g7lpFCCUGoRExdrg==
+X-Received: by 2002:a05:6a21:71c1:b0:3f9:bfa2:6067 with SMTP id adf61e73a8af0-3fe970faf9fmr3662178637.21.1795048373034;
+        Wed, 18 Nov 2026 16:32:53 -0800 (PST)
+Received: from localhost ([111.228.63.84])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c5cba3313dsm1975051b3a.53.2026.11.18.16.32.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Nov 2026 16:32:52 -0800 (PST)
+From: Cen Zhang <zzzccc427@gmail.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	jjzuming@gmail.com,
+	zzzccc427@gmail.com
+Subject: [PATCH v2 0/2] Bluetooth: Fix advertising instance accesses without hdev->lock
+Date: Thu, 19 Nov 2026 08:32:44 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0245-v14-e37270232af59a877004-0@gmail.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,172 +96,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
-In-Reply-To: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 18 Nov 2026 18:04:39 -0500
-X-Gm-Features: AclHuK-21xvoF1R7FRBUL1DF35OsNzAIO8RSAqbqE4KfBM5RlmzDAc_5P9bd6dI
-Message-ID: <CABBYNZJvzYd98m9rosF2m+nP50tTUf1MwHBPThpcUYHNoUxKzw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: check security before completing a
- deferred BR/EDR accept
-To: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Mohammed,
+Snapshot advertising instance data under hdev->lock and keep instance
+numbers, rather than list pointers, while waiting for controller commands
+(patch 1). The resume and power-on walks use a 255-byte stack array in
+list order, covering every nonzero u8 instance ID without an allocation
+failure after the pause state has been consumed. Widen the timeout
+conversion before converting to 10 ms units and clamp to U16_MAX.
 
-On Wed, Nov 18, 2026 at 4:34=E2=80=AFPM Mohammed Alquraini
-<mohammed.saad.alquraini@gmail.com> wrote:
->
-> A BR/EDR L2CAP service that listens with BT_DEFER_SETUP asks the kernel t=
-o
-> enforce its BT_SECURITY level and only decides which peer to admit. The
-> deferred-accept completion path does not honour that.
->
-> The child channel is placed on the parent's accept queue at CONN_REQ time=
- and
-> is reported pollable (bt_accept_poll() returns EPOLLIN for a BT_CONNECT2 =
-child
-> on a BT_DEFER_SETUP listener) before the link security procedure resolves=
-.
-> When userspace recvmsg()s the deferred child in that window, l2cap_sock_d=
-efer()
-> moves the channel to BT_CONFIG and __l2cap_connect_rsp_defer() replies
-> L2CAP_CR_SUCCESS with no security check. If the security procedure then f=
-ails,
-> l2cap_security_cfm() has no branch that matches a failed result on a BT_C=
-ONFIG
-> channel, so the channel is never torn down: a peer that failed the servic=
-e's
-> required security level keeps a connected, data-passing channel.
->
-> The sibling setsockopt(BT_SECURITY) path already rechecks with
-> l2cap_chan_check_security(), and the non-deferred incoming path denies wi=
-th
-> L2CAP_CR_SEC_BLOCK; only the BR/EDR basic/ERTM deferred-accept path was
-> missed. This is the BR/EDR counterpart of commit 522e9ed157e3 ("Bluetooth=
-:
-> l2cap: Check encryption key size on incoming connection").
+Translate management instance numbers to controller handles in the
+remaining periodic advertising, BIG creation and advertising set
+transfer commands. For the shared handle 0, update the intended instance
+after the command succeeds, since the completion has no instance number
+(patch 2). The remove-set and random-address paths have already been
+fixed in the current tree and keep those implementations.
 
-That is encryption key size, not security level, and why is it
-mentioned here and doesn't have a Fixes tag if that was missed?
+The former patch 2, "Bluetooth: hci_core: Initialize advertising RPA work
+only once", is already applied upstream and is not included again.
 
-> Gate the deferred completion on the security state. In l2cap_sock_defer()=
-,
-> before completing a BR/EDR deferred accept, call l2cap_chan_check_securit=
-y();
-> if the level is not yet met, mark the socket BT_SK_ACCEPTED, leave the ch=
-annel
-> in BT_CONNECT2 and send nothing. l2cap_security_cfm() then resolves it: o=
-n
-> failure the existing BT_CONNECT2 branch denies with L2CAP_CR_SEC_BLOCK; o=
-n
-> success, a channel the daemon already accepted is completed through the s=
-ame
-> path a non-deferred accept takes (state -> BT_CONFIG, CONN_RSP SUCCESS +
-> CONF_REQ) rather than re-signalling an accept already made, so exactly on=
-e
-> CONN_RSP is sent per channel and the on-air sequence stays strictly monot=
-onic
-> (AUTHEN_PEND, then AUTHOR_PEND for a not-yet-accepted channel, then SUCCE=
-SS).
->
-> Validated on an arm64 QEMU rig with a BR/EDR peer emulated over /dev/vhci=
-:
-> with the patch, an early accept followed by a genuine Authentication_Comp=
-lete
-> failure is answered with CONN_RSP result=3D3 (SEC_BLOCK) and no data is e=
-ver
-> delivered, identical to the non-deferred control; an early accept followe=
-d by
-> a successful (keyless) auth completes only after the security chain finis=
-hes,
-> with exactly one CONN_RSP SUCCESS and no trailing PEND; a deferred listen=
-er
-> that accepts only after the security resolves goes through the designed
-> CR_PEND -> recvmsg -> SUCCESS path with the link at the required level.
->
-> AI assistance was used in finding and preparing this patch.
->
-> Fixes: f66dc81f44d9 ("Bluetooth: Add support for deferring L2CAP connecti=
-on setup")
-> Signed-off-by: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-> ---
->  include/net/bluetooth/bluetooth.h |  1 +
->  net/bluetooth/l2cap_core.c        | 10 +++++++++-
->  net/bluetooth/l2cap_sock.c        |  7 +++++++
->  3 files changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
-uetooth.h
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -407,6 +407,7 @@
->         BT_SK_SUSPEND,
->         BT_SK_PKT_STATUS,
->         BT_SK_PKT_SEQNUM,
-> +       BT_SK_ACCEPTED,
->  };
->
->  struct bt_sock_list {
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -8011,7 +8011,15 @@
->                         __u16 res, stat;
->
->                         if (!status && l2cap_check_enc_key_size(hcon, cha=
-n)) {
-> -                               if (test_bit(FLAG_DEFER_SETUP, &chan->fla=
-gs)) {
-> +                               bool deferred =3D test_bit(FLAG_DEFER_SET=
-UP, &chan->flags);
-> +                               struct sock *sk =3D chan->data;
-> +
-> +                               /* Complete inline if the daemon accepted=
- early. */
-> +                               if (deferred && sk &&
-> +                                   test_and_clear_bit(BT_SK_ACCEPTED, &b=
-t_sk(sk)->flags))
-> +                                       deferred =3D false;
+Validation: GCC modular and Clang built-in Bluetooth builds, including
+Clang context analysis; every prefix of both revised series and their
+combined tree build on bluetooth-next f42f5cae154b.
+No new kernel runtime test was run; the quoted report is from the earlier
+instrumented test kernel.
 
-I read this thru a couple of times and I still don't get how can you
-get !status when security hasn't completed? Are you perhaps forcing
-invalid behavior from the controller or something similar?
+I used Codex (OpenAI) to help write these patches.
 
-> +                               if (deferred) {
->                                         res =3D L2CAP_CR_PEND;
->                                         stat =3D L2CAP_CS_AUTHOR_PEND;
->                                         chan->ops->defer(chan);
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1274,6 +1274,13 @@
->                         release_sock(sk);
->                         __l2cap_le_connect_rsp_defer(chan);
->                 } else {
-> +                       /* Defer completion until security resolves. */
-> +                       if (!l2cap_chan_check_security(chan, false)) {
-> +                               set_bit(BT_SK_ACCEPTED, &bt_sk(sk)->flags=
-);
-> +                               release_sock(sk);
-> +                               l2cap_chan_unlock_conn(chan, have_conn);
-> +                               return err;
-> +                       }
+Cen Zhang (2):
+  Bluetooth: hci_sync: Fix remaining advertising instance UAFs
+  Bluetooth: hci_sync: Use controller handles for periodic advertising
 
-Why wouldn't we do it earlier? This is too late, the userspace has
-been awaken by the likes of l2cap_sock_defer_cb when the client socket
-should really have been rejected not accepted.
+ net/bluetooth/hci_sync.c | 343 ++++++++++++++++++++++++++++++---------
+ net/bluetooth/mgmt.c     |  34 +++-
+ 2 files changed, 292 insertions(+), 85 deletions(-)
 
->                         sk->sk_state =3D BT_CONFIG;
->                         chan->state =3D BT_CONFIG;
->                         release_sock(sk);
-> --
-> 2.43.0
+---
+Changes in v2:
+- Address the advertising snapshot allocation and timeout/handle concerns
+  raised by Sashiko:
+  https://netdev-ai.bots.linux.dev/sashiko/#/patchset/pm-bluetooth-objects-candidate-0245-v9-6b34bc036455ad3dd4ea-0%40gmail.com
+- Use a 255-byte stack array in list order, and widen and clamp the duration
+  conversion.
+- Add a separate periodic/BIG/transfer handle mapping fix; retain the
+  remove-set and random-address fixes already in next.
+- Drop the former patch 2, Initialize advertising RPA work only once,
+  because it is already applied upstream.
+- Rebase onto bluetooth-next f42f5cae154b; preserve the connection-work
+  shutdown changes.
 
-
-
---=20
-Luiz Augusto von Dentz
+Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0245-v9-6b34bc036455ad3dd4ea-0@gmail.com
