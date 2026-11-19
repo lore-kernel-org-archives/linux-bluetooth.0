@@ -1,111 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795090188;
-	b=feOKV8DV2FYNoXndYrFb8t8KaV/SP6KqVoNKqOc709wcHIiP1DkDy1gPfKLmPTxl8BSC
-	 BmjQfINJ/wVolI0G8zxMEBC1fTQRcJhHiiuwZTUFlu74R+0T2ghLJYlr5e8sm8TwXWZiP
-	 yEvHxmy6yWOO2koUg3gSSQR2eDLpOJ9Yvk40CdbWNLnWQtMpExjCqcdGfWt8MLeEVW1YX
-	 LezswaYsx4cswbajNOO67jE1wb9M4/SEgjjCebCOk7RT0UE9yeD0BwdU7zoabEwyRbrAE
-	 1LUUSKH9nggfepDVNvxfw3jRnph/ejDVBFdwHjAAKLjqjmqK5brglfF7hJherzQ6ZOQ==
+	t=1795095092;
+	b=oiFU8PF0uZ9f346quLFQDEfXUPpT98gW9AWGuaDWyRTVu5b3K4qq6qKdY3vk9TtfWtu7
+	 T9OB2wcOTVYqfW5WZTOQi8RrzSMMaMK6ibGFKUt3Jd2CymDRiBXNDp4dRSMZuLsegDN8g
+	 LsOKOcOxgxXSrZh3yeJ5IBbwfGlG1LoALg/0yt9E6+zKFyGiJ4qxEISrZHFVijsx4KbSn
+	 i+88lq5uTkKPbyeQjjsXOx+dDyEPEYeUhLsYSR1MjOMydYoYleUi2cjZUldcBUYgsu2uP
+	 prSZVWtO5dISyk72NExduSGdzSUtoUahiU+dubDsTuX35QAcqYdDK51h5dXftpp03Aw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795090188;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
-	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
-	b=tWYxkREwBjL9Br6p8nQNP6Yps+SCDAf7BocJh/PXid0bNpWc3Qwcggqfh9yVj9acL9Jo
-	 tNIdy9Phlhqg1iGcgDbD+9UGp4HkELWmjMp/fy+7MahV59s1QQlZACy+FS9sOiV7ZcGP2
-	 3aYc7NyVRaf/b0EAXS/51xRA3w6xtNJz1KQRoM21Jw11ExfmqRQxHvKsYndGvLlBzcJsE
-	 fPkyJE3bql7ksQwEz5Gni3/qGrD3ubsiFswa7W7MFjwYHgXfjkuJAZ/GQHf3asJyMKn/8
-	 4XsBpyi3rj8qQlBlZzQ7jKC2LeKL6Rx5QYyMTrFMuf9XwVZLmeR68wL2t66cVvKiGWg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795095092;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=j+Za7bMQTz/jGW5KKJ1wZv8OZM3LMy2RfyXXPrr5ddk=;
+	b=ZdRUG3+cmj/6Oc6tD2jZ7NaPDFMu7XSpV1cnBeAyPmzZJC8OhoHyW7EJbAT3yHHqNVMO
+	 8WJiVZTI2FNbzt4feN93k9TPaU2biv2oRotTRdIQv8+2V2NS5Rt4Qef5UesPVhEXoh8kf
+	 sKkDtwP1D3efcTKvIW5vbyv3KxUv+BSDN4aIU1KONoWLrkOmbz0IjLKkeRCzvOHJv5iBZ
+	 JjAvwSNITlHcUr9PxlBFSu279Z1J+ud2U4W2OfEblxOFRXHOwCd35mqBb0K566OEJrLb5
+	 FQmAkSd32+DY1iK0m+iMr8Qd+WWQbc4wHejy0uzQP5RDwAcNby8ZXYYDA/n4APpB9Wg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=L1M4CQou;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=eI9i9DQI;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	dmarc=pass header.from=lunn.ch;
+	spf=pass smtp.mailfrom=lunn.ch;
+	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=mOPIqIOm;
+	arc=none smtp.remote-ip=156.67.10.101
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730B3606A32F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 730B3606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CE8606A320;
+	Thu, 19 Nov 2026 13:31:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0CE8606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=L1M4CQou;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=eI9i9DQI
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AJBjvtw705605
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=RT+0AKmVcApMzKaYRkKEr+
-	FBqJcHBjpcZhiE+ofNNCk=; b=L1M4CQoufx5wO/CVdDnvzTpGpFuSf1/2xEhUxU
-	MEasBz4A8BRWIAxniyY+Z6AcAHjnInrpVRIY2h6dXqbRTs2BqUzIz1UlVEwttcfS
-	1ZFIPmXawTnh1aYJhyeae6BVqLs7lHASkOkmMHLTpSk9ZmuzQUEWsUTBlUvNfztq
-	3W5jSoSrbwb+iYzF5kMYp1IRavQaR23VuzmfrEdsb9gQbOkeWmXVLWXMF8iw3VIU
-	jG4sBdBV0edudzDGHQrM0rM9viENmqa/dcXDtbnkxUXwLu8lQhSUehdB6Xn8Lv0k
-	BCmZzL/DqNbYJjzbWXaW/GgUTPZb2ZXHIltcd8pgdfuWW91g==
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j1x708qrh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:46 +0000 (GMT)
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-567c8af65f1so224678b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 04:09:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795090185; x=1795694985; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
-        b=eI9i9DQI2U5/CVrWaOUfn4THLsaSmQ4IkTK7v62Afk3wAwG8lTJtUQmRZ+ka6m21le
-         F6sekXpOFfoX2liME64ESwvQoE2/4tRrNU3YKPpOuizgR5Q2wRnyTHKenekEJIThk7qv
-         aT+QNL4+RZ3AdeOTfs/aespOFcqntOLg0g4qvWzYVRmLvIxbgMZs+IHaXk+KBjN00T1p
-         ROL762B6aQSwAeHGeB02TkGgX7L4kckeIYPNfnwji8i9V4qFM6lQoHjkGrN5ekd5ZpKV
-         Ds9Gdn9G/5kBghkYrMxNK8pOBtLpLlAbv2vGHF3Xf6fV/ScmdGC+LYfsGZkOI9dnNxnw
-         KLaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795090185; x=1795694985;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
-        b=1erg8cXSzG3CmS1EvMQjTtgLudeJEfGkunQ/LFIULRmMKhCf0/0dqWA7dRjo6zHtoc
-         wpquQxA3KxZY0okKHbpEmyHUijI9para01VexPgGxli7PWXgy8SguWgVu2x/wJyeaW/j
-         eKNszLTPgAfcRVNzi5AaRZ1YsTcGLOWHpGaez+vmoe2rBqGztfIoljceXWcCQpYm0txR
-         ixDMj4tzOj6hqpvnTkcyT2ExRRscsNc5pm/UL1bx58OrvwUEK9RfTUQWH2HaJ4zIGMmr
-         UDI7ZQZUMaOngnRNhFfZbNswu0LX0v52OXVUkLEjG4Qelb6v0EJoeQeUt7EurGkl3SzJ
-         V+hA==
-X-Forwarded-Encrypted: i=1; AL+hErFpjAmtfQXW1lF7hsLxtZ+GbL7reRKCjfP4NXxzGcirE2dzqpkOcwIvSL2z8Xa9BPnvMXbQpZ9oxlz3Iooz8Uk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+eV61zjaEBN5QVzee93yBV8kD3qaT4Yprw43VNeeqHP8JDb7xQ
-	S+5d/RTBbZ3iUgQDIpkUhNmxG8RC6XxuxsHRBEMH/+Pun9284/Lq001PeS0LxLG56/FDbrb5gMx
-	XdcBE3JoHYKnRUNlpHaByuvAp3x1y/SVi0d+FSp9Ye0KQzesFE7tMQ2SMj9r72Bn6TVjfSUOAt7
-	3fFhU=
-X-Gm-Gg: AYBFou3lCDzfKHzTuGECQW8FHE7LGD8qPrPms7mb0+BdQUOj+qWnTpuRsvH/GOLHp4N
-	F71H/uV/dxfqoiEgH/TTKZJHWTD9NrhUfHgmklV4khgM9zG/TnALtSZlxtFQNtGJB5RqWKoYrLq
-	XTlyM1C2R+R+poQEsk95mbicLPu4NI8r1uldelBa6QLU979YJbZrCaskPX2GqwEZ//HGmU8Xdpk
-	jhwW57basTJmWdKOohJ1tqEcPVC2yLkEB0NCh+w/9xM2bAzGQsYb/nsfJnKJBR+MzqZWjljuSvF
-	IRCS2ENiyIAal1cvbuej+UxW4POHGXdA+C3RTZtT0QkGoGbG+Tmlq2M/TMS9nWWJPnfcbQpDKYU
-	cajcPagY6RWjvC/0oYrq5T7JATGKrYL7nNCK8JEAo2n27ValFTgDR44/IpDzE10HrOXyYgy66s2
-	dueVRoGQe4/Ox9xeARx1c=
-X-Received: by 2002:a05:6808:1a1f:b0:4f8:4a95:991d with SMTP id 5614622812f47-5773a6f88c5mr9488718b6e.2.1795090185378;
-        Thu, 19 Nov 2026 04:09:45 -0800 (PST)
-X-Received: by 2002:a05:6808:1a1f:b0:4f8:4a95:991d with SMTP id 5614622812f47-5773a6f88c5mr9488651b6e.2.1795090184798;
-        Thu, 19 Nov 2026 04:09:44 -0800 (PST)
-Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm5135874fac.6.2026.11.19.04.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 04:09:44 -0800 (PST)
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Thu, 19 Nov 2026 04:09:33 -0800
-Subject: [PATCH bluez] tools/test-runner: Fix TESTHOME parsing for short
- paths
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=mOPIqIOm
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j+Za7bMQTz/jGW5KKJ1wZv8OZM3LMy2RfyXXPrr5ddk=; b=mOPIqIOmu6kDdwVuemWcNK9Dnn
+	3scHm6yoxWlXhjKDg88oGkRMzRyRggfFiPC7IQHuffZ0g5VsQiVACcLcbYFf/YJimxzK2sEH4Ma7z
+	s46ArUotTLBJyzxjIYKthUVRWJnOH1H0QxoK1FCOjd282vF3lK0QU0S6Yx/wpK07j6KI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1xU2Dn-0002Ui-FK; Thu, 19 Nov 2026 14:30:39 +0100
+Date: Thu, 19 Nov 2026 14:30:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Chris Lu <chris.lu@mediatek.com>, Mans Rullgard <mans@mansr.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Cornelia Huck <cornelia.huck@de.ibm.com>,
+	Andrew Morton <akpm@osdl.org>, Jeff Garzik <jeff@garzik.org>,
+	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+	linux-input@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, linux-sound@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v3 18/31] net: phy: Use the compatibility driver
+ attachment API
+Message-ID: <7c87310f-e1c6-4a84-8161-11a6e5d91785@lunn.ch>
+References: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
+ <20261118-device-trust-core-v3-18-d655875c4bfb@nvidia.com>
+ <71c1b931-c553-46e3-b49a-51167f168ac4@lunn.ch>
+ <20261119071811.GG162713@unreal>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -115,88 +104,28 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261119-fix_test_runner-v1-1-ddad300e86ed@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIAPzm/moC/yWM0QqCQBBFf0XmuQVHU7FfCRG1a03EFjO7EYn/3
- qaP53LPWcigAqNTtpDiLSZPn4APGU23wV/h5JKYiryombl1s3z6AAu9Ru+hrmqa8sjlkGNuKVk
- vRbpsxTONj4gvdftscbxjCv8aresPYQ9DUXoAAAA=
-X-Change-ID: 20261119-fix_test_runner-5773413a0ef9
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Zijun Hu <zijun_hu@icloud.com>
-X-Mailer: b4 0.15.2
-X-Proofpoint-ORIG-GUID: c3WenZQ5zJefGJu3MbWAgVieIEj3Ka6t
-X-Authority-Analysis: v=2.4 cv=RdgFmFtv c=1 sm=1 tr=0 ts=6afee70a cx=c_pps
- a=yymyAM/LQ7lj/HqAiIiKTw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
- a=EUspDBNiAAAA:8 a=k84UmWxO1rnOZ_snXCEA:9 a=QEXdDO2ut3YA:10
- a=efpaJB4zofY2dbm2aIRb:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE5MDA0OCBTYWx0ZWRfX6mFqGZ5+mjJq
- 15SoF2gRLiZLGPmosd89XBntHuj17evDyroNpgly4vWP176zuBZyD3QVzNb43xbmS8e2m7Dan5k
- sj8riOKjG1ESTCYjvFkQHK7Ap1wke+4=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE5MDA0OCBTYWx0ZWRfX2+pLTZFnMejC
- IbDbvrlzSNEtgUAg7a3X6xVxx46GusVCgJEx4MHADYYtOTtDRqsc3451qiESm/MdaCNoGsyxa5I
- 2IeXCRB3hFidK+B/jQkjNkPC5JmKziT2YJpVfw2nxI4Mgg7TwpI9kt5jhr1zqV8osi47mR1h05W
- TwNX3XS82VJGj2tOeNK1XTSxCi+bwmwI6jzjGJpVdCttMKFUZyfsZD9nsKrYgyU77fQA4hdMVhD
- W3a/fpkeT6/UDjNh91CqXoUJZreR54lIRrrGVKA5SziXLKC9SvAPQPlBegXyFg9JCKgcW8ftCN6
- tJnes9yBL7h2Eq/ihiNYib6zpAJto+FaH49X0fq8QWX+htnHeJFFBozPDyNHHvQKKati5smR1LB
- Bg9XVd4tXBmMDKhIQcCv2bFl5Ep0p2vxDAZ8k8sIQy6XakSlVE8pQhFZPEnhLvslUYXx+xyuXW6
- 9o2yXURW+0YdNlYw0GQ==
-X-Proofpoint-GUID: c3WenZQ5zJefGJu3MbWAgVieIEj3Ka6t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-19_03,2026-11-19_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 malwarescore=0
- adultscore=0 spamscore=0 bulkscore=0 clxscore=1015 phishscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611190048
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261119071811.GG162713@unreal>
 
-TESTHOME is parsed wrongly if the HOME path is shorter than 4
-characters, e.g. "TESTHOME=/ab TESTDBUS=1" gives "/ab TESTDBUS=1".
+On Thu, Nov 19, 2026 at 09:18:11AM +0200, Leon Romanovsky wrote:
+> On Wed, Nov 18, 2026 at 09:21:45PM +0100, Andrew Lunn wrote:
+> > > @@ -3813,6 +3809,8 @@ static int phy_probe(struct device *dev)
+> > >  	int err = 0;
+> > >  
+> > >  	phydev->drv = phydrv;
+> > > +	phydev->is_genphy_driven = phydrv == &genphy_driver ||
+> > > +				 phydrv == &genphy_c45_driver;
+> > >  
+> > 
+> > Why do this here?
+> 
+> This flag marks that driver is already probed, which is reliably
+> happening in phy_probe() under right locks. It was the easiest
+> way to battle AI reviews which don't agree with how PHY subsystem
+> performs driver bound.
 
-Fix by searching from @ptr + 9, the HOME path start, instead of
-@home + 9.
+I've not seen the netdev LLM do a review yet. It will be interesting
+to see what it says.
 
-Fixes: e622e623de13 ("build: Add test-runner utility for virtual machine execution")
-Assisted-by: Claude:claude-opus-5-5
----
- tools/test-runner.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 0bca31a46351..6b8d0522fa7a 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -2167,17 +2167,17 @@ static void run_tests(void)
- 			audio_server = strndup(start, end - start);
- 			printf("Audio server %s requested\n", audio_server);
- 		}
- 	}
- 
- 	ptr = strstr(cmdline, "TESTHOME=");
- 	if (ptr) {
- 		home = ptr + 4;
--		ptr = strpbrk(home + 9, " \r\n");
-+		ptr = strpbrk(ptr + 9, " \r\n");
- 		if (ptr)
- 			*ptr = '\0';
- 	}
- 
- 	run_command(cmds, home);
- }
- 
- static void usage(void)
-
----
-base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
-change-id: 20261119-fix_test_runner-5773413a0ef9
-
-Best regards,
---  
-Zijun Hu <zijun.hu@oss.qualcomm.com>
-
+   Andrew
