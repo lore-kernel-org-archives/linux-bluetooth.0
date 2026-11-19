@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795108599;
-	b=bzS+3nGXpz4T4HOFTwaglONNbFP1mRNRTJv9e/ZOrCG76NwtUPkuxBU0jV5rphPolIRO
-	 07GcmPo2TLJ8IWlQY2R48w8oVRCCIgfKgyaZJ1Sb2/ssk2vnk6CHb/11eR03vK9pgBhX/
-	 d6KHWEx77zaaHdVBczsNKYq/gwk02v4uxs0wBnAZqoEoCM54lHDGiRZ0yZpmtqZ2m15g9
-	 TNOmzhhpHXsR9iPNBQk/YQ+WAmJBZs3zcQgnrWnUz4ADTIpZvqz9JX+6D44pao7dayn//
-	 On9Y8JPBcxJ9Yb3RF14Cy1LVnrYC2tugrd5wQqRzITh+IhCvzM2pFEjh5pLn2JhXWWg==
+	t=1795108600;
+	b=AO+KAU6R6dV4i2Yi9zsc0ilDKbgeJaCjcjWxH+xWodwVSvY3s8N7Ojh9E78GKpEQeskc
+	 77xchOSPQsgS058hMQdxU12IHrn2NgGEar1FkKFGcdBjj0i8eDKWSK9VbgtwlNLZPfCFJ
+	 Fx2CHiRRdsgxpPVM8y521LrQ1rKH9VvYcbD0Dh1tusE5hizcWE5xY6WDAIOqQ8nYJg+yo
+	 9yKa1pP20n4CILpgnNbiYmi/ot2MVVXwL+zVajUKwVGdRZY6JR08QK9d+yVx+yNMVrNOu
+	 NA8pGTLm04WTPinjlIMWBfPhvMciD6mxHwGL96loIHJzfoExqMvfYoo1hAXdtsFNVuw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795108599;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795108600;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=RYI+BoVF5pAYudFW+FQq2C9Gm83dzHHiguwstCW+PmA=;
-	b=JOE5qkCqI1F+5d1fh8uExViBrMQQl+SIY5zsNYNFmnhS2Fn8+9ShWe8sbWdWL4mPFvTD
-	 Aoo6b6TAiB/MpALWAoA6Ia8gaITSmjHczYi7wg/CE8OCYPHQy99GiFeF03BKAnQicSbHo
-	 1m2E0p4MhbLH0pOuvy3Bi64mkVPYYl3QSJ7YgoAOoJzYOBO7MYkHv7/4YrsFJEuGbzuPs
-	 +49IpyNDymaOS4EydvBbcSeQWSZ6oiCg1HfcVzgmuV7d92YmwYo4rOWHo4sZWwk2HGVr0
-	 EUdCjj8VBsbAj22QqR9mTqLGgU05MMZ+kv5/39WW+5b0VKNzDmJU7yL9LDiDjhxOeQw==
+	bh=AHA1KrehPP3A6ZlKbbd51mDGoNEhWPk4PqsD6p7cM34=;
+	b=gn2UIEYpQBf+qVmxZk5Jbl9mmRQgBixSr3qw0gzQ8uAKxXkLOt3p1yBAdN6Hy4S9EGw3
+	 df2dZr5awKnwSjzSTLzZa2a/3PpIDpMM273bHDxowve6xtERbOFsY3+JxMKCN7S+09h0R
+	 9Eo0IPTczYZ6LC7s8lrJrpAJcpUTI/WMJPYp1MqzTBW3hPWFQQ99IyTI576OfjbekCcUB
+	 857jIaO2QWOZihgInF4ji15hojWG6isHgy1w4tRDRwxOMzHwnf8rCm75nFWKv675smQ4B
+	 pDV1H4LNRJjxB3VEM27oZRyywk2GNbIbR9OeAo7F8OJOYBn0iyZixAvhWEnyqd7/xAQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Tqk0JSON;
-	arc=none smtp.remote-ip=209.85.221.173
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cyxkg456;
+	arc=none smtp.remote-ip=209.85.221.169
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2C1606A33D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F2C1606A33D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D43606A326
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:16:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63D43606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Tqk0JSON
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5ee3e658c72so1433871e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:16:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cyxkg456
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5ecde8e8e5bso746562e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:16:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795108598; x=1795713398; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795108599; x=1795713399; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=RYI+BoVF5pAYudFW+FQq2C9Gm83dzHHiguwstCW+PmA=;
-        b=Tqk0JSONmOIKa/VJdOGxxXIq6jQW96nxbKtwisXAfyp3zGUlQwUPgorzB3bdq5zUGh
-         zbyrvN6EE4hXWQdAwrHFHXGICEddGI65sYbL+AfavavXPKVfx2poPvQjaLg1i0YtdQdo
-         deq2NzYJPG6Yw7Ag4rh9B1hqxojtHqyviRiXa/iTmfiQEIvV1VkPFzkxiULfvh+tbIfg
-         BN7DAQ+FebNYq5rnwXhPijhU94NiMfhgEScO7y4vVaOY7LkPl/iiT+0U8q+knKFM6E4r
-         /ysjWhevykm1FnXXv/ae3ru/Jy7yMKfzfdX/i6HWIGDyPJAPhYDamK5+hyaWP8qoIHGo
-         fkMw==
+        bh=AHA1KrehPP3A6ZlKbbd51mDGoNEhWPk4PqsD6p7cM34=;
+        b=cyxkg456avltu20BFK0TPumKwg5wn4CMUrqTwei/3Elez93uqYZwWcfiQMzUJW1PA8
+         mIYnrN6zKs93BTww0y0QtPpc0f4hY9361rJzthv+JD9dMKPBzvguOcOyVQuMuJKLOksm
+         Q3LN2YkhlIFAUiIGyiY+n7EpBBsI3GaeIvwZax68fElbjoEK0m1kpQ0taknrO4Zrze5z
+         lMbzo5k0wWfdzkvqvrl+ePKFge4eekmw0/BRUqAEGPqDCKQbVy6tisp1+dA7FEUPmt25
+         0pBM7AWIybhp30QGfpH5Xy5UMupbjOf+bFBskqpeLAVJUH0CRayjaVRFt8V6lIj6CNEx
+         qIGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795108598; x=1795713398;
+        d=1e100.net; s=20260707; t=1795108599; x=1795713399;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=RYI+BoVF5pAYudFW+FQq2C9Gm83dzHHiguwstCW+PmA=;
-        b=A4FpOIBnveiEmrVODwgumzFe6QljFxU8qPpSKDk2VbATPfN4hgCFUyNeVKx4nW8P6V
-         hH19hQZBORbkJxCegQhCEmFuBMLxvaxBaoUaBP4Y6isMLytL6sRwS360mUZGocNI2Xsb
-         nw9u5HgYGFep69btnA1WzDYs5k3BFfzn2B4EipH2T+5F8fTcEK6b2ePD5j4QYJkwGyIU
-         wntCNq5rb61lqTn8Ij1Iv915wHoPou2ul4d6efsCYROx4TRCvlYyT6ImpUmluipVlILr
-         LPZC3r2sOkZGcl3mbBgCMN5vbOioiupQl/VCclx8pcjFhMNt8BCzIP+39/MQQ+THrWSV
-         54nQ==
-X-Gm-Message-State: APuU4Z9v+aFMY5pdq55jl3NhD9l5bPxzi718FqlBV77v+LWZ+0gJzLc+
-	xtB5ZA/Gu4hlzmjcQK+ikRZm8bStcL//bbVAfDtNYLBZRi7zB+qKZE0IiDSGhm/Rfjg=
-X-Gm-Gg: AYBFou1FgrkTucguRmffdIlKr96qdd05Er5M475sVJtAEJ7JT5Y9DDHF/Pg72cJfu/M
-	QOHjT6w2jtUlJ/eu3IQsf4uYr/8TWZDNs+FIUX4LDqspNappL8STOgqUPoB9EXEei0TIzNuYVLa
-	twur553aC0XEoBlbg4o1MfQBBqAtO0OPG07jpDbOSrlH8WcFN9tleyxGviiYh4eSAQSDbTvATo/
-	gzSrYpBLOswVhu3iguc/9LgoiFpbUTwkJodJ1SXJF2QJwqmugw+gPOLBg3rwbtdC6i5CAHb7FqF
-	T171CJ5ZPBNOWBw9sLkRhp8z4w4dOU8M6Xm0WCQByj17/g31+xbZ1Jt0vtltG5iOdLzS4S8K3tK
-	XcKMdb3eU9SZJjZJNbWjlN9MGbLrCH7SMaKMqIveaJ740Oqf6VICaLfKFPD/yzHxDKLmn1fN400
-	vLPll0vTflGFyPMjs/nXigYyy7Fc0dSg0lnOncWqdYWyhSRkgCkutdneszkU8Dg505zq2k+bvpw
-	N6pks8pyqd05o4jCKGPfgT5CWNm8HQiwfrFuTN/6gNxMzPsk4+z6GWHhfE501EMnCoPeJYXTT26
-	0+NNwCwK2IZcg8llFsNivINE0/zWqXhsGI4z8/5DPJ1fxWnyJi9l5k/N/hdOQzjvFYO5mBVhGpR
-	DZxtW82HowA2+2HdhhhimUf5DfXgdDccZP3lQeKFF//GZ+e+g5YmphSnPl28vOl/rIrgvvwxsJ8
-	6rkXgLwp32Y3HuVWiGzVG81S4E
-X-Received: by 2002:a05:6122:3d10:b0:5ec:16d2:4537 with SMTP id 71dfb90a1353d-5ee8aebfff6mr303321e0c.7.1795108598005;
-        Thu, 19 Nov 2026 09:16:38 -0800 (PST)
+        bh=AHA1KrehPP3A6ZlKbbd51mDGoNEhWPk4PqsD6p7cM34=;
+        b=PYek8zCgFE5be6rxbVgD/tPzuFdGaqsnGg51fqbFLYgeH2g7QOk49shMR12Tp++bAI
+         UFXDwDKeUFn/MFGuYThG/y2S7xMLnjhQ5v34EtgNz7TPjxxfp0EfBvz9fRd2cqURdFo+
+         pX4mH60OdqUw/cIn+au2aYmzky+fXrscDOwyb8af4ZsS51It0WwKkNlK2SEwCCeBKHGr
+         WLvttG7ILg+q2hPpS9xT5JmsB3hrk7YWkKAp97FMEq7cMbHR5KvJiNQwaDUgU0FHzSHH
+         ay751WYwsfZAejPF4fjwCoEsI62O4UjFg66M3wPV+X3CyiUZFy1iFsMg03Ec1JrpZ9BV
+         o6bw==
+X-Gm-Message-State: APuU4Z9mzCPQXP80qUXIGtP+NXDcYFyNpdMwJTRK9YYf4ERcyLSlLIX6
+	uf+Xyc1a5DA5LsbzXJSIVHEyxlbQWjs4t6XB8TdBR3nJPSDzWUEjbGhLYiYqL18TTQ0=
+X-Gm-Gg: AYBFou3CSNh01R1vCyClM/CC1OLQmjHA4KFcH5lMRZVpIeFou7NXJ7CyuIcglYCMg6A
+	7SQ71Ic0ukPfniEIcqscdqi1tNVWdWONy7o/enPnFyglaOCAB722gXEC4XXAJnjmVlw4Tpvvz4z
+	q0Q4/NT+hpZZJYzg3XyfIds+bBVYIYpfLp2GDOeGLPmKq/MTwMYnCpwHjScgHfrLF0pv7sdqzr+
+	gZoceIHeffMA5RF69G/doXVMLVLXcTUc+RxMQJQp8EKXgUifd24yaCimR6lnloNlsV+n/S9y8uE
+	qxvI9fkARoOEAUb2xuL2JeeX8xbtW/ohjeSX7JR3ogl23a3+E1dWwRJSfdPxHgf833TMxih9V8Q
+	U7ukISD0GluB4YxP8ygyvt8N1WTDXxZVU3yIhDnwxTLwSIQ22iM/NY/4yM7wasXhVweLkhyUjkB
+	bpmuTNDuufnqTVRFQFXW1NjrUKAQLJlPwnmNjdTflYMFrWD277JOG9B6AV2kyx+CLxHELpNqkMM
+	etnBwoqGkFwa5CmR886G9SRmta0KGhQ8RWUfvrpLKqZT9RYyYrmq9PZ4rTZbaynxyqtk5Z3WOKM
+	xwHDJjr2EXQnL14koAfYAsj615n1uRTXEYryz5k/N4bvYTM5yxcQGZv8GaSLkstGNSO2xP1/GtC
+	9ArIeVtIdqaHDlme8SDnVAYuDRBc2oj3l4h0eij42wrZvOkoY7sRx0MUnVT9RzMdkWY+q2yJiL9
+	0NDCw=
+X-Received: by 2002:a05:6122:e26d:b0:5ea:f399:7820 with SMTP id 71dfb90a1353d-5ee8aefb9e9mr227330e0c.10.1795108599100;
+        Thu, 19 Nov 2026 09:16:39 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5a8fd3sm131881e0c.8.2026.11.19.09.16.37
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5a8fd3sm131881e0c.8.2026.11.19.09.16.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 09:16:37 -0800 (PST)
+        Thu, 19 Nov 2026 09:16:38 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 12/16] profiles/ranging: Defer CS Security Enable until the link is encrypted
-Date: Thu, 19 Nov 2026 12:16:20 -0500
-Message-ID: <20261119171625.1014004-13-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 13/16] profiles/ranging: Choose the CS antenna configuration from both ends
+Date: Thu, 19 Nov 2026 12:16:21 -0500
+Message-ID: <20261119171625.1014004-14-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261119171625.1014004-1-luiz.dentz@gmail.com>
 References: <20261119171625.1014004-1-luiz.dentz@gmail.com>
@@ -101,188 +101,219 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-LE CS Security Enable is only valid on an encrypted link (Core v6.2
-Vol 4 Part E 7.8.133, which fails it with Insufficient Security
-otherwise). On the Central, the Config Complete handler checked the ATT
-security level once and put the state machine on hold if the link was
-not yet encrypted, so a configuration completing before encryption
-never got its Security Enable.
+Set Procedure Parameters sent the configured antenna configuration as
+is, ACI 7 unless the application gave another. ACI 7 is the 2:2
+configuration and needs two antennas and four antenna paths on both
+ends. Against a single-antenna peer, or on a single-antenna local
+Controller, the command was rejected with Rejected Due to Limited
+Resources and no procedure was started.
 
-Defer the command instead and send it when the HCI Encryption Change
-event reports the link as encrypted. Track the encryption in the
-connection mapping, so the check no longer depends only on an ATT
-instance being attached, and keep the ATT security level as a fallback
-for a link that was encrypted before the state machine was attached.
+The capabilities of both ends are read during the setup phase, but the
+antenna counts were only logged. Keep the antenna count and antenna path
+limit from both, and check the requested configuration against them and
+the eight configurations of Core v6.2 Vol 6 Part A, Table 5.3. If it
+fits, use it as given; otherwise use the first one that fits, with a
+Preferred_Peer_Antenna that has at least as many bits set as the peer has
+antenna elements in it.
 
-Assisted-by: Claude:claude-opus-5-5
+Table 5.3 is written as "device A:device B" where device A is the
+initiator (Vol 6 Part B, 2.4.2.47), so a configuration is asymmetric:
+one antenna locally and four on the peer is ACI 6 as the Initiator but
+ACI 3 as the Reflector. Use the negotiated CS role to decide which end
+contributes which count, and refuse to send the command until both
+capability reads and the role are known.
+
+Assisted-by: Claude:claude-sonnet-5-5
 ---
- profiles/ranging/rap_hci.c | 93 ++++++++++++++++++++++++++++++++------
- 1 file changed, 80 insertions(+), 13 deletions(-)
+ profiles/ranging/rap_hci.c | 133 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
 
 diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 7f82bbafb2a5..3a6d514cfcf9 100644
+index 3a6d514cfcf9..6181bc0f12d5 100644
 --- a/profiles/ranging/rap_hci.c
 +++ b/profiles/ranging/rap_hci.c
-@@ -75,6 +75,8 @@ struct cs_state_machine {
- 	bool procedure_active;
- 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
- 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
-+	bool sec_enable_pending;  /* Security Enable deferred until encrypted */
-+	unsigned int encrypt_evt_id[3];  /* Encryption Change v1/v2/v3 */
- 	/* Negotiated CS role for this config (CS_INITIATOR/CS_REFLECTOR), taken
- 	 * from LE CS Config Complete. Unknown until that event arrives, which
- 	 * is why it is kept apart from role_enable: the latter is the bitmask
-@@ -99,6 +101,7 @@ struct rap_conn_mapping {
- 	uint8_t bdaddr[6];
- 	uint8_t bdaddr_type;
- 	bool is_central;  /* true if local device is BLE Central on this link */
-+	bool encrypted;  /* set from the HCI Encryption Change event */
- 	struct bt_att *att;
- 	struct bt_rap *rap;
- };
-@@ -910,7 +913,8 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 	 * the ones for other links: acting on them would overwrite this
- 	 * link's negotiated role and advance its state.
- 	 */
--	if (!find_mapping_by_handle(sm, evt->handle)) {
-+	mapping = find_mapping_by_handle(sm, evt->handle);
-+	if (!mapping) {
- 		DBG("Not for this link, ignoring");
- 		return;
- 	}
-@@ -1018,26 +1022,68 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 	/* Success - proceed to Security enable complete */
- 	cs_set_state(sm, CS_STATE_WAIT_SEC_CMPLT);
- 
--	/* CS Security Enable may only be issued by the BLE Central */
--	mapping = find_mapping_by_handle(sm, evt->handle);
--	if (mapping && mapping->is_central) {
--		if (bt_att_get_security(mapping->att, NULL) <
--						BT_ATT_SECURITY_MEDIUM) {
--			error("CS Security Enable skipped: not encrypted");
--			cs_set_state(sm, CS_STATE_HOLD);
--			return;
--		}
--
-+	/* CS Security Enable may only be issued by the BLE Central, and only on
-+	 * an encrypted link. The LE role comes from the connection mapping
-+	 * (set from the LE connection event), not from the CS role in rap_ev.
-+	 * If the link is not encrypted yet, defer: the Encryption Change event
-+	 * retries it (rap_encrypt_change_evt).
+@@ -89,6 +89,12 @@ struct cs_state_machine {
+ 	struct timespec last_chan_class_time;  /* For 1-second rate limit */
+ 	struct bt_rap_le_cs_config   cs_config;
+ 	struct bt_rap_le_cs_frequency cs_frequency;
++	uint8_t remote_num_antennas;  /* from Read Remote Supported Caps */
++	uint8_t remote_max_antenna_paths;
++	bool remote_caps_known;
++	uint8_t local_num_antennas;  /* from LE CS Read Local Supported Caps */
++	uint8_t local_max_antenna_paths;
++	bool local_caps_known;
+ 	cs_timeout_func_t timeout_func;
+ 	void *timeout_data;
+ 	void (*proc_active_func)(bool active, void *user_data);
+@@ -441,6 +447,13 @@ static void rap_rd_loc_supp_cap_done_cb(const void *data, uint8_t size,
+ 		rsp->max_consecutive_procedures_supported);
+ 	DBG("  Num Antennas: %u", rsp->num_antennas_supported);
+ 	DBG("  Max Antenna Paths: %u", rsp->max_antenna_paths_supported);
++
++	/* Needed to pick the antenna configuration, which has to fit both
++	 * ends (Core v6.2 Vol 6 Part A, Table 5.3).
 +	 */
-+	if (!mapping->is_central) {
-+		/* Peripheral link: the Central's Link Layer starts CS Security
-+		 * Start (Core v6.2 Vol 6 Part B 5.1.23). The local controller
-+		 * reports completion with LE CS Security Enable Complete when
-+		 * it responds to the peer's request (Vol 4 Part E 7.7.65.41),
-+		 * and that event continues the procedure. Do not stop here.
-+		 */
-+		DBG("Peripheral link: waiting for peer CS Security Start");
-+		sm->sec_enable_pending = false;
-+	} else if (mapping->encrypted ||
-+			(mapping->att && bt_att_get_security(mapping->att,
-+					NULL) >= BT_ATT_SECURITY_MEDIUM)) {
- 		DBG("Central,encrypted: Sending CS Security Enable command");
- 		rap_send_hci_cs_security_enable_command(sm, evt->handle);
- 	} else {
--		DBG("Peripheral: Waiting for security enable event...");
-+		DBG("Central, not yet encrypted: deferring CS Security Enable");
-+		sm->sec_enable_pending = true;
- 	}
- 
- 	/* Send callback to RAP Profile */
- 	bt_rap_hci_cs_config_complete_callback(size, &rap_ev, sm->rap);
++	sm->local_num_antennas = rsp->num_antennas_supported;
++	sm->local_max_antenna_paths = rsp->max_antenna_paths_supported;
++	sm->local_caps_known = true;
+ 	DBG("  Roles Supported: 0x%02X", rsp->roles_supported);
+ 	DBG("  Modes Supported: 0x%02X", rsp->modes_supported);
+ 	DBG("  RTT Capability: 0x%02X", rsp->rtt_capability);
+@@ -621,6 +634,104 @@ static void rap_send_hci_cs_security_enable_command(
+ 	DBG("CS Security Enable command sent successfully");
  }
  
-+static void rap_encrypt_change_evt(const void *data, uint8_t size,
-+					void *user_data)
-+{
-+	struct cs_state_machine *sm = user_data;
-+	const struct bt_hci_evt_encrypt_change *evt = data;
-+	struct rap_conn_mapping *mapping;
-+	uint16_t handle;
-+
-+	if (!sm || size < sizeof(*evt) || evt->status != 0)
-+		return;
-+
-+	handle = le16_to_cpu(evt->handle);
-+	mapping = find_mapping_by_handle(sm, handle);
-+	if (!mapping)
-+		return;
-+
-+	mapping->encrypted = (evt->encr_mode != 0x00);
-+
-+	if (!sm->sec_enable_pending || !mapping->is_central ||
-+						!mapping->encrypted)
-+		return;
-+
-+	DBG("Encrypted: sending deferred CS Security Enable");
-+	sm->sec_enable_pending = false;
-+	rap_send_hci_cs_security_enable_command(sm, handle);
-+}
-+
-+static const uint8_t encrypt_evts[] = {
-+	BT_HCI_EVT_ENCRYPT_CHANGE,
-+	BT_HCI_EVT_ENCRYPT_CHANGE_V2,
-+	BT_HCI_EVT_ENCRYPT_CHANGE_V3,
++/*
++ * Pick the antenna configuration for Set Procedure Parameters.
++ *
++ * The ACI values of Core v6.2 Vol 6 Part A, Table 5.3 are "device A:device B"
++ * antenna counts, where device A is the initiator (Vol 6 Part B, 2.4.2.47),
++ * so which end contributes which count depends on the local CS role. The
++ * entries are ordered so that the first match uses as many antenna paths as
++ * both ends allow.
++ */
++static const struct {
++	uint8_t aci;
++	uint8_t paths;
++	uint8_t init_ant;
++	uint8_t refl_ant;
++} cs_antenna_configs[] = {
++	{ 0x07, 4, 2, 2 },  /* 2:2 */
++	{ 0x03, 4, 4, 1 },  /* N_AP:1 */
++	{ 0x06, 4, 1, 4 },  /* 1:N_AP */
++	{ 0x02, 3, 3, 1 },
++	{ 0x05, 3, 1, 3 },
++	{ 0x01, 2, 2, 1 },
++	{ 0x04, 2, 1, 2 },
++	{ 0x00, 1, 1, 1 },  /* 1:1, always usable */
 +};
 +
- static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
- 					 void *user_data)
- {
-@@ -1807,6 +1853,19 @@ void *bt_rap_attach_hci(struct bt_rap *rap, struct bt_hci *hci,
- 		queue_push_tail(sm->event_ids, UINT_TO_PTR(id));
- 	}
- 
-+	/* Encryption Change is a plain HCI event; it lets a deferred CS
-+	 * Security Enable be sent once the link is encrypted. The controller
-+	 * reports it with the v2 or v3 event instead of the legacy one when
-+	 * those are enabled; all three start with status, handle and mode.
++static bool cs_select_antenna_config(struct cs_state_machine *sm)
++{
++	uint8_t local_ant, peer_ant, max_paths, req, sel_peer = 0;
++	bool initiator;
++	size_t i, sel = ARRAY_SIZE(cs_antenna_configs);
++
++	/* Both capability reads have to be in before the configuration can be
++	 * known to fit: ACI 7 (2:2), the default, is rejected with Rejected
++	 * Due to Limited Resources if either end has a single antenna. The
++	 * role decides which end of the configuration is ours, so it has to
++	 * be settled as well.
 +	 */
-+	for (i = 0; i < ARRAY_SIZE(encrypt_evts); i++) {
-+		sm->encrypt_evt_id[i] = bt_hci_register(hci, encrypt_evts[i],
-+					rap_encrypt_change_evt, sm, NULL);
-+		if (!sm->encrypt_evt_id[i])
-+			error("Failed to register Encryption Change 0x%02x "
-+				"handler", encrypt_evts[i]);
++	if (!sm->local_caps_known || !sm->remote_caps_known ||
++						!sm->cs_role_known) {
++		error("CS Set Proc Params: capabilities or role unknown");
++		return false;
 +	}
 +
- 	DBG("HCI state machine attached (role=%u, ant=0x%02x, power=%d)",
- 		sm->role_enable, sm->cs_opt.cs_sync_ant_sel,
- 		sm->cs_opt.max_tx_power);
-@@ -1962,6 +2021,7 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
- 	remove_conn_mapping(sm, handle);
++	initiator = sm->cs_role == CS_INITIATOR;
++	local_ant = sm->local_num_antennas;
++	peer_ant = sm->remote_num_antennas;
++	max_paths = MIN(sm->local_max_antenna_paths,
++			sm->remote_max_antenna_paths);
++	req = sm->cs_frequency.tone_antenna_config_selection;
++
++	for (i = 0; i < ARRAY_SIZE(cs_antenna_configs); i++) {
++		uint8_t need_local = initiator ?
++					cs_antenna_configs[i].init_ant :
++					cs_antenna_configs[i].refl_ant;
++		uint8_t need_peer = initiator ?
++					cs_antenna_configs[i].refl_ant :
++					cs_antenna_configs[i].init_ant;
++
++		if (cs_antenna_configs[i].paths > max_paths ||
++				need_local > local_ant || need_peer > peer_ant)
++			continue;
++
++		/* The requested configuration fits, so keep it as given */
++		if (cs_antenna_configs[i].aci == req) {
++			DBG("ACI 0x%02X fits both ends", req);
++			return true;
++		}
++
++		if (sel == ARRAY_SIZE(cs_antenna_configs)) {
++			sel = i;
++			sel_peer = need_peer;
++		}
++	}
++
++	/* The 1:1 entry needs one antenna on each side, so this only happens
++	 * if a side reported none.
++	 */
++	if (sel == ARRAY_SIZE(cs_antenna_configs)) {
++		error("No usable CS antenna configuration: local %u ant, "
++			"peer %u ant", local_ant, peer_ant);
++		return false;
++	}
++
++	sm->cs_frequency.tone_antenna_config_selection =
++					cs_antenna_configs[sel].aci;
++	/* Preferred_Peer_Antenna needs at least as many bits set as the peer
++	 * has antenna elements in this configuration.
++	 */
++	sm->cs_frequency.preferred_peer_antenna = (1 << sel_peer) - 1;
++
++	DBG("ACI 0x%02X does not fit, using 0x%02X: local %u ant, peer %u ant, "
++		"%u paths, peer mask 0x%02X, initiator=%d", req,
++		cs_antenna_configs[sel].aci, local_ant, peer_ant, max_paths,
++		sm->cs_frequency.preferred_peer_antenna, initiator);
++
++	return true;
++}
++
+ static bool rap_send_hci_cs_set_procedure_parameters(
+ 		struct cs_state_machine *sm, uint16_t handle)
+ {
+@@ -632,6 +743,9 @@ static bool rap_send_hci_cs_set_procedure_parameters(
+ 		return false;
+ 	}
+ 
++	if (!cs_select_antenna_config(sm))
++		return false;
++
+ 	DBG("Sending CS Set Procedure Parameters for handle 0x%04X", handle);
+ 
+ 	memset(&cmd, 0, sizeof(cmd));
+@@ -849,6 +963,14 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
+ 
++	/* Every state machine on this adapter sees every CS event, so do not
++	 * let another link's capabilities overwrite this one's.
++	 */
++	if (!find_mapping_by_handle(sm, evt->handle)) {
++		DBG("Not for this link, ignoring");
++		return;
++	}
++
+ 	/* Check status */
+ 	if (evt->status != 0) {
+ 		error("Remote capabilities failed with status 0x%02X",
+@@ -869,6 +991,16 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 	subfeatures_supported = le16_to_cpu(evt->subfeatures_supported);
+ 	DBG("subfeatures_supported=0x%04X", subfeatures_supported);
+ 
++	/* Remember the peer's antenna count: the antenna configuration used in
++	 * Set Procedure Parameters must fit both ends (Core v6.2 Vol 4 Part E
++	 * 7.8.140).
++	 */
++	sm->remote_num_antennas = evt->num_antennas_supported;
++	sm->remote_max_antenna_paths = evt->max_antenna_paths_supported;
++	sm->remote_caps_known = true;
++	DBG("remote antennas=%u paths=%u", sm->remote_num_antennas,
++		sm->remote_max_antenna_paths);
++
+ 	bt_rap_set_remote_sw_time(sm->rap, evt->t_sw_time_supported);
+ 
+ 	/* Check Bit 1 of subfeatures_supported (0x0002) */
+@@ -2022,6 +2154,7 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
  	sm->procedure_active = false;
  	sm->cs_role_known = false;
-+	sm->sec_enable_pending = false;
+ 	sm->sec_enable_pending = false;
++	sm->remote_caps_known = false;
  	sm->current_state = CS_STATE_UNSPECIFIED;
  }
  
-@@ -2001,6 +2061,7 @@ void bt_rap_set_proc_active_cb(void *hci_sm, void (*func)(bool, void *),
- void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
- {
- 	struct cs_state_machine *sm = hci_sm;
-+	size_t i;
- 
- 	if (!rap)
- 		return;
-@@ -2010,9 +2071,15 @@ void bt_rap_detach_hci(struct bt_rap *rap, void *hci_sm)
- 	/* Cleanup the per-instance state machine */
- 	if (sm) {
- 		/* Unregister HCI events */
--		if (sm->hci)
-+		if (sm->hci) {
- 			queue_foreach(sm->event_ids, unregister_event_id,
- 								sm->hci);
-+			for (i = 0; i < ARRAY_SIZE(sm->encrypt_evt_id); i++) {
-+				if (sm->encrypt_evt_id[i])
-+					bt_hci_unregister(sm->hci,
-+							sm->encrypt_evt_id[i]);
-+			}
-+		}
- 
- 		if (sm->measurement_timeout_id) {
- 			timeout_remove(sm->measurement_timeout_id);
 -- 
 2.56.0
 
