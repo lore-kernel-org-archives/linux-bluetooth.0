@@ -1,78 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795076200;
-	b=v8ATjJBcim9k8qTGTPig4VrRaXLKIh2QpT18be8q5L7FugemGEaoihLw+cOKd0mIzeWT
-	 oPX9GGBUBE//fRqHAP7rgfyKFqLBOn01Pkq8yAhfozLfe4eOlXRkjQ+gDP25BSBUlwheC
-	 dtaDSr5FGOLAsdokscq04+DyLUhgaqt9ZWWIUhUKOURtuLC3inT2BHFik5VBSw9G7b768
-	 nDN5p5V3P83NzAHbsghBmKbJipMysaZ43dtoil39bL7Gif2+SizPJP6mlweCHhtZD10bS
-	 laD5uMX84EYsSrEGaEL5XTsuiLcmYyub6mxLU1ctRHhpwV1zL89XxK5sujppgg5o1Aw==
+	b=NQEjIc8A+7imYpU5ucwnmxez0OzMP5c7vfhl6aUPpvkVlevjyLa/kicDn70Lu3wrnyI9
+	 PLj+3KvRWTdIkdzLNFeCxjh7JlaU+LTryJTty1nDjJubNj1ArF5BKWvIuUZJoPEKdF2ft
+	 YUoBiuYmlYD1HK/s6bs1egUSUnxr7F1c5gH5BGN8jQBVR/XVDfs5WMrFCEWZ7jcCO+XWP
+	 6pJjRI/aN+KLb5SKbPIXAIw8uvnj4tZlFrpDzOMSzXWwksfrISIC9qISK3aIaiIEmHdJj
+	 gQxlpXTLEMLIJp/A7geld1Kd3LJucZu0lItLVtF6j2JKg/T2nh2hYk9wo6bTXcy9AEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795076200;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=A/bYZ29NrtRIdkD8/EDYGJpEcNeUykUIFsmz03k8PU8=;
-	b=KZJQAyiE/Eh33o8fbGnvD9yCXVXboGqfPfu67MqY6r01sW3sFMS342aOWXSmpz1omXSS
-	 sx04Hk7bRrK4i5zGtiscz83vxDDcjbQFCtOx0awZZmcGSe0a/tJTTIJlPA7EMaNuLIvv+
-	 xETP7F+Zl1OhldHg616bdX2YHZw1GY1Wozmc+xoMkbZ90nyS4I8LbHkVDK4EtfPQNzZiL
-	 9DcvzFt6xToBmrCj2i39+AdMjrZJeRPI8NH2GvCscFw17Rn3xlLfGo4P9ZqzOXMcH+lGL
-	 Jqy5P8XjBwr9E1SvhnlZilcPMhwCk4w4QVMuppaAJWAIAgj2+0uGrjJV21LLv7fVDDA==
+	bh=IgDDUKxF1+ipRCgB11JeSH81nhIhazwCjzLwbk58IcE=;
+	b=F8RlhMEoFUHe/GgfoW6yI2b/Y7pow1T1+JZP1xdw5yEM+Hsj8yaA46XOV+FU9CSc1ZHo
+	 uyZB9TcLZdKTS/kSSOfUTKfvz1EnV19v94vaR3ZYAizFDqvwSCYnkjwzrPyuLhRCeOitV
+	 eQo/u9Y8Ncd4mAs5vKnn5qT4peI+mqiQYllz3J1hW/ljXGlLWL2a4ykl94IsOaWRJz1tH
+	 h7fXXDfF1R0Sc+QCjvJ1DNwipKgTFYBw/xXvoOywAjhed3b4BucCm9Ar6qux3URpiMT3b
+	 vaxunj9QIjTJcenzjwCQq+8ubc6Ll3SWi/o/t2sNnO/Vld+mpB/5ldGJ8ztmHjW3Veg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=D7ic4Edr;
-	arc=none smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DeD6KHM4;
+	arc=none smtp.remote-ip=209.85.218.50
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B8C606A80B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F2A606A812
 	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 08:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1B8C606A80B
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19F2A606A812
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=D7ic4Edr
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b75c0f5fe8so330427a12.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DeD6KHM4
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c504707acfeso42904066b.1
         for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 00:16:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795076198; x=1795680998; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=A/bYZ29NrtRIdkD8/EDYGJpEcNeUykUIFsmz03k8PU8=;
-        b=D7ic4EdrGPVCZmTP4SCXHq3KUX/OyQzFeITSuQi9gryFG2OhdNyZH2LcICu/ACX2L7
-         ZOltreYYi2pzLeKjyZokOw9PtlOyEV4RcdIdwVm52Qwlz80M9ascnUW61oFM2S5Iki7j
-         hmBHlLNEUR/mQkz2NFoXj3ctq3xISVDjLqmEVvesua+Ynze0oOAvKVGH0KmKNsV1/V7G
-         jbhbyoWZr8gIqCXvxZ8q0WiXlyBOvHYqLtJrJ4qv4Dp2IYhtAw2BhRRT8jiydbRD0iuZ
-         mHdJXHswM+R3J+m6yvLJEK177EjVBI/SoZCqAQ1LEvsYaRWaltTiCam5i/Hl7E+Co+R5
-         /vzQ==
+        bh=IgDDUKxF1+ipRCgB11JeSH81nhIhazwCjzLwbk58IcE=;
+        b=DeD6KHM4rRLjGLXERUBqyCE8g4eRwiKBrrVbDfuSDFSS6PbR+wvm1ORYtzEKFoTEBK
+         aHnR1FmvzBUQVC8VxRGAh3JP2wnT7NGusKSOilOyUY/KYaB4BxTV9gRM4aihIb7suem3
+         Sk13u6C8QU2ILo5yx607oxA1CEzkJ/U+sH8suuyn8vSXQyozAAEweRZ6de5Pr9itEx4p
+         kUXv0owUtT0SRDu2pnkyfKibwRTobVskG7TI8FlbjZ8xALfAbj0s0tcjmVR1ARJcR9JO
+         io45Ato2Pg2Jfu4MeKm28OOyB/Yk/pmdFomUYRYdQXipNbQR4/lr01/ry1TEzYKZ81Xl
+         esrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795076198; x=1795680998;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=A/bYZ29NrtRIdkD8/EDYGJpEcNeUykUIFsmz03k8PU8=;
-        b=K9R6REVRVmd9qlTRUvmabdgtn9nAavrvkMClJNXVbQo/O5aTIbFxR1/wn8vX6Lq8yt
-         ++X+Ulx65pPKxPIh5gKkB2LuDpTj/W/1+rzbrZMuTUUT1xz2fBDorWK7opnKHhsFT5BO
-         j78slg/A9ZnOTEuNmq2iBZ5bEksEsTWv8Fher0qIlXC7goWhafa/3E/PKCHaIOnr9yiy
-         CbW2BAJVZ74cAuwkp7d/w6EWkwlEu5Y0yFBoX3ib6/wixRAJVl4Ivc5N6T4sC3JNq25Q
-         MYAsmDqfLZvBhC9pKzKPKUdatn4mfoe9QuMtdJpzYToW34ZrIoI/n0uKlvkjJOaxdzXj
-         +qqg==
-X-Gm-Message-State: APuU4Z9Gmeu/X4Jy+VlFrfEBCBBz50n4mLrduxgG87I7il9lP/hytR8j
-	DWYUWQifTwRsff2PsRVNTYlnogWfhjyBT5QPN/0Ocw3iSsXOYgoMk6idMrBThjhu
-X-Gm-Gg: AYBFou0gQ9D61DesTwg/RPTKW3vOPDm2OfyuagrMv/kF/z6gESrRjXtZhdcB8nT71Ey
-	Q3EVyA9iDL2mdV2aUwUoe7alw05W7t2qkqnvKZJXD5qinf0XAJu5mTcXCOsBQQBpibDIm9qXCSj
-	iVaGEHV7a0crICr5ikpiPShDafKqbCv0ioIuGnlcW014y4EewWX/Cx8TTnpBImgveFh/RA+4Vxt
-	a6s5fdpZgbZeVd54SRTtMgQsmkXvaWspr30pQXUcKbeX9diE7fFLrKtDY39tY1GNDUKpXuUJQwX
-	IGKO/MffF7Pz7nbhk+inTOYjtI+GzRsDLihwjy1fHiKEzDLFWSlHfVLWHiVTtNzQuxwfWblW4w7
-	4bNqjHm0WFwPy7tjMaBixLZ529QpDStGW7KV2gRyz45wCZDxuy3iYjUk7G3veNcWJVNcUtx3kxf
-	DK970haSPZWlGUTvdhpeMfs0qGtwmovzPr+3ANENg929aVpaZBT4UsqE/n1ob20FGLzvMJLwxqa
-	MqwDN7i1KrTmfUu0Ho4+pTVxlpNg0Gh3oaH0f5oy9qbwWsldlesuH7NwYpxZH6Wjn3jsFf3EHVS
-	TU/b0vJRmdXnQ4pjAYlFdGBf8+lQrZ7O/Oyo
-X-Received: by 2002:aa7:d290:0:b0:6b5:832f:10ea with SMTP id 4fb4d7f45d1cf-6b887caa7f8mr4323754a12.1.1795076197800;
-        Thu, 19 Nov 2026 00:16:37 -0800 (PST)
+        bh=IgDDUKxF1+ipRCgB11JeSH81nhIhazwCjzLwbk58IcE=;
+        b=L3aXqUWSxO5Bjqa/D4YnkgxU5Qpii7n8O7M0HCIV4gUQp7ZmxEeFUTlCgM5SgWpv1D
+         CHpwALhWsNFdk883bK5mBMnfrVS7cSYucqEaNYD4VekQ88G53w2wBgNU6gBITXqgfZuH
+         RfA1FBhMOhOywop0A9yU3AEUak/di0ZEOi3nrKTNNJCzRD4N9VSJsVFs5JwFo+eRUYPW
+         KuebGbJqLmzpVXBWIjKIZFgnE+/hbJCvu0mIasc2Avr6vsazUrkWOkdoWIcmMgLOI2Iw
+         aTfUNGIxwl8FkU/Ey6wnq63IuuPJju+2z0RZyiMqB8xTXppIeEtLLSzOVv8VPVH6PXGs
+         kqgQ==
+X-Gm-Message-State: APuU4Z/ukXgvSjKfpf2hviFimXsz3lX4RQYmsNDgLr6rdw0RHw+8QKT9
+	y0qhJl27nVe6arIeiK9fe7+fjFrP5TKYXmIHIgfjYCB5MIi63kIJ6eyRqwaVFQ7R
+X-Gm-Gg: AYBFou07OFrG9Mg9oquHsN7n0FaEePGJOYJP0QHygsGRyhgJRGYmtxU9Vr0ymCy6/wx
+	rreRp4iI2X2c60+UUD9DLadHPGPdl8E7jshJV8Y1VqwzBYt+dWfLQO7sEtqeunobBEWXBane0ba
+	P+xYUcS5Vx66ehv/Y+pPr3dJ4MqdvzjQ0KI5oa8Z5fx5+nQPHpj47aieHOqWskkr2swqEU/sXw/
+	tNwnzk9Qk7OLa+AtYDKKCk2ZTbJhNm2FlxvUR+D1CDDXXXMOTcfopjdrmZvJxzFsaLSCpmbIVuz
+	kfWcGUQ8r6rsGnBZietqkOuiElYcAllpr0KCJTdUQA2h7Q6uyYcvy13MGSKXOs/wLe/o0a2CRi3
+	eiU2E7IFvcu3sCJl0QlMSTHjdExiaSA7KQ65t3eFGrIXycQiXkeEzF/Vig0Y4kPcoZgbeLsOvJm
+	6rWg/FPZ0tCXxUfoxxP2h7FgkqYvzP/h0k5MtiGsJNmIrIvnf5AC+MePwdUzRNSNX0rGLn8s8mJ
+	u4IrChaE/y6BP1H6zQWcnGolmR+To1cBo5kYhapqn7p6GTohSQUsfvr/Ire/V6+buW50W+H3IPD
+	H9ycsZwFm+2jL61CPAzTMNnRLtZ6qaQ9GCc=
+X-Received: by 2002:a05:6402:ca02:b0:6b8:8146:a10f with SMTP id 4fb4d7f45d1cf-6b887e52710mr3932484a12.2.1795076198434;
+        Thu, 19 Nov 2026 00:16:38 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
         by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b88a22e143sm2229580a12.29.2026.11.19.00.16.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -80,9 +80,9 @@ Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v3 4/9] monitor: Fix advertising handle of LE PA commands
-Date: Thu, 19 Nov 2026 09:16:16 +0100
-Message-ID: <20261119081621.112623-5-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v3 5/9] monitor: Fix TX power and CTE Type of LE PA Report
+Date: Thu, 19 Nov 2026 09:16:17 +0100
+Message-ID: <20261119081621.112623-6-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261119081621.112623-1-rolandschober1968@gmail.com>
 References: <20261119081621.112623-1-rolandschober1968@gmail.com>
@@ -97,55 +97,61 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The decoders of LE Set Periodic Advertising Parameters, Data and Enable
-print the Advertising_Handle with print_handle(), which looks the value
-up as a connection handle. With a connection using the same handle,
-the advertising set is shown with the peer of that connection:
+The LE Periodic Advertising Report decoder prints TX_Power 0x7f, which
+means that the information is not available, as a power of 127 dBm. It
+names CTE_Type 0x01 an AoA Constant Tone Extension, but 0x01 is the AoD
+Constant Tone Extension with 1 us slots, and it pads the value with a
+space:
 
-< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
-        Handle: 0 (LE-ACL) Address: C0:11:22:33:44:55 (Static)
+        TX power: 127 dbm (0x7f)
+        CTE Type: AoA Constant Tone Extension with 1us slots (0x 1)
 
-Print it the way the extended advertising commands do:
+Decode them as the specification defines them:
 
-        Handle: 0x00
+        TX power: not available (0x7f)
+        CTE Type: AoD Constant Tone Extension with 1us slots (0x01)
 
-Fixes: 61563bd7b477 ("monitor: Add LE Set Periodic Advertising commands decoding")
+Fixes: 5441a5b91a08 ("monitor: Decode LE Periodic Advertising Report Event")
+Fixes: f1354119897a ("monitor: Update periodic sync commands.")
 Assisted-by: Claude:claude-opus-5-5
 ---
- monitor/packet.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ monitor/packet.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index c290dbf7c..f358563b0 100644
+index f358563b0..d926efe28 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -8704,7 +8704,7 @@ static void le_set_pa_params_cmd(uint16_t index, const void *data, uint8_t size)
- {
- 	const struct bt_hci_cmd_le_set_pa_params *cmd = data;
- 
--	print_handle(cmd->handle);
-+	print_field("Handle: 0x%2.2x", cmd->handle);
- 	print_slot_125("Min interval", cmd->min_interval);
- 	print_slot_125("Max interval", cmd->max_interval);
- 	print_pa_properties(cmd->properties);
-@@ -8715,7 +8715,7 @@ static void le_set_pa_data_cmd(uint16_t index, const void *data, uint8_t size)
- 	const struct bt_hci_cmd_le_set_pa_data *cmd = data;
+@@ -13924,7 +13924,10 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
  	const char *str;
  
--	print_handle(cmd->handle);
-+	print_field("Handle: 0x%2.2x", cmd->handle);
+ 	print_field("Sync handle: %d", evt->handle);
+-	print_power_level(evt->tx_power, NULL);
++	if (evt->tx_power == 127)
++		print_field("TX power: not available (0x7f)");
++	else
++		print_power_level(evt->tx_power, NULL);
+ 	if (evt->rssi == 127)
+ 		print_field("RSSI: not available (0x%2.2x)",
+ 						(uint8_t) evt->rssi);
+@@ -13940,7 +13943,7 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
+ 		str = "AoA Constant Tone Extension";
+ 		break;
+ 	case 0x01:
+-		str = "AoA Constant Tone Extension with 1us slots";
++		str = "AoD Constant Tone Extension with 1us slots";
+ 		break;
+ 	case 0x02:
+ 		str = "AoD Constant Tone Extension with 2us slots";
+@@ -13953,7 +13956,7 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
+ 		break;
+ 	}
  
- 	switch (cmd->operation) {
+-	print_field("CTE Type: %s (0x%2x)", str, evt->cte_type);
++	print_field("CTE Type: %s (0x%2.2x)", str, evt->cte_type);
+ 
+ 	switch (evt->data_status) {
  	case 0x00:
-@@ -8745,7 +8745,7 @@ static void le_set_pa_enable_cmd(uint16_t index, const void *data, uint8_t size)
- 	const struct bt_hci_cmd_le_set_pa_enable *cmd = data;
- 
- 	print_enable("Periodic advertising", cmd->enable);
--	print_handle(cmd->handle);
-+	print_field("Handle: 0x%2.2x", cmd->handle);
- }
- 
- static const struct bitfield_data ext_scan_phys_table[] = {
 -- 
 2.47.3
 
