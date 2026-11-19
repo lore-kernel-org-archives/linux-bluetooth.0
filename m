@@ -1,87 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795072436;
-	b=oOzSHWNDksZwv5TQDvL/SwERvhqO6JrOpvrl2aRmTrPOa4BfweJVipFGdGHPUPxzNTRN
-	 QVVaj9Grrsh3MVaaoDXsxj6cOn2lB4IZUvw9NhI4XN+ICd7t130fSTPR9HxdPA/lVTxW4
-	 qrbRfg+BzmLxJbIKSJPOCGZUomWFSHfmtDmogyEYo42HGW7Erz0WR2tGoVE5F13G7gUbF
-	 Dnp/+/V43AT0pqunfIQ5C136uu77q5pVwSuZMwjcH0VbCyiOiT9c5sFJraXFcl8rSkXN+
-	 bb9G2FB1aS30eVmu/9Nin0OryUzuOvh934a824sDJTdxno+ZM9VchrLiUNGKNeELAuA==
+	t=1795072439;
+	b=isiQTdhlh71Q2B6bwtn3rFSTtI/vpB/3APdU6gCUJ/ougG3qwzcZRrCvguJANC4ZmZUO
+	 fOzky7CmqUZv2lYeOY3Xlz8rwJrABWkZ1wYIFPF//Z9V6010nj4WWMrBDcf4gxFcSJaPo
+	 EQKpx3EhSmGOhObSXHuN8eBrk07rd7owPhinjFSPLmdV+bW+IiW0yEGXPKOhsqtTNMKaT
+	 mR5bR+8X0LuUAudYewlahOTTs66E/e8/e1D990HlUd2fMHoNX8Byla1+sp+7OUcEdt1HL
+	 e+mS8JIARe3Qm1lMAuxJHaLxBbHd+er4Fcvwd4nHkdaB41NeK5m3bHxRCIU+VML5tXw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795072436;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795072439;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=k4UhT5Jq8Y8M39+o9mbaLIDjF2zv9aikpB62F4omhag=;
-	b=cjq3gVndN+MAVDTdbXWn8JCC5JXdkfr3qmTXlZdF3/LF2GslS5/ubhnW39EvTifO734B
-	 7cKGVY2rIwXe1RRB4YuQSaE56rFN0p6pPxNX7NPtnugxpDDE/JD6bw6Jj6MIcGuQ4m4Ia
-	 6ICjF6ygxnun/Efv2Z0Swru2QJlRdgxXaLEPO784tEaSSg80FHrOVM60zbvYzufsUpdvt
-	 D0xdtaDZ0hcWixU+h8Gald1NmEcgojirNGHFKc9evmGYV+O5wpbpT4lz8L22w9qRgABnu
-	 q/KvNKnx1HiNl0tnTA9Qmo9kgzwDa0tkTZNS01HBMs9j/nSGkCJ9/uT8VGtvA2qX4BQ==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+	b=OBcOIRsyb+EaRro4hZytMpe8e+Z6VyBV8N1ReSImJqtaxd5O677dL1L4bjW0xT1fiDhN
+	 rHMEcoUyTXHPhl7jYr5o3JJ85IcMpsL+Tu0jM06zBWiVxj0+Vura+jI22vjr2l11TWwvV
+	 S27tgip0yZQBBjNGER3aiKhet1K1jExj4FupQu9EUpx6o9AOMBnaHIn4xm2xCp7ZfaGsr
+	 66ZjxaSXTzQBrJ4KBEm4lSHWFgdaqXXz3IuMbVWKWdB6jDUrQSa4CMvg/dxfhklpOBMKD
+	 2kGMmhsiYTxQ0TXdKMGJMf2G3aTxugfTWClPra16jjqU/zo86j0OCC0u7x+38o9s0jw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0GLPnCnV;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=himIOP9V;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7970F606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:13:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7970F606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB4606A320
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:13:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54BB4606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0GLPnCnV
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a56e05568aso3464745e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:13:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=himIOP9V
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4bb609d9bf4so3017225e9.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:13:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795072435; x=1795677235; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=k4UhT5Jq8Y8M39+o9mbaLIDjF2zv9aikpB62F4omhag=;
-        b=0GLPnCnVuxTdLulFsMYthAQAmKfQGZQHrVU05B0ACvQQ9QEZEtE2BG1+oMODH9tLLS
-         loKw+3sf3pBQF6mMd8IM68718asbD0o01sedg4dC7ulCvxFo4dBjv4dMXx3HHZ+/sYF+
-         uErOSIrtpbA1oVLY1qXPzktkE9vg1EaxINpOxDGJaSxhAEwzzZ1+e6ZZi7H3LSldHTqO
-         h2jHIKu3bbzIocXpiwZ3s6jTx2ghxIk4ifc9eM3x6ZkKlnv98UV2jOXbMmnQ4k//Wt3v
-         +Q0ykLJrBGulRKQKYthyVpZK4/mFGM64yMLYNf/7sHz90DIXbbHVnzB4Yj9WgDAweEvj
-         bPlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795072435; x=1795677235;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1795072438; x=1795677238; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=k4UhT5Jq8Y8M39+o9mbaLIDjF2zv9aikpB62F4omhag=;
-        b=A4y5q9Hjf9UMUc/b8wJ/UUKdhvP963hwERrSH+u9P6NtCDMXO739y3tWcp6jFJWsyp
-         PmvcfTKugR2pQ9uyT9ipsGjRYk6qORj5KoCmGfsoNKrBeNL94+Zha+k0UG3ErWRbPmTa
-         Dm27nXtkfawtSGXzA1Lah8TFzWoNafk4Dv1GS/vOvbfGENVCl73cSvyB1ggrJu4A+mJh
-         z04t0DhAVnC32V5aYZ72WwQMvONScS4HqOWWl6qUhjriL8XQtH/f6SG1KCoXbls/FJ9J
-         rYsKGjX/xro8gjNyEHdZD88Huhb3+e7poNF/wlC1+Pn92sT5pC9CQFHQO4eCFc9EsDBY
-         ke+Q==
-X-Gm-Message-State: APuU4Z9Zsccj5rbonwghMcVeLayfA/UDPDg+6wwBslgsD4cqBQ+oJQHF
-	+Q0vLx9LD53kFQTpyIviILInhsrGqtneat59GcZ5s6Bfg/uKtWLgkQSRxdiln08G
-X-Gm-Gg: AYBFou27TLp4bWeg7Y8bmKDe2rmC/MxyOg6TVb/U+qOfJ0mQP8BE8KryhUC7Yqd2cvX
-	4A36Cf+XW0KTqO5/D3h4IAvzf5ma9iZkVLyu6mNpwMd2ezmcDGGmOS92HOWxTM8cwwBoEUfY5S6
-	2gUiPwqqevkbzzuaw+arVXD3Jxh/5aU+yCZNES34z/AWypnhE8VJ/121/0MWQ67HeSGUjA6F3n9
-	zk+j9qTSSRFlJHMt9W7OLZXW6qnmKSauKehTpajMW4Kk8SNnvMOBDNmAXUutYmNRp3nxRxRnUgn
-	yIQEgZnNZIoOSOx3IuGjlm+KVXApUZhaj2rDEbd8q2oIuzd12K4Tu5qcbOvc76r7jmefZnxOuTJ
-	QkNqrNI2zVtg2gEd+ZXaiNVyB/pjpd77iidVvIMq3kxyNi2UWemJNld01pHCVbGG4duttkEvLUZ
-	miF20JWIQmEzxWSWw3P5/u/3J6LDUw1uwZTQITUr4a0S0iAPMv07lLH+Q4BFxj8ViQob0Fdm4t6
-	YiffvHNHqD8GZBrRG3P6oTkCphWp3C+6HFZLMwA2FnOu33ZfHkFukvXlESi7wEUv4/GSZWzNICq
-	QaNBib9Rz1devTKFqRVM+iL/LZxB4L9dx9JS
-X-Received: by 2002:a05:600c:190c:b0:4bb:7ad9:2f22 with SMTP id 5b1f17b1804b1-4bb7d57ccf5mr94693155e9.0.1795072434624;
-        Wed, 18 Nov 2026 23:13:54 -0800 (PST)
+        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+        b=himIOP9VW8dFI4Cb78UcSnYZ4hH4vw39/NkXWuIBcyRF356zskq4HKIRzWX04uJx+g
+         Mxellf66zrBhlQqTkp/4thojyTydK7Ich/y0Tlqrmwhdr6jmFP54Cya2eWF3qmiZ9ISG
+         vuu3JoSbiBWdYT7HuM5Pdlk3M2IyTDn65RqLIdozfDIHXA+k4axAtUvgofbNw9BdOS2R
+         S+S0gSTu7wVLV0y+wmDIH89Am6kBuTkt5jXxjtGn9VpIaHF63jY4W5F/9qQV2T/V9TXx
+         I39xHVoC31xh8UHKhIIZdXI+WKa39Go3HNdnq5iPiqmblZwhvREbc2CVZKYzldOs5H0E
+         IZFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795072438; x=1795677238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
+        b=gAptiKXcdugOTuP9uxOMBzJ2tp51A00mn7LuYcLauw9Som/b/TCxHynoCsEVf8WQHD
+         ztySdjFn3JGOondDlsb0+PTop6ATqHWSBp1HbJ2YwyEzwFU6pN71hT/GCim40lL1IH3h
+         Z2aXI+tooJT8mWqVZq9TNObVsIXUg8HwR61myDRX3FmOX1YeaEEIX9pgd5QHZwx8daIJ
+         eNTq3VawCJ3uZP0geMnogrGQuSu4d84fZCQ+1F+U73k/7qejNHmHiT8Rb1LPwrsvvipy
+         Jhh9I/T+eixyXo7rlo+2iVFTXiXvJTIUIHjwRjJwoAqzrEAvi/SIg2CIXiA2oZbDazMw
+         FTuA==
+X-Gm-Message-State: APuU4Z9F1PStE0opCZfdkCRaK15c7V8jpjUnPRoHV5A4uoci5pUdRT/7
+	Qc/3uVv9+mMs8ulZQqOmg60eBZBvEoWpgoUIU7AhXOfEH4PkUkcdYvXP5l0Z32Qn
+X-Gm-Gg: AYBFou1X0vVov2bTrxrkB1+gGat6P9lDQLdLHwl2vXkBIHe82lVZIFgPEjdcKAjsnbH
+	suewUWswMhfO6HzTh2drLr70raCcEkKyjqp+K+1Wh+KuD2RJ0xPzWNZtDGKZvongvsFUkPz14/6
+	QBiFY8MPLs6qnzEXBo2za/4e3TI4/pSuetiOduSIetht5xLDX1jUpAescJJul4eepFIHlDnIvL5
+	mUCOFw/Jkigt+byM8mW9H+ItIxy43nUrXHLmnWIMhihr6p9eg2hx0NBJQ79DyslcwSQPDzg5Ms4
+	7NdV3v25rWSzk459of2Kf+1YwYSaptDyTiORy6u9FNlti652fqGwCZ+pTc6ICqE96N+X4MQHAqs
+	NRxmotdtlGem/C58FgwuDSG6pOTyJiqOZeApyGyFG+hk+UhLZlhNltyl4mAqgVNLejKyhhlE+sr
+	ZHu8QfpSbvcbSuyBc3KgFW4HEH4t3SY4MXzRNqwJz9M3OHjYKf8LnkJiNIyE1faR864ECiGuTS9
+	rMrtTAvqv/gTBpIKC5+R7uaOPjtekW0G8vHD3mQyl7Bxp0BR7bagZTMpIsIpr1HPQ7YkvOOi/Fk
+	qJY+8PpaWGGVekqKK0SReZjWatNseD6Kv5wwwHA0HffNKrzXfvvufvSa
+X-Received: by 2002:a05:600c:468b:b0:4bb:7ad9:301f with SMTP id 5b1f17b1804b1-4bb7da0c682mr95592775e9.2.1795072437405;
+        Wed, 18 Nov 2026 23:13:57 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.13.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.13.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 23:13:54 -0800 (PST)
+        Wed, 18 Nov 2026 23:13:57 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 0/6] monitor: Decode Periodic Advertising with Responses
-Date: Thu, 19 Nov 2026 08:13:26 +0100
-Message-ID: <20261119071332.32424-1-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v2 1/6] monitor: Fix handle decoding of status_handle_rsp
+Date: Thu, 19 Nov 2026 08:13:27 +0100
+Message-ID: <20261119071332.32424-2-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261119071332.32424-1-rolandschober1968@gmail.com>
+References: <20261119071332.32424-1-rolandschober1968@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,57 +97,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series teaches btmon the HCI commands and events of Periodic
-Advertising with Responses (PAwR, Bluetooth 5.4). Until now they were
-only listed by name in the opcode table and the events were printed as
-unknown.
+status_handle_rsp() decodes the return parameters of commands which
+return a Status followed by a Connection_Handle, but it only reads the
+first octet of the two octets of the handle, so any handle above 255 is
+printed wrong.
 
-It is meant as the first step towards supporting the PAwR advertiser
-role in the kernel and in BlueZ, which is what an access point of the
-Electronic Shelf Label profile needs: being able to read the traces
-comes before changing anything else.
+With LE Periodic Advertising Set Info Transfer returning handle 3585:
 
-Patches 1 to 3 fix existing decoders found on the way:
- - the Connection_Handle returned by the Periodic Advertising Sync
-   Transfer commands and by LE Remove ISO Data Path was read as one
-   octet,
- - LE Periodic Advertising Report trusted Data_Length and
-   LE Extended Create Connection trusted the number of PHY parameter
-   blocks, so truncated packets made them decode octets outside the
-   packet.
+> HCI Event: Command Complete (0x0e) plen 6
+      LE Periodic Advertising Set Info Transfer (0x08|0x005b) ncmd 1
+        Status: Unknown Connection Identifier (0x02)
+        Connection handle: 1
 
-Patch 4 splits the LE Periodic Advertising Report decoding into
-helpers without changing its output, so that patch 6 can share it.
+Read the handle as a 16-bit value:
 
-Patch 5 decodes the five commands and patch 6 the six events,
-including the [v2] variants of existing events.
+        Connection handle: 3585
 
-Testing: I have no controller with PAwR support at hand yet. The
-commands were sent with hcitool to a controller which rejects them, so
-that btmon decodes what the host sent, and the events and the
-successful command responses were decoded from hand-made btsnoop
-traces, well formed and truncated ones. The output for well formed
-packets of the existing decoders was compared with the current tree.
+Fixes: b73d4bb9e3c9 ("monitor: Decode LE Periodic Advertising Sync Transfer command")
+Assisted-by: Claude:claude-fable-5-2
+---
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2:
- - Add patches 2 and 3. The two problems Copilot found in v1 were in
-   the [v2] decoders, but they came from the [v1] decoders they reuse,
-   so they are fixed there.
- - Patch 4 keeps the new Data_Length check in the shared helper.
-
-Roland Schober (6):
-  monitor: Fix handle decoding of status_handle_rsp
-  monitor: Fix data length of LE PA Report decoding
-  monitor: Fix PHY decoding of LE Ext Create Connection
-  monitor: Split LE PA Report decoding into helpers
-  monitor: Add PAwR HCI commands decoding
-  monitor: Add PAwR HCI events decoding
-
- monitor/analyze.c |   1 +
- monitor/bt.h      | 174 ++++++++++++++++
- monitor/packet.c  | 510 ++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 646 insertions(+), 39 deletions(-)
-
+diff --git a/monitor/packet.c b/monitor/packet.c
+index eddf8706a..4ff24092e 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -4976,7 +4976,7 @@ static void status_handle_rsp(uint16_t index, const void *data, uint8_t size)
+ 	uint8_t status = *((const uint8_t *) data);
+ 
+ 	print_status(status);
+-	print_field("Connection handle: %d", get_u8(data + 1));
++	print_field("Connection handle: %d", get_le16(data + 1));
+ }
+ 
+ static void status_bdaddr_rsp(uint16_t index, const void *data, uint8_t size)
 -- 
 2.47.3
 
