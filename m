@@ -1,83 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795082529;
-	b=3C2fn6CUbStQLTirt9KoBMbjFG4goDew0XYmdrgizCoaVvGpiLXxgL4Pc9naErs/kmc0
-	 u+DpDiKNb7JDDWgKNHNS/Njf+s5K0QqvKsdWmYRXh6i8ztFZvF12bdytMgWuu9iz4RarI
-	 R86eUSMfcpfNASKEcutnv4RG/ADcT6CGzz4//JbVhoibok4URU8TOAZfae8TKUHmypZWI
-	 QZBrZePDiLPe7PvPZs1zLsJCst6cu1Ftv80LdZeQOXUIOlw7rexQLLByOMYXvF80DDdH/
-	 sgtqYthhursVPViiG9aFPW4Ks5H4mL2wKIb+2lL6c55WJWVsYnOV1Zhz4tjW1wpPVjQ==
+	t=1795087466;
+	b=Jr/39NOwuo708jqMqCCALgtNkhD2argdf865teKnxbuS2Ba+AOQa5zA7+JT3bePieKud
+	 9k1EbekAiDeXGMBe51CrwKJPQMr7YxH2ckRkySfXmMyhlOhQ64RcnJ/62xRZdEF9rJJxD
+	 oLUxVTH3sw6BXIZMWQmx624Aob5IJrciSy2ot54KPAi0ho+eICQoXVm1eCW1Kh1VzzlDQ
+	 seRW7wQmgRAwVCd4FTBLg081HiISlQ0yavzLtUznDHAGGJBS5TCGT+rcY0wPlOsL9nWwh
+	 agXwDTq8JaLQuGz/6DNlcALE5eceGCkh/fTXjXaCtvFF6ARnn0gz82u767F/E+SmtEw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795082529;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=9jeHYXFD/G2sqoXTusHDwSBnCnK5o2IhDchYKKEWk3k=;
-	b=P+DqIm4trWOapNK2EqTuyr22+K6lzynGtPKWZUUyQ1XrEavTDQaXkWG8SaZiwTLu8wWG
-	 grpczr/x40bXawC1wSzKvvqph3pd8noQdcAqR2p3GSrMKuvicSBLCNQ4ZPAPzDnVsVVD2
-	 MWbIubCRRz5gfu4QAO6OlAc5BYN5SpXxXCylF0RZMXTXyOZS1j6AwT/n3h3V3dEdmBWr7
-	 /OIKH+13GsnN4xI0MXrOdbDUjiO7d5aK3SHja2fWKTLWL24h8s+6257iStFmuDAhbg8AI
-	 Uk4ozK+k9NHND5wG1cCHeBr4u9AkP0oIpqS2tXssq1uQqV8Akaniv0DifglykODlfmA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795087466;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
+	b=ModzV+Juclj47MqZpMBPYVLF5FaFTHkk7e0clnVX7I6HdAxcP4ux8k1yODkP359PlIyH
+	 o9D0gvRnvy77rkSdxiDap+BVyY1M5dMN1TzMNszEEMZVj+D+67PN0wIzFTUkj7dcHMVZw
+	 SFFvpPJ9WWBbzR0O9hNWAti/kYET6/RceOBECCCnTs8vJh26UyMo6ShLsoT+NPt+ol57r
+	 cRlyV6aBtql4t2Uyt8s18i/hglQuT7uGyK7ijyo/8yPCVOzLQ922Gb3tiKx5ltxhoy325
+	 dWiN+BFPYgBxx79lVfnH1IUkqKVWxRlVG8zyyhSJFf5qZTdfzFbMPYrrGrPd6LsYZEA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=bpSKm6XG;
-	arc=none smtp.remote-ip=198.175.65.17
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ISpxDJ5D;
+	arc=none smtp.remote-ip=209.85.214.174
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7D2606A334;
-	Thu, 19 Nov 2026 10:02:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA7D2606A334
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDC9606A32F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 11:24:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5FDC9606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=bpSKm6XG
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795082529; x=1826618529;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DWkBTpM0y5NrhB+kpM3SMygitfJv9C34lAuaaT4Q2p8=;
-  b=bpSKm6XGR0LoAsH/wLSElPW/qN5fESjtRg/av75kuqpK7GZJiOl5NBfV
-   C18fz+iQTt5ndXHzUZfyatwC4GP8v6bMaLTKOFznjhYMT6+Fv/nAA6ax+
-   TN5jdc0sZFbOklDVEflJnCY+Xv2GqOdfrbMTPwinZ7nh+sW7+sF7iGZn4
-   hY6NJVezYWY7HQcmJu3tH5zrq6NPK8ZZ2a8vJ0dcIDry3/koxFO7FEPou
-   gqMN7FT2c40WV11B8Jli8ExZWm0JLI1VAaWGqhHyvJgC0lP1Sefn+RFi5
-   EksDHc1qZ6eTr73jESbzUjF+0KWNmkZwi/ByPaz3tzD9UvQjEzlty0JRQ
-   Q==;
-X-CSE-ConnectionGUID: syjfW4F4Tyi77msTj+HaDA==
-X-CSE-MsgGUID: fDHF5lPJRVqb1y/2PjJw2w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11970"; a="3934238"
-X-IronPort-AV: E=Sophos;i="6.27,220,1787036400"; 
-   d="scan'208";a="3934238"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2026 02:02:08 -0800
-X-CSE-ConnectionGUID: GvLWE86WRIi7QQa7a/d5hg==
-X-CSE-MsgGUID: g8xzbAROQdeFreWrGvZalw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,220,1787036400"; 
-   d="scan'208";a="10261660"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 19 Nov 2026 02:02:05 -0800
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xTyxu-00000001Fb0-49ld;
-	Thu, 19 Nov 2026 10:02:02 +0000
-Date: Thu, 19 Nov 2026 18:01:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ISpxDJ5D
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2f02f04a426so3455905ad.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 03:24:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795087466; x=1795692266; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
+        b=ISpxDJ5DVGF8N/aDoxpxQdXM4+cJL6qMmIH5RKsZQMoGzMcIXLk4VJfefJXnTwINzV
+         4Ku7wouKuWuV0Dzw8z1IBDzEC2rtaKEJtKIj/Px36IRP/VBEOsFy7B0la+qImczYSi2u
+         T/rq4CNWanmRV600ZLKCDKttYVJdniPRZ4bc2ZaJx6kfkNn7YaAYUUh3RM0sRNMapcr0
+         SugVjQMLwU/9Faln1uxt/pC72FprBdrkp1SXmTJrJcdo45jpoy+FfWJVf68cwBspkjWQ
+         NQgHgLIJ+USu0JknlFUXV2LIqLOWAwma8/dQm6dy9mrlGYI9qHEUABczO4OoMpuUYcgy
+         PxOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795087466; x=1795692266;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
+        b=a8eb2eWinyCniYh/0qfB1EtoIBHzkmlSDxLnV7rlp7jsNwlDtRv5EhcUraUpvs6UZk
+         CQYPVX7r6IaGTQFGLimX1Q6PmRtFdzixTrrZ9qfH2Oz6WZS7Y+PYRE9Z00a/WUlgJOsr
+         KMAMb4fpkbVG62KIg7qKzKvqZwj3xWyW/DTCULqe3GedTEFlPz5X5lO4qLbe0n38yOfh
+         Z+pot4XVGmfmD74U/hCZcbD0wzzMwoyYp/noDmw8jyV/waHCIG4lcdoJ0oC7+66YwBhr
+         BqPB4OTuH57U9FHSMISMtBRasYv9X5/xOiqmyaFNeUmsmrNv/tkHvGZ59TORcV4smdeB
+         Z6rw==
+X-Gm-Message-State: APuU4Z/CW5gqB8LZhM8cj7pPg1mX8VZ9+NhR2E3OxhgXdVJ6medvMtRd
+	xTkoU5gZdMtEGEWz+nELEQHuRWGx24FoOTKJeG6fG+R7GaFx2mR4tBWq
+X-Gm-Gg: AZFdTZeupZW9DBnBDfTRbpZVmyHr2vWStbXw7O9jsIYq4FAumYwgeg2YDvBMWbOjrHx
+	DaT2rz/Ou5BdDTJBT06ogR4nceKqBB2vePVsJxJnN00sd2xbWgEXejAeclugWMPal36mUw+b5/n
+	zc54xPUQcFTG5SIjVxtSIism3oEH0mT6vZFHG1Wl6yYUOYkUvMBZDeN4UgTvEdortlwD6mfktVy
+	xJu1a5QRcYMiO0d4wJwEyYvhDOIBSIR47wsywtrqjVxCAzmIw5qp7KK0mMc7hCJnczTLTCz79NY
+	rJ/pJjqrSGL2Y/+shoydfxq4uZhCpPgC/xpi7M+1RugTSKMeqbpBkmTXNdQfqqcREvbapp11wGo
+	pgDAU972ZeuEEvQyXN79VdAI4oXjK4rZJvGxK715kdl7bLzJbvPtZVkPSiLL9qykCIQHcu0XKFf
+	kAkqiw+DPOvNwS/SRnb0/9kcM7uPHtXQuU8af+NZ4X6NcA9t+8/biqfqAeDpTZi/ruGklfNWNZb
+	hrRnmzaCFDY2I5614ypdcJwzbHrzB8BoQnZ44s2z2fc4p02yYb95wH4dPWtiIJ5P2GJs5bKw9kg
+	5tpuucdTKa5jHvdvErtiu79ZqshOrynEbEcedIcrVleBjwCIiZP1dqjYiALI64nZo31CWgOq1R0
+	t
+X-Received: by 2002:a17:902:d2c7:b0:2ed:2305:5244 with SMTP id d9443c01a7336-2eff752ec1dmr60082795ad.46.1795087465193;
+        Thu, 19 Nov 2026 03:24:25 -0800 (PST)
+Received: from G7XWH7K1F3 ([2408:8256:2e80:7371:84c0:a687:3d35:47b0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2eff62876a6sm28540805ad.63.2026.11.19.03.24.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 19 Nov 2026 03:24:24 -0800 (PST)
+From: Zhao Li <enderaoelyther@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Mohammed Alquraini <mohammed.saad.alquraini@gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: check security before completing a
- deferred BR/EDR accept
-Message-ID: <202611191741.wWf1jeoY-lkp@intel.com>
-References: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
+	Zhao Li <enderaoelyther@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: MGMT: Retain the selected legacy advertising schedule ID
+Date: Thu, 19 Nov 2026 19:23:59 +0800
+Message-ID: <20261119112359.34543-1-enderaoelyther@gmail.com>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -87,110 +96,119 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261118213322.60067-1-mohammed.saad.alquraini@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Mohammed,
+Updating the currently advertised legacy instance can schedule that same
+instance again instead of the next selected instance. Add Advertising
+stores the selected ID in the original request after mgmt_pending_new() has
+copied it, so the queued callback still reads the requested ID. Add
+Extended Advertising Data never passes the selected ID to its callback.
 
-kernel test robot noticed the following build warnings:
+Pass the selected ID to both callbacks in the pending command's user
+data, and keep the request ID for the replies and completion cleanup.
+Extended advertising controllers do not rotate instances in software, so
+keep scheduling the requested instance there, as both callbacks do now,
+without cancelling the rotation timeout or looking up the next one.
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v7.4-rc3 next-20261116]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Found by code review.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mohammed-Alquraini/Bluetooth-L2CAP-check-security-before-completing-a-deferred-BR-EDR-accept/20261119-003322
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20261118213322.60067-1-mohammed.saad.alquraini%40gmail.com
-patch subject: [PATCH] Bluetooth: L2CAP: check security before completing a deferred BR/EDR accept
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20261119/202611191741.wWf1jeoY-lkp@intel.com/config)
-compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 3b14d7c370558b46e5f0c6494a05c492e59bf32c)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261119/202611191741.wWf1jeoY-lkp@intel.com/reproduce)
+Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
+Cc: stable@vger.kernel.org # needs adjustments for <= 6.5
+Signed-off-by: Zhao Li <enderaoelyther@gmail.com>
+---
+Tested in QEMU on bluetooth-next f42f5cae154b with vhci controllers and
+four new mgmt-tester cases. On an LE-only controller with instances 1
+and 2, updating the advertised instance 1 through Add Advertising or
+Add Extended Advertising Data now makes the next LE Set Advertising Data
+carry instance 2's data; without this patch it carries instance 1's new
+data again. On an extended advertising controller, updating the current
+instance 2 sends LE Set Extended Advertising Data for handle 2 with the
+new data, with and without this patch. The rest of the mgmt-tester suite
+shows no difference beyond one LL Privacy case that times out
+intermittently on both kernels.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202611191741.wWf1jeoY-lkp@intel.com/
+No new W=1, sparse or smatch warnings.
 
-All warnings (new ones prefixed by >>):
+AI assistance was used.
 
->> net/bluetooth/l2cap_sock.c:1256:14: warning: acquiring mutex 'sk->chan->conn->lock' that is already held [-Wthread-safety-analysis]
-    1256 |         have_conn = l2cap_chan_lock_conn(chan);
-         |                     ^
-   net/bluetooth/l2cap_sock.c:1256:14: note: mutex acquired here
->> net/bluetooth/l2cap_sock.c:1281:5: warning: mutex 'sk->chan->conn->lock' is not held on every path through here [-Wthread-safety-analysis]
-    1281 |                                 l2cap_chan_unlock_conn(chan, have_conn);
-         |                                 ^
-   include/net/bluetooth/l2cap.h:1016:2: note: expanded from macro 'l2cap_chan_unlock_conn'
-    1016 |         ({                                                              \
-         |         ^
-   net/bluetooth/l2cap_sock.c:1256:14: note: mutex acquired here
-    1256 |         have_conn = l2cap_chan_lock_conn(chan);
-         |                     ^
-   2 warnings generated.
+ net/bluetooth/mgmt.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6ed3bf6f1738..075252d72cbb 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -9099,9 +9099,9 @@ static void add_advertising_complete(struct hci_dev *hdev, void *data, int err)
+ static int add_advertising_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_add_advertising *cp = cmd->param;
++	u8 instance = PTR_UINT(cmd->user_data);
+ 
+-	return hci_schedule_adv_instance_sync(hdev, cp->instance, true);
++	return hci_schedule_adv_instance_sync(hdev, instance, true);
+ }
+ 
+ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+@@ -9185,7 +9185,9 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	if (hdev->adv_instance_cnt > prev_instance_cnt)
+ 		mgmt_advertising_added(sk, hdev, cp->instance);
+ 
+-	if (hdev->cur_adv_instance == cp->instance) {
++	if (ext_adv_capable(hdev)) {
++		schedule_instance = cp->instance;
++	} else if (hdev->cur_adv_instance == cp->instance) {
+ 		/* If the currently advertised instance is being changed then
+ 		 * cancel the current advertising and schedule the next
+ 		 * instance. If there is only one instance then the overridden
+@@ -9232,7 +9234,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	cp->instance = schedule_instance;
++	cmd->user_data = UINT_PTR(schedule_instance);
+ 
+ 	err = hci_cmd_sync_queue(hdev, add_advertising_sync, cmd,
+ 				 add_advertising_complete);
+@@ -9461,6 +9463,7 @@ static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+ 	struct mgmt_cp_add_ext_adv_data *cp = cmd->param;
++	u8 instance = PTR_UINT(cmd->user_data);
+ 	int err;
+ 
+ 	if (ext_adv_capable(hdev)) {
+@@ -9475,7 +9478,7 @@ static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
+ 		return hci_enable_ext_advertising_sync(hdev, cp->instance);
+ 	}
+ 
+-	return hci_schedule_adv_instance_sync(hdev, cp->instance, true);
++	return hci_schedule_adv_instance_sync(hdev, instance, true);
+ }
+ 
+ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -9537,7 +9540,9 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				  cp->data + cp->adv_data_len);
+ 
+ 	/* If using software rotation, determine next instance to use */
+-	if (hdev->cur_adv_instance == cp->instance) {
++	if (ext_adv_capable(hdev)) {
++		schedule_instance = cp->instance;
++	} else if (hdev->cur_adv_instance == cp->instance) {
+ 		/* If the currently advertised instance is being changed
+ 		 * then cancel the current advertising and schedule the
+ 		 * next instance. If there is only one instance then the
+@@ -9579,6 +9584,8 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto clear_new_instance;
+ 	}
+ 
++	cmd->user_data = UINT_PTR(schedule_instance);
++
+ 	err = hci_cmd_sync_queue(hdev, add_ext_adv_data_sync, cmd,
+ 				 add_ext_adv_data_complete);
+ 	if (err < 0) {
 
-vim +1256 net/bluetooth/l2cap_sock.c
-
-ce60b9231b66710 Sebastian Urban        2024-05-01  1241  
-32d86e048d8efed Pauli Virtanen         2026-08-29  1242  static int l2cap_sock_defer(struct sock *sk)
-6898325923f9571 Gustavo Padovan        2011-02-04  1243  {
-32d86e048d8efed Pauli Virtanen         2026-08-29  1244  	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1245  	bool have_conn;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1246  	int err = 0;
-6898325923f9571 Gustavo Padovan        2011-02-04  1247  
-32d86e048d8efed Pauli Virtanen         2026-08-29  1248  	/* Fast path check */
-32d86e048d8efed Pauli Virtanen         2026-08-29  1249  	lock_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1250  	if (sk->sk_state != BT_CONNECT2) {
-32d86e048d8efed Pauli Virtanen         2026-08-29  1251  		release_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1252  		return 0;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1253  	}
-32d86e048d8efed Pauli Virtanen         2026-08-29  1254  	release_sock(sk);
-11770f41b8a7e12 Pauli Virtanen         2025-03-18  1255  
-32d86e048d8efed Pauli Virtanen         2026-08-29 @1256  	have_conn = l2cap_chan_lock_conn(chan);
-6898325923f9571 Gustavo Padovan        2011-02-04  1257  	lock_sock(sk);
-6898325923f9571 Gustavo Padovan        2011-02-04  1258  
-c5daa683f2d3315 Gustavo Padovan        2012-05-16  1259  	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
-c5daa683f2d3315 Gustavo Padovan        2012-05-16  1260  						    &bt_sk(sk)->flags)) {
-32d86e048d8efed Pauli Virtanen         2026-08-29  1261  		err = 1;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1262  
-32d86e048d8efed Pauli Virtanen         2026-08-29  1263  		if (!have_conn) {
-32d86e048d8efed Pauli Virtanen         2026-08-29  1264  			release_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1265  			err = -ENOTCONN;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1266  		} else if (chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
-15f02b91056253e Luiz Augusto von Dentz 2020-03-02  1267  			sk->sk_state = BT_CONNECTED;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1268  			chan->state = BT_CONNECTED;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1269  			release_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1270  			__l2cap_ecred_conn_rsp_defer(chan);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1271  		} else if (bdaddr_type_is_le(chan->src_type)) {
-3831971355d901c Johan Hedberg          2013-05-17  1272  			sk->sk_state = BT_CONNECTED;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1273  			chan->state = BT_CONNECTED;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1274  			release_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1275  			__l2cap_le_connect_rsp_defer(chan);
-3831971355d901c Johan Hedberg          2013-05-17  1276  		} else {
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1277  			/* Defer completion until security resolves. */
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1278  			if (!l2cap_chan_check_security(chan, false)) {
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1279  				set_bit(BT_SK_ACCEPTED, &bt_sk(sk)->flags);
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1280  				release_sock(sk);
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19 @1281  				l2cap_chan_unlock_conn(chan, have_conn);
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1282  				return err;
-e9a22bfeb7fdd1c Mohammed Alquraini     2026-11-19  1283  			}
-8c1d787be4b62d2 Gustavo Padovan        2011-04-13  1284  			sk->sk_state = BT_CONFIG;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1285  			chan->state = BT_CONFIG;
-32d86e048d8efed Pauli Virtanen         2026-08-29  1286  			release_sock(sk);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1287  			__l2cap_connect_rsp_defer(chan);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1288  		}
-32d86e048d8efed Pauli Virtanen         2026-08-29  1289  	} else {
-32d86e048d8efed Pauli Virtanen         2026-08-29  1290  		release_sock(sk);
-3831971355d901c Johan Hedberg          2013-05-17  1291  	}
-3831971355d901c Johan Hedberg          2013-05-17  1292  
-32d86e048d8efed Pauli Virtanen         2026-08-29  1293  	l2cap_chan_unlock_conn(chan, have_conn);
-32d86e048d8efed Pauli Virtanen         2026-08-29  1294  	return err;
-6898325923f9571 Gustavo Padovan        2011-02-04  1295  }
-6898325923f9571 Gustavo Padovan        2011-02-04  1296  
-
+base-commit: f42f5cae154b90a0cb6d8232dc84c7614ca2e6a0
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.56.1
+
