@@ -1,111 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.182
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795098229;
-	b=zu5vAt9KqKLKX2aDQ6uYUGQ2nM55v1TZxSnVP0re2UKZV3xnSAUS/RfK3KF5l+H+PUYb
-	 jKMxURiCpOR01IF4MZhV5sdcJDVInnPWsFjHO8VULStFwC0mQwdjfi62jZKUlyar+g62A
-	 ETiIOCcBZuu5lcfPrkrQK1IP+YkBk8YreegP5bysqDD81P2OXQ7XkrCTzjvSqKNBDWBbR
-	 +nJDacmkAQ8JBURVCr+yTuWwGsdRUApyklPf3xp84NYYiBS4aCaegEkpvnjkfgNGt5gf8
-	 gzPeEJ0f0CA/oC5Vn+iaIrm3UVr62WXN39Zl/6Ms20Vrg19NIRG+Vmpi6q9cu6/VOQg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795098229;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.41
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795105114;
+	b=MfDmB/AajAz6t8LCdWIQUu+5igcEqJeATdCgnF+z1h1ElXhEQL6u9uoaL6B+8ZWRgHGu
+	 NwnZwcvkHtW4+/PzWQx2pghau8OgxUtD853o4hNU8Fo1OTSmAavt1X4YOEtEfE9zLWegO
+	 U4EaGWIzGeWcnNcE1Lc08le12GXMHXVQDyeDeYqi29J2RIapqMSg1saWjWfyPDhZEBZCl
+	 nwKI8R+sz97TDhkwOMqqJ+p49sCiNXEGCKmSNKoggEaAH+/H4MB4ikZcu07bja5cmxUxL
+	 +bS59fiXyey90IRZmxVeutdhJKxOhUxp3tSwICry+P3lZ0CDTzKwRZBs7TmxoFieNuQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795105114;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
-	b=QSvhvyEpnBk93eGP4XZt2hfmlkZA6Hkj9fxcGI5mGk4t9CM6wQH2jKfPqc2mx8WIvKvn
-	 bvFeAxd21VEb7jHg0yNzKonbg4jOoqzm120QH07gRvDC0eWblNEkV3GBIJe/EOIXyFvi2
-	 n8IdoJ6VdWhjPbdxcCgPLkF71GwpzeLPh8ViHUgC6MU8Q1xYzOEDZizF2UYkKMQCHSyb6
-	 5tv8tfsyh+ygVvD0fQnkAEQ/Mh82fwa/rkoW7+05twdsa8C55i609iDaLWyAlwzh7ORmo
-	 z6BYKh2P9bMf573nUBlPt7Lif58SCslr0JCJKXbxqMLPG6trB7zOg1yS66cukI0eccw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=0h0qSugiriXLCrjB8RiZ3h/iIyQo/vB18s/SqAimWKc=;
+	b=RhdKYlEUWJLicd4iKanIfJ6SMgGFVJkIzrXxTDNyDra1tSp60ltjkrGs+vAdU+6Svklw
+	 71gd0G4fzL3qOTg+RbkOcx95PE9sm7ETdF9Z15QoN8k7vy0PQC6ZpdHOS5TSlQIzVBN80
+	 kgTKZJAtAj4pLjsiLpZAVsQJiDA42H0kgZSshZsF7L9TTdb3sfFNk7ZHAoD8IRQkP4+aJ
+	 UYgCUO/f0qCMcZjG88n0DzYZ4DhLlN9Ii+iw04nvdFa8ELdP44G9Lx+on7d1tUCzO0P8T
+	 ylSn1GyRM2nGzo6AV1vmtIRJXqfIXsIVDCQ4p9lJS4OJpqpGK3LLtqS0zTw3f+QXG6Q==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RakDrLwK;
-	arc=none smtp.remote-ip=209.85.214.182
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j1zpbkH2;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.41
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2B1606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 14:23:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C2B1606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252E2606A324
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 16:18:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 252E2606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RakDrLwK
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2efd7259872so13749745ad.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 06:23:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j1zpbkH2
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-67990a45e02so2453746d50.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 08:18:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795105113; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Gn5nx/BP5Qrm9pruuB6VYXj3TqpH4vrcpgWBJm51bpY9I4+Ru2zhSIdUqFwoCLqaaG
+         xLyklMtrbph3PD+UBj+AAnLJpbwCm6ywOOhnWjw+z54+iob5rXyQqn8EJvRSA8EfQnyK
+         +EjTKmzxjPe7dhDhf5tpTlWnHotKK+Vv4Oo0n3BwR0ugGNlRi1bsIIcNkua8JJn2xRSn
+         7bmYrLI4eitSBViQPJUu0CbhmyQSwBYUW6D4YbrhWWKkBQVkeQFtzdhZg6HQOdOOhGwd
+         XFdpk4NG4CnMvy4QMnEKJQ9dbc0ilf9XjgV2s91T5SONis/vQouJcS9Y6TiviTBl1m1K
+         a7Nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=0h0qSugiriXLCrjB8RiZ3h/iIyQo/vB18s/SqAimWKc=;
+        fh=fJTvNhOwO3AM3tYUbNMUqA+BVc/up3gAa8zqoR5nDD4=;
+        b=naahQbEXx0KUoTnjhAX9kt9Rtjk4jUFy6qCFDRji73d4le7vhLYIJaBgWl3HrAosas
+         wsua3H+nKOz0N15RcI+j+3YILnhRJiZnhgYlwwndnhtOA/QgjwtLxnNkIEVIfXK8Wv9m
+         77YXlHUJsm7i4X6iymRA8OIETXlFwisip7wYKqcwWPAgmYw9tcuksWuNFKW4hpkIvyZ/
+         J6XcQAXYCKUoN25Wt/dt5QnyMTKSrORNhJZDMdejhPFAsinGqd65gWC3DhxaD93MNdac
+         Oq0KD+A4M+auhec35LF/Lrz96zl3A2a64I1lswnTb6Et0Jf7bsK64QkgpUzdXo0m/vak
+         rcpg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795098228; x=1795703028; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+        d=gmail.com; s=20260707; t=1795105113; x=1795709913; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
-        b=RakDrLwKnpFkXQ5x53xU+/JtMeb5PKs/XkG/jGg4XUbPrV73tNZs5tZHokm+sjHSaD
-         R53c42cI3ZAqLjcvQeKkxZnMlquo2wkjbjqxPk/+SGxCsClwm9WbYqtlckHmdAMLAW/W
-         sCiIayoTguztq+/dzFAq47t/Wgeni9PqjkfBR/GKPGF1vnphVLQ9OSbymwte1rXoSaNM
-         SoSH6cEG/+tzOQwWZDOZVZXJKYCAEGrndvMQdcryCRTXj0asVWvOO0gIYKrjdEZhARPY
-         FJ5yFBp4vC7QWuTfm2RHldZSJvR1Eo78YqbRmFO191CVsS3RVXrql2nTN/cbG/6WKic9
-         Sx7A==
+        bh=0h0qSugiriXLCrjB8RiZ3h/iIyQo/vB18s/SqAimWKc=;
+        b=j1zpbkH21kknQa6KsrhUHu41uM1mX8InRRgcKPk/LnUnwpKzU3OzLXf6k8XKb1nFLy
+         31kJ0I0utfipI291HCHEQXlh+1NlSPdiInKC/KOAvfS075x6Gaiu9qIUQ17Z+6JTriRm
+         jQfy3cZSO3+CjckxjFYC/rBF5P4utwl7d/BAdiA9JculYeibwmUFyPsXQQ/KsdOyPhtX
+         2Ja2X7lz0qYXuCY/0tYIiJKceY6zEXZ4IeQ/gAj3JKaMwPMP8IQFxq4YJ7ZEsqjdoVan
+         tGa/xmywFLpDlG6aqwKjcdDOgadbKWzbV4qVVex2wLqU4PBeI2szEiLHAUgOM7ZKXxQn
+         uIuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795098228; x=1795703028;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+        d=1e100.net; s=20260707; t=1795105113; x=1795709913;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
-        b=yNityBrzSKMF4RMSjw2afv0dNw5JS1EenNK9KEwlN7VDTGwuvc3frfmS4yiZWaZG5u
-         tksokKHFUmOOgikRdlc6VFDwPTE125hR+u5CHs0XywL4gMPZR0wVyh7jCoSrFYLlkQaS
-         factgvSs2UMhnH9hXxvzNH3Yn+7ruUBnFlIvWl7nu6lqxMF324aWCeVFEymSdjAAzkG7
-         p/N9Zx5Qwd40SzHMJUzjBnYEYCBe/Euj6+Vgi6TRgzsoOL7v+i0sPY4eMIPQxCmOL5x/
-         y55KH9SrGArIes3lUo/dRLG30LdkrsIlUsmXeiOqc922w7Mzw5dCWrKbEWqrRE67iNBO
-         yUhg==
-X-Forwarded-Encrypted: i=1; AL+hErERCZpahBgvjZL8VHIbga2rjoKK1MJRTTt/AchnfQtmuQEf6Yy4emXpJF1bZEge3xh+QYLze8211WO6WIkWPYA=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8kHElBzOsOcrrize1HWGCfre6Gd1iKoReRIUO29QYjAGnHMvBX
-	+SCOzR4KXljI1kTPuslHxx9EXugMTgdgT+WiXvEq5l8uiVEOZpYb77ql
-X-Gm-Gg: AZFdTZdauA7CG/hoZnucCZmZ1sqFVgT8epNbZMxYz0Tp+aB60TGDQ8LC0sSr54zoGA0
-	56+2aW5E1sw+lPMYobpKaguk6YTY4mhNP/iJfomNBp/P3+sAIzehxPY9b2bSGTcsuFH+gmvXhfd
-	zRlHkhHB2ej32jDY42MNZ01ELCVDhkaRzgxNDMW313m/vX40ajIe+kHBoCxZmZW6O98yie9C6Om
-	j5M/TAySqYvMlR7YoJupXf1+5qwKUDZcUcYeOS293/A9pDbB+I3r0NPSEjA2uTPZfsP9ntP0r6P
-	/27lV/P+lTKOMS2ZhpWbodM041L0vaQEh9/1SG8rBJgs00M6B5uVWu/dBYZcIELTqCPek1EanEr
-	zv+ebiWhCGRC6avosI7r/DXQL/+mGOmX3/47q/o0aCDoTy5XSbLmiGaQfiRye3Y8hOHFhWF85su
-	+VEFi2f5uG2V7o2itIrAhrr2eiptP+3w9kEEa9xoceYtr87WCo+WUSnRsB1UNU4Fjs5oGL1vD8D
-	Olnhk7h5mPnu5skixDfgWiCAUzFPq9Eb2hteMF0iYwANHMX2qKoUNXoWZ7XaBkwpmKgMPYWwgdh
-	cuOCOghnWk/A6jNIuzjOrWopROyxfRK7Sts=
-X-Received: by 2002:a17:903:244f:b0:2ef:ee39:5dbb with SMTP id d9443c01a7336-2eff754e579mr60705635ad.61.1795098228295;
-        Thu, 19 Nov 2026 06:23:48 -0800 (PST)
-Received: from DESKTOP-NM9EKIA ([2001:e60:8509:ba6c:11e:f696:8454:757])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f10e67csm164415ad.53.2026.11.19.06.23.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 06:23:47 -0800 (PST)
-From: Joonhoe Kim <26rote@gmail.com>
-To: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Cc: Srinivas Kandagatla <srini@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Abel Vesa <abelvesa@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath12k@lists.infradead.org
-Subject: Re: [PATCH RFC 4/5] wifi: ath12k: Support MAC address from the firmware node
-Date: Thu, 19 Nov 2026 23:23:41 +0900
-Message-ID: <20261119142342.2063-1-26rote@gmail.com>
-X-Mailer: git-send-email 2.55.0.windows.5
-In-Reply-To: <20261014-b4-nvmem-efivar-v1-4-187c85f65018@oss.qualcomm.com>
-References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com> <20261014-b4-nvmem-efivar-v1-4-187c85f65018@oss.qualcomm.com>
+        bh=0h0qSugiriXLCrjB8RiZ3h/iIyQo/vB18s/SqAimWKc=;
+        b=s/Gv4kf5gzvC1obsj+UHlbWQtkYeUpWt5y0yKX0MPsXu5N1zXQ1reSIqSUnFJ0kq4Y
+         7vTSXtCrmADhK1oUk44bToBK9cgTgVn3l6xKuu7sZ9JUMI7Xn7TD2oAlS7H8cBGUpg4B
+         bmkJx3pQ/P2M3KmSNg1lLsiJ7HSVYgx8Gt9iDmv6JU3BjvEvymV/+i7iXdzaR4ykCM8D
+         2a/bYAG6QUqvYw8htrkYtMHXoYA61sDYorQx3MMfywVAccETdn1dCjiwc2Hm/X+OwdLt
+         bJ6r7/eQZEODQyjF9z1eMagshM4wJa/naZSQPZDC0Gg4SZKN/otcjJhxIMq/fwu+2TdL
+         9DLQ==
+X-Gm-Message-State: APuU4Z8h7GLjjPO/hiU10G6oKDP1Z6jm+GlHLX3xlcFqoAG7zErDhBHr
+	4tQLouZyIEYSjNVhrKRIqhcvfOJWDBgzMSjoaKn6u8/UxZxlN+N6c3cpkV3ZIP61c4kesUdohXc
+	uE5pEkpFMaZMb6cCwKbqI8iQYe7bQCwDYW95uZMGzgg==
+X-Gm-Gg: AZFdTZcHznhxpAzaMR8nzb1JONeasnQX4gz/PJRWGijaGhkOGN8oeCThejx2lMQdET4
+	/npT2V05DxVQXkNwbipncaEnybwW9nXXigYUKNvihYOmzOKdFKfJlZ3aWRsE8xZAKodRBHYogpZ
+	opfczYRwLoY8u+SKWyHUOnHUXCoUIDs4ByYIlztTnWAmZ5ljOaXxbPORU/ljbs7lHSD3axXO73o
+	+XcaXcZbByPZbLu2kdJ60wTCJseu3cYcPgI1D+nUQ8J9RM3izWPts0DqF1jwwomUnLT2H6LJ1Sh
+	N86v/IAqrB6ETMS6qiYaNEyM3UmpHGz8irkn4h131yAc7cZrDD7pAXolJMu5JDylqJ5xFYQTwdC
+	C8y70qztpCIxmWwrz9BzF1RQsrZIb+H1o8S7JwWYYo6YYDGTg8bneM36yu/tov0mKmm7ND9sjLE
+	H57RRzSNRBnoQkhDpGXU8ztWl7otogfPfEZ764FX56TmyKUnMFhmNKxAsSGxE=
+X-Received: by 2002:a05:690e:1209:b0:67c:1dca:80d with SMTP id
+ 956f58d0204a3-67dd3f9f48amr2886498d50.69.1795105112888; Thu, 19 Nov 2026
+ 08:18:32 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -115,43 +104,111 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20261119081621.112623-1-rolandschober1968@gmail.com>
+In-Reply-To: <20261119081621.112623-1-rolandschober1968@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Nov 2026 11:18:21 -0500
+X-Gm-Features: AclHuK-Q77xt3arYmDj_8ltgr_-yiw4XGV2bx_45SrhKRqHjW9BVHBgwlw9n6YA
+Message-ID: <CABBYNZ+1W99QY=nQNA-sUd3-MnfLBqFLWaULFgVbTcFahYG+oQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 0/9] monitor: Decode Periodic Advertising with Responses
+To: Roland Schober <rolandschober1968@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 14 Oct 2026, Abel Vesa wrote:
-> Read a MAC address from the device's firmware node (a DT "mac-address"/
-> "local-mac-address" property, or an nvmem cell named "mac-address" via
-> device_get_mac_address()), and use it in preference to the address from
-> the firmware board data.
+Hi Roland,
 
-Another user for this: the Lenovo Y700 Gen 5 tablet (TB323FU,
-Kaanapali) has a WCN7860 on PCIe, and its firmware reports a new
-00:03:7f:xx:xx:xx address in the WMI ready event on every boot. Network
-profiles bound to the permanent address stop matching after a restart.
-The factory address is only in a file on the Android persist partition,
-which the vendor stack passes to the firmware over QMI, and the
-bootloader puts no address in the device tree. So on this board a fixed
-local-mac-address is only good for testing; a per-device source would
-still be needed.
+On Thu, Nov 19, 2026 at 3:24=E2=80=AFAM Roland Schober
+<rolandschober1968@gmail.com> wrote:
+>
+> This series teaches btmon the HCI commands and events of Periodic
+> Advertising with Responses (PAwR, Bluetooth 5.4). Until now they were
+> only listed by name in the opcode table and the events were printed as
+> unknown.
+>
+> It is meant as the first step towards supporting the PAwR advertiser
+> role in the kernel and in BlueZ, which is what an access point of the
+> Electronic Shelf Label profile needs: being able to read the traces
+> comes before changing anything else.
+>
+> Patches 1 to 6 fix existing decoders which the new ones use or which
+> were found on the way:
+>  - the Connection_Handle returned by the Periodic Advertising Sync
+>    Transfer commands and by LE Remove ISO Data Path was read as one
+>    octet,
+>  - LE Periodic Advertising Report trusted Data_Length and
+>    LE Extended Create Connection trusted the number of PHY parameter
+>    blocks, so truncated packets made them decode octets outside the
+>    packet,
+>  - the LE Set Periodic Advertising commands printed the advertising
+>    handle as a connection handle,
+>  - LE Periodic Advertising Report printed an unavailable TX power as
+>    127 dBm and named the AoD CTE type with 1 us slots AoA,
+>  - LE PAST Received printed the handle twice and decoded the clock
+>    accuracy as a BR/EDR one.
+>
+> Patch 7 splits the LE Periodic Advertising Report decoding into
+> helpers without changing its output, so that patch 9 can share it.
+>
+> Patch 8 decodes the five commands and patch 9 the six events,
+> including the [v2] variants of existing events.
+>
+> Testing: I have no controller with PAwR support at hand yet. The
+> commands were sent with hcitool to a controller which rejects them, so
+> that btmon decodes what the host sent, and the events and the
+> successful command responses were decoded from hand-made btsnoop
+> traces. Every command and event of these traces was also fed to the
+> decoders cut to every length, in a buffer of exactly that size, with
+> AddressSanitizer, which found no read beyond a packet. The output for
+> well formed packets of the existing decoders was compared with the
+> current tree.
+>
+> v3:
+>  - Add patches 4, 5 and 6, and print the advertising handle, the TX
+>    power and the CTE type the same way in the new decoders.
+>  - Patch 2: also report octets beyond Data_Length.
+>  - Patch 3: report extra PHY parameter blocks, and do not report the
+>    remaining PHYs as unknown after a truncated block.
+>  - Patch 8: reuse the [v1] decoder for LE Set Periodic Advertising
+>    Parameters [v2], print 0x00 subevent timings as none, check
+>    Response_Data_Length, and match LE Extended Create Connection [v2]
+>    with the events which complete it.
+>  - Patch 9: Data_Status 0xff keeps its reserved meaning in the [v1]
+>    LE Periodic Advertising Report, LE Enhanced Connection Complete [v2]
+>    is matched with the command which started the connection.
+>  - Patches 8 and 9: report a subevent data command or a response
+>    report with fewer entries than announced.
+>
+> v2:
+>  - Add patches 2 and 3. The two problems Copilot found in v1 were in
+>    the [v2] decoders, but they came from the [v1] decoders they reuse,
+>    so they are fixed there.
+>  - The patch which splits the LE Periodic Advertising Report decoding
+>    keeps the new Data_Length check in the shared helper.
+>
+> Roland Schober (9):
+>   monitor: Fix handle decoding of status_handle_rsp
+>   monitor: Fix data length of LE PA Report decoding
+>   monitor: Fix PHY decoding of LE Ext Create Connection
+>   monitor: Fix advertising handle of LE PA commands
+>   monitor: Fix TX power and CTE Type of LE PA Report
+>   monitor: Fix LE PAST Received decoding
+>   monitor: Split LE PA Report decoding into helpers
+>   monitor: Add PAwR HCI commands decoding
+>   monitor: Add PAwR HCI events decoding
+>
+>  monitor/analyze.c |   1 +
+>  monitor/bt.h      | 174 ++++++++++++++
+>  monitor/packet.c  | 585 +++++++++++++++++++++++++++++++++++++++++-----
+>  3 files changed, 708 insertions(+), 52 deletions(-)
+>
+> --
+> 2.47.3
+>
 
-I tested this patch on v7.3 with three changes for Sashiko's review [1]:
-the return value of device_get_mac_address() decides whether the
-address is used, the buffer is __aligned(2), and with more than one
-radio SET_IEEE80211_PERM_ADDR() also takes the firmware node address
-instead of ab->mac_addr. With local-mac-address in the wifi@0 node, the
-permanent address came from it and Wi-Fi connected as before.
+Copilot flagged 2 problems:
 
-The cover letter says this patch is only an illustration. Do you plan
-to send it on its own? If so, with those changes (and the comments
-dropped as Paul asked), feel free to add:
+https://github.com/bluez/bluez/pull/2849#pullrequestreview-5977101363
 
-Tested-by: Joonhoe Kim <26rote@gmail.com> # Lenovo Y700 Gen 5 (WCN7860)
-
-qcom,ath12k.yaml has additionalProperties: false, so it would need to
-allow nvmem-cells/nvmem-cell-names (as used in 5/5) and
-local-mac-address/mac-address as well.
-
-[1] https://lore.kernel.org/all/sashiko-outbox-171329@kernel.org/
-
-Thanks,
-Joonhoe Kim
+--=20
+Luiz Augusto von Dentz
