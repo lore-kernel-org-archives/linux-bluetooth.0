@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795072439;
-	b=isiQTdhlh71Q2B6bwtn3rFSTtI/vpB/3APdU6gCUJ/ougG3qwzcZRrCvguJANC4ZmZUO
-	 fOzky7CmqUZv2lYeOY3Xlz8rwJrABWkZ1wYIFPF//Z9V6010nj4WWMrBDcf4gxFcSJaPo
-	 EQKpx3EhSmGOhObSXHuN8eBrk07rd7owPhinjFSPLmdV+bW+IiW0yEGXPKOhsqtTNMKaT
-	 mR5bR+8X0LuUAudYewlahOTTs66E/e8/e1D990HlUd2fMHoNX8Byla1+sp+7OUcEdt1HL
-	 e+mS8JIARe3Qm1lMAuxJHaLxBbHd+er4Fcvwd4nHkdaB41NeK5m3bHxRCIU+VML5tXw==
+	t=1795072441;
+	b=eA4ArU4KX5WIeIek4VIib37ARG12UH/1l+shuW4w1a2QJ288tY88yW7dccAW1WQIP73R
+	 qw2bjN9UhpxVOoVsLBLTyvMLZyzW3w7Alps5HYGiW0TrU2hN3ysdhVRm7P267C/y4pqlh
+	 iGeitBUQnMDQnSkQBBKKS8msbJa7Ztbg67WeMvz+/bkQMTbd7Cf1arNyQsfT9WffjZ5l3
+	 t+XLb/eI6Rc2FfwcKfPIFst5o54GfiDa0FLH/0iThQjkP5kYRv5S8pteVhi3Irn//OdxO
+	 5En7+Tx7DQejja5UocMLGlp77/Tv7PTnupgrUTxqtl/GB5iZRfAfAvoDuYXxzh7UNMQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795072439;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795072441;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
-	b=OBcOIRsyb+EaRro4hZytMpe8e+Z6VyBV8N1ReSImJqtaxd5O677dL1L4bjW0xT1fiDhN
-	 rHMEcoUyTXHPhl7jYr5o3JJ85IcMpsL+Tu0jM06zBWiVxj0+Vura+jI22vjr2l11TWwvV
-	 S27tgip0yZQBBjNGER3aiKhet1K1jExj4FupQu9EUpx6o9AOMBnaHIn4xm2xCp7ZfaGsr
-	 66ZjxaSXTzQBrJ4KBEm4lSHWFgdaqXXz3IuMbVWKWdB6jDUrQSa4CMvg/dxfhklpOBMKD
-	 2kGMmhsiYTxQ0TXdKMGJMf2G3aTxugfTWClPra16jjqU/zo86j0OCC0u7x+38o9s0jw==
+	bh=MNnpBEDTbwc3p59eYQh0IhUrbFt7av9B3+LIG1StQvk=;
+	b=s1vC+gPtwROqfz7foHwGOZRr3p85TMEethZc1utXB6g4gXVaGrydeJTitHj++1eFUT5t
+	 hYvvTnrTC3TwExttEqTePrpjWAWdA2+WUNrVOzuQhuEDDSFJTWusLucU1IJ0Q8BD3b/Z0
+	 T1xJY3qi9QBX3hjo3x5H44WUPeegANgRnR8p11zKn403SRHd8e1kk517njRu/3PJIs72i
+	 e5xyZCpNIXtnb5/jAVo2wmvntIZH7Kk3tNAp62nWTZ8lVhMiSTxg1CZ2q+eTW8JaCRhIW
+	 4UWBJaAuiNBF6vpkA+mwxuz4Lj9gqW293720BcWzbPfc46FUgCUHj9zz07UdDVLKrTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=himIOP9V;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cPakR8O8;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB4606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:13:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54BB4606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20A0606A320
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:14:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F20A0606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=himIOP9V
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4bb609d9bf4so3017225e9.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:13:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cPakR8O8
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a68f888a41so1505255e9.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:14:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795072438; x=1795677238; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795072439; x=1795677239; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
-        b=himIOP9VW8dFI4Cb78UcSnYZ4hH4vw39/NkXWuIBcyRF356zskq4HKIRzWX04uJx+g
-         Mxellf66zrBhlQqTkp/4thojyTydK7Ich/y0Tlqrmwhdr6jmFP54Cya2eWF3qmiZ9ISG
-         vuu3JoSbiBWdYT7HuM5Pdlk3M2IyTDn65RqLIdozfDIHXA+k4axAtUvgofbNw9BdOS2R
-         S+S0gSTu7wVLV0y+wmDIH89Am6kBuTkt5jXxjtGn9VpIaHF63jY4W5F/9qQV2T/V9TXx
-         I39xHVoC31xh8UHKhIIZdXI+WKa39Go3HNdnq5iPiqmblZwhvREbc2CVZKYzldOs5H0E
-         IZFA==
+        bh=MNnpBEDTbwc3p59eYQh0IhUrbFt7av9B3+LIG1StQvk=;
+        b=cPakR8O8VnA4AUzSp5XKn3zBYkh8CLswR1/4oQOQwczaF5q5ULwuUHPOcPj2hF+c06
+         LsGUhL7EyY4SmMIK6kXVKFDYwNOORvhG7QMvTaCbZW/x+XveQIVFA04riUJwAUx7H+R2
+         L/C0Yk2WXcGIH9iJDqycTXLTintaV8ItCTBGPb6QePy1Oqou1fxnj0Nvv/2LTKNErEFi
+         FCj1Ph+gyCwmPvWL4YZSLgWBnSj59yh3iuxub12xzkFUsgbEFAnjAAbFDBvQPIyRHt43
+         5Q8Y/KLRGJfzjXor4kCcX79ODXf1ctkxxf/RPidsYTxH5hSz7zfliFNqq7GXHzorNHAL
+         +RBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795072438; x=1795677238;
+        d=1e100.net; s=20260707; t=1795072439; x=1795677239;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hZCctNQK3cN5qV2Hx2SOGwUfxpcb935adt9+raA2U5A=;
-        b=gAptiKXcdugOTuP9uxOMBzJ2tp51A00mn7LuYcLauw9Som/b/TCxHynoCsEVf8WQHD
-         ztySdjFn3JGOondDlsb0+PTop6ATqHWSBp1HbJ2YwyEzwFU6pN71hT/GCim40lL1IH3h
-         Z2aXI+tooJT8mWqVZq9TNObVsIXUg8HwR61myDRX3FmOX1YeaEEIX9pgd5QHZwx8daIJ
-         eNTq3VawCJ3uZP0geMnogrGQuSu4d84fZCQ+1F+U73k/7qejNHmHiT8Rb1LPwrsvvipy
-         Jhh9I/T+eixyXo7rlo+2iVFTXiXvJTIUIHjwRjJwoAqzrEAvi/SIg2CIXiA2oZbDazMw
-         FTuA==
-X-Gm-Message-State: APuU4Z9F1PStE0opCZfdkCRaK15c7V8jpjUnPRoHV5A4uoci5pUdRT/7
-	Qc/3uVv9+mMs8ulZQqOmg60eBZBvEoWpgoUIU7AhXOfEH4PkUkcdYvXP5l0Z32Qn
-X-Gm-Gg: AYBFou1X0vVov2bTrxrkB1+gGat6P9lDQLdLHwl2vXkBIHe82lVZIFgPEjdcKAjsnbH
-	suewUWswMhfO6HzTh2drLr70raCcEkKyjqp+K+1Wh+KuD2RJ0xPzWNZtDGKZvongvsFUkPz14/6
-	QBiFY8MPLs6qnzEXBo2za/4e3TI4/pSuetiOduSIetht5xLDX1jUpAescJJul4eepFIHlDnIvL5
-	mUCOFw/Jkigt+byM8mW9H+ItIxy43nUrXHLmnWIMhihr6p9eg2hx0NBJQ79DyslcwSQPDzg5Ms4
-	7NdV3v25rWSzk459of2Kf+1YwYSaptDyTiORy6u9FNlti652fqGwCZ+pTc6ICqE96N+X4MQHAqs
-	NRxmotdtlGem/C58FgwuDSG6pOTyJiqOZeApyGyFG+hk+UhLZlhNltyl4mAqgVNLejKyhhlE+sr
-	ZHu8QfpSbvcbSuyBc3KgFW4HEH4t3SY4MXzRNqwJz9M3OHjYKf8LnkJiNIyE1faR864ECiGuTS9
-	rMrtTAvqv/gTBpIKC5+R7uaOPjtekW0G8vHD3mQyl7Bxp0BR7bagZTMpIsIpr1HPQ7YkvOOi/Fk
-	qJY+8PpaWGGVekqKK0SReZjWatNseD6Kv5wwwHA0HffNKrzXfvvufvSa
-X-Received: by 2002:a05:600c:468b:b0:4bb:7ad9:301f with SMTP id 5b1f17b1804b1-4bb7da0c682mr95592775e9.2.1795072437405;
-        Wed, 18 Nov 2026 23:13:57 -0800 (PST)
+        bh=MNnpBEDTbwc3p59eYQh0IhUrbFt7av9B3+LIG1StQvk=;
+        b=QQGwsbziSyNUbsYHusGGEOiu4YqIkPdlqvRxw8sNXwNi9WM+phTBgalQ/5uQS1VU3E
+         DpPaZDd3TGcZzDg3MbTubjbOG0Tt7aM+8AONI2I89Q3kaRk161VZ0BbY3XMioStCBUpJ
+         Y7LW+iXCIMbyJl3LNQ9JMeUJZr/ygK1ArOmpIahdDByAULvAS7wQ5b/gUv6WAvS3TLEh
+         DIj3SkPd92HtJbK++ykA1igRTrzCxgbn/0aj/eRZeXkn2vqqmX0JrH/EENRwggcCJ7Lt
+         84CAYEC6WmjxOnFBwIVXnaBJqZrblIK3mrDGYxRjxWU/lhAVhLY/ePHxvr1otmEKaWql
+         AnKQ==
+X-Gm-Message-State: APuU4Z8W5hQaJNIKhqxVjSwVCmne9nmca7vgX6YEH6BDcfC5hXUxAyfy
+	GhA3zEc4gUh1dJunhKPA97eAnRIU1eiOBAcvIRLZEmQj2n5ECjiCXr3802AcVs2r
+X-Gm-Gg: AYBFou20rf1RbGmgVpmrhdRwDpxcCG8pKuHEM6DYnDeXx3Qwz9Fk/7vr14+gb5AspIs
+	FwhlhyZK1gBBPf61YnX47j69N0HLVW+zNXFOzHNhykgEhSRD5cH5lEz28XK8It2i56v/VLWQIMQ
+	U/d/6p8p0910Dfpbaq7GwIB8eRUQuFBcKoR9PR+6pv4lX7vL/OS9/JXixIB6iPjhBPx+xbm/SX7
+	CnPPj7rehGS4uGFhvNgIgyC0ADky+g6OTAIsUUheC5/n8vt/GrbSFu4ItKS0eZYTurfO2vwo/Yh
+	4luc53T31Q/rTo6f5CTsFygQSyFjl7a/uOTC09LYgJlKqrFjv+TmuztyS1YJWqDOLxfOLl3PTts
+	cCgqke0T9h73wWyerALJPZURF6BafgRYsLIcRU1FBoU5mbZ5gmPfkpPhWyXrVN7Fc37dRtT3ZpZ
+	AIsOlc25LuTu+7fu3PfJrBLgCf1eN10c71PS+nkJ0Fkesxom8tKqnjn/yR+Vi6G0q6smDnG5wUL
+	YqGiWZN1cTU/JSYhhudmrMpzhjmZJp8YgNL9XKExfalSjKC+vdP0lM06Mrh9ewgaZoEVjjD5wxo
+	hvGWzMduzFdIF29PWnrq6xqc6sf9pSQQBo6/
+X-Received: by 2002:a05:600c:4e92:b0:4bb:7ae0:30bf with SMTP id 5b1f17b1804b1-4bb7da147cfmr86266085e9.2.1795072439163;
+        Wed, 18 Nov 2026 23:13:59 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.13.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.13.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 23:13:57 -0800 (PST)
+        Wed, 18 Nov 2026 23:13:58 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 1/6] monitor: Fix handle decoding of status_handle_rsp
-Date: Thu, 19 Nov 2026 08:13:27 +0100
-Message-ID: <20261119071332.32424-2-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v2 2/6] monitor: Fix data length of LE PA Report decoding
+Date: Thu, 19 Nov 2026 08:13:28 +0100
+Message-ID: <20261119071332.32424-3-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261119071332.32424-1-rolandschober1968@gmail.com>
 References: <20261119071332.32424-1-rolandschober1968@gmail.com>
@@ -97,41 +97,47 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-status_handle_rsp() decodes the return parameters of commands which
-return a Status followed by a Connection_Handle, but it only reads the
-first octet of the two octets of the handle, so any handle above 255 is
-printed wrong.
+The LE Periodic Advertising Report decoder passes Data_Length from the
+event to the advertising data decoder without checking it against the
+size of the event, so a truncated event makes it decode octets which
+are not part of it:
 
-With LE Periodic Advertising Set Info Transfer returning handle 3585:
+> HCI Event: LE Meta Event (0x3e) plen 8
+      LE Periodic Advertising Report (0x0f)
+        ...
+        Data length: 1
+        Data[1]:
+        00                                               .
 
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Periodic Advertising Set Info Transfer (0x08|0x005b) ncmd 1
-        Status: Unknown Connection Identifier (0x02)
-        Connection handle: 1
+Report the length as invalid and dump the remaining octets instead:
 
-Read the handle as a 16-bit value:
+        Data length: 1
+        invalid data length
 
-        Connection handle: 3585
-
-Fixes: b73d4bb9e3c9 ("monitor: Decode LE Periodic Advertising Sync Transfer command")
-Assisted-by: Claude:claude-fable-5-2
+Fixes: 5441a5b91a08 ("monitor: Decode LE Periodic Advertising Report Event")
+Assisted-by: Claude:claude-opus-5-5
 ---
- monitor/packet.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ monitor/packet.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index eddf8706a..4ff24092e 100644
+index 4ff24092e..0adc0144a 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -4976,7 +4976,7 @@ static void status_handle_rsp(uint16_t index, const void *data, uint8_t size)
- 	uint8_t status = *((const uint8_t *) data);
+@@ -13957,6 +13957,13 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
  
- 	print_status(status);
--	print_field("Connection handle: %d", get_u8(data + 1));
-+	print_field("Connection handle: %d", get_le16(data + 1));
+ 	print_field("Data status: %s%s%s", color_on, str, COLOR_OFF);
+ 	print_field("Data length: %u", evt->data_len);
++
++	if (evt->data_len > size - sizeof(*evt)) {
++		print_text(COLOR_ERROR, "invalid data length");
++		packet_hexdump(evt->data, size - sizeof(*evt));
++		return;
++	}
++
+ 	print_eir("Data", evt->data, evt->data_len, true);
  }
  
- static void status_bdaddr_rsp(uint16_t index, const void *data, uint8_t size)
 -- 
 2.47.3
 
