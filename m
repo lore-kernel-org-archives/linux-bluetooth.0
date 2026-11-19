@@ -1,92 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795087466;
-	b=Jr/39NOwuo708jqMqCCALgtNkhD2argdf865teKnxbuS2Ba+AOQa5zA7+JT3bePieKud
-	 9k1EbekAiDeXGMBe51CrwKJPQMr7YxH2ckRkySfXmMyhlOhQ64RcnJ/62xRZdEF9rJJxD
-	 oLUxVTH3sw6BXIZMWQmx624Aob5IJrciSy2ot54KPAi0ho+eICQoXVm1eCW1Kh1VzzlDQ
-	 seRW7wQmgRAwVCd4FTBLg081HiISlQ0yavzLtUznDHAGGJBS5TCGT+rcY0wPlOsL9nWwh
-	 agXwDTq8JaLQuGz/6DNlcALE5eceGCkh/fTXjXaCtvFF6ARnn0gz82u767F/E+SmtEw==
+	t=1795090188;
+	b=feOKV8DV2FYNoXndYrFb8t8KaV/SP6KqVoNKqOc709wcHIiP1DkDy1gPfKLmPTxl8BSC
+	 BmjQfINJ/wVolI0G8zxMEBC1fTQRcJhHiiuwZTUFlu74R+0T2ghLJYlr5e8sm8TwXWZiP
+	 yEvHxmy6yWOO2koUg3gSSQR2eDLpOJ9Yvk40CdbWNLnWQtMpExjCqcdGfWt8MLeEVW1YX
+	 LezswaYsx4cswbajNOO67jE1wb9M4/SEgjjCebCOk7RT0UE9yeD0BwdU7zoabEwyRbrAE
+	 1LUUSKH9nggfepDVNvxfw3jRnph/ejDVBFdwHjAAKLjqjmqK5brglfF7hJherzQ6ZOQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795087466;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
-	b=ModzV+Juclj47MqZpMBPYVLF5FaFTHkk7e0clnVX7I6HdAxcP4ux8k1yODkP359PlIyH
-	 o9D0gvRnvy77rkSdxiDap+BVyY1M5dMN1TzMNszEEMZVj+D+67PN0wIzFTUkj7dcHMVZw
-	 SFFvpPJ9WWBbzR0O9hNWAti/kYET6/RceOBECCCnTs8vJh26UyMo6ShLsoT+NPt+ol57r
-	 cRlyV6aBtql4t2Uyt8s18i/hglQuT7uGyK7ijyo/8yPCVOzLQ922Gb3tiKx5ltxhoy325
-	 dWiN+BFPYgBxx79lVfnH1IUkqKVWxRlVG8zyyhSJFf5qZTdfzFbMPYrrGrPd6LsYZEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795090188;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
+	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
+	b=tWYxkREwBjL9Br6p8nQNP6Yps+SCDAf7BocJh/PXid0bNpWc3Qwcggqfh9yVj9acL9Jo
+	 tNIdy9Phlhqg1iGcgDbD+9UGp4HkELWmjMp/fy+7MahV59s1QQlZACy+FS9sOiV7ZcGP2
+	 3aYc7NyVRaf/b0EAXS/51xRA3w6xtNJz1KQRoM21Jw11ExfmqRQxHvKsYndGvLlBzcJsE
+	 fPkyJE3bql7ksQwEz5Gni3/qGrD3ubsiFswa7W7MFjwYHgXfjkuJAZ/GQHf3asJyMKn/8
+	 4XsBpyi3rj8qQlBlZzQ7jKC2LeKL6Rx5QYyMTrFMuf9XwVZLmeR68wL2t66cVvKiGWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ISpxDJ5D;
-	arc=none smtp.remote-ip=209.85.214.174
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=L1M4CQou;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=eI9i9DQI;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDC9606A32F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 11:24:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5FDC9606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730B3606A32F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 730B3606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ISpxDJ5D
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2f02f04a426so3455905ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 03:24:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=L1M4CQou;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=eI9i9DQI
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AJBjvtw705605
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=RT+0AKmVcApMzKaYRkKEr+
+	FBqJcHBjpcZhiE+ofNNCk=; b=L1M4CQoufx5wO/CVdDnvzTpGpFuSf1/2xEhUxU
+	MEasBz4A8BRWIAxniyY+Z6AcAHjnInrpVRIY2h6dXqbRTs2BqUzIz1UlVEwttcfS
+	1ZFIPmXawTnh1aYJhyeae6BVqLs7lHASkOkmMHLTpSk9ZmuzQUEWsUTBlUvNfztq
+	3W5jSoSrbwb+iYzF5kMYp1IRavQaR23VuzmfrEdsb9gQbOkeWmXVLWXMF8iw3VIU
+	jG4sBdBV0edudzDGHQrM0rM9viENmqa/dcXDtbnkxUXwLu8lQhSUehdB6Xn8Lv0k
+	BCmZzL/DqNbYJjzbWXaW/GgUTPZb2ZXHIltcd8pgdfuWW91g==
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j1x708qrh-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 12:09:46 +0000 (GMT)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-567c8af65f1so224678b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 04:09:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795087466; x=1795692266; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
-        b=ISpxDJ5DVGF8N/aDoxpxQdXM4+cJL6qMmIH5RKsZQMoGzMcIXLk4VJfefJXnTwINzV
-         4Ku7wouKuWuV0Dzw8z1IBDzEC2rtaKEJtKIj/Px36IRP/VBEOsFy7B0la+qImczYSi2u
-         T/rq4CNWanmRV600ZLKCDKttYVJdniPRZ4bc2ZaJx6kfkNn7YaAYUUh3RM0sRNMapcr0
-         SugVjQMLwU/9Faln1uxt/pC72FprBdrkp1SXmTJrJcdo45jpoy+FfWJVf68cwBspkjWQ
-         NQgHgLIJ+USu0JknlFUXV2LIqLOWAwma8/dQm6dy9mrlGYI9qHEUABczO4OoMpuUYcgy
-         PxOQ==
+        d=oss.qualcomm.com; s=google; t=1795090185; x=1795694985; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
+        b=eI9i9DQI2U5/CVrWaOUfn4THLsaSmQ4IkTK7v62Afk3wAwG8lTJtUQmRZ+ka6m21le
+         F6sekXpOFfoX2liME64ESwvQoE2/4tRrNU3YKPpOuizgR5Q2wRnyTHKenekEJIThk7qv
+         aT+QNL4+RZ3AdeOTfs/aespOFcqntOLg0g4qvWzYVRmLvIxbgMZs+IHaXk+KBjN00T1p
+         ROL762B6aQSwAeHGeB02TkGgX7L4kckeIYPNfnwji8i9V4qFM6lQoHjkGrN5ekd5ZpKV
+         Ds9Gdn9G/5kBghkYrMxNK8pOBtLpLlAbv2vGHF3Xf6fV/ScmdGC+LYfsGZkOI9dnNxnw
+         KLaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795087466; x=1795692266;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/1a2zhpdMOBK0mOqw/Tno4RXP4oEFs74drCisxFYseU=;
-        b=a8eb2eWinyCniYh/0qfB1EtoIBHzkmlSDxLnV7rlp7jsNwlDtRv5EhcUraUpvs6UZk
-         CQYPVX7r6IaGTQFGLimX1Q6PmRtFdzixTrrZ9qfH2Oz6WZS7Y+PYRE9Z00a/WUlgJOsr
-         KMAMb4fpkbVG62KIg7qKzKvqZwj3xWyW/DTCULqe3GedTEFlPz5X5lO4qLbe0n38yOfh
-         Z+pot4XVGmfmD74U/hCZcbD0wzzMwoyYp/noDmw8jyV/waHCIG4lcdoJ0oC7+66YwBhr
-         BqPB4OTuH57U9FHSMISMtBRasYv9X5/xOiqmyaFNeUmsmrNv/tkHvGZ59TORcV4smdeB
-         Z6rw==
-X-Gm-Message-State: APuU4Z/CW5gqB8LZhM8cj7pPg1mX8VZ9+NhR2E3OxhgXdVJ6medvMtRd
-	xTkoU5gZdMtEGEWz+nELEQHuRWGx24FoOTKJeG6fG+R7GaFx2mR4tBWq
-X-Gm-Gg: AZFdTZeupZW9DBnBDfTRbpZVmyHr2vWStbXw7O9jsIYq4FAumYwgeg2YDvBMWbOjrHx
-	DaT2rz/Ou5BdDTJBT06ogR4nceKqBB2vePVsJxJnN00sd2xbWgEXejAeclugWMPal36mUw+b5/n
-	zc54xPUQcFTG5SIjVxtSIism3oEH0mT6vZFHG1Wl6yYUOYkUvMBZDeN4UgTvEdortlwD6mfktVy
-	xJu1a5QRcYMiO0d4wJwEyYvhDOIBSIR47wsywtrqjVxCAzmIw5qp7KK0mMc7hCJnczTLTCz79NY
-	rJ/pJjqrSGL2Y/+shoydfxq4uZhCpPgC/xpi7M+1RugTSKMeqbpBkmTXNdQfqqcREvbapp11wGo
-	pgDAU972ZeuEEvQyXN79VdAI4oXjK4rZJvGxK715kdl7bLzJbvPtZVkPSiLL9qykCIQHcu0XKFf
-	kAkqiw+DPOvNwS/SRnb0/9kcM7uPHtXQuU8af+NZ4X6NcA9t+8/biqfqAeDpTZi/ruGklfNWNZb
-	hrRnmzaCFDY2I5614ypdcJwzbHrzB8BoQnZ44s2z2fc4p02yYb95wH4dPWtiIJ5P2GJs5bKw9kg
-	5tpuucdTKa5jHvdvErtiu79ZqshOrynEbEcedIcrVleBjwCIiZP1dqjYiALI64nZo31CWgOq1R0
-	t
-X-Received: by 2002:a17:902:d2c7:b0:2ed:2305:5244 with SMTP id d9443c01a7336-2eff752ec1dmr60082795ad.46.1795087465193;
-        Thu, 19 Nov 2026 03:24:25 -0800 (PST)
-Received: from G7XWH7K1F3 ([2408:8256:2e80:7371:84c0:a687:3d35:47b0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2eff62876a6sm28540805ad.63.2026.11.19.03.24.19
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 19 Nov 2026 03:24:24 -0800 (PST)
-From: Zhao Li <enderaoelyther@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhao Li <enderaoelyther@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: MGMT: Retain the selected legacy advertising schedule ID
-Date: Thu, 19 Nov 2026 19:23:59 +0800
-Message-ID: <20261119112359.34543-1-enderaoelyther@gmail.com>
-X-Mailer: git-send-email 2.56.1
+        d=1e100.net; s=20260707; t=1795090185; x=1795694985;
+        h=cc:to:message-id:content-transfer-encoding:content-type
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=RT+0AKmVcApMzKaYRkKEr+FBqJcHBjpcZhiE+ofNNCk=;
+        b=1erg8cXSzG3CmS1EvMQjTtgLudeJEfGkunQ/LFIULRmMKhCf0/0dqWA7dRjo6zHtoc
+         wpquQxA3KxZY0okKHbpEmyHUijI9para01VexPgGxli7PWXgy8SguWgVu2x/wJyeaW/j
+         eKNszLTPgAfcRVNzi5AaRZ1YsTcGLOWHpGaez+vmoe2rBqGztfIoljceXWcCQpYm0txR
+         ixDMj4tzOj6hqpvnTkcyT2ExRRscsNc5pm/UL1bx58OrvwUEK9RfTUQWH2HaJ4zIGMmr
+         UDI7ZQZUMaOngnRNhFfZbNswu0LX0v52OXVUkLEjG4Qelb6v0EJoeQeUt7EurGkl3SzJ
+         V+hA==
+X-Forwarded-Encrypted: i=1; AL+hErFpjAmtfQXW1lF7hsLxtZ+GbL7reRKCjfP4NXxzGcirE2dzqpkOcwIvSL2z8Xa9BPnvMXbQpZ9oxlz3Iooz8Uk=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+eV61zjaEBN5QVzee93yBV8kD3qaT4Yprw43VNeeqHP8JDb7xQ
+	S+5d/RTBbZ3iUgQDIpkUhNmxG8RC6XxuxsHRBEMH/+Pun9284/Lq001PeS0LxLG56/FDbrb5gMx
+	XdcBE3JoHYKnRUNlpHaByuvAp3x1y/SVi0d+FSp9Ye0KQzesFE7tMQ2SMj9r72Bn6TVjfSUOAt7
+	3fFhU=
+X-Gm-Gg: AYBFou3lCDzfKHzTuGECQW8FHE7LGD8qPrPms7mb0+BdQUOj+qWnTpuRsvH/GOLHp4N
+	F71H/uV/dxfqoiEgH/TTKZJHWTD9NrhUfHgmklV4khgM9zG/TnALtSZlxtFQNtGJB5RqWKoYrLq
+	XTlyM1C2R+R+poQEsk95mbicLPu4NI8r1uldelBa6QLU979YJbZrCaskPX2GqwEZ//HGmU8Xdpk
+	jhwW57basTJmWdKOohJ1tqEcPVC2yLkEB0NCh+w/9xM2bAzGQsYb/nsfJnKJBR+MzqZWjljuSvF
+	IRCS2ENiyIAal1cvbuej+UxW4POHGXdA+C3RTZtT0QkGoGbG+Tmlq2M/TMS9nWWJPnfcbQpDKYU
+	cajcPagY6RWjvC/0oYrq5T7JATGKrYL7nNCK8JEAo2n27ValFTgDR44/IpDzE10HrOXyYgy66s2
+	dueVRoGQe4/Ox9xeARx1c=
+X-Received: by 2002:a05:6808:1a1f:b0:4f8:4a95:991d with SMTP id 5614622812f47-5773a6f88c5mr9488718b6e.2.1795090185378;
+        Thu, 19 Nov 2026 04:09:45 -0800 (PST)
+X-Received: by 2002:a05:6808:1a1f:b0:4f8:4a95:991d with SMTP id 5614622812f47-5773a6f88c5mr9488651b6e.2.1795090184798;
+        Thu, 19 Nov 2026 04:09:44 -0800 (PST)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4b743721fe9sm5135874fac.6.2026.11.19.04.09.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 04:09:44 -0800 (PST)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Date: Thu, 19 Nov 2026 04:09:33 -0800
+Subject: [PATCH bluez] tools/test-runner: Fix TESTHOME parsing for short
+ paths
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,119 +115,88 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261119-fix_test_runner-v1-1-ddad300e86ed@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAPzm/moC/yWM0QqCQBBFf0XmuQVHU7FfCRG1a03EFjO7EYn/3
+ qaP53LPWcigAqNTtpDiLSZPn4APGU23wV/h5JKYiryombl1s3z6AAu9Ru+hrmqa8sjlkGNuKVk
+ vRbpsxTONj4gvdftscbxjCv8aresPYQ9DUXoAAAA=
+X-Change-ID: 20261119-fix_test_runner-5773413a0ef9
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Zijun Hu <zijun_hu@icloud.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-ORIG-GUID: c3WenZQ5zJefGJu3MbWAgVieIEj3Ka6t
+X-Authority-Analysis: v=2.4 cv=RdgFmFtv c=1 sm=1 tr=0 ts=6afee70a cx=c_pps
+ a=yymyAM/LQ7lj/HqAiIiKTw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=k84UmWxO1rnOZ_snXCEA:9 a=QEXdDO2ut3YA:10
+ a=efpaJB4zofY2dbm2aIRb:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE5MDA0OCBTYWx0ZWRfX6mFqGZ5+mjJq
+ 15SoF2gRLiZLGPmosd89XBntHuj17evDyroNpgly4vWP176zuBZyD3QVzNb43xbmS8e2m7Dan5k
+ sj8riOKjG1ESTCYjvFkQHK7Ap1wke+4=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE5MDA0OCBTYWx0ZWRfX2+pLTZFnMejC
+ IbDbvrlzSNEtgUAg7a3X6xVxx46GusVCgJEx4MHADYYtOTtDRqsc3451qiESm/MdaCNoGsyxa5I
+ 2IeXCRB3hFidK+B/jQkjNkPC5JmKziT2YJpVfw2nxI4Mgg7TwpI9kt5jhr1zqV8osi47mR1h05W
+ TwNX3XS82VJGj2tOeNK1XTSxCi+bwmwI6jzjGJpVdCttMKFUZyfsZD9nsKrYgyU77fQA4hdMVhD
+ W3a/fpkeT6/UDjNh91CqXoUJZreR54lIRrrGVKA5SziXLKC9SvAPQPlBegXyFg9JCKgcW8ftCN6
+ tJnes9yBL7h2Eq/ihiNYib6zpAJto+FaH49X0fq8QWX+htnHeJFFBozPDyNHHvQKKati5smR1LB
+ Bg9XVd4tXBmMDKhIQcCv2bFl5Ep0p2vxDAZ8k8sIQy6XakSlVE8pQhFZPEnhLvslUYXx+xyuXW6
+ 9o2yXURW+0YdNlYw0GQ==
+X-Proofpoint-GUID: c3WenZQ5zJefGJu3MbWAgVieIEj3Ka6t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-19_03,2026-11-19_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ adultscore=0 spamscore=0 bulkscore=0 clxscore=1015 phishscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
+ definitions=main-2611190048
 
-Updating the currently advertised legacy instance can schedule that same
-instance again instead of the next selected instance. Add Advertising
-stores the selected ID in the original request after mgmt_pending_new() has
-copied it, so the queued callback still reads the requested ID. Add
-Extended Advertising Data never passes the selected ID to its callback.
+TESTHOME is parsed wrongly if the HOME path is shorter than 4
+characters, e.g. "TESTHOME=/ab TESTDBUS=1" gives "/ab TESTDBUS=1".
 
-Pass the selected ID to both callbacks in the pending command's user
-data, and keep the request ID for the replies and completion cleanup.
-Extended advertising controllers do not rotate instances in software, so
-keep scheduling the requested instance there, as both callbacks do now,
-without cancelling the rotation timeout or looking up the next one.
+Fix by searching from @ptr + 9, the HOME path start, instead of
+@home + 9.
 
-Found by code review.
-
-Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
-Cc: stable@vger.kernel.org # needs adjustments for <= 6.5
-Signed-off-by: Zhao Li <enderaoelyther@gmail.com>
+Fixes: e622e623de13 ("build: Add test-runner utility for virtual machine execution")
+Assisted-by: Claude:claude-opus-5-5
 ---
-Tested in QEMU on bluetooth-next f42f5cae154b with vhci controllers and
-four new mgmt-tester cases. On an LE-only controller with instances 1
-and 2, updating the advertised instance 1 through Add Advertising or
-Add Extended Advertising Data now makes the next LE Set Advertising Data
-carry instance 2's data; without this patch it carries instance 1's new
-data again. On an extended advertising controller, updating the current
-instance 2 sends LE Set Extended Advertising Data for handle 2 with the
-new data, with and without this patch. The rest of the mgmt-tester suite
-shows no difference beyond one LL Privacy case that times out
-intermittently on both kernels.
+ tools/test-runner.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-No new W=1, sparse or smatch warnings.
-
-AI assistance was used.
-
- net/bluetooth/mgmt.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6ed3bf6f1738..075252d72cbb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9099,9 +9099,9 @@ static void add_advertising_complete(struct hci_dev *hdev, void *data, int err)
- static int add_advertising_sync(struct hci_dev *hdev, void *data)
- {
- 	struct mgmt_pending_cmd *cmd = data;
--	struct mgmt_cp_add_advertising *cp = cmd->param;
-+	u8 instance = PTR_UINT(cmd->user_data);
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 0bca31a46351..6b8d0522fa7a 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -2167,17 +2167,17 @@ static void run_tests(void)
+ 			audio_server = strndup(start, end - start);
+ 			printf("Audio server %s requested\n", audio_server);
+ 		}
+ 	}
  
--	return hci_schedule_adv_instance_sync(hdev, cp->instance, true);
-+	return hci_schedule_adv_instance_sync(hdev, instance, true);
+ 	ptr = strstr(cmdline, "TESTHOME=");
+ 	if (ptr) {
+ 		home = ptr + 4;
+-		ptr = strpbrk(home + 9, " \r\n");
++		ptr = strpbrk(ptr + 9, " \r\n");
+ 		if (ptr)
+ 			*ptr = '\0';
+ 	}
+ 
+ 	run_command(cmds, home);
  }
  
- static int add_advertising(struct sock *sk, struct hci_dev *hdev,
-@@ -9185,7 +9185,9 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	if (hdev->adv_instance_cnt > prev_instance_cnt)
- 		mgmt_advertising_added(sk, hdev, cp->instance);
- 
--	if (hdev->cur_adv_instance == cp->instance) {
-+	if (ext_adv_capable(hdev)) {
-+		schedule_instance = cp->instance;
-+	} else if (hdev->cur_adv_instance == cp->instance) {
- 		/* If the currently advertised instance is being changed then
- 		 * cancel the current advertising and schedule the next
- 		 * instance. If there is only one instance then the overridden
-@@ -9232,7 +9234,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	cp->instance = schedule_instance;
-+	cmd->user_data = UINT_PTR(schedule_instance);
- 
- 	err = hci_cmd_sync_queue(hdev, add_advertising_sync, cmd,
- 				 add_advertising_complete);
-@@ -9461,6 +9463,7 @@ static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
- {
- 	struct mgmt_pending_cmd *cmd = data;
- 	struct mgmt_cp_add_ext_adv_data *cp = cmd->param;
-+	u8 instance = PTR_UINT(cmd->user_data);
- 	int err;
- 
- 	if (ext_adv_capable(hdev)) {
-@@ -9475,7 +9478,7 @@ static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
- 		return hci_enable_ext_advertising_sync(hdev, cp->instance);
- 	}
- 
--	return hci_schedule_adv_instance_sync(hdev, cp->instance, true);
-+	return hci_schedule_adv_instance_sync(hdev, instance, true);
- }
- 
- static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
-@@ -9537,7 +9540,9 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
- 				  cp->data + cp->adv_data_len);
- 
- 	/* If using software rotation, determine next instance to use */
--	if (hdev->cur_adv_instance == cp->instance) {
-+	if (ext_adv_capable(hdev)) {
-+		schedule_instance = cp->instance;
-+	} else if (hdev->cur_adv_instance == cp->instance) {
- 		/* If the currently advertised instance is being changed
- 		 * then cancel the current advertising and schedule the
- 		 * next instance. If there is only one instance then the
-@@ -9579,6 +9584,8 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto clear_new_instance;
- 	}
- 
-+	cmd->user_data = UINT_PTR(schedule_instance);
-+
- 	err = hci_cmd_sync_queue(hdev, add_ext_adv_data_sync, cmd,
- 				 add_ext_adv_data_complete);
- 	if (err < 0) {
+ static void usage(void)
 
-base-commit: f42f5cae154b90a0cb6d8232dc84c7614ca2e6a0
--- 
-2.56.1
+---
+base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
+change-id: 20261119-fix_test_runner-5773413a0ef9
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
