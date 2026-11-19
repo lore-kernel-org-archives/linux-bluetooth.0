@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795076202;
-	b=wk2F8JxKMYlSYgizuOwQFyPMja8X98/LiOhVmcPmgKNFWCpgA9eT4mFEoEU5D3p+EJmB
-	 QccI0PC1cmtj9Ru9k8p/LO977Org6dkV87kZoILEVi1FQowiSmA1u2u41LbwPFbl3i/9R
-	 wYK5MdABAwCo+dFguGxt0Op+D9SkmRws7PlPFY2Gq4t9+kHVtMUP0mV24FOd1jNNgBRoZ
-	 7LwJ3hFvkD9fVV0MmBrKELlwXOu7kO4LcWlzSNf/Ns2i2Rvp98yIk5eI3VaT3mbU3BhUT
-	 C/ztReNlgTg9t90nf1wHXXQ2sStE8ljpp133z7ciGXOnz46dPwW348f8o+HSOZWc+Yg==
+	t=1795076203;
+	b=3SaX4QrlOJ9E4+E4pJLleY3V36yTTFQEkrqtDnmiY7b4rJKZts2ZA4+Fz3Y5FJuzjCEW
+	 yB+W56YtBxC2akWmUFlooam4aXL6z9AruoejG2tGKLhuY5tYpgxFHlnmxUxVV8edlK6Fo
+	 NyQDPfdTbB4JxANaEHXcSZSw31YLClN7vggsFFa7VzhSP0cA99Om8VjdwdFygVK1hg5dJ
+	 mo+Lkq8S9Ygm1/xQSi7HtQQLyG/j68nOCtHBcFsb+sE2ve3/m+jXhLcFIIiebQCVqZWxC
+	 QdzuVjEmimUSp8g9WSypAlIlQ+qnBIyMcr2p2eQ3ge7UM3kI89yYTDNmY0gaexvew6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795076202;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795076203;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3GVG1C0VFuOf5e2/RWTwBfJMJQFVw+GJ+1stSK0/3uo=;
-	b=fU2zYLD3ZVe7gaIRqHEnF51veb12N5UDoNhgZXHyr+Mm4rbu8VdOZxwkKoegH4lhttcm
-	 yfIGhqFq6GO7uT45ukAzNOb+WX90KcmGrYIlBMpP372X3ghr1zelEXjN5DxZuS11oOQLZ
-	 irKTE1gjCjRkXqk8CKoXf7d6HBhn3cxjqq5tM75jtRBQEFrUKc+LgC7vC2kZ7E8Dyy3Ve
-	 cp620i1hp9JEyYG4m+QKxRjobck70mE4jbn8bi5P02rWOycx2K/bVAnllRYCDytH7DloJ
-	 FbgUxv1+nYT4zjQwsjrOtDkuYOG1zgPem3zQehfqZ1dsjQ2AUz/6PR3rB+/YDKdYAew==
+	bh=tlLfl8uLzJmuJhJ0d66zhINo3edlyiab2+7aSXoCh9k=;
+	b=JdfFRHEUqwb6HyZNEiZocc2S/sj3PHuG09Ns8i5ShGyfdzV2L7PL/wAR3lvrGnaYYRp7
+	 ccZ1/Vr3qcZ+LxanGxzdWVgA8oeijNiyiMasffkyP0nrDwe6bqGn1O7uZeqZGgmUuOTy3
+	 tcTZjxRj8pKRNaItsmbLQUFp0RrHojGoXc6CnhIPqwriAkM0oZ7/8tCAFah5CAUCMyEJA
+	 MeRuw+vGJl+ATD8zqHlurIPFMqiLPYNzVspqyAy1RaNAc+2HOtmwwfnm2l8rSoJ/+FjIO
+	 RxP1WpFJFU7be1fvdDZkyk9qX/BpTwpGJl2KfQZnbyKcBH06+M7tWaZPxgWjiSSMr0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RZZoIdjz;
-	arc=none smtp.remote-ip=209.85.208.46
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fsgikGZs;
+	arc=none smtp.remote-ip=209.85.208.41
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54106606A822
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FFC606A812
 	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 08:16:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54106606A822
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5FFC606A812
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RZZoIdjz
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6b86bbbe954so303314a12.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fsgikGZs
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b87040a20bso203301a12.2
         for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 00:16:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795076201; x=1795681001; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=3GVG1C0VFuOf5e2/RWTwBfJMJQFVw+GJ+1stSK0/3uo=;
-        b=RZZoIdjzrnEqaOYCThahVmB6Roh5O5gfDAp9t1aw45a4Tew2U7IkIUtWGoeRbUz0y2
-         rqTgwghNP0U8HDR4WLZ8Rn3W3+vsUGPUZrE+7RycrWtRe6WmznYuFikMdK2GbAsL5Nwp
-         2lV8IsdEXAEmU8eykv4/ZobplQrGVpPxyAZAjQa9f8jinK+NfDConncYAQlVzfXNw6dq
-         02uFzJW7/NdDQKlRx3LusgvCOGimQjDGgkLbLK4xsBRYlJ2pvSpCfjkML4KGtbhL0nAm
-         vc++1h9bRyKGrZ/tERkeoW987lBBjdFf/5tB57Es9BAvlmHW24oXON161DLcqmsAFVZv
-         lNfw==
+        bh=tlLfl8uLzJmuJhJ0d66zhINo3edlyiab2+7aSXoCh9k=;
+        b=fsgikGZsw/EH6gVweqtpAftgQMA3/WeZYFfQc3fy/C2R306P4HH8LdeaP41SjJ9Bkm
+         IRTzglBKsPbRXTdtFHz4hgbgBqoyTGCX2TTK7PGaHRBK1D0qCYJbcUVfs0s7+Y8YhJ3n
+         UKVOmnovGWO7QqVD8t69k+gEbDChQPA+egBHATeDScCoY/JteMh+Y1ZxWX6EjfBroILZ
+         XbBMT2yobdr2PA3WGqckUtjJhXbySn8ST2rbWW7OWTPgCC4JpaN7rfW/3yDuZ1IUUZpk
+         khjgrXeTB5Y+jAG5vT04Xi2CMufkyrpz9god7NFU7vpFMzYTGx8iRkpASEr2K/zmUawP
+         g/eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795076201; x=1795681001;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3GVG1C0VFuOf5e2/RWTwBfJMJQFVw+GJ+1stSK0/3uo=;
-        b=yrbr72O/sAlUndZ9yMW0l6toi3sZVeUfumpCwyr+hGDhn++o5nSw/RXzmH4mZwirQ6
-         50E7hJDje5ijmGiBk8aX8pPwU+w1DBnxkiw4aiIhqgm4ZpWiYyjAnnwol2/LHctjTE7V
-         U1LF+c/H9Pttjmtj+nR2mUWkpZ4pXxC2q1gHWm7DbIGAGhUSIMBHkGLCKeA+nmBrU+p8
-         KI006hEy7hbqqvJzhP7d7u7R8VsYVAIt4LoS/YcfZk69/bwliMgOztiQFYLVVsKT2HED
-         RNt3465yQvCk0wyuNh47rXfUtx9GXvmMuGwrhXC4+Dy4Kru7O8l/W9fFt1YjVekmf4x0
-         1k3Q==
-X-Gm-Message-State: APuU4Z+B5RWOCqPz6ILC3Rfl72g4FeFTntA18sX9AJRRv0Now79PFqhN
-	6gHvErx2CDChzOrSP5bV3chhTvPiueMO7pdn4lMCxGG9HZKf7bgWpVwzrEXvxhLk
-X-Gm-Gg: AYBFou2/FSkXTvb5T3CFsNxuYH1Pu1E+dIiXGo2GYgI7Z0PczNtUj20Kom+/lZJJ8dR
-	YMwP3tyka9qEgpBhKXokKV7osz+EO4yt1pvkbXHreQkFMSawAAhUEQa8ykuvj4oWVD8EN7690TT
-	yCgpy+KPfCIISTV2Zku3sayVmJLOHeZSnSpzDWf4TFwotqqbfpwXsNTEk4fTFpyeZAv01uwUK2Q
-	FoXJQ8F+WPyKHU9lcM2mrIRDjxc9eFnH1ki5w7Zhnx879DR13GWGzbxnwQyq3NXqtoIs222a+na
-	leVTn5X6fgR5Vus3wPrwk9fCEmB/QFWVwSZ0XiufA9vlvbMy2WXltQiovwssni+lm14MJC1qlfI
-	HrTW6e5iNoE1wTsXhTRcdXSCbvEplFLTZUdzeBXE+5wT5xTK8GezKfSKGbjByv3/865Q96M8fxv
-	fm7IRJRz4UKzXPYuQUOtohFLTexjj6rBEA89NytETw3uGk2Cp75PS6XWVGed/e9Ga7G4sn8Q5q4
-	zE/rbKjusAstbMDG7+n+nQf+FIByDDTVFH0GvtXKKxVle6aWzE6u5gEMlWcCOXx6KjMRA2ovEvz
-	dxdPNNz6i0p4aPaIlu6qRAZSGahpYxowpJ8=
-X-Received: by 2002:a05:6402:a147:b0:6b7:9fa5:8ed6 with SMTP id 4fb4d7f45d1cf-6b887e83a46mr4377824a12.2.1795076200311;
-        Thu, 19 Nov 2026 00:16:40 -0800 (PST)
+        bh=tlLfl8uLzJmuJhJ0d66zhINo3edlyiab2+7aSXoCh9k=;
+        b=ary2/y3uRM+m95YTkHT39hMbjl++ZlLiEhQZQrIDRT9h4nYSBrzjOkViVqNjWbGxNw
+         YUepzotmPoEdsvkBXfaA1OGZGCww1chaDlO2ohQhRpKlnMl+p9r0rJyDYo6t6xyqg9CP
+         ZCkLcc0hoscegegNwJ10l4qgqP1kl7NJf33gaxLypNhWBmHlr7aG3iI8UfEH3s948fiH
+         2sbAylgUYMEL6iZUvsyiZ1KWfMQHhRXnBeGAy8aDdeHthfryZ5+h+/KIxuMYU+I9v41D
+         GdnaRu94vcB0vJKN10DFiEheTRyhbmul7+spxbUeQNanGSC80EanLZ+uGhGC+1BEN3Tq
+         1+wQ==
+X-Gm-Message-State: APuU4Z83m5Qp41XZDgdmCOLT6SBpI9zx4g/L+34u7z/JioJqZJQ3WOwf
+	3/UfBeQHQeSZ+ObaCabl5dgtVztxhLCawYazdn0ZHOvgO7mQYmvQIP7SOSoKlNWq
+X-Gm-Gg: AYBFou306z4WquU/C7LStVqWFn2Y0FKeOocDSr3yLzsxxJBFIifc9lFlAVu73xSWsvq
+	FQ/k6PqURm97nglEVJKPOHhOVSPz0OVhJIW3nZr18JxMvpxFY9qGF3qGtC3/J4+A8pP3mVhz16d
+	CL6aNQIUcCG3xfyOpVRzVjvSPTddM39IpM6XKV2EKZOvkrCG3e8d7SfT9Gew15DZctCCWHP3Sw3
+	kEg23sQNcWxKDvueHIZ/VKwxcO5GvAyhscYS7utWrLoatvIjYt4TVwB/Q5Gi1xWEgAVXXQyxxXc
+	tnR5WdVds2kwGMHx94bEA/6BNspfipR4tgMwkWICG/9vsO3Vx2n1pjkZmkTE1rNJBXIQcMItogQ
+	TD8sN1Qff+etrM3+cpuGTPbBm81jENESr4u0dwFzfw8StJXhwvNYfwXBUEo7Sg2WXB8uBmKXKAv
+	m5tUHXQHYHQxYIa+y9hgWUEB0GTfgGiIhHd4SlNhNeKfDzEvWLuRTMgJ4n2xSo+GQwM/AliEkip
+	Vk3yAILV3PawosXFfdwlXROiDCaJZXZpNrg46I1dIp9ezD47He6SSKCaE9HDxLr7G4l1LGZoH2V
+	6ksvvlmlFFWFvIsHdRMWxzdqtBMbgOXAwB+UTBOOqjV56lMOzJyI5g9f
+X-Received: by 2002:a05:6402:364a:b0:6b7:c8fb:53cc with SMTP id 4fb4d7f45d1cf-6b887c8ab30mr6036587a12.1.1795076201058;
+        Thu, 19 Nov 2026 00:16:41 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b88a22e143sm2229580a12.29.2026.11.19.00.16.39
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b88a22e143sm2229580a12.29.2026.11.19.00.16.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 00:16:39 -0800 (PST)
+        Thu, 19 Nov 2026 00:16:40 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v3 8/9] monitor: Add PAwR HCI commands decoding
-Date: Thu, 19 Nov 2026 09:16:20 +0100
-Message-ID: <20261119081621.112623-9-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v3 9/9] monitor: Add PAwR HCI events decoding
+Date: Thu, 19 Nov 2026 09:16:21 +0100
+Message-ID: <20261119081621.112623-10-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261119081621.112623-1-rolandschober1968@gmail.com>
 References: <20261119081621.112623-1-rolandschober1968@gmail.com>
@@ -97,433 +97,431 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Decode the HCI commands introduced by Periodic Advertising with
-Responses (PAwR) in Bluetooth 5.4, which so far only had their names
-in the opcode table:
+Decode the LE Meta events introduced by Periodic Advertising with
+Responses (PAwR) in Bluetooth 5.4:
 
- - LE Set Periodic Advertising Subevent Data
- - LE Set Periodic Advertising Response Data
- - LE Set Periodic Sync Subevent
- - LE Extended Create Connection [v2]
- - LE Set Periodic Advertising Parameters [v2]
+ - LE Periodic Advertising Sync Established [v2]
+ - LE Periodic Advertising Report [v2]
+ - LE Periodic Advertising Sync Transfer Received [v2]
+ - LE Periodic Advertising Subevent Data Request
+ - LE Periodic Advertising Response Report
+ - LE Enhanced Connection Complete [v2]
 
-LE Extended Create Connection [v2] is matched with the events which
-complete it like [v1].
+The [v2] events reuse the decoding of the events they extend, and
+LE Enhanced Connection Complete [v2] is tracked like [v1], both by the
+decoder and by the analyze mode, and is matched with the LE Create
+Connection command which started the connection.
 
-The subevent data of LE Set Periodic Advertising Subevent Data is a
-list of elements of variable length, each with its own AD structures:
-
-< HCI Command: LE Set Periodic Advertising.. (0x08|0x0082) plen 15
+> HCI Event: LE Meta Event (0x3e) plen 4
+      LE Periodic Advertising Subevent Data Request (0x27)
         Handle: 0x00
-        Num subevents: 2
+        Subevent start: 0 (0x00)
+        Subevent data count: 4 (0x04)
+
+> HCI Event: LE Meta Event (0x3e) plen 22
+      LE Periodic Advertising Response Report (0x28)
+        Handle: 0x00
+        Subevent: 2 (0x02)
+        TX status: AUX_SYNC_SUBEVENT_IND was transmitted (0x00)
+        Num responses: 2
         Entry 0
-          Subevent: 0 (0x00)
-          Response slot start: 0
-          Response slot count: 2
+          TX power: not available (0x7f)
+          RSSI: -55 dBm (0xc9)
+          CTE Type: No Constant Tone Extension (0xff)
+          Response slot: 0 (0x00)
+          Data status: Complete
           Data length: 5
           Data[5]:
-        04 ff 59 00 01                                   ..Y..
+        04 ff 59 00 2a                                   ..Y.*
         Company: Nordic Semiconductor ASA (89)
           Data[1]:
-        01                                               .
+        2a                                               *
         Entry 1
-          Subevent: 1 (0x01)
-          Response slot start: 0
-          Response slot count: 0
+          TX power: not available (0x7f)
+          RSSI: not available (0x7f)
+          CTE Type: No Constant Tone Extension (0xff)
+          Response slot: 1 (0x01)
+          Data status: Failed to receive AUX_SYNC_SUBEVENT_RSP
           Data length: 0
-
-< HCI Command: LE Set Periodic Advertising.. (0x08|0x0086) plen 12
-        Handle: 0x00
-        Min interval: 1000.00 msec (0x0320)
-        Max interval: 1000.00 msec (0x0320)
-        Properties: 0x0000
-        Num subevents: 4 (0x04)
-        Subevent interval: 100.00 msec (0x50)
-        Response slot delay: 6.25 msec (0x05)
-        Response slot spacing: 1.000 msec (0x08)
-        Num response slots: 32 (0x20)
 
 Assisted-by: Claude:claude-opus-5-5
 Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/bt.h     |  84 ++++++++++++++++
- monitor/packet.c | 247 ++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 326 insertions(+), 5 deletions(-)
+ monitor/analyze.c |   1 +
+ monitor/bt.h      |  90 +++++++++++++++++++++
+ monitor/packet.c  | 197 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 286 insertions(+), 2 deletions(-)
 
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 5d54ad61b..b16db8bd1 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -1171,6 +1171,7 @@ static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
+ 		evt_le_conn_complete(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
++	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE_V2:
+ 		evt_le_enh_conn_complete(dev, tv, frame, &iov);
+ 		break;
+ 	case BT_HCI_EVT_LE_CIS_ESTABLISHED:
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 59bc90ccd..b97592afb 100644
+index b97592afb..1231f3e84 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -3032,6 +3032,90 @@ struct bt_hci_rsp_le_read_iso_link_quality {
- 	uint32_t duplicated_packets;
+@@ -4457,6 +4457,96 @@ struct bt_hci_evt_le_big_info_adv_report {
+ 	uint8_t  encryption;
  } __packed;
  
-+#define BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA	0x2082
-+#define BT_HCI_BIT_LE_SET_PA_SUBEVENT_DATA	BT_HCI_CMD_BIT(46, 5)
-+struct bt_hci_le_pa_subevent_data {
-+	uint8_t  subevent;
-+	uint8_t  response_slot_start;
-+	uint8_t  response_slot_count;
-+	uint8_t  data_len;
-+	uint8_t  data[];
-+} __packed;
-+
-+struct bt_hci_cmd_le_set_pa_subevent_data {
-+	uint8_t  handle;
-+	uint8_t  num_subevents;
-+	struct bt_hci_le_pa_subevent_data subevents[];
-+} __packed;
-+
-+struct bt_hci_rsp_le_set_pa_subevent_data {
++#define BT_HCI_EVT_LE_PA_SYNC_ESTABLISHED_V2	0x24
++struct bt_hci_evt_le_per_sync_established_v2 {
 +	uint8_t  status;
-+	uint8_t  handle;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_PA_RESPONSE_DATA	0x2083
-+#define BT_HCI_BIT_LE_SET_PA_RESPONSE_DATA	BT_HCI_CMD_BIT(46, 6)
-+struct bt_hci_cmd_le_set_pa_response_data {
-+	uint16_t sync_handle;
-+	uint16_t request_event;
-+	uint8_t  request_subevent;
-+	uint8_t  response_subevent;
-+	uint8_t  response_slot;
-+	uint8_t  data_len;
-+	uint8_t  data[];
-+} __packed;
-+
-+struct bt_hci_rsp_le_set_pa_response_data {
-+	uint8_t  status;
-+	uint16_t sync_handle;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_PA_SYNC_SUBEVENT	0x2084
-+#define BT_HCI_BIT_LE_SET_PA_SYNC_SUBEVENT	BT_HCI_CMD_BIT(46, 7)
-+struct bt_hci_cmd_le_set_pa_sync_subevent {
-+	uint16_t sync_handle;
-+	uint16_t properties;
-+	uint8_t  num_subevents;
-+	uint8_t  subevents[];
-+} __packed;
-+
-+struct bt_hci_rsp_le_set_pa_sync_subevent {
-+	uint8_t  status;
-+	uint16_t sync_handle;
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_EXT_CREATE_CONN_V2	0x2085
-+#define BT_HCI_BIT_LE_EXT_CREATE_CONN_V2	BT_HCI_CMD_BIT(47, 0)
-+struct bt_hci_cmd_le_ext_create_conn_v2 {
-+	uint8_t  adv_handle;
-+	uint8_t  subevent;
-+	uint8_t  filter_policy;
-+	uint8_t  own_addr_type;
-+	uint8_t  peer_addr_type;
-+	uint8_t  peer_addr[6];
-+	uint8_t  phys;
-+	uint8_t  data[];
-+} __packed;
-+
-+#define BT_HCI_CMD_LE_SET_PA_PARAMS_V2		0x2086
-+#define BT_HCI_BIT_LE_SET_PA_PARAMS_V2		BT_HCI_CMD_BIT(47, 1)
-+struct bt_hci_cmd_le_set_pa_params_v2 {
-+	uint8_t  handle;
-+	uint16_t min_interval;
-+	uint16_t max_interval;
-+	uint16_t properties;
++	uint16_t handle;
++	uint8_t  sid;
++	uint8_t  addr_type;
++	uint8_t  addr[6];
++	uint8_t  phy;
++	uint16_t interval;
++	uint8_t  clock_accuracy;
 +	uint8_t  num_subevents;
 +	uint8_t  subevent_interval;
 +	uint8_t  response_slot_delay;
 +	uint8_t  response_slot_spacing;
-+	uint8_t  num_response_slots;
 +} __packed;
 +
-+struct bt_hci_rsp_le_set_pa_params_v2 {
++#define BT_HCI_EVT_LE_PA_REPORT_V2		0x25
++struct bt_hci_le_pa_report_v2 {
++	uint16_t handle;
++	uint8_t  tx_power;
++	int8_t   rssi;
++	uint8_t  cte_type;
++	uint16_t event_counter;
++	uint8_t  subevent;
++	uint8_t  data_status;
++	uint8_t  data_len;
++	uint8_t  data[];
++} __packed;
++
++#define BT_HCI_EVT_LE_PAST_RECEIVED_V2		0x26
++struct bt_hci_evt_le_past_recv_v2 {
 +	uint8_t  status;
-+	uint8_t  handle;
++	uint16_t handle;
++	uint16_t service_data;
++	uint16_t sync_handle;
++	uint8_t  sid;
++	uint8_t  addr_type;
++	uint8_t  addr[6];
++	uint8_t  phy;
++	uint16_t interval;
++	uint8_t  clock_accuracy;
++	uint8_t  num_subevents;
++	uint8_t  subevent_interval;
++	uint8_t  response_slot_delay;
++	uint8_t  response_slot_spacing;
 +} __packed;
 +
- #define BT_HCI_CMD_LE_READ_ALL_LOCAL_FEATURES	0x2087
- #define BT_HCI_BIT_LE_READ_ALL_LOCAL_FEATURES	BT_HCI_CMD_BIT(47, 2)
- struct bt_hci_rsp_le_read_all_local_features {
++#define BT_HCI_EVT_LE_PA_SUBEVENT_DATA_REQUEST	0x27
++struct bt_hci_evt_le_pa_subevent_data_request {
++	uint8_t  handle;
++	uint8_t  subevent_start;
++	uint8_t  subevent_data_count;
++} __packed;
++
++#define BT_HCI_EVT_LE_PA_RESPONSE_REPORT		0x28
++struct bt_hci_le_pa_response {
++	int8_t   tx_power;
++	int8_t   rssi;
++	uint8_t  cte_type;
++	uint8_t  response_slot;
++	uint8_t  data_status;
++	uint8_t  data_len;
++	uint8_t  data[];
++} __packed;
++
++struct bt_hci_evt_le_pa_response_report {
++	uint8_t  handle;
++	uint8_t  subevent;
++	uint8_t  tx_status;
++	uint8_t  num_responses;
++	struct bt_hci_le_pa_response responses[];
++} __packed;
++
++#define BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE_V2	0x29
++struct bt_hci_evt_le_enhanced_conn_complete_v2 {
++	uint8_t  status;
++	uint16_t handle;
++	uint8_t  role;
++	uint8_t  peer_addr_type;
++	uint8_t  peer_addr[6];
++	uint8_t  local_rpa[6];
++	uint8_t  peer_rpa[6];
++	uint16_t interval;
++	uint16_t latency;
++	uint16_t supv_timeout;
++	uint8_t  clock_accuracy;
++	uint8_t  adv_handle;
++	uint16_t sync_handle;
++} __packed;
++
+ #define BT_HCI_EVT_LE_READ_ALL_REMOTE_FEATURES_COMPLETE	0x2B
+ struct bt_hci_evt_le_read_all_remote_features_complete {
+ 	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index fa19139d9..edf09ac10 100644
+index edf09ac10..df1947ada 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -230,6 +230,10 @@ static const struct deferred_data deferred_table[] = {
- 	{ BT_HCI_CMD_LE_CREATE_CONN, 0x3e, 0x0a, PENDING_KEY_NONE, 0, 0 },
- 	{ BT_HCI_CMD_LE_EXT_CREATE_CONN, 0x3e, 0x01, PENDING_KEY_NONE, 0, 0 },
- 	{ BT_HCI_CMD_LE_EXT_CREATE_CONN, 0x3e, 0x0a, PENDING_KEY_NONE, 0, 0 },
-+	{ BT_HCI_CMD_LE_EXT_CREATE_CONN_V2, 0x3e, 0x01,
-+					PENDING_KEY_NONE, 0, 0 },
-+	{ BT_HCI_CMD_LE_EXT_CREATE_CONN_V2, 0x3e, 0x0a,
+@@ -234,6 +234,10 @@ static const struct deferred_data deferred_table[] = {
+ 					PENDING_KEY_NONE, 0, 0 },
+ 	{ BT_HCI_CMD_LE_EXT_CREATE_CONN_V2, 0x3e, 0x0a,
+ 					PENDING_KEY_NONE, 0, 0 },
++	{ BT_HCI_CMD_LE_CREATE_CONN, 0x3e, 0x29, PENDING_KEY_NONE, 0, 0 },
++	{ BT_HCI_CMD_LE_EXT_CREATE_CONN, 0x3e, 0x29, PENDING_KEY_NONE, 0, 0 },
++	{ BT_HCI_CMD_LE_EXT_CREATE_CONN_V2, 0x3e, 0x29,
 +					PENDING_KEY_NONE, 0, 0 },
  	{ }
  };
  
-@@ -8710,6 +8714,179 @@ static void le_set_pa_params_cmd(uint16_t index, const void *data, uint8_t size)
- 	print_pa_properties(cmd->properties);
+@@ -13925,6 +13929,28 @@ static void le_enhanced_conn_complete_evt(struct timeval *tv, uint16_t index,
+ 				(void *)evt->peer_addr, evt->peer_addr_type);
  }
  
-+static void print_pa_subevents(uint8_t num_subevents, uint8_t interval,
-+					uint8_t delay, uint8_t spacing)
++static void le_enhanced_conn_complete_v2_evt(struct timeval *tv,
++				uint16_t index, const void *data, uint8_t size)
 +{
-+	if (!num_subevents)
-+		print_field("Num subevents: 0 (no responses) (0x00)");
-+	else
-+		print_field("Num subevents: %u (0x%2.2x)", num_subevents,
-+								num_subevents);
++	const struct bt_hci_evt_le_enhanced_conn_complete_v2 *evt = data;
 +
-+	/* 0x00 is used by the events for trains without responses */
-+	if (!interval)
-+		print_field("Subevent interval: None (0x00)");
-+	else
-+		print_field("Subevent interval: %.2f msec (0x%2.2x)",
-+						interval * 1.25, interval);
++	/* The v2 event starts with the parameters of the v1 event */
++	le_enhanced_conn_complete_evt(tv, index, data, size);
 +
-+	if (!delay)
-+		print_field("Response slot delay: None (0x00)");
++	if (evt->adv_handle == 0xff)
++		print_field("Advertising handle: No Advertising Handle (0xff)");
 +	else
-+		print_field("Response slot delay: %.2f msec (0x%2.2x)",
-+						delay * 1.25, delay);
++		print_field("Advertising handle: %u (0x%2.2x)",
++					evt->adv_handle, evt->adv_handle);
 +
-+	if (!spacing)
-+		print_field("Response slot spacing: None (0x00)");
++	if (le16_to_cpu(evt->sync_handle) == 0xffff)
++		print_field("Sync handle: No Sync Handle (0xffff)");
 +	else
-+		print_field("Response slot spacing: %.3f msec (0x%2.2x)",
-+						spacing * 0.125, spacing);
++		print_field("Sync handle: %u (0x%4.4x)",
++					le16_to_cpu(evt->sync_handle),
++					le16_to_cpu(evt->sync_handle));
 +}
 +
-+static void le_set_pa_params_v2_cmd(uint16_t index, const void *data,
-+							uint8_t size)
+ static void le_direct_adv_report_evt(struct timeval *tv, uint16_t index,
+ 					const void *data, uint8_t size)
+ {
+@@ -14153,6 +14179,18 @@ static void le_pa_sync_evt(struct timeval *tv, uint16_t index,
+ 	print_field("Advertiser clock accuracy: 0x%2.2x", evt->clock_accuracy);
+ }
+ 
++static void le_pa_sync_v2_evt(struct timeval *tv, uint16_t index,
++				const void *data, uint8_t size)
 +{
-+	const struct bt_hci_cmd_le_set_pa_params_v2 *cmd = data;
++	const struct bt_hci_evt_le_per_sync_established_v2 *evt = data;
 +
-+	/* The v2 command starts with the parameters of the v1 command */
-+	le_set_pa_params_cmd(index, data, size);
-+	print_pa_subevents(cmd->num_subevents, cmd->subevent_interval,
-+				cmd->response_slot_delay,
-+				cmd->response_slot_spacing);
-+	print_field("Num response slots: %u (0x%2.2x)",
-+				cmd->num_response_slots,
-+				cmd->num_response_slots);
++	/* The v2 event starts with the parameters of the v1 event */
++	le_pa_sync_evt(tv, index, data, size);
++	print_pa_subevents(evt->num_subevents, evt->subevent_interval,
++				evt->response_slot_delay,
++				evt->response_slot_spacing);
 +}
 +
-+static void le_set_pa_params_v2_rsp(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_pa_params_v2 *rsp = data;
+ static const char *pa_cte_type_str(uint8_t cte_type)
+ {
+ 	switch (cte_type) {
+@@ -14203,7 +14241,8 @@ static void print_pa_report_info(uint16_t handle, uint8_t tx_power,
+ }
+ 
+ static void print_pa_report_data(uint8_t data_status, uint8_t data_len,
+-					const uint8_t *data, uint8_t size)
++					const uint8_t *data, uint8_t size,
++					bool subevents)
+ {
+ 	const char *color_on;
+ 	const char *str;
+@@ -14227,6 +14266,10 @@ static void print_pa_report_data(uint8_t data_status, uint8_t data_len,
+ 		break;
+ 	}
+ 
++	/* Only the [v2] event, which reports subevents, defines 0xff */
++	if (data_status == 0xff && subevents)
++		str = "Failed to receive AUX_SYNC_SUBEVENT_IND";
 +
-+	print_status(rsp->status);
-+	print_field("Handle: 0x%2.2x", rsp->handle);
+ 	print_field("Data status: %s%s%s", color_on, str, COLOR_OFF);
+ 	print_field("Data length: %u", data_len);
+ 
+@@ -14247,7 +14290,26 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
+ 	print_pa_report_info(evt->handle, evt->tx_power, evt->rssi,
+ 							evt->cte_type);
+ 	print_pa_report_data(evt->data_status, evt->data_len, evt->data,
+-							size - sizeof(*evt));
++					size - sizeof(*evt), false);
 +}
 +
-+static void le_set_pa_subevent_data_cmd(uint16_t index, const void *data,
-+							uint8_t size)
++static void le_pa_report_v2_evt(struct timeval *tv, uint16_t index,
++				const void *data, uint8_t size)
++{
++	const struct bt_hci_le_pa_report_v2 *evt = data;
++
++	print_pa_report_info(evt->handle, evt->tx_power, evt->rssi,
++							evt->cte_type);
++	print_field("Periodic event counter: %u (0x%4.4x)",
++					le16_to_cpu(evt->event_counter),
++					le16_to_cpu(evt->event_counter));
++	if (evt->subevent == 0xff)
++		print_field("Subevent: No subevents (0xff)");
++	else
++		print_field("Subevent: %u (0x%2.2x)", evt->subevent,
++							evt->subevent);
++	print_pa_report_data(evt->data_status, evt->data_len, evt->data,
++					size - sizeof(*evt), true);
+ }
+ 
+ static void le_pa_sync_lost_evt(struct timeval *tv, uint16_t index,
+@@ -14330,6 +14392,113 @@ static void le_past_received_evt(struct timeval *tv, uint16_t index,
+ 	print_field("Advertiser clock accuracy: 0x%2.2x", evt->clock_accuracy);
+ }
+ 
++static void le_pa_subevent_data_request_evt(struct timeval *tv,
++				uint16_t index, const void *data, uint8_t size)
++{
++	const struct bt_hci_evt_le_pa_subevent_data_request *evt = data;
++
++	print_field("Handle: 0x%2.2x", evt->handle);
++	print_field("Subevent start: %u (0x%2.2x)", evt->subevent_start,
++						evt->subevent_start);
++	print_field("Subevent data count: %u (0x%2.2x)",
++						evt->subevent_data_count,
++						evt->subevent_data_count);
++}
++
++static void le_pa_response_report_evt(struct timeval *tv, uint16_t index,
++					const void *data, uint8_t size)
 +{
 +	struct iovec iov = { .iov_base = (void *) data, .iov_len = size };
-+	const struct bt_hci_cmd_le_set_pa_subevent_data *cmd;
-+	const struct bt_hci_le_pa_subevent_data *se;
++	const struct bt_hci_evt_le_pa_response_report *evt;
++	const struct bt_hci_le_pa_response *rsp;
++	const char *color_on;
++	const char *str;
 +	uint8_t i;
 +
-+	cmd = util_iov_pull_mem(&iov, sizeof(*cmd));
-+	if (!cmd)
++	evt = util_iov_pull_mem(&iov, sizeof(*evt));
++	if (!evt)
 +		return;
 +
-+	print_field("Handle: 0x%2.2x", cmd->handle);
-+	print_field("Num subevents: %u", cmd->num_subevents);
++	print_field("Handle: 0x%2.2x", evt->handle);
++	print_field("Subevent: %u (0x%2.2x)", evt->subevent, evt->subevent);
 +
-+	for (i = 0; i < cmd->num_subevents; i++) {
-+		se = util_iov_pull_mem(&iov, sizeof(*se));
-+		if (!se)
++	switch (evt->tx_status) {
++	case 0x00:
++		str = "AUX_SYNC_SUBEVENT_IND was transmitted";
++		break;
++	case 0x01:
++		str = "AUX_SYNC_SUBEVENT_IND was not transmitted";
++		break;
++	default:
++		str = "Reserved";
++		break;
++	}
++
++	print_field("TX status: %s (0x%2.2x)", str, evt->tx_status);
++	print_field("Num responses: %u", evt->num_responses);
++
++	for (i = 0; i < evt->num_responses; i++) {
++		rsp = util_iov_pull_mem(&iov, sizeof(*rsp));
++		if (!rsp)
 +			break;
 +
 +		print_field("Entry %u", i);
-+		print_field("  Subevent: %u (0x%2.2x)", se->subevent,
-+							se->subevent);
-+		print_field("  Response slot start: %u",
-+						se->response_slot_start);
-+		print_field("  Response slot count: %u",
-+						se->response_slot_count);
-+		print_field("  Data length: %u", se->data_len);
++		print_pa_tx_power("  ", rsp->tx_power);
++		print_pa_rssi("  ", rsp->rssi);
 +
-+		if (!util_iov_pull(&iov, se->data_len))
++		print_field("  CTE Type: %s (0x%2.2x)",
++				pa_cte_type_str(rsp->cte_type), rsp->cte_type);
++		print_field("  Response slot: %u (0x%2.2x)",
++				rsp->response_slot, rsp->response_slot);
++
++		switch (rsp->data_status) {
++		case 0x00:
++			str = "Complete";
++			color_on = COLOR_GREEN;
++			break;
++		case 0x01:
++			str = "Incomplete, more data to come";
++			color_on = COLOR_YELLOW;
++			break;
++		case 0xff:
++			str = "Failed to receive AUX_SYNC_SUBEVENT_RSP";
++			color_on = COLOR_RED;
++			break;
++		default:
++			str = "Reserved";
++			color_on = COLOR_RED;
++			break;
++		}
++
++		print_field("  Data status: %s%s%s", color_on, str, COLOR_OFF);
++		print_field("  Data length: %u", rsp->data_len);
++
++		if (!util_iov_pull(&iov, rsp->data_len))
 +			break;
 +
-+		print_eir("  Data", se->data, se->data_len, true);
++		print_eir("  Data", rsp->data, rsp->data_len, true);
 +	}
 +
-+	/* Fewer entries than announced, or octets after the last one */
-+	if (i < cmd->num_subevents || iov.iov_len) {
++	/* Fewer responses than announced, or octets after the last one */
++	if (i < evt->num_responses || iov.iov_len) {
 +		print_text(COLOR_ERROR, "  invalid packet size");
 +		if (iov.iov_len)
 +			print_hex_field("  Data", iov.iov_base, iov.iov_len);
 +	}
 +}
 +
-+static void le_set_pa_subevent_data_rsp(uint16_t index, const void *data,
-+							uint8_t size)
++static void le_past_received_v2_evt(struct timeval *tv, uint16_t index,
++					const void *data, uint8_t size)
 +{
-+	const struct bt_hci_rsp_le_set_pa_subevent_data *rsp = data;
++	const struct bt_hci_evt_le_past_recv_v2 *evt = data;
 +
-+	print_status(rsp->status);
-+	print_field("Handle: 0x%2.2x", rsp->handle);
++	/* The v2 event starts with the parameters of the v1 event */
++	le_past_received_evt(tv, index, data, size);
++	print_pa_subevents(evt->num_subevents, evt->subevent_interval,
++				evt->response_slot_delay,
++				evt->response_slot_spacing);
 +}
 +
-+static void le_set_pa_response_data_cmd(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_pa_response_data *cmd = data;
-+
-+	print_field("Sync handle: %d", le16_to_cpu(cmd->sync_handle));
-+	print_field("Request event: %u (0x%4.4x)",
-+					le16_to_cpu(cmd->request_event),
-+					le16_to_cpu(cmd->request_event));
-+	print_field("Request subevent: %u (0x%2.2x)", cmd->request_subevent,
-+						cmd->request_subevent);
-+	print_field("Response subevent: %u (0x%2.2x)", cmd->response_subevent,
-+						cmd->response_subevent);
-+	print_field("Response slot: %u (0x%2.2x)", cmd->response_slot,
-+						cmd->response_slot);
-+	print_field("Data length: %u", cmd->data_len);
-+
-+	if (cmd->data_len != size - sizeof(*cmd)) {
-+		print_text(COLOR_ERROR, "invalid data length");
-+		packet_hexdump(cmd->data, size - sizeof(*cmd));
-+		return;
-+	}
-+
-+	print_eir("Data", cmd->data, cmd->data_len, true);
-+}
-+
-+static void le_set_pa_response_data_rsp(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_pa_response_data *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_field("Sync handle: %d", le16_to_cpu(rsp->sync_handle));
-+}
-+
-+static void le_set_pa_sync_subevent_cmd(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_set_pa_sync_subevent *cmd = data;
-+	uint8_t i;
-+
-+	print_field("Sync handle: %d", le16_to_cpu(cmd->sync_handle));
-+	print_pa_properties(cmd->properties);
-+	print_field("Num subevents: %u", cmd->num_subevents);
-+
-+	size -= sizeof(*cmd);
-+
-+	for (i = 0; i < cmd->num_subevents && i < size; i++)
-+		print_field("  Subevent: %u (0x%2.2x)", cmd->subevents[i],
-+							cmd->subevents[i]);
-+
-+	if (cmd->num_subevents != size)
-+		print_text(COLOR_ERROR, "  invalid number of subevents");
-+
-+	if (size > cmd->num_subevents)
-+		print_hex_field("  Data", cmd->subevents + cmd->num_subevents,
-+						size - cmd->num_subevents);
-+}
-+
-+static void le_set_pa_sync_subevent_rsp(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_rsp_le_set_pa_sync_subevent *rsp = data;
-+
-+	print_status(rsp->status);
-+	print_field("Sync handle: %d", le16_to_cpu(rsp->sync_handle));
-+}
-+
- static void le_set_pa_data_cmd(uint16_t index, const void *data, uint8_t size)
+ static void le_cis_established_evt(struct timeval *tv, uint16_t index,
+ 					const void *data, uint8_t size)
  {
- 	const struct bt_hci_cmd_le_set_pa_data *cmd = data;
-@@ -8902,6 +9079,28 @@ static void le_ext_create_conn_cmd(uint16_t index, const void *data,
- 	print_ext_conn_phys(cmd->data, size - sizeof(*cmd), cmd->phys);
- }
- 
-+static void le_ext_create_conn_v2_cmd(uint16_t index, const void *data,
-+							uint8_t size)
-+{
-+	const struct bt_hci_cmd_le_ext_create_conn_v2 *cmd = data;
-+
-+	if (cmd->adv_handle == 0xff)
-+		print_field("Advertising handle: No Advertising Handle (0xff)");
-+	else
-+		print_field("Advertising handle: %u (0x%2.2x)",
-+					cmd->adv_handle, cmd->adv_handle);
-+
-+	if (cmd->subevent == 0xff)
-+		print_field("Subevent: No subevent (0xff)");
-+	else
-+		print_field("Subevent: %u (0x%2.2x)", cmd->subevent,
-+							cmd->subevent);
-+
-+	/* The remaining parameters are the ones of the v1 command */
-+	le_ext_create_conn_cmd(index, &cmd->filter_policy,
-+			size - sizeof(cmd->adv_handle) - sizeof(cmd->subevent));
-+}
-+
- static const struct bitfield_data create_sync_cte_type[] = {
- 	{  0, "Do not sync to packets with AoA CTE"	},
- 	{  1, "Do not sync to packets with AoD CTE 1us"	},
-@@ -12019,11 +12218,49 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x207f, 370, "LE Set Extended Advertising Parameters [v2]" },
- 	{ 0x2080, 371, "LE Set Decision Data" },
- 	{ 0x2081, 372, "LE Set Decision Instructions" },
--	{ 0x2082, 373, "LE Set Periodic Advertising Subevent Data" },
--	{ 0x2083, 374, "LE Set Periodic Advertising Response Data" },
--	{ 0x2084, 375, "LE Set Periodic Sync Subevent" },
--	{ 0x2085, 376, "LE Extended Create Connection [v2]" },
--	{ 0x2086, 377, "LE Set Periodic Advertising Parameters [v2]" },
-+	{ BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA,
-+			BT_HCI_BIT_LE_SET_PA_SUBEVENT_DATA,
-+			"LE Set Periodic Advertising Subevent Data",
-+			le_set_pa_subevent_data_cmd,
-+			sizeof(struct bt_hci_cmd_le_set_pa_subevent_data),
-+			false,
-+			le_set_pa_subevent_data_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_pa_subevent_data),
-+			true },
-+	{ BT_HCI_CMD_LE_SET_PA_RESPONSE_DATA,
-+			BT_HCI_BIT_LE_SET_PA_RESPONSE_DATA,
-+			"LE Set Periodic Advertising Response Data",
-+			le_set_pa_response_data_cmd,
-+			sizeof(struct bt_hci_cmd_le_set_pa_response_data),
-+			false,
-+			le_set_pa_response_data_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_pa_response_data),
-+			true },
-+	{ BT_HCI_CMD_LE_SET_PA_SYNC_SUBEVENT,
-+			BT_HCI_BIT_LE_SET_PA_SYNC_SUBEVENT,
-+			"LE Set Periodic Sync Subevent",
-+			le_set_pa_sync_subevent_cmd,
-+			sizeof(struct bt_hci_cmd_le_set_pa_sync_subevent),
-+			false,
-+			le_set_pa_sync_subevent_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_pa_sync_subevent),
-+			true },
-+	{ BT_HCI_CMD_LE_EXT_CREATE_CONN_V2,
-+			BT_HCI_BIT_LE_EXT_CREATE_CONN_V2,
-+			"LE Extended Create Connection [v2]",
-+			le_ext_create_conn_v2_cmd,
-+			sizeof(struct bt_hci_cmd_le_ext_create_conn_v2),
-+			false,
-+			status_rsp, 1, true },
-+	{ BT_HCI_CMD_LE_SET_PA_PARAMS_V2,
-+			BT_HCI_BIT_LE_SET_PA_PARAMS_V2,
-+			"LE Set Periodic Advertising Parameters [v2]",
-+			le_set_pa_params_v2_cmd,
-+			sizeof(struct bt_hci_cmd_le_set_pa_params_v2),
-+			true,
-+			le_set_pa_params_v2_rsp,
-+			sizeof(struct bt_hci_rsp_le_set_pa_params_v2),
-+			true },
- 	{ BT_HCI_CMD_LE_READ_ALL_LOCAL_FEATURES,
- 			BT_HCI_BIT_LE_READ_ALL_LOCAL_FEATURES,
- 			"LE Read All Local Features",
+@@ -15484,6 +15653,30 @@ static const struct subevent_data le_meta_event_table[] = {
+ 		"LE Broadcast Isochronous Group Info Advertising Report",
+ 		le_big_info_evt,
+ 		sizeof(struct bt_hci_evt_le_big_info_adv_report) },
++	{ BT_HCI_EVT_LE_PA_SYNC_ESTABLISHED_V2,
++		"LE Periodic Advertising Sync Established [v2]",
++		le_pa_sync_v2_evt,
++		sizeof(struct bt_hci_evt_le_per_sync_established_v2), true },
++	{ BT_HCI_EVT_LE_PA_REPORT_V2,
++		"LE Periodic Advertising Report [v2]",
++		le_pa_report_v2_evt,
++		sizeof(struct bt_hci_le_pa_report_v2), false },
++	{ BT_HCI_EVT_LE_PAST_RECEIVED_V2,
++		"LE Periodic Advertising Sync Transfer Received [v2]",
++		le_past_received_v2_evt,
++		sizeof(struct bt_hci_evt_le_past_recv_v2), true },
++	{ BT_HCI_EVT_LE_PA_SUBEVENT_DATA_REQUEST,
++		"LE Periodic Advertising Subevent Data Request",
++		le_pa_subevent_data_request_evt,
++		sizeof(struct bt_hci_evt_le_pa_subevent_data_request), true },
++	{ BT_HCI_EVT_LE_PA_RESPONSE_REPORT,
++		"LE Periodic Advertising Response Report",
++		le_pa_response_report_evt,
++		sizeof(struct bt_hci_evt_le_pa_response_report), false },
++	{ BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE_V2,
++		"LE Enhanced Connection Complete [v2]",
++		le_enhanced_conn_complete_v2_evt,
++		sizeof(struct bt_hci_evt_le_enhanced_conn_complete_v2), true },
+ 	{ BT_HCI_EVT_LE_READ_ALL_REMOTE_FEATURES_COMPLETE,
+ 		"LE Read All Remote Features Complete",
+ 		le_read_all_remote_features_complete_evt,
 -- 
 2.47.3
 
