@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795072442;
-	b=MqbFVXh0/07wRgG1RHo+MZoT8iWDMOeW0xusNB15qZPh7s/Wvf5en+d7IF+f/24j0oXB
-	 yypF1LHDUDmYkKdTvdMIG1r5TlR2nh8e2K19JRhxcRnAnz5qJuf7UlaKV74raLuq9/uKZ
-	 b31PqalFKbBVRzc1MFP6fdk5v8Bf1Al0T7FBG+LwJij0sW43HI170Yj2JXOwi1EPePmFe
-	 HJ90F0FIJZh/1buJ/TThi2ikNCS7L4pEg8YmGX2tnPWmvsrsSSGXAq75LV+fPczXR/DrM
-	 I+nuo2SWDRybJrrLACrd0S5+K+GokMxRLmx8wNAY/Qm7d292cnu6laHexwOXdzG4PYQ==
+	t=1795072443;
+	b=Doa3DxlbIhOZnBOcQ53manVcCn46E99GQTj2KjrcUJFlkYEIpHFpZBlDjl+OsZ0/q+bD
+	 yhHUIdgglfkHSm03Uyw5YipiB7c8twMXMpHHpyJpQEwSrbIzurUxcwd8CJEQdbigFofju
+	 OepaCvrNe+BeJZodsnnPa/6KmuT4+EXbqKCjoC8VVs2PnA+lSM5gLuA2YsDCK8v0tChKU
+	 ujasJFYBA0nFv0Oht/3+aoZDYtEwpI53lXd9aCshi2duLIX5xNlh4fbT4WHwjDH+oe17c
+	 OZXEB/Fznfi2GfciF+1J6RbZEU0985XD3SLvd+U9c5pbuPAhDeDUp7a73KekxJzpbXg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795072442;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795072443;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=i3iKnLh6NZmOvIo+AB+CizexH4TnqVcWJP+0t5Ki0og=;
-	b=arp6W38KZBub7qdTVV8cIdDpdYcDtCyLrwj3L/XMFghJR7luFcckiedADl8t8s31gJ42
-	 OTIoI4ibHqzwBIOgFVijXPoaQYLwr91RFNsRBuGgz7+DEId5rQeOzXnZ2Ov+TsvbwcEEQ
-	 T8YuHtKkpW+kBVcCKc01VraOrvR+nQ3krJrNrFx80VVN1Ts5hTQl3yx/KcFntyJ+rmSYH
-	 N+EDxLQfs5hh1JwZ8Y+tG4F9p6svDUyJlYrcr6bxbcHW6x8MbGyRdczUT+Eyxl7kETkLq
-	 YhTjZvXESs7TNAmaSm5MfsANZFOdbsg1IiM0K/zkQyJ0uXXloLAtAM6x4EKdCtiPc7Q==
+	bh=dqQztl3ppOtgcOCmLsJPlTHZe0ZDQW0ApB6TA2G8Tok=;
+	b=xpqu7NsBnATtyrOMXkanRow/lJrGzvVyQqojSPsEpPg3rNWBjerCA/weRuvwRLOvZfpu
+	 5VEADUgxlcrPyPZ8J2aD+zTpEeGp9S2cuy4DlL+sMRYlS8DwNEKbyTA8jShwO6nEGX9lV
+	 LGJt6ANvx3/L1ZhaNTEdHURPmCVYEzt7mQ5fieNqmxUP27bhhOa1+f1MTtnY7thOLcEyE
+	 0/ae2SZPXnSrE/m9/JdrqD/Q0tCACow/4ZTmh4PdevhaREHQENi6R/XdWrZwBBImG4EzW
+	 wgAiALjwJP8li+1R5Bjrt3eK1dsc6KzehW/sQTf1YuWHSqFtHSkf3jiAMFAunfafZhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=BL32lDGs;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GKvD0EoD;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BAE606A32C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:14:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9BAE606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C5D606A320
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 07:14:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91C5D606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=BL32lDGs
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4bb7679f28bso1495785e9.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:14:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GKvD0EoD
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb5e3cbf45so1296375e9.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 23:14:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795072440; x=1795677240; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795072442; x=1795677242; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=i3iKnLh6NZmOvIo+AB+CizexH4TnqVcWJP+0t5Ki0og=;
-        b=BL32lDGsNTRiwwf4CRCcPRtzRc9tVwrWPjeTd7okFt/7ORdDyvXNOP/z061oejJiPi
-         cAif2tk2c2tveDdisYeiu3wmhLpfW+DZ7XPjdt+YM9I8OsUACEJPrLBHVL6Exclpg2K4
-         Jaf8omxmW0zRUsAJyf6LO4m8MRFoWxrL5gWkYdHtwyEI116mLiopC6p+RIEF7vVI2j8G
-         jhsRZ0OkT+/cMGOrLDzX35/HJ8SXk6/cA5G1+PL5Am0gW54v+FDw9dTDlaHL/vpPbC+M
-         zRvERcmtuHjD4EQrHmu2IUc8sU5EeI96TBeXT9ZC+xINcIXBZ1uyRyErs6YMZfJPgRos
-         eXSQ==
+        bh=dqQztl3ppOtgcOCmLsJPlTHZe0ZDQW0ApB6TA2G8Tok=;
+        b=GKvD0EoDXHmx5LYGgWTmoyvDEttJsA+jUAQdIeNQkQXstDPMrDQApjgdhipSfqIn6a
+         1ETctUgLf8uC9+UCyipK28HEu0deT49HvUjbjFug5FxUuEUzXmdT3pB0n8ijBFlRuI/8
+         98Af+nfp0NZVOwKywExVhD5R+/Ij1IbKsKw3OBS1G16MZ2B/E7KFlvxis9W+ksruQ9fG
+         MPs0ki5MRukcjO4E9EgNWtuwJeUv3wcEjPhpgwzVUUa7bx4Y6TSaBrgZVKoEInUfKNOR
+         hD4bT+kx+v3f88DuJLXWmtzt3naD309Y72m0rUFUHJqHjlDPtF5JTIpO/zVvgfl4pAE0
+         Drwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795072440; x=1795677240;
+        d=1e100.net; s=20260707; t=1795072442; x=1795677242;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=i3iKnLh6NZmOvIo+AB+CizexH4TnqVcWJP+0t5Ki0og=;
-        b=ed5PlXY2DxzS/wbKflZ4hoy8TXN2UT/3HcrMa5ZVJsjFTgARgbLDLE/kfpyu7/NQJs
-         J1KONqLZj0X0t+yjUC242HY6nzcjI4FfvtYH3DvDP8yR/S5Li5/E5HQ61ChmXihRtgrL
-         hNfgbB7AXCo8zecw5tunOvh1g9XlDho3ieLEMQ0AS7v3cB8NEUxULhG2heoCSk+zawCu
-         jTAm82M5TJ+dUeEBNSdrJWFuVn7HvCWlm498zAH98vdbebhSk7iuOd4FemZ6ODyuQnqJ
-         INhES1WnnZMJhaS+Y1N2TprRsDEY4+xbkF4Dh6bsFSJ6eN2Vrj9SKGqKMY4cE2EZ8jcm
-         TSbg==
-X-Gm-Message-State: APuU4Z9uI+np+BSLD2ajiUNpJIoTY0s0W3Mia+fUY66eFk9AM9ZWQ2LS
-	EyBX0w39srKMFVZsdvF9VkMScPxB74uFPyHBUf0aQNWUlgP9DxYIvKofAV+XKZa1
-X-Gm-Gg: AYBFou3MRiaALAVoABkLDo5/aIwflS0uBc/VhFRksAIiWkdxSD/MhevQ/bzjSPyHH82
-	uk0reX/reWxGdZ0kulpuckyYHSU13AkkSn7Icc89HqFfB7q5cdk/nWvHcjzUvU4Mw1oXFSCXbzB
-	C/eh7/tDzoTGcvP3ljLTxS/0xNXGyXXjw4BCbe0pqrYptKh6p6we8wq48ExgBfRDOzb5VEnvSjn
-	muA9fRF9K2eiV71FJhr+/0M/DgZadEIHNfGvE2S4ZtQrkoWWVhqRhmxMAN+VYTAsENAYW7e+zC5
-	yfPAHpajJQ5lKOsbo0RzOL+tL4ZkllbC5JaD2SjBrAfTrvoZxSAlajdwoMIQLRkSm2K1CD3h9vs
-	JfGb+jQDB1ef3J5fH6CYPl5AQ0KSZ9sRVnRrQGIN7561JbEMa+8m1SBvJhLJOUDM3/nMW+X+KB9
-	IGA/hUC2F54Sex5hnpZaJiBhtty9XGY6wpu6yW5QnFKt0z/aV0/RNMcNp6qfzmJGhpsZ31dicZ8
-	oDS19I0ZQn+l0K238454RcwHMsu7iyhCfgv/N16WAiCCWeMsqY1DxZKD1ZwHfM8nYhozdLTxS08
-	gX/sSMQOB9QbQmIHPIDjtiOBtqLHaRnb/RM=
-X-Received: by 2002:a05:600c:2e0b:b0:4bb:6a02:d42e with SMTP id 5b1f17b1804b1-4bb7da033b8mr56511275e9.1.1795072440279;
-        Wed, 18 Nov 2026 23:14:00 -0800 (PST)
+        bh=dqQztl3ppOtgcOCmLsJPlTHZe0ZDQW0ApB6TA2G8Tok=;
+        b=U1+Sp2zT3Ofz/i8rsVvt7OjpeXCIBZdyWsMWu4VkJFb8z9jH73uOnjS915NYpfJZCl
+         sOKwzUEJflDONfTt1uEhgj6RL2iAS6C1kK57wHRIVqwhcerxRIKTTMmhyVf3wifB8uUP
+         IGD09L8HHbX1VjJyqO37Q9FGpEIFzImltfZ94kHjYekVKAalbGWnMHqLhxtbfo1OsOiK
+         V5s/GX8G5zjZiJsn+QeGQXey+9Wjpvf6Ts4ShzQv7MfZ+rBk5D1dOu0IXSOfokTSIDaG
+         i0568nfCuMmHvyjjlR8tDJuw+RBcsWwKdeWUnyVfYiprJfPfyfTO/HFcrpvGMy37kVjV
+         xqVQ==
+X-Gm-Message-State: APuU4Z/+fceSccnELR/rqJWITl+VqFU3jPIVaxeAVn5Wj/pM4FMf1DVj
+	1ssaFKtoeA14buBiug4R9+JGaqDt3YAyT+uIEQVlhbGaILsiixOWzmQi6XTrS6+O
+X-Gm-Gg: AYBFou1s+qpoeYrwovXuMIfpnsmaecNVYGGr1wtXXW4d8mK72b4MknYa4OvCuotGRt9
+	uqOQqg/slxNI6SsHLydjD/8OQjGXta4ZoA7I0IZEEg3EH9eQSSsuku0g+DsVj/9TpVEhV1V0Tg4
+	JBQsxQl5QNeFqAy5qkNG5l5OUnVwg945VBFrNZ9hUttocDBK5FXzAZ/2kKQWhBoJ5hSB5E6S7ad
+	pWTR8GivcSmmUOjsGS7QPNWtQg7gdLJtSMW0HP0yqnWLYWDoa4Q4g+GB94fhS0aiTs97D+9xlTO
+	S9v0E4pbAd8BzrfzfdZJXqaz1yOj40D9V+7R13ezb2RdYuBpaNzJKOXWECc94RLDU8AiuvBsFrq
+	6npWgV6P4QXAal/slAv+OiJcICuXr5iTxAMsuz3+hc5uH8Ll2gFxL4BCRQYJrtYmLiLDJDSgMqa
+	p4ejvx2qvvrdXBx2/RnVx5+9XR+mYQG8p4HfVybQy/y8QtI2QEHlw+CVlb0hk4CEFYcBC2epRTe
+	8u9vHGPACAlao7qpC4jFrd5jbJhHxSY01qKwCCo4fP2CJ1mj6Pk4/l7hkNqE3prlAVnEu0eeFlg
+	4o04PAOdmwNXULFMYayPbFHgmPyP6JR0FAA=
+X-Received: by 2002:a05:600c:2158:b0:4bb:7ad8:99f2 with SMTP id 5b1f17b1804b1-4bb7d581cd3mr66600505e9.0.1795072441894;
+        Wed, 18 Nov 2026 23:14:01 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.13.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85343607sm17549165e9.6.2026.11.18.23.14.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 23:14:00 -0800 (PST)
+        Wed, 18 Nov 2026 23:14:01 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 3/6] monitor: Fix PHY decoding of LE Ext Create Connection
-Date: Thu, 19 Nov 2026 08:13:29 +0100
-Message-ID: <20261119071332.32424-4-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v2 4/6] monitor: Split LE PA Report decoding into helpers
+Date: Thu, 19 Nov 2026 08:13:30 +0100
+Message-ID: <20261119071332.32424-5-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261119071332.32424-1-rolandschober1968@gmail.com>
 References: <20261119071332.32424-1-rolandschober1968@gmail.com>
@@ -97,71 +97,132 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The LE Extended Create Connection decoder reads one block of connection
-parameters for each bit set in Initiating_PHYs without checking that the
-command carries that many blocks, so a truncated command makes it decode
-octets which are not part of it:
+Move the decoding of the reception information (handle, TX power, RSSI
+and CTE type) and of the data (status, length and AD structures) of the
+LE Periodic Advertising Report event into helpers, and the CTE type
+names into a function of their own.
 
-< HCI Command: LE Extended Create Connection (0x08|0x0043) plen 10
-        ...
-        Initiating PHYs: 0x01
-        Entry 0: LE 1M
-          Scan interval: 0.000 msec (0x0000)
-          Scan window: 0.000 msec (0x0000)
-          ...
+This is a preparation for decoding the events added by Periodic
+Advertising with Responses, which carry the same information, and
+does not change the output.
 
-Check the size of the command before decoding each block:
-
-        Initiating PHYs: 0x01
-          invalid packet size
-
-Fixes: e29ef3b85116 ("monitor: Add LE Extended Scan commands decoding")
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/packet.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ monitor/packet.c | 80 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 45 insertions(+), 35 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 0adc0144a..ee9e63496 100644
+index ee9e63496..9a3de9bc6 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -8816,7 +8816,8 @@ static const struct bitfield_data ext_conn_phys_table[] = {
- 	{ }
- };
- 
--static void print_ext_conn_phys(const void *data, uint8_t flags)
-+static void print_ext_conn_phys(const void *data, uint8_t size,
-+							uint8_t flags)
- {
- 	const struct bt_hci_le_ext_create_conn *entry;
- 	uint8_t mask = flags;
-@@ -8827,9 +8828,16 @@ static void print_ext_conn_phys(const void *data, uint8_t flags)
- 
- 	for (i = 0; ext_conn_phys_table[i].str; i++) {
- 		if (flags & (1 << ext_conn_phys_table[i].bit)) {
--			entry = data + bits_set * sizeof(*entry);
- 			mask &= ~(1 << ext_conn_phys_table[i].bit);
- 
-+			if ((bits_set + 1) * sizeof(*entry) > size) {
-+				print_text(COLOR_ERROR,
-+						"  invalid packet size");
-+				break;
-+			}
-+
-+			entry = data + bits_set * sizeof(*entry);
-+
- 			print_field("Entry %d: %s", bits_set,
- 						ext_conn_phys_table[i].str);
- 			print_slot_625("  Scan interval", entry->scan_interval);
-@@ -8880,7 +8888,7 @@ static void le_ext_create_conn_cmd(uint16_t index, const void *data,
- 	print_own_addr_type(cmd->own_addr_type);
- 	print_peer_addr_type("Peer address type", cmd->peer_addr_type);
- 	print_addr("Peer address", cmd->peer_addr, cmd->peer_addr_type);
--	print_ext_conn_phys(cmd->data, cmd->phys);
-+	print_ext_conn_phys(cmd->data, size - sizeof(*cmd), cmd->phys);
+@@ -13905,46 +13905,45 @@ static void le_pa_sync_evt(struct timeval *tv, uint16_t index,
+ 	print_field("Advertiser clock accuracy: 0x%2.2x", evt->clock_accuracy);
  }
  
- static const struct bitfield_data create_sync_cte_type[] = {
+-static void le_pa_report_evt(struct timeval *tv, uint16_t index,
+-				const void *data, uint8_t size)
++static const char *pa_cte_type_str(uint8_t cte_type)
+ {
+-	const struct bt_hci_le_pa_report *evt = data;
+-	const char *color_on;
+-	const char *str;
+-
+-	print_field("Sync handle: %d", evt->handle);
+-	print_power_level(evt->tx_power, NULL);
+-	if (evt->rssi == 127)
+-		print_field("RSSI: not available (0x%2.2x)",
+-						(uint8_t) evt->rssi);
+-	else if (evt->rssi >= -127 && evt->rssi <= 20)
+-		print_field("RSSI: %d dBm (0x%2.2x)",
+-				evt->rssi, (uint8_t) evt->rssi);
+-	else
+-		print_field("RSSI: reserved (0x%2.2x)",
+-						(uint8_t) evt->rssi);
+-
+-	switch (evt->cte_type) {
++	switch (cte_type) {
+ 	case 0x00:
+-		str = "AoA Constant Tone Extension";
+-		break;
++		return "AoA Constant Tone Extension";
+ 	case 0x01:
+-		str = "AoA Constant Tone Extension with 1us slots";
+-		break;
++		return "AoA Constant Tone Extension with 1us slots";
+ 	case 0x02:
+-		str = "AoD Constant Tone Extension with 2us slots";
+-		break;
++		return "AoD Constant Tone Extension with 2us slots";
+ 	case 0xff:
+-		str = "No Constant Tone Extension";
+-		break;
++		return "No Constant Tone Extension";
+ 	default:
+-		str = "Reserved";
+-		break;
++		return "Reserved";
+ 	}
++}
+ 
+-	print_field("CTE Type: %s (0x%2x)", str, evt->cte_type);
++static void print_pa_report_info(uint16_t handle, uint8_t tx_power,
++						int8_t rssi, uint8_t cte_type)
++{
++	print_field("Sync handle: %d", handle);
++	print_power_level(tx_power, NULL);
++	if (rssi == 127)
++		print_field("RSSI: not available (0x%2.2x)", (uint8_t) rssi);
++	else if (rssi >= -127 && rssi <= 20)
++		print_field("RSSI: %d dBm (0x%2.2x)", rssi, (uint8_t) rssi);
++	else
++		print_field("RSSI: reserved (0x%2.2x)", (uint8_t) rssi);
++
++	print_field("CTE Type: %s (0x%2x)", pa_cte_type_str(cte_type),
++								cte_type);
++}
+ 
+-	switch (evt->data_status) {
++static void print_pa_report_data(uint8_t data_status, uint8_t data_len,
++					const uint8_t *data, uint8_t size)
++{
++	const char *color_on;
++	const char *str;
++
++	switch (data_status) {
+ 	case 0x00:
+ 		str = "Complete";
+ 		color_on = COLOR_GREEN;
+@@ -13964,15 +13963,26 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
+ 	}
+ 
+ 	print_field("Data status: %s%s%s", color_on, str, COLOR_OFF);
+-	print_field("Data length: %u", evt->data_len);
++	print_field("Data length: %u", data_len);
+ 
+-	if (evt->data_len > size - sizeof(*evt)) {
++	if (data_len > size) {
+ 		print_text(COLOR_ERROR, "invalid data length");
+-		packet_hexdump(evt->data, size - sizeof(*evt));
++		packet_hexdump(data, size);
+ 		return;
+ 	}
+ 
+-	print_eir("Data", evt->data, evt->data_len, true);
++	print_eir("Data", data, data_len, true);
++}
++
++static void le_pa_report_evt(struct timeval *tv, uint16_t index,
++				const void *data, uint8_t size)
++{
++	const struct bt_hci_le_pa_report *evt = data;
++
++	print_pa_report_info(evt->handle, evt->tx_power, evt->rssi,
++							evt->cte_type);
++	print_pa_report_data(evt->data_status, evt->data_len, evt->data,
++							size - sizeof(*evt));
+ }
+ 
+ static void le_pa_sync_lost_evt(struct timeval *tv, uint16_t index,
 -- 
 2.47.3
 
