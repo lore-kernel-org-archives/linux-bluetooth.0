@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795108602;
-	b=aaJzOyLCogyYXI9kpNY0nhcjWFmyVljGiIiXu4B90lla5QvQoJXM+hdLU+wuFqMLqU2U
-	 7dQZ1doc/yDYII7zZZm9RGIz6p/Md6HZdvn7n30EytBBnW2BBgEcAYZ2Z4nPhEuonhvdT
-	 vYv/XjbPkF/6j6esReNcAISFUUUpXCkpVhrWQGwv0NXTQcXQ5b/sl8SwMRqfzp8R0N4fW
-	 aJKnt34YLV3LqGgbsl7nyCPVLfCJIfmSjFfE1RD/pjWy4OsdcrVCUjEkBw2jAWjHGTzKD
-	 uNnYkqxA7s13mIrvrrjPmaPRZ5Vq/IOC0pVwdz4No4q5lEYBK7yluiNakAwjDf25lgQ==
+	b=2CMBbyXnDJL6jA4ktl2QpswrnKQ1019f/1/UhfijDQe7/TnRLPgdesomVmjPXO7hWVAs
+	 ZaSg5GkNGveIBd/XxMb7IFdYBJC5dR7sVis0pvTEo0ncICi3536NOhMpjMaKTq5Jp2l5D
+	 ZjAGir6H+gotr609yVzXSyVp/tQRe6+Ko0cH1q0TnZQxsJ2mXX+gMGyMvj/NGbodzppSP
+	 zspCHA+EgT2lsgFsh/LHv8WkINk3DB/8AN/+zbc+sz94vSl5aum/mt1H0O8IsBJfeo1gm
+	 4fLQW0EDzDPs1PUJ6wn1i+jQN73wuxhN1XP48H9o0G8CAJfcpAjzGrjNzanMpdr39ow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795108602;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=AtJxjTZNgO84ftKvVvjIcX3dl1Zwrzzg4A4Qa5HcUm0=;
-	b=0Wbh+4S7xaJa6X9nsQxx6NQCe2F7++JnVV5jDXQPxLTkh2nvyxTSbymNHYDIYOyBczTg
-	 RFMzkj7V5VJRKa/Mz2j9I5g/UI5bl1DHUqglJBe+P/hy5C+N258QxHdRDF4OTjYTxrXmg
-	 I/qOgnldsjku2nMUkiOG9BKxFOxgKEAYohlLIfK3F11Ly9CuUPXMTejqECEYAl6oPqbeT
-	 flhZFZivaRQlparIH4OvfntiTBpi4+PQzArPiAWsPM/QoTr/lXI5nwSTOmsFMeLi49x44
-	 G8we7ngfSWehpTSXK1iSDZwyAO90EpFfsppsizDTGV2vU+/1nOJr3l1OrLZwum8E9Rw==
+	bh=uNJDcDonwJPcKiS2SaoS4TSeCKFi2WbbvpazhM15EQc=;
+	b=NQ4rCBnhYoYYTiLZj0Vqbi7y12RJZlBWqBoSKvTAx90xXUeySTu6HL1poQh9VcqSdp8g
+	 W4ABwKuYzM/oRtWgaEYA2Ew2BQ8VoPRPxZa4045SNOG9owBuxbMnNvxvKEvy2RC5nvpjs
+	 3G7jZDwrF/JJFg86q2Uq+KMSZTg8dscKv1cEAHibfxEdpPIb9KmMKWfCpOSnz5nYwAYm+
+	 bcub3b9GMwkUjdc8siA2Id6Hh674MRBu+KQ6aw9qLMvf6U7Rv24I0LmoSCh8eqvzTdPtR
+	 Ma87q6KscVI9VBRe5wpTkrLT4cL3tbxA03TrZ/q2nDlCsftUr/lIfI6ZqDwk82jO6yQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=T6DswpEX;
-	arc=none smtp.remote-ip=209.85.221.181
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xEPaBfnX;
+	arc=none smtp.remote-ip=209.85.221.175
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2730F606A339
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:16:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2730F606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A207606A33C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:16:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2A207606A33C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=T6DswpEX
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-5eafaeb8684so882769e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:16:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xEPaBfnX
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5ecda93627eso758533e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:16:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795108600; x=1795713400; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795108601; x=1795713401; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=AtJxjTZNgO84ftKvVvjIcX3dl1Zwrzzg4A4Qa5HcUm0=;
-        b=T6DswpEXh+suEdMQdkVUQRj1OQXc4SCplc4V7QIz5i0XA4DYkyBe1JSBq3Y+/+NbST
-         UgXdLbgv9S/PC3m1ixVywT2TsRar1NfGbhzIJxaL2692Noa8ci/fnTgE9wdei6DdElsB
-         kRCfJbPmdzqtnK4wsHfRAb8i0KkCKiAiD/raDhRePd2iH1wsotl/3J9ftbE12qTBM3u8
-         hNJ2squyzpOtFuhZ8ODttPiruOPbwgzz5lSoEELTTG5iNql888vHEd+hsvwPSUXLyL1F
-         eKejpktnL2WEijH1gyHhIk+Wjuyc9a167p78fRuRWg+cJOMd/XN5nl9jj7pnzygs4gx/
-         edTw==
+        bh=uNJDcDonwJPcKiS2SaoS4TSeCKFi2WbbvpazhM15EQc=;
+        b=xEPaBfnX9kB3C0rt09HXJwZlXTmZgcZ8ibwrI9kc4A53TwbApuzwCxpauShGE3KYif
+         xiBnY2jWtyIVoe66ggc1ACtpP/9I96hAn0vXPCPj2n0+KHfNMzg4R2mmRJ2pI3RjOPpt
+         gtv3g3EAgSvHfotSUDqofviHjqKUPUPq16rvtaZvPUj+haqLU/eEtb7j7pns6kCsU1ri
+         qU7f3OhovFvQQIK76B+jC7ZW4kOoh2S6AFKn0boUMXh/Ali8mK2GDJfJCy1BTpTXVRga
+         JCui20ZtukdxfQmhiAsYW+i4yqdxN57GOKn2lJrqWsPtUuq3Ok+F2DvdfWEx/48jcrH2
+         tAoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795108600; x=1795713400;
+        d=1e100.net; s=20260707; t=1795108601; x=1795713401;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=AtJxjTZNgO84ftKvVvjIcX3dl1Zwrzzg4A4Qa5HcUm0=;
-        b=lJorUoHIGB3iu1a0Opghuluql7hGEq9DzZe2yGKozTQGjCll9zbSF7AwV+8PRUMLwX
-         oTW0C6RXbHexzl9pOgdLPmSFeKrIbF6tDVKAyknuyQXxUU4qeOV3ym/o4rV2swhE85Uy
-         uJ4AkSc+5yDufFOuZ4p1SvLTzAE1LQTAcyLjxawLeU4sVrhQ+q+tkDMTbVKotQiQNR46
-         Oj9U7p8YFc8tUaa7YufsQ+zrUf//RFN8gpBaOqcGpvC2OqrXuJgnflfC07F9lNj+Y5Aw
-         3EHkiF03HP/t2XMKcKswiKQn0MqG/1dnIFRVsAOc3coR+NIXGk2/gawy1uH7CWEaFwtX
-         uOPA==
-X-Gm-Message-State: APuU4Z98w1JmUzYZEQD6PXO8oQ62XS9bT3heaUDFGJO8qN3iNEgzEl2k
-	a+ImE1rPyM4pYWGVgv+GMQLxMVJWkTxfE6heJHjjIA7mfk6OWcXytkB7DdzAS5qzVvo=
-X-Gm-Gg: AYBFou1Tri9rjrVabEDHWuz2zwh4MPcg9WAtMnN0KgKhw9Y7BTAwDd2+ueabFWSgzJW
-	giE2spiHUtItcuxd89ujDQkEc8vRdmQ+8IidrFFiE96DNeFhm/skAgOShMZVOhBTabPKVm07qKW
-	/qEpz6rNBlXU3LSre7bLT2rtmkrVEoHT58cXWkaJzt58V/VEgl8xfJ/HyZTGf22zP1aR+3z70qb
-	My00z7SokN2djpg5QRbAdwK5F+Rj3A8ZfTkX8AmZqA0o3Yf5RA9kJ+9gEcXAZC3sxSMaEqclJPB
-	FgxL/3Zoeqa1mAxn6UXjCsijLRIH7jTiwPS2qzKvqGftUkQophEwTNa9T7in1KB4AmEju6a0VYW
-	RZp6UiJjTBHrVIYhvTZVxtH7vw0fm6M+dqEXVVrxSFO7yw/oCjncFBqiUJGhTVXwTSJBr3OZ8Rf
-	k26xkQIwmevW0Q/g8EXuLlnkPCbg/nbfhw1gAmw+k4FKvjtW9bwTC3OSD54OQkoB/KJt++MHEMN
-	D0wWQYWzQpmdsy35V1H2+E7m3qRrdPtTXFUF5VsgDAbd4tAE8jYXWbkJOigxSospShfkQLHsAbA
-	OHcTUxQtIYiC5FAQUUraEgaGV6O42qHEtUSHXkGBo/7FCWqoG4K/StF/Cc0q3QXHWBkDisFsFoE
-	V/tzg15mbqjZkkvJzM615r9t/mTReKQWocZNWL12q+WWEvidr40td5m/s4d7c0RIJ0GZG5ysJcn
-	T4WK/0
-X-Received: by 2002:a05:6122:328c:b0:5ea:389c:51fe with SMTP id 71dfb90a1353d-5ee8af32dd5mr240908e0c.17.1795108600060;
+        bh=uNJDcDonwJPcKiS2SaoS4TSeCKFi2WbbvpazhM15EQc=;
+        b=kaX7YbKG0D95dW15maVS/RK4GtTUO8sR35EHSUR3Mqts4w+HVHxy0YK0Ms+exsxMuJ
+         frkYgx/Zvp87HKKsdUbzzOlQe9Qa/YtBVNlJHvOVObYSqkuVH649JJB6TZBZW5fey0pM
+         V/1nt/3WH1MP7xJG71gpC4VYG/ZMSqI2gq1xFB+LaiUrOziKtLNWPPzkE2yrJPZSlqSj
+         Rh7zVmH2DWXmr1hki4qswDR6FMLqS7vB/H4eP/yEPMulf+EwK2ZUxqJkbyvB7ZNW6YzE
+         A144DwD8EF7qgKumRYwStu6cVpApwUjzuLe6fvrX8qQzbFp4uT5Riynpl2J8g1na+M+G
+         1GkA==
+X-Gm-Message-State: APuU4Z+a3ufgQAfmXGUgM2LAD1ILGRa3UCANuAfN/fkpRAzHLDbCU3RQ
+	F6s5Eg73oOUhnudGPiW3BlyhPXZPqQkNSYoBbLRYM7TKBaf5T6vIHGnntJTfztJ6OJk=
+X-Gm-Gg: AYBFou3OnnRsuVDzG9S5qool9D2N+5DTgG8uaMaTfXvGjDaQtOqkNhp8sUto+Tp/aYz
+	ZXHuFxc5czo5ylaIoz8VO6zOgnAsWQebCJggaDC3QkJ1T730s4oNDBdBy3PFdvlvl4ei1qgfnmo
+	gbpNKSdQ0drAAdMPGQnoo98AuVhEGl+Sgm6PH4lXdZxjaY6CYBMzxpbzj4GhLCc2gJdzaOEcJDz
+	30m7YA2nThPowZ27xNUVrDF2KXyalnuP6lu8PYSzEnMoPBKAesfNdfRkUb7N4nRvuEsFhfpsR42
+	S2k6qKE3FVJs97iqOqvfrT1bdmfxK7+r+rQOoXRYguAI2EqRF0/kDZAjC2+eij0TJCzlUP7v4mu
+	xMnPqYgZQ2GkqDZNxJdjqgDuHLoo3TdB1WQ1+HNYkkYKQlU6ZC2aCe2DR7DJq4u9f0GFDdx51Xa
+	uAajvF2l7MC1iWkb+ityMaKAJHCOYyIOU5qB8XZGCVVCXcS+IEEoB0nQUzjU3btcZa4nUlOPreH
+	EAtpMVjZzeesBuFEo8OsbQkaEtnREwH/ejHC8bvhiVE2ytvQf3SLyPf832uzTVmkP549yvx8JUi
+	4HmwU3rueMOWXQez4IQ8KQbfXQa+lbc4e5Hov3M6KaUuKAlUqtModQDbQ611cXVtHp0frLwOndV
+	Rmd+tIhhkbNlnpuC0DeJEH9CpIk0aDvYiUbpiEldjE/jpyOl4LSnvpNfqxSHb385i4rAkCht8iV
+	gZPqfGl+RC20iNbvlEEIlCRhwA
+X-Received: by 2002:a05:6122:17a2:b0:5ea:a173:6607 with SMTP id 71dfb90a1353d-5ee8aed26admr211718e0c.10.1795108600895;
         Thu, 19 Nov 2026 09:16:40 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5a8fd3sm131881e0c.8.2026.11.19.09.16.39
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5a8fd3sm131881e0c.8.2026.11.19.09.16.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 09:16:39 -0800 (PST)
+        Thu, 19 Nov 2026 09:16:40 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 14/16] profiles/ranging: Do not start a procedure after StopMeasurement()
-Date: Thu, 19 Nov 2026 12:16:22 -0500
-Message-ID: <20261119171625.1014004-15-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 15/16] shared/rap: Start the Real-time timeout when the procedure starts
+Date: Thu, 19 Nov 2026 12:16:23 -0500
+Message-ID: <20261119171625.1014004-16-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261119171625.1014004-1-luiz.dentz@gmail.com>
 References: <20261119171625.1014004-1-luiz.dentz@gmail.com>
@@ -101,88 +101,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-StopMeasurement() during the setup phase, or the measurement duration
-expiring there, found no procedure to disable and returned without
-touching the setup. The pending Set Default Settings response, Config
-Complete and Security Enable Complete still arrived, and the Initiator
-went on to create a configuration and enable a procedure that nobody
-was waiting for any more.
+RAP v1.0 4.4.1.1 requires the Requester to disable Real-time Ranging
+Data if none arrives within 5 seconds after starting the CS procedure.
+The timer was started when the CCCD was written instead, which can be
+seconds before the procedure starts, since the CS configuration and
+security setup come first. The CCCD could then be disabled before the
+procedure had a chance to produce any data.
 
-Remember that a stop was requested until the next StartMeasurement(),
-and while it is set do not send Create Config, and do not send Set
-Procedure Parameters and Procedure Enable as the Initiator.
+Start the timer from CS Procedure Enable Complete when the procedure
+is enabled and Real-time Ranging Data is subscribed.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/ranging/rap_hci.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ src/shared/rap.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 6181bc0f12d5..8dbb6b847c11 100644
---- a/profiles/ranging/rap_hci.c
-+++ b/profiles/ranging/rap_hci.c
-@@ -73,6 +73,7 @@ struct cs_state_machine {
- 	unsigned int measurement_timeout_id;
- 	bool initiator;
- 	bool procedure_active;
-+	bool stop_requested;  /* StopMeasurement() since StartMeasurement() */
- 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
- 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
- 	bool sec_enable_pending;  /* Security Enable deferred until encrypted */
-@@ -565,7 +566,9 @@ static void rap_def_settings_done_cb(const void *data, uint8_t size,
- 		/* Only the Initiator creates the config; the Reflector waits
- 		 * for its own CS Config Complete.
- 		 */
--		if (cs_local_is_initiator(sm))
-+		if (sm->stop_requested)
-+			DBG("Measurement stopped during setup, no config");
-+		else if (cs_local_is_initiator(sm))
- 			rap_send_hci_cs_create_config_command(sm, rp->handle);
- 		else
- 			DBG("Reflector role: Waiting for CS Config Completed");
-@@ -1271,6 +1274,15 @@ static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
+diff --git a/src/shared/rap.c b/src/shared/rap.c
+index bc6f133b5da9..d4ce1751f052 100644
+--- a/src/shared/rap.c
++++ b/src/shared/rap.c
+@@ -411,6 +411,7 @@ struct ras_ccc_state {
+ static void ras_ondemand_client_reset(struct ras *ras);
+ static void ras_realtime_segments_clear(struct bt_rap *rap);
+ static void ras_ondemand_cache_clear(struct bt_rap *rap);
++static void ras_realtime_arm_timeout(struct bt_rap *rap, unsigned int timeout);
+ static bool ras_cp_write_op(struct bt_rap *rap, struct ras *ras,
+ 				uint8_t opcode, uint16_t counter);
  
- 		/* Check if role is initiator */
- 		if (sm->cs_role_known && sm->cs_role == CS_INITIATOR) {
-+			/* StopMeasurement() during the setup phase had no
-+			 * procedure to disable, so do not enable one now.
-+			 */
-+			if (sm->stop_requested) {
-+				DBG("Measurement stopped during setup");
-+				cs_set_state(sm, CS_STATE_STOPPED);
-+				return;
-+			}
+@@ -3352,6 +3353,13 @@ void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
+ 
+ 	/* Store procedure enable config in the session-level template */
+ 	reqtracker->bcs_proc_data.proc_enable_config = *data;
 +
- 			DBG("Initiator role: Sending CS Set Procedure Params");
- 			if (!rap_send_hci_cs_set_procedure_parameters(
- 							sm, handle)) {
-@@ -2035,6 +2047,7 @@ bool bt_rap_start_measurement(void *hci_sm, uint16_t conn_handle,
- 	}
- 
- 	sm->active_conn_handle = conn_handle;
-+	sm->stop_requested = false;
- 
- 	if (sm->measurement_timeout_id) {
- 		timeout_remove(sm->measurement_timeout_id);
-@@ -2074,6 +2087,11 @@ bool bt_rap_stop_measurement(void *hci_sm)
- 	if (!sm || !sm->hci)
- 		return false;
- 
-+	/* The setup phase may still be running, with nothing to disable yet:
-+	 * keep it from creating a config or enabling a procedure.
++	/* RAP v1.0 4.4.1.1: the first Real-time Ranging Data is due within
++	 * 5 seconds after the CS procedure starts.
 +	 */
-+	sm->stop_requested = true;
-+
- 	if (sm->measurement_timeout_id) {
- 		timeout_remove(sm->measurement_timeout_id);
- 		sm->measurement_timeout_id = 0;
-@@ -2155,6 +2173,7 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
- 	sm->cs_role_known = false;
- 	sm->sec_enable_pending = false;
- 	sm->remote_caps_known = false;
-+	sm->stop_requested = false;
- 	sm->current_state = CS_STATE_UNSPECIFIED;
++	if (data->state == 0x01 && rap->realtime_notify_id)
++		ras_realtime_arm_timeout(rap,
++					RAS_REALTIME_FIRST_SEGMENT_TIMEOUT);
  }
+ 
+ void bt_rap_hci_cs_sec_enable_complete_callback(uint16_t length,
+@@ -4643,9 +4651,6 @@ static bool rap_subscribe_ranging_data(struct bt_rap *rap,
+ 		rap->realtime_notify_id = bt_rap_register_notify(rap,
+ 				value_handle, rap->realtime_ccc_value,
+ 				ras_segment_notify_cb, "real-time");
+-		if (rap->realtime_notify_id)
+-			ras_realtime_arm_timeout(rap,
+-					RAS_REALTIME_FIRST_SEGMENT_TIMEOUT);
+ 		return rap->realtime_notify_id != 0;
+ 	}
  
 -- 
 2.56.0
