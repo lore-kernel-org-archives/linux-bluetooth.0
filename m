@@ -1,74 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795110170;
-	b=eH05AGlJJdJBXBruS9f8leMOBeWEdTI6XlIgM2vCsWLxwvKmEIfJCWeyNHcE16/b1VnB
-	 06VNh3hOiLCr7LWAIMC3EAox5VbxVzETJ0b61BD5BXKPNIlUQDpFF9K3EA1N0JT8/1Lnr
-	 PJzyQbqxMgLR1J8hewh6Bjby6ZK1nfGEz1kNyBeoWymYT4oxMxbNRULZeoAULByGVpZvq
-	 I4x5BK5tvqTwI9yiDi9hd7oB8syanN29D1FEmixxBytbsl+69tenS6nbN529W/lejcr0S
-	 hzwBidttYMhjO+2AJOtewzfIYekEVJWTchKb5RsDOCWZVZ8aOHxkttROIu7oPERbfuQ==
+	t=1795113006;
+	b=VcwRVKbbI55DPsGtcZ3y5VEcJjlEUsDpB7gIqJa4KKbhCNddaEBmDIzWoTk1oHys15CF
+	 FS+diUFZ/6c27Bf/I95dYw1pHMeo8WaKxNS+iKfp46q/H9FDj8Vby2hc4FLR0FAOzTn1F
+	 hqd8fmhvzwcbdENGlmla8r49PayPfmgxypi2xRbMBfdLdo2cJ1h3skb9m8txcA3LCmiEu
+	 scSDC+D+vHlneYpD0G8nVHAqUrmjlJL9gEwqMoPLYEloxurz9u/Wk6znslXyrnTzaGlrj
+	 mLMC6pNcW6Grt408I6MvITjVfpthCvda6ugQ2fYpLQUGBxo4DiZCX2be17aX5hCqjTg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795110170;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=yEbZyio6RHkFuoGZgKLHpD2Rvg7Mr+mnrwAlweTHVKg=;
-	b=tKj6reJ4tW4y7pBpgiZOMakB15P+MbtCIHRNii7sH9YEc9f9EhKTPvf6LpTsR72+IqiV
-	 ThJDwLOQlZbxO6jQb5dR+F7nMaNwnqOhDupmnIOBI+YMmhbUwN5KVNVU8SRLJjtHnLgG/
-	 HfX9rdeACaOhsNqhIcCtFgLPXC2pltFk05Hz/W4gJtLFKKiLejmofb1V5pVjr6KBqvqvk
-	 rpiR3fReUA/Kpb3M+bnfcvK/6s2/FTcphF9DNEsvNt3nRxgXixVo84ns+WM47gxQezcWo
-	 ZDwytazrrdXDFUZgjw2cG1w8yax10AUzmUbOA4I1vjIp8Y3N56qR8nbHT0KBHY+h/vA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795113006;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=Gc0jlhD8fYBpp2JOB5FsEBrptnYoEvq455CnUlQvFbw=;
+	b=p0LpbqbFpU05nxDxBkY+dbieSrZu1eDPjB7RXuU8jrXD1fOp7rm67wI/veV31uQNVb6L
+	 nlRfu4UlecCR7zjif3MGBjLFU3vwNm0Ho1rOxgQI3SqRM3f4S2nWfKwvOQFvH6TMJ0cb+
+	 9C1UFW9IWqXAr2kZ5pqCEdy5vcb1d+H0eOwpyw/lm4+FeClhEmXE3SFOL0I5v84t+GE0G
+	 duY7V0w+idj7Tsy4QO/L6lm9T/196pLxmwL1skpJ2r5qwKwB/GXphCr61ylHmrYPf+B49
+	 MSnULeedYuyJyDVvlaiaWHCs8X0jwJmPzEaKX1TdDWhqSkDTaiWKosLdMAptms6L9ug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=PKH4Yc+G;
-	arc=none smtp.remote-ip=198.175.65.20
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Q6zG9wsG;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56D7606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:42:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A56D7606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6ACD606A32A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 18:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=PKH4Yc+G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795110170; x=1826646170;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=sTWBYTTl301d6hkfG8l+hYbtLyzcvATN6afPU2biQNE=;
-  b=PKH4Yc+Gq9pU1b1lUBlv3ZVVYcIdmbyrHOwX0JocTfp/k7UMZvDGcEL8
-   uiCL0E4W5D92lpAz77w68pFQGR3i+eN7nLZfb6Vg4uJAo7FwdhwI/z8P+
-   GniN54A7c74y/0K0PTbZWJ/gesBkvw3PG6dfVS20HcC6EYGgDqRKa3ui0
-   eG/1UQ115RcEJXnjX+/fOsMZtyKCbqkCK0wg9M1Ie4lYHleBxVf/NcHl0
-   37kRmJBDTTHuV5akqkduJ1V0Qgy3WR5wNfRjNhH8deIRyZUsEZDruNgru
-   Arhk8wNPBDxv2CfFJ/Agj51tQIuXbeiHmrYxayHrC995jg71dWCm//tht
-   w==;
-X-CSE-ConnectionGUID: 4A+WIBCwSkGeyzx/xe1uBA==
-X-CSE-MsgGUID: E0JbHdCGQtSealriX7UMtw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11971"; a="4009864"
-X-IronPort-AV: E=Sophos;i="6.27,221,1787036400"; 
-   d="scan'208";a="4009864"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2026 09:42:36 -0800
-X-CSE-ConnectionGUID: a/6UQ60pQe6Y8SzhiupVcw==
-X-CSE-MsgGUID: eeuIzvs3RoiFw3/Qaw5g9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,221,1787036400"; 
-   d="scan'208";a="12212233"
-Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
-  by fmviesa012.fm.intel.com with ESMTP; 19 Nov 2026 09:42:35 -0800
-From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	kiran.k@intel.com,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Add support for paging over DRAM
-Date: Thu, 19 Nov 2026 23:11:49 +0530
-Message-ID: <20261119174149.3355356-1-chandrashekar.devegowda@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Q6zG9wsG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F371F000C6;
+	Thu, 19 Nov 2026 18:30:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795113006;
+	bh=Gc0jlhD8fYBpp2JOB5FsEBrptnYoEvq455CnUlQvFbw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=Q6zG9wsGwQ8B+8gbvt2J1DL//A3J7o9aiwPLFEigqPzwEJ6X8dD3IVCOdyT+MpodT
+	 i2ruioh9Aq7QJJiMtLhC29kQxWCh36GhOBwfrmbch+5w7sMGNSQ1Lk8LuD2YRQCv2b
+	 WotHoAVu8YoGWgXmb/CK/V+v7Nrbj7SHL8ikbwfm0mwkFPgRV3qKDuJehIpLBjUDOz
+	 qSVJJNUETxxomAOCAFxps9mfQbKpsHjpiatJHFJ2gecTT7m21PdKhbkVrm5oH03vWS
+	 eIGLoGzXqc8b1OB2IzxW6cNHLmSIstCF5VONTqfTcMd03q1nw38rnis6idjTPRVmDu
+	 IQdZvxBO2hq9g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5DE9D3808210;
+	Thu, 19 Nov 2026 18:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -79,204 +54,40 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Reject user coredump until
+ firmware is operational
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179511300528.3261689.3188065362433475885.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Nov 2026 18:30:05 +0000
+References: <20261118232043.1987049-1-kiran.k@intel.com>
+In-Reply-To: <20261118232043.1987049-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com
 
-Configure the extended context info so that the controller can page
-firmware code over host DRAM. Allocate DMA memory for the paging TLV, the
-paged DRAM table and the pages it describes, and pass their address and
-size to the controller through the extended context info address and size
-fields of the context info.
+Hello:
 
-All allocations are device managed, so no additional cleanup is needed in
-the error or remove paths.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Tested on PTL platform by downloading the firmware with the extended
-context info configured. The download completes and the controller comes
-up.
+On Thu, 19 Nov 2026 04:50:43 +0530 you wrote:
+> A user can request a device coredump through the PCI coredump sysfs
+> attribute at any time, including while firmware is being downloaded
+> from btintel_pcie_setup(). The request then rings the DBGC flush
+> doorbell on bootloader firmware that does not service it, or, if the
+> core halted, reads debug regions under MAC access while the setup
+> retry path is resetting and re-enabling the device.
+> 
+> [...]
 
-Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 71 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel_pcie.h | 57 +++++++++++++++++++++++++
- 2 files changed, 128 insertions(+)
+Here is the summary with links:
+  - [v1] Bluetooth: btintel_pcie: Reject user coredump until firmware is operational
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cb60e0e5df95
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 382e02851758..435ee41a298d 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/kernel.h>
-+#include <linux/bitfield.h>
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/overflow.h>
-@@ -3576,6 +3577,72 @@ static int btintel_pcie_config_pcie(struct pci_dev *pdev,
- 	return 0;
- }
- 
-+/* Set up the extended context info with the paging TLV and the DRAM pages
-+ * the controller can use for paging. All memory is device managed and is
-+ * released when the driver is unbound.
-+ */
-+static int btintel_pcie_alloc_ext_ctxt_info(struct btintel_pcie_data *data)
-+{
-+	struct device *dev = &data->pdev->dev;
-+	struct btintel_pcie_page_table *page_table;
-+	struct btintel_pcie_paging_tlv *paging;
-+	struct btintel_pcie_ext_ctxt *ext_ci;
-+	u32 ext_ci_size;
-+	size_t info_size, total_size;
-+	dma_addr_t p_addr, page_p_addr;
-+	void *v_addr;
-+	int i;
-+
-+	info_size = ALIGN(sizeof(*ext_ci), BTINTEL_PCIE_DMA_ALIGN_128B);
-+	total_size = info_size + ALIGN(sizeof(*page_table),
-+				       BTINTEL_PCIE_DMA_ALIGN_128B);
-+
-+	v_addr = dmam_alloc_coherent(dev, total_size, &p_addr,
-+				     GFP_KERNEL | __GFP_NOWARN);
-+	if (!v_addr)
-+		return -ENOMEM;
-+
-+	ext_ci = v_addr;
-+	page_table = v_addr + info_size;
-+
-+	ext_ci->version = cpu_to_le16(BTINTEL_PCIE_EXTCTXT_INFO_VER);
-+	ext_ci->size_dw = cpu_to_le16(sizeof(*paging) / sizeof(u32));
-+
-+	paging = &ext_ci->paging;
-+	paging->type = cpu_to_le16(BTINTEL_PCIE_PAGING_TYPE);
-+	paging->len_dw = cpu_to_le16((sizeof(*paging) -
-+				      offsetof(struct btintel_pcie_paging_tlv,
-+					       high)) / sizeof(u32));
-+	paging->high = cpu_to_le32(upper_32_bits(p_addr + info_size));
-+	paging->low = cpu_to_le32(lower_32_bits(p_addr + info_size));
-+	paging->size = cpu_to_le32(sizeof(*page_table));
-+
-+	page_table->num_of_pages = cpu_to_le32(BTINTEL_PCIE_PAGING_NUM_PAGES);
-+	page_table->bytes_per_page = cpu_to_le32(BTINTEL_PCIE_PAGING_PAGE_SIZE);
-+
-+	for (i = 0; i < BTINTEL_PCIE_PAGING_NUM_PAGES; i++) {
-+		if (!dmam_alloc_coherent(dev, BTINTEL_PCIE_PAGING_PAGE_SIZE,
-+					 &page_p_addr,
-+					 GFP_KERNEL | __GFP_NOWARN))
-+			return -ENOMEM;
-+
-+		page_table->pages[i].addr_high =
-+			cpu_to_le32(upper_32_bits(page_p_addr));
-+		page_table->pages[i].addr_low =
-+			cpu_to_le32(lower_32_bits(page_p_addr));
-+	}
-+
-+	ext_ci_size = FIELD_PREP(BTINTEL_PCIE_EXT_CI_SIZE_MASK,
-+				 sizeof(*ext_ci)) |
-+		      BTINTEL_PCIE_EXT_CI_BLOCKING_MODE |
-+		      BTINTEL_PCIE_EXT_CI_VALID;
-+
-+	data->ci->ext_addr = p_addr;
-+	data->ci->ext_size = ext_ci_size;
-+
-+	return 0;
-+}
-+
- static void btintel_pcie_init_ci(struct btintel_pcie_data *data,
- 				 struct ctx_info *ci)
- {
-@@ -3862,6 +3929,10 @@ static int btintel_pcie_alloc(struct btintel_pcie_data *data)
- 	data->ci = v_addr;
- 	data->ci_p_addr = p_addr;
- 
-+	err = btintel_pcie_alloc_ext_ctxt_info(data);
-+	if (err)
-+		goto exit_error_rxq;
-+
- 	/* Initialize the CI */
- 	btintel_pcie_init_ci(data, data->ci);
- 
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index b60e24ca558d..615e2218ad99 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -137,6 +137,12 @@
- #define BTINTEL_PCIE_DEVICE_ID_NVL_Hx_SCP2	0xD346
- #define BTINTEL_PCIE_DEVICE_ID_PTL_FMP2		0xE476
- 
-+/* Extended context information */
-+#define BTINTEL_PCIE_EXTCTXT_INFO_VER		0xA00A
-+#define BTINTEL_PCIE_PAGING_TYPE		0x0081
-+#define BTINTEL_PCIE_PAGING_NUM_PAGES		256
-+#define BTINTEL_PCIE_PAGING_PAGE_SIZE		(4 * 1024)
-+
- /* Causes for the FH register interrupts */
- enum msix_fh_int_causes {
- 	BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0	= BIT(0),	/* cause 0 */
-@@ -282,6 +288,17 @@ enum {
- #define BTINTEL_PCIE_TLV_TYPE_ECL_MEM_ADDRESS         0x07
- #define BTINTEL_PCIE_TLV_TYPE_SMEM_ADDRESS	      0x08
- 
-+/*
-+ * Extended context info size, written to ctx_info.ext_size
-+ * bits[0:15] - extended context info size in bytes
-+ * bits[16:29] - reserved
-+ * bit[30] - blocking_mode
-+ * bit[31] - valid
-+ */
-+#define BTINTEL_PCIE_EXT_CI_SIZE_MASK		GENMASK(15, 0)
-+#define BTINTEL_PCIE_EXT_CI_BLOCKING_MODE	BIT(30)
-+#define BTINTEL_PCIE_EXT_CI_VALID		BIT(31)
-+
- /*
-  * Struct for Context Information (v2)
-  *
-@@ -712,6 +729,46 @@ struct btintel_pcie_ini_dump_info {
- 	/* no cfg_names for BT - keep zero-length */
- } __packed;
- 
-+/* TLV describing the paged DRAM table
-+ * @type: The TLV id
-+ * @len_dw: The TLV payload length in dwords
-+ * @high: The MSB of the paged DRAM table address
-+ * @low: The LSB of the paged DRAM table address
-+ * @size: The size of the paged DRAM table in bytes
-+ */
-+struct btintel_pcie_paging_tlv {
-+	__le16	type;
-+	__le16	len_dw;
-+	__le32	high;
-+	__le32	low;
-+	__le32	size;
-+} __packed;
-+
-+/* Extended context info, pointed to by ctx_info.ext_addr
-+ * @version: The extended context info version
-+ * @size_dw: The size of all the TLVs that follow in dwords
-+ * @paging: The paging TLV
-+ */
-+struct btintel_pcie_ext_ctxt {
-+	__le16	version;
-+	__le16	size_dw;
-+	struct btintel_pcie_paging_tlv paging;
-+} __packed;
-+
-+/* Paged DRAM table
-+ * @num_of_pages: Total number of pages allocated in host DRAM
-+ * @bytes_per_page: Size of each page in bytes
-+ * @pages: DMA address of each page
-+ */
-+struct btintel_pcie_page_table {
-+	__le32 num_of_pages;
-+	__le32 bytes_per_page;
-+	struct {
-+		__le32 addr_high;
-+		__le32 addr_low;
-+	} pages[BTINTEL_PCIE_PAGING_NUM_PAGES];
-+} __packed;
-+
- /* struct btintel_pcie_data
-  * @pdev: pci device
-  * @hdev: hdev device
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
