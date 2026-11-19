@@ -1,100 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795095092;
-	b=oiFU8PF0uZ9f346quLFQDEfXUPpT98gW9AWGuaDWyRTVu5b3K4qq6qKdY3vk9TtfWtu7
-	 T9OB2wcOTVYqfW5WZTOQi8RrzSMMaMK6ibGFKUt3Jd2CymDRiBXNDp4dRSMZuLsegDN8g
-	 LsOKOcOxgxXSrZh3yeJ5IBbwfGlG1LoALg/0yt9E6+zKFyGiJ4qxEISrZHFVijsx4KbSn
-	 i+88lq5uTkKPbyeQjjsXOx+dDyEPEYeUhLsYSR1MjOMydYoYleUi2cjZUldcBUYgsu2uP
-	 prSZVWtO5dISyk72NExduSGdzSUtoUahiU+dubDsTuX35QAcqYdDK51h5dXftpp03Aw==
+	t=1795098229;
+	b=zu5vAt9KqKLKX2aDQ6uYUGQ2nM55v1TZxSnVP0re2UKZV3xnSAUS/RfK3KF5l+H+PUYb
+	 jKMxURiCpOR01IF4MZhV5sdcJDVInnPWsFjHO8VULStFwC0mQwdjfi62jZKUlyar+g62A
+	 ETiIOCcBZuu5lcfPrkrQK1IP+YkBk8YreegP5bysqDD81P2OXQ7XkrCTzjvSqKNBDWBbR
+	 +nJDacmkAQ8JBURVCr+yTuWwGsdRUApyklPf3xp84NYYiBS4aCaegEkpvnjkfgNGt5gf8
+	 gzPeEJ0f0CA/oC5Vn+iaIrm3UVr62WXN39Zl/6Ms20Vrg19NIRG+Vmpi6q9cu6/VOQg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795095092;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=j+Za7bMQTz/jGW5KKJ1wZv8OZM3LMy2RfyXXPrr5ddk=;
-	b=ZdRUG3+cmj/6Oc6tD2jZ7NaPDFMu7XSpV1cnBeAyPmzZJC8OhoHyW7EJbAT3yHHqNVMO
-	 8WJiVZTI2FNbzt4feN93k9TPaU2biv2oRotTRdIQv8+2V2NS5Rt4Qef5UesPVhEXoh8kf
-	 sKkDtwP1D3efcTKvIW5vbyv3KxUv+BSDN4aIU1KONoWLrkOmbz0IjLKkeRCzvOHJv5iBZ
-	 JjAvwSNITlHcUr9PxlBFSu279Z1J+ud2U4W2OfEblxOFRXHOwCd35mqBb0K566OEJrLb5
-	 FQmAkSd32+DY1iK0m+iMr8Qd+WWQbc4wHejy0uzQP5RDwAcNby8ZXYYDA/n4APpB9Wg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795098229;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
+	b=QSvhvyEpnBk93eGP4XZt2hfmlkZA6Hkj9fxcGI5mGk4t9CM6wQH2jKfPqc2mx8WIvKvn
+	 bvFeAxd21VEb7jHg0yNzKonbg4jOoqzm120QH07gRvDC0eWblNEkV3GBIJe/EOIXyFvi2
+	 n8IdoJ6VdWhjPbdxcCgPLkF71GwpzeLPh8ViHUgC6MU8Q1xYzOEDZizF2UYkKMQCHSyb6
+	 5tv8tfsyh+ygVvD0fQnkAEQ/Mh82fwa/rkoW7+05twdsa8C55i609iDaLWyAlwzh7ORmo
+	 z6BYKh2P9bMf573nUBlPt7Lif58SCslr0JCJKXbxqMLPG6trB7zOg1yS66cukI0eccw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=lunn.ch;
-	spf=pass smtp.mailfrom=lunn.ch;
-	dkim=pass header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=mOPIqIOm;
-	arc=none smtp.remote-ip=156.67.10.101
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RakDrLwK;
+	arc=none smtp.remote-ip=209.85.214.182
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CE8606A320;
-	Thu, 19 Nov 2026 13:31:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0CE8606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2B1606A320
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 14:23:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C2B1606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.a=rsa-sha256 header.s=20171124 header.b=mOPIqIOm
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=j+Za7bMQTz/jGW5KKJ1wZv8OZM3LMy2RfyXXPrr5ddk=; b=mOPIqIOmu6kDdwVuemWcNK9Dnn
-	3scHm6yoxWlXhjKDg88oGkRMzRyRggfFiPC7IQHuffZ0g5VsQiVACcLcbYFf/YJimxzK2sEH4Ma7z
-	s46ArUotTLBJyzxjIYKthUVRWJnOH1H0QxoK1FCOjd282vF3lK0QU0S6Yx/wpK07j6KI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1xU2Dn-0002Ui-FK; Thu, 19 Nov 2026 14:30:39 +0100
-Date: Thu, 19 Nov 2026 14:30:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RakDrLwK
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2efd7259872so13749745ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 06:23:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795098228; x=1795703028; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
+        b=RakDrLwKnpFkXQ5x53xU+/JtMeb5PKs/XkG/jGg4XUbPrV73tNZs5tZHokm+sjHSaD
+         R53c42cI3ZAqLjcvQeKkxZnMlquo2wkjbjqxPk/+SGxCsClwm9WbYqtlckHmdAMLAW/W
+         sCiIayoTguztq+/dzFAq47t/Wgeni9PqjkfBR/GKPGF1vnphVLQ9OSbymwte1rXoSaNM
+         SoSH6cEG/+tzOQwWZDOZVZXJKYCAEGrndvMQdcryCRTXj0asVWvOO0gIYKrjdEZhARPY
+         FJ5yFBp4vC7QWuTfm2RHldZSJvR1Eo78YqbRmFO191CVsS3RVXrql2nTN/cbG/6WKic9
+         Sx7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795098228; x=1795703028;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=t9bWB+Ike65eic+Yy4cT8z9+HxhXkL0til5+GubOeaM=;
+        b=yNityBrzSKMF4RMSjw2afv0dNw5JS1EenNK9KEwlN7VDTGwuvc3frfmS4yiZWaZG5u
+         tksokKHFUmOOgikRdlc6VFDwPTE125hR+u5CHs0XywL4gMPZR0wVyh7jCoSrFYLlkQaS
+         factgvSs2UMhnH9hXxvzNH3Yn+7ruUBnFlIvWl7nu6lqxMF324aWCeVFEymSdjAAzkG7
+         p/N9Zx5Qwd40SzHMJUzjBnYEYCBe/Euj6+Vgi6TRgzsoOL7v+i0sPY4eMIPQxCmOL5x/
+         y55KH9SrGArIes3lUo/dRLG30LdkrsIlUsmXeiOqc922w7Mzw5dCWrKbEWqrRE67iNBO
+         yUhg==
+X-Forwarded-Encrypted: i=1; AL+hErERCZpahBgvjZL8VHIbga2rjoKK1MJRTTt/AchnfQtmuQEf6Yy4emXpJF1bZEge3xh+QYLze8211WO6WIkWPYA=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8kHElBzOsOcrrize1HWGCfre6Gd1iKoReRIUO29QYjAGnHMvBX
+	+SCOzR4KXljI1kTPuslHxx9EXugMTgdgT+WiXvEq5l8uiVEOZpYb77ql
+X-Gm-Gg: AZFdTZdauA7CG/hoZnucCZmZ1sqFVgT8epNbZMxYz0Tp+aB60TGDQ8LC0sSr54zoGA0
+	56+2aW5E1sw+lPMYobpKaguk6YTY4mhNP/iJfomNBp/P3+sAIzehxPY9b2bSGTcsuFH+gmvXhfd
+	zRlHkhHB2ej32jDY42MNZ01ELCVDhkaRzgxNDMW313m/vX40ajIe+kHBoCxZmZW6O98yie9C6Om
+	j5M/TAySqYvMlR7YoJupXf1+5qwKUDZcUcYeOS293/A9pDbB+I3r0NPSEjA2uTPZfsP9ntP0r6P
+	/27lV/P+lTKOMS2ZhpWbodM041L0vaQEh9/1SG8rBJgs00M6B5uVWu/dBYZcIELTqCPek1EanEr
+	zv+ebiWhCGRC6avosI7r/DXQL/+mGOmX3/47q/o0aCDoTy5XSbLmiGaQfiRye3Y8hOHFhWF85su
+	+VEFi2f5uG2V7o2itIrAhrr2eiptP+3w9kEEa9xoceYtr87WCo+WUSnRsB1UNU4Fjs5oGL1vD8D
+	Olnhk7h5mPnu5skixDfgWiCAUzFPq9Eb2hteMF0iYwANHMX2qKoUNXoWZ7XaBkwpmKgMPYWwgdh
+	cuOCOghnWk/A6jNIuzjOrWopROyxfRK7Sts=
+X-Received: by 2002:a17:903:244f:b0:2ef:ee39:5dbb with SMTP id d9443c01a7336-2eff754e579mr60705635ad.61.1795098228295;
+        Thu, 19 Nov 2026 06:23:48 -0800 (PST)
+Received: from DESKTOP-NM9EKIA ([2001:e60:8509:ba6c:11e:f696:8454:757])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f10e67csm164415ad.53.2026.11.19.06.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 06:23:47 -0800 (PST)
+From: Joonhoe Kim <26rote@gmail.com>
+To: Abel Vesa <abel.vesa@oss.qualcomm.com>
+Cc: Srinivas Kandagatla <srini@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	Chris Lu <chris.lu@mediatek.com>, Mans Rullgard <mans@mansr.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Cornelia Huck <cornelia.huck@de.ibm.com>,
-	Andrew Morton <akpm@osdl.org>, Jeff Garzik <jeff@garzik.org>,
-	linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
-	linux-input@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Greg Kroah-Hartman <gregkh@suse.de>, linux-sound@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v3 18/31] net: phy: Use the compatibility driver
- attachment API
-Message-ID: <7c87310f-e1c6-4a84-8161-11a6e5d91785@lunn.ch>
-References: <20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com>
- <20261118-device-trust-core-v3-18-d655875c4bfb@nvidia.com>
- <71c1b931-c553-46e3-b49a-51167f168ac4@lunn.ch>
- <20261119071811.GG162713@unreal>
+	Jeff Johnson <jjohnson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Abel Vesa <abelvesa@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org
+Subject: Re: [PATCH RFC 4/5] wifi: ath12k: Support MAC address from the firmware node
+Date: Thu, 19 Nov 2026 23:23:41 +0900
+Message-ID: <20261119142342.2063-1-26rote@gmail.com>
+X-Mailer: git-send-email 2.55.0.windows.5
+In-Reply-To: <20261014-b4-nvmem-efivar-v1-4-187c85f65018@oss.qualcomm.com>
+References: <20261014-b4-nvmem-efivar-v1-0-187c85f65018@oss.qualcomm.com> <20261014-b4-nvmem-efivar-v1-4-187c85f65018@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,28 +115,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261119071811.GG162713@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 19, 2026 at 09:18:11AM +0200, Leon Romanovsky wrote:
-> On Wed, Nov 18, 2026 at 09:21:45PM +0100, Andrew Lunn wrote:
-> > > @@ -3813,6 +3809,8 @@ static int phy_probe(struct device *dev)
-> > >  	int err = 0;
-> > >  
-> > >  	phydev->drv = phydrv;
-> > > +	phydev->is_genphy_driven = phydrv == &genphy_driver ||
-> > > +				 phydrv == &genphy_c45_driver;
-> > >  
-> > 
-> > Why do this here?
-> 
-> This flag marks that driver is already probed, which is reliably
-> happening in phy_probe() under right locks. It was the easiest
-> way to battle AI reviews which don't agree with how PHY subsystem
-> performs driver bound.
+On Wed, 14 Oct 2026, Abel Vesa wrote:
+> Read a MAC address from the device's firmware node (a DT "mac-address"/
+> "local-mac-address" property, or an nvmem cell named "mac-address" via
+> device_get_mac_address()), and use it in preference to the address from
+> the firmware board data.
 
-I've not seen the netdev LLM do a review yet. It will be interesting
-to see what it says.
+Another user for this: the Lenovo Y700 Gen 5 tablet (TB323FU,
+Kaanapali) has a WCN7860 on PCIe, and its firmware reports a new
+00:03:7f:xx:xx:xx address in the WMI ready event on every boot. Network
+profiles bound to the permanent address stop matching after a restart.
+The factory address is only in a file on the Android persist partition,
+which the vendor stack passes to the firmware over QMI, and the
+bootloader puts no address in the device tree. So on this board a fixed
+local-mac-address is only good for testing; a per-device source would
+still be needed.
 
-   Andrew
+I tested this patch on v7.3 with three changes for Sashiko's review [1]:
+the return value of device_get_mac_address() decides whether the
+address is used, the buffer is __aligned(2), and with more than one
+radio SET_IEEE80211_PERM_ADDR() also takes the firmware node address
+instead of ab->mac_addr. With local-mac-address in the wifi@0 node, the
+permanent address came from it and Wi-Fi connected as before.
+
+The cover letter says this patch is only an illustration. Do you plan
+to send it on its own? If so, with those changes (and the comments
+dropped as Paul asked), feel free to add:
+
+Tested-by: Joonhoe Kim <26rote@gmail.com> # Lenovo Y700 Gen 5 (WCN7860)
+
+qcom,ath12k.yaml has additionalProperties: false, so it would need to
+allow nvmem-cells/nvmem-cell-names (as used in 5/5) and
+local-mac-address/mac-address as well.
+
+[1] https://lore.kernel.org/all/sashiko-outbox-171329@kernel.org/
+
+Thanks,
+Joonhoe Kim
