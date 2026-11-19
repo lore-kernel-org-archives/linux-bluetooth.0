@@ -1,93 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795108603;
-	b=1x7d3/LHMFFri/x9wSc7O5f27wFN+fioncUFJoPrZEbv0A4sZhpKf75vrFvOruy5yrxd
-	 eGrJkhGEu+6bMCtWAyrb0/05v6LPH+ksWv96WmLndF/9MhQuV9IFlqkGR94nuqE7DycGj
-	 yU5nkSCVwU0d8c2IjS/zwPY4ffYdbmF9BZdwVDdN7vbkkukMLLcbS9W1qDUQoBgX30MLz
-	 453gVBFRrFfpW/yImtrTqrdg1pdeFP0nZ/FAzR/28SctzsVkHA1OMTPqNCKVsvbosT4vv
-	 zmpoCE5hMkvOBxIpgKMLIc6V9SPvnB6e+nVSUT9wloR/8KekRSalnGvO7rhJG0QAc4Q==
+	t=1795109411;
+	b=rXaIfH/26KDjtc//y8C1EevyG1D79rGFdkjcfcHg5KJlGKuHyNp/AR0go2P7mK8F1MFh
+	 IM8kYDxTDpn7FL7AWCz5a0kpUtg1T87k2XsUlBbe9YGagfUvtRCCDvL0MflOHh4v/euQA
+	 YIHMaV+VSUPX/qxC7A1ingUWjSUN1aXqjwZL8XsbAlSszGJ6FLz78YWtiQ8oRaOjYwtuF
+	 Gt4XepODTWZuLWskeUVxW2BL2PKeJs7ulOBe6K0ip0lJjGmMWqQZ3MUlUPEU/O05yYyOw
+	 N6+BG852ZAVpoK1eOFMWI9540MegG1P/WtxXJAAWdiMOfPC3wyFRISLwObS+nsij7sw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795108603;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-	b=32/1A7H188PsFSolY5vn4tz7rWheicLjnNxhljf8LMfEtfqMF9SbFxvdA6ATO7gMcKk2
-	 A2joqlUt/evaS0xT54jz2UY6YFvrmOPfZPicCUPfhiblWbA0fTw7ytYrqFECUDlaUmULM
-	 w2za79I9oRi6rzNG0ET33+IyrU0bFNzm2BWwnLgocebINg6Uzjv9Na7weM4/ohjWWcCnh
-	 2XS6sfHQwAJp+0UN7P8v2bB0k3zbMGlq2WeDAyfXmIQhua/Bd/ut+MB8wface97y7Hync
-	 xg8x9bd0XOgwD/NewKqnMseYIQlItORUXQjVa+H/e4eEh++BM3igzcmHPpWeLgXDUyg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795109411;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=ft3mmSChUDGt4cL2Ec9qfIEVMzlaJuMpFHKTNh39bDI=;
+	b=ryQGP02qCHZUdnBDKXGWOh707GSvz5G9iSPqAcCDFAD/dFKJtvQBDsgH1zu9tVSUMtj5
+	 XAhVhpHG4lhwj+8KjsBwMdz2Y/LSLTClsd/YMCFdvFyB+K5CNSnNiEYZhmfr8XXuWU/bg
+	 LGvl8mda4ysq33IEShLhwTxiuMrxhDkpeeoGxsLuAshT8diPvkTEyHoCfv9yGJif/2fzw
+	 nWs3z7KAjZhUmRn/DjgmDlNdykMEooXGfSNiUjgRhwNHU0ydv0GEq8OTacUE2APuyok3j
+	 wDViycgk5XxboBEGKTCb56YuGC2utAX7tLPdx6oxctGPxIiqz6kSYSLYUTsOQVPHytg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TQCqP28P;
-	arc=none smtp.remote-ip=209.85.221.169
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i2zUAGIi;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5E5606A331
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:16:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3F5E5606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796E2606A338
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TQCqP28P
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5ec690faf85so878293e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:16:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795108602; x=1795713402; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-        b=TQCqP28Pmw23P1FYMgUUOrFNYznfMOkWCxs2bKhZlIvC5tJcM8pGt5uOr/eTgdYGmY
-         +nX3UKUGeeJbWlJiWG7VtpQ1ycJXuyTf4V3KPCwnH9wpZHKy1w2vmCpR1kCaDMU39m5D
-         DW+7Usv1z2ROSCVD5VOaFk1DO5S99tLbobSZ/4Ny0qSFMdSGF7jFu73TeEAqRtO0JtYR
-         9p6185V4bQDN7kIjA3Dfazy+xJ6J3ITmTF8FIGlbvS1yBFLpK3z8Vvs+tn7ivDMJhMn3
-         LeqlrRo95sROgxBLiQIZbhCfWRf4POT8ZCXbPYVjbp4dGgnpDMBEhHdpcMbKmQOTErLX
-         Icbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795108602; x=1795713402;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-        b=wrA3mPf3Mlla4rc2QUZd93C5LUcRzqI4swuVhDzEJLtuV+N5Lc8bMSLK7EmUUVF9Tt
-         gHePOkPJzDgOaj+uk1kmpOTT0w6sK+8mLha9JbYfz6gVUbZIdQnQ2FqT8o4BSPBmDXMf
-         ULH7orYZZU3TRYhtBIiXui+rMzcGCYUBlo+w7Ir/O2lQ4ZEm6mnBBVfnbXBdHPv8r1ii
-         xVSEF+Eq75Fw8esI6c1ka5xJbm1xt4nDFsTGoVwLWhktCZ+ft5oe5K/e0b8QxpyQAYxU
-         vtgoF64rMjrACbP39PGeFB0Y19LkSR5M+KYYlSOs/hRqLiaOvAqSMstyKpqMrOzk3rg6
-         1+nA==
-X-Gm-Message-State: APuU4Z/SPrpZ152Ceqlxl11wNmy8ueUKN2EsLsMqBCRayr+RYBmDgKUM
-	RBJ1+731aumrhBvvn42ffTk0UFHlWcsSxDZ9hk99euJH+3BWUuSxK73FGn7CSQu6/NM=
-X-Gm-Gg: AYBFou13B/Pe5JLfR4J4kWvcO0QFljqYIwR7JdrcsY5up1Fu6M7JVmBixMC0pqAtjRq
-	OBCuGkbJxtithqbrA9ZtWzld8UhvInOx5VHmRBDUfcb3K8yFtoS9e0jJRwMWudgaurk7E3xChUk
-	OADLDJFngVawpfFEmQNzVwBzCqZFVo30Bpj1z+LT4PP/I6lHZGl1ErayMk1zZ53ibIBttnDsFpC
-	rQvlJPA5y29PZgoPtTHJJau+w7At08SyhxZzR2E7LXLtWh2vBRwySFaRYNSHMsdxnz+mPvmNcay
-	AwN6ypZTVivBlayvNGOsTIFl6vPfZP+qbhLPgn8PfpQhZWhzVL0RnqiYENN+g8iDXAgO8C6LDEE
-	YyyC59BdOtLF8iXXc/aAfjovbWqzcsVkq/zO5U2X3OF5rvo4+g1CvOyE5kOThg2jBH0hzQVSJbj
-	oGaOTyY/Jsg4j8Sv/Uqbap51juYQRifaLvVXSq0rtjXradCcWZqNdm+UtXTBen7C91hGI+pObFQ
-	QyKn4t6+vY5kAqg0MogT1O/3JplHGJFwB3HtJpGfZZskzOANMF+qTpZdesS7myLtYoKTU4kMBRz
-	ZF0Gp0+SpJ3LfEDhxmczv8WJFPWbFw84RuZO7G7rtj4+Th++YcvRKiVyWi17Jl2m1GFR0+TU6Dl
-	8/eqV7aE/2NgTZc9w6Wxvm60PiKekzoYER50X4dUlRxm9R/0XI4obxTFQywnXAwnLrJx9wMv4sp
-	UCUM8=
-X-Received: by 2002:a05:6122:8b83:b0:5ee:28b4:915 with SMTP id 71dfb90a1353d-5ee8af6044fmr265307e0c.19.1795108601931;
-        Thu, 19 Nov 2026 09:16:41 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5a8fd3sm131881e0c.8.2026.11.19.09.16.41
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 09:16:41 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 16/16] unit/test-rap: Add tests for Ranging Data subscription and counters
-Date: Thu, 19 Nov 2026 12:16:24 -0500
-Message-ID: <20261119171625.1014004-17-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261119171625.1014004-1-luiz.dentz@gmail.com>
-References: <20261119171625.1014004-1-luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i2zUAGIi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BB11F000C5;
+	Thu, 19 Nov 2026 17:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795109411;
+	bh=ft3mmSChUDGt4cL2Ec9qfIEVMzlaJuMpFHKTNh39bDI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=i2zUAGIi4s/4vAwdt69Dj5Ez2MX78vDd2bGv77M+JUKCJAdetGElyqtvzRCVGvkqE
+	 w7HGBw1TJbWros++1mDLVopLtW86ChiDX6bPueuHaQyo81DAdsza7iaJ7Ue3elOQIt
+	 YMfmratH8ClolUHVUgVWMaf2gdJXJWSa4eySbnMbw09qwqM23xvhmf4UYbXH8qFtfB
+	 1YWUK6Pkh+4vCRw9mrk3V/SBtoxVLvdVFp5PTI1uL3XgU81ZEglSpnmX2jHOeFAixH
+	 NrRu6QHm7gNCzcynQR2qwivvhVT1EjOjxSHoymEJRSfAfQ2j1Wx9MUfyjkc0vSURBU
+	 KVwTp7G6QtIKQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15463808210;
+	Thu, 19 Nov 2026 17:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -98,581 +54,84 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v5 00/17] Bluetooth: Fixes for issues reported by
+ sashiko.dev
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179510940978.3231831.6458719198997058051.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Nov 2026 17:30:09 +0000
+References: <20261118191118.318779-1-luiz.dentz@gmail.com>
+In-Reply-To: <20261118191118.318779-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-Add Requester tests for the Ranging Data subscriptions: nothing is
-written when RAS Features is read, Real-time and On-demand CCCD values
-for both transports, subscribing on start, and the 5 s Real-time timeout
-running from CS Procedure Enable Complete rather than from the CCCD write.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Add a two-connection test that the Ranging Data Ready and Overwritten
-counters are per connection.
+On Wed, 18 Nov 2026 14:11:01 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This series fixes issues reported by sashiko.dev against the Bluetooth
+> core, each patch carries the identifier of the report(s) it addresses in
+> its Reported-by tag.
+> 
+> Missing locking around shared state:
+>  - Patch 2 takes hci_req_sync_lock around hci_powered_update_sync() in
+>    hci_power_on().
+>  - Patches 3 and 4 look up advertising instances under hdev->lock in
+>    hci_disable_ext_adv_instance_sync() and
+>    hci_schedule_adv_instance_sync().
+>  - Patch 5 serializes the writers of hdev->link_keys. smp_notify_keys()
+>    runs with the l2cap channel lock held, which is ordered after
+>    hdev->lock, so this adds a dedicated hdev->link_keys_lock instead of
+>    taking hdev->lock there.
+>  - Patch 13 protects the MSFT event prefix with hdev->lock.
+>  - Patch 15 holds hdev->lock while looking up and freeing advertisement
+>    monitors.
+> 
+> [...]
 
-Assisted-by: Claude:claude-sonnet-5-5
----
- unit/test-rap.c | 507 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 464 insertions(+), 43 deletions(-)
+Here is the summary with links:
+  - [v5,01/17] Bluetooth: mgmt: Fix read_index_list() buffer overflow
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cfdd650c5dab
+  - [v5,02/17] Bluetooth: hci_core: Take req_sync lock in hci_power_on()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6a296a465812
+  - [v5,03/17] Bluetooth: hci_sync: Lock the lookup in hci_disable_ext_adv_instance_sync()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8984b72f9508
+  - [v5,04/17] Bluetooth: hci_sync: Hold hdev->lock in hci_schedule_adv_instance_sync()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c592dfe9637c
+  - [v5,05/17] Bluetooth: SMP: Serialize link key updates from smp_notify_keys()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e428ab70fb33
+  - [v5,06/17] Bluetooth: SMP: Check smp_data before using SMP_DEV()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e8764a694634
+  - [v5,07/17] Bluetooth: SMP: Don't create the BR/EDR channel while unregistered
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8a119ba64f33
+  - [v5,08/17] Bluetooth: hci_event: Validate sent command length in LE Set Ext Adv Enable
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ad7c1f067df2
+  - [v5,09/17] Bluetooth: mgmt: Reject zero multi advertising rotation duration
+    (no matching commit)
+  - [v5,10/17] Bluetooth: L2CAP: Don't use uninitialized EFS in l2cap_parse_conf_rsp()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cb3251457da2
+  - [v5,11/17] Bluetooth: mgmt: Fix mesh transmission locking and lifetime
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1d7a52778858
+  - [v5,12/17] Bluetooth: MGMT: Fix use-after-free in mgmt_powering_down()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7c8dcf322b0d
+  - [v5,13/17] Bluetooth: MSFT: Protect the event prefix with hdev->lock
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0434cd10518c
+  - [v5,14/17] Bluetooth: hci_debugfs: Fix racy toggling of debugfs controlled flags
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b49abf5f92ea
+  - [v5,15/17] Bluetooth: hci_core: Hold hdev->lock when removing advertisement monitors
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7f08b6ef44fa
+  - [v5,16/17] Bluetooth: MSFT: Free the response of the monitor commands
+    https://git.kernel.org/bluetooth/bluetooth-next/c/775eca0c3df2
+  - [v5,17/17] Bluetooth: hci_core: Don't fail removing a monitor unknown to the controller
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8d3e5e6fe6d0
 
-diff --git a/unit/test-rap.c b/unit/test-rap.c
-index 338f0babf2a4..a1655640d41c 100644
---- a/unit/test-rap.c
-+++ b/unit/test-rap.c
-@@ -49,6 +49,10 @@ struct test_data_ras {
- struct test_config_rap {
- 	const struct iovec *setup_data;
- 	const size_t setup_data_len;
-+	/* Run once the Requester is ready; when NULL the test passes there */
-+	void (*action)(struct bt_rap *rap);
-+	/* Called when the ATT script is exhausted; NULL leaves it to action */
-+	void (*complete)(const void *user_data);
- };
- 
- struct test_data_rap {
-@@ -180,6 +184,57 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
- 		printf("%s: Failed to send notification\n", __func__);
- }
- 
-+static void inject_proc_enable(struct bt_rap *rap)
-+{
-+	struct rap_ev_cs_proc_enable_cmplt ev;
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.conn_hdl = 0x0001;
-+	ev.config_id = 0x01;
-+	ev.state = 0x01;
-+
-+	bt_rap_hci_cs_procedure_enable_complete_callback(sizeof(ev), &ev, rap);
-+}
-+
-+static void inject_cs_result(struct bt_rap *rap, uint16_t proc_counter)
-+{
-+	size_t event_size = sizeof(struct rap_ev_cs_subevent_result) +
-+			    sizeof(struct cs_step_data);
-+	struct rap_ev_cs_subevent_result *fake_event;
-+	struct cs_mode_zero_data *mode_zero;
-+
-+	if (tester_use_debug())
-+		tester_debug("Injecting fake CS data...");
-+
-+	fake_event = g_malloc0(event_size);
-+
-+	fake_event->conn_hdl = 0x0001;
-+	fake_event->config_id = 0x01;
-+	fake_event->start_acl_conn_evt_counter = 0x0000;
-+	fake_event->proc_counter = proc_counter;
-+	fake_event->freq_comp = 0x0000;
-+	fake_event->ref_pwr_lvl = 0x00;
-+	fake_event->proc_done_status = 0x00;
-+	fake_event->subevt_done_status = 0x00;
-+	fake_event->abort_reason = 0x00;
-+	fake_event->num_ant_paths = 0x01;
-+	fake_event->num_steps_reported = 0x01;
-+
-+	fake_event->step_data[0].step_mode = CS_MODE_ZERO;
-+	fake_event->step_data[0].step_chnl = 0x00;
-+	/* Mode 0: 1+1+1+4 bytes */
-+	fake_event->step_data[0].step_data_length = 4;
-+	mode_zero = &fake_event->step_data[0].step_mode_data.mode_zero_data;
-+	mode_zero->packet_quality = 0x01;
-+	mode_zero->packet_rssi_dbm = 0x02;
-+	mode_zero->packet_ant = 0x03;
-+	mode_zero->init_measured_freq_offset = 0x04;
-+
-+	bt_rap_hci_cs_subevent_result_callback(event_size, fake_event, rap);
-+
-+	g_free(fake_event);
-+}
-+
- static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 					unsigned int id, uint16_t offset,
- 					const uint8_t *value, size_t len,
-@@ -220,48 +275,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 	/* If notifications/indications enabled on Real-time Ranging Data CCCD,
- 	 * inject fake HCI CS subevent data to trigger notifications
- 	 */
--	if (handle == 0x0006 && ccc_value != 0x0000 && data->rap) {
--		size_t event_size = sizeof(struct rap_ev_cs_subevent_result) +
--				    sizeof(struct cs_step_data);
--		struct rap_ev_cs_subevent_result *fake_event;
--		struct cs_mode_zero_data *mode_zero;
--
--		if (tester_use_debug())
--			tester_debug("Injecting fake CS data...");
--
--		fake_event = g_malloc0(event_size);
--		if (!fake_event)
--			return;  /* Already sent write response */
--
--		/* Fill in the header fields */
--		fake_event->conn_hdl = 0x0001;
--		fake_event->config_id = 0x01;
--		fake_event->start_acl_conn_evt_counter = 0x0000;
--		fake_event->proc_counter = 0x0001;
--		fake_event->freq_comp = 0x0000;
--		fake_event->ref_pwr_lvl = 0x00;
--		fake_event->proc_done_status = 0x00;
--		fake_event->subevt_done_status = 0x00;
--		fake_event->abort_reason = 0x00;
--		fake_event->num_ant_paths = 0x01;
--		fake_event->num_steps_reported = 0x01;
--
--		fake_event->step_data[0].step_mode = CS_MODE_ZERO;
--		fake_event->step_data[0].step_chnl = 0x00;
--		/* Mode 0: 1+1+1+4 bytes */
--		fake_event->step_data[0].step_data_length = 4;
--mode_zero = &fake_event->step_data[0].step_mode_data.mode_zero_data;
--		mode_zero->packet_quality = 0x01;
--		mode_zero->packet_rssi_dbm = 0x02;
--		mode_zero->packet_ant = 0x03;
--		mode_zero->init_measured_freq_offset = 0x04;
--
--		/* Inject the fake event to trigger notification */
--		bt_rap_hci_cs_subevent_result_callback(event_size, fake_event,
--						       data->rap);
--
--		g_free(fake_event);
--	}
-+	if (handle == 0x0006 && ccc_value != 0x0000 && data->rap)
-+		inject_cs_result(data->rap, 0x0001);
- 	return;
- 
- done:
-@@ -413,6 +428,13 @@ static void test_setup_rap(const void *user_data)
- 
- static void rap_client_ready_cb(struct bt_rap *rap, void *user_data)
- {
-+	struct test_data_rap *data = user_data;
-+
-+	if (data->cfg->action) {
-+		data->cfg->action(rap);
-+		return;
-+	}
-+
- 	tester_test_passed();
- }
- 
-@@ -432,7 +454,7 @@ static void test_client_rap(const void *user_data)
- 	io = tester_setup_io(data->iov, data->iovcnt);
- 	g_assert(io);
- 
--	tester_io_set_complete_func(NULL);
-+	tester_io_set_complete_func(data->cfg->complete);
- 
- 	data->db = gatt_db_new();
- 	g_assert(data->db);
-@@ -1001,6 +1023,372 @@ const struct test_config_rap cfg_cggit_discovery = {
- 	IOV_DATA(0x0a, 0x09, 0x00), \
- 	IOV_DATA(0x0b, 0x01, 0x00)
- 
-+/*
-+ * Requester subscription behavior (RAP v1.0 4.4)
-+ *
-+ * Remote handles: Real-time CCCD 0x0006, On-demand CCCD 0x0009, RAS Control
-+ * Point CCCD 0x000c, Ranging Data Ready CCCD 0x000f, Ranging Data Overwritten
-+ * CCCD 0x0012.
-+ */
-+#define ATTACH_FEATURES_REALTIME \
-+	IOV_DATA(0x0a, 0x03, 0x00), \
-+	IOV_DATA(0x0b, 0x01, 0x00, 0x00, 0x00)
-+
-+/* Abort supported, Real-time not */
-+#define ATTACH_FEATURES_ONDEMAND \
-+	IOV_DATA(0x0a, 0x03, 0x00), \
-+	IOV_DATA(0x0b, 0x04, 0x00, 0x00, 0x00)
-+
-+#define WRITE_CCCD(handle, value) \
-+	IOV_DATA(0x12, handle, 0x00, value, 0x00), \
-+	IOV_DATA(0x13)
-+
-+static gboolean idle_pass_cb(gpointer user_data)
-+{
-+	tester_test_passed();
-+	return FALSE;
-+}
-+
-+static gboolean realtime_disable_cb(gpointer user_data)
-+{
-+	bt_rap_disable_realtime_ranging(user_data);
-+	return FALSE;
-+}
-+
-+/* Reading RAS Features must not subscribe by itself: nothing is written
-+ * until the Upper Tester asks for Ranging Data (RAP/REQ/RRD/BV-01-C).
-+ */
-+static void action_idle(struct bt_rap *rap)
-+{
-+	g_timeout_add(300, idle_pass_cb, NULL);
-+}
-+
-+static void action_realtime_notify(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_REALTIME,
-+				BT_RAP_RANGING_NOTIFY));
-+	g_timeout_add(200, realtime_disable_cb, rap);
-+}
-+
-+static void action_realtime_indicate(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_REALTIME,
-+				BT_RAP_RANGING_INDICATE));
-+	g_timeout_add(200, realtime_disable_cb, rap);
-+}
-+
-+/* StartMeasurement() with the peer supporting Real-time subscribes to it */
-+static void action_ensure(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_ensure_ranging_data(rap));
-+}
-+
-+static void action_ondemand_notify(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_ONDEMAND,
-+				BT_RAP_RANGING_NOTIFY));
-+}
-+
-+static void action_ondemand_indicate(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_ONDEMAND,
-+				BT_RAP_RANGING_INDICATE));
-+}
-+
-+#define RAP_REQ_RRD_NO_SUBSCRIBE \
-+	ATTACH_FEATURES_REALTIME
-+
-+#define RAP_REQ_RRD_ROUND(value) \
-+	ATTACH_FEATURES_REALTIME, \
-+	WRITE_CCCD(0x06, value), \
-+	WRITE_CCCD(0x06, 0x00)
-+
-+#define RAP_REQ_RRD_ENSURE \
-+	ATTACH_FEATURES_REALTIME, \
-+	WRITE_CCCD(0x06, 0x01)
-+
-+/* On-demand: the data characteristic follows the requested transport, the
-+ * Control Point, Ranging Data Ready and Overwritten are indicated.
-+ */
-+#define RAP_REQ_ORD_ROUND(value) \
-+	ATTACH_FEATURES_ONDEMAND, \
-+	WRITE_CCCD(0x09, value), \
-+	WRITE_CCCD(0x0c, 0x02), \
-+	WRITE_CCCD(0x0f, 0x02), \
-+	WRITE_CCCD(0x12, 0x02)
-+
-+const struct test_config_rap cfg_rap_idle = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_idle,
-+};
-+
-+const struct test_config_rap cfg_rap_rt_notify = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_notify,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_rt_indicate = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_indicate,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_ensure = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ensure,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_od_notify = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ondemand_notify,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_od_indicate = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ondemand_indicate,
-+	.complete = test_complete_cb,
-+};
-+
-+/*
-+ * The 5 s wait for the first Real-time Ranging Data starts with the CS
-+ * procedure (RAP v1.0 4.4.1.1), not with the CCCD write: the CCCD is disabled
-+ * 5 s after Procedure Enable Complete, which is injected after the write.
-+ */
-+
-+static gint64 proc_enable_time;
-+
-+static gboolean inject_proc_enable_cb(gpointer user_data)
-+{
-+	proc_enable_time = g_get_monotonic_time();
-+	inject_proc_enable(user_data);
-+	return FALSE;
-+}
-+
-+static void action_realtime_timeout(struct bt_rap *rap)
-+{
-+	proc_enable_time = 0;
-+
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_REALTIME,
-+				BT_RAP_RANGING_NOTIFY));
-+	g_timeout_add(300, inject_proc_enable_cb, rap);
-+}
-+
-+static void realtime_timeout_complete(const void *user_data)
-+{
-+	/* Disabled no earlier than 5 s after Procedure Enable Complete */
-+	if (!proc_enable_time ||
-+	    g_get_monotonic_time() - proc_enable_time < 4900 * 1000)
-+		tester_test_failed();
-+	else
-+		tester_test_passed();
-+}
-+
-+const struct test_config_rap cfg_rap_rt_timeout = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_timeout,
-+	.complete = realtime_timeout_complete,
-+};
-+
-+/*
-+ * RAS Ranging Data Ready/Overwritten reads report the counters of the
-+ * connection they are read on (RAS v1.0, 3.4 and 3.5).
-+ */
-+#define RAS_CONNS	2
-+
-+struct cnt_op {
-+	int conn;
-+	enum { CNT_READ, CNT_WRITE, CNT_INJECT } type;
-+	uint16_t handle;
-+	uint16_t value;
-+};
-+
-+struct test_data_cnt {
-+	struct test_data_ras ras;
-+	struct bt_att *satt[RAS_CONNS];
-+	struct bt_att *catt[RAS_CONNS];
-+	struct bt_gatt_server *server[RAS_CONNS];
-+	struct bt_gatt_client *client[RAS_CONNS];
-+	struct gatt_db *cdb[RAS_CONNS];
-+	unsigned int ready;
-+	unsigned int step;
-+};
-+
-+static struct test_data_cnt cnt_data;
-+
-+static const struct cnt_op cnt_ops[] = {
-+	/* Fresh connections report no counter */
-+	{ 0, CNT_READ, 0x000e, 0 },
-+	{ 1, CNT_READ, 0x000e, 0 },
-+	{ 0, CNT_READ, 0x0011, 0 },
-+	{ 1, CNT_READ, 0x0011, 0 },
-+	/* Connection 0 selects On-demand and two procedures complete on it,
-+	 * the second one overwriting the first.
-+	 */
-+	{ 0, CNT_WRITE, 0x0009, 0x0001 },
-+	{ 0, CNT_INJECT },
-+	/* Only connection 0 sees the counters */
-+	{ 0, CNT_READ, 0x000e, 2 },
-+	{ 1, CNT_READ, 0x000e, 0 },
-+	{ 0, CNT_READ, 0x0011, 1 },
-+	{ 1, CNT_READ, 0x0011, 0 },
-+};
-+
-+static void cnt_teardown(const void *user_data)
-+{
-+	struct test_data_cnt *data = (void *)user_data;
-+	int i;
-+
-+	for (i = 0; i < RAS_CONNS; i++) {
-+		bt_gatt_client_unref(data->client[i]);
-+		bt_gatt_server_unref(data->server[i]);
-+		bt_att_unref(data->satt[i]);
-+		bt_att_unref(data->catt[i]);
-+		gatt_db_unref(data->cdb[i]);
-+	}
-+
-+	gatt_db_unref(data->ras.db);
-+	bt_rap_unregister(data->ras.ras_id);
-+	queue_destroy(data->ras.ccc_states, free);
-+
-+	tester_teardown_complete();
-+}
-+
-+static void cnt_next(struct test_data_cnt *data);
-+
-+static void cnt_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+	const struct cnt_op *op = &cnt_ops[data->step];
-+
-+	g_assert(success);
-+	g_assert_cmpuint(length, ==, 2);
-+	g_assert_cmpuint(get_le16(value), ==, op->value);
-+
-+	data->step++;
-+	cnt_next(data);
-+}
-+
-+static void cnt_write_cb(bool success, uint8_t att_ecode, void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+
-+	g_assert(success);
-+
-+	data->step++;
-+	cnt_next(data);
-+}
-+
-+static void cnt_next(struct test_data_cnt *data)
-+{
-+	const struct cnt_op *op;
-+	uint8_t value[2];
-+	struct bt_rap *rap;
-+
-+	if (data->step == ARRAY_SIZE(cnt_ops)) {
-+		tester_test_passed();
-+		return;
-+	}
-+
-+	op = &cnt_ops[data->step];
-+
-+	switch (op->type) {
-+	case CNT_READ:
-+		g_assert(bt_gatt_client_read_value(data->client[op->conn],
-+					op->handle, cnt_read_cb, data, NULL));
-+		break;
-+	case CNT_WRITE:
-+		put_le16(op->value, value);
-+		g_assert(bt_gatt_client_write_value(data->client[op->conn],
-+					op->handle, value, sizeof(value),
-+					cnt_write_cb, data, NULL));
-+		break;
-+	case CNT_INJECT:
-+		rap = bt_rap_get_session(data->satt[op->conn], data->ras.db);
-+		g_assert(rap);
-+		inject_proc_enable(rap);
-+		inject_cs_result(rap, 0x0001);
-+		inject_cs_result(rap, 0x0002);
-+		data->step++;
-+		cnt_next(data);
-+		break;
-+	}
-+}
-+
-+static void cnt_client_ready_cb(bool success, uint8_t att_ecode,
-+							void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+
-+	g_assert(success);
-+
-+	if (++data->ready == RAS_CONNS)
-+		cnt_next(data);
-+}
-+
-+static void test_counters(const void *user_data)
-+{
-+	struct test_data_cnt *data = (void *)user_data;
-+	int i;
-+
-+	data->ras.db = gatt_db_new();
-+	g_assert(data->ras.db);
-+
-+	gatt_db_ccc_register(data->ras.db, gatt_ccc_read_cb, gatt_ccc_write_cb,
-+					gatt_notify_cb, &data->ras);
-+
-+	bt_rap_add_db(data->ras.db);
-+
-+	data->ras.ras_id = bt_rap_register(ras_attached, ras_detached,
-+								&data->ras);
-+	data->ras.ccc_states = queue_new();
-+
-+	for (i = 0; i < RAS_CONNS; i++) {
-+		int sv[2];
-+
-+		g_assert(socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0,
-+								sv) == 0);
-+
-+		data->satt[i] = bt_att_new(sv[0], false);
-+		data->catt[i] = bt_att_new(sv[1], false);
-+		g_assert(data->satt[i] && data->catt[i]);
-+
-+		bt_att_set_close_on_unref(data->satt[i], true);
-+		bt_att_set_close_on_unref(data->catt[i], true);
-+		bt_att_set_security(data->satt[i], BT_ATT_SECURITY_MEDIUM);
-+
-+		data->server[i] = bt_gatt_server_new(data->ras.db,
-+						data->satt[i], 64, 0);
-+		g_assert(data->server[i]);
-+
-+		data->cdb[i] = gatt_db_new();
-+		data->client[i] = bt_gatt_client_new(data->cdb[i],
-+						data->catt[i], 64, 0);
-+		g_assert(data->client[i]);
-+
-+		bt_gatt_client_ready_register(data->client[i],
-+				cnt_client_ready_cb, data, NULL);
-+	}
-+
-+	/* Notifications go out through the first connection */
-+	data->ras.server = data->server[0];
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -1080,5 +1468,38 @@ int main(int argc, char *argv[])
- 			test_setup_rap, test_client_rap,
- 			&cfg_cggit_discovery, RAP_CL_CGGIT_CHA_BV_06_C);
- 
-+	/* RAP Requester Ranging Data subscriptions */
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [No subscription at attach]",
-+			test_setup_rap, test_client_rap, &cfg_rap_idle,
-+			RAP_REQ_RRD_NO_SUBSCRIBE);
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time Notification]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_notify,
-+			RAP_REQ_RRD_ROUND(0x01));
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time Indication]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_indicate,
-+			RAP_REQ_RRD_ROUND(0x02));
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Subscribe on start]",
-+			test_setup_rap, test_client_rap, &cfg_rap_ensure,
-+			RAP_REQ_RRD_ENSURE);
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time timeout from "
-+				"Procedure Enable]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_timeout,
-+			ATTACH_FEATURES_REALTIME, WRITE_CCCD(0x06, 0x01),
-+			WRITE_CCCD(0x06, 0x00));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [On-demand Notification]",
-+			test_setup_rap, test_client_rap, &cfg_rap_od_notify,
-+			RAP_REQ_ORD_ROUND(0x01));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [On-demand Indication]",
-+			test_setup_rap, test_client_rap, &cfg_rap_od_indicate,
-+			RAP_REQ_ORD_ROUND(0x02));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [Subscribe on start without "
-+				"Real-time support]",
-+			test_setup_rap, test_client_rap, &cfg_rap_ensure,
-+			RAP_REQ_ORD_ROUND(0x01));
-+
-+	/* RAS Ranging Counters are per connection */
-+	tester_add("RAS/SR/RCO/Ranging Counters per connection", &cnt_data,
-+			NULL, test_counters, cnt_teardown);
-+
- 	return tester_run();
- }
+You are awesome, thank you!
 -- 
-2.56.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
