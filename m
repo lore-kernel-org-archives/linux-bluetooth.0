@@ -1,84 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795109852;
-	b=1GgWRXP8QwoFrt7EsqFffKFzkv7EvaXg9SwqKa+a4txISxv5WKfnUUrXfgTkJbXvaw0P
-	 tFOUtwOMbQX0iDru52Otf61NuTMYlgiF8RAjJnPB0MrBww9bcNwp4BDrbLBdLdkoKTHQY
-	 LlIWdF8IdtFC8Lzhp6aQ147YYnYEOXFZjE7KwWXoywLaW/qoz4HYsq7TCVp7i8f7wcGBU
-	 Vw5xnwKV0V6BTpdnJNjWo7muspcIdv5s7kQpZyuWsFhprAKw4fafNO2+Q5i8daYBzvGe3
-	 hV5YMNS1xFqg5OfhCR+GotWEnJcmhxpODz7oDzWnefgwYGQV+gimHwr4dbNgkxPwgRw==
+	t=1795110059;
+	b=hwhgVUEzK7TVvVIjS8x5WChQQ5u+Es4GP/K1FWIiqc9pSYUue5llLiMy1JVktpQWnLBt
+	 aECJOC3X+HYBehA9ZCGR2xcBcBV9Oq+UOjxgoaUVllmp3S3XGUagXHLZrzC7nLy3vU40g
+	 WxNA/tk0VqSO8dMGlbmsGXmeNBt7vxzC7XnD58Vgj2X2KG3e98OP/f+s1IGcfB3eWL8al
+	 ybV7y/jd+x+6yEWOwNDcG+dJCUe9tq8zaUxAmd00rYUfcKyxiHBEGqUZdkiGny+TBReLp
+	 s71ER9+Vbt19aAvurhXbu8xHzuUxHnVG4yug3Df15w3pF3Ac5USpgGKP7BK8rqIB1mw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795109852;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=rCcjalpi291nHPXGOJpc6UD5YTDOe+4Zu4aTNNdWKmI=;
-	b=Go5jFuwPU/Q7QbWEbWl2o5HMI95QEC+rhA40n9cfzVYYFB4n1Qdzw9gHEFrYcmCNvHDX
-	 cEZfz7fv8/cNtzJH6Ijlu73jOk0nEZol/kF0sDgOBlOH6ohFVGS8xP3ttUHI4WpD+z9pH
-	 Wp0+LK8UWmLdcupbn/v645Fr6Pgf9UwHUx8PlyfYM7H/lMzpmTwy2I3pbNrkiLkzyD6DX
-	 69NBDnQaye2kKp2cEr5RFu45yM1dTItTqlyBM1tn10lYl3GAxgTOoYlBYTWnk4bngfNIw
-	 Ec3p6XEt/XGvdMmTFZf05kzR9ZbxPub7BJ+iXbAJtKzGVBROtY+2YGFweQGD39mOfXA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795110059;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Jc65HYYVpcVCP6bEIxGRv1EQZVgbxXkJFNoTQor6tQY=;
+	b=GFWRAKPFaWM5mG2M/tUp2UYvEDhh3TIAm8c5sCmLrcXsafmvsmpvoWhz+3uhRZDX5jpB
+	 t0E8vPP709E38CasEowRFMFgMc8UfJkKixiAlL6RgI56gg3HlK3KcyBPi3vNbtoYu1Q/k
+	 smpsq9k1LNZxJT8tQzz5EsmlD+aSh6mscElB/sEkILpf2j2NdKk1sDqZhmRueH27B+S68
+	 m78N7sOYDmnQo01C9Wjt2FtFujAIaxwJ7SYrtbo+PIMKXXmyvjE17YKdlL1T0+BSYyvU0
+	 unReSCTIrxDkZhTsdvU8/GQy9GJVC7LctuwFY28gCc2akPR8hWArzh3unoVDRxIiCzA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="An6rjm/p";
-	arc=none smtp.remote-ip=74.125.82.50
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=IF8lwhh8;
+	arc=none smtp.remote-ip=198.175.65.9
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F17606A320
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:37:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6F17606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663FB606A331
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 17:40:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 663FB606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=An6rjm/p
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-1b244fb7fffso2569333c88.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 09:37:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795109851; x=1795714651; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=rCcjalpi291nHPXGOJpc6UD5YTDOe+4Zu4aTNNdWKmI=;
-        b=An6rjm/pizaroR0RTehMTWLaxCeIXb541iPy5gnlXrf98cKmNbIJH9HXSXZc4vlieW
-         mrmegWj62U81OfvsV+NeRVuR8KrU2g7M7JTwNbqHBvYJjJNrQ8LxkFp53g8t4oPUlIH5
-         oFucrAlT05jkd92VgLrV3amFI6MpktDjclC2eHK5Z/uAxWhAiDMEI57jfiB8XYAi3Neu
-         389NC6ZJISZsaE4F6mXm39BHBs8PNmDmJcqCv8GoMp1jKDjXH6cKseu747ibiFbWloK5
-         UvHvG/N3BksFVMEdkOeZdncbWr0plYwfRzUewN6835C+yKYdtpyVJn7bUlIlfEpJ7gw/
-         kYsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795109851; x=1795714651;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=rCcjalpi291nHPXGOJpc6UD5YTDOe+4Zu4aTNNdWKmI=;
-        b=bqhdIQNM5ZQGSiSnw80ROdXiLrJLhpkIlzxLP1+2bksZzXlKMGWFPwobRJmeK8GV1N
-         +rhze8gMlQEv7Q3nGRGFFY4GlHiV9ET33uzjV0Ed5E2113qXn8OANRstC+bZWR8GnXAH
-         KCCPWae8snDsNUAjsKwFvNA/sc0+LZ9RecRyIc8og8er4j4YT9COnZdHg4VBjhUEbExm
-         k+mWZ3x6jhJm7aRP/1y+4UwRJzDeKNrxr3pZnuJNkXXCgE3pPzyov+rPm/vH/R1Gwkbf
-         ff91arCb34K4FXw+DlNt9ic78wPDD+iNiNY1huXe6lK6Rqgwr7q73KZoVKABX16VgHQ4
-         +pnA==
-X-Gm-Message-State: APuU4Z/Efx4QbPFyIuroAWpjN09pe2U9SsILHKGHWUD4ZSg3JhS2Lytu
-	lXbAUA/KsJoIi7pe9v2U4GVb2G76uM/b0rVlwWjBk1QdIUJiAP+444I6cUxFaw==
-X-Gm-Gg: AYBFou2ZRUJCLp8nrk1rypazPYlxcGcdc0Q7AJJG2W7vVCEEZpc72d0jDe1qJSmMBF7
-	yY2kd8/qeGkwAwU1ttCLVQdxvx6Z5B6dPOdrf5DjlMcMwlwhV5bZGPme2kAHkrj778sIcgpbq+T
-	4RC22vf6ZMsy6h623aP36k5M8S6c5OyhOJTquBjfjDBT8OeiGK+jk2aQ5RJBoeFbSk8gkS7jHDV
-	p5lvjOGmMULJkIAvWX1kJ4nK+rrofM0uyCDiVlF9EszXfabZIDUrDyt4Azu62vjWV4m8LPOcFTI
-	fDECGwpNLR8fEiFWuYWdICPMcyRbXTvuhIVBQ2XZ5AXDSsV0Eku4FtMHB8KL0ICsir2mUyL2r6+
-	D8BKfffj7xgwWBfwOx8ebO4WlfdflO/bBLlILu5dQdiR5OhuOqWmkbAVCqv7dETqRyuwK41WbDN
-	JhI3lfrvOrGf/WVQUzFvh1zAfe0hOAPZER5H+g/DJVLhhGRfpr0KQI/ujrRX00nQ2qjS0FdYrHi
-	LnSCvfel7gDLMl7gZn8FTlK877wl4FMuLh/f71aoVPzaWZqCvCjidCpPbDVVoJ8Ug==
-X-Received: by 2002:a05:701b:4205:20b0:1b5:32d6:677f with SMTP id a92af1059eb24-1b5568eeb95mr287779c88.34.1795109850898;
-        Thu, 19 Nov 2026 09:37:30 -0800 (PST)
-Received: from [172.17.0.2] ([172.184.211.120])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b55681301asm636904c88.8.2026.11.19.09.37.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 09:37:30 -0800 (PST)
-Message-ID: <6aff33da.45417901.4f93f.c85d@mx.google.com>
-Date: Thu, 19 Nov 2026 09:37:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8398108555322125880=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=IF8lwhh8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795110058; x=1826646058;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j93Z+eMlc/xmvw5eUjDrqzBwzELkcUsOrQZjfY3+Ppw=;
+  b=IF8lwhh8ZbYcf4Ym5jOF5PSS0xdtg+rSaW2O37AlcTvd84zFfkVd5Tia
+   VYIprV//wmV/yRsJBClEAXLiaC4gZelTMv5hOUzrRouqhg2FpVNWVB6eY
+   azXjB/s/UX/mNFtPtVQMdwzro+FbhnGGfVuF+u9wDlLKuU5ZWdMOgHgXv
+   w0PsNW8uupbThZLseV+di0hZRBySBLoGl68iEgFWlOksMCWf4lXfxKeQb
+   3jyZWEm4u9/MtRwNVDHlXPiBY+ikXAScnzFBPgjGQT1T2mQlDS55ERP87
+   MwDYuDttNhPt+ENhDzHdMljcQM+BGAg0doM9+Zf6kBru3f3XRtKzi5wxL
+   A==;
+X-CSE-ConnectionGUID: KrDhZb+rSWKfLZ0bNaU+Jg==
+X-CSE-MsgGUID: yZ5bJfhuRRWxKGujXRTMeQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11971"; a="3818636"
+X-IronPort-AV: E=Sophos;i="6.27,221,1787036400"; 
+   d="scan'208";a="3818636"
+Received: from fmviesa013.fm.intel.com ([10.60.135.153])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2026 09:40:58 -0800
+X-CSE-ConnectionGUID: I5edCf7YTwWhUBEM3jVaUQ==
+X-CSE-MsgGUID: jIUMwZHUT5ikwN297lGpGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,221,1787036400"; 
+   d="scan'208";a="12453014"
+Received: from weba0957.iind.intel.com (HELO WEBA0932.iind.intel.com) ([10.224.186.34])
+  by fmviesa013.fm.intel.com with ESMTP; 19 Nov 2026 09:40:57 -0800
+From: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	kiran.k@intel.com,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+Subject: [PATCH v7 1/2] Bluetooth: btintel: Add TOP silent reset hooks
+Date: Thu, 19 Nov 2026 23:10:12 +0530
+Message-ID: <20261119174014.3355314-1-chandrashekar.devegowda@intel.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,51 +78,111 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, enderaoelyther@gmail.com
-Subject: RE: Bluetooth: MGMT: Retain the selected legacy advertising schedule ID
-In-Reply-To: <20261119112359.34543-1-enderaoelyther@gmail.com>
-References: <20261119112359.34543-1-enderaoelyther@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8398108555322125880==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add an INTEL_TOP_RESET flag so btintel_boot() returns -ECANCELED and
+the transport can run its own TOP silent reset instead of the Intel
+soft reset. Cache boot_addr in struct btintel_data for the replay.
 
-This is automated email and please do not reply to this email!
+No functional change on its own.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1216056/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.65 seconds
-VerifyFixes                   PASS      0.07 seconds
-VerifySignedoff               PASS      0.07 seconds
-GitLint                       PASS      0.24 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      33.30 seconds
-CheckAllWarning               PASS      37.87 seconds
-CheckSparse                   PASS      39.81 seconds
-BuildKernel32                 PASS      32.23 seconds
-CheckKernelLLVM               PASS      34.75 seconds
-TestRunnerSetup               PASS      785.31 seconds
-TestRunner_mgmt-tester        PASS      89.71 seconds
-TestRunner_mesh-tester        PASS      5.51 seconds
-IncrementalBuild              PASS      30.63 seconds
-
-
-
-https://github.com/bluez/bluetooth-next/pull/1159
-
+Signed-off-by: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 28 ++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  2 ++
+ 2 files changed, 30 insertions(+)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 15c00d833f27..ea8ca4b95d95 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1313,6 +1313,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ {
+ 	const u8 *fw_ptr;
+ 
++	if (hdev->bus == HCI_PCI) {
++		struct btintel_data *data = hci_get_priv(hdev);
++
++		data->boot_addr = 0;
++	}
++
+ 	fw_ptr = fw->data;
+ 
+ 	while (fw_ptr - fw->data < fw->size) {
+@@ -1330,6 +1336,12 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ 
+ 			*boot_addr = le32_to_cpu(params->boot_addr);
+ 
++			if (hdev->bus == HCI_PCI) {
++				struct btintel_data *data = hci_get_priv(hdev);
++
++				data->boot_addr = *boot_addr;
++			}
++
+ 			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+ 
+ 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+@@ -2138,6 +2150,13 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ 	ktime_t calltime;
+ 	int err;
+ 
++	/* Let the transport replace the Intel soft reset for a TOP reset */
++	if (hdev->bus == HCI_PCI &&
++	    btintel_test_flag(hdev, INTEL_TOP_RESET)) {
++		bt_dev_info(hdev, "TOP reset pending, skipping Intel soft reset");
++		return -ECANCELED;
++	}
++
+ 	calltime = ktime_get();
+ 
+ 	btintel_set_flag(hdev, INTEL_BOOTING);
+@@ -3908,6 +3927,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	struct intel_version_tlv new_ver;
+ 	struct btintel_data *data = hci_get_priv(hdev);
+ 	u8 hw_variant = INTEL_HW_VARIANT(ver->cnvi_bt);
++	bool top_reset = btintel_test_flag(hdev, INTEL_TOP_RESET);
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+@@ -3924,10 +3944,18 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	for (int i = 0; i < __INTEL_NUM_FLAGS; i++)
+ 		btintel_clear_flag(hdev, i);
+ 
++	if (top_reset)
++		btintel_set_flag(hdev, INTEL_TOP_RESET);
++
+ 	btintel_set_flag(hdev, INTEL_BOOTLOADER);
+ 
+ 	data->unlocker = false;
+ 
++	if (top_reset && ver->img_type == BTINTEL_IMG_OP) {
++		bt_dev_err(hdev, "TOP reset requested on operational image");
++		return -EALREADY;
++	}
++
+ 	/* Legacy unlocker flow (BlazarI / BlazarIW / BlazarU / Gale Peak):
+ 	 * Boot ROM -> unlocker.sfi -> IML -> OPFW
+ 	 *
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 372c6d7d8cbe..a59d642f096e 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -260,6 +260,7 @@ enum {
+ 	INTEL_ACPI_RESET_ACTIVE,
+ 	INTEL_WAIT_FOR_D0,
+ 	INTEL_UNLOCKER_LOADED,
++	INTEL_TOP_RESET,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+@@ -268,6 +269,7 @@ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
+ 	int (*acpi_reset_method)(struct hci_dev *hdev);
+ 	u32 cnvi_bt;
++	u32 boot_addr;
+ 	bool	unlocker;
+ };
+ 
+-- 
+2.43.0
 
---===============8398108555322125880==--
