@@ -1,92 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795048374;
-	b=sdV66CdbsecOoUsqzuS51Zj2ujk1r553Wu8GkvT3PEhjUUTZEC+CBBPHsbouQds6Iaag
-	 2NFMbn5Resq0smq4UPRpeNcZHUxAq3x7z0o8WvZUfzNfH7mFAVD4h6qrpiBxiLXxJLyL0
-	 gJ81AO2Cz0ONpCcpaTmZDm5aQYTWMQ83maxWaMvADIvmyUVV5JKvWo3oL+l3EMLC9ynHh
-	 7BYgE8GZ0LR9dQPfqJ2Nvypi2aNRgPXvvVBEQM5EBerQNnEuWjw9bqLxyKK5ONnhNOZJ2
-	 PYDVi/4vOiGPO5sn7g4V7fdflWNoBhR5qU6yH8n1CYVxlDVNmhonK+ac1s+rHuK0ZKw==
+	b=EPGC563Evd+clHB9kjU8ftTrUbbP//S1oGnONb5G31t8HmBbxRN6HVmoBIGvMD2Thl1R
+	 7qsfeXt2jcuSGcxGpaFbZPyM6ZNcSr8fwjqYbIogSFrfnpc/vRj4xMLl3sDy7n6fvJokR
+	 Ns3M75FcGHhw5drWGkSS7GvEv4U1YTTqcITL8950hwxYlFaEMkBIovP6FoxFqeeBCcLzz
+	 Z5A6nlJkk97vfTkr8wwERL3VhsMSOycHQEZP1K60KsK9DcD5jHZ41Scs4WNISIINDdeao
+	 6pTBxFrrwBsnrMhjpcx9no7dANgdgHRlKVINKTxuRneZNrUoX/dZFSM5ARD+yun2rEA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795048374;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
-	b=DgunNlMlGSgGYpOm2a/BdmRLBRhpSnewIucFVHXoKTl6fauV6aJ3HNRK2g2X+2eEjab+
-	 xBPFDRYaL2doUWD7txpiSUiSSGH0Iiw7zzcnzRomlSwkzSrgfm9/YBMZrMUAte+fAyfaJ
-	 4Aj2qC+E9RiNHZ41W+cSelkvpTOkXagQ4UxBZ2QJ/rvgtrn4Q30+6I4LBtEb6SnmY7im/
-	 bTXJ3JPI7q//osXjdeIIDn/7diCn/gwQr6gEaJjubjlBbkop6lsn0T1fpYbFXJrZ8BypW
-	 DSBQ15+5zbnXSTio9rn7l4eRHzCaRKnn9XHnCuCk0P58mF4SQUC+0M13pzUUyeYR9lQ==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=rffgUGkVHnEqpaThmuNJhXv5TM/nY+7d/A13Ey88Qs4=;
+	b=HnRleEB18l1xJtvNSHv2VMMUMQpqw/ptYDQ4H6j3Z1Jn1lqTroEx6PsV1ee6yKsxrAsK
+	 iomdcqFddqZBXx3qsxvQJ06vKHpiFFvdUgoIUgzTXpsydH5JIdNtIGzmQM0Qj8do4tRZy
+	 IqI8+wdfpeU3sdOlSp+7Kgp9Z4jFHPtlVfCnubaZnRgOAVmFTfafqhWP6CuCcTHwUcTBo
+	 zjNq0i8Z2MtVkAhIi0f6edr32lDaFJlS810JETVbNANzNdmVMwY3yc9yLPs1y9QNnar+P
+	 gBGAwXOR5MfbHJ0SN/G/gwaxRPsOEblyYWDmUy7w4Awdbkw3weVSYt9Rb48WnBbp4rA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OnEZLQvm;
-	arc=none smtp.remote-ip=209.85.210.175
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nBSNWY2z;
+	arc=none smtp.remote-ip=209.85.216.41
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9846606A33B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0291606A32C
 	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 00:32:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C9846606A33B
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0291606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OnEZLQvm
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8a05b210703so983274b3a.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=nBSNWY2z
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3adac5b29ebso1055021a91.2
         for <linux-bluetooth@vger.kernel.org>; Wed, 18 Nov 2026 16:32:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795048373; x=1795653173; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
-        b=OnEZLQvmypkXI0fCPVOTYeVsYe04BE/wZwfijxBKm+wf1XTpsWoFLSKyn1/ECm9RIm
-         74s8mPa+jbznMVZnl+MXtFrnPBozlh0sslG/hB8csWVv1e7metma2CCxtnkA+a3IXxTe
-         kEVIqFsqexO1tep/NN0wCuNj2zDI/aBDiRRIBUCXFBpMz5reJ4/z3SClxaZ0opV6/uLT
-         CAPXSxGIVG1KskfhzRv2mhZdkxLlAoMgvKalYm3b1JQ/ZrZg2E/FFVyNoSf6ltwVolyz
-         YY94U2woXU6syO7BzHGFt2AtxrMWcfPmMntPz5SlBqSNyrxfvmKNDXmTqwS+Q8RKdpWd
-         u1eg==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=rffgUGkVHnEqpaThmuNJhXv5TM/nY+7d/A13Ey88Qs4=;
+        b=nBSNWY2zC9vTGG0tKos2I67rOPSgYRC47kUdOyEXf+eClZlmWe54juBZsz8zFLwQOs
+         BLKFIpcfBkL6bH9Yyfo2n9Gl9McPoGkAJXiHpkRDQjfFLJDG/46gdj+JOlmVNNEvGaKx
+         MSq3wiKyOV97DIcxFTyd2ZQ6VUu9GN8O0GB7494gruztfiQihfEp2fI+wr9uC6AYwLGC
+         FXR5Eee4dgH1L6ODs9B7fMBRHxcDUaYiWpVkAiSutF5zIERy8rm2uGyY5ah/modo+bRD
+         bNv4+O3YlUVMzbX38xHxfJ79kAEKEgjutHzhBJ0UcJB48qn3uH9yYV0M7OWR138t7Kro
+         XebA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795048373; x=1795653173;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=HnRk3fx7u+jQY8R+1pp+cMuEBmrZFokwGNCM6chCNnE=;
-        b=aizcgkyOP7/1Z0N0XiEgpffDyLduu4hNZvmXv71NLfcUIIj5h9vY1ceGcVgepvTXae
-         lsegqvW4R8jl/3+Ghkhbc2Os6wkERYr9aiizwvGlZmJEG7uGOq+agRtBS5UKvRqpbbNZ
-         DfcNAF2EKNiKsETFl/W6nO31/Shs/r4Cz48bIPNRad2/HWWl24YRrWyCM6nwbr7JICFd
-         TW5vKiv9JjE6vqQa913SVdnmQ7CvRARIndoIWQLxloQbIzkpNeFWFE8tAFcfqayFr4YK
-         SO7yk+JBsSN5jKudwgr4OIV7zm9dI0upqqy7PNqwnZbttj522ijvhlyKcEevTfnWuHE9
-         40Ig==
-X-Gm-Message-State: APuU4Z9yF0ObjQbm7ht46+q/nEZFQhgG23yKvSf+Wf4tlML89IxSRDPo
-	oXyzYjxJeGOIoXKDxxBEtTQliez6RGExahx5wOILq9Vw7cHe5uKX5zIc
-X-Gm-Gg: AYBFou1KMqRLcGbLv9Jplx/A+00sIR68deeBADBd4wodxiofyPVNmZkcXKcH3rWr4NQ
-	NhsjXNQMElFkn6z4pONOxgoIdlbMEKXGyIN3eDuL60Z8Vj4aCBoCxNJEHDdXQf6L1pvLa+blJQQ
-	qTKhIWtPb7+ad3TixscTXD+Y/vX0l56ambDX23DRCycnC5Fs2lUj1A/EwiCZxR5dhWqCNfVTkK/
-	lq/Nx36b53GBFf29DJv3QM/uioXsd4q6MjDs8T2sDFCsaA99kgQdhS7kzYRS0QIuT1JGom54Sup
-	wzTfr4XjqjdrEumRC/LZ/73rQVSpDt4uMCn5mKJAjUxoSHHTlEAKRF2+uJ7mU8JqteFWHE200KI
-	rBCcNNlQrD6xPfqa6qWSn+gYj7NKy/Wy7fM9gP5Md9NDvxcIH/CKt5xlKfmp6TW574HdN73e0hu
-	hXASvJELX6Lb1PiPbM9yYt7vZPK/CqdsFyKRj5lUGDLOWQRO0SGW8P4OG9//1FBBpx7XpjD0bq9
-	GeICg72SompKzeR8ZIsESyfr+K29WHC0iSS0LnvS2RadFaoZr9Ou6Iu+72Q6niYxbJUXORKa0O8
-	JvG1Sfa4/3g7lpFCCUGoRExdrg==
-X-Received: by 2002:a05:6a21:71c1:b0:3f9:bfa2:6067 with SMTP id adf61e73a8af0-3fe970faf9fmr3662178637.21.1795048373034;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=rffgUGkVHnEqpaThmuNJhXv5TM/nY+7d/A13Ey88Qs4=;
+        b=tOAnbsAKuPQ6ZeZs1ZG/gdimgJMcNv9Xi8wOGg+rBRBrC0yiIPgl7y/VQ9wlNHVqV9
+         flk/MzT7vJHw0O1slKMPTbUk+XYLkItLKIrv8knnJhkhcAggKnJMp2p8GkYPzlgmi0lk
+         //GlLb86MW9EEKqEs/V7JVklcJatC1p0mPn2QrMIfimImXA80Jzwhz9Exw3Hyp8A9eWC
+         ZJXUC/o94BoSZ33CfyPZzn/VuybyxCB0f7RijIyb9lYIwDUyRYhIgEy6H9mp0TKdCFB0
+         xq+63fmmkrcFchkblh37dYXly1nW3hoplkczVZOTfiAgqjIWo84RxKulLFhtVzkrlTju
+         q6fQ==
+X-Gm-Message-State: APuU4Z/LgCzQY3q6+stYeh+c/ji28k3/nvxgOav3bO2vKCTTmVuY7+4o
+	HP9B+DNjxmFSCbfQqVtCnRkNG6EyRJD1Dk2owgctVceuCeA6xpml5KqwkMtiPw==
+X-Gm-Gg: AZFdTZfYvMrtqTKTJv8wo9FtyfH4WEVm978s+1uIjKzwgWUsdqwxsRlRl2qk2t7JY4w
+	fyb6AlqGZ3OKoEX09ELXZRUpYF3uKDGkbu0zSKI3IcZkNiOY/f6Gw4/3lNROPIHmgKwaxAbRQDu
+	GMgcjCd9f3t9SWiMQvjpQZe0swizDGrfcI5WlTcVIbamR+Tf7+h4+8E4gOAW6/W0ogsIaD95Nux
+	yeWLFdhI3+e1jpj5rD+HIRcu2DF1X8W46m9ZZ3jSTJ5/fFBHyA0qyu65n9AZV91CqxO2hO7mzJV
+	usFGONVvnJJAOEYdtIkfxTutxZ6oAzPxelwyvMlr1GUKzMuC9goiekfmxvdI+zbuW+IDfuAUkZN
+	pZawhAJGrYaqHQRvULZ/8EZBMej8jyGoaQXn6sv0dgwT75vjzs6TooOLU/CEXYB80lZII+PHq4M
+	1idaVAB0u/KwCmr+gOg7DsAdaiTIbEsF0m2BL2Ol5dg1W2Bc20zhDpzNL44bUIQlzfoUWAste3/
+	rGUMZzEXB1ayKK06pF/tjHvQFcYp6FRuRITaVU/DCP9s11N+qaAnwOrXiwXoRDbZcFO0xZHj8Kk
+	Z8fbsCsZylXYn1AN2O5fXh8SYca1fDnShBxTy/ZYM8k=
+X-Received: by 2002:a17:90b:4490:b0:3ad:c4e9:7beb with SMTP id 98e67ed59e1d1-3b3d07aab52mr4096283a91.43.1795048373240;
         Wed, 18 Nov 2026 16:32:53 -0800 (PST)
-Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c5cba3313dsm1975051b3a.53.2026.11.18.16.32.49
+Received: from [172.17.0.2] (ec2-3-42-157-127.us-west-2.compute.amazonaws.com. [3.42.157.127])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3fdefd78csm552335a91.7.2026.11.18.16.32.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 18 Nov 2026 16:32:52 -0800 (PST)
-From: Cen Zhang <zzzccc427@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	jjzuming@gmail.com,
-	zzzccc427@gmail.com
-Subject: [PATCH v2 0/2] Bluetooth: Fix advertising instance accesses without hdev->lock
-Date: Thu, 19 Nov 2026 08:32:44 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0245-v14-e37270232af59a877004-0@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Message-ID: <6afe43b4.9af75b30.4c355.8a9b@mx.google.com>
+Date: Wed, 18 Nov 2026 16:32:52 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5933365075326746141=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -96,53 +89,41 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, leon@kernel.org
+Subject: RE: driver core: Authorize device trust before driver binding
+In-Reply-To: <20261118-device-trust-core-v3-1-d655875c4bfb@nvidia.com>
+References: <20261118-device-trust-core-v3-1-d655875c4bfb@nvidia.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Snapshot advertising instance data under hdev->lock and keep instance
-numbers, rather than list pointers, while waiting for controller commands
-(patch 1). The resume and power-on walks use a 255-byte stack array in
-list order, covering every nonzero u8 instance ID without an allocation
-failure after the pause state has been consumed. Widen the timeout
-conversion before converting to 10 ms units and clamp to U16_MAX.
+--===============5933365075326746141==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Translate management instance numbers to controller handles in the
-remaining periodic advertising, BIG creation and advertising set
-transfer commands. For the shared handle 0, update the intended instance
-after the command succeeds, since the completion has no instance number
-(patch 2). The remove-set and random-address paths have already been
-fixed in the current tree and keep those implementations.
+This is an automated email and please do not reply to this email.
 
-The former patch 2, "Bluetooth: hci_core: Initialize advertising RPA work
-only once", is already applied upstream and is not included again.
+Dear Submitter,
 
-Validation: GCC modular and Clang built-in Bluetooth builds, including
-Clang context analysis; every prefix of both revised series and their
-combined tree build on bluetooth-next f42f5cae154b.
-No new kernel runtime test was run; the quoted report is from the earlier
-instrumented test kernel.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-I used Codex (OpenAI) to help write these patches.
+----- Output -----
 
-Cen Zhang (2):
-  Bluetooth: hci_sync: Fix remaining advertising instance UAFs
-  Bluetooth: hci_sync: Use controller handles for periodic advertising
+error: patch failed: include/linux/pci.h:616
+error: include/linux/pci.h: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
 
- net/bluetooth/hci_sync.c | 343 ++++++++++++++++++++++++++++++---------
- net/bluetooth/mgmt.c     |  34 +++-
- 2 files changed, 292 insertions(+), 85 deletions(-)
+Please resolve the issue and submit the patches again.
+
 
 ---
-Changes in v2:
-- Address the advertising snapshot allocation and timeout/handle concerns
-  raised by Sashiko:
-  https://netdev-ai.bots.linux.dev/sashiko/#/patchset/pm-bluetooth-objects-candidate-0245-v9-6b34bc036455ad3dd4ea-0%40gmail.com
-- Use a 255-byte stack array in list order, and widen and clamp the duration
-  conversion.
-- Add a separate periodic/BIG/transfer handle mapping fix; retain the
-  remove-set and random-address fixes already in next.
-- Drop the former patch 2, Initialize advertising RPA work only once,
-  because it is already applied upstream.
-- Rebase onto bluetooth-next f42f5cae154b; preserve the connection-work
-  shutdown changes.
+Regards,
+Linux Bluetooth
 
-Link to v1: https://lore.kernel.org/r/pm-bluetooth-objects-candidate-0245-v9-6b34bc036455ad3dd4ea-0@gmail.com
+
+--===============5933365075326746141==--
