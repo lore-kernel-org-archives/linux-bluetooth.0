@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795066526;
-	b=fpd0jR0fNHXbndXQcehmfTuC6vrDhl0QXC/Q+Z9ORl8y9ESucWmBfvm+MTt/PK+L/bfS
-	 9K46Z9wRrsoKGzyHDHhi/9Jg3W4pxsfqzVbRehgATFb8yhNa3cSzKl3ykFCpVZTWkHLpr
-	 QJjZQNkSPzV2uq9Un0x/zH5q7+8PzG15zOixraGJ13OvhPiwAZB14BWUhoBW/SF+qOnic
-	 VNthX6f9T/zwZGx72j7b4Uw29xw79uG4YhXxKAMPpcabfLFVhihoMeh9YP9zH9QmKuXtD
-	 AbXVdIhvpfue5ecdi3Y7gPBZp2snnwZnNM086B3d5Waim48zfyWAH4Lr4jvGLbO9qjA==
+	t=1795066542;
+	b=BwByheFMDvaS2Cktz+MvwZbQGrGHalRVyyIU1wfloRZlRyod8TPJmodW/53J/eSoC13v
+	 BCydqa1G417K6hlWXXxdNw+tvMdUzZxTfqg5s3AtioKV8YQRLbIpRRsozhHGx2LA198k3
+	 astLzjElxFLn2Uy30DBUujeiT3Oq12fpBcgtMCzBqoI14dulFYSTBxEOGu+pxJ7ol+BOU
+	 OHHMMitskqSSmszALgUJHtH9ZLf5HKeipwq86F+W94SwiNCX36guhk+jbFs9wyStHkt7n
+	 BanlyPaq2XCsgBbCb2ausiqK96fMKPHq5gFLbvQfLYeSboAq2RayHdB9gPNgU5JigNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795066526;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795066542;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=z46ZwabXBcpTEJRysA4syBAZyQggGPY6SIVcMl/gSzA=;
-	b=AtnL78Xjrzq+kkrR7Es7A31LHLmD7mt5Wn08yant/TuBz8x9j3H2UkFvvnQbujrQlW2Y
-	 4XWYg+zMempKB4x7ol2N37Go6+ZLpvFu5E0rvZ7Me5Q+LOQtUKvvJtI1HPiyMuwe7lJEN
-	 JxxrKqFqN/AROQYKrLVwgTJfGTsXKhcGGiPziDOYtGvC9yX6pPKfH8ZZvXOVB6YMCnSrj
-	 y5EgCq04i/ZNLu9PMCnhtaFJ1diUkVb1tvuzDNbAaR1ubWv/S8geEqIBi/nZU7oPEgo2a
-	 gI+T66/kE9V9fxmeoEeZ0MsR/bZHTFbG7fIzLN14Il9xPq1VQCdFLCDdNM+ZMwT0yJw==
+	bh=4HnqDLCNCiAOQ9sq1Q6ULWGj/wzn4gKYXx5Raw5Q7fU=;
+	b=a/h53YNX3gyhNqOyi6KowFGn5/VJWmMnBMgKkxUJgsMmLXb+eOD4RftI9Up43kmXWFGk
+	 cFxROlipol3d0G6Wqqm5JkOIynII9hVJnSilDenXTJpjX/i0UdJiTBvtC+P58jWSww4JX
+	 Xzq5B4bQS4p61F5PWqPYf5mjrbcB94MI0dsCsXir83ZgcRKZ09RQi27lSbMTso5Ns1gTX
+	 vj8JwmKkWry2T1Yf1VSR1OOO/yMy/MmcpocNv6KUcAeeV1ePJ+4Q5JcLMWqWZmOExoRhM
+	 4IaG7dvlz6DyKOQS/+DROwsycIGaK9YvCebr0pTpgiBDP94MamP8mhIWlPKLwIULS0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=tZNGbQMb;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pfPcCYsQ;
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98812606A330;
-	Thu, 19 Nov 2026 05:35:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98812606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9431606CC69;
+	Thu, 19 Nov 2026 05:35:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9431606CC69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=tZNGbQMb
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=pfPcCYsQ
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=z46ZwabXBcpTEJRysA4syBAZyQggGPY6SIVcMl/gSzA=; b=tZNGbQMbkEBB3qnsfmrI0ak97e
-	GXxh5zYLcHrA7zzJrOQPdhV8uybDVtFAWYTrP+dt/z9kZiD41YJ2wTmXVlB8OYrmzf5wEwT37Km6a
-	bsmU2r2a+szwKja0pzLZGHDqbW+LwePYyxWY28VlKJW4IkKj5u6oq7VCuB7i2yoEQ6coDe9GcyFby
-	gmUkrTGRPw16swI5ikzHGUIbD/DQdgrEEfISwS/y2TJ9bAeOWAGvRZM46laKYkr4+h5q8QUSFOd1e
-	FNUYp/NsoT++jUBOGEPDm/c59sWmUx3tgkmaRELHsSyXx62CAagtXJ2Elyvg7quNk77tut/ToOd3p
-	hQQjF0qQ==;
+	bh=4HnqDLCNCiAOQ9sq1Q6ULWGj/wzn4gKYXx5Raw5Q7fU=; b=pfPcCYsQEwWHQjf5W29Fay/2Uv
+	UJCzM/N8GPrKSlfa0kFLlCQSAsxwysOlDXJuf47g1kmF+Z2a4A6aqLLaImJuq+Uw0Pr+eVVIL20WJ
+	0+QsE2toVIUeuAewEy/xGnT7NZ6A5Ekqo5aDPryoX6bp/PFb3d+d1wjBI+Wlyl30Pa2FKn+cnqbDv
+	4+km0I/8557GlM9yhg4WcFnQT9PDGri91LWN2jFxyHexdEYpPDz1TuclUwMaVWFLOsyTLkgl2Bs2+
+	gZQ+OUl6AGwuouyQ5KZhilUoxyrUBrMlpuvuiGEbOw7LPa0k+AQixDX+f23ld5jyeNVdBvzyUTiy3
+	LAKnDb0w==;
 Received: from [50.53.43.113] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xTunq-0000000Aufu-1tOB;
-	Thu, 19 Nov 2026 05:35:22 +0000
+	id 1xTuo9-0000000Aufu-0VZ6;
+	Thu, 19 Nov 2026 05:35:41 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
@@ -132,9 +132,9 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	Matthew Brost <matthew.brost@intel.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	intel-xe@lists.freedesktop.org
-Subject: [PATCH v2 01/12] docs: ioctl-number: update MM entries
-Date: Wed, 18 Nov 2026 21:35:02 -0800
-Message-ID: <20261119053514.255348-2-rdunlap@infradead.org>
+Subject: [PATCH v2 08/12] docs: ioctl-number: update USB entries
+Date: Wed, 18 Nov 2026 21:35:09 -0800
+Message-ID: <20261119053514.255348-9-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261119053514.255348-1-rdunlap@infradead.org>
 References: <20261119053514.255348-1-rdunlap@infradead.org>
@@ -149,7 +149,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add ioctl number entries for test_hmm_uapi and gup_test.
+Update the list of files where USB ioctls are defined.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
@@ -162,32 +162,33 @@ take all of these through the docs-next tree.]
 Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Shuah Khan <skhan@linuxfoundation.org>
 Cc: linux-doc@vger.kernel.org
-Cc: David Hildenbrand <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>
-Cc: linux-mm@kvack.org
+Cc: Neill Kapron <nkapron@google.com>
+Cc: Andrey Konovalov <andreyknvl@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-usb@vger.kernel.org
 
- Documentation/userspace-api/ioctl/ioctl-number.rst |    4 ++++
- 1 file changed, 4 insertions(+)
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
---- linux-next-20261111.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ linux-next-20261111/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -147,6 +147,8 @@ Code  Seq#    Include File
- 'G'   00-0F  xen/gntalloc.h, xen/gntdev.h                              conflict!
- 'H'   00-7F  linux/hiddev.h                                            conflict!
- 'H'   00-0F  linux/hidraw.h                                            conflict!
-+'H'   00-0F  lib/test_hmm_uapi.h                                       conflict!
-+                                                                       <mailto:linux-mm@kvack.org>
- 'H'   01     linux/mei.h                                               conflict!
- 'H'   02     linux/mei.h                                               conflict!
- 'H'   03     linux/mei.h                                               conflict!
-@@ -252,6 +254,8 @@ Code  Seq#    Include File
- 'f'   81-8F  linux/fsverity.h
- 'g'   00-0F  linux/usb/gadgetfs.h
+--- linux-next-20261116.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ linux-next-20261116/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -233,6 +233,9 @@ Code  Seq#    Include File
+ 'U'   00-EF  linux/usbdevice_fs.h
+ 'U'   C0-CF  drivers/bluetooth/hci_uart.h
+ 'U'   00     net/nfc/nci_core.h                                        conflict!
++'U'   00-0F  linux/usb/raw_gadget.h                                    conflict!
++'U'   01     linux/usb/g_uvc.h                                         conflict!
++'U'   64     drivers/usb/misc/usbtest.c                                conflict!
+ 'V'   all    linux/vt.h                                                conflict!
+ 'V'   all    linux/videodev2.h                                         conflict!
+ 'V'   C0     linux/ivtvfb.h                                            conflict!
+@@ -279,6 +282,9 @@ Code  Seq#    Include File
  'g'   20-2F  linux/usb/g_printer.h
-+'g'   01-0F  mm/gup_test.h                                             conflict!
-+                                                                       <mailto:linux-mm@kvack.org>
+ 'g'   01-0F  mm/gup_test.h                                             conflict!
+                                                                        <mailto:linux-mm@kvack.org>
++'g'   01-03  linux/usb/functionfs.h                                    conflict!
++      80-86
++'g'   41-42  linux/usb/g_hid.h
  'h'   00-7F                                                            conflict! Charon filesystem
                                                                         <mailto:zapman@interlan.net>
  'h'   00-1F  linux/hpet.h                                              conflict!
