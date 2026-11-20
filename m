@@ -1,93 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795189701;
-	b=owSeyqlh+mymVmj2t0siBTh1g9Pt0jehA+0Oe4EgqrazgOARDP1diTCWcNlAv4aS5Tt5
-	 9oDEjEaftY4N+HO5XprIZtrenOjc1QbCkLGi4oR7Y8AWrSiLpIdqZelsks+q6bQs/9qqn
-	 XpVfmGJVRfAMrMWSNIbmjFBqZlp3u38WwCUgzOyCGwWAJl2UV3PDGbxWB/RME8YNl4xaA
-	 jpr9NFSqwLN4qu2mqSTfKR5EPaqJDsZFAeGgcFfWbxD2Iowl4pvo+sPLCe9ydEJ1miFgR
-	 FLHOPhzn+43YQIz0pni68h+jM/4AwhgQW+rX/xAqQdsRDoR0If8PTveSKlXEknxvrlg==
+	t=1795193715;
+	b=TDZU7z4yrOlzdPMnE3KzI8loZ55mR+WbORb3adruMBCj7TEyF3U8jJCvU8LACA8unTiL
+	 tDQuxQQplrmW6VOTu+kSi17slXTXuShsSRw2CynnXa0WxruNmRxFktvdyNAcjSbHEXG2E
+	 CYdrkox7MXCMvFZPB04bSnguC0QErhc4I6X8/6opBHvYPKNqh6m0Tj4036zbxYE9Ya9va
+	 UFacaG0V/yZuF7jIgA+HHusFNJZhaOx0mHQHNIVPCOp7JnzsEa7JitRq0OkHi7g9ElCZ/
+	 /O93ZBOUrx9NS4/hNr98R2liLJ0oWh9KyLL8854BxdAM19ZhggvZERJ8IgHG+ManjZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795189701;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795193715;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=0u6vAxCXwuIQM4WwNEYl7bkzWCDOZvHT+QIhOY4Zyk0=;
-	b=CmkevzcitMtLkU+V/mn++ExNenJPL5jgEOO7aLgwNhoS0FrMzo+aL2N3ovWPiA1VsXsl
-	 wJ/JtfMYIDZbEhwfeARYMozXuHBcc1g36eKhExYc0bxOIAm9sTyw+JH4AZWf+EcTa55jS
-	 u28t1kcalwwEEoQZ4XdkvKQVbWHlTWWpk45EHY+812+KkxInLtE2Eu/nDbUtnyW7Iev/4
-	 kbp+cC0wh3mdxNOO2So0bCY3WDtVt4kvFcjViMEti0pHNKgL/ORB/g8mfKGHgs5tOOVfe
-	 dObqqXGWux1XVco4Yi1d9lo7pDYCSZ4YEwLiQeTGnrWRa8EtIG2PvwKflNQ2RwhWEAw==
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=ElO73yNjCIzAA6t3svuJRavPK3fg+4ryODBQrYhgIuM=;
+	b=mn7JDbwG15+Mm2eCUAKblH9FQvgyZdqljzPRKAlwHNPTgh0qCouwL4Swie+1+H46naLE
+	 0pE6O42eeGJHKP7BHfayBLUE9Vzdiwo49gjMwcqjGW22XALYgsmY2sxvZ+lsDu/l1hOTm
+	 vEwDJqgzZVj2rcwf5MNi+rFlrTYJoCQvNMDPv7nqlraoOetVxj1O9JH6LVWg87oDcxjMk
+	 uREcPbXWNsxIepDxuTy9DbF7yN/7Jjd1/snsN7SQfc7kGUBNy+t/L0DLpE1gfffX3QZjZ
+	 BRPyED76vyc+j+wJ99YVQsmuj3FBBSnuVJiNOo2TuZ4XO8BT2/vkza5OVQjGa0jc+dg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U7TYZj+l;
-	arc=none smtp.remote-ip=209.85.221.178
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="l3wov/tw";
+	arc=none smtp.remote-ip=209.85.222.50
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F3960A2608
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 15:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96F3960A2608
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C48C606A335
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 16:55:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C48C606A335
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U7TYZj+l
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5eac6c5f927so400985e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 07:48:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=l3wov/tw
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-99e0b348a05so325526241.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 08:55:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795189700; x=1795794500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=0u6vAxCXwuIQM4WwNEYl7bkzWCDOZvHT+QIhOY4Zyk0=;
-        b=U7TYZj+l9vbF0JzacRyu2YbmpxeBbikZ0ADT2e0Gz5XRWidM5e0YFJf8Oq06/k3oJu
-         Ux82q/JyE17Cwon/IHAlPh8lsDeW1KpX3+VaIaCArvSaV3mTbQ3H4Sd3FvbDCmsgCTQ3
-         zL2Uh5wckP+cqZ1bmcGEnNUzeQ42qURtP1cGx9215kqxXGZf0i4C6UqXLRhEl+8qHoU4
-         TpuVzFTC4n53wyZpBeJRcip5XGmAT48Xsmvrj4VyhtF858aPyP0xvDPFF4TALxqYY3aD
-         A2Xfqfz1srzYlAgDKtNemSiHfcnuC5rmdJ0PrHmRdEHREHPE1g7DeU7PB6SLnBNtDtCS
-         rvHg==
+        d=gmail.com; s=20260707; t=1795193713; x=1795798513; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ElO73yNjCIzAA6t3svuJRavPK3fg+4ryODBQrYhgIuM=;
+        b=l3wov/twgJAM3vkIo3r9gi8OkteC1bDl8mDiltog0ddlp14CT+EOo6jkk2JHjtxGBB
+         a1NF7bffl67PrtrxYUthX56a0axEKfNTJH1jsVjXBxjy8FqCoccO6XpssmQIM53radHl
+         umDbQB/KZlSOwTEpzdAZsj//Fu/ZievzqnrAoxv9BppH8Nb4jc/DZRxMWyz9SFMDvw8z
+         65noUxQN/ZiKffdp3WNka96LT/QUItGeyiiFwJvy/MPneWFonvMwxICWhc9l0Cw4+98E
+         llv7MioZ+35TAJ+SsTu9v6FuMR1HSHVJo2QscGatzalIE123m3kIQM8q7kBxdogzbG+X
+         ivhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795189700; x=1795794500;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=0u6vAxCXwuIQM4WwNEYl7bkzWCDOZvHT+QIhOY4Zyk0=;
-        b=YzhL+fk3VnLzTkJpdS220CwxpnAzjyOeIeTOMqFuZRehTH9eoWs3/C32hYMctu9sKp
-         idR/1t4RAlw8VhUUtN3qIMYMxV6FArMKpxA23wo+e2xgwsPRV9Vd+INEqDcupaDqDh6W
-         xrj7pB5QleqQzoZ6s1whtZo0enzz3RLz9IMiN/xqmy4lqyfNwDe4Xh+t51KL2iGLQXd3
-         RD5XisOCLsxgejZnnbYsiRWtROU9etc7+U59/NVQzDaFJ7hFwDnpqB0YeRhkVWbGZ6S6
-         NP35BPhOQNRmkZNsIqdwx/dWVb7xQlKZQfslyTRGXgZzeysy1uxZ+zvBYPCx31l4krUV
-         EMYQ==
-X-Gm-Message-State: APuU4Z91++Qbfmn+aTTo/xjG05vE62Fii3oa2PZ138FUox+Cpe9RLGuR
-	kuM/nG4wvPnHK57b/kJdVOe4EyKDjZgxlEZq8OPzQxg2hgRS4g1hrjJY2CqUAJQ8
-X-Gm-Gg: AZFdTZdl+HL2NKzZP+fZBfBv2TH0NNeoLXBTPhqNGs0CLDFsHdde3xU9xNI5V2DE+NE
-	sshf4llSnCPAG1mzTHMm4kJmT4scaZ5+hkbM6JLt2jYn9ugUDvsA5rNx7JerbkpDupRt+14gdHr
-	DU0oUqX2OUhv9W8lT2dUsJjKZsm1Llc7tErepaGSety1ifSMgHVKwi1+62gAXoJS0MNz024uyAg
-	z7a14IdYbQrApTolz3x/lorjtA+NILobwfbbmQVKaoK/3tn9lipQMhw7cYc5/RbiN4235Xk7Myc
-	47qr5/4V9LxsOX4um5/dQZcD5SIVfhwTqJTjTGJTYmbqGOdfFTQBowyAGS6ofPxP/bmEGRMDJtw
-	QeyPkhNw83xlpYtOEqwfwhLyMnSdZmc0PFBnulpAb7U7tBBw8oOAc17VvUo8dg7RLQfevOna6nU
-	ikfX6XZJEJPD6k96otTvg+CBDF+2Z5WTdhWWF6+GFB0EgMYQGaaA96R4m6lKwXu8O43q2jvsuQK
-	QGAvBAF1JVYh2963DNgoyrnQcAdQPDVHt0kqsTDCTIU31oek+IC6ppK8t7DZF0njprcXDhhrs4o
-	rywVKdY1EDvNpqYEQxg8eZU+cZTmfw2Xgv2sHXNKLtMTnaEsFPn9CmVUNoXM4xMSV26zkafsFga
-	1HsFx1pLKnK6bN8pVzQ4scg3f2YcHyKlBvviFNBhwFHSti/1CXUpJle2oCrYfqt7BJySs51F0dv
-	ArS+Z2KMm3e3VaYu6ZJ6q4DT/m
-X-Received: by 2002:a05:6123:10b:b0:5ea:c6c1:8dd4 with SMTP id 71dfb90a1353d-5ee8aea6de3mr1880901e0c.5.1795189700472;
-        Fri, 20 Nov 2026 07:48:20 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795193713; x=1795798513;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ElO73yNjCIzAA6t3svuJRavPK3fg+4ryODBQrYhgIuM=;
+        b=XiVRl7/Fz4LR4w6RQ2/EKV0dql7HaGisuWyvd5wzB6mxEy94HyuuT2VcGdtKxcugBW
+         L9wggWRPPr1JZyTFmg3VRhMUxSQoP49MZXn6jAYA51t4EbPPVLhdIJmN+Us/n5jeIxgE
+         dsEBP9U/8bVVCaaaxYEXBxiPBsAbVnvOYYTXHYoqj6eVXGwguRzRrQ0zCZdi+XFaSG54
+         p10Ao9NJ1m7mM76YopZ4esHbQBMrpC2nQucod2kRlbUJW2UVHIt7CK9lp7SFfgj8wrpg
+         eDVBF2El//MTkkgra8WaLjaUt9WPcOtC8HluO98e3hQbiVub2iADxNNBLoKpaYEF3Tjr
+         Es0w==
+X-Gm-Message-State: APuU4Z/pVxnCF1x0KY++VAFY/Pzrberdismu3bFhpf0vkoNeKQOI+iWn
+	qTaYHCj2pmqGeZqqMviPTopew+3/Auq3fbiR5SzLGpObHiyqQs/hR1evrvMLa0NN
+X-Gm-Gg: AZFdTZdwG9XltXvTko9iyuk7PSHaDaD1qthm1WcXrEDLgzPAi6B7o514ibXzm5mgcbM
+	LN0FOwLR7aJJfBymIp4UXWWNX3axT59CuUbJQM7nrzLfX+xLtVzrn3EpKwsBJSOgjz6IVoI8Q5E
+	bLpNGSz9CXemi/JwtuFideJ182joUpeY882aUjykOTzR5wcYrvEsCxn6OZwG6PlHEfekr8fCKOD
+	TjHstLkP2phEiJE4ZmMvI1d+B1UUpegsYJN7vmzgP+rfTRhbrTnTC0z9/zrMW/YzE9rncu0TJMX
+	tsT58FFId9slCPCcAIR+D6r2awL2IGugBCJNuEZx5nrxkZepwDhjtF3jlTjuCDLclXqFtRWS7sq
+	m/5noffvUOtgRlGuT+Inp2uZXvmZQGAwBQ56Uo/5oiHjqj1AlwbyfhRJvRjjC1M3AgGqLpZCaIm
+	yliX4i5Eh4oRrZEieud2ehxii71p9liXi2DHqH+8Zl0/yLjNHFsJae29/bCyg4NQwmA9EQZ35PR
+	UZbPOKjVxKNQ3Z1m289xjUDDJYAs332X5MmDdP/MQRKQ0mRwJ9AV1X1LUcLLJ5GyDgwej1tHWCo
+	vED9i5dogfDKMNAqsFu7+ohI2uwWledgkWESXujwJ6bP35hT8+1d0jcqml7tv34dv/dPKC7J/Z/
+	ojVKYjNQD7wqoKk3FKReblnF8w9awqBchShfmjfK/x7sqefzuwa5c6LQ6v6EM4qrvhLIJzYgO8H
+	xy1rU=
+X-Received: by 2002:a05:6102:448b:b0:7cb:288a:b66d with SMTP id ada2fe7eead31-7d739424abemr1721011137.20.1795193712972;
+        Fri, 20 Nov 2026 08:55:12 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b555137sm2830847e0c.3.2026.11.20.07.48.19
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99e6df8a28dsm3486193241.4.2026.11.20.08.55.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 07:48:20 -0800 (PST)
+        Fri, 20 Nov 2026 08:55:12 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/2] Bluetooth: L2CAP: Don't offer deferred channels before security is met
-Date: Fri, 20 Nov 2026 10:48:16 -0500
-Message-ID: <20261120154816.1745952-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 00/18] Channel Sounding and RAP fixes
+Date: Fri, 20 Nov 2026 11:54:50 -0500
+Message-ID: <20261120165510.1858959-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261120154816.1745952-1-luiz.dentz@gmail.com>
-References: <20261120154816.1745952-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,89 +97,94 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-A BR/EDR channel is moved to BT_CONNECT2 as soon as the connection
-request is answered as pending, no matter if it is waiting for the
-information exchange, for the link security or for userspace to
-authorize it, and the socket state follows the channel state.
+This series fixes the Ranging Profile Requester and Reflector setup
+and RAS server issues found while running the RAP and RAS PTS tests
+(Channel Sounding with a Reflector, peer-created configurations,
+Ranging Data subscriptions, per-connection Ranging Counters), plus a
+GATT database CCC state leak and a use-after-free in bluetoothctl.
 
-bt_accept_poll() assumes that a child in BT_CONNECT2 of a listener
-using BT_DEFER_SETUP is waiting to be authorized, and
-bt_accept_dequeue() returns any child of such a listener, so although
-the listener is only notified once the security is met, a listener
-that doesn't wait for it can accept() the child and then authorize it
-with recvmsg() while authentication is still pending.
-l2cap_sock_defer() then moves the channel to BT_CONFIG and responds
-with L2CAP_CR_SUCCESS, and if authentication fails afterwards the
-channel is left open since l2cap_security_cfm() doesn't close channels
-in BT_CONFIG.
+v4:
+- profiles/ranging: filter Procedure Enable Complete by connection and
+  decode event handles before the lookup (also big-endian hosts).
+- profiles/ranging: use the config ID chosen by the peer and clear the
+  role, pending Security Enable and procedure when it is removed.
+- profiles/ranging: serialize restarts with a session generation and by
+  recognizing the report of a disable sent before the restart.
+- profiles/ranging: honor the stopped session for Config Complete and
+  Procedure Enable Complete, and defer procedure setup until both
+  capability reads are in.
+- profiles/ranging: stop a running Reflector procedure by removing the
+  configuration, decide Reflector sessions from the negotiated role,
+  ignore duration for Reflector and clean up on every way a session ends.
+- shared/rap: wait for the RAS Features read before picking a mode, keep
+  an explicit Disabled mode, retry rejected CCCD writes and arm the
+  Real-time timeout when it is enabled mid-procedure.
+- unit/test-rap: tests for the shared/rap changes.
 
-Fix this by only moving the socket to BT_CONNECT2 when the channel is
-offered to the listener with l2cap_sock_defer_cb(), which is only
-called once the security is met, and by only letting accept() return a
-child of a listener using BT_DEFER_SETUP once it is in BT_CONNECT2, as
-bt_accept_poll() does. The child stays in the accept queue so the
-backlog limit and the cleanup done when the listener is closed are not
-affected.
+v3:
+- gatt-database: ignore device removal when the adapter has no GATT
+  database (non-LE controllers).
+- profiles/ranging: end an armed Reflector session when the remote
+  procedure stops, so bluetoothctl and the daemon agree on the session.
+- profiles/ranging: ignore Remote FAE completions of other links.
+- profiles/ranging: also handle Encryption Change v2 and v3 events when
+  deferring CS Security Enable.
+- profiles/ranging: keep the setup state of a configuration the peer
+  created before StartMeasurement() instead of resetting it to INIT.
 
-Fixes: f66dc81f44d9 ("Bluetooth: Add support for deferring L2CAP connection setup")
-Assisted-by: OpenCode:claude-fable-5.2
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
-v3: Only let accept() return children in BT_CONNECT2, as
-    bt_accept_poll() does, instead of only skipping the ones in
-    BT_OPEN.
-v2: New patch.
----
- net/bluetooth/af_bluetooth.c |  6 +++++-
- net/bluetooth/l2cap_sock.c   | 10 +++++++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
+v2:
+- gatt-database: clear the cached state of both bearers of a dual-mode
+  device when it is removed.
+- shared/rap: keep the Ranging Data Ready and Overwritten counters per
+  connection instead of resetting the adapter-wide state on detach.
+- profiles/ranging: exclude armed Reflector sessions from the Active
+  property.
+- profiles/ranging: ignore Remote Supported Capabilities of unmapped
+  handles, so one link cannot overwrite another's antenna limits.
+- profiles/ranging: enter CS_STATE_INIT before the asynchronous
+  capability reads, so a peer-created configuration is not rewound.
+- unit/test-rap: add tests for the Requester Ranging Data subscriptions,
+  the Real-time timeout and the per-connection counters.
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 7758e9ea3848..103d61d13fbf 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -330,8 +330,12 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 			continue;
- 		}
- 
-+		/* With deferred setup only a child in BT_CONNECT2 has been
-+		 * offered to the listener, see bt_accept_poll().
-+		 */
- 		if (sk->sk_state == BT_CONNECTED || !newsock ||
--		    test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags)) {
-+		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
-+		     sk->sk_state == BT_CONNECT2)) {
- 			bt_accept_unlink(sk);
- 			if (newsock)
- 				sock_graft(sk, newsock);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index d5663a4642a9..57ada00f76eb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1812,7 +1812,13 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
- 
- 	lock_sock(sk);
- 
--	sk->sk_state = state;
-+	/* BT_CONNECT2 also covers a channel still waiting for the information
-+	 * exchange or link security. Only l2cap_sock_defer_cb() moves the
-+	 * socket to BT_CONNECT2, once the channel can be offered to the
-+	 * listener.
-+	 */
-+	if (state != BT_CONNECT2)
-+		sk->sk_state = state;
- 
- 	if (err)
- 		sk->sk_err = err;
-@@ -1880,6 +1886,8 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- 
- 	lock_sock(sk);
- 
-+	sk->sk_state = BT_CONNECT2;
-+
- 	parent = bt_sk(sk)->parent;
- 	if (parent)
- 		parent->sk_data_ready(parent);
+Cheng Jiang (15):
+  gatt-database: Drop stale device state for removed bonds
+  shared/rap: Reset the readable Ranging Counters per connection
+  shared/rap: Subscribe on-demand data with the requested transport
+  shared/rap: Subscribe to Ranging Data when a measurement starts
+  client/cs: Fix use-after-free in stop_measurement_reply
+  shared/hci: Look up the connection handle on the right link
+  profiles/ranging: Let the Reflector run the CS setup phase
+  profiles/ranging: Let StartMeasurement() pick the Initiator for Both
+  profiles/ranging: Take the CS role from Config Complete
+  profiles/ranging: Act on a CS configuration created by the peer
+  profiles/ranging: Keep a peer-driven setup from being rewound
+  profiles/ranging: Defer CS Security Enable until the link is encrypted
+  profiles/ranging: Choose the CS antenna configuration from both ends
+  profiles/ranging: Do not start a procedure after StopMeasurement()
+  shared/rap: Start the Real-time timeout when the procedure starts
+
+Luiz Augusto von Dentz (3):
+  profiles/ranging: Keep CS sessions apart from stale and unrelated
+    events
+  unit/test-rap: Add tests for Ranging Data subscription and counters
+  shared/rap: Defer Ranging Data mode selection until Features is read
+
+ client/cs.c                        |  40 +-
+ doc/org.bluez.ChannelSounding1.rst |  25 +-
+ lib/bluetooth/hci.h                |   1 +
+ profiles/ranging/rap.c             |  90 +++-
+ profiles/ranging/rap_hci.c         | 721 +++++++++++++++++++++++------
+ src/device.c                       |   3 +
+ src/gatt-database.c                |  34 ++
+ src/gatt-database.h                |   2 +
+ src/shared/hci.c                   |  12 +-
+ src/shared/hci.h                   |   2 +-
+ src/shared/rap.c                   | 190 +++++++-
+ src/shared/rap.h                   |  11 +-
+ tools/hcitool.c                    |   3 -
+ unit/test-rap.c                    | 604 ++++++++++++++++++++++--
+ 14 files changed, 1485 insertions(+), 253 deletions(-)
+
 -- 
 2.56.0
 
