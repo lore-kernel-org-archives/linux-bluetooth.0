@@ -1,85 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.178
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795213928;
-	b=SVcMCSz8rG8lDSYAzoCt8gyCP02ep/2SLqbX+a5Y6aQXI4VML4AChGrCtiJu2HCGo2jt
-	 jtwA6Y2ymrh6WMQGX1rV0SbPkGUI3753dQq/4Vo7NXhM7VQMI8XosS1rVsieabQj4PtuT
-	 pIrBc0GSTYYptfMLDpyHuQreToBHVkP9Pd5XsLg4/sCnK5qkNmEanx9oHEhaK9mIkuv4F
-	 UrMIfur7OAhnJia3dwiOObdHsIJ9Ss98ojtbA4TLiz9ei6EF6/3hcfonYVJaFW/Rh8yvH
-	 BzBOMqIEnDNmBwh3DdjZ8qvAl9Bd29RsGwKRbSgDaDtEkACDAbr8yhJ8eTzNdQFBv6A==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795213928;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.50
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795214010;
+	b=sH5MIU1+0Q1Vicsq9D1XfDAiN2FwDkeRa+54XccBlZJIwqvTEXbF8t1SCn1K+su9pQF3
+	 0RU2/ztl1Iq0iERYpzKLKY0/mcQWKO6WhTKhGwbpzP+PlSHYWtyE4Cq8ANDxKKVQoeIfN
+	 +c/DNHqvFynV7EA14leOkgJVZkW+DxtF6sunmuGrfagLBhh3/9H2ru8qqwYuS9c/fjPEy
+	 RGXYsujaC7QRHCpD+jTeIykhbQhqizSgzVGNMal3ZpzDviJQxUKaMBJE+gHRFpEx4A1+a
+	 k6RzigmRnNZmwIvdglLTJeOzdkYpuiXsHVHilW1Rm4AM2stTFdEE2rz9Gdn8dbFYgiw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795214010;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=BH+upZSVQ7OPiPxfnFmcCDdD4JGg5FFYgBbOWBYm9EM=;
-	b=IzS4MkTw1Ky0/EAmdF0KIsIIJJ4RKAN7upPcsug4M/VW1MJqX4DHxsedx1VHx79SmzWh
-	 9IHGAuC3MS9lXU8Ec2qX4oq9XYdG5pYVEVKPw1cIKujEu6CvxkCf9lxLSlgztgQCXGkXP
-	 Mp6toCtCgAGwr/iheEtqKSqvALw35yzp2jR2WRR+XYaj6Lu+9ftBUi1nCc/h6/0gdy9Tv
-	 1iND6PhODoglKWBdDQJYkTrwELYVklTNUR9QxJ0ezcXgLEPjBlvfjV14NwW+5Om/Gag5C
-	 d/2R8oJNnFWWEuAUlWYJqukJQOZQNFgoS2nQ+CGEx+8egtjhzPRNHTeJLwtlveH1F5g==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=NjGHsbldweRnr4/xsq2r1tnUyB+g32VIQ7hsyxVyeHw=;
+	b=Y4q1Ft+LArir0iFrsa1+ZbXt/LWrY10tt6ee+/YaR/55EwPpUp7apZ6BNlzydvkif78g
+	 8BUTIrkQ+6BQ3YeNnn5aCc5hWANNEpr0BHEjoAcZ8EaltQiOtko1/gdnd9bmIjoKEROKC
+	 TL/o53n2KdHzL49TP6dVDMev35nlZAarfiWSm3idrvaMOIZ8pt8ac0sF39Z+Ge9ClI4dR
+	 4T3HX0SWJNZmpFWWuF83nrDOQjLqmGNoLsr9zHE4As5B7I34MUxzLXT+oS2q9LOYIzAsc
+	 aH+Ze/iwPK8QafuesN/P6E+ztM18BqiXS4gu5bA8WEb2fJH0fStm9SVt110PFZncUng==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Qqj14nZh;
-	arc=none smtp.remote-ip=209.85.160.178
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WPJt7faW;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.50
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E1E606A686
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 22:32:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52E1E606A686
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE8E606A339
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 22:33:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CE8E606A339
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Qqj14nZh
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5366ae57896so14952621cf.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:32:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WPJt7faW
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-4adae187d94so934469fac.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:33:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795214009; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Owk5FoHfTI9HeZkDqflOpCVh9akxWADNpfSJuR342FdfH4V+d8GK5nYjunuz+ipyuF
+         K7Au/ARCh4/sr27gvCZOPvedg2xnTNA/dWfZW1q0Yi3c5vnQAyalA9HmiApom+40RLMO
+         H11yI5JElKemg/t9Uqi+7i1SIT5Jk5T9Oej0zzJav/ti37md2tncPgKpG0bGLv9qTnZ9
+         NWOCzaj7eKca2+1nXEvVCZkEGSbFfws3I5KtfXVCDKO9ya2H5whpctmfMDnoElau5BXF
+         k7NIcCdJwXUxt3MfpNwxloZYjBb7BtccvnQoVEGEm8jiyCjRBxE4xPb34GgBsiSFjvJI
+         nlKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=NjGHsbldweRnr4/xsq2r1tnUyB+g32VIQ7hsyxVyeHw=;
+        fh=gRLYu96uBnDlo1nqr0VYrJMf45gY8W5gYSFQdW7R52E=;
+        b=JuRLkqIxi8qDoM0M9t25Wh74Wg5m5aw5LfXRmdeIchLm5PKtqhza1FYC57KgYckPdb
+         ll4wIJE+xt+MuSCafWxQTEfWFmsrzB61hvqKgKR19sRMTczF1VbNKaxffwTVHCBO3icp
+         ZvQyP6MRdtUQ7jSK1A+UNFoDTYI/b1xGu5LU9mpeyReNTxH9UOU5pbfDxWdfZUPG8Eaj
+         KnJMdVlM2/mFo0d+ppgwe3/USRHlRQcAcMxKgeVX2eHdhQkdtE/LmIRYDRfvie+NuUPv
+         pg1jVkF1WyaHyGNW/8l/YnDLrcRThU+mlsii5uHXS/45TUeMYH0rRBH3M0bZ6pMYz2eN
+         XiwQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795213926; x=1795818726; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=BH+upZSVQ7OPiPxfnFmcCDdD4JGg5FFYgBbOWBYm9EM=;
-        b=Qqj14nZhIz4afX2f5DtsKlVYXNz4029NtJqRWmuLbrr232fdpWOPyOz+8yeyI4W2wn
-         Zbp6e1IyqlU18uNInqZbhVP8HwI/fKHl/q0l6FCqllVl4cDNEAa08jpCftWDf2RQSyNx
-         0md1z1eeEB7cXsvhUEtIN/b904UsRzHxan47n/yqXUy6uNrVaR+EYmkaKPvcDYD9JWRU
-         9gl/IRvgsSN0EjVXtAc/4rhEJXe8D6cNy7+iDDWIukdcOA6N6uzw0iR+0X82EnaY1Sv4
-         N7dgwN9vD7GVySnrAA0okPrvVIdf8Qp42ou4z86v/9SVmzmWci3i5lkwhmsOSKHivg1V
-         UUFg==
+        d=gmail.com; s=20260707; t=1795214009; x=1795818809; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NjGHsbldweRnr4/xsq2r1tnUyB+g32VIQ7hsyxVyeHw=;
+        b=WPJt7faWtOibcMTtRfHUKrLg8irqIy6bHnEZJo+hPzM4ldY0rdVyYXkTxVYRhW0CFa
+         1BHjKSX2P2WpZWAg2lBqafEi1JWroqLqojTOCjIGLHX/nOQiauNYLrYjS3yjk1irqwdc
+         s/vs8CYVenbkzLC+fGSZtLfqsphTISS0vMIW5/Unrg4/zjqfCPg+MpJnxvjCxx/lU1jb
+         A9f3d0r28CPuSraTdpfbyz7O+kIyRZn97bX920fOni0lgWw0nkNqnIpgh1wcM4ig7e8c
+         OGrNG+isEaPH6FiOWW9Xgz9kBlRHXSwAfncmQOdnFfXdmGJtRDGaHEfY8IunP9uLH8NL
+         IO9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795213926; x=1795818726;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=BH+upZSVQ7OPiPxfnFmcCDdD4JGg5FFYgBbOWBYm9EM=;
-        b=y4OUTx5GeLTgpQVasIqlTd/N8jO5Y1yMmTJL9plFCY3tcqN7ZazL3A6du13HiY2wO7
-         YQ66jLVZNHPK/UV2JncyKlP2czpl/jnCIBrR84HHryacDjEHYP7tzCwtMT6T5LcHs3r0
-         9OS/eP2FUhclsr8nK6YclRwiXUIQFlfi2kAiXvs8HaqcevfpRXOfxr9bNl6c0F+fzb0A
-         Vnxuj704k0rxwmU8fXR+vwikKgMebNULzujtiiUvYXUHNq4G3djIUqUVzvXrA6IMrSf5
-         NTNEUDxDVEfAYOWln9of+pYIocZBdB9Wufk1FiVmAp5fxyMwu/CEXuGsEqKcucehHbOr
-         9PUA==
-X-Gm-Message-State: APuU4Z+yfBT/pj3ZvFNq3nNEHmutdRn+RqG9Gsp7SctS60rMRXC27yXa
-	pmpDSBR42dR91X1A9ui47wQ1oAhmtDqn6HpGZ8/0XAu0CUbGgRgnfLZztsx8Yg==
-X-Gm-Gg: AZFdTZfoLL2wxtmaKtESn+RqT6Dz9fuvcndHghFPu9oQbYX6GbqsKjMWEST7ysq645a
-	K9QE928k8RPFFl9GbDlzBzVxso48Ua8yhJRxpV6OtMNtIqNxeYxXsZS4FsE7KW8jcjcWwgwY7gr
-	FdeD8hAvFNDjfk14TsomvHohD8BSgH3K/F83TrW1or1DfD0ZJwsDHhD1ZHB/pYyI0OJgDSBWSKa
-	i7pypHmnFZ2aD87Q/Z78nUDICCK5ho67MMArZnQTGMkDf30EgWRqrdQ0NT7jnlv/oHXe8IxJWQr
-	l/DakjsIIA0h0xfOuceksnNb1T9OohbVx5nenJX+eJJhkFdTAw3KmK053Q/d/nciqigxZiN+KOw
-	jb1Gf4g+NUGV+JZUdbESETLKi6sXyYNtDUUzhnd8I3cFN8dSuTlprto9JFxwxi4o49BjIfHnENf
-	5kzQKlK3VfYYM4oky0TWpYIA/RJ+peQY8WoxWgDlNzjjBIKYDTD5OwJw8CFP0GEUHo9Pn1enZJu
-	uHE6U+OFN8VF3YC4HFreO5wGJZaiiJ3DheqLhPSADAkMYuE4Y/8c52bQTWszD16Bq6aUmpRHwop
-	6WmqQYBAWTHNHqqROGaL4netyF3N9xI=
-X-Received: by 2002:a05:622a:58b:b0:533:3192:7a8e with SMTP id d75a77b69052e-55d76a76454mr82575661cf.43.1795213926329;
-        Fri, 20 Nov 2026 14:32:06 -0800 (PST)
-Received: from [172.17.0.2] (ec2-3-41-210-118.compute-1.amazonaws.com. [3.41.210.118])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-921349d14d1sm37944466d6.18.2026.11.20.14.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 14:32:05 -0800 (PST)
-Message-ID: <6b00ca65.c0a35c19.390d42.d237@mx.google.com>
-Date: Fri, 20 Nov 2026 14:32:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4521042529292460735=="
+        d=1e100.net; s=20260707; t=1795214009; x=1795818809;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=NjGHsbldweRnr4/xsq2r1tnUyB+g32VIQ7hsyxVyeHw=;
+        b=FAqBICUlGzpLu3NSivcDqikZVo/a+QkwyTeJEgVzYiqIKLfjcx2bgIBCLKGSf7mCKA
+         JErHIC5Skd2HOI32KsYar25dZ6tomCLWfPmVDKFvU0sYfJ1uoW9MED86YIK0Fy0+D9cO
+         Cy+DF95dwKQ0o1ORLM01cx05yU+jNDypjjg5t9sMni/vAbEz1Es6F2HqvcFstg6o+xME
+         vHFVU2aeD40ZXI2J3aAGpR/3jYNcLAN6BgcR0XOWJpWLyNCxZ4Eb2ay8KjOzuOLxWoqo
+         +8aKkpg/1hQpfMn8hCQzHThl0ME+bbzD1lz5IgjlO59OkaKWj6wpYK5fT51BsFzn4TB7
+         6fSQ==
+X-Gm-Message-State: APuU4Z85BZ5KZOcsfBkhcOGmbq/lZv5FYj8FrH9Ggjw4ld+A3MFMqsRU
+	pjjEmCquEwoA3Y09ulf9agmY1FDcWJvgXwS+v7w5LBu7W6VtPbZJRoXjIMkE7qAyxIkaX87HP1H
+	JYnIRA1VtDNk7z0gueQbJV0RJID5aJXgaMbxgOWZw1w==
+X-Gm-Gg: AZFdTZfciX6J2+4fO27Od6BPMh+9hGik918i5v+XrVvAuEDckGGAUtlNJw3f41shsPq
+	8bffeUQeV6BTc1PTVDT9Uex0TD1heREep+m7jajrlym5NfFmeNaM7aBZZO0PlyDxpOtfOGiZtVE
+	dKiKjW3Ghz8FjlRo7MAfxEoEIHxvsdste7pA3mp4W5Hs2FaeHliPW7Xm4dshXujM5Z2X8s+NC38
+	rscnGn+0v+q7DzSjM0tEbZZ4D55ntP5maLkYT9oLWsjjfqY0yIzbtWcHs/MeeAnDByvu8Yh/Hpp
+	WVuJwpEIytCUZldxPvMERKqT8wrUDtwIeAQOQRyiV8nW2vGTHRG+yPfwufa5VMdTKsZZVCZHQS6
+	re02h1Y99BzrNn1Hf5+ugXSdsvjV5A73sFOpgGosPv4s0TnqsPpmpY+ZPdow=
+X-Received: by 2002:a05:6870:e0c9:b0:4b7:4fda:1750 with SMTP id
+ 586e51a60fabf-4bc84145f58mr4294810fac.32.1795214009164; Fri, 20 Nov 2026
+ 14:33:29 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,86 +99,92 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Channel Sounding and RAP fixes
-In-Reply-To: <20261120165510.1858959-2-luiz.dentz@gmail.com>
-References: <20261120165510.1858959-2-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: "Kefah T. Issa" <kefah.issa@gmail.com>
+Date: Sat, 21 Nov 2026 01:33:18 +0300
+X-Gm-Features: Aa3M54r5qC7OD7cZ5dFAwn3S3aC6uePRdeAd-x09CEG_A_eaB8vwOR9YrF2laRo
+Message-ID: <CA+mvMuuSaS=s6eYx30n1n7fQwKaX-d=jaCsZwSh7n=VirEAWEQ@mail.gmail.com>
+Subject: [BUG] btintel_pcie: hw exception leaves controller dead (boot_stage
+ 0xd0fb6047) until PCI rebind, CNVi [8086:e476]
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============4521042529292460735==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hello,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9zZXJpZXMvMTIxNzU3MC8KCi0tLVRlc3QgcmVzdWx0LS0tCgpUZXN0IFN1
-bW1hcnk6CkNoZWNrUGF0Y2ggICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICA4LjM3IHNlY29u
-ZHMKR2l0TGludCAgICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDUuMjUgc2Vjb25kcwpC
-dWlsZEVsbCAgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTMuNTYgc2Vjb25kcwpCbHVl
-ek1ha2UgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMjA0Ljk0IHNlY29uZHMKTWFrZUNo
-ZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE0LjI1IHNlY29uZHMKTWFrZURpc3Rj
-aGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDEwNi45MyBzZWNvbmRzCkNoZWNrVmFsZ3Jp
-bmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyNTQuNTMgc2Vjb25kcwpDaGVja1NtYXRjaCAg
-ICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTg1LjQ3IHNlY29uZHMKYmx1ZXptYWtlZXh0ZWxs
-ICAgICAgICAgICAgICAgUEFTUyAgICAgIDY1LjgwIHNlY29uZHMKVGVzdEZ1bmN0aW9uYWwgICAg
-ICAgICAgICAgICAgUEFTUyAgICAgIDkxNC45MCBzZWNvbmRzCkluY3JlbWVudGFsQnVpbGQgICAg
-ICAgICAgICAgIFBBU1MgICAgICAzNDYuMjAgc2Vjb25kcwpTY2FuQnVpbGQgICAgICAgICAgICAg
-ICAgICAgICBQQVNTICAgICAgNzE0LjA5IHNlY29uZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBGQUlMCkRlc2M6IFJ1biBnaXRsaW50Ck91
-dHB1dDoKW0JsdWVaLHY0LDAzLzE4XSBzaGFyZWQvcmFwOiBTdWJzY3JpYmUgb24tZGVtYW5kIGRh
-dGEgd2l0aCB0aGUgcmVxdWVzdGVkIHRyYW5zcG9ydAoKMTogVDEgVGl0bGUgZXhjZWVkcyBtYXgg
-bGVuZ3RoICg4Mj44MCk6ICJbQmx1ZVosdjQsMDMvMThdIHNoYXJlZC9yYXA6IFN1YnNjcmliZSBv
-bi1kZW1hbmQgZGF0YSB3aXRoIHRoZSByZXF1ZXN0ZWQgdHJhbnNwb3J0IgpbQmx1ZVosdjQsMDgv
-MThdIHByb2ZpbGVzL3Jhbmdpbmc6IExldCBTdGFydE1lYXN1cmVtZW50KCkgcGljayB0aGUgSW5p
-dGlhdG9yIGZvciBCb3RoCgoxOiBUMSBUaXRsZSBleGNlZWRzIG1heCBsZW5ndGggKDg1PjgwKTog
-IltCbHVlWix2NCwwOC8xOF0gcHJvZmlsZXMvcmFuZ2luZzogTGV0IFN0YXJ0TWVhc3VyZW1lbnQo
-KSBwaWNrIHRoZSBJbml0aWF0b3IgZm9yIEJvdGgiCltCbHVlWix2NCwxMi8xOF0gcHJvZmlsZXMv
-cmFuZ2luZzogRGVmZXIgQ1MgU2VjdXJpdHkgRW5hYmxlIHVudGlsIHRoZSBsaW5rIGlzIGVuY3J5
-cHRlZAoKMTogVDEgVGl0bGUgZXhjZWVkcyBtYXggbGVuZ3RoICg4Nz44MCk6ICJbQmx1ZVosdjQs
-MTIvMThdIHByb2ZpbGVzL3Jhbmdpbmc6IERlZmVyIENTIFNlY3VyaXR5IEVuYWJsZSB1bnRpbCB0
-aGUgbGluayBpcyBlbmNyeXB0ZWQiCltCbHVlWix2NCwxMy8xOF0gcHJvZmlsZXMvcmFuZ2luZzog
-Q2hvb3NlIHRoZSBDUyBhbnRlbm5hIGNvbmZpZ3VyYXRpb24gZnJvbSBib3RoIGVuZHMKCjE6IFQx
-IFRpdGxlIGV4Y2VlZHMgbWF4IGxlbmd0aCAoODU+ODApOiAiW0JsdWVaLHY0LDEzLzE4XSBwcm9m
-aWxlcy9yYW5naW5nOiBDaG9vc2UgdGhlIENTIGFudGVubmEgY29uZmlndXJhdGlvbiBmcm9tIGJv
-dGggZW5kcyIKW0JsdWVaLHY0LDE0LzE4XSBwcm9maWxlcy9yYW5naW5nOiBEbyBub3Qgc3RhcnQg
-YSBwcm9jZWR1cmUgYWZ0ZXIgU3RvcE1lYXN1cmVtZW50KCkKCjE6IFQxIFRpdGxlIGV4Y2VlZHMg
-bWF4IGxlbmd0aCAoODM+ODApOiAiW0JsdWVaLHY0LDE0LzE4XSBwcm9maWxlcy9yYW5naW5nOiBE
-byBub3Qgc3RhcnQgYSBwcm9jZWR1cmUgYWZ0ZXIgU3RvcE1lYXN1cmVtZW50KCkiCltCbHVlWix2
-NCwxNS8xOF0gcHJvZmlsZXMvcmFuZ2luZzogS2VlcCBDUyBzZXNzaW9ucyBhcGFydCBmcm9tIHN0
-YWxlIGFuZCB1bnJlbGF0ZWQgZXZlbnRzCgoxOiBUMSBUaXRsZSBleGNlZWRzIG1heCBsZW5ndGgg
-KDg5PjgwKTogIltCbHVlWix2NCwxNS8xOF0gcHJvZmlsZXMvcmFuZ2luZzogS2VlcCBDUyBzZXNz
-aW9ucyBhcGFydCBmcm9tIHN0YWxlIGFuZCB1bnJlbGF0ZWQgZXZlbnRzIgpbQmx1ZVosdjQsMTYv
-MThdIHNoYXJlZC9yYXA6IFN0YXJ0IHRoZSBSZWFsLXRpbWUgdGltZW91dCB3aGVuIHRoZSBwcm9j
-ZWR1cmUgc3RhcnRzCgoxOiBUMSBUaXRsZSBleGNlZWRzIG1heCBsZW5ndGggKDgyPjgwKTogIltC
-bHVlWix2NCwxNi8xOF0gc2hhcmVkL3JhcDogU3RhcnQgdGhlIFJlYWwtdGltZSB0aW1lb3V0IHdo
-ZW4gdGhlIHByb2NlZHVyZSBzdGFydHMiCltCbHVlWix2NCwxNy8xOF0gdW5pdC90ZXN0LXJhcDog
-QWRkIHRlc3RzIGZvciBSYW5naW5nIERhdGEgc3Vic2NyaXB0aW9uIGFuZCBjb3VudGVycwoKMTog
-VDEgVGl0bGUgZXhjZWVkcyBtYXggbGVuZ3RoICg4ND44MCk6ICJbQmx1ZVosdjQsMTcvMThdIHVu
-aXQvdGVzdC1yYXA6IEFkZCB0ZXN0cyBmb3IgUmFuZ2luZyBEYXRhIHN1YnNjcmlwdGlvbiBhbmQg
-Y291bnRlcnMiCltCbHVlWix2NCwxOC8xOF0gc2hhcmVkL3JhcDogRGVmZXIgUmFuZ2luZyBEYXRh
-IG1vZGUgc2VsZWN0aW9uIHVudGlsIEZlYXR1cmVzIGlzIHJlYWQKCjE6IFQxIFRpdGxlIGV4Y2Vl
-ZHMgbWF4IGxlbmd0aCAoODU+ODApOiAiW0JsdWVaLHY0LDE4LzE4XSBzaGFyZWQvcmFwOiBEZWZl
-ciBSYW5naW5nIERhdGEgbW9kZSBzZWxlY3Rpb24gdW50aWwgRmVhdHVyZXMgaXMgcmVhZCIKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVjayAtIEZBSUwKRGVzYzog
-UnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKbWFrZVszXTogKioqIFtNYWtlZmlsZToxMDQz
-NjogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtNYWtlZmlsZToxMDU3MTog
-Y2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMTA3NDogY2hlY2st
-YW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMTA3NjogY2hlY2tdIEVycm9yIDIKIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRl
-c2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdt
-dC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzox
-NDUxODo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg
-4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTQ1MTgg
-fCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1ha2Vb
-M106IHdhcm5pbmc6IC1qNCBmb3JjZWQgaW4gc3VibWFrZTogcmVzZXR0aW5nIGpvYnNlcnZlciBt
-b2RlLgptYWtlWzNdOiAqKiogW01ha2VmaWxlOjEwNDM2OiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3Ig
-MQptYWtlWzJdOiAqKiogW01ha2VmaWxlOjEwNTcxOiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtl
-WzFdOiAqKiogW01ha2VmaWxlOjExMDc0OiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01h
-a2VmaWxlOjExMDc2OiBjaGVja10gRXJyb3IgMgoKCmh0dHBzOi8vZ2l0aHViLmNvbS9ibHVlei9i
-bHVlei9wdWxsLzI4NjAKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+The CNVi Bluetooth controller on my laptop has crashed twice in a week
+with the same error. After the crash the controller doesn't respond, but
+hci0 stays up and still reports Powered, so connected devices simply stop
+working. The only recovery I've found is unbinding and rebinding the PCI
+device.
 
---===============4521042529292460735==--
+System
+- Lenovo ThinkPad X1 2-in-1 Gen 11 (21V9CTO1WW), BIOS N4OET53W (1.16),
+  2026-08-24
+- Intel Core Ultra 7 365
+- 00:14.7 Bluetooth [0d11]: Intel Corporation Core Ultra Processors
+  (Series 3) CNVi Bluetooth [8086:e476] (rev 01), subsystem [8086:0011]
+- Fedora 45, kernel 7.3.4-300.fc45 (the first crash was on 7.3.3-300.fc45)
+- linux-firmware 20261019, ibt-00a0-01a1-pci:
+  "Firmware timestamp 2026.36 buildtype 1 build 102163",
+  "Firmware SHA1: 0xfbf3efe9", "Firmware Version: 19-36.26"
+- bluez 5.88
+
+The crash
+Both times only an LE HID mouse (Logitech MX Anywhere 3S) was connected.
+No audio was in use and there was no suspend or resume. Nothing in the
+kernel log or the journal comes before it:
+
+  2026-11-21T01:13:57+03:00 kernel: Bluetooth: hci0: Received hw
+exception interrupt
+  2026-11-21T01:13:57+03:00 kernel: Bluetooth: hci0: Received gp1
+mailbox interrupt
+  2026-11-21T01:13:57+03:00 kernel: Bluetooth: hci0: Controller in
+error state (boot_stage: 0xd0fb6047)
+  2026-11-21T01:13:57+03:00 kernel: Bluetooth: hci0: Invalid exception
+dump signature: 0x2cfb5a78
+
+  2026-11-14T13:49:14+03:00 kernel: Bluetooth: hci0: Received hw
+exception interrupt
+  2026-11-14T13:49:14+03:00 kernel: Bluetooth: hci0: Received gp1
+mailbox interrupt
+  2026-11-14T13:49:14+03:00 kernel: Bluetooth: hci0: Controller in
+error state (boot_stage: 0xd0fb6047)
+  2026-11-14T13:49:14+03:00 kernel: Bluetooth: hci0: Invalid exception
+dump signature: 0x2cbb5878
+
+After the crash
+- The kernel logs nothing more until an HCI command is sent. On 11-14,
+  turning Bluetooth off and on 4.5 hours later gave:
+    Bluetooth: hci0: sending frame failed (-19)
+    Bluetooth: hci0: Opcode 0x0c24 failed: -19
+    Bluetooth: hci0: Opcode 0x2042 failed: -19
+    Bluetooth: hci0: Unable to disable scanning: -19
+    Bluetooth: hci0: start background scanning failed: -19
+- bluetoothctl still shows the controller as Powered: yes and the mouse
+  as Connected: yes.
+- This brings it back:
+    echo 0000:00:14.7 > /sys/bus/pci/drivers/btintel_pcie/unbind
+    echo 0000:00:14.7 > /sys/bus/pci/drivers/btintel_pcie/bind
+  The firmware then loads without errors and the mouse reconnects by
+  itself.
+
+Devcoredump
+After the rebind on 11-21, a 4 MB devcoredump appeared for hci0
+("Driver: btintel_pcie", "Dump Time: 20-11-2026 22:20:25", which is UTC,
+the same firmware build). That is about 20 s after the rebind and 6.5
+minutes after the crash, so I can't tell whether it holds the state from
+the crash. I've kept it and can send it privately if it helps.
+
+Questions
+1. Is boot_stage 0xd0fb6047 a known firmware fault in build 102163?
+2. Is "Invalid exception dump signature" expected here, or is the driver
+   reading the exception dump from the wrong place?
+3. Shouldn't the driver recover from this by itself, for example with a
+   reset or FLR, instead of leaving hci0 up with a dead controller? The
+   device has vendor_reset and reset_method (flr) in sysfs. I haven't
+   tried either.
+
+I'm happy to test patches or newer firmware.
+
+Thanks,
+Kefah T. Issa
