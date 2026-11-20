@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795213607;
-	b=Ns4dBjCOQ5jLcGIPnvPEBA9jUC55DIRFGFCVJD9VluDdaTOgqRcyVkaKbmMDKpMkcV27
-	 Cue5h3wKfZTy019MIylYQmjPAXwqp/a989Q7v3/YHcLGuetfVnam/lP4ypvAnP3C5K9O2
-	 uCX5YqV1sNnUPlRCbi31hS+6pxW3ckd+lak3GzaqwgeDaH0Xyaq+KL3PO8N35ohJUHiYW
-	 LGuK1+qxjIYmmm0i3JUwEfhDQOjU/lu2Jx30zI0D8J8NmY7lgUoJ8uSCHbInE0NMPDngu
-	 YcRSsTZKo11d1fYTPKz8gDhT8vWpOGBj1rVwH3N2RPYrATe5L67CgTIkZyjeFMwatXw==
+	b=ct3EiUm2lSwr8LO1Hxhw8/di7YIICHH1qWebZXl48d4M+mQHmgmiuahFXPekNaLNWe0q
+	 Hd4YGNXJ4J7B8qh928EBGFGIdJ7Z5V8WZamxFqB03rL9IjScd9ZCZyezc2BRi7LbY2btu
+	 y+6Vmu0gFEOC4wlQJEKV16bJV3G63UgYX4Ioqymuvjk4zGXfeo0bQcCLB/L1t2VX8yRmy
+	 4/g7Ym4+wMJvEJhwUdU+YX5QfTweoDpObF3wPH/sCl1Va5PWxscDEO9TXphkCLPNL08bd
+	 depmp7mo1+GFQ2WA228flwhFY1RrJLnRervue+SHXR1ppugkW2N0mcsKTap/Ml5osdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795213607;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-	b=RcF6MtesTkF5TM9dcWK+xGJpQbJhrhr3GaMHVv2N0J86qnTd8fCE7MeBt8ZRj44DSXMl
-	 BJrtIH2/Y1k2wgmumR8VxfWMZiGoFtsVaZnCBMBH4scQx8ThPzrcxHoDwPi61HTPSiDmX
-	 fVt/ksu5Op4BokTggPo5tTbeiauv17r6Ivq1GkxmOS8zKrKS/uKgFbPgy1zWqpSLwAW2E
-	 0XWfPGaiM7y0cXKWGMzEhp9Eodf0K7IaBjhHogcPG/WnSiOtGRDnVYUhbCdPtHJJuIsDf
-	 S/Ciqh8sPlXceJyl2WUwPUEQnUXm9MKQks/j4u7RQGZwV8FMjm+bf+GwQ+slXuWaVrQ==
+	bh=cEWpRNXwLO6tMVnFBy4u1Yu8LTLkEG1xyMaCgV+OMJw=;
+	b=ckXEY7180NQ+6qCPucqAz3Qf8CtCcoiygu+zHyT88IBCOWe4VE2u4FpF2DhknTHjEl7e
+	 A0qWPh9uHucwn7w41sJ34e4AdZdSC6ZkSyuMlcLDTT1QAg6c1su2ILruL/F68eEi4KPsu
+	 4vukI2cZaBRPB0HUPK9KQyOXP1lTz3oFhNQ10/ZXjbwjRLNNRQNSi258y+Ik34oINS7xU
+	 ySjH0Eo6uC+MEwRZBa0DbovkTWiOcZSaC/U/v4cMlFsmR9eE8LmQpNqs1hXCUqpcyDiAo
+	 I7vVLsdDVXHh75vEtIvc1wlvBUOU8EGwUgqlh7XSFqgdBJ5DPMSqtez1uM+cjrOE2UA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Z99pM9/W";
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PewT9R+E;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F0B606A680
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 22:26:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55F0B606A680
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2B0606A6A2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 22:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB2B0606A6A2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z99pM9/W
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a68f888a41so969255e9.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:26:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PewT9R+E
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb609d9bf4so2477665e9.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:26:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795213605; x=1795818405; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795213603; x=1795818403; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-        b=Z99pM9/Wt39sQbFlBncavq3TS9juQ/BH9/tJD7cnQ8rk8F68VI6h7H5VoUNa42eBZ/
-         qlKxQqyTlfqk/XoVNr9yvB+uRso+PrYhA8I6eHXo9w5reGsotNJRxVqYkUhpeDC2xwp8
-         0Q9ZIJbLU8CLhD/3QE8IL9AqUgP+ZCFutka40+j5sSYtEZv8QoLHFV1VynNGk6u8/0xg
-         u2AgsqSrGv4Ecnua4ofL7UrCadN8p76Ew4y8tbyAVf3DruILe1wPSbmslu70qI+ZRnOG
-         GDTAK5spcixckZrtN5MYHvkOxsSnbaDi1omcXgxIPr9FQ5mVfJO6uInHcfGRAWgaJNIP
-         rZQA==
+        bh=cEWpRNXwLO6tMVnFBy4u1Yu8LTLkEG1xyMaCgV+OMJw=;
+        b=PewT9R+EQCHMqiR/1kR2i3HjBigpJLdm+7GjyXVlpgNZceVFfXneL4r9jSmlJLs/6X
+         5YKv0oHCqINhuMWIJidD4fRVFspV0SKUebssG17l+9oMX0oPuA8y8u9LRp8/Yz9g70HE
+         BpS++sRry73AmuwmbG4AEV1s6ye1wE4QXet6B8LIEjx7s/afMPas2SKqeXWFmVizFlDi
+         PIGA4O4Qn+QZWRphvkRivHZCd9JzlmC2HpdFO+RNOdLXZyR9uqV337+Ts7DFrqO9Tlrb
+         WVSyc4heM7pPB3jOOIroVBDw/Uo092ZfClpC3u62NjODfc6XDnjJ0WErFBtNUjuMrKGb
+         mvuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795213605; x=1795818405;
+        d=1e100.net; s=20260707; t=1795213603; x=1795818403;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-        b=nz2yMONcjO6++rgM46bUDtpvFgHBIp7JeAp4j428AS3+s09Em7WYaNujM25Bde/Rew
-         O7QcxSmVLr+Yo9LfESyIoTvGupBsvFzBk06KHTYhv2Qkg2YRWKTSKmaeCwh7apcUQPOI
-         CTTikZVMPkq7DJYhUmzigHK8N+7yscNB97LZbA5Npu7RK0FDrKKh7z4D3Q4t7V/sbv0R
-         k458n9JQVslmIfldoh0u3e7fwDyAGxu3valbqpAj/DvuODG3NanvSyCxukkCWWaJ6aN9
-         tgeXRieWJApLM/Uc4qdGuI12kBYryoy1sLXzaqAU6DppaEWxZW85kvwclRJcr0LcVLdn
-         C65A==
-X-Gm-Message-State: APuU4Z/OxI3z917VZc2arfJGdM7txUkACX5EkFjLYjDpNqVoI+NpdDKD
-	W1WIrRmfUum028QWveOqXCvvAPDwPp9wsOCnbdK6jQhRErU2XQiBg3TF3k+aTg==
-X-Gm-Gg: AYBFou2OUNsNxjxgvMLWJUxXJdUlpOsBX8vIlhGFvdftRiVpjw1bA4t1b7WOrYqSyDa
-	pqcmuipjugqBFm9LdmAv0TNPt7cMuhiVpEdL44ICvxlEDSCGzdxWG9iBaxOTxX9QhvTht4SZG4F
-	unVVktWCSOzbpYmCRgB945qNhxp5gCEr/4axOGi1DNlL/fq+iOZWjEr0PFVIWZX9Z0XEUTcI7Me
-	nwp4INXyO370TRWVJ+NhuQu9rtzhA60xrLAn6WXtAEOOajRz68y8+/tE1/2l/PX6kr0kP9ASUTn
-	3fRO7aYRcpzD4dXcY269ctGb6WYB4y5YvGRpkG36taMwRSUPJciwcE05qA3I6Yu685A8ps5Nrii
-	vNLHbqgFMRVvIjIkU81daq08ez5JPPg970bmPYU0ruiX0sGraSkNPespJI9pix3Jf3i26+Tfuyr
-	gPTr6wE1TvlTYj788+DCsnTME+w4DuR1EuUJwrIdovPSQBn7VXhseXzkZdfuu5G3DYeRDgwa1hE
-	jYiUeiLa1tJPHMi3LNOOuT4fS0V6ATMMs8hG+FCHkjnWTFTV/IyPTjODTeF9R7xLWSiKiaZCC6f
-	SjaYQ6BssfU6Kyd/FbT89wphB+Y6JTAq6rncwhG/GC7VKuCbbIb04rX4u5F5IKzBonoq9Q==
-X-Received: by 2002:a05:600c:217:b0:4bb:6a02:d42e with SMTP id 5b1f17b1804b1-4bb887f3fb8mr71412125e9.1.1795213604634;
-        Fri, 20 Nov 2026 14:26:44 -0800 (PST)
+        bh=cEWpRNXwLO6tMVnFBy4u1Yu8LTLkEG1xyMaCgV+OMJw=;
+        b=eu/1C6ZIJo+OMb3d5XyKxejbBO/n8ogriYRm7R4Xyy6/YKAX3aapf0BM5/ZU74p73k
+         p8SjgpP+tS1EHbL8tmo08VIF7H1ip23pLXwtoQvzRJ73S/IIDSOVnZ1sw1K+mKq3Fwfp
+         1m+7Mn8fPMTYeNuNvdLl1bqW4p6f0JYQT3Cq95JT+8vXurICpoMGTksjkreoLcjf+9RD
+         7pvHGsLE59cqLRKOf2aGn+CBO0+3woLtoP1JpC/em8QFeVDBRSx3uajceFb9bHr7kOCo
+         vT9Ndr8ccJ3TXSUIEmk3IreXChFJQcgEJ+lh+/QzS11sPUZbRV4IjCg5ODq/n/UQwlP7
+         38Vg==
+X-Gm-Message-State: APuU4Z+Hq3wGt8X1dvgE0agmF+uWyT7hU+6acZO3ENbE5Ly4FTXTSLm5
+	daWh2cgcR6oTMyytfaweScJLbGyDEQqqCks0CmUTUARdisAsXsO6QTpldmjieA==
+X-Gm-Gg: AYBFou1mm4DXhQUPeyHu1ohaj3zrHXV7s9yK2X2wNOXZMQ9qlVap3DjhCQj0LExTpgr
+	OqyGL8lqbFytSOZ1/YkiMpzFcwiH1b8ZnZpaYPi65vTZH10SdRel3B2Wow/bW4eqq4wafZdr34d
+	Mb4gFtONTTt7E9XqDxVOd1p0fZgQQIVdx7DihDpBSLlq4wv31Dj4dRL6ny0X1DP/4dIbANri4Pz
+	09wlYbzWGKhvtwg8vVEVNawjEGRhEfbVWkt+dAT3+qJR2eO1A9/kwzbT/pHukMheErbGHZ8uhyJ
+	VtzYAG3b5vWV6NjOa7+cYR4VmRPc2U30QadgosetLrjYmKAvvr1ReVLvLeDvOp2nQQ+vpS2NwWP
+	MQmLjWoUvkV4+m9iWpVimhs8xtm0SUB/jbyUynukI6IfH6mVY0n9KVLgNt7oftk0uS5X3bTMWyt
+	HzRZEYZ2oEJKJwM/RZwelkJ5Z+az7Hg5zPlWYSf0k0Q2iDBlxAolckrSQpqPhHUfykO+D0QYcjm
+	o1URLcWOdqTabjyM4cn8sJjxzCwk9zGzLHMwezcolQsiGxX1IXhYGOCzIXpGQduC8ff4DS0MvFH
+	kUKhq/Eg2UgT35zPvDniDIKa+G5Yl6/eY5mLz7eUxsliJWP4
+X-Received: by 2002:a05:600c:8206:b0:4a0:1f9e:5f78 with SMTP id 5b1f17b1804b1-4bb88787d87mr99629525e9.0.1795213603096;
+        Fri, 20 Nov 2026 14:26:43 -0800 (PST)
 Received: from schinder.fritz.box ([2001:9e8:b39e:f00:df5c:2a51:ff8a:45b1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90660cb4sm23698785e9.2.2026.11.20.14.26.44
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90660cb4sm23698785e9.2.2026.11.20.14.26.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 14:26:44 -0800 (PST)
+        Fri, 20 Nov 2026 14:26:42 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ 4/5] monitor: Fix reading beyond the Apple manufacturer data
-Date: Fri, 20 Nov 2026 23:26:23 +0100
-Message-ID: <20261120222624.150321-5-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ 1/5] monitor: Fix overflow of the name buffer in print_eir
+Date: Fri, 20 Nov 2026 23:26:20 +0100
+Message-ID: <20261120222624.150321-2-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261120222624.150321-1-rolandschober1968@gmail.com>
 References: <20261120222624.150321-1-rolandschober1968@gmail.com>
@@ -97,46 +97,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-print_manufacturer_apple() reads the type before it checks that there
-is one, and prints the identifier as a string although nothing
-terminates it, so up to 98 octets which follow the AD structure are
-printed with it.
+print_eir() copies the Shortened Local Name, the Complete Local Name
+and the Broadcast Name into a buffer of 239 octets, which is enough for
+the 240 octets of an Extended Inquiry Response. Advertising data from
+other packets can have longer AD structures: an LE Periodic Advertising
+Report with a Complete Local Name of 240 octets makes AddressSanitizer
+report a write beyond the buffer.
 
-Check the length first and print the identifier with its length.
+Size the buffer for the largest AD structure.
 
-Fixes: 35b0d0c7c281 ("monitor: Decode Apple identifier and iBeacon data structures")
+Fixes: 854c945433fc ("monitor: Add full EIR parsing support")
+Fixes: 99deeea86f15 ("btmon: Decode Broadcast Name")
 Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/packet.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ monitor/packet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 6646dc147..042a2ecb6 100644
+index eddf8706a..bce3bb819 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -3763,18 +3763,16 @@ static void print_fec(uint8_t fec)
+@@ -4418,7 +4418,7 @@ static void print_eir(const char *label, const uint8_t *eir, uint8_t eir_len,
+ 		uint8_t field_len = eir[0];
+ 		const uint8_t *data = &eir[2];
+ 		uint8_t data_len;
+-		char name[239], label[100];
++		char name[255], label[100];
+ 		uint8_t flags, mask;
  
- static void print_manufacturer_apple(const void *data, uint8_t data_len)
- {
--	uint8_t type = *((uint8_t *) data);
-+	uint8_t type;
- 
- 	if (data_len < 1)
- 		return;
- 
--	if (type == 0x01) {
--		char identifier[100];
-+	type = *((uint8_t *) data);
- 
--		snprintf(identifier, sizeof(identifier) - 1, "%s",
-+	if (type == 0x01) {
-+		print_field("  Identifier: %.*s", data_len - 1,
- 						(const char *) (data + 1));
--
--		print_field("  Identifier: %s", identifier);
- 		return;
- 	}
- 
+ 		/* Check for the end of EIR */
 -- 
 2.47.3
 
