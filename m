@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795195207;
-	b=lgRCg68aSWJeG13YaintU60A09AUEwhlnYxlDbH8C45RiSa7Uo5+KAsH+unJ66U4xukM
-	 lY+QikHsIlQDYCMnFT6DG2/xDEO2rGD3OgHxaAJHCoxRl1kH+OHezXAPqnMqt+/5n/oqG
-	 4q6K/JMAw6acYRmr5Gth6j5ztmBdOf4BCmp0GBF1bFv7JaEpnlTNZdRSuZqX7L7rayJAI
-	 QFfD8CDX6LQrVUqqgS3WtWCt4Mz4ed0YU2hyjg+GROWLmcZGmD9Zmorkt4jv1AwfFtOCs
-	 98Ql9g/7oka1PwBYA6fjEDsvF7edqNcxBDCC3a2DgCPsZcU9FL2b77shcRJKEf+GVDg==
+	t=1795195208;
+	b=VKBl1wR5Fo/ZPg2MUpYq5YyvHwp5s7xd/NhaT5YUAXGxUYXdaAkDXmBg08joN1NnnQca
+	 N7mywAM7/Tc2et1GJ6kU2gAJUrsbSU9j6lYfWG4W9PkoncaVuDHut+J5tzGFbGiQonR+B
+	 NMLzqnhUbFJnIvfwpk6/vJSzp7CYZ+N+ROja4UdXRW2xd1qrYWX36IGgnvsqR7MkCKrH5
+	 LlLDbu84+C34fjf9RyG2QgIk95MJSIwCuRBMvDPtvGTnS3CW+UnOD2IcQ9r2Xlq5nqmxI
+	 x1jS6CQFwYAc3XeWjEisuLawUyFuKCTdDWQwvzNQ4QebXx5JTsLerFyE23m23QpQObA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795195207;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795195208;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=stbY6RyBYX0J6lQyHoEKH3y5E24DblkhJDBPRzo9SDI=;
-	b=qrW5gekGn1OvQ+jfwAFGZMcTV9sB4UtOBsZLgO4Q8O41Mt7lbsUeT5C56rLzijSV4Hgy
-	 C1mAc0i4Y1ZcDb7VOpFZT0qSbX4xtfZtjuMSic1nQqLcdYpH1c1Xo4YJA5g9fC34JQkhl
-	 VHFuaYFuUTp80wKP5D7Fy1S7GcY7NNnUPoK70derkYvoIvREszT3JBly4LQUv9Jv2aYft
-	 txEzYFM5txBQm+FLBW0UeaYusHYK4CAC/APWz2t2PCkpYcsVKEcrcjaVZKFKWZy54QpvF
-	 K6IzcNsxzwghtScfNKxhM2SsPDfMXgyzC7n9Azf0KMr4S0+yOpIE/T9sUw4KOJgBXMQ==
+	bh=YnD6ivR6v+smYNM+xYN2G91XYMaHiNSbWjEy6hii1CU=;
+	b=Heb6YHYYr1hPWt0tjeC/CPXniGNfU74/+F5bZCv8M7cPO07+ps2EP8F/zPXWq+RnLZsS
+	 V2MbKIXMKt7Id0th7x6+Ib5Fpd2jwMQ4AUcFiSrFOIEU3WF6HbXZePHIsS4vxTowccxtx
+	 a0kLxLkkgKDEPkyTfUE/MzNcdWLUhzAvlW+bLH4q+mmOn0RFepC28kRoC+KCdcwJs9D0I
+	 Cq3Zxwb3WabSETDJg4o5mE5CdXqcGs/rFADtf3R3AL18eXfEsfpmhnTkoqvVV6PvQWshO
+	 8TrVXxp6wyzAomN8aso/SQms0l4LdVI2pOyMiy5RAG6fbcDH0P938y3RudUuyR51a7A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=L0PqarrS;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ozGcW1Z0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DF3606A320;
-	Fri, 20 Nov 2026 17:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3B860A2623
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 17:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=L0PqarrS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81FE31F000C4;
-	Fri, 20 Nov 2026 17:20:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ozGcW1Z0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0969E1F000EB;
+	Fri, 20 Nov 2026 17:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795195206;
-	bh=stbY6RyBYX0J6lQyHoEKH3y5E24DblkhJDBPRzo9SDI=;
+	s=k20260515; t=1795195208;
+	bh=YnD6ivR6v+smYNM+xYN2G91XYMaHiNSbWjEy6hii1CU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=L0PqarrSZ77qq1IRI+M0p1GXieOSuZLf6CpmHdd7W0rAC4LFcXS7PgJu7mqbAuj1B
-	 gfndqnjC/s/G9k3zqZheM6THqmHhoJvaR2Lv4YBrfqGW6qs4CvcdCv6xReFsrb53np
-	 iGTxOJAr7IB6FyH9A0t2bdHnO/WbXgg30anxjKeyNiICRdU2FCfI+S1Vz+UEyc1n6m
-	 keg7OzhAcADdaMdwxtRk0/wLGZp3Z5ALacHvzMpalkgAgvU5FR3qTuSxRKE1ilV8Dq
-	 lmf7rVZGC5z6yKmYIglnquyswDddBR+MFiQ6GOsGxoEacCwFUB9MhBXC2yzrhYnzLG
-	 kbTfXKl2xBBdA==
+	b=ozGcW1Z0CvPwHVxeT+vh2BaqaV0vT8vq54tqlDvO5VwQy6x1QTtTwFbdi2ZYxslhx
+	 5eE7Ogki/gZEj3UidRpgjmdy9fyjtnSoyw+NfdP7fmWqS3I4iujH0Yl4+kYmwNV7mV
+	 vd/7WYY/zIgX/drznlRgALUO492/eKdtUg9q01bI3YI4ABL7ecIn9mvduERJOdjCaB
+	 NF1KPYJRRfjch+txJkjWYEmfqyBl+mWKDJXQ4H3YT5BKljjDQg19QZ1YF3VuNZXslf
+	 VLCoM4NfsnY8lemHNznlBoO3T9ZCJ4VtZ/6ZRDFyLfohmyRS2sUe0X5Tw0I5bh6FZK
+	 BMxiYFImAOv1w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 775763809A88;
-	Fri, 20 Nov 2026 17:20:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15FC3809A88;
+	Fri, 20 Nov 2026 17:20:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,44 +54,41 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: MSFT: Only enable the advertisement filter
- with monitors
+Subject: Re: [PATCH v3 1/2] Bluetooth: btintel_pcie: Set only MAC_INIT in
+ btintel_pcie_mac_init()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179519520528.673037.13658094971187951302.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Nov 2026 17:20:05 +0000
-References: <20261120-msft-filter-monitors-v1-0-8192f0c0791a@pm.me>
-In-Reply-To: <20261120-msft-filter-monitors-v1-0-8192f0c0791a@pm.me>
-To: Thomas de Gruijter <thomasdegruijter@pm.me>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com,
- howardchung@google.com, mcchou@chromium.org, apusaka@chromium.org,
- luiz.von.dentz@intel.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <179519520652.673037.13393312532564477069.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Nov 2026 17:20:06 +0000
+References: <20261120094249.2419421-1-kiran.k@intel.com>
+In-Reply-To: <20261120094249.2419421-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com, pmenzel@molgen.mpg.de
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 20 Nov 2026 02:13:34 +0100 you wrote:
-> On MediaTek MT7922 (USB 0e8d:0616, BT firmware build 20260724) LE
-> discovery and passive scanning find nothing, because msft_do_open()
-> enables the MSFT advertisement filter on every power on even when no
-> advertisement monitor is registered, and this controller then drops
-> every advertisement.
+On Fri, 20 Nov 2026 15:12:48 +0530 you wrote:
+> btintel_pcie_mac_init() is called prior to reading device memory via
+> target access. To acquire MAC access, only the MAC_INIT and
+> MAC_ACCESS_REQ bits in the function control register need to be
+> programmed.
 > 
-> Patch 2 only enables the filter while at least one monitor is offloaded.
-> It is the first user of msft->filter_enabled, which does not follow the
-> controller when it reports the filter as already being in the requested
-> state, so patch 1 fixes that first.
+> Currently, btintel_pcie_mac_init() also modifies FUNC_ENA, FUNC_INIT,
+> BUS_MASTER_DISCON, and SW_RESET, which are not relevant to MAC access
+> (though doing so had no observed side effects). Leave those bits
+> untouched and only set MAC_INIT if it is not already set.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] Bluetooth: MSFT: Record the filter state on Command Disallowed
-    https://git.kernel.org/bluetooth/bluetooth-next/c/75d6b9d82c35
-  - [2/2] Bluetooth: MSFT: Only enable the advertisement filter with monitors
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4a8f9b7fb4f5
+  - [v3,1/2] Bluetooth: btintel_pcie: Set only MAC_INIT in btintel_pcie_mac_init()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b535edbf5178
+  - [v3,2/2] Bluetooth: btintel_pcie: Fold MAC_INIT into btintel_pcie_get_mac_access()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4fe38719e673
 
 You are awesome, thank you!
 -- 
