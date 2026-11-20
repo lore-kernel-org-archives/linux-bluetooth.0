@@ -1,73 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=203.205.221.205
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.57.64
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795182065;
-	b=pv1SfAzpVlV8m9im08KnG+H++JeYvJfNJrYNXKpm6jHBnGzV2z2wR1F7O6IEL2vPEC+9
-	 HTyMopGv8jrnX2a3qnYmcqD5UNcVkdgZpcpf2HpMiHis8fctP0k3m0utomezSRYTXWVDg
-	 m51TeCqdDUbU4F2TV4Ko5pAiMjzpHi2a85ovbYdtduYocBYBmOV2B4BHd9Zixl38Cb0At
-	 ZC/F8GF5USXbRNLBvvQVnK6wo6jr+KBzqneQqS8xJXKsvyfF+drecognNfJhhJcmDGiwd
-	 hNWJEtRr3p0dmBMS60jvI+K3RrN168aVVGq+XitF7+8ugl1UK13CwYRjd5i84rZ1zkQ==
+	t=1795182533;
+	b=sdIZi2IBhslUiI3A/HI7JG1bmYGy5Wkw0QsgD2/T0VEiyJto83wLc9+7CPnyGqAYQLpH
+	 EtfgO+2xBIlRyMNG+9wMBI3CmbgIU8BXksav1aQOdUiPZvrEzUXaqp7n2P2zBwLgnG18L
+	 EEuQubMukI0XVqAw6uax17l/Y5epLMdSG6JfSht6ll/aOBWouBnnshxYk+yM9KcTpQD9c
+	 nnzxg1ROKB4JJIbp2Ff2C11aLi70hE1T1pi/hh3rRzr0YmDf/UycPK408etIr7RTh9V6D
+	 tBpoX7BtpdOzN5Ih6su4xOa4APzedIK8VzdI4PRCNg4NG+pEGwQvbVT2JUIHKkSAlDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795182065;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795182533;
 	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Cc:Subject:Date:X-OQ-MSGID:
+	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Subject:Date:X-OQ-MSGID:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:
 	 MIME-Version;
 	bh=6J6hVWng2rSlwYKEbhFdmNXPBAvz8eUpC47Ucla4fKs=;
-	b=nK9RbsRL8wFbgQ6lh1tP9Wpj7MrbFS2VTtkuhLnh5VPoGNC1rQ6IlANlpxo/tF2lyCbG
-	 I1QTITx9t/vIAUsQRnjfVEif+k1boxiVb4U1nhUzI7JOLcpWxeeKsMezJKUoyckNhq28/
-	 ihsgpEpPXk6dLCzwPUL7YW2k2MxsmaqrdKMXQc5roLeFsevJjhnlh7jF3vXqPxyILVIDW
-	 JGuH6QA30xmVX9b7v6DjZ3mFOmx5zw+enaw2XrP9yjWBSi+8ydoEAL9D0Am2dV9IPW9pu
-	 YqMlkZHLurMsiC8xQB24VRZkKQ/H3P2zcQhyA3LiStpQLSTbn4HsKz9AVM5DygMSGzg==
+	b=PXfJ75RvD6WesKxtniRhkdbHum4Wk5YXIr8gQw7K5j37LsJD5xnkDZZs7LQTctUOB7DJ
+	 VzO2P2XKpcsFUhz2Nu31rQeKcEkKipUq9yaNIyPrleZCIhR7FHqnFk+GKy0L9q6JHcRKJ
+	 qvZ5ZzRIJL0GkfUUlhGWicgkaxOs4cCi7tCpOopDovrAdmYsh1lMcCjrc/QVzQx9LEiKA
+	 m5zT5i61b2Ik1+LGI0OAOqmUQwHxAcyJ/HtmqhO/DE2utSm2BBiYbjU4mGcaByKvaFSwM
+	 eUInH3jQ2eDdvjbY7zDImATmkmXSOObajPttQDr991bLXHbKa2byB9V31UpNxGz7urw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=qq.com;
 	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=OBMVqJyt;
-	arc=none smtp.remote-ip=203.205.221.205
-Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
+	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=AjpzNVp+;
+	arc=none smtp.remote-ip=162.62.57.64
+Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D1B60A2602
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 13:41:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52D1B60A2602
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338B2606A33A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 13:48:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 338B2606A33A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=OBMVqJyt
+	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=AjpzNVp+
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1795182052; bh=6J6hVWng2rSlwYKEbhFdmNXPBAvz8eUpC47Ucla4fKs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OBMVqJytk0fcG3mVF3xaon2CwcDoPFLpMhEyRrKvcLojjXrkHkZw52vCI3hHoGrrv
-	 r2wESDGRTaM58hFmaSjjTc5ePfq+LhysrIS44qVV1MziWPNQ9mX7SDvRb0/xuLzAFJ
-	 oD/brX4OavDCNyNBM6GE0rIZ1b/7/fvmzQKA140E=
+	t=1795182521; bh=6J6hVWng2rSlwYKEbhFdmNXPBAvz8eUpC47Ucla4fKs=;
+	h=From:To:Subject:Date:In-Reply-To:References;
+	b=AjpzNVp+zwz7gibWHcU/ePfgaXMlm+4zMAaNFHCBOHbq4h9Ig7xqqtFGISEWhwOxI
+	 6TSYtmQakiY7ydSIz+ruTWiZ6XCOWEieF0Y418U4G1HVquPap7cScJk3YswrdpziYH
+	 b4QTi2LB3C8iNRM9v+ogkxVhRwSzYoLKOVzw8ygY=
 Received: from [127.0.0.1] ([2409:8d5c:8f0:65e5:65c9:1ea4:b234:d5d4])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id A320CC11; Fri, 20 Nov 2026 21:40:50 +0800
-X-QQ-mid: xmsmtpt1795182050t6nfei0cn
-Message-ID: <tencent_FAC43B4F7D48065F3FE97765001726F60A08@qq.com>
-X-QQ-XMAILINFO: MyIXMys/8kCtBD8Zm1zJWKzVnkbv9rWpT56sMYdTQKqFw17Ui6empn9XPBZECK
-	 bkEZGn+XvSd8cUGKXnA4cpfkf2wVQRFE74C5OcIXhqh84JEmmqXhEjv1OoQ8dNMkl6maygdb/VIT
-	 /c/UogczWuTvWMTvSg6/D2snXz9whpYkKN3/q8ENkE5b75x2GvEl9D1ZBXnx3ZKGm3JfQA3iysqN
-	 2Dd+kqgH0UapOvJhVefAPh9Zehfp8dYP1w7hfaG1XP5I9VFPCD/fdqEvg6qg6eQWp1A9vdonecf1
-	 mdWO4ygdTxL1FfSMB3LwRd3jp/AKNEyAeBvSXEwH2tfYbKH9wraZ37PRefD8Ms5TuhAj9jCL58cd
-	 Jx03a1ROtK9U4EcMerEWXjm61OHaF/3Ul3J1vegLf7/HrBnYWt9Dtl5H8nGtV3kCMHvP6lXVgUsf
-	 fH1jL4bpbBU9ja7eLJp9kVlLCMZG1bBNz6H8GAyaaInv35ai5R1tsodQ+fXebZZV+jfvWRPxagRR
-	 49H2NvIpn7WzvXOp0s6g/AY2eHa7NMk7Gs0+qRPu6lev/ALrwUxoMUSnH6t+UOLt1nwROEBL8G3i
-	 gU3qzqzfpsgxr1JSQFRicK6ln1nVbiwIcrxJVnwwG5KPhzZ03UPJWLduEsDTYlwkV/xn8hF8eW2Y
-	 ap2zUlZ4hNn0NtHTsM6mgnvALVsPUKgRb45InjDwQFjCwo8iQTY/NEmXjpS1oha9gKso24ZoUIp9
-	 GrGt4kEqwe7kYo2T2Z6jWbb9I1ri4raWpnkGL3In9pTE2J5bdTIAT01SNs30+b6JllIKmiVv3zor
-	 AQsY83DV3htqE0Vgaxay7V22bEHTU0bbYeCFdY+WAwRQJcibQJm8Sz/dK8mUJY9tzz4k1gevkuoK
-	 JqHlwTyvZFEyFTM4vdsWzDmF9UHD6McO+POUkkOHxii3ynZV+4SSCDSWTrZ46F9//TDY61BPlPEh
-	 we6+YdL4VK5ngBrF/+AZ14yroVphXJVgu+I3e1fNde7AtkrKDUEphu8PPskqB2vLHQz9JItced2o
-	 VXK9RIhVOJ+rcHdpmLiEx3m0r7i56lAdLjIqoeBJ3fhNor9Wyy2VyR3anJixK1ObH1zzxo0tSzMn
-	 ++S+Yb4DwAeM5/oxzvGA5rIe7tEQOMeKpk7wJVPwi9+eBIBWZL9YmePkotDA==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id C28118D9; Fri, 20 Nov 2026 21:48:40 +0800
+X-QQ-mid: xmsmtpt1795182520t4eh513iy
+Message-ID: <tencent_010B36BDB8ACF762CE3E9238EF090609E205@qq.com>
+X-QQ-XMAILINFO: M1rD3f8svNznDLDz2Wyvu10gQ9/u4nV7M0RwxESTrCmxmV2wZNaKo/+/4xxbzi
+	 qc8H2Ad44QbU6OgShhXm2/8E8rLRLFfWJ6mntfEVqmOwfVVGDdPknIE5Vuhmd5u5GW7bytkPrByG
+	 48vhweNTGw3+qOxotDyVAkOXZVui5poqMedQrF9e7MovJmrNlfh8Yq4mIQYSifcFtQDDQYpNBYtL
+	 OSxkzdXFZnIdtkzHsBdri+3/EIAOyhX4fttCagWFsR8HD+lUG6W/QxLU/M4Gq3kuqeJzVT2TqJZo
+	 5tcQ4IwhjdVAZTj1ofxh2xDAfXstxtnx9dN1DoB+6K+ZwFCJbLjpipc3RTVf6j4JyGMTeJJG2s9S
+	 +R52MsNb3C6yQgY/Rmg4Sz0b/K/vq1kvq2YaWuJD3WAQcCCL2q1Ph/et2/8iAIPwsUJmT/auMogv
+	 /iwDc0BLxYnBxYsstTsj33H2nsJul7MV7RpbWDSPzLBZpgWlpKz1upvIBwLoakV2o5MkdiKkhc6d
+	 JKJD633ag3Om9auOLNPLg5d5CL/WN6sI3R0x+mzBHfBI75OhkcBhK2C9goL6U0H6j+bUgD2x2D9Z
+	 2GCOdy4euOw32s4sgSv4HTDh1RV6MX4a9Ze5gSOgEOWWA9W6O/ysRm5en4Tn7B7oVDIBEfPkxWXj
+	 g/VAl/zhhfes7eETZxY2fUdRkGRH4El31wBWHAcooSGKOfcHrBZGteOYk9Idri4z+g1x6mqiIbMy
+	 UulOw9rdi7NFrmffRtfOFYpu9D8r7VtxKi31EoqN+kOvHUZX1CgNVqxoPv8leBSdijBowvVsaoqF
+	 toJQeXZoITYbihs+4HlUo8yCpPSTFSGYtquaoRoMdxd8BYiIRBKOcb4SHpb4nBlTwuNIeAugcRes
+	 8qNQLAboDzTqDb9Pgl935kIo2MKnC9vWtO6V7z1NiB1AdSbMQHvmWypFi0cYO8qIw/4taqSDbxrt
+	 SgdKipNMuUI4JFBAcf8Ce5sCTMa+G3Q9ipW6XBwVSqADKNfTMv1ZV36MO6hir8v1yvmsFP18Jtov
+	 UeGF14eJhomNBJ1N8AwOlcQJ0ndmh0FHBi8SfqMrI9nTxYINdD2kBOH7EWgbdnUyBSq+z5vzUktN
+	 /HYx6QYP0Jh6GOC9V6uX+Nl2cvZeuKr7SHPvcqvX67ZWehkYw5ie8CqQewoAkwfgmHSqOpDEEDxS
+	 m4jVsImVWcFkGTpQ==
+X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
 From: Hang Nan <2122295973@qq.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
- pav@iki.fi, zzzccc427@gmail.com, enderaoelyther@gmail.com
 Subject: [PATCH v4] Bluetooth: RFCOMM: hold the listener across child teardown
-Date: Fri, 20 Nov 2026 21:40:49 +0800
-X-OQ-MSGID: <179518204966.64680.13551839061949152667@qq.com>
+Date: Fri, 20 Nov 2026 21:48:39 +0800
+X-OQ-MSGID: <179518251986.64680.15473101899696216335@qq.com>
 In-Reply-To: <179517710658.56988.15563657158904954302@qq.com>
 References: <179517710658.56988.15563657158904954302@qq.com>
 Content-Type: text/plain; charset="utf-8"
