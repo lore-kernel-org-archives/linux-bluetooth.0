@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795193716;
-	b=bZUn1su8cgvlYR6alDlkxqQoe8wBQCL3qPD0nnZWc6vIxuQM8/tE+ig/GRwfMaHr/czd
-	 LMQ1dEbHiCAe7pf51/szNRHwB3rSdoLhgLQ+zmIsKF36G1661aZRfKymtkpIyjQhEtJk6
-	 Q31BH1K5aDaymr+PicLb4std2+HQejd+EZ9JcQ/u1oCccN6naC9XlqMsiUh8BJCuKWQ4L
-	 Hh8/PFK/swZrVgeZ/w3eJZQ4TORQw50ENHb8T5pD3omR/NvOyWVot6U2SeCtoaBc4/IwF
-	 S7ai0/8MLvbeH0zyDbyskwmF1T3NRCRBc5tfigTQFcOf4QB66f6J0omDsIsMEkaTmZA==
+	t=1795193717;
+	b=NpJ9mT9cMtA3fZHAw/PzxPGZNe33wsUwdwWWI6mpi0LimbNtXQ+qQmAsGOHULeTEYsIX
+	 aRAssuUaqEs5Kn/PLW9WLg9cyq+aa7xQM28wotJ7BF+UooD/HnZJzaFhqXy+wjrb/qni+
+	 MOAZL7k4E5MwYks45HEZ3tixW3CRtQOYTxmqKcszp4SzfgDhoJrKSxJwQ8OaxOrwzIa/8
+	 7PorwQlbEk3luQg2x+xIn9eOxLh2H0iJjVhGfWllDviy7k9ySaWyJ8w50JGGIpAGJnzQv
+	 tM1KDIcP6utGq23oIv71CUK2gYMzn7pI3MQCIdmWYO7jArWmC1lxzLPaXCMIBjKKOZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795193716;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795193717;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=vq0mozm8bmwrCugrLLcQn4oqHWq9S+fcfXEP+8fmfRw=;
-	b=nFT7iknDIamGnhfE04rljlfVEcz76DCtu9W3AuxwfozOIlZ6urt2/10nshWbjRkimJBs
-	 KeFUDjCf7r3BoB32F27d4hCr8cJpTkJ/CM2ETcE94/6IVUvDJYfXuj0m6+nhWCFZ0f1xh
-	 r3tKPlOHgFC1JIyPlnzPyYbEsXDsAR/240dbjzWWqzex9PuUyEuqVklEUyUwKfn58nFby
-	 YyTfDZv7Rk6wCwizPpLx63YsbfUjsEDOqosD8h3VjqrN9QtWAo4soe437VGRDXELOVZD8
-	 kPIRDi9G1+fPlduOR0hweoktqODbmR7Ov3+bVp3/QrZQ1oDe9j3V1pEurcrpttq82bg==
+	bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
+	b=LNJ5NmVjs79HYQZRd0lcRPX8+vIvc2IQKYJJZNiG804Xj1AZclgY9v92reGdWAMEyF2V
+	 RLLX8ky2n6ZJhlfCoNK1i2hNVmYdFZ8wqT9hEf8v8C9nIZuASOPpS0ioliyn6f1KlM1k5
+	 tufSzRA04ubNuiNTXg+o05/snZaBLp85yXs93mekL51swiKqXPIsupnuUV4nXswDf5Lpn
+	 HHzNEZJCNJt7P7dK2vmofcatleoaOfKuh/cTs8Nj0TyuvQGMPkmjfnZu9YgBWVgk2+wsh
+	 yDlnAZGWPpCaRsiZC75dMVeqiA2NHiTtsVqxTOW1itdrHIwxeD0c3L2dTJDi35m8wkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=aCXHrPJS;
-	arc=none smtp.remote-ip=209.85.221.182
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L8T+Q4yU;
+	arc=none smtp.remote-ip=209.85.222.42
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4762C606A32A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 16:55:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4762C606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55D960A2609
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 16:55:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A55D960A2609
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=aCXHrPJS
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5eae12762c9so427669e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 08:55:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L8T+Q4yU
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-9906870a9baso604712241.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 08:55:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795193714; x=1795798514; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795193715; x=1795798515; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=vq0mozm8bmwrCugrLLcQn4oqHWq9S+fcfXEP+8fmfRw=;
-        b=aCXHrPJSLEaZgoj6qQ7bRtU4bntf3CzOXQmnFaBGrVq5r56f5L+XnW4hLxNi65SA24
-         SGyXhjTETRJJyxCmzoECGTmLohmQPLJcpynoI7vIftFi50revY9rDoLWE8QxCGhaXJTi
-         vzWxN2ilNfGK3BP//K+FKUj+4d5+r72sL6mNe00AucxONJzioaJOSdBP9qzrxJa/jN52
-         QfJnu7urdhM/he51A6JjE7vD5Oj+Ctp22Xzd0t50kRkicuODbqMLMELcYe/AdlxiheiR
-         OQ2Sv40huRZd0D4wSbpUtwvthUIM7E2b7QhSI/lE17QVaLBCHJ0r/XhzVHV/Y3mR/su+
-         bKWA==
+        bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
+        b=L8T+Q4yUMp+/84kloWwLO+hmJiTmAh9sMLPBoB6lCfgT8a//abxKQZGLnQT1B3oI6A
+         RWs6TFNbsVErsPeHzTRyhaTviQLjM3iAKCFvyGgNPKeLDE3qvk5XarAMO0esek5r6NGS
+         wpJOTY4CKUAAm8Yeut4uoaPbN0iRFPG3iBFAnOFMyRz/tTO0NF+ShOUh4gOT1bEvjNdd
+         9b5vXEl2Yma4qislniacKzBd0hyVoZSHHInEdvUf/TpkMgh6SQBE4zdrQ01VKk3aLT9y
+         c41FTJGjObwiaY8BVo/lo9ZBvOBbIW9aJDZjwwQk5dwswolLZ1EcJ07uQYBZ6avxp0Wv
+         KPhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795193714; x=1795798514;
+        d=1e100.net; s=20260707; t=1795193715; x=1795798515;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=vq0mozm8bmwrCugrLLcQn4oqHWq9S+fcfXEP+8fmfRw=;
-        b=BoXg1+oylWEThGKNpQ5AbYzK6Y6GT9dLnB65YPcnZMz5PK69ZxmqzGKaGxBkpECjdu
-         CahXVcvXKsbUHaT7VH3UPDUqLXXbhXkn1wx37p2E3DTzEZAue77F2PfjjbsEQr0tUclq
-         ggqkzTr3jdNKqK+nSbCsBTnzlL7AKiOrrbKSbPMAXSnJNYQtw1ElJKBBYo1BpKmYl9lE
-         foIRhEzDe2/V3IMrxx8sjOV/iD0amKNe97fh/Kpta6thxf2IsuvEhW/OAdto5xcn//nu
-         GgSQMr8rglwDiZLYgtdrsHNpAjAg6LfNUOux9YLAsHYdjEhG+phcI67HEn8ugsj/2jk6
-         +W9g==
-X-Gm-Message-State: APuU4Z8n2uXVldDxEfqw/SQjwNpvutGvS6QyzpbXAkEl+/VBO+KidzAI
-	1cohhCEjsGiczzSyNdLZoppNHH8D5mUahcJTxv/X0Bku/4wtyr6GC6TD8irpUgzK
-X-Gm-Gg: AZFdTZfG1X2Z3KHbPgMPl+PcNCF3GmpycqvfdQ7rh4QcUoXEO+pMyzTsZURzOzrg0Ph
-	WnjByXqWqhYUonUs0dHNp3XJDJIS4z8jHTtPTZ759wcis5CDzrRsh+gQw7RugYEv/YF893nQ6ze
-	gwdzIPb75xPPH7HaMKGqi5UgeTZdoUinj1QxttLusrGowbkK3UVT2ihMYB1UEEH2GJfJmRC/leW
-	hKu7bBEjx1p0E89/rkvH+Tay36oLSTIyVd4PU7xoHpGmt8IrsrRSxBeNaOnMTyXzqy4yP8nf85S
-	ipKiovvxuseVpxXpEHq3Yq24ibJOpCTMVZtn3kdPOEHvBz47KbAlGLuoVuFPij3vyccw8QyKXwX
-	VaxnDNoO+lu48i34L3fQjxh+u4pzSk9ugCg8uh46mIpPHFzDXPfZ0n71IQAWH1YDyCSC9N4k0At
-	KXg2F2qQ0J6B+n4zQmxdsPWVXbTwB6boSBt7Obgjqgrp+Jf5xB1eq8XMilN9I9gHaOJ7cjTcFWj
-	rzRoY1gr4Kznve7CWQJMlzfD1j7FiL1PYTCQZcaXhOfhU+XcAtf4ZoqaEPtufOBVEhEo1hehhNo
-	3mgPB1ECYwCkZeUeniua2VQOx/AaxY0LZRm46UPNKSLAddkT+xbdV6bkG/yD4cqiygaw2rwMTjR
-	C0A8FRUoNVv35eHry+iFN0+/L5GUlzeSrC+al52ejv5aaVMfNSmRcHtwspfC6v9qTA4Qx5dvCIY
-	6fjVU=
-X-Received: by 2002:a05:6102:3713:b0:7ce:645a:13a4 with SMTP id ada2fe7eead31-7d7395a933amr1614315137.20.1795193714151;
-        Fri, 20 Nov 2026 08:55:14 -0800 (PST)
+        bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
+        b=xV+DmSBLZJ9dm5KaHVDIljWZjUsSOUcDv5Kff0/t2U2fKlToNaVNNl+wmvTxL8rCB2
+         UwshnduEVslrempEdHF6AislWBKeoa7So8GP+LJ6UGQFp3nzoKYn2UVOMJq8NI0Sz9BK
+         wEvybNlH4xW/Ytyo5m0Lq8g915FiJbxwTey/LId0OU41EDC9MPnrPeEQbi0db+PAs9J5
+         7YKV3XQgE2XLOXdcJ20jYufuf8irCpfyLVuGm677cyw5oGxuXOlMXXWbaVMjjasqzHEM
+         Xp2XwmvkbBOudSgCroFUHgeAxTOwDpcEdnl3Vd7YyxE1/EcCwqBYONAzXLBpkT/sZe7n
+         NYcg==
+X-Gm-Message-State: APuU4Z8eTGobh0RovnqVgaHSs2cy8F71CCLCGSkJ1qkUfMwdWyrQ0gSL
+	m7FtZVN3m6kpzkJjdgQ6O+8kXSTjKoB+8ZV/QX59cmbINMDmTnrOzkQ7phtqnVGr
+X-Gm-Gg: AZFdTZfB5241ZSEbLtxM8H9dNr0/34hu9+XzVwPc9VgKI+lZSv0Pqx7GN5/Rpg09KvL
+	2pw5ffY8IQDBavvJouadlRBKdIRJ++Ll6FUNCoIpSPiPpYk5N3fWMnow3oJC7c2XVt3PTe6pwwt
+	jJ9AKgsq41TBtN3VlDFtm3HHdgEHY2JixVJOdXVhi+ZI93zxiztZIVbFOzCMPV2tECgQVc2XBsm
+	lAd0CR9oNsYlNvXFFEqPI9bliOtt9fXKieenw5f7DtfhOmq8Y7alZOcZZ6EdFTS+jxMHxddqrXp
+	2Az00ONsAZwnSJHumLgPg7khybVJl90V283RbO7a2k3wJiuZ0iVr0gP9B9c721yKkiGYVm7lDJr
+	TM00rP85Gfa25BVybjRglxF/aALtGIwAFYd20n5s4sxBlKZVJ5wiR0WWSQdm39TGuPhVUdLN9eQ
+	riJQrE4xc4qY7pMACZqhThMqb2/S5aLyUwZxhwLFAho+ShLBxoOLjfTghjIaIzDyvse5Ezbq268
+	D+LMLV143wWRPimR/wY+mxVkknMl7Ed2mV5tp6AFADN6staah95FdU5Lzyhbb6lZEu56F4qqJny
+	lWEFCcouJtbIOMnNqPlU5BgerRmQi9fUrI/5a9IOrm7Qkf26ko4OfpLS6wXiHcHY6etV2cxT8JM
+	VzNViYb/C+em+XjhlirFOL81hZZkWKC+aSrR+/uDRKi9GkLXycuFMZOrJvX0tyTNxFSVAHRwsJb
+	0Ohfo=
+X-Received: by 2002:a05:6102:26d3:b0:7cc:26a8:e716 with SMTP id ada2fe7eead31-7d739460f96mr1832659137.18.1795193715473;
+        Fri, 20 Nov 2026 08:55:15 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99e6df8a28dsm3486193241.4.2026.11.20.08.55.13
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99e6df8a28dsm3486193241.4.2026.11.20.08.55.14
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 08:55:13 -0800 (PST)
+        Fri, 20 Nov 2026 08:55:15 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 01/18] gatt-database: Drop stale device state for removed bonds
-Date: Fri, 20 Nov 2026 11:54:51 -0500
-Message-ID: <20261120165510.1858959-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 03/18] shared/rap: Subscribe on-demand data with the requested transport
+Date: Fri, 20 Nov 2026 11:54:53 -0500
+Message-ID: <20261120165510.1858959-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261120165510.1858959-1-luiz.dentz@gmail.com>
 References: <20261120165510.1858959-1-luiz.dentz@gmail.com>
@@ -101,90 +101,104 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-When a device is removed while disconnected, its cached CCC state
-stays in the GATT database and is restored on the next connection.
-Drop that state from device_remove() so a re-paired device starts
-clean.
+The On-demand Ranging Data characteristic was always subscribed with
+notifications, so an indication request from the Upper Tester was
+ignored for the data characteristic, while the RAS Control Point,
+Ranging Data Ready and Ranging Data Overwritten followed it.
 
-Assisted-by: Claude:claude-haiku-5-5
+RAS v1.0 Table 3.1 has it the other way around: On-demand Ranging Data
+must support both notifications and indications, the RAS Control Point
+supports only indications, and notifications are optional for Ranging
+Data Ready and Ranging Data Overwritten. With notifications selected
+the Control Point subscription was rejected, so no On-demand transfer
+could be requested.
+
+Use the requested transport for On-demand Ranging Data, always
+subscribe to Control Point indications, and subscribe Ready and
+Overwritten with indications when the server supports them, falling
+back to notifications only when it does not. A server may send Ready
+only as indications: PTS does so in RAP/REQ/ORD/BV-01-C.
+
+Assisted-by: Claude:claude-opus-5-5
 ---
- src/device.c        |  3 +++
- src/gatt-database.c | 34 ++++++++++++++++++++++++++++++++++
- src/gatt-database.h |  2 ++
- 3 files changed, 39 insertions(+)
+ doc/org.bluez.ChannelSounding1.rst |  5 +++--
+ src/shared/rap.c                   | 32 +++++++++++++++++++++++-------
+ 2 files changed, 28 insertions(+), 9 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 36a980d1ea66..b4dd52e4f34e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5637,6 +5637,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
- {
- 	DBG("Removing device %s", device->path);
+diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
+index 32c83e36f536..e75535b97092 100644
+--- a/doc/org.bluez.ChannelSounding1.rst
++++ b/doc/org.bluez.ChannelSounding1.rst
+@@ -275,8 +275,9 @@ CCCD subscriptions, then enables the selected mode.
  
-+	btd_gatt_database_remove_device(
-+			btd_adapter_get_database(device->adapter), device);
-+
- 	if (device->auth_retry_id) {
- 		device->auth_retry_id = 0;
- 		timeout_remove(device->auth_retry_id);
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index cbee49d59f55..81a52492002d 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -4277,6 +4277,40 @@ void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
- 	att_disconnected(0, state);
+ ``transport`` selects the CCCD value for Real-time or On-demand mode. It is
+ ignored for Disabled mode. Use ``0x01`` for notifications or ``0x02`` for
+-indications. For On-demand mode, this applies to Control Point, Ready, and
+-Overwritten; segmented On-demand Data always uses notifications.
++indications. For On-demand mode, this applies to On-demand Data. Control
++Point always uses indications, and Ready and Overwritten use indications
++if the peer supports them, notifications otherwise.
+ 
+ Raises ``org.bluez.Error.Failed`` when remote RAS discovery and Features read
+ have not completed, or the selected mode is unsupported by the peer.
+diff --git a/src/shared/rap.c b/src/shared/rap.c
+index 6de8111d1067..1c4b5239e1ba 100644
+--- a/src/shared/rap.c
++++ b/src/shared/rap.c
+@@ -4556,6 +4556,21 @@ static void ras_cp_response_notify_cb(struct bt_rap *rap,
+ 	}
  }
  
-+static void remove_device_state(struct btd_gatt_database *database,
-+				const bdaddr_t *addr, uint8_t type)
++/* Indicate Ranging Data Ready and Ranging Data Overwritten when the server
++ * supports it; otherwise let the client fall back to notifications.
++ */
++static uint16_t rap_status_ccc(struct gatt_db_attribute *chrc)
 +{
-+	struct device_state *state;
++	uint8_t props;
 +
-+	state = find_device_state(database, addr, type);
-+	if (!state)
-+		return;
++	if (gatt_db_attribute_get_char_data(chrc, NULL, NULL, &props, NULL,
++								NULL) &&
++			!(props & BT_GATT_CHRC_PROP_INDICATE))
++		return 0;
 +
-+	/* While connected, gatt_server_cleanup() still reaches the state
-+	 * through the disconnect callback, so leave it alone here.
-+	 */
-+	if (state->disc_id)
-+		return;
-+
-+	queue_foreach(state->ccc_states, clear_ccc_state, state->db);
-+	queue_remove(database->device_states, state);
-+	device_state_free(state);
++	return BT_RAP_RANGING_INDICATE;
 +}
 +
-+void btd_gatt_database_remove_device(struct btd_gatt_database *database,
-+						struct btd_device *device)
-+{
-+	const bdaddr_t *addr = device_get_address(device);
-+
-+	/* Adapters without LE support have no GATT database */
-+	if (!database)
-+		return;
-+
-+	/* A dual-mode device can have a state for each bearer */
-+	remove_device_state(database, addr, device_get_le_address_type(device));
-+	remove_device_state(database, addr, BDADDR_BREDR);
-+}
-+
- static void restore_ccc(struct btd_gatt_database *database,
- 			const bdaddr_t *addr, uint8_t addr_type, uint16_t value)
- {
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index 998e3c452b16..94469a707184 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -20,6 +20,8 @@ btd_gatt_database_get_adapter(struct btd_gatt_database *database);
+ /* Initiator role: subscribe to a single on-demand-related characteristic,
+  * logging (not failing) on any missing attribute/handle so a
+  * partially-capable peer doesn't block subscription to the others.
+@@ -4637,21 +4652,24 @@ static bool rap_subscribe_ranging_data(struct bt_rap *rap,
+ 	if (mode == BT_RAP_RANGING_DATA_ONDEMAND) {
+ 		uint16_t value_handle;
  
- void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
- 						struct btd_device *device);
-+void btd_gatt_database_remove_device(struct btd_gatt_database *database,
-+						struct btd_device *device);
- void btd_gatt_database_server_connected(struct btd_gatt_database *database,
- 						struct bt_gatt_server *server);
- 
+-		/* Data is segmented and can be large, so keep it on
+-		 * notifications. The control and status characteristics use
+-		 * the requested transport.
++		/* Only the data characteristic follows the requested
++		 * transport (RAS v1.0 Table 3.1). The RAS Control Point can
++		 * only be indicated, and Ranging Data Ready and Ranging Data
++		 * Overwritten are indicated whenever the server supports it,
++		 * since a server may send them only as indications.
+ 		 */
+ 		rap_subscribe_ondemand_chrc(rap, ras->ondemand_chrc,
+-			BT_RAP_RANGING_NOTIFY, ras_segment_notify_cb,
++			rap->ondemand_ccc_value, ras_segment_notify_cb,
+ 			"on-demand", &rap->ondemand_notify_id);
+ 		rap_subscribe_ondemand_chrc(rap, ras->cp_chrc,
+-			rap->ondemand_ccc_value, ras_cp_response_notify_cb,
++			BT_RAP_RANGING_INDICATE, ras_cp_response_notify_cb,
+ 			"RAS Control Point", &rap->cp_notify_id);
+ 		rap_subscribe_ondemand_chrc(rap, ras->ready_chrc,
+-			rap->ondemand_ccc_value, ras_data_ready_notify_cb,
++			rap_status_ccc(ras->ready_chrc),
++			ras_data_ready_notify_cb,
+ 			"Ranging Data Ready", &rap->ready_notify_id);
+ 		rap_subscribe_ondemand_chrc(rap, ras->overwritten_chrc,
+-			rap->ondemand_ccc_value,
++			rap_status_ccc(ras->overwritten_chrc),
+ 			ras_data_overwritten_notify_cb,
+ 			"Ranging Data Overwritten",
+ 			&rap->overwritten_notify_id);
 -- 
 2.56.0
 
