@@ -1,79 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1795137222;
-	b=Uih681F5BEpHUqgddPtnUI6ipfGfYhvWkvlE5SUjsLgD/Udn85ZQAy5/14qhe2chYhIm
-	 pWUNyTmPbiDv99mEdnGtx5bHoXIlCK2gdnQII7FeLpPfg3x6GTX+OGrjX9RkAcgXDUntW
-	 H4Wptw1KzSqp9H2b7qvJWAHVML2wxYK6htTlL88FMpo4HaBQUMnm0FTENdjhVhUteox18
-	 jx58rQV1Tpi6rwW8o/WjmEC+YUkzx9BgRyrX6GzeTkiByd97jb1KFff6lrvHW/OBMvIbn
-	 bsLshhqvDFxIfq0xFvPItlqKjh8cDWMeuyAfIOBc1HexKu3ijV11fWiRxJtYAp7NBQA==
+	b=oesaNS0JiI6fg39a+9j6/1lyUy+V9fc1JwDDKjyCosM1B6njpHmGVH7Lbrii/S2KGM+K
+	 cHm6BVKSuUXxltVU8uIuAKFAW48uPYmIzBFnD7Fx3eAa4RUstTdYu4ExJNoFGO6zT1M7K
+	 /mkBFG9T3SnwnRXKF51uq+osQM4DVuYKL4T3LD5Q/KW3JE2oyUjDS8dOKF3V4tq6qpJyQ
+	 cdO+oakKvHDaBjG1CSGcvI+0Tdy1L+e6feBNqpqLAbUD1inYw9n07Lc51DKvGZWo8cnK3
+	 jl6LoE9l0NlUNQNUdunZWam0F/CfT32A36YsUoGrn0O6ecDBnTqn5AnsYjIR9dXNi1w==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795137222;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=ZZ/wZxb5FVQ258VnNPOOYek4ipDLrwtdDou9zYB1QIc=;
-	b=yj4ddLH0BLCV0UM3NqOy8foZOXoaBF8xPwOoiYhAETcnV4WrN291ekaW5WTlOdaxP+NX
-	 6cxOuo5Y78dIKIBY7+N7GTWjSN8G3hsOUdkYTdDd61DJWbsjh6aIPzZXkNfQ4bKt0Z0Zf
-	 YEO60BJEZc/WttHft0Zaa6jaj2cd093HUkkW4psyUmnPjqNRhRsm5AnowAufUPZaP/CYS
-	 XuRPRIdmchQMQZF6B+jhoYVrg5Yxbt7QHe+q7NnqmfeeBNoPe2F/j6Q7ldBCJLm3gaOPg
-	 2c/9L1aa1W8RY4KrcnMKt0LOLpi9oFkIn9hm55MvesgS5zC0AQPUFv5xNHpvWBXPe+g==
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=4+N34wH9vfHLS4WrXIYkFEqFjJc0yjIlWDzHKwe4kRk=;
+	b=fIp1co0SS07215833+AspogEt0Nt8Ll7Hn1+xaTs2KL6uAlLAoRamE15rSroslGG5yGr
+	 qgRpl/Eh6reNQwwprpbYWf9ZdGvL0YUi7FiSUYCZ01VX0gUdehlblclKLPzRHku04Uu2F
+	 c6iE3kFJXdTb8xML0uOOrYOb+woPXlsIje7p3MeNsWzlMtLOoMI483PG2AUkbsU74pMg9
+	 LUnjPYPq/L2NM5eX0K2rjEwDB3Fkhgem2EFmuWg6m/dgXfb5RVvVHaEdfy02xQeUO4NY0
+	 rtqiO47Bn+DqQ9CWl6BS5EmSnhCXQtAMp634/r7XmllRqnwA6JsoNocqEg8dB+UsmLg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCnWTjDy;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dLDKk15X;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84D8606A331;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB08606A325;
 	Fri, 20 Nov 2026 01:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCnWTjDy
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dLDKk15X
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
 	t=1795137222;
-	b=rtCNLIzN8eva13DmQqgKQcY6dwMF/3HzsFb66OZRSnDh4cF8mGQ9nqaFGI0o88Bho2sH
-	 FyuPgFrVSrolgIirQ2lhxFaelSbzWQUSA3gbi4kLED4xdnzD/AfnnNBShwg9/2fETRuOn
-	 1ZPhUtNixbR5K7IE0ibdX+8ije3U5TkC1U/co5225uK2lf3mAPUAh7XUyAXO+9TJUrDAl
-	 dldHJ1RBlvg8SQnyrMhzKnh/8zhBleCZacfHkxgFwJN7o3PfNNNgvWFWNgzg+XjLSTADf
-	 w3Lq+Gga/tGrFPn1WNDCgsbCEpfm4msLPk+QOGGJNVLfwyGYYVRsXKgIwA5bvo5PwZw==
+	b=UWGzaBACcDPWLWlD2IXUnaxATGtl0cFOd3IhYlY12KR6tZR3yz1LdThhHh0dkSUt9ZWS
+	 4f0dXItI9v7BjbERiUXgi80R6AXSW3IpJShrGTlSD2EnFlo2XnP/yglls3J5W3WeyzdLb
+	 7YXGSN3Gn5CsiRugJmlko8rjvf+vStyL1SangIGwuXGqnfj+ByB215qHpWHQKckGIj1r4
+	 LfOrR6kbbBmgZh3AtHZgIu5Fp3IPb3MPor7KENqfGz9ueiKRkwpvcdPF61mJB6UnLR+H1
+	 JrkyDvF6msoC0ddIuTtbb54s/TwVhlp/cuq+Y+wRlWOp7i1D34ZxGdx0q8MVcGGOMPg==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
 	c=relaxed/relaxed; t=1795137222;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=ZZ/wZxb5FVQ258VnNPOOYek4ipDLrwtdDou9zYB1QIc=;
-	b=zU2lPCtuC+Wc+sS3nMOZcn8nB3e2z0ytIP1ErSlAjrlbkgNtzocqywi+RwY3GqB/Hc4b
-	 F37+d6DnH52mxT3sCFRSk0JBddPW5b9rkn1fbI9Uji0t7KzcijAIZu9qrkao7pl/BWnje
-	 cmu2CCFse8yLAdWhA8a485Kq8Bx6mlknXhqXtUalDYtRFfuFAVFGA4SeuE6EgybuTo9xD
-	 3HYZLUVWULWdkUJfP6UJaLMza3lg5Bzm3IC3ACnJP9mUGGIpYQ0kia5dXT8Ee6iQ+J8mk
-	 fPqdmD5bvd36l4TXz6pRGGahS+B/IDgegm1MWBWuntwdFfEmyYFu5+ayAnc0A65zdGA==
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=4+N34wH9vfHLS4WrXIYkFEqFjJc0yjIlWDzHKwe4kRk=;
+	b=2FDG52neYJVwI4xDylejMTJqEKKv06HsrP/HsPf384aBBhdXfEmMB9Xi4NI4Uiwzm/P+
+	 mhrn69yi5KIYYIQ6bw3QzN4HTQMQmovIYvi6RqaMqb/k2f96tyRxgwApYMjuSOaBAFryu
+	 zTWvyOwrmL0AnzhhwLbzhdfldCluBgYPxDlsmEDOcf94lLmwCI85LW/bP3gMuV9K0PYQ4
+	 xORnFaimAUOk1O1VU6nh8ciskN/UQpDUUe3KjX/Jo3GcrgV9WwPKNACobmCDSDHYyQiAK
+	 vtk5qfhCxhlro4Wlm2hfV01cVFTIZCYCNEuAczZo9C3/1RU/SIqDewQpTWhw/4Cdlxw==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id C89CC1F000CA;
+	by smtp.kernel.org (Postfix) with ESMTPS id 93AFF1F000C4;
 	Fri, 20 Nov 2026 01:13:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1795137222;
-	bh=ZZ/wZxb5FVQ258VnNPOOYek4ipDLrwtdDou9zYB1QIc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=PCnWTjDy4cgwyIz293TjAi/JU1bcL+qtgBPl6cac9FwLG8JF2wIUNAkAzedYq2vt6
-	 nldxhitkSpYuGwLyEAlIqxIF35uKAz4ZRkKFPMV+qr1AuQTaVFQi55a0+MYeXiy4Vt
-	 bmjTQWLJaWrg8arkJ/0byCt8tH2GXYZNKSl59xu7CjA2Uz6brQXTZDHM9ujdc6FrhM
-	 fpSar/SFsL99mfFxwCVyUMEZJtMfMTnj57KN2riwcdcqZjiZ2MslPJ/D3AX6xg3/xp
-	 WR5O3FDUdcdoJOQkirxdtdkoqKN4/bNYWBkeUXWJDGJkFBurPiLzel5bzhgWKOdMZJ
-	 IfHgipmjvwxmA==
+	bh=4+N34wH9vfHLS4WrXIYkFEqFjJc0yjIlWDzHKwe4kRk=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=dLDKk15XdPjvj0oUsvnaayn4j+3UVGkkwPPPfyWxjFbXYl/7lj3wx0wn6IUGONGrT
+	 OAnM2x4YagNBOmBkPvoQOQ29szfbYiVpuTYpUNi7W3tlGNTxyS9fmWYesKi7ooo9et
+	 MDBAPHhuVmVmwWcobN6GM2zMNjLaiwjcyvRsyz+UFbwAn8MBdKYq1v8IzXqrFEx36f
+	 2UN+9Q6tH5HKH9xDdHTzDVCnkMHtOk+Mq8PN3FChzIlK/3jk0RdZ2M2IfY96oBgxRV
+	 SBFewulJGKOG7EcFFu6TbnMpQRrkQTW+7AadYIBhgDSuCjBHhN+W45GJf2v96+8sBK
+	 A+T9z+YCWyCaQ==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 55E7C42614;
+	by lkml.kernel.org (Postfix) with ESMTP id 255A64260F;
 	Fri, 20 Nov 2026 01:13:41 +0000 (UTC)
 From: Thomas de Gruijter via B4 Relay <devnull+thomasdegruijter.pm.me@kernel.org>
-Date: Fri, 20 Nov 2026 02:13:36 +0100
-Subject: [PATCH 2/2] Bluetooth: MSFT: Only enable the advertisement filter
+Subject: [PATCH 0/2] Bluetooth: MSFT: Only enable the advertisement filter
  with monitors
+Date: Fri, 20 Nov 2026 02:13:34 +0100
+Message-Id: <20261120-msft-filter-monitors-v1-0-8192f0c0791a@pm.me>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,9 +85,11 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261120-msft-filter-monitors-v1-2-8192f0c0791a@pm.me>
-References: <20261120-msft-filter-monitors-v1-0-8192f0c0791a@pm.me>
-In-Reply-To: <20261120-msft-filter-monitors-v1-0-8192f0c0791a@pm.me>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMTQqDMBBA4avIrDuQBPyhVykuGp3oSE1kJpaCe
+ HfTdvkt3jtASZgU7tUBQm9WTrHA3ioY5mecCHksBmdcY60zuGrIGPiVSXBNkXMSRVNT67vgG9v
+ WUNJNKPDnt330f+vuFxry9wXneQEdqSFXeAAAAA==
+X-Change-ID: 20261120-msft-filter-monitors-05e7b8fb6175
 To: Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
  Brian Gix <brian.gix@intel.com>, Yun-Hao Chung <howardchung@google.com>, 
@@ -95,169 +98,76 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Thomas de Gruijter <thomasdegruijter@pm.me>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795137220; l=5018;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795137220; l=2581;
  i=thomasdegruijter@pm.me; s=20261120; h=from:subject:message-id;
- bh=oT34K5Pir/uDlTpBt575+nbbGyIR7ZHnel9uDdmYiDw=;
- b=fsi+gUP+ht/139YcgqzEyVLogw8p4nnwczBQby4sAl8ujOmP77MtN21lncNbh0//pUWXNb45j
- SHpRBT+6vAgAAFjBIMZzTcKLfzU0zT4T2L58Y6Ul02dvtDNYftR49hm
+ bh=8/AuYm0ked8MCkDMwRkqznLi5F2SKWqBi78N6Aa7kMI=;
+ b=AphLmhqzHZxMDtYf0VAg+/x/lgsXYSXgkcQBKjrS4dPXrmKocw1a04GmEI6I/mcRTS/3quUOP
+ Jo9s4NXGOKmCxiILM75AwxlizDUzGHcgpgfsZh56HcVxTXsfugmB7bX
 X-Developer-Key: i=thomasdegruijter@pm.me; a=ed25519;
  pk=YtEZHHXdsASGVJkddpdFLAnfVg0G/gza+FXgPGUJZlg=
 X-Endpoint-Received: by B4 Relay for thomasdegruijter@pm.me/20261120 with
  auth_id=1578
 X-Original-From: Thomas de Gruijter <thomasdegruijter@pm.me>
 Reply-To: thomasdegruijter@pm.me
-Content-Transfer-Encoding: 7bit
 
-From: Thomas de Gruijter <thomasdegruijter@pm.me>
+On MediaTek MT7922 (USB 0e8d:0616, BT firmware build 20260724) LE
+discovery and passive scanning find nothing, because msft_do_open()
+enables the MSFT advertisement filter on every power on even when no
+advertisement monitor is registered, and this controller then drops
+every advertisement.
 
-msft_do_open() unconditionally enables the MSFT LE advertisement filter
-on every power on, whether or not any advertisement monitor is
-registered.
+Patch 2 only enables the filter while at least one monitor is offloaded.
+It is the first user of msft->filter_enabled, which does not follow the
+controller when it reports the filter as already being in the requested
+state, so patch 1 fixes that first.
 
-On MediaTek MT7922 (USB 0e8d:0616, firmware build 20260724) the
-controller then drops every LE advertisement: LE Set Extended Scan
-Enable succeeds, but no LE Extended Advertising Report is ever
-delivered, so LE discovery and passive scanning find nothing. BR/EDR
-inquiry is not affected. Sending LE Set Advertisement Filter Enable with
-Enable set to 0x00 restores reporting immediately. The Microsoft HCI
-extension specification defines the filter as disabled by default and
-does not specify what a controller reports while the filter is enabled
-without any monitor condition.
+How the problem was found
+-------------------------
+- btmon showed LE Set Extended Scan Parameters/Enable completing with
+  status 0x00, followed by zero LE Extended Advertising Report events
+  while three BLE beacons and ~20 other devices were in range.
+- With hci0 powered off in BlueZ, the controller was reset and driven
+  directly through the HCI user channel. Legacy and extended scanning
+  both delivered reports (~870-980 in 10 s from 23 devices). Adding the
+  kernel's init steps one at a time showed that only LE Set
+  Advertisement Filter Enable(0x01) stops all reports (0, versus
+  ~520-540 with LE Set Address Resolution Enable or the CIS host
+  feature bit added instead).
+- Disabling the filter on the running hci0 through a raw HCI socket made
+  BlueZ LE discovery see 22 devices instead of 0.
 
-Only enable the filter while at least one monitor is offloaded to the
-controller, and update it after a monitor is added or removed and after
-the monitors are re-registered on power on and resume. Like the
-monitors, the filter state does not survive a power off, so reset the
-tracked state in msft_do_close() instead of sending a redundant disable
-on power on. A command is only sent when the wanted state differs from
-msft->filter_enabled, so this depends on the previous patch keeping
-that state accurate when the controller reports the filter as already
-being in the requested state.
+Testing
+-------
+- Patch 2 was tested on the MT7922 described
+  above: LE discovery works right after boot (22 devices instead of 0)
+  and BLE power control of Lighthouse base stations works again.
 
-Fixes: 394566bf1e37 ("Bluetooth: advmon offload MSFT handle filter enablement")
-Signed-off-by: Thomas de Gruijter <thomasdegruijter@pm.me>
+Not tested
+----------
+- Patch 1.
+- Any setup with advertisement monitors registered (adding or removing
+  monitors, suspend/resume with monitors), any controller other than
+  the MT7922, and the Command Disallowed path of patch 1, which needs a
+  controller that starts with the filter enabled.
+
+Tool assistance
+---------------
+The investigation and the creation test scripts were done using Claude Code.
+I have reviewed the changes and the analysis and can answer questions about them.
+
 ---
- net/bluetooth/msft.c | 46 +++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 43 insertions(+), 3 deletions(-)
+Thomas de Gruijter (2):
+      Bluetooth: MSFT: Record the filter state on Command Disallowed
+      Bluetooth: MSFT: Only enable the advertisement filter with monitors
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index f372df9a9831..db7b40ab5fc1 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -468,6 +468,30 @@ static int msft_remove_monitor_sync(struct hci_dev *hdev,
- 	return err;
- }
- 
-+/* Keep the advertisement filter enabled only while at least one monitor is
-+ * offloaded to the controller. With the filter enabled and no monitors, some
-+ * controllers (e.g. MediaTek MT7922) drop every advertisement, which breaks
-+ * LE discovery and passive scanning entirely.
-+ *
-+ * This function requires the caller holds hci_req_sync_lock
-+ */
-+static void msft_update_filter_enable(struct hci_dev *hdev)
-+{
-+	struct msft_data *msft = hdev->msft_data;
-+	bool enable, update;
-+
-+	if (!msft)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+	enable = !list_empty(&msft->handle_map);
-+	update = enable != msft->filter_enabled;
-+	hci_dev_unlock(hdev);
-+
-+	if (update)
-+		msft_set_filter_enable(hdev, enable);
-+}
-+
- /* This function requires the caller holds hci_req_sync_lock */
- int msft_suspend_sync(struct hci_dev *hdev)
- {
-@@ -493,6 +517,8 @@ int msft_suspend_sync(struct hci_dev *hdev)
- 	/* All monitors have been removed */
- 	msft->suspending = false;
- 
-+	msft_update_filter_enable(hdev);
-+
- 	return 0;
- }
- 
-@@ -633,6 +659,7 @@ int msft_resume_sync(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- 
- 	reregister_monitor(hdev);
-+	msft_update_filter_enable(hdev);
- 
- 	return 0;
- }
-@@ -670,11 +697,11 @@ void msft_do_open(struct hci_dev *hdev)
- 
- 	if (msft_monitor_supported(hdev)) {
- 		msft->resuming = true;
--		msft_set_filter_enable(hdev, true);
- 		/* Monitors get removed on power off, so we need to explicitly
- 		 * tell the controller to re-monitor.
- 		 */
- 		reregister_monitor(hdev);
-+		msft_update_filter_enable(hdev);
- 	}
- }
- 
-@@ -706,6 +733,11 @@ void msft_do_close(struct hci_dev *hdev)
- 		kfree(handle_data);
- 	}
- 
-+	/* The advertisement filter is back to its default, disabled state
-+	 * after power off as well.
-+	 */
-+	msft->filter_enabled = false;
-+
- 	hci_dev_unlock(hdev);
- 
- 	mutex_lock(&msft->filter_lock);
-@@ -1173,6 +1205,7 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
- int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
- {
- 	struct msft_data *msft = hdev->msft_data;
-+	int err;
- 
- 	if (!msft)
- 		return -EOPNOTSUPP;
-@@ -1180,13 +1213,17 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
- 	if (msft->resuming || msft->suspending)
- 		return -EBUSY;
- 
--	return msft_add_monitor_sync(hdev, monitor);
-+	err = msft_add_monitor_sync(hdev, monitor);
-+	msft_update_filter_enable(hdev);
-+
-+	return err;
- }
- 
- /* This function requires the caller holds hci_req_sync_lock */
- int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
- {
- 	struct msft_data *msft = hdev->msft_data;
-+	int err;
- 
- 	if (!msft)
- 		return -EOPNOTSUPP;
-@@ -1194,7 +1231,10 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
- 	if (msft->resuming || msft->suspending)
- 		return -EBUSY;
- 
--	return msft_remove_monitor_sync(hdev, monitor);
-+	err = msft_remove_monitor_sync(hdev, monitor);
-+	msft_update_filter_enable(hdev);
-+
-+	return err;
- }
- 
- int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ net/bluetooth/msft.c | 57 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 49 insertions(+), 8 deletions(-)
+---
+base-commit: 1d79f61152c315e30e758116e525871732181a98
+change-id: 20261120-msft-filter-monitors-05e7b8fb6175
 
--- 
-2.56.0
+Best regards,
+--  
+Thomas de Gruijter <thomasdegruijter@pm.me>
 
 
