@@ -1,70 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.7
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795163214;
-	b=OIpHxA5LuZh2aUtaKCSpUMMs0i9Xev7TmH5cGTDPlKooCgC9EfNChDFa9rOPGBOF8X3v
-	 JZzpf/BIsC8Vk3IpHgMjt5Lhbnc3zimjfRBWi2vv/YUx6TosG8oI7bZPQ/Jh22QMLm1uZ
-	 3spW3wpAeo6amxGAWBmkXAKWmbfRCgE49fI6qgdkCeVGnCDI1N6SEBFH0fUmTgygp76FS
-	 UBSA6jew6dTHuBb/hcK87XCeooB867SZJZA9QnF+yGeidjy6LK7WSt3qwXVWEqTNt4KeQ
-	 vYSu8s1fxRjwEqWICC4NIZFeLdTzUeRWmIEdgRgDm1haT2tTpvMzYIvxmH2WUoG4PrQ==
+	t=1795166562;
+	b=3MOXoFAlx3iCCJooItogeZ5YwSyGcAdlEUekQmFBClkV8yL+KzXkKkZ8b0JbBv2qXHa7
+	 PfcOYoEf8c2KwEvHa5WyR/CbkobLXFOvpnD7/3VCXe+otnvuEHaVFhgvwb387d1PDRAnl
+	 RK4pnSBY2XixbfCijt/bmatgYHnQGdkUECs46WdN4tMGgTZ4s/51DKYa8rO6AdZxMR+b5
+	 NIbEWqP94dHU2KVDfS6+6ssbfjp+EI/F3lBfelrdsstzGH/pxk/CyhnMY9D1F+/2SDyD1
+	 +oRTtv22eLX6S6O7XzX21ye9AFbJoke33C37CB5jVMCF8axrK6YmmXrxQn3fxdiW/Ow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795163214;
-	h=DMARC-Filter:X-SpamFilter-By:DKIM-Signature:Received:Received:
-	 Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=3RdsJmKkC6IgpIevNBF79SFGapdKJgsNYchPj2f52JM=;
-	b=Tz7CUB4R+kTmzVAIkUKvvngNemAxZdUDyZKOJ/Ag+1cSbV+ZH1DTrmb3rumGKwD12jqK
-	 ejIvzJUbcYnjVHFDxD5LrAuZ9+ROXAiTS7p9SHwRqNq+bL/w9i/dln9eKnhD5MbTRetrM
-	 HmTFSo1+/rr+sZ+A8KPYYN7LI7K8qTwxZbNU9/FnJoIDxEzveyvZtai6UGOEIE7+UHrjW
-	 hLK4iGxNs77lpOtzLNmZsgKSzE4pFHw55vfutOIBPbw1NmbU9ovJCI/6X61HnV5/H1brl
-	 iAfAO0OywkKSFowPVdLjKqIGagtG66+8ODCg0Lb2YalPloE1tjCA3ERb63HQP9jpePA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795166562;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=YjR5k59UT47s6yBsF0l7vHb/E+RngyAk9H/cLwS1WkI=;
+	b=UFQMXc9TMZ+9z25I30tdVReXomDQtPNBm6smzkUOxDjBAWGzNv/Yv1mbo9afg86bwvDM
+	 48M1fB0EtRge+CmUNZAR7m7Z4AXd/wkma1FDj9rz0vFdgpGOxnYytm5U/npkopjEdN7v0
+	 iUzFD4xXIiIdQl4ShOtOxo8+688tSLTHZ7bp95goBEFs2hjHRU3F0v5SZObMhqWgSgEA8
+	 US9MIb4rvvvaxsQehxGUAO1PxLSZGDTXsqgAtDfmS2KDcaoSRttrr8AHV6mkLriKihk4l
+	 3N1OjVlA/UUkk5wk0OirlPmyo8ImEcZKl21Z6IAmiZWOlM/Fa4SmUgENuJJtg4tgmdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=realtek.com;
-	spf=pass smtp.mailfrom=realtek.com;
-	dkim=pass header.d=realtek.com header.i=@realtek.com header.a=rsa-sha256 header.s=dkim header.b=s9mz6AjH;
-	arc=none smtp.remote-ip=211.75.126.72
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="jjd/6kKf";
+	arc=none smtp.remote-ip=192.198.163.7
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52801606A33C;
-	Fri, 20 Nov 2026 08:26:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52801606A33C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEDC606A320
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 09:22:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4EEDC606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.a=rsa-sha256 header.s=dkim header.b=s9mz6AjH
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6AK8Qg6H23249580, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1795163202; bh=3RdsJmKkC6IgpIevNBF79SFGapdKJgsNYchPj2f52JM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	b=s9mz6AjHjMg2GVbf60zWBpeKWKf+25had9ZnSil7WCPhd80itF0OElPBqAtLaDOCX
-	 kGf9aPjEY5DdZ9IeNDOi8F0smgoYwtDnmg/iJ7ltkSpZzcfv3YvowvO7tlKEdgAEX2
-	 H/HPSRNf/eI9QcACPfVDRKGZJTuLyxWdINz9VxGWwO11xAhh2jNVrpgL3EpQ4IXIf8
-	 57RvZ2bKP4zJKSKFjAS8y982r20rYjiqeocIcANYvvYh8ee4vXmB3AlbLNJC+RBfo4
-	 ItmduWJJhzVtsOG1BpZlD7R+/6iQHJcaUp9qszcU8wOI6yhCnlFuk8LGt+MFAiTQEb
-	 sNTy+y1J5K8LQ==
-Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
-	by rtits2.realtek.com.tw (8.15.2/3.29/5.94) with ESMTPS id 6AK8Qg6H23249580
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Nov 2026 16:26:42 +0800
-Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
- RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Fri, 20 Nov 2026 16:26:36 +0800
-Received: from localhost.localhost (172.24.54.48) by
- RTKEXHMBS06.realtek.com.tw (10.21.1.56) with Microsoft SMTP Server id
- 15.2.2562.56 via Frontend Transport; Fri, 20 Nov 2026 16:26:36 +0800
-From: Hilda Wu <hildawu@realtek.com>
-To: <marcel@holtmann.org>
-CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <alex_lu@realsil.com.cn>,
-	<jason_mao@realsil.com.cn>, <zoey_zhou@realsil.com.cn>,
-	<max.chou@realtek.com>, <kidman@realtek.com>, <arunr@valvesoftware.com>
-Subject: [PATCH v10 0/2] Bluetooth: btrtl: Add firmware format v3 support and RTL8922D
-Date: Fri, 20 Nov 2026 16:26:34 +0800
-Message-ID: <20261120082636.3834168-1-hildawu@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jjd/6kKf
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795166563; x=1826702563;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UbBqzs+/3VP6MuUkrf+lE9sMTVZyWCwCxNGAQ3ykpk8=;
+  b=jjd/6kKfT1FzbT/ZlIFWI3LMYbVkyazUAwyVWBHRnfPUAET3KtXMYSyS
+   xLBj4BftmlNs0SqGIomEnsX85xyUzXGHg8XM/wgucRffjemJpWiGVg94h
+   n4ofBwc+NuG0EjiUu3NRTEIfDNr1DJ2OmUVsJicigx9QKXiIEbfUG4WJ/
+   0d4bIpbHgmUXRfEeDrRPQrt8ZGbNFHLz5EGLS4QJ3WZd336+NdtigxzMv
+   9yVILZQV0X7ih4E4MABZM21Akah+4ftxpg9NwIXl8RHJ759ZQF3pBoUl/
+   7PYWOntFgx5dLsHQ58prXnqkW80fmycMgooF4/ArvpHQ8Bx3567LKu3QU
+   A==;
+X-CSE-ConnectionGUID: +E9ZLG+8SGKucwmYHeUJMA==
+X-CSE-MsgGUID: 7sVpFPppS2Cug7QDT6RSqQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11971"; a="3889053"
+X-IronPort-AV: E=Sophos;i="6.27,222,1787036400"; 
+   d="scan'208";a="3889053"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2026 01:22:42 -0800
+X-CSE-ConnectionGUID: LBiOd3j1ToKgG1ZBbiCHWw==
+X-CSE-MsgGUID: voTAazZcSDSP3EVz3BuEiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,222,1787036400"; 
+   d="scan'208";a="10736872"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa005.fm.intel.com with ESMTP; 20 Nov 2026 01:22:40 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH v3 1/2] Bluetooth: btintel_pcie: Set only MAC_INIT in btintel_pcie_mac_init()
+Date: Fri, 20 Nov 2026 15:12:48 +0530
+Message-ID: <20261120094249.2419421-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -74,49 +79,55 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 
-This series adds support for the new Realtek firmware format v3 and for
-the first controller that uses it, the RTL8922D.
+btintel_pcie_mac_init() is called prior to reading device memory via
+target access. To acquire MAC access, only the MAC_INIT and
+MAC_ACCESS_REQ bits in the function control register need to be
+programmed.
 
-Format v3 replaces the flat epatch container with a section/subsection
-layout that can carry several independently configurable images, selected
-by key id and IC cut, each with its own register fixups and optional
-per-image config file.  Patch 1 adds the parser and the downloader.  The
-new code lives in btrtl_enh.c, which is linked into the same module as
-btrtl.c, so the lifetime of the parsed image list follows the existing
-btrtl_device_info and no extra module or symbol_get() dependency is
-introduced.  Support for the existing v1 and v2 firmware is unchanged.
+Currently, btintel_pcie_mac_init() also modifies FUNC_ENA, FUNC_INIT,
+BUS_MASTER_DISCON, and SW_RESET, which are not relevant to MAC access
+(though doing so had no observed side effects). Leave those bits
+untouched and only set MAC_INIT if it is not already set.
 
-Patch 2 adds the RTL8922D id table entry, the matching quirks and the
-MODULE_FIRMWARE() entries.  The firmware binary will be submitted to the
-linux-firmware project separately.
+Fixes: b9465e6670a2 ("Bluetooth: btintel_pcie: Read hardware exception data")
+Assisted-by: Copilot:Gemini 4 Argon
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+changes in v2:
+- Split the patch into two
 
-Both patches are needed for a working RTL8922D.  Patch 2 depends only on
-patch 1 and the series should be applied as a whole.
+changes in v3:
+- No change
 
-Note that building btrtl.c and btrtl_enh.c as one composite object
-renames the module from btrtl.ko to btrtl_core.ko.  The CONFIG_BT_RTL
-option and the exported symbols are unchanged.
+ drivers/bluetooth/btintel_pcie.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-Testing was done on RTL8922D over USB (0bda:a82d, chip id 55) with
-rtl8922du_fw.bin; the boot log is included in patch 1.
-
-Alex Lu (1):
-  Bluetooth: btrtl: Add firmware format v3 support
-
-Hilda Wu (1):
-  Bluetooth: btrtl: Add the support for RTL8922D
-
- drivers/bluetooth/Makefile     |   4 +-
- drivers/bluetooth/btrtl.c      | 226 +++++++---
- drivers/bluetooth/btrtl.h      |  87 +++-
- drivers/bluetooth/btrtl_enh.c  | 795 +++++++++++++++++++++++++++++++++
- drivers/bluetooth/btusb_main.c |  25 +-
- 5 files changed, 1056 insertions(+), 81 deletions(-)
- create mode 100644 drivers/bluetooth/btrtl_enh.c
-
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 12a2cca09d7d..9b75807065c0 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -874,14 +874,11 @@ static void btintel_pcie_mac_init(struct btintel_pcie_data *data)
+ {
+ 	u32 reg;
+ 
+-	/* Set MAC_INIT bit to start primary bootloader */
+ 	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+-	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
+-			BTINTEL_PCIE_CSR_FUNC_CTRL_BUS_MASTER_DISCON |
+-			BTINTEL_PCIE_CSR_FUNC_CTRL_SW_RESET);
+-	reg |= (BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_ENA |
+-			BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT);
+-	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	if (!(reg & BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT)) {
++		reg |= BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT;
++		btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG, reg);
++	}
+ }
+ 
+ static int btintel_pcie_get_mac_access(struct btintel_pcie_data *data)
 -- 
-2.34.1
+2.54.0
 
