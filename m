@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795189677;
-	b=MA5aaKb/vn1jPxWGWzZ5dgzJ60DGo9UlaubHrN2Tte1AXYvxyL7YF/Gr4qztMTzUniHD
-	 KevNTR8lINsF8ItNyC+519tWYK9RVSE8as0C2BkiaM34FZR2Le0f7E5QfgUgD5k9Fmsso
-	 dfHI61YbY9mn1pf0a2maGTotPZZ2q8Cl8ZC1KO2V5sOG4wd9yxjryJm5MLvLbhhvoeaBR
-	 8w4xYpn6sV1eLCOZd2+5DK27ppeYFrqHK6Vvy1B3C2XZAStaPB2tlzGx5b/fic1mU9jDq
-	 HkPjgVajLXYzVnhc0PF0ClO9ibVXXqRdfly1jZdSzpNzD3FeO96gN7ipMdR3+zwNwBA==
+	b=FmrchMr20m/qT3WL14hJkwrDmJ2kh8ZsO/RfyQDsaIQ7hlsic4YLMAwbDhKobmvC+L4W
+	 fUcMMMDSkHf0eFIKnffFrDax3xhOlX483k6o2RSkmx8HAZT2FylWKE7NyoaZ2w4WZ3Kk8
+	 60rp5ZD55JEHIM2OTPlLW7REXcOwgfNCcotzJM13xRWRb+bQg/72Lb79HNlG1jyVd2wMo
+	 EpilGO3dBJsB+0rs8pXHcAfPEQ6QWAjVCU2s1bYDmf/jUKMrbU4VdlJ9E8677CfTVq+h3
+	 O5YMwY57LQY6hetIvl0EJwD3SjjFkfKyMNE/Z8zXoua1MDVKbiBvjqZBzCVezcb5ECg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795189677;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=y/lT1QMwfD/p55bxm9COt6HPjh2mAtJlm27/jufBbKg=;
-	b=BcAooAaJmJx3HA6Tj2TPDiMfQ5QbdMJOYXHQY0naPY/jbXN15yCnqki9Yu/6rk+lHKPh
-	 6lVDjTz5uqmzEoBMb/OLBhf/KApSUgqV0kOFjmLLE0ozn4xG1JQp5QBFGW05J+0MRQDgQ
-	 eXmaJVC2k9pUbuJmZKVNsz589WTBZY+zbD3e+t3LeAFUkuI2Sun0+1Hkqp3Sfk2jrbEs4
-	 EAy0I6VrO7cXmvs9WhA2OHVas8Qu/sQ743DvsSVG5HmS4mhHvNFPGkL0bOzAoI5I5Tluk
-	 m4EwnFmEek1dsHpYKzVcx4eWanlnKNqsJKCsbIqj0py3LB9/5cx/7vvKG4wMbvREp/A==
+	bh=42NGEQHQkO+c2IVY/4yLvjO1Fjer9RIlL+E42bxJVxQ=;
+	b=BtF2tTde4aNUqYaZ7lDtueO9KCxxYgDxJqOSuCLo9FDLIoiUPTtRDuqy1FMZITyF+Tkx
+	 xNuiMRvdjEQXsZk2I1gD1B1eVMGq5wcLEc515+qqcywa3kLW7Ng3sY0GSyxBO8y440CZP
+	 Iqjcmfj1MFaDQDGCsSZOs9Y9AF4DC91t6R7e31VzovNWnvQbzAo53EDRKW87MIaRw2Am5
+	 0m4huoIEaUkNbkPs7cVlw6q48B0C5tAPQm81TYsQxL1weqq0XV5W04JkVYlVpmJ1pHNRz
+	 XkpaWJiMsxyJ/+Q9GhKm3ynMFmtq4DHKtOl/GOuZ3TzcUI7GFc8nzImvLo7hVsDWmcA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="M1mf/6hd";
-	arc=none smtp.remote-ip=209.85.222.53
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HpderuxJ;
+	arc=none smtp.remote-ip=209.85.217.50
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09D460A2623
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 15:47:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C09D460A2623
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842E560A2607
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 15:47:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 842E560A2607
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=M1mf/6hd
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-99e1408dc59so495457241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 07:47:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HpderuxJ
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-7d2dbc0a8d4so352956137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 07:47:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795189676; x=1795794476; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=y/lT1QMwfD/p55bxm9COt6HPjh2mAtJlm27/jufBbKg=;
-        b=M1mf/6hdjs6v9H7+CHmR5KIiAj2bxjip1QcqvUrTDxthBX7j7KT+4JCiY70gaz1Yie
-         ILXnQ4bt8a3olovrprK87zb8hKu1iZR+xyi3COpQ7hb+H+zWQ87nDH0JfWp0kWyi2v/R
-         OWKzUN/4wfU1e8WFeC38HrrYftmo99RZ6D3uOHj7RNUQKIpms9K6Kp598bV018kngkaX
-         ZZZgriKU7LZIh6Lgm1qaqNVoJv4cqPA7KCV+bcie4a4Gn+eonAHB1DLBxDZO6lCCrchU
-         ZkQOgVgr+NvYpKGANhBMtKcdpv3Sgd0BbXosNw6pOo++pyDvzq5jVH39zqIDtQg76Za5
-         tNnQ==
+        bh=42NGEQHQkO+c2IVY/4yLvjO1Fjer9RIlL+E42bxJVxQ=;
+        b=HpderuxJYttJzGIKEcWJKAVNBGv53WkR9j4mU3IJDjSp6x/7AWPijJJZ6B64c28mlf
+         wpVFiFIsZb2OY/aTgEKJ5weSr9GiW4Pw8IwlhPgiYtjO55s4RHQ38eKTFtjT2jO4cIjF
+         EtaOnIj+dAyZZ7xoezpigcPj9bjzQujX0knsc2NCmQarXsPzQnHjfnutLnf/fjEcoBT4
+         AcFhn88pgR9EXoAfxoX2m+/BWg0ePvoF0V5AYLPafmDrDbA7FwBf7htq7KTT/4nTEjyH
+         h/HMX5xtFcJBba6bv6m9UmcsaFbNhN3v0EH/YR5bQoiIgVLMNZypOQnMiBifUUsXhh9C
+         lxPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795189676; x=1795794476;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=y/lT1QMwfD/p55bxm9COt6HPjh2mAtJlm27/jufBbKg=;
-        b=H65Usl2utSGvSuGjHwbQMUcElG9sqGF34ehMX2/8UxUrVO00JWB8I+RZyQYqxyHw7m
-         K6g737fQLQT8z1yFpN1EYDOF4ePav18NBbr2Duh24CRaZHfU/cyX9qGW7sI2IZbaJRxg
-         nijQpCJvNPQQZSIQqvI8vwJ2n1ClFKGzHBbFGvMsYMtr2Mck9BDrwtuDnAn/u/71I6Gi
-         Y3ZOrpoCOugpzQEOwFZPrlXMxl0MBZCLg/kslFWpbGlEVJrExIytnJKiazW2o4CbRzuo
-         YW8fHb0V/MM8ykYERieNmAYaN45971AiVp4ypc/V7zp0wRdDOMr2p0wqSO1Ex1hJugV2
-         YT3g==
-X-Gm-Message-State: APuU4Z9azL6FUGqZlrqOP4e/PUEchyO1D2qCYkkdqqwKiSrjVq+D/0ez
-	viZJK5leVhdEd6dCfa2xrpOvQoipk5/truLAq0faUX+YsEH1QMAri9ZUyq3yrXz3
-X-Gm-Gg: AZFdTZcZxyy8g7ijn0vaUtXNSh+gEHQgiJC85+okRGrtuarL2mSBjhuy/MHl4I4++3n
-	tnxJxMncezKxgP3PKhg/VOFSl9HM7Jm9LlbiVclGvdEBG/rh6Kcb7zDKNtlBz/syg/OAv36G9HA
-	0nik2zxwSBZeVWzi2P2CuymoOOvT6dGbzFawGYv/MSNZHqaf6laNu7Q0NpubaTaG6NHp2uBiN8t
-	U0rRpeGuFHFTQ/GEI3NBWfLP37W40kxhq/eJ6lVtgiUdwn64jJ+sRXhjhVXisM7FpmcPiH4g5RA
-	LZMdS0WQd9mmAMbrCAnmJ7MDB87G9R5Du6CIr0wewVSbU5ivZZkmSK+3ANLFsUU/k0TLPUO/toR
-	BofNJcEbBMzQihiBbt5Cs8lwteS1yC1KtBlpwQYPTUZ13yR6tm10jo6PFis/GabJtUKWT4qyh/Y
-	XbT34k52tFBzEHXDqhimdsUAuiH+l17yCR6tjZ3ex4KpW3ys0w308FtWU9c5VvpU2Z50BVDw91l
-	xiuR1O7BDctkxn7GDdXgGZSWvio7UCOWs7hRS6XJ/pMQCUt6uigmL2AKazFlTboE2jYW+/JllXZ
-	2ziacOzv4QaQjbWUEYiPtvvpg1FZmbVccJxLv20wEIK48dHCALc8ohuciL2AjazQNeAxM7duo5/
-	O/I1ugLZ7XzgJGdNh6jMY8//QNG+SF5OoJ1zSsTojR8H+kys/q9AS1PKJAJ3V3Tj9oWZmWUGfVD
-	z3mXWA
-X-Received: by 2002:a05:6102:6e89:b0:7d2:8dd0:2ed with SMTP id ada2fe7eead31-7d739390129mr1372162137.10.1795189675679;
-        Fri, 20 Nov 2026 07:47:55 -0800 (PST)
+        bh=42NGEQHQkO+c2IVY/4yLvjO1Fjer9RIlL+E42bxJVxQ=;
+        b=fKEepejZJ431gmxHaAE39/1duaoVC1irfCdU+MmnQ/B2JF/NUmGCzVLD+pXYY03F+G
+         XA4NdV9iz5Noe6ebQbm1BJE0tLj61HBJHoZsBaTOrJsHC0Sc78XgaDMAjCwZoouVa7Ng
+         e4fAlEqr4a7/EKFaHwN6MhOoLGJ8dXIGT4zZkoXCC17RoBUhTbiGfokWSE1xFQtYeXvp
+         1d+6X+F+KK1HsczRH7jF0niAU5Fs0DkxH+WK3EzRea3LsTerdwR5o5V21bJP4sXJnuxg
+         UsSIjxOvEELoUtXytSnrfNBX1Tc2cotq4Kzo7ZqqXceMqijPX0q1kdb1cq6vVUVcRpra
+         UodQ==
+X-Gm-Message-State: APuU4Z8WQIL3snll8CqX2wK+Yeaj/cqLUWNTe0ZIw/JeoyJl+tShBRuS
+	62qj6BmGw3dtE1cCWqIqg0qWe2h/Kl5p3UQMHGdN6yrFZaNwhxVlUXwpPoqvyAqe
+X-Gm-Gg: AZFdTZcGMdtShtT8f3OJ/XvIFFAa0xasU6hIbbnFlwB5DpeJOqGH/wUXuJSqqxTkuqn
+	PTHmN1uJtWk3a8VByiSspj65b2+JRNcGYOvXNathy7l90im153+l3EAxCz4gkQPKemJrVsDygxZ
+	Gxy6Eq2oa7bgmsuRbPuWolqJzlUwo/fl3ki8VKDS3wz5ciC12m2IJoO9ZStWiOR/8Q4i7L111zm
+	nHdUAaCg2Y7jGnEKOkksdRAQAy7ejGDlaggIZdbgWTkmhG4icnoJxoKrXtKzO86/0OEKmJBf12C
+	bBzxzoWYpefv85aTlExwPRiGrQuIkuzU9UtdCy1Saf9x2mLr4h67W0ofLJW6dekAeIDxJiqr3BM
+	Q8PTJ8Dz8ClXJ2pzzNZ4HXFb7h8m5FXuCUOO/YUcHBAD22lcQQtzq7JbSfeU0jGSfxRxCo3FDLX
+	/fCQUgYCKD9lD0GoQkY+T1cKH6LvhY/MpArL7tK8QIQ1QxC+PPspbPrr9ze9WC/pYyTF4vnyHUb
+	HEif9ovtXrxfOfkqJ/h/1EyKUnUY7EuXS/QeOTwODixkfxbJsI8qe9mx0S5jpcXtx05HxQsluAr
+	su9OQUX5SIIrZOe5zu8lyLQjF5ixEhVlAeeyloUOagZUMk2ap3yn4Nsu0LzKyyFFoVsWp5Hbb3V
+	Ltk8uYafDl5Fy/Mve833PZBlPLaJoS0i46x3HwIawpjLL9g5+DfkW5Fhu67GaElVbZe8P0vFQs1
+	1mj9awM2/qCkwRBpJxlAFvKpSP
+X-Received: by 2002:a05:6102:504b:b0:7ce:5952:125d with SMTP id ada2fe7eead31-7d7396cc165mr1294088137.36.1795189676423;
+        Fri, 20 Nov 2026 07:47:56 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7b12eb7sm3358243137.0.2026.11.20.07.47.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 07:47:55 -0800 (PST)
+        Fri, 20 Nov 2026 07:47:56 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/5] rfcomm-tester: Add tests for deferred setup
-Date: Fri, 20 Nov 2026 10:47:49 -0500
-Message-ID: <20261120154750.1745643-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 5/5] l2cap-tester: Set IO capability in Client SSP - Success 2
+Date: Fri, 20 Nov 2026 10:47:50 -0500
+Message-ID: <20261120154750.1745643-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261120154750.1745643-1-luiz.dentz@gmail.com>
 References: <20261120154750.1745643-1-luiz.dentz@gmail.com>
@@ -101,225 +101,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add the following tests:
+L2CAP BR/EDR Client SSP - Success 2 connects with BT_SECURITY_HIGH but
+doesn't set the IO capability, which defaults to NoInputNoOutput, so
+pairing results in an unauthenticated key and the test only passes
+because the kernel lowers the security level of the channel to the one
+of the link.
 
-Basic RFCOMM Socket Server - Defer Success
-Basic RFCOMM Socket Server - Defer Early Accept
-
-Defer Early Accept has the listener accepting and authorizing the
-connection while authentication, which then fails, is still pending and
-expects the connection to be refused.
+Set the IO capability to DisplayYesNo so pairing results in an
+authenticated key and the security level requested is met.
 
 Assisted-by: OpenCode:claude-fable-5.2
 ---
- tools/rfcomm-tester.c | 146 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 146 insertions(+)
+ tools/l2cap-tester.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-index 998d698c1bb2..ae4f3c7ee7ac 100644
---- a/tools/rfcomm-tester.c
-+++ b/tools/rfcomm-tester.c
-@@ -43,6 +43,7 @@ struct test_data {
- 	struct tester_io *io;
- 	unsigned int io_id;
- 	uint16_t conn_handle;
-+	int listen_sk;
- 	uint16_t send_len;
- 	uint16_t recv_len;
- };
-@@ -61,6 +62,12 @@ struct rfcomm_server_data {
- 	uint8_t server_channel;
- 	uint8_t client_channel;
- 	bool expected_status;
-+	bool defer;
-+	int sec_level;
-+	const uint8_t *pin;
-+	uint8_t pin_len;
-+	const uint8_t *client_pin;
-+	uint8_t client_pin_len;
- 	const uint8_t *send_data;
- 	const uint8_t *read_data;
- 	uint16_t data_len;
-@@ -286,13 +293,81 @@ static void setup_powered_server_callback(uint8_t status, uint16_t length,
- 	tester_setup_complete();
- }
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 7004955a1af7..da10954075e9 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -98,6 +98,7 @@ struct l2cap_data {
+ 	const void *write_data;
  
-+/* Authorize a deferred connection, the socket is kept open in data->io */
-+static void defer_authorize(struct test_data *data, int sk)
-+{
-+	ssize_t ret;
-+	char c;
-+
-+	ret = recv(sk, &c, 1, MSG_DONTWAIT);
-+
-+	tester_print("Authorize deferred setup sk = %d: %zd (%s)", sk, ret,
-+					ret < 0 ? strerror(errno) : "ok");
-+
-+	if (data->io)
-+		tester_io_unref(data->io);
-+
-+	data->io = tester_io_new(sk);
-+	tester_io_set_close_on_unref(data->io, true);
-+}
-+
-+static void pin_code_request_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_ev_pin_code_request *ev = param;
-+	struct test_data *data = user_data;
-+	const struct rfcomm_server_data *srv = data->test_data;
-+	struct mgmt_cp_pin_code_reply cp;
-+
-+	/* Behave like a listener that does not wait to be notified: accept
-+	 * and authorize whatever is queued while authentication is pending.
-+	 */
-+	if (srv->defer) {
-+		int new_sk;
-+
-+		new_sk = accept(data->listen_sk, NULL, NULL);
-+		if (new_sk < 0) {
-+			tester_print("Nothing to accept while authentication "
-+					"is pending: %s (%d)", strerror(errno),
-+					errno);
-+		} else {
-+			tester_print("Accepted sk = %d while authentication "
-+					"is pending", new_sk);
-+			defer_authorize(data, new_sk);
-+		}
-+	}
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(&cp.addr, &ev->addr, sizeof(cp.addr));
-+	cp.pin_len = srv->pin_len;
-+	memcpy(cp.pin_code, srv->pin, srv->pin_len);
-+
-+	mgmt_reply(data->mgmt, MGMT_OP_PIN_CODE_REPLY, data->mgmt_index,
-+					sizeof(cp), &cp, NULL, NULL, NULL);
-+}
-+
- static void setup_powered_server(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-+	const struct rfcomm_server_data *srv = test_data;
- 	unsigned char param[] = { 0x01 };
- 
- 	tester_print("Powering on controller");
- 
-+	if (srv && srv->pin) {
-+		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+		mgmt_register(data->mgmt, MGMT_EV_PIN_CODE_REQUEST,
-+				data->mgmt_index, pin_code_request_callback,
-+				data, NULL);
-+
-+		bthost_set_pin_code(bthost, srv->client_pin,
-+							srv->client_pin_len);
-+
-+		mgmt_send(data->mgmt, MGMT_OP_SET_BONDABLE, data->mgmt_index,
-+				sizeof(param), param, NULL, NULL, NULL);
-+	}
-+
- 	mgmt_send(data->mgmt, MGMT_OP_SET_CONNECTABLE, data->mgmt_index,
- 				sizeof(param), param,
- 				NULL, NULL, NULL);
-@@ -374,6 +449,33 @@ const struct rfcomm_server_data listen_read_success = {
- 	.read_data = data
+ 	bool enable_ssp;
++	uint8_t io_cap;
+ 	uint8_t client_io_cap;
+ 	int sec_level;
+ 	bool reject_ssp;
+@@ -393,6 +394,7 @@ static const struct l2cap_data client_connect_ssp_success_test_2 = {
+ 	.server_psm = 0x1001,
+ 	.enable_ssp = true,
+ 	.sec_level  = BT_SECURITY_HIGH,
++	.io_cap = 0x01,
+ 	.client_io_cap = 0x04,
  };
  
-+const struct rfcomm_server_data listen_defer_success = {
-+	.server_channel = 0x0c,
-+	.client_channel = 0x0c,
-+	.expected_status = true,
-+	.defer = true,
-+};
-+
-+static const uint8_t pair_pin[] = { 0x30, 0x30, 0x30, 0x30 }; /* "0000" */
-+/* "1111" */
-+static const uint8_t pair_wrong_pin[] = { 0x31, 0x31, 0x31, 0x31 };
-+
-+/* The listener accepts and authorizes the connection while authentication is
-+ * still pending and then authentication fails, the connection shall be
-+ * refused.
-+ */
-+const struct rfcomm_server_data listen_defer_early_accept = {
-+	.server_channel = 0x0c,
-+	.client_channel = 0x0c,
-+	.expected_status = false,
-+	.defer = true,
-+	.sec_level = BT_SECURITY_MEDIUM,
-+	.pin = pair_pin,
-+	.pin_len = sizeof(pair_pin),
-+	.client_pin = pair_wrong_pin,
-+	.client_pin_len = sizeof(pair_wrong_pin),
-+};
-+
- const struct rfcomm_server_data listen_nval = {
- 	.server_channel = 0x0c,
- 	.client_channel = 0x0e,
-@@ -721,6 +823,13 @@ static bool rfcomm_listen_cb(struct tester_io *io, uint32_t cond,
- 		return false;
- 	}
+@@ -2342,6 +2344,16 @@ static void setup_powered_common(void)
+ 				data->mgmt_index, pin_code_request_callback,
+ 				data, NULL);
  
-+	/* The result is checked once the client connection completes */
-+	if (srv->defer) {
-+		tester_print("Accept deferred setup sk = %d", new_sk);
-+		defer_authorize(data, new_sk);
-+		return false;
++	if (test && test->io_cap) {
++		struct mgmt_cp_set_io_capability cp;
++
++		cp.io_capability = test->io_cap;
++
++		mgmt_send(data->mgmt, MGMT_OP_SET_IO_CAPABILITY,
++				data->mgmt_index, sizeof(cp), &cp,
++				NULL, NULL, NULL);
 +	}
 +
- 	if (srv->send_data) {
- 		ssize_t ret;
- 
-@@ -803,6 +912,37 @@ static void test_server(const void *test_data)
- 		return;
- 	}
- 
-+	if (srv->sec_level) {
-+		struct bt_security sec;
-+
-+		memset(&sec, 0, sizeof(sec));
-+		sec.level = srv->sec_level;
-+
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec,
-+							sizeof(sec)) < 0) {
-+			tester_warn("Can't set security level: %s (%d)",
-+						strerror(errno), errno);
-+			tester_test_failed();
-+			close(sk);
-+			return;
-+		}
-+	}
-+
-+	if (srv->defer) {
-+		int opt = 1;
-+
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &opt,
-+							sizeof(opt)) < 0) {
-+			tester_warn("Can't enable deferred setup: %s (%d)",
-+						strerror(errno), errno);
-+			tester_test_failed();
-+			close(sk);
-+			return;
-+		}
-+	}
-+
-+	data->listen_sk = sk;
-+
- 	if (listen(sk, 5) < 0) {
- 		tester_warn("listening on socket failed: %s (%u)",
- 				strerror(errno), errno);
-@@ -868,6 +1008,12 @@ int main(int argc, char *argv[])
- 	test_rfcomm("Basic RFCOMM Socket Server - Read Success",
- 				&listen_read_success, setup_powered_server,
- 				test_server);
-+	test_rfcomm("Basic RFCOMM Socket Server - Defer Success",
-+				&listen_defer_success, setup_powered_server,
-+				test_server);
-+	test_rfcomm("Basic RFCOMM Socket Server - Defer Early Accept",
-+				&listen_defer_early_accept,
-+				setup_powered_server, test_server);
- 	test_rfcomm("Basic RFCOMM Socket Server - Conn Refused", &listen_nval,
- 					setup_powered_server, test_server);
+ 	if (test && test->client_io_cap)
+ 		bthost_set_io_capability(bthost, test->client_io_cap);
  
 -- 
 2.56.0
