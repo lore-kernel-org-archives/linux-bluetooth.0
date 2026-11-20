@@ -1,102 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.179
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795142080;
-	b=PQzLLDlxAhZqV+HhRI1hYRCsc9U/iw+sVrZBZ0k3srL/M4JY7zg7+TMx199ZItz4vSYU
-	 HCqFrSFXLfxnX4t7A9dS/UpW5KsLNMJ76JrLqreoCTkwvcegZ4lCwFNcv9YiwbrzfSsyg
-	 kwpspLH4gX36hLMyxz2un8/RuCS43WOQI9xCFeUTd53TRYUTRvq5bjoTqu7tWmMXDtBeH
-	 bCVvCMTJhfs9XkhpRhe5pknnBJ7tcjwpkHFF529g52+Ubo9091MQ42zfT3fqlczwM0AqL
-	 ibGckpfF57AFJE07HN2yHhgICUqQQUov+z4XIn4FdqezGgUv/7M647n1QceMiG/ddVQ==
+	t=1795150273;
+	b=AdSUwt1Vk80TPgt1tHEKiDAEZBvte6qcNqqhQUff+DyFO9LQdA1bQ0vHhqeKFQYs06QL
+	 MmZGYLwys2d0Mz7xG6r4feFoN4iybHGCgwgQdEQl6SmonCn2mrcIznCgT5E0Aw1dzp/kM
+	 23bGhfXkLbpAQbUIB4nZyu8WVC+HOhro4IEhxnk4hHkjdve2vC2SHQN9fLL6PqAuaFrnk
+	 eLoeIUqPN4ClYoHdwgAoDLNqJHGvXApYqvkGdY2KRFBalBkrDt8IXDpHFtg0E+LQ1BUFO
+	 iUmTeXdbEbaap320HQjtmPYyVnoN/cVJj0+wgS8/ezhIPXTtuWW5s0neM9Tu4P8PFSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795142080;
-	h=Received:DKIM-Signature:To:Cc:Subject:From:In-Reply-To:Message-ID:
-	 References:Date:MIME-Version:Content-Type;
-	bh=yLxaIFgMgiNdJ6EvHj90KmNsd7UyUa4rOHQt8MkQ4o8=;
-	b=Y2eziJjix+rCJmotITUC1fd/QYZTQ0IPR3HxWU/SkBAx69PjfNqbggHSkujxK75DYJqk
-	 XIAeWuf8iFDDejIceS8bsk2lRgP87R0p/VgDA0PbvMoR+tOxUCI2MHJUe7nuSfMcFwXql
-	 gp72gmKfdHupZ8Vy9tnigaMrCHreEAfPGLAAocP/jUSpXc77A/FN3gUTwvOKWTgABDGhS
-	 c+TQEgsP/AMSI7pX/mquwQ9BC9JuvtkeNzeJpMTVOKAgtEw01lFo6+oY6ZYMtzptKoqUW
-	 HlplGEim1q2R29baUQrH4xrDNRYu2sevvJuzPve0aV6uJKntg/UIwuW8IQN6eb/0J9g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795150273;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=Lle7pM8YZ0bwRDxOmfRn80pwIxp8VU+aNUwkQhPQ6VM=;
+	b=A+DWbWKkmOPIDzuMRy1DlPyOokq/5gzli/mJPEAdIly7RdHkKYBbtgDenJDNhJT64KV7
+	 osbvTOY/hEKvpNXd5ccveyzPZ8eq9X0mn2PrJUhaurzG1j/v3bTNC1XScO/uUijIvA8H6
+	 yjnkkS28r+Rha2nArPTbRrabmY8qnrtLH+f0sHv8LfY/SsUPmU2FHqu6IeTZ2bLvvBVxE
+	 FW57JDYAVpUSXJ+sY5a90cat7GQt180AIFRxbnt6TxnzKpMzeRRHkqPyqKSzmLi9tt9jg
+	 o19MBcGuAeIbSZWm7Mbci63IgYi/T/EqGkPEpBWJysYAkVUPYpvsc48O4HcX2syP0aA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dq2Owl4T;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yhgzI4vC;
+	arc=none smtp.remote-ip=209.85.160.179
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E23606A320;
-	Fri, 20 Nov 2026 02:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3912260A2600
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 04:51:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3912260A2600
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dq2Owl4T
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A6D31F000C6;
-	Fri, 20 Nov 2026 02:34:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795142079;
-	bh=yLxaIFgMgiNdJ6EvHj90KmNsd7UyUa4rOHQt8MkQ4o8=;
-	h=To:Cc:Subject:From:In-Reply-To:References:Date;
-	b=dq2Owl4TQH5i1O8lPJeqrs/bhVJe74UawaV8WZGOjcpXryG9VX5bBPEuofmjMl6C8
-	 KEMZUEWUmofCrIT9kL1mF9sqs29c0Cyil2oxP83BwPsBQxJM3XbOQHwaj2x7OkBm3R
-	 Ubt4udGPNHycSNftWKTVPyy9zKiSLnNOhFSlFIOPsiCL9/KFgmw/r+jfOmYYUs/VC/
-	 SAI+QguGa/5ffH3iaZeehgrULZs3TCS3y0wcIRBQ7+1cYjuY8NOZbiPkIC9OoceHPS
-	 +R5fZniZZazVx2uAAw4qgmr08ft+ySZxWB+NNVSP3BxvosYlgijyZSgy8PCf4WR5j7
-	 gqEvBh4+Qs7GQ==
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org,  Jonathan Corbet <corbet@lwn.net>,  Shuah
- Khan <skhan@linuxfoundation.org>,  linux-doc@vger.kernel.org,  David
- Hildenbrand <david@kernel.org>,  Andrew Morton
- <akpm@linux-foundation.org>,  Jason Gunthorpe <jgg@nvidia.com>,  Leon
- Romanovsky <leonro@nvidia.com>,  linux-mm@kvack.org,  Jaroslav Kysela
- <perex@perex.cz>,  Takashi Iwai <tiwai@suse.com>,
-  linux-sound@vger.kernel.org,  Jens Axboe <axboe@kernel.dk>,
-  linux-block@vger.kernel.org,  Marcel Holtmann <marcel@holtmann.org>,
-  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-  linux-bluetooth@vger.kernel.org,  Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>,  Jason Wang <jasowangio@gmail.com>,
-  David Heidelberg <david@ixit.cz>,  oe-linux-nfc@lists.linux.dev,  Chas
- Williams <3chas3@gmail.com>,  "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org,  Helge Deller
- <deller@gmx.de>,  linux-fbdev@vger.kernel.org,
-  dri-devel@lists.freedesktop.org,  MPT-FusionLinux.pdl@broadcom.com,
-  "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,  "Martin
- K. Petersen" <mkp@kernel.org>,  linux-scsi@vger.kernel.org,  Miquel Raynal
- <miquel.raynal@bootlin.com>,  Richard Weinberger <richard@nod.at>,
-  Vignesh Raghavendra <vigneshr@ti.com>,  Zhihao Cheng
- <chengzhihao1@huawei.com>,  linux-mtd@lists.infradead.org,  Neill Kapron
- <nkapron@google.com>,  Andrey Konovalov <andreyknvl@gmail.com>,  Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>,  linux-usb@vger.kernel.org,
-  Juergen Gross <jgross@suse.com>,  Stefano Stabellini
- <sstabellini@kernel.org>,  xen-devel@lists.xenproject.org,  Hans de Goede
- <hansg@kernel.org>,  Arnd Bergmann <arnd@arndb.de>,  "Michael S. Tsirkin"
- <mst@redhat.com>,  Eugenio =?utf-8?Q?P=C3=A9rez?= <eperezma@redhat.com>,
-  Sean
- Christopherson <seanjc@google.com>,  Paolo Bonzini <pbonzini@redhat.com>,
-  kvm@vger.kernel.org,  virtualization@lists.linux.dev,  Jan Kara
- <jack@suse.cz>,  linux-fsdevel@vger.kernel.org,  "Theodore Ts'o"
- <tytso@mit.edu>,  linux-ext4@vger.kernel.org,  Mike Marshall
- <hubcap@omnibond.com>,  devel@lists.orangefs.org,  Paulo Alcantara
- <pc@manguebit.org>,  Namjae Jeon <linkinjeon@kernel.org>,
-  linux-cifs@vger.kernel.org,  Jaegeuk Kim <jaegeuk@kernel.org>,  Chao Yu
- <chao@kernel.org>,  linux-f2fs-devel@lists.sourceforge.net,  Florian
- Fainelli <florian.fainelli@broadcom.com>,  Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>,  Tzung-Bi Shih
- <tzungbi@kernel.org>,  Benson Leung <bleung@chromium.org>,  David Airlie
- <airlied@gmail.com>,  Simona Vetter <simona@ffwll.ch>,  Alex Deucher
- <alexander.deucher@amd.com>,  Christian =?utf-8?Q?K=C3=B6nig?=
- <christian.koenig@amd.com>,
-  amd-gfx@lists.freedesktop.org,  Jani Nikula
- <jani.nikula@linux.intel.com>,  Joonas Lahtinen
- <joonas.lahtinen@linux.intel.com>,  Rodrigo Vivi <rodrigo.vivi@intel.com>,
-  Tvrtko Ursulin <tursulin@ursulin.net>,  intel-gfx@lists.freedesktop.org,
-  Matthew Brost <matthew.brost@intel.com>,  Thomas =?utf-8?Q?Hellstr=C3=B6?=
- =?utf-8?Q?m?=
- <thomas.hellstrom@linux.intel.com>,  intel-xe@lists.freedesktop.org
-Subject: Re: [PATCH v2 06/12] docs: ioctl-number: update SCSI entries
-From: "Martin K. Petersen" <mkp@kernel.org>
-In-Reply-To: <20261119053514.255348-7-rdunlap@infradead.org>
-Message-ID: <yq1eccgqlhr.fsf@mail.kernel.org>
-References: <20261119053514.255348-1-rdunlap@infradead.org>
-	<20261119053514.255348-7-rdunlap@infradead.org>
-Date: Thu, 19 Nov 2026 21:34:38 -0500
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yhgzI4vC
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-5430f70c827so7306451cf.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 20:51:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795150272; x=1795755072; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Lle7pM8YZ0bwRDxOmfRn80pwIxp8VU+aNUwkQhPQ6VM=;
+        b=yhgzI4vCPdJDM4xo3RIjFMkUV4hWQubK88kh5MYwA+e0yNPc3AVCnXprQGmh97kt0q
+         WEYNIUWun/2qTljjs8YZ5B5MczgMp9z3T7YUhvPWUJmWAb58eFgQ4WFRA9HH8HQWCc1x
+         WrQsrY3UXcgOjknVTQeZjn9Wj08m4AjO9cDQ1n2gdBV4a3OsFc0vBdrhXvpMMNtNhFKL
+         h3K3QkrIojLtEHNZmajWFCxMn5q09gRqwHSe/Eer+zVZdzKlulJ/77qGm1lI4lN0j1jd
+         Bl/cojVcQu30kHNlqbryIlgKSJ80b/GzOVLmkXA3yv+aLkF0Ote3CtJOwMQ0MTR1N+gE
+         OAqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795150272; x=1795755072;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Lle7pM8YZ0bwRDxOmfRn80pwIxp8VU+aNUwkQhPQ6VM=;
+        b=Nf0GmNwmCGZ/0YDJu9tqs5gFdOP9hJdGDNBX8Q9GMU0dr1qpoX43ga5mrAdCcpHdet
+         7pw3pdj5lZi/yp7+mpO+oQLQMZ/X+g9cLc0WHLheNwVtQiPalJQClCz1XE1qqRJMRNbe
+         TsD+L4iAS3QCvSxhyr1Gs3l68qXgbWyQ9eX0ZK8BZ0aNTMWoGB00mTTpjVWOfqtQ1QKR
+         /s8s3CTI7US2F/w7rmslsWmh0qxAIpHT3fS/datEJW9HONgsoeeQGgAo8jNS1jIN5IN9
+         NyMITcpsD0E8m1DofRLKdGq8B++3O3iCSIm1GsA8sp0srz7pdI4HxBLe0TaA9jwfjuqZ
+         GOOw==
+X-Gm-Message-State: APuU4Z/ls1VimjrbC/CyO439DQy32jTOFu/2rZtVEov1pRmqYO5beAIG
+	c6UcVKvvGZZxfLezFG+Tnn+i+vK1BsvIxzpyWh8CRqsPt1tfS4jhtY3F+6RuxA==
+X-Gm-Gg: AYBFou1jDYIG25n0iwVjNDYYdDAg7OIs0qk/4D7zLHyqfrFXetZsL+l2fsL+xfB2zWK
+	G1fWXu/pza5m9bQdQZs9Oek4jWoYooZtqBf6SmzaZVyvc3LgVHre1Qd4cZjxVf8Rhi9yg7+jD5m
+	rRwcR7rl/V8GhXL3D0puI/jVLU6TaVPG9xuilLKv2kOnW3FBDA5W4x+MQIwqdCPiiF73F+8KS3R
+	O6EA8ZU4DXJSCJPlJmRIUQ3SjNLMGtK5SA2ouzrWAN6GTYN5MTc5hzLlRZqRI7Z6UWVGSe/51on
+	IM8otuMDwrjlQPwEK9nNkmNI/rXKu6bz61I6VrICheCFynMMOm//SAq7sTjaryaMve+CiVevEsC
+	b3m1hfkK98MoExo/RBjzRHy+g0jtoJCrpo8YYJF2H1NWXj4ZbcFOPv/57a8DrvVsk0bSVjYv/Ak
+	JDpoOBZeG1uoQWX/DQA/RFJ3gdA6DviUMQJ9dLolVtfq7Kr9lnwH2Quuk1eQsON4DCb4q7g2FSe
+	BRerl60juZW110kjCl+IBNfZdxBkAB4wq3PwaAEqqHgdoSdZC/ELU3VE2PM/A==
+X-Received: by 2002:ac8:5d89:0:b0:54f:c347:91a8 with SMTP id d75a77b69052e-55d769e939dmr39435191cf.25.1795150271985;
+        Thu, 19 Nov 2026 20:51:11 -0800 (PST)
+Received: from [172.17.0.2] ([20.55.117.43])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-55d78812968sm13257801cf.9.2026.11.19.20.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 20:51:11 -0800 (PST)
+Message-ID: <6affd1bf.e5d8ea26.86636.d83b@mx.google.com>
+Date: Thu, 19 Nov 2026 20:51:11 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3312692184365445294=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -106,15 +88,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, thomasdegruijter@pm.me
+Subject: RE: Bluetooth: MSFT: Only enable the advertisement filter with monitors
+In-Reply-To: <20261120-msft-filter-monitors-v1-1-8192f0c0791a@pm.me>
+References: <20261120-msft-filter-monitors-v1-1-8192f0c0791a@pm.me>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3312692184365445294==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1216804/
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.59 seconds
+VerifyFixes                   PASS      0.13 seconds
+VerifySignedoff               PASS      0.13 seconds
+GitLint                       PASS      0.68 seconds
+SubjectPrefix                 PASS      0.26 seconds
+BuildKernel                   PASS      31.48 seconds
+CheckAllWarning               PASS      34.70 seconds
+CheckSparse                   PASS      37.94 seconds
+BuildKernel32                 PASS      30.86 seconds
+CheckKernelLLVM               PASS      34.09 seconds
+TestRunnerSetup               PASS      749.60 seconds
+TestRunner_l2cap-tester       PASS      14.73 seconds
+TestRunner_iso-tester         PASS      13.14 seconds
+TestRunner_bnep-tester        PASS      3.19 seconds
+TestRunner_mgmt-tester        PASS      89.03 seconds
+TestRunner_rfcomm-tester      PASS      4.52 seconds
+TestRunner_sco-tester         PASS      5.62 seconds
+TestRunner_ioctl-tester       PASS      4.68 seconds
+TestRunner_mesh-tester        PASS      4.54 seconds
+TestRunner_smp-tester         PASS      4.39 seconds
+TestRunner_userchan-tester    PASS      3.26 seconds
+TestRunner_6lowpan-tester     PASS      4.44 seconds
+IncrementalBuild              PASS      31.35 seconds
 
 
-Randy,
 
-> Update the list of files where SCSI ioctls are defined and update the
-> ranges of function numbers that are used.
+https://github.com/bluez/bluetooth-next/pull/1163
 
-Reviewed-by: Martin K. Petersen (Oracle) <mkp@kernel.org>
+---
+Regards,
+Linux Bluetooth
 
--- 
-Martin K. Petersen
+
+--===============3312692184365445294==--
