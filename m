@@ -1,84 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.119
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795185403;
-	b=Q8d6FK9mEpqxH+MP4yprjdBcWuFgnN/Sr4YGWB0dzaDd9bmrua7NybEEgOUlWM7a2osK
-	 d4x1MOW78IhxfF7AP95Mz9W8c8e2dnW78QewyNM+4jw9SfXBZz9c9dT/rLbi2XnlTdIAy
-	 M4Yn+50Q9pputqqz4tPyFp/3I4BMkVoZJ0nTk+4k7MFYqsJ1qx8QVp94jU1WCGE7gKUpb
-	 17NEV79tULPfG219Kdm7Y7l4oS+TJu/B2HrYuLg64961yoAsy+EpmqBKmj9dIeYWULsAA
-	 Akjyb+FMMzYKKgm/f3MxVJnngHzsSVTsGUXmABqHefabI5NikwcT0VRJ7Ag+EGeZ+6g==
+	t=1795185736;
+	b=sdqSWq3bywFFk+UG3ZQjzbbzCCJZJSBJGniixm0ele6QTFZvU4AqltcskanoRniJVoBI
+	 UEiS7i5EDSUPUEHeI0+Wjs3VfDrcDYY96Js1eqIgoYJM7ykA15NPu1ApfGZlE8IzIvG30
+	 1G53FvCCZJJ+J7RnFyuzi9UZxzPS/b9ziziciGzfBRUJSjeqLsxiJnDhyGyghP1+70+XG
+	 H+w0xFGTsWLpoID2JEqP+J/bwc0NIHsSKgoLHH0EvE6QnEsNQ67CgCYUjFQZFa8esg54s
+	 BtxKQu+DkPaKgem8dyjkubu9/ueL30OLxuhaUOMWWseuT9pUAaxibiloCkFpG/Mu+1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795185403;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
-	b=Xm4NTQ6+/1CD49DbWi3zf5p2lul17BSFY1x2ovh8Hbe5jKHeVWlKCok3U5Sv2hXgfyvx
-	 Efq5WXnE4lDIYHWyTHrtmxjoQcXmzDYGo3kYg4lMmlLEYmziWT+ALqm60IBV2vmMqYgLb
-	 nAStEAQmoeSfeBv1Uj5yUJ5KloJE7P+uSsloEESSKkY3lwxNVpvSoVJ6nYL6ZuD9jCko6
-	 HkX9StJF4BxtAEr4Weg9COysjwreFDWr1i89TmHMqVL8nvlOe1pacy6qjefjOFE+avDAW
-	 N7eXgIISCyYXVEO8LgsZi8GgbpSwz4stXlKgEEz3Xo60RTByJiBLTHrgvUuNrWG1lgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795185736;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=IaxywgaH6YjhP6G9lKCqkoQrXWtt7tpB1h0VrvbX464=;
+	b=Rw/sU1rjmy2uy9VK3oOwPHOJhsURdVfXX12WR0FnWlt5wBB9xwRtoQ37j4mabTofbaat
+	 WHpWa7FCiXipQMfPHMAauJJfHnrIHp6XTo7nNckupoReaHjwM5vMAhOJxA4T/zlqwwjWA
+	 atmqTodet1hNEz+0dvujp4OX0aRMP7bQmCZl+SFfk5GTSPWoKCC3JkFxn8q72p6YEuwXH
+	 jlGa4ni26Yix7CREzyW6baBwIMuSpBOyEmi8n83Y5qssyYYX/1b6u39SRRQeDFZsfKb/6
+	 xpXgKt/44FSXZt+nQHJq8peNC5hZHaCimP+V3bVc9P8EQcHNex+PaNFnxEBuE5MS0rA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kHLaRqxQ;
-	arc=none smtp.remote-ip=209.85.160.45
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=protonmail.com;
+	spf=pass smtp.mailfrom=protonmail.com;
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b="FeCd/AQr";
+	arc=none smtp.remote-ip=79.135.106.119
+Received: from mail-106119.protonmail.ch (mail-106119.protonmail.ch [79.135.106.119])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741EF606A320
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 741EF606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA816606A32A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:42:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EA816606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kHLaRqxQ
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-4b5138f0991so1171613fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:36:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795185402; x=1795790202; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
-        b=kHLaRqxQSh/MnQUIu5oNOvfFL7X6oc9dnYL81kNuqonbfsu2ggXKRKWrQxCC67Ov7o
-         qR4Z4QtWi1Q+y3pPJtCnBo/NeRjoNmmkleszSth/vKfvNVDB4QN5QJWQMWh37NZjfSuQ
-         oO3G7zSP+ISWJbr/MhsJj5MH2On+fz/qBR+f2EL5fPYyrvnF3PdeD2gdN1xnPYWfT/M5
-         JXf+ddbciN9Zf3AhnuaEAR9CzlyEw+mAuuPmWroVGBXkU1otkuat3cDU0Sh+nThTnaMj
-         Hck2c6LS4OFCT955J5wFdEuqqyEeS+JZ+k/IBkNNG+nzcTX5cMUahltG+56QSlBNi24P
-         8hnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795185402; x=1795790202;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
-        b=dud3QN0r0RgWXY5z3BLJd6vu+9m4a7FXotqWSh/BPsxAalqk7/ZPlmec/4x0dl7fm3
-         9NQ8cNVgHD4zvg0yKDjbe9rJlRewIKxWvE9E/xMBdYpc5wIN3aBFOjWqkvzIAwHpCYaz
-         L7UJnG9gPpiBB98WMfOp69RUK4IaeVmJqtuIxUsC3o01+Ri0SfyED/AhyIFbO5Gp4juK
-         1IW7A/49nhJkPA2yAzoOdaBRda6Bfs4VbdbotQMYMahEyYToGsvrIjsNA2rM+9wYbUAF
-         6myybId/m3nGaV5NZa3vAFwXz+e0Ghm3nZ1muW+wqojr4C4jWP/9ru249/qOMUUzDPTp
-         lizA==
-X-Gm-Message-State: APuU4Z8l31fr41nztr8tMJcdlJ6FznWPCYFdByqzONTwqvZCI6S6N3wo
-	8jfS7GLjzbOa95fvzWwZ1ITyUK2xwtuUjkXyr8fUd4CVFOYBVhQ87gbq73SV/g==
-X-Gm-Gg: AZFdTZdBUb2unDjVRNYPzOuawA79cbozTSBCifKYTI68RTOBg/uVqaOksKOiVGfkZ3x
-	9p1sM1CuDf+/x8FbYo2GI4aEgEbooYTShrCNLLr11KI+xZYpfJdKunrwky30tMxkig8PPdE01BO
-	1nBHxU86XTV21quFomPD3/FnqZCFKAgNxaUGfzR+7VnOgrvRl2XDI1iioZnpLKWL+sBftCFMcly
-	1QXC9lN4uIrhgeOJ6ABAaRC8mllKBY9dgPfcjp4GtYXuUTULneyho99clNH0uX5JkGhaN3Ng/RY
-	0W/bStaVsMpIEEzlr423ie0gerxyNzRgD9zHbGT1JtTLGBHJZncjbi3UBrnu4Qj4OdTRO280Ku1
-	oFeG6SKVXyPShClZT6rndVCCPjcGuDasI7UOjC//aF4TePA+qKoALXGPMem8a0vbCIItbbFVqxn
-	r7S8KuJfinXX6fg3P3frD5rpuKU69wL9xQNYKO1nL26z2rdIgLn4iWPMR0x1dBMg4H1HQKSTJm4
-	pzJS/TGXK/McOxUCRvOR8SwYkSv58hsnibakkUWIKLYEGbRyHFh3AN7UZqQ6i0=
-X-Received: by 2002:a05:6808:199f:b0:568:2782:d1b4 with SMTP id 5614622812f47-57a0bd95bcemr2886007b6e.32.1795185402440;
-        Fri, 20 Nov 2026 06:36:42 -0800 (PST)
-Received: from [172.17.0.2] ([132.196.84.24])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-57a34250ef2sm2463166b6e.3.2026.11.20.06.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 06:36:41 -0800 (PST)
-Message-ID: <6b005af9.24a8470f.69082.5255@mx.google.com>
-Date: Fri, 20 Nov 2026 06:36:41 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6684603334981386739=="
+	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=FeCd/AQr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1795185733; x=1795444933;
+	bh=IaxywgaH6YjhP6G9lKCqkoQrXWtt7tpB1h0VrvbX464=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=FeCd/AQrfoVJ3tdxbIHibyOdoBYWaIGiZGcPj3nJUL0g/eojQG7XUF2qPkQAtpjCe
+	 iZSiiDAejzP1Qv0IA6sFX5NaqZL/T0AYREyg1W+/vN7407ZNGYkDJyckCnP/HPb71e
+	 3QiNULNiFu4cU+84MttmZC+iNiEZt6O2nXMQgnd+FKxbSSrQrivSV6Oxh/DJlhrW8Y
+	 tTmulntve7y4/wdt8TdNt37BJTyudwtH/s9cuNTt2R54OeZ0EvZQKtz4MZRFCI5Xrq
+	 cD9w4Q2fs/LwF7FXO9R+SpAURTEh1DwdEYCymzsftnWqgkR6rrRM0ZK1kcb3SyKTFH
+	 lReyzKDohrd/w==
+Date: Fri, 20 Nov 2026 14:42:08 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Jovelyn Custodio <noplatinumfound@protonmail.com>
+Subject: [PATCH BlueZ v2] main.conf: Add SecureSimplePairing option
+Message-ID: <20261120144201.19188-1-noplatinumfound@protonmail.com>
+Feedback-ID: 27263372:user:proton
+X-Pm-Message-ID: 9acd6827c4d09edc274fffc9a86822cbd9723a99
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,64 +60,195 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, noplatinumfound@protonmail.com
-Subject: RE: [BlueZ] main.conf: Add SecureSimplePairing option
-In-Reply-To: <20261120105609.94042-1-noplatinumfound@protonmail.com>
-References: <20261120105609.94042-1-noplatinumfound@protonmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---===============6684603334981386739==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This adds SecureSimplePairing option to General section which can be
+used to keep Secure Simple Pairing disabled on BR/EDR capable adapters.
+It defaults to true, which keeps the current behaviour of always
+enabling it.
 
-This is automated email and please do not reply to this email!
+Some HID devices can't reconnect to a host that has SSP enabled. A
+Nintendo Switch Pro Controller reconnecting to an RTL8851BU adapter
+authenticates and encrypts the link on its own, opens PSM 17 and then
+stalls until Encryption Key Refresh Complete arrives with LMP Response
+Timeout 30 seconds later. PSM 19 is never opened. With SSP disabled
+the host starts authentication instead, no key refresh takes place and
+the controller reconnects.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1217210/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.36 seconds
-GitLint                       FAIL      0.26 seconds
-BuildEll                      PASS      14.00 seconds
-BluezMake                     PASS      176.57 seconds
-CheckSmatch                   WARNING   187.48 seconds
-bluezmakeextell               PASS      63.59 seconds
-TestFunctional                PASS      899.30 seconds
-IncrementalBuild              PASS      193.18 seconds
-ScanBuild                     PASS      681.59 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] main.conf: Add SecureSimplePairing option
-
-27: B2 Line has trailing whitespace: "    "
-32: B2 Line has trailing whitespace: "    "
-39: B2 Line has trailing whitespace: "    "
-42: B2 Line has trailing whitespace: "    "
-51: B2 Line has trailing whitespace: "    "
-60: B2 Line has trailing whitespace: "    "
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/main.c: note: in included file (through src/device.h):
-
-
-https://github.com/bluez/bluez/pull/2857
-
+Assisted-by: Claude:claude-fable-5-2
 ---
-Regards,
-Linux Bluetooth
+v2: No code changes. Drop the trailing whitespace in the notes that
+    GitLint complained about.
+
+Notes:
+    I ran into this with a Switch Pro Controller on an RTL8851BU combo
+    stick (kernel 7.3.4, BlueZ 5.88). Fresh pairing works, but pressing
+    Home to reconnect fails every time: the controller pages the host,
+    authenticates and turns on E0 by itself, opens PSM 17, and about 100 ms
+    later the link stalls. 30 seconds on I get Encryption Key Refresh
+    Complete with LMP Response Timeout and a disconnect. PSM 19 never shows
+    up.
+
+    Link policy 0x0000, Secure Connections off, UserspaceHID=3Dfalse and
+    disable_ertm didn't help. Accepting as peripheral (a2dp and avrcp
+    plugins off) didn't either, since the controller asks for a role switch
+    itself and I'm back at the stall.
+
+    Refusing the role switch as well got further: Encryption Key Refresh
+    Complete came back with Transaction Collision, then Success, PSM 19
+    opened and hid-nintendo bound. About 0.8 seconds later the controller
+    turned encryption off and the kernel dropped the link with
+    Authentication Failure. So the refresh seems to only get stuck when the
+    adapter is central.
+
+    Turning SSP off with btmgmt was the only single change that fixed it,
+    but bluetoothd switches it back on at every start, hence the option.
+
+    Tested on that one adapter and controller only:
+     - option absent or true: SSP gets enabled as before
+     - option false: SSP stays off after a daemon restart and after
+       rebinding btusb, and the Home press reconnect works with a link key
+       made while SSP was on
+     - pairing from scratch with the option false works too (legacy
+       pairing, autopair answers with PIN 0000)
+     - make check passes, checkpatch is clean
+
+    Not tested:
+     - adapters whose controller supports BR/EDR Secure Connections. Going
+       by mgmt.c the kernel rejects Set Secure Connections there while SSP
+       is off, so they'd lose SC with this option. That's what the note in
+       main.conf is about.
+     - ControllerMode =3D bredr
+     - UserspaceHID=3Dtrue. I'd already switched it to false before I found
+       this and haven't gone back yet.
+
+    I can't see LMP on this chip, so I don't know if the stuck key refresh
+    is Realtek's firmware or the controller's. It's probably the same thing
+    as https://github.com/bluez/bluez/issues/824.
+
+ src/adapter.c | 22 ++++++++++++++++++----
+ src/btd.h     |  1 +
+ src/main.c    |  4 ++++
+ src/main.conf | 11 +++++++++++
+ 4 files changed, 34 insertions(+), 4 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 1439642..3d3a272 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -10841,6 +10841,19 @@ static void read_exp_features(struct btd_adapter *=
+adapter)
+ =09btd_error(adapter->dev_id, "Failed to read exp features info");
+ }
+=20
++static void set_ssp(struct btd_adapter *adapter)
++{
++=09bool enabled =3D adapter->current_settings & MGMT_SETTING_SSP;
++
++=09if (!(adapter->supported_settings & MGMT_SETTING_SSP))
++=09=09return;
++
++=09if (enabled =3D=3D btd_opts.ssp)
++=09=09return;
++
++=09set_mode(adapter, MGMT_OP_SET_SSP, btd_opts.ssp ? 0x01 : 0x00);
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ =09=09=09=09=09const void *param, void *user_data)
+ {
+@@ -10921,8 +10934,8 @@ static void read_info_complete(uint8_t status, uint=
+16_t length,
+ =09=09=09set_mode(adapter, MGMT_OP_SET_LE, 0x01);
+ =09=09if (missing_settings & MGMT_SETTING_BREDR)
+ =09=09=09set_mode(adapter, MGMT_OP_SET_BREDR, 0x01);
+-=09=09if (missing_settings & MGMT_SETTING_SSP)
+-=09=09=09set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
++
++=09=09set_ssp(adapter);
+ =09=09break;
+ =09case BT_MODE_BREDR:
+ =09=09if (!(adapter->supported_settings & MGMT_SETTING_BREDR)) {
+@@ -10933,8 +10946,9 @@ static void read_info_complete(uint8_t status, uint=
+16_t length,
+=20
+ =09=09if (missing_settings & MGMT_SETTING_BREDR)
+ =09=09=09set_mode(adapter, MGMT_OP_SET_BREDR, 0x01);
+-=09=09if (missing_settings & MGMT_SETTING_SSP)
+-=09=09=09set_mode(adapter, MGMT_OP_SET_SSP, 0x01);
++
++=09=09set_ssp(adapter);
++
+ =09=09if (adapter->current_settings & MGMT_SETTING_LE)
+ =09=09=09set_mode(adapter, MGMT_OP_SET_LE, 0x00);
+ =09=09break;
+diff --git a/src/btd.h b/src/btd.h
+index 9bf3102..39fb609 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -141,6 +141,7 @@ struct btd_opts {
+ =09bool=09=09device_privacy;
+ =09uint32_t=09name_request_retry_delay;
+ =09uint8_t=09=09secure_conn;
++=09bool=09=09ssp;
+=20
+ =09struct btd_defaults defaults;
+=20
+diff --git a/src/main.c b/src/main.c
+index 3a051c5..27d98a6 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -83,6 +83,7 @@ static const char *supported_options[] =3D {
+ =09"MultiProfile",
+ =09"FastConnectable",
+ =09"SecureConnections",
++=09"SecureSimplePairing",
+ =09"Privacy",
+ =09"JustWorksRepairing",
+ =09"TemporaryTimeout",
+@@ -1117,6 +1118,8 @@ static void parse_general(GKeyFile *config)
+ =09parse_config_bool(config, "General", "RefreshDiscovery",
+ =09=09=09=09=09=09&btd_opts.refresh_discovery);
+ =09parse_secure_conns(config);
++=09parse_config_bool(config, "General", "SecureSimplePairing",
++=09=09=09=09=09=09&btd_opts.ssp);
+ =09parse_config_bool(config, "General", "Experimental",
+ =09=09=09=09=09=09&btd_opts.experimental);
+ =09parse_config_bool(config, "General", "Testing",
+@@ -1479,6 +1482,7 @@ static void init_defaults(void)
+ =09btd_opts.refresh_discovery =3D TRUE;
+ =09btd_opts.name_request_retry_delay =3D DEFAULT_NAME_REQUEST_RETRY_DELAY;
+ =09btd_opts.secure_conn =3D SC_ON;
++=09btd_opts.ssp =3D true;
+ =09btd_opts.filter_discoverable =3D true;
+=20
+ =09btd_opts.defaults.num_entries =3D 0;
+diff --git a/src/main.conf b/src/main.conf
+index c990614..76f9ec0 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -122,6 +122,17 @@
+ # Defaults to "on"
+ #SecureConnections =3D on
+=20
++# Default Secure Simple Pairing setting.
++# Enables Secure Simple Pairing for BR/EDR on adapters that support it.
++# Disabling it makes BR/EDR pairing fall back to legacy PIN code pairing, =
+so
++# only do it for remote devices that don't work otherwise. Existing link k=
+eys
++# are kept. The kernel refuses to enable Secure Connections without it on
++# controllers that support BR/EDR Secure Connections. If the adapter is
++# already powered the change applies the next time it is powered on.
++# Possible values: true, false
++# Defaults to true
++#SecureSimplePairing =3D true
++
+ # Enables D-Bus experimental interfaces
+ # Possible values: true or false
+ #Experimental =3D false
+--=20
+2.56.1
 
 
---===============6684603334981386739==--
