@@ -1,76 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.62.57.64
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795182533;
-	b=sdIZi2IBhslUiI3A/HI7JG1bmYGy5Wkw0QsgD2/T0VEiyJto83wLc9+7CPnyGqAYQLpH
-	 EtfgO+2xBIlRyMNG+9wMBI3CmbgIU8BXksav1aQOdUiPZvrEzUXaqp7n2P2zBwLgnG18L
-	 EEuQubMukI0XVqAw6uax17l/Y5epLMdSG6JfSht6ll/aOBWouBnnshxYk+yM9KcTpQD9c
-	 nnzxg1ROKB4JJIbp2Ff2C11aLi70hE1T1pi/hh3rRzr0YmDf/UycPK408etIr7RTh9V6D
-	 tBpoX7BtpdOzN5Ih6su4xOa4APzedIK8VzdI4PRCNg4NG+pEGwQvbVT2JUIHKkSAlDg==
+	t=1795183419;
+	b=VR9YLBC2riOR5rwC7gxBBaVvuwx9m6SuzAP92yqdTMXtOdU5IRe2vvfPUlv+FHMm0P0s
+	 2tBw4NXHi3Oxmejn8GbJf/oh3n4UdguYjcEBQyyFWw3X/NfCxsSbD4igLGAiNphcLkdG2
+	 qNEm/l6IUsbmDSVmsFYReJvjmcea6STLz2FlGoeqFviO3NcGuVKhvR8/JxWDtj3dddMny
+	 sJ+mARtZzI47qleriLgsmYveMPbJv9ZTrJxBMLJQtd3EZe4X2hXU+FICwSru8IeSeFR1N
+	 h+8MLlB4VwUhOKxGrl7jI3E/8Q6IjKGzHOUp7H1rCj04xfIxfwJ6dr1f+aumWefZ/7A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795182533;
-	h=DMARC-Filter:DKIM-Signature:Received:X-QQ-mid:Message-ID:
-	 X-QQ-XMAILINFO:X-QQ-XMRINFO:From:To:Subject:Date:X-OQ-MSGID:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:
-	 MIME-Version;
-	bh=6J6hVWng2rSlwYKEbhFdmNXPBAvz8eUpC47Ucla4fKs=;
-	b=PXfJ75RvD6WesKxtniRhkdbHum4Wk5YXIr8gQw7K5j37LsJD5xnkDZZs7LQTctUOB7DJ
-	 VzO2P2XKpcsFUhz2Nu31rQeKcEkKipUq9yaNIyPrleZCIhR7FHqnFk+GKy0L9q6JHcRKJ
-	 qvZ5ZzRIJL0GkfUUlhGWicgkaxOs4cCi7tCpOopDovrAdmYsh1lMcCjrc/QVzQx9LEiKA
-	 m5zT5i61b2Ik1+LGI0OAOqmUQwHxAcyJ/HtmqhO/DE2utSm2BBiYbjU4mGcaByKvaFSwM
-	 eUInH3jQ2eDdvjbY7zDImATmkmXSOObajPttQDr991bLXHbKa2byB9V31UpNxGz7urw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795183419;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 MIME-Version:X-Received:Date:In-Reply-To:X-Google-Appengine-App-Id:
+	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
+	 Content-Type;
+	bh=4+syWqY/lnxKoYS1jvcWWXvKjEtqhzboTnziuyBrgao=;
+	b=MHVcbwQCZpIIO8qCTMfjVYCEEHiHwEVEZA2N4bTFYTNlFZRo1TJKv5/ex1KV186J284e
+	 z+a2re5AD0Y+wY9LvzbwPCvtHWcLweY3KZBteJJSFd494ddowGfRAcMi8RcQ5cR0o2gI0
+	 o0M7IHtbamJ8c9lq75/CdoJMnU3+JDYeTtyzVMSPoHUWRloYjlUgyCacY1ESWQ0BD9hAK
+	 kbew3gGg/LhLs+mMGiS/ETiDcg3JahczM0IggfACCj7wcG6VW9GnNvj8Z92OLgGzxRnK8
+	 TD7Si0fuv+OmVCqEhhKADkiaH0ZUFckgn52D3NQos8mY5J8LeeKwXz9m5VxQm5gYOKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=qq.com;
-	spf=pass smtp.mailfrom=qq.com;
-	dkim=pass header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=AjpzNVp+;
-	arc=none smtp.remote-ip=162.62.57.64
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=fail header.from=syzkaller.appspotmail.com;
+	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
+	arc=none smtp.remote-ip=209.85.210.69
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338B2606A33A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 13:48:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 338B2606A33A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=qq.com header.i=@qq.com header.a=rsa-sha256 header.s=s201512 header.b=AjpzNVp+
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1795182521; bh=6J6hVWng2rSlwYKEbhFdmNXPBAvz8eUpC47Ucla4fKs=;
-	h=From:To:Subject:Date:In-Reply-To:References;
-	b=AjpzNVp+zwz7gibWHcU/ePfgaXMlm+4zMAaNFHCBOHbq4h9Ig7xqqtFGISEWhwOxI
-	 6TSYtmQakiY7ydSIz+ruTWiZ6XCOWEieF0Y418U4G1HVquPap7cScJk3YswrdpziYH
-	 b4QTi2LB3C8iNRM9v+ogkxVhRwSzYoLKOVzw8ygY=
-Received: from [127.0.0.1] ([2409:8d5c:8f0:65e5:65c9:1ea4:b234:d5d4])
-	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
-	id C28118D9; Fri, 20 Nov 2026 21:48:40 +0800
-X-QQ-mid: xmsmtpt1795182520t4eh513iy
-Message-ID: <tencent_010B36BDB8ACF762CE3E9238EF090609E205@qq.com>
-X-QQ-XMAILINFO: M1rD3f8svNznDLDz2Wyvu10gQ9/u4nV7M0RwxESTrCmxmV2wZNaKo/+/4xxbzi
-	 qc8H2Ad44QbU6OgShhXm2/8E8rLRLFfWJ6mntfEVqmOwfVVGDdPknIE5Vuhmd5u5GW7bytkPrByG
-	 48vhweNTGw3+qOxotDyVAkOXZVui5poqMedQrF9e7MovJmrNlfh8Yq4mIQYSifcFtQDDQYpNBYtL
-	 OSxkzdXFZnIdtkzHsBdri+3/EIAOyhX4fttCagWFsR8HD+lUG6W/QxLU/M4Gq3kuqeJzVT2TqJZo
-	 5tcQ4IwhjdVAZTj1ofxh2xDAfXstxtnx9dN1DoB+6K+ZwFCJbLjpipc3RTVf6j4JyGMTeJJG2s9S
-	 +R52MsNb3C6yQgY/Rmg4Sz0b/K/vq1kvq2YaWuJD3WAQcCCL2q1Ph/et2/8iAIPwsUJmT/auMogv
-	 /iwDc0BLxYnBxYsstTsj33H2nsJul7MV7RpbWDSPzLBZpgWlpKz1upvIBwLoakV2o5MkdiKkhc6d
-	 JKJD633ag3Om9auOLNPLg5d5CL/WN6sI3R0x+mzBHfBI75OhkcBhK2C9goL6U0H6j+bUgD2x2D9Z
-	 2GCOdy4euOw32s4sgSv4HTDh1RV6MX4a9Ze5gSOgEOWWA9W6O/ysRm5en4Tn7B7oVDIBEfPkxWXj
-	 g/VAl/zhhfes7eETZxY2fUdRkGRH4El31wBWHAcooSGKOfcHrBZGteOYk9Idri4z+g1x6mqiIbMy
-	 UulOw9rdi7NFrmffRtfOFYpu9D8r7VtxKi31EoqN+kOvHUZX1CgNVqxoPv8leBSdijBowvVsaoqF
-	 toJQeXZoITYbihs+4HlUo8yCpPSTFSGYtquaoRoMdxd8BYiIRBKOcb4SHpb4nBlTwuNIeAugcRes
-	 8qNQLAboDzTqDb9Pgl935kIo2MKnC9vWtO6V7z1NiB1AdSbMQHvmWypFi0cYO8qIw/4taqSDbxrt
-	 SgdKipNMuUI4JFBAcf8Ce5sCTMa+G3Q9ipW6XBwVSqADKNfTMv1ZV36MO6hir8v1yvmsFP18Jtov
-	 UeGF14eJhomNBJ1N8AwOlcQJ0ndmh0FHBi8SfqMrI9nTxYINdD2kBOH7EWgbdnUyBSq+z5vzUktN
-	 /HYx6QYP0Jh6GOC9V6uX+Nl2cvZeuKr7SHPvcqvX67ZWehkYw5ie8CqQewoAkwfgmHSqOpDEEDxS
-	 m4jVsImVWcFkGTpQ==
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-From: Hang Nan <2122295973@qq.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: RFCOMM: hold the listener across child teardown
-Date: Fri, 20 Nov 2026 21:48:39 +0800
-X-OQ-MSGID: <179518251986.64680.15473101899696216335@qq.com>
-In-Reply-To: <179517710658.56988.15563657158904954302@qq.com>
-References: <179517710658.56988.15563657158904954302@qq.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041A3606A325
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:03:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 041A3606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-862c4207de6so1008107a34.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:03:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795183418; x=1795788218;
+        h=content-type:to:from:subject:message-id:in-reply-to:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=4+syWqY/lnxKoYS1jvcWWXvKjEtqhzboTnziuyBrgao=;
+        b=xcc0ediVaqOxPzsqEBTUh4mRk3w6KkxBMw+Z43irvFOBL7dkHdf2goEjOQ3NggdrHC
+         ux10DtFhZIfwhIK9EWad6aDCH23XEP4UAlgwLFCsRc7faXeVtk0je46sh+/bcOmtBi+2
+         4Vh/uVRa3oFyE7nfziDCN7F/O3K1uAVf/m/T9eX1T1Ki93BDzDmHpJwvHi61tXSlkinN
+         ruKrnl0oo7Wqlw7r5G8TOX7cLYml1X/EePrVS9OGjvJf2FegQmZGB36IP1HDHjIuHKrv
+         haF/M/T/3bx+otlvfUM0i1OY+cI7hOZiaD02TvsSMo5QKL0m4b7YU+1PHDFE0IF0E+dT
+         Z9kA==
+X-Gm-Message-State: APuU4Z/wDYpZgRsj0PGc6WQmd0z3D3VE92HS32/8Avff+/biOUJBt+8Q
+	8+a0mnC/Yv2zUtHmqNMOu21o6AzG+6K0Q0/J3k8Zf3dUSUX5g2W7CooyOoNZNpRkKiPvtuYx91l
+	r5HvZRewLL9VYUHl8jINSwGvbwzIk7S2BfSFQd4Fv+Usv0SCwpbExQS3f77w=
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -80,88 +57,168 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+X-Received: by 2002:a05:6808:3384:b0:4f3:6c2b:5f22 with SMTP id
+ 5614622812f47-57a0b44a292mr3448839b6e.29.1795183417909; Fri, 20 Nov 2026
+ 06:03:37 -0800 (PST)
+Date: Fri, 20 Nov 2026 06:03:37 -0800
+In-Reply-To: <6afadb28.371d364b.254eb1.0017.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6b005339.800a86e2.12ce6f.0001.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] possible deadlock in add_ext_adv_params_complete
+From: syzbot <syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lm0963hack@gmail.com, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-rfcomm_sk_state_change() notifies the listener through bt_sk(sk)->parent
-after bt_accept_unlink() has dropped the child's queue reference.  The
-accept queue never held a reference on the listener - bt_accept_enqueue()
-only takes one on the child - so a concurrent close() of the listener can
-reach rfcomm_sock_cleanup_listen() with an empty queue and free it before
-the notification, leaving krfcommd to dereference freed memory in
-parent->sk_data_ready().
+syzbot has found a reproducer for the following issue on:
 
-Take a reference on the listener before the unlink and drop it after the
-notification.  Same bug class as 4020751fd0df ("Bluetooth: L2CAP: hold the
-listener while notifying child teardown") and its ISO counterpart.
+HEAD commit:    0742ef27cd72 net: pcs: xpcs: add 10000baseCR_Full to 10GBA..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=163bc2bd580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e2d0fd941bcd2fb5
+dashboard link: https://syzkaller.appspot.com/bug?extid=fc55a609cd9deea4ea37
+compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ae1bbe580000
 
-The reference cannot be dropped where it is taken.  Once
-bt_accept_unlink() has run, close() may have released the fd reference, so
-the sock_put() can be the final put and runs rfcomm_sock_destruct() ->
-rfcomm_dlc_lock(listener->dlc) while the child's socket lock and the
-child's DLC mutex are still held.  All DLC mutexes share one lockdep class
-(rfcomm_dlc_alloc() does a plain mutex_init()), and this function already
-runs under d->lock and takes lock_sock(sk), so that nests a same-class
-mutex and inverts the d->lock -> sk_lock order.
+The issue was bisected by AI to:
 
-Release it in the existing SOCK_ZAPPED tail instead, where the child's
-socket lock has been released and its DLC lock is dropped for
-rfcomm_sock_kill() - the same place the code already drops the DLC lock so
-that the child's own destructor does not deadlock.
+commit 1c66bee492a5fe00ae3fe890bb693bfc99f994c6
+Author: Min Li <lm0963hack@gmail.com>
+Date:   Sat Mar 4 13:50:35 2023 +0000
 
-Gate the put on the condition that took the reference rather than on
-SOCK_ZAPPED alone: __rfcomm_sock_close() sets SOCK_ZAPPED directly for
-BT_CONNECT/BT_CONNECT2/BT_CONFIG/BT_CONNECTED, so this tail can also run
-when this invocation did not unlink the child (d->state != BT_CLOSED) and
-never took a reference.
+    Bluetooth: Fix race condition in hci_cmd_sync_clear
 
-v3: move the sock_put() out of the notification block (Zhao Li), and gate
-it on a local flag.
-v4: resend - v3 went out with the diff only (no commit message and no
-Signed-off-by), caught by bluez.test.bot.
+AI reasoning:   https://syzkaller.appspot.com/ai_job?id=5984fd05-f227-4d9b-91df-08015fba0856
 
-Suggested-by: Zhao Li <enderaoelyther@gmail.com>
-Signed-off-by: Hang Nan <2122295973@qq.com>
----
- net/bluetooth/rfcomm/sock.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+AI-generated root cause summary:
+An ABBA circular locking dependency exists between hdev->lock and
+hdev->cmd_sync_work_lock in the Bluetooth subsystem. Callers holding
+hci_dev_lock(hdev) (such as MGMT command handlers and HCI event handlers)
+acquire hdev->cmd_sync_work_lock when enqueuing or looking up cmd_sync work via
+hci_cmd_sync_queue()/hci_cmd_sync_queue_once(). Conversely, hci_cmd_sync_clear()
+(and related cancellation paths in net/bluetooth/hci_sync.c) acquires
+hdev->cmd_sync_work_lock and calls _hci_cmd_sync_cancel_entry(), which invokes
+entry->destroy (e.g. add_ext_adv_params_complete) while still holding
+hdev->cmd_sync_work_lock. Because entry->destroy attempts to acquire
+hci_dev_lock(hdev), this inverts the lock hierarchy and causes a deadlock.
 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 3fb8b5474948..94a495e86057 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -66,6 +66,7 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 	__must_hold(&d->lock)
- {
- 	struct sock *sk = d->owner, *parent;
-+	bool held = false;
- 
- 	if (!sk)
- 		return;
-@@ -83,6 +84,12 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 	if (parent) {
- 		if (d->state == BT_CLOSED) {
- 			sock_set_flag(sk, SOCK_ZAPPED);
-+			/* close() may already have dropped its reference and the
-+			 * queue holds none, so keep the listener alive across the
-+			 * unlink and the notification.
-+			 */
-+			sock_hold(parent);
-+			held = true;
- 			bt_accept_unlink(sk);
- 		}
- 		parent->sk_data_ready(parent);
-@@ -100,6 +107,12 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 		 * rfcomm_sock_destruct() will dead lock. */
- 		rfcomm_dlc_unlock(d);
- 		rfcomm_sock_kill(sk);
-+		/* Drop the listener reference with neither the child's socket
-+		 * lock nor its DLC lock held: this put can be the final one and
-+		 * rfcomm_sock_destruct() takes the listener's own DLC mutex.
-+		 */
-+		if (held)
-+			sock_put(parent);
- 		rfcomm_dlc_lock(d);
- 	}
- }
--- 
-2.47.3
+full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=fc55a609cd9deea4ea37
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com
+
+The cause commit was identified by AI and may be wrong.
+If you agree with it, please also add:
+Fixes: 1c66bee492a5 ("Bluetooth: Fix race condition in hci_cmd_sync_clear")
+
+Bluetooth: MGMT ver 1.23
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor256/6049 is trying to acquire lock:
+ffff8880206f00b8 (&hdev->lock){+.+.}-{4:4}, at: add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+
+but task is already holding lock:
+ffff8880206f07c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:684
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       hci_cmd_sync_lookup_entry net/bluetooth/hci_sync.c:871 [inline]
+       hci_cmd_sync_queue_once+0x42/0x250 net/bluetooth/hci_sync.c:808
+       hci_update_passive_scan+0x1bf/0x210 net/bluetooth/hci_sync.c:3596
+       le_conn_complete_evt+0xee9/0x18d0 net/bluetooth/hci_event.c:6106
+       hci_le_conn_complete_evt+0x187/0x470 net/bluetooth/hci_event.c:6117
+       hci_event_func net/bluetooth/hci_event.c:8104 [inline]
+       hci_event_packet+0x67a/0xf10 net/bluetooth/hci_event.c:8158
+       hci_rx_work+0x2b4/0x1110 net/bluetooth/hci_core.c:4156
+       process_one_work kernel/workqueue.c:3495 [inline]
+       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3578
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3659
+       kthread+0x38b/0x480 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (&hdev->lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3209 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+       validate_chain kernel/locking/lockdep.c:3952 [inline]
+       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+       add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+       _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:669 [inline]
+       hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:686
+       hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2703
+       vhci_release+0x182/0x1d0 drivers/bluetooth/hci_vhci.c:709
+       __fput+0x408/0xa40 fs/file_table.c:512
+       fput_close_sync+0x11f/0x240 fs/file_table.c:618
+       filp_close_sync fs/open.c:1574 [inline]
+       __do_sys_close fs/open.c:1597 [inline]
+       __se_sys_close+0xa2/0x160 fs/open.c:1584
+       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+       do_syscall_64+0x171/0x540 arch/x86/entry/syscall_64.c:89
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&hdev->cmd_sync_work_lock);
+                               lock(&hdev->lock);
+                               lock(&hdev->cmd_sync_work_lock);
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+locks held by syz-executor256/6049: 1, on CPU#1:
+ #0: ffff8880206f07c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:684
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 6049 Comm: syz-executor256 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
+ check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
+ check_prev_add kernel/locking/lockdep.c:3209 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3328 [inline]
+ validate_chain kernel/locking/lockdep.c:3952 [inline]
+ __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
+ lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
+ __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+ __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
+ add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
+ _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:669 [inline]
+ hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:686
+ hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2703
+ vhci_release+0x182/0x1d0 drivers/bluetooth/hci_vhci.c:709
+ __fput+0x408/0xa40 fs/file_table.c:512
+ fput_close_sync+0x11f/0x240 fs/file_table.c:618
+ filp_close_sync fs/open.c:1574 [inline]
+ __do_sys_close fs/open.c:1597 [inline]
+ __se_sys_close+0xa2/0x160 fs/open.c:1584
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x171/0x540 arch/x86/entry/syscall_64.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcd736358be
+Code: 08 0f 85 55 e2 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 90 41 56 41 55 49 89 fd 48 89 d7 41 54 41 89 cc 55 48 89 f5 53
+RSP: 002b:00007ffe530b8c28 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 000055557f5ed400 RCX: 00007fcd736358be
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00007ffe530b8cd0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fcd736af5a0 R15: 0000000000000002
+ </TASK>
