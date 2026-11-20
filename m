@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795189674;
-	b=0R71BpUWHxwj9Z4glmY+VFdhqYh0UFEqPWFa1mA1hhq/jtx6H5wE4r8Kq6qJ3cPpZaCz
-	 7k6bwJZ23o8fjeVBdWMlhpwVrQDLiKTfOEaVdwIVEx96/MvvTlj80NfroVu5u6THqwamg
-	 yAF/YDa45N34buWkraQbsCyEuXlLN4FisXYCCbYEGScuwGeFuutRtbBWYRSdAeBZHqXLx
-	 aFTG0qvzs+bzq/rRhKEO6YA5YMR1991EMFpsqQ8AagM52BNl39AtCF7l1Kzj0hMSAHBFH
-	 2AP46mMVeTfgmP2aSXnIiXJ/FYgRsKyLT50pH/XOpiRzWHhI1nyjjS3QLbnIY8i9PEA==
+	t=1795189675;
+	b=G4d6u06PA2rrseiZqkh7wxOoOmMoO+xv9oMp2o6nrERtPKGl4bETUB/ryiSZ1OThU92q
+	 KFrOVwk2QHQR8O/e24QCnhY6gJR9Z2hgemafSLPHTzymij6i2e2++tEMBEfdx/32feduO
+	 wKdn+rqpUmTcvurXsdPsClJfgR4N449zXaL7DjOywqHIslmkGDbe2ppssW7tgnNva/3+p
+	 ovKiAHn30Zjzpc/NQ7lvk99LtTRjA/AZxYvCPQlh2fNn5nNbjYQrsw1t+xgsNu7Z7YoEt
+	 I+MLgZyvaBHYwAOldo0KoTBFs+GItdIckAuQuOx16U7N64RK5QHkHSaQ884kYj+98ng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795189674;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795189675;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=jLLPiV1rvSMMGLBYkGcSf0yw0iogICCJHvUrydl9SsU=;
-	b=mzsQWC4iYE4ADr/wrEE03mnMy1pnHBvGBFgLBX/T7YyXcgofD8UZOptP+jLjerIu3i/Z
-	 kDig4Nb2bRYGThlE+whzyuIX/v+NqRNtGAn14+mps7/Zzj+1zh63ZJCfEShw5tRefl1WW
-	 G0z93ONfTNZqn3/J6qsKPzWn8v4I3EVirM6H6kDv8v/0NoVYMOtc3flp1qKYi+19F3NfK
-	 nvHhwKh5P8BBLnEr7QKYYBdvM/n3JkA9FWQBzr5dcsixGE5W9NGE6JYKKBD8qkTzgOymc
-	 ctuusbanyWdIneQ2Qr4FRW6qqaB5+RZqMqzFuFH4owoIqReSWgdZimr0O/qzBMLhtRw==
+	bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+	b=anNzHhtAxoAnWSCccRXiqesqOcqgjFMnQRKQedvofvyDWTtJsVvWWctbUGBh2MKYRPMG
+	 cJQJEIcbVD9SYLa8Jar2hny/J98xNFcu0szuVbocp0WNWqRzrR2xCiOs2iGF3bOvO2HUr
+	 Bl884bFoBOezZOQJ9mliqGNoaELWDGvhxFYJthJa8+gyiOiaJUQX1zTkEbZl8wusnuwp5
+	 323uFRylK10g7D+G49c7igW8tK4cn82Y/CnWkQW2e138SO5ZaBO4XaM+MxjVRMfWdA8Fo
+	 3cBEqySWlKSKSudQMvgRnVeV/ety/LNDalzcXNs+D1hch9gNJjeCK0v2hh32mTXyKrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QBra4AUs;
-	arc=none smtp.remote-ip=209.85.217.44
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bJd+GHRq;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A04C60A2609
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C11660A2616
 	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 15:47:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6A04C60A2609
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0C11660A2616
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QBra4AUs
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-7cc53938a8fso758264137.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bJd+GHRq
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-99e0b1ee864so341363241.1
         for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 07:47:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795189673; x=1795794473; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795189674; x=1795794474; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=jLLPiV1rvSMMGLBYkGcSf0yw0iogICCJHvUrydl9SsU=;
-        b=QBra4AUsliY/0Z6XgRJmuJ0nwlpLbrzMeAe1SDY1tQF+tFVxOmNBYzg/yptePHiJac
-         KsfRmV5D6ej03LTHnyZkrA8wkMcZEnSjFxBbCOGti71/ORrs4iOSoebYYqRDJXfCDM3x
-         SypB8cRuIqfJe996KzjDDBdUtYtp6fv3O9tl6+mlmOZjaT3iGJZtwR+UvqlPoEwH1ViO
-         pKvMhdSj8/zbBdNq0C9kWuqUrtSGnkN6nOz69m6J17Xq0ESGaOXvhSkZqYbqoaiLaeEl
-         OGvFQwPj5GLC050FIhTUeekhlKzukEE/YXq1/PwXh+mQSh59Lq29lah17mP5wqrjsmD4
-         HBaQ==
+        bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+        b=bJd+GHRq2f73xuZ67afoan1eYU4Gqk32qBRR1I+V3JGtaWrJ/aHsCI/C2qZ0/809YD
+         Ku9tD/0aRkvP/yFaIfONbvScxmf7WmoPR5FKwtCKerElIp+A8IHi0jUKwKTQhjEUlD3V
+         0/zOUz7x0yZziyX7m+J6JhyVvLxwF4l2FDLoIRG2RbM35hdTyVSG3ZAi+Tq4FrB/4cw8
+         EHbHjwEGAdCeM1fYkK/vhO3l5uaTPlLI+T0bLcQNV55nJke2at9TG2BpabDX50C0eH/5
+         Z1Td7x2wqEV2sPs6XEYSJ2Q2JubgPlzGGmXyofBpc0Ch5jvP+MTfPEB5XyMBOcPXWAjs
+         LSIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795189673; x=1795794473;
+        d=1e100.net; s=20260707; t=1795189674; x=1795794474;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=jLLPiV1rvSMMGLBYkGcSf0yw0iogICCJHvUrydl9SsU=;
-        b=xZUYHEfKxjFfEons3uPTdZ/UbfsHQ92HV/Ub0NAmCH+8RJtVDTaYclWOegg7d9JQGj
-         RYwm7rFPvSH3z4t5GWiHUNe2ECYLGN6q3S2Sy+Z9v9q2txWkgbbCLjH9VA6751JI2eed
-         v02z3nRa2NZcRaLHMkfXdpl2yYAO10bj5AXLmfgm8BIKLhNI+/qII+jHEYx7eraGF5bY
-         x4FN8oJa9pgYlDppIL6UVa/5pH8Fbgjzzd1dJEMRR2w/D5bXGlLNVMV8+7phfHF40/6y
-         Eg2AORU3rp2DLM8oZYn7B5O7jnkV4LJVdwH18V3oPEQ/jwyKnKk8tMbBpThfBTOhQpn2
-         gM9w==
-X-Gm-Message-State: APuU4Z8NdV20NG8T65ptLqRSrsiKyYABIRQTWjCXv2Tb3VhbGw7szl8W
-	eBw2eRRZjUwqHggkD/kMj8VmuklBfzSBdCyBEMhA87u71gC60j3XQ6CkRtNI6cfM
-X-Gm-Gg: AZFdTZebJja1SifwFEP64sdNSdiw+HffShI+vvkuxBxLnuZo27eMG4MtCOs5vX+PvOE
-	5uMWkG0XfSjGjN+crRwuYmbL/43NKBS+JpAeMAfC00N6wLJW0c3KMktsfEQM7qCt414FzYZDa30
-	biU5I1lbCnw8/JPTPl36Pu3QaHWHtIcYxVW1bpCAL+aZ9XilBL7MhIvt2us7uq94wJxWHKu2k7h
-	Oe5SQJP6rjx9Gw7w7/Rvk87ILPiBjEPqt9qBHcBD/q8NfLEfZqE7tc0qGyZf3BzhPuU5ku4AXCE
-	aIJkcfrh0htH+vfp2FqZ8tQnGRx+0b19ZtI4GzBDAIYrXM95V0K3fRazFmJJzi0xroK03fnRSkj
-	B9zyWMjvVX6IYoO/XGnQgCEy7j+GPah+nKX9z/gTWPCiNt/AUNJXWKBXCJEEamQGo73n9gQLars
-	O1E3L/9oEZ1qt+Eu/sPQ+CzCBy3o75mCJmcmSjeq8f7dKJJuhUOXTvHFjYkO9zNC+JNfpsblwFi
-	Ywm8hRx/yeBsAe2L30WbvYE0O+I/95KcmNAL8/AMpDv8Nnz9gdLi/JAwcFtcL38TOW508v9vlT6
-	hwRMu+3FHk0ixm/loSqo5k15XzUzojvJGRgLh5SLiyE+osfJJ9K5LERA0WawJABMiflLigsSLko
-	rJq2EOyZggPqsJx6vhIkNMTUK/+IiFRNixlt5duOSqHFvseARCfW2iGPk7PIchgkLZOnOP3NoFh
-	849WU=
-X-Received: by 2002:a05:6102:5698:b0:7d2:8610:3223 with SMTP id ada2fe7eead31-7d73968ae3emr1809272137.34.1795189673258;
+        bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+        b=XYzLDKi4IcLxp2lTLgq5K5W/G/K+x6HKf9ae/UNwFHKEXBdJOg6CE0kq0/HNcBCaB0
+         3aeovNgailgEx/I9zBInqM4sGD5k0CI9oHuZ/IDrLEZmsEVixQxwsKXQY8b0IAkqumKL
+         EW+gtmsdU0GIXHZ0saGbxEUM/vXaZ2jNbkAOTX4hH7sOtldvZjaNcSiLdtYaSJri3tQm
+         Ft8QsM2W77MpPRZvNTdtRLmX7f67e8cLOyhljRc+044xR3ci/0gVxoeuqpuH3x83ENOh
+         5kydXawidAMNQ/0cqFU36hbXW9zrfR9T76fYUWUCJ7BZ3vo4/gHJdY3oyVvn4VQERlI4
+         5+/Q==
+X-Gm-Message-State: APuU4Z84IdweI2w0VcvfXABNyiS6+6e9qboDRvIa0RL5zVH9qTzpHGHE
+	ZE7vGpSYFLed4/rH8PVbZOo6/1muMYw1CwJbuptsWomScehPYj4RkVixkPIaQ/pD
+X-Gm-Gg: AZFdTZdI4BOcu5vMdTdagV1yDyeQajLQge4K7aA9bJiumBjMgR9EwbULI8JAf9CHOj5
+	WBimfGeAqUTssW9SIWOiT/GP6aEc2erAzJP0Ops/6p6A5KCS3dkH07KeL3l2qF+2osdGOCkL2YV
+	oKHP0smm8EmLHt8hNVaGFWtnVj9Hu5moY0n+7QLnJVXtziWHBW48nspS0NX6JutE6lvYJEJPYSv
+	sGo4lRre6OMxccGHsOU63AmeU5s9MynQUva/tCeTgxnHL55J90RaG0MdYb01MNEw7UnrJZpCg/k
+	fuzIQSgbMKauz4xXI7tDwb6lvigvJ2+Z7W7zQ8HXpiL3eqHOPukJ5+1etXGgr3NvrsvSXePy7nD
+	d7+qOOt52gXxQUZfsAI2vcUdzE9ARSa2RFvrYVta8d8EeNqy9OZ7tv9X/xvDJu1hXyZyOBbNzdW
+	MPExG+melFdbnHolRQb5TTHLoERj7KNX8zpaeaDJ4bsxz6zhQAiY2cEuTIJhWFfjZKdr3aY/PNw
+	7wedavjGeVYMSBIJT3OR8eI3kEurq9WKa3h+QAQAxF61HVcbXuQNwT3xdD7nlc/t75lMX/cnUc5
+	Ue9j/pXySi2ihbevYibqzWG+byxbkhdjBqa4t5YpU7LWkN1t9RKIvWckWd4UfjRZy+0Ufa1uyAT
+	3n9f4YAUz28I9GopPwUTWYWrw4AnW0diiWM47mS99nFA+2Vt8nK5/BOCNTEzxiXjW+sFy21mDRM
+	ei/DR0lQ56L9oNDSubMqlHIG4U
+X-Received: by 2002:a05:6102:b04:b0:7cc:2fd1:7122 with SMTP id ada2fe7eead31-7d739462ae8mr1607276137.18.1795189673992;
         Fri, 20 Nov 2026 07:47:53 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7b12eb7sm3358243137.0.2026.11.20.07.47.52
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7b12eb7sm3358243137.0.2026.11.20.07.47.53
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 07:47:52 -0800 (PST)
+        Fri, 20 Nov 2026 07:47:53 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/5] emulator/bthost: Add helpers to test security of deferred setup
-Date: Fri, 20 Nov 2026 10:47:46 -0500
-Message-ID: <20261120154750.1745643-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/5] emulator/btdev: Add btdev_set_link_key_type
+Date: Fri, 20 Nov 2026 10:47:47 -0500
+Message-ID: <20261120154750.1745643-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261120154750.1745643-1-luiz.dentz@gmail.com>
 References: <20261120154750.1745643-1-luiz.dentz@gmail.com>
@@ -101,173 +101,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add helpers so testers can control the remote side while a connection
-is pending:
-
- - bthost_hold_auth_request()/bthost_release_auth_request() hold the
-   reply to a PIN Code or IO Capability Request, keeping pairing in
-   progress until it is released.
- - bthost_set_l2cap_rsp_pending() keeps a request while its Connection
-   Response is pending, so its callback is called with the final
-   response as well.
- - bthost_set_conn_encrypt() enables/disables the encryption of a
-   BR/EDR connection.
+Add btdev_set_link_key_type() to set the key type reported in Link Key
+Notification no matter the type of the key pairing results in, so
+testers can emulate pairing completing with a key that doesn't meet
+the security level required.
 
 Assisted-by: OpenCode:claude-fable-5.2
 ---
- emulator/bthost.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++
- emulator/bthost.h |  6 ++++
- 2 files changed, 92 insertions(+)
+ emulator/btdev.c | 13 ++++++++++++-
+ emulator/btdev.h |  5 +++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index e65d29faa989..afc83891778e 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -207,6 +207,7 @@ struct l2cap_pending_req {
- 	bthost_l2cap_rsp_cb cb;
- 	void *user_data;
- 	struct l2cap_pending_req *next;
-+	bool pending;
- };
- 
- struct l2cap_conn_cb_data {
-@@ -273,6 +274,11 @@ struct bthost {
- 	uint8_t io_capability;
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 1140acd90e7d..7c630718013d 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -214,6 +214,8 @@ struct btdev {
+ 	uint8_t pin_len;
+ 	uint8_t io_cap;
  	uint8_t auth_req;
- 	bool reject_user_confirm;
-+	bool hold_auth_request;
-+	bool auth_request_held;
-+	bool auth_request_pin;
-+	bool l2cap_rsp_pending;
-+	uint8_t auth_request_bdaddr[6];
- 	void *smp_data;
- 	bool conn_init;
- 	bool le;
-@@ -1543,6 +1549,13 @@ static void evt_pin_code_request(struct bthost *bthost, const void *data,
- 	if (len < sizeof(*ev))
- 		return;
++	bool link_key_type_set;
++	uint8_t link_key_type;
+ 	bool ssp_auth_complete;
+ 	uint8_t ssp_status;
  
-+	if (bthost->hold_auth_request) {
-+		memcpy(bthost->auth_request_bdaddr, ev->bdaddr, 6);
-+		bthost->auth_request_held = true;
-+		bthost->auth_request_pin = true;
-+		return;
-+	}
-+
- 	if (bthost->pin_len > 0) {
- 		struct bt_hci_cmd_pin_code_request_reply cp;
+@@ -1906,7 +1908,10 @@ static void link_key_notify(struct btdev *btdev, const uint8_t *bdaddr,
  
-@@ -1667,6 +1680,13 @@ static void evt_io_cap_request(struct bthost *bthost, const void *data,
- 	if (!conn)
- 		return;
+ 	memcpy(ev.bdaddr, bdaddr, 6);
+ 	memcpy(ev.link_key, key, 16);
+-	ev.key_type = get_link_key_type(btdev, bdaddr);
++	if (btdev->link_key_type_set)
++		ev.key_type = btdev->link_key_type;
++	else
++		ev.key_type = get_link_key_type(btdev, bdaddr);
  
-+	if (bthost->hold_auth_request) {
-+		memcpy(bthost->auth_request_bdaddr, ev->bdaddr, 6);
-+		bthost->auth_request_held = true;
-+		bthost->auth_request_pin = false;
-+		return;
-+	}
-+
- 	memcpy(cp.bdaddr, ev->bdaddr, 6);
- 	cp.capability = bthost->io_capability;
- 	cp.oob_data = 0x00;
-@@ -2437,6 +2457,29 @@ static void handle_pending_l2reqs(struct bthost *bthost, struct btconn *conn,
- 			continue;
- 		}
- 
-+		/* A request kept while its response was pending only expects
-+		 * another Connection Response, other requests may be using
-+		 * the same identifier.
-+		 */
-+		if (req->pending && code != BT_L2CAP_PDU_CONN_RSP) {
-+			curr = &req->next;
-+			continue;
-+		}
-+
-+		/* Keep the request while the response is only pending */
-+		if (bthost->l2cap_rsp_pending &&
-+				code == BT_L2CAP_PDU_CONN_RSP &&
-+				len >= sizeof(struct bt_l2cap_pdu_conn_rsp)) {
-+			const struct bt_l2cap_pdu_conn_rsp *rsp = data;
-+
-+			if (le16_to_cpu(rsp->result) == 0x0001) {
-+				req->pending = true;
-+				req->cb(code, data, len, req->user_data);
-+				curr = &req->next;
-+				continue;
-+			}
-+		}
-+
- 		*curr = req->next;
- 		req->cb(code, data, len, req->user_data);
- 		free(req);
-@@ -4276,6 +4319,49 @@ uint8_t bthost_get_auth_req(struct bthost *bthost)
- 	return auth_req;
+ 	send_event(btdev, BT_HCI_EVT_LINK_KEY_NOTIFY, &ev, sizeof(ev));
+ }
+@@ -9458,6 +9463,12 @@ void btdev_get_mtu(struct btdev *btdev, uint16_t *acl, uint16_t *sco,
+ 		*iso = btdev->iso_mtu;
  }
  
-+void bthost_hold_auth_request(struct bthost *bthost, bool hold)
++void btdev_set_link_key_type(struct btdev *btdev, uint8_t type)
 +{
-+	bthost->hold_auth_request = hold;
++	btdev->link_key_type_set = true;
++	btdev->link_key_type = type;
 +}
 +
-+void bthost_release_auth_request(struct bthost *bthost)
-+{
-+	bthost->hold_auth_request = false;
-+
-+	if (!bthost->auth_request_held)
-+		return;
-+
-+	bthost->auth_request_held = false;
-+
-+	if (bthost->auth_request_pin) {
-+		struct bt_hci_evt_pin_code_request ev;
-+
-+		memcpy(ev.bdaddr, bthost->auth_request_bdaddr, 6);
-+		evt_pin_code_request(bthost, &ev, sizeof(ev));
-+	} else {
-+		struct bt_hci_evt_io_capability_request ev;
-+
-+		memcpy(ev.bdaddr, bthost->auth_request_bdaddr, 6);
-+		evt_io_cap_request(bthost, &ev, sizeof(ev));
-+	}
-+}
-+
-+void bthost_set_l2cap_rsp_pending(struct bthost *bthost, bool enable)
-+{
-+	bthost->l2cap_rsp_pending = enable;
-+}
-+
-+void bthost_set_conn_encrypt(struct bthost *bthost, uint16_t handle,
-+							uint8_t encr_mode)
-+{
-+	struct bt_hci_cmd_set_conn_encrypt cp;
-+
-+	cp.handle = cpu_to_le16(handle);
-+	cp.encr_mode = encr_mode;
-+
-+	send_command(bthost, BT_HCI_CMD_SET_CONN_ENCRYPT, &cp, sizeof(cp));
-+}
-+
- void bthost_set_reject_user_confirm(struct bthost *bthost, bool reject)
+ void btdev_set_le_states(struct btdev *btdev, const uint8_t *le_states)
  {
- 	bthost->reject_user_confirm = reject;
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index b3e18114638a..92aaf42305da 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -206,6 +206,12 @@ void bthost_set_io_capability(struct bthost *bthost, uint8_t io_capability);
- uint8_t bthost_get_io_capability(struct bthost *bthost);
- void bthost_set_auth_req(struct bthost *bthost, uint8_t auth_req);
- uint8_t bthost_get_auth_req(struct bthost *bthost);
-+void bthost_hold_auth_request(struct bthost *bthost, bool hold);
-+void bthost_release_auth_request(struct bthost *bthost);
-+void bthost_set_l2cap_rsp_pending(struct bthost *bthost, bool enable);
-+void bthost_set_conn_encrypt(struct bthost *bthost, uint16_t handle,
-+							uint8_t encr_mode);
-+
- void bthost_set_reject_user_confirm(struct bthost *bthost, bool reject);
- bool bthost_get_reject_user_confirm(struct bthost *bthost);
+ 	memcpy(btdev->le_states, le_states, sizeof(btdev->le_states));
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 097021c01cc5..517c65a19cf0 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -90,6 +90,11 @@ const uint8_t *btdev_get_adv_addr(struct btdev *btdev, uint8_t handle);
+ void btdev_get_mtu(struct btdev *btdev, uint16_t *acl, uint16_t *sco,
+ 								uint16_t *iso);
  
++/* Report the given type in Link Key Notification, whichever is the type of
++ * the key that pairing results in.
++ */
++void btdev_set_link_key_type(struct btdev *btdev, uint8_t type);
++
+ void btdev_set_le_states(struct btdev *btdev, const uint8_t *le_states);
+ 
+ void btdev_set_al_len(struct btdev *btdev, uint8_t len);
 -- 
 2.56.0
 
