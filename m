@@ -1,53 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.69
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795183419;
-	b=VR9YLBC2riOR5rwC7gxBBaVvuwx9m6SuzAP92yqdTMXtOdU5IRe2vvfPUlv+FHMm0P0s
-	 2tBw4NXHi3Oxmejn8GbJf/oh3n4UdguYjcEBQyyFWw3X/NfCxsSbD4igLGAiNphcLkdG2
-	 qNEm/l6IUsbmDSVmsFYReJvjmcea6STLz2FlGoeqFviO3NcGuVKhvR8/JxWDtj3dddMny
-	 sJ+mARtZzI47qleriLgsmYveMPbJv9ZTrJxBMLJQtd3EZe4X2hXU+FICwSru8IeSeFR1N
-	 h+8MLlB4VwUhOKxGrl7jI3E/8Q6IjKGzHOUp7H1rCj04xfIxfwJ6dr1f+aumWefZ/7A==
+	t=1795185403;
+	b=Q8d6FK9mEpqxH+MP4yprjdBcWuFgnN/Sr4YGWB0dzaDd9bmrua7NybEEgOUlWM7a2osK
+	 d4x1MOW78IhxfF7AP95Mz9W8c8e2dnW78QewyNM+4jw9SfXBZz9c9dT/rLbi2XnlTdIAy
+	 M4Yn+50Q9pputqqz4tPyFp/3I4BMkVoZJ0nTk+4k7MFYqsJ1qx8QVp94jU1WCGE7gKUpb
+	 17NEV79tULPfG219Kdm7Y7l4oS+TJu/B2HrYuLg64961yoAsy+EpmqBKmj9dIeYWULsAA
+	 Akjyb+FMMzYKKgm/f3MxVJnngHzsSVTsGUXmABqHefabI5NikwcT0VRJ7Ag+EGeZ+6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795183419;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Gm-Message-State:
-	 MIME-Version:X-Received:Date:In-Reply-To:X-Google-Appengine-App-Id:
-	 X-Google-Appengine-App-Id-Alias:Message-ID:Subject:From:To:
-	 Content-Type;
-	bh=4+syWqY/lnxKoYS1jvcWWXvKjEtqhzboTnziuyBrgao=;
-	b=MHVcbwQCZpIIO8qCTMfjVYCEEHiHwEVEZA2N4bTFYTNlFZRo1TJKv5/ex1KV186J284e
-	 z+a2re5AD0Y+wY9LvzbwPCvtHWcLweY3KZBteJJSFd494ddowGfRAcMi8RcQ5cR0o2gI0
-	 o0M7IHtbamJ8c9lq75/CdoJMnU3+JDYeTtyzVMSPoHUWRloYjlUgyCacY1ESWQ0BD9hAK
-	 kbew3gGg/LhLs+mMGiS/ETiDcg3JahczM0IggfACCj7wcG6VW9GnNvj8Z92OLgGzxRnK8
-	 TD7Si0fuv+OmVCqEhhKADkiaH0ZUFckgn52D3NQos8mY5J8LeeKwXz9m5VxQm5gYOKw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795185403;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
+	b=Xm4NTQ6+/1CD49DbWi3zf5p2lul17BSFY1x2ovh8Hbe5jKHeVWlKCok3U5Sv2hXgfyvx
+	 Efq5WXnE4lDIYHWyTHrtmxjoQcXmzDYGo3kYg4lMmlLEYmziWT+ALqm60IBV2vmMqYgLb
+	 nAStEAQmoeSfeBv1Uj5yUJ5KloJE7P+uSsloEESSKkY3lwxNVpvSoVJ6nYL6ZuD9jCko6
+	 HkX9StJF4BxtAEr4Weg9COysjwreFDWr1i89TmHMqVL8nvlOe1pacy6qjefjOFE+avDAW
+	 N7eXgIISCyYXVEO8LgsZi8GgbpSwz4stXlKgEEz3Xo60RTByJiBLTHrgvUuNrWG1lgA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.210.69
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kHLaRqxQ;
+	arc=none smtp.remote-ip=209.85.160.45
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041A3606A325
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:03:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 041A3606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-862c4207de6so1008107a34.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:03:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795183418; x=1795788218;
-        h=content-type:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741EF606A320
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 14:36:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 741EF606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kHLaRqxQ
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-4b5138f0991so1171613fac.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:36:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795185402; x=1795790202; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=4+syWqY/lnxKoYS1jvcWWXvKjEtqhzboTnziuyBrgao=;
-        b=xcc0ediVaqOxPzsqEBTUh4mRk3w6KkxBMw+Z43irvFOBL7dkHdf2goEjOQ3NggdrHC
-         ux10DtFhZIfwhIK9EWad6aDCH23XEP4UAlgwLFCsRc7faXeVtk0je46sh+/bcOmtBi+2
-         4Vh/uVRa3oFyE7nfziDCN7F/O3K1uAVf/m/T9eX1T1Ki93BDzDmHpJwvHi61tXSlkinN
-         ruKrnl0oo7Wqlw7r5G8TOX7cLYml1X/EePrVS9OGjvJf2FegQmZGB36IP1HDHjIuHKrv
-         haF/M/T/3bx+otlvfUM0i1OY+cI7hOZiaD02TvsSMo5QKL0m4b7YU+1PHDFE0IF0E+dT
-         Z9kA==
-X-Gm-Message-State: APuU4Z/wDYpZgRsj0PGc6WQmd0z3D3VE92HS32/8Avff+/biOUJBt+8Q
-	8+a0mnC/Yv2zUtHmqNMOu21o6AzG+6K0Q0/J3k8Zf3dUSUX5g2W7CooyOoNZNpRkKiPvtuYx91l
-	r5HvZRewLL9VYUHl8jINSwGvbwzIk7S2BfSFQd4Fv+Usv0SCwpbExQS3f77w=
+        bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
+        b=kHLaRqxQSh/MnQUIu5oNOvfFL7X6oc9dnYL81kNuqonbfsu2ggXKRKWrQxCC67Ov7o
+         qR4Z4QtWi1Q+y3pPJtCnBo/NeRjoNmmkleszSth/vKfvNVDB4QN5QJWQMWh37NZjfSuQ
+         oO3G7zSP+ISWJbr/MhsJj5MH2On+fz/qBR+f2EL5fPYyrvnF3PdeD2gdN1xnPYWfT/M5
+         JXf+ddbciN9Zf3AhnuaEAR9CzlyEw+mAuuPmWroVGBXkU1otkuat3cDU0Sh+nThTnaMj
+         Hck2c6LS4OFCT955J5wFdEuqqyEeS+JZ+k/IBkNNG+nzcTX5cMUahltG+56QSlBNi24P
+         8hnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795185402; x=1795790202;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=W8I8TGsWcKeU26KtkMkayxjmI/q+7uT4HLlad8vyFJY=;
+        b=dud3QN0r0RgWXY5z3BLJd6vu+9m4a7FXotqWSh/BPsxAalqk7/ZPlmec/4x0dl7fm3
+         9NQ8cNVgHD4zvg0yKDjbe9rJlRewIKxWvE9E/xMBdYpc5wIN3aBFOjWqkvzIAwHpCYaz
+         L7UJnG9gPpiBB98WMfOp69RUK4IaeVmJqtuIxUsC3o01+Ri0SfyED/AhyIFbO5Gp4juK
+         1IW7A/49nhJkPA2yAzoOdaBRda6Bfs4VbdbotQMYMahEyYToGsvrIjsNA2rM+9wYbUAF
+         6myybId/m3nGaV5NZa3vAFwXz+e0Ghm3nZ1muW+wqojr4C4jWP/9ru249/qOMUUzDPTp
+         lizA==
+X-Gm-Message-State: APuU4Z8l31fr41nztr8tMJcdlJ6FznWPCYFdByqzONTwqvZCI6S6N3wo
+	8jfS7GLjzbOa95fvzWwZ1ITyUK2xwtuUjkXyr8fUd4CVFOYBVhQ87gbq73SV/g==
+X-Gm-Gg: AZFdTZdBUb2unDjVRNYPzOuawA79cbozTSBCifKYTI68RTOBg/uVqaOksKOiVGfkZ3x
+	9p1sM1CuDf+/x8FbYo2GI4aEgEbooYTShrCNLLr11KI+xZYpfJdKunrwky30tMxkig8PPdE01BO
+	1nBHxU86XTV21quFomPD3/FnqZCFKAgNxaUGfzR+7VnOgrvRl2XDI1iioZnpLKWL+sBftCFMcly
+	1QXC9lN4uIrhgeOJ6ABAaRC8mllKBY9dgPfcjp4GtYXuUTULneyho99clNH0uX5JkGhaN3Ng/RY
+	0W/bStaVsMpIEEzlr423ie0gerxyNzRgD9zHbGT1JtTLGBHJZncjbi3UBrnu4Qj4OdTRO280Ku1
+	oFeG6SKVXyPShClZT6rndVCCPjcGuDasI7UOjC//aF4TePA+qKoALXGPMem8a0vbCIItbbFVqxn
+	r7S8KuJfinXX6fg3P3frD5rpuKU69wL9xQNYKO1nL26z2rdIgLn4iWPMR0x1dBMg4H1HQKSTJm4
+	pzJS/TGXK/McOxUCRvOR8SwYkSv58hsnibakkUWIKLYEGbRyHFh3AN7UZqQ6i0=
+X-Received: by 2002:a05:6808:199f:b0:568:2782:d1b4 with SMTP id 5614622812f47-57a0bd95bcemr2886007b6e.32.1795185402440;
+        Fri, 20 Nov 2026 06:36:42 -0800 (PST)
+Received: from [172.17.0.2] ([132.196.84.24])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-57a34250ef2sm2463166b6e.3.2026.11.20.06.36.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2026 06:36:41 -0800 (PST)
+Message-ID: <6b005af9.24a8470f.69082.5255@mx.google.com>
+Date: Fri, 20 Nov 2026 06:36:41 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6684603334981386739=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -57,168 +88,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:3384:b0:4f3:6c2b:5f22 with SMTP id
- 5614622812f47-57a0b44a292mr3448839b6e.29.1795183417909; Fri, 20 Nov 2026
- 06:03:37 -0800 (PST)
-Date: Fri, 20 Nov 2026 06:03:37 -0800
-In-Reply-To: <6afadb28.371d364b.254eb1.0017.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6b005339.800a86e2.12ce6f.0001.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in add_ext_adv_params_complete
-From: syzbot <syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	lm0963hack@gmail.com, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, noplatinumfound@protonmail.com
+Subject: RE: [BlueZ] main.conf: Add SecureSimplePairing option
+In-Reply-To: <20261120105609.94042-1-noplatinumfound@protonmail.com>
+References: <20261120105609.94042-1-noplatinumfound@protonmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+--===============6684603334981386739==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-HEAD commit:    0742ef27cd72 net: pcs: xpcs: add 10000baseCR_Full to 10GBA..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=163bc2bd580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e2d0fd941bcd2fb5
-dashboard link: https://syzkaller.appspot.com/bug?extid=fc55a609cd9deea4ea37
-compiler:       Debian clang version 22.1.8 (1~deb13u4), Debian LLD 22.1.8
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11ae1bbe580000
+This is automated email and please do not reply to this email!
 
-The issue was bisected by AI to:
+Dear submitter,
 
-commit 1c66bee492a5fe00ae3fe890bb693bfc99f994c6
-Author: Min Li <lm0963hack@gmail.com>
-Date:   Sat Mar 4 13:50:35 2023 +0000
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1217210/
 
-    Bluetooth: Fix race condition in hci_cmd_sync_clear
+---Test result---
 
-AI reasoning:   https://syzkaller.appspot.com/ai_job?id=5984fd05-f227-4d9b-91df-08015fba0856
+Test Summary:
+CheckPatch                    PASS      0.36 seconds
+GitLint                       FAIL      0.26 seconds
+BuildEll                      PASS      14.00 seconds
+BluezMake                     PASS      176.57 seconds
+CheckSmatch                   WARNING   187.48 seconds
+bluezmakeextell               PASS      63.59 seconds
+TestFunctional                PASS      899.30 seconds
+IncrementalBuild              PASS      193.18 seconds
+ScanBuild                     PASS      681.59 seconds
 
-AI-generated root cause summary:
-An ABBA circular locking dependency exists between hdev->lock and
-hdev->cmd_sync_work_lock in the Bluetooth subsystem. Callers holding
-hci_dev_lock(hdev) (such as MGMT command handlers and HCI event handlers)
-acquire hdev->cmd_sync_work_lock when enqueuing or looking up cmd_sync work via
-hci_cmd_sync_queue()/hci_cmd_sync_queue_once(). Conversely, hci_cmd_sync_clear()
-(and related cancellation paths in net/bluetooth/hci_sync.c) acquires
-hdev->cmd_sync_work_lock and calls _hci_cmd_sync_cancel_entry(), which invokes
-entry->destroy (e.g. add_ext_adv_params_complete) while still holding
-hdev->cmd_sync_work_lock. Because entry->destroy attempts to acquire
-hci_dev_lock(hdev), this inverts the lock hierarchy and causes a deadlock.
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ] main.conf: Add SecureSimplePairing option
 
-full analysis:  https://syzkaller.appspot.com/x/ai_root_cause?x=fc55a609cd9deea4ea37
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fc55a609cd9deea4ea37@syzkaller.appspotmail.com
-
-The cause commit was identified by AI and may be wrong.
-If you agree with it, please also add:
-Fixes: 1c66bee492a5 ("Bluetooth: Fix race condition in hci_cmd_sync_clear")
-
-Bluetooth: MGMT ver 1.23
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor256/6049 is trying to acquire lock:
-ffff8880206f00b8 (&hdev->lock){+.+.}-{4:4}, at: add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
-
-but task is already holding lock:
-ffff8880206f07c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:684
-
-which lock already depends on the new lock.
+27: B2 Line has trailing whitespace: "    "
+32: B2 Line has trailing whitespace: "    "
+39: B2 Line has trailing whitespace: "    "
+42: B2 Line has trailing whitespace: "    "
+51: B2 Line has trailing whitespace: "    "
+60: B2 Line has trailing whitespace: "    "
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/main.c: note: in included file (through src/device.h):
 
 
-the existing dependency chain (in reverse order) is:
+https://github.com/bluez/bluez/pull/2857
 
--> #1 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
-       hci_cmd_sync_lookup_entry net/bluetooth/hci_sync.c:871 [inline]
-       hci_cmd_sync_queue_once+0x42/0x250 net/bluetooth/hci_sync.c:808
-       hci_update_passive_scan+0x1bf/0x210 net/bluetooth/hci_sync.c:3596
-       le_conn_complete_evt+0xee9/0x18d0 net/bluetooth/hci_event.c:6106
-       hci_le_conn_complete_evt+0x187/0x470 net/bluetooth/hci_event.c:6117
-       hci_event_func net/bluetooth/hci_event.c:8104 [inline]
-       hci_event_packet+0x67a/0xf10 net/bluetooth/hci_event.c:8158
-       hci_rx_work+0x2b4/0x1110 net/bluetooth/hci_core.c:4156
-       process_one_work kernel/workqueue.c:3495 [inline]
-       process_scheduled_works+0xc3d/0x1630 kernel/workqueue.c:3578
-       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3659
-       kthread+0x38b/0x480 kernel/kthread.c:436
-       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+---
+Regards,
+Linux Bluetooth
 
--> #0 (&hdev->lock){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3209 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3328 [inline]
-       validate_chain kernel/locking/lockdep.c:3952 [inline]
-       __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
-       lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
-       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
-       __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
-       add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
-       _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:669 [inline]
-       hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:686
-       hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2703
-       vhci_release+0x182/0x1d0 drivers/bluetooth/hci_vhci.c:709
-       __fput+0x408/0xa40 fs/file_table.c:512
-       fput_close_sync+0x11f/0x240 fs/file_table.c:618
-       filp_close_sync fs/open.c:1574 [inline]
-       __do_sys_close fs/open.c:1597 [inline]
-       __se_sys_close+0xa2/0x160 fs/open.c:1584
-       do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
-       do_syscall_64+0x171/0x540 arch/x86/entry/syscall_64.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&hdev->cmd_sync_work_lock);
-                               lock(&hdev->lock);
-                               lock(&hdev->cmd_sync_work_lock);
-  lock(&hdev->lock);
-
- *** DEADLOCK ***
-
-locks held by syz-executor256/6049: 1, on CPU#1:
- #0: ffff8880206f07c0 (&hdev->cmd_sync_work_lock){+.+.}-{4:4}, at: hci_cmd_sync_clear+0xfb/0x3f0 net/bluetooth/hci_sync.c:684
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 6049 Comm: syz-executor256 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/06/2026
-Call Trace:
- <TASK>
- dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
- print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2087
- check_noncircular+0x12f/0x150 kernel/locking/lockdep.c:2219
- check_prev_add kernel/locking/lockdep.c:3209 [inline]
- check_prevs_add kernel/locking/lockdep.c:3328 [inline]
- validate_chain kernel/locking/lockdep.c:3952 [inline]
- __lock_acquire+0x164c/0x2de0 kernel/locking/lockdep.c:5288
- lock_acquire+0x115/0x350 kernel/locking/lockdep.c:5942
- __mutex_lock_common kernel/locking/mutex.c:646 [inline]
- __mutex_lock+0x197/0x15a0 kernel/locking/mutex.c:821
- add_ext_adv_params_complete+0xd5/0x890 net/bluetooth/mgmt.c:9253
- _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:669 [inline]
- hci_cmd_sync_clear+0x1b4/0x3f0 net/bluetooth/hci_sync.c:686
- hci_unregister_dev+0x1b4/0x5c0 net/bluetooth/hci_core.c:2703
- vhci_release+0x182/0x1d0 drivers/bluetooth/hci_vhci.c:709
- __fput+0x408/0xa40 fs/file_table.c:512
- fput_close_sync+0x11f/0x240 fs/file_table.c:618
- filp_close_sync fs/open.c:1574 [inline]
- __do_sys_close fs/open.c:1597 [inline]
- __se_sys_close+0xa2/0x160 fs/open.c:1584
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x171/0x540 arch/x86/entry/syscall_64.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcd736358be
-Code: 08 0f 85 55 e2 ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 90 41 56 41 55 49 89 fd 48 89 d7 41 54 41 89 cc 55 48 89 f5 53
-RSP: 002b:00007ffe530b8c28 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 000055557f5ed400 RCX: 00007fcd736358be
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-RBP: 00007ffe530b8cd0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fcd736af5a0 R15: 0000000000000002
- </TASK>
+--===============6684603334981386739==--
