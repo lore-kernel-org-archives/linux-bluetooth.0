@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795156748;
-	b=hCxN8CfbrjEwiskZEX5x3bSdoGb24baGazUVCS/XNnjWnAoP1iS6oKCL7yvKE7w5iocZ
-	 wqb5Cixc5qIFm+HbWDM9uiHLYK5+tiAEQKdQu8YT7lIIk1dFpdC4qZPlno1ZXqplj5RJj
-	 9FkpQVzoFe9CnaGedRSgN5bBvwLdjGDmlSkzkP0bb9sKY9dFyh8Plk7Xu3qFIpxYEeAh+
-	 vkpX9PGmfC6W/3ITaJlMWx26Mip7M+qPFs5wfaLo0ijbm65KBpy+94gnSeUCbubE8SA4r
-	 O7NnRnDLTJehw/syK0mS33wNteBgy4DvGujW/cMsDOO7U+RDyIidNG9FKGaj0+wTAOA==
+	b=IIbeLvFYAPxMBmFx+IvE8KauIMiXl2t/K3YHW4bAiPp3KutQZVtBkDFyrYr9i5Qf6CrG
+	 TUpixrvBdOKJPoQx8sBOPoWVR9DGQGXfquVOmXHn4GlLpVFKNN9gDDki88Avwx3+sq+5K
+	 BmCWH+aF8DdH2jo65Zag8USKubMavlM4sI4m5dVT8va26vh74cXX2eZnrxdBzLHKAd2F8
+	 opc7FP+XowE89upS00TE/YUQHzOU+DGW/vz9QwQE9X+QmrP5VIvQtNqt5344tGSFb6mDy
+	 dwoEKpdu1UNoVkWdKEJ1pBjB/an3Fe9xK6Fxzu912x3fJummTK6ljUFsbY7hHJup3iA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795156748;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=9b3wkdM1zubf9Rrjy22aWqnNj0ZkbZpbRoUAJQIplMs=;
-	b=jVYEwZ2Cj5holZody5cDtLB6+yClJ26/eX3hNfvd+4/ao3T7FuwADfzWkDUP+LWHLmKA
-	 O4J0yjS0mtQ0RR7KesIa/Vr/KhxZtfg2VCSv5GsSlzDeBtfHr2HuaN7nCwPkYbcOxE0PI
-	 WVqVfwBa6hr0gie5sspS7bXOBzkM6Dm34iHj7Ts78WdUkvWLOjxyM25vsuf570mOgY2ZX
-	 JflhFif2pe2+pFEDfEQGyDVHAizLpHmhltq/12uaUhmuWlubyfZQMpaIMt9wPtBaDE+r4
-	 xqGZczfZh6pXXoH3ocKTWwDVHdRsucNlp5KTq0+BflPLj0YcyKtDSqCxRS5JWsCDNlQ==
+	bh=zOfNEWZO6xNHYpFVSEMGJORJZchuusLPTn8ganHRSGc=;
+	b=AVYg/KHSZPdwqcGAU3C1uToztxLEzXXdKTisPdyAPjg46haLAeMZBD/poJ0VcCEWFDRt
+	 p1lZSbnnX64+IgeUGmXChEFHt7YDR84HL+sywQBvIJZH4PYzKsel/wsvWfMS6Z32fyloQ
+	 6q+00D7A8hAK9pgg4PSO6vhEew+tmJG/PLq3Urg1fyeebOP38iR0hWsraP3dWf1GYT+eb
+	 fAmD6Jd/ZDy0M7TBUq+oQ0K0Qs2osCzLdVlC29nCefytuyYzFCnw1P4Mklww43EopEppi
+	 i0sekHHi0P6W0l52Jz2Fe8R4SyMr0VszLWcXT1oXjfbYIEyZr1avZlcfMY4xqbemZXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IIMMg8t4;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=02rWgMsa;
+	arc=none smtp.remote-ip=209.85.221.48
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6CD606A325
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:39:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA6CD606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EFB606A32C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 06:39:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C5EFB606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IIMMg8t4
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4bb5d38264aso475275e9.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 22:39:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=02rWgMsa
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4a3ac4ac65bso9179f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Nov 2026 22:39:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795156746; x=1795761546; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795156745; x=1795761545; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=9b3wkdM1zubf9Rrjy22aWqnNj0ZkbZpbRoUAJQIplMs=;
-        b=IIMMg8t415jocOag4iuaIpJR1gTI9B0vFeVmIVpu2s8c5ocf3TGgVqV3BrmKLXINhk
-         eEXoC3X8lthzy5I7Vq1Uy7JAwDHgZLCFSTZqqFmniLcS9o2DR5U+q9tIP9LLEJUcTh3Y
-         haT12KZuB/sq3mXLNV4+FRZ5J/b9l3zgN/Pxv6lcNDOGMSsdWuPJkqKmrCUgM/6Zbseu
-         UFfAck4aEDCU4Lev6Hfa6MGu45EwHswTmaViybT9XluW5vYjwurwQke5X9xex7lEIteP
-         sTnUB1LSfiAlSgKkvy4IsSDxNJycit6xsQEaLDznq0dSQnwGQQxXMINjmXIXnL/4TMoS
-         Fd1w==
+        bh=zOfNEWZO6xNHYpFVSEMGJORJZchuusLPTn8ganHRSGc=;
+        b=02rWgMsa3byoROnlDoaeeUUHSVQYaRpmiNQUG10MTxgl6Cv3/aeNNP9lR791r5Hs1L
+         1IoNLb0mwoAVF5C/by/sCUNJ2YSWUO8sXaF0HWAklgfGIgSPGJex9tZk8ILeMunjyIum
+         qmtLOgVWErgiC9o+YZpxctYEJoy43Q/bKU+nQ1hus0Utpdjnh3823PqiCEe+jCjfRtlZ
+         bJMMV9D/VcROhcFJgkFquTRTggr8wbnK3Upre67Hn7r+Qob4Tg5/LQzqJpxuOMDgKbEy
+         hFZ+Jdrw1Qir1IucKJc1HAxzLIppNO0oRs3RwOFIoDFUIHcIqEaP6ZUJhAjfk4W9MMea
+         cePQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795156746; x=1795761546;
+        d=1e100.net; s=20260707; t=1795156745; x=1795761545;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9b3wkdM1zubf9Rrjy22aWqnNj0ZkbZpbRoUAJQIplMs=;
-        b=WLzhcxy08BXOr1ffJXTkyBF97OfDcoiqaEIf1yWNDL6gdYpsy3XxVXXz0q1cKBMDqO
-         y0/dYigzxrv+IMKZTSE0+BZ+9rh4zlO2ej+E0tjOFMdGsuy3ZXmmL8LkDaFzLRwZibk3
-         KlheYzM7dX8pwed/kTx+Z3qlhQa64YDS/KmMZRlskozmf3+/CPVwOGQwiYizhsgVgX3u
-         JTBa5iZsCIwtkSPbBUM9+HWHtKA+XXU0IJJ+sDXDQbTqJRsuZGVcD82ZLSRcJaAGGvew
-         5TiFuYTo6lK18QQ2zXNCJh73PM41Zf7okw6TMXGV/u9oR1/GF05ErtLctaCpkb2DmmJv
-         2k9w==
-X-Gm-Message-State: APuU4Z8wGSgswDfawRYhdMjy5uS7tWxvZb7CzsPPai51s1/tFuUL0fj9
-	G/ZD65a8cyJyek8Vhp10wePtE6FXZ3FZoQw2sK12DLITutsuX0n4OngWo4FN/dqR
-X-Gm-Gg: AZFdTZfAaCG9qFC5Sk/rolpU67oDJBkwkx2UFfVfty8Ry1J7pjo8k8WD9DrNIrI8Wzg
-	C8/Mj+k11+TztC71RQwNUdAj3U0QRolxgMSdGtpVhuZrr+oQek8D/p+/9/pUNl0LOtg7EaBo0V0
-	xXLPOgPAcglDYNFXUCiRTit6+NVm4cjKldvysAXLSQTjLUv4Qe8en7LPqtBbrMWqjhDAgtePesg
-	FIGycIjoedQSwXk3roYztpAB+wyA5OO3x1bD+bsxRzXtb83cvGmPcD7YIK7LL7wbP5MX13UX88+
-	d6zIDgjpab/zQd0cwBRKAJhZe5FhFnFyjj98pA42nAS1O4LAhDTDvJFWdKvJ5SbACJgtWghw57L
-	iv9UmhXDThTDOF13lRgMcP5fYelK3m+ynUWS1GMcJY7jol1XU4zaR0+Tle78MlBsCYW/RATT5d1
-	amnBqnGIl6HpDRUvFypO2ynZDtom7h/YBc85fWrrf2I0mINw6lSN62p/H/qgKMYm+ezn++P6XqH
-	keWSGTWQcvdKshZ52Byv2lE5e2FoBahUhyGVVmaSeFHA4/Y9NWkWYsd5ZgsEwHMJUagCR/sgJoS
-	o7kNvZrsY7/3DKnBfxRP8xm3T1Q8TzO2mfQ=
-X-Received: by 2002:a05:6000:4812:b0:4a6:bc53:2472 with SMTP id ffacd0b85a97d-4abb3b41cf6mr3185458f8f.5.1795156746134;
-        Thu, 19 Nov 2026 22:39:06 -0800 (PST)
-Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab69bf630esm3685607f8f.16.2026.11.19.22.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=zOfNEWZO6xNHYpFVSEMGJORJZchuusLPTn8ganHRSGc=;
+        b=wFDNYobfEVHXdSF6oBjQ6CI753VN2Q2bDyUMj0s5JHBWBeEtozsZRtrwHPsAU1qyaO
+         /q93FmdLBONXVSe4hmF6x2T3CM7F47xjLuT2EljKJ8+2QM7hwEcaXsT8hjp1QlHVVNjM
+         FsleFq+fVf3HI2UI6j5g9vw7dZYMmIJZHAhTbZNlmv2TdNWczXjfcDE7HAOEyGS9+EfR
+         /+K7BmoWniyW9J4/p9/M+hg15iQ+mXYwjBf2ntgo4daOUiF6VQ2eGy5dhC/YuPl8AzuI
+         JweimM32YcPcjipmGWmiwjVB3QZD4jp0eOg2Z2HU6GIBVpkuWo/4L5jIQThcrXo7gZbO
+         Qh0Q==
+X-Gm-Message-State: APuU4Z+8jKwgc8KEsQHbaha+takrJAe2F2/9scLR3wpIGY1gylLVRb+q
+	fzcMe8/1SN5srH+Nt4zi8zE7BwVP58SSZ2JgNKR9V1sE5jG1+4LrXdilGsP3g7Nf
+X-Gm-Gg: AZFdTZe8/d3Fmel/zOe6SYp3+fk19/ErPMW8XFN3jJSmYpX4KBagFqsLp4z6PV2oAX4
+	Dy2jIfJCVY/ZmA/UHW1yJPQHtuZvkddY7Q/mfE2UtBDgQuZWlSf3UW02Dy9HLuRT8WfSbBWJuKQ
+	9NcAP95mgKyejOjy/IPkW8+33X++pizX2bWco9VmEt3s1hTJu6yQ3hIk565HsHL2AFve1OgWz+o
+	+esCAIAxwVFVcEm50Jztjq4GQFKdfo28eLrYYTwW3UvkY3PN1GBidSP9tqVD6Nzx0cc4q/G8qfy
+	+aRhXMvaoKsDl1elLHIancHv3BcAK7wkoCnyCR5Eb6/+EQ0Y14nYWiz7pBtozJ1JiwP3vZj/ed1
+	QtunJ48TniS/MVYAghg0rTHHxSU03ut15UOk2B6iB7uwGttLkCkksRJbJMOvNGNCkS2oeiqEX5/
+	UNQk1gXw+hNu+VUMkqu4Wnz+DH2LD2JbRm9yiVduJZX/M1udXAwgL3m3RYR6Sy4wJVaXrT8I++L
+	os49HW6fpdfVqDKMomoWRNUMd1QtlT719lKeDj84cdo+3fQNFFvzsfhdY6pspnjLmtAlzY49TwW
+	8ozgAfQgVevwrpsXssDoJ78+pHyTP+o2VDc=
+X-Received: by 2002:a05:6000:26d0:b0:48e:5d5e:c27b with SMTP id ffacd0b85a97d-4abb47b2501mr3617216f8f.6.1795156745084;
         Thu, 19 Nov 2026 22:39:05 -0800 (PST)
+Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab69bf630esm3685607f8f.16.2026.11.19.22.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 22:39:04 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v4 07/10] monitor: Fix byte order of LE PA Sync Handle and Properties
-Date: Fri, 20 Nov 2026 07:38:53 +0100
-Message-ID: <20261120063856.16585-8-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v4 04/10] monitor: Fix advertising handle of LE PA commands
+Date: Fri, 20 Nov 2026 07:38:50 +0100
+Message-ID: <20261120063856.16585-5-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261120063856.16585-1-rolandschober1968@gmail.com>
 References: <20261120063856.16585-1-rolandschober1968@gmail.com>
@@ -97,54 +97,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The decoders of the LE Periodic Advertising Sync Established and
-LE Periodic Advertising Report events print the Sync_Handle, and the
-decoder of LE Set Periodic Advertising Parameters prints the
-Periodic_Advertising_Properties, as they are stored in the packet.
-On a big-endian host Sync_Handle 2 is therefore shown as 512, and the
-Include TxPower property (0x0040) as unknown property 0x4000.
+The decoders of LE Set Periodic Advertising Parameters, Data and Enable
+print the Advertising_Handle with print_handle(), which looks the value
+up as a connection handle. With a connection using the same handle,
+the advertising set is shown with the peer of that connection:
 
-Convert them from little-endian like the other fields.
+< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
+        Handle: 0 (LE-ACL) Address: C0:11:22:33:44:55 (Static)
 
-Fixes: 9285a4e33882 ("monitor: Decode LE Periodic Advertising Sync Established Event")
-Fixes: 5441a5b91a08 ("monitor: Decode LE Periodic Advertising Report Event")
+Print it the way the extended advertising commands do:
+
+        Handle: 0x00
+
 Fixes: 61563bd7b477 ("monitor: Add LE Set Periodic Advertising commands decoding")
-Assisted-by: Claude:claude-fable-5-2
+Assisted-by: Claude:claude-opus-5-5
 ---
  monitor/packet.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index ce05928c1..4b7a82ac0 100644
+index 9814e0e96..da4e8aa98 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -8707,7 +8707,7 @@ static void le_set_pa_params_cmd(uint16_t index, const void *data, uint8_t size)
- 	print_field("Handle: 0x%2.2x", cmd->handle);
+@@ -8704,7 +8704,7 @@ static void le_set_pa_params_cmd(uint16_t index, const void *data, uint8_t size)
+ {
+ 	const struct bt_hci_cmd_le_set_pa_params *cmd = data;
+ 
+-	print_handle(cmd->handle);
++	print_field("Handle: 0x%2.2x", cmd->handle);
  	print_slot_125("Min interval", cmd->min_interval);
  	print_slot_125("Max interval", cmd->max_interval);
--	print_pa_properties(cmd->properties);
-+	print_pa_properties(le16_to_cpu(cmd->properties));
- }
- 
- static void le_set_pa_data_cmd(uint16_t index, const void *data, uint8_t size)
-@@ -13904,7 +13904,7 @@ static void le_pa_sync_evt(struct timeval *tv, uint16_t index,
- 	const struct bt_hci_evt_le_per_sync_established *evt = data;
- 
- 	print_status(evt->status);
--	print_field("Sync handle: %d", evt->handle);
-+	print_field("Sync handle: %d", le16_to_cpu(evt->handle));
- 	if (evt->sid > 0x0f)
- 		print_field("Advertising SID: Reserved (0x%2.2x)", evt->sid);
- 	else
-@@ -13924,7 +13924,7 @@ static void le_pa_report_evt(struct timeval *tv, uint16_t index,
- 	const char *color_on;
+ 	print_pa_properties(cmd->properties);
+@@ -8715,7 +8715,7 @@ static void le_set_pa_data_cmd(uint16_t index, const void *data, uint8_t size)
+ 	const struct bt_hci_cmd_le_set_pa_data *cmd = data;
  	const char *str;
  
--	print_field("Sync handle: %d", evt->handle);
-+	print_field("Sync handle: %d", le16_to_cpu(evt->handle));
- 	if (evt->tx_power == 127)
- 		print_field("TX power: not available (0x7f)");
- 	else
+-	print_handle(cmd->handle);
++	print_field("Handle: 0x%2.2x", cmd->handle);
+ 
+ 	switch (cmd->operation) {
+ 	case 0x00:
+@@ -8745,7 +8745,7 @@ static void le_set_pa_enable_cmd(uint16_t index, const void *data, uint8_t size)
+ 	const struct bt_hci_cmd_le_set_pa_enable *cmd = data;
+ 
+ 	print_enable("Periodic advertising", cmd->enable);
+-	print_handle(cmd->handle);
++	print_field("Handle: 0x%2.2x", cmd->handle);
+ }
+ 
+ static const struct bitfield_data ext_scan_phys_table[] = {
 -- 
 2.47.3
 
