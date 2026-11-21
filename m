@@ -1,93 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795231936;
-	b=iLwTI/z3PyQcM1Kv+Qj/BUNso0DVVGKzrUAxmm2IM0Bi8WegmqL+3WSoj//ZDNySWe36
-	 Vb97g3nW0Rajd8B/QSlepev4zQ2brt7EJKcxIZzszXjjajnw6VTAUEaltkJHX+Fsx3t1u
-	 cRoc+uL+lXpIOOEQgIvGZa1qrtgouUZc7edQdYMtfihjokIstaKzBOkf9DlnSJ/eIiWQj
-	 gz3O+mxqRLKNTDaCYns1t+AkWNAvmSmZ7nfClmSCTGp/5V2pJOymW2XhYfJUl9pDB+Xjt
-	 snXh7iRx1A9lbTU6DhSq1U4KPaqsVGSpc9hqOxdnX9fa1hy8I8Xq9wPfMW1B7+XtpvQ==
+	t=1795233528;
+	b=4vteTaBsEx0xyvE8300c8plAFawyz9C0RW1GSz/oiC+r5gq1SJNymBi9HS26pcij51pR
+	 nhYNi9qCfNqxIIdy/b8LVzakjlLKWVSkOLRVLV1yEuADEGZh7SL7DtTyMyKMlIJOlMBpJ
+	 9udv+zO+NKjboSu7Mm2feUE+JeqHn9lOn21GWqgrjwWm1k89sWO3v1gZEQcmYTluYU0xA
+	 VD7VqRJlXnuTbFOPFL37UxXf76deBwULHcTRS8CYd8Mj7Ack6rOA83SxBDEUI1qYoeaku
+	 jJnh98W32mayVefRs/KrWDY2OCjOFEO0mBJtuvFidBitb0RwgGIytS/0+qRFPUM7teA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795231936;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795233528;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=TAKJX2eFfbSxexSFrpKVYNT5rJCAgJ+amarkA8wMwcg=;
-	b=IQjF9b9uX9ITmSyZLlJyeKd61njHSF7nsfAU5UzSxU4ZPPWGXwCrS/IS9eo6dRfj5kPo
-	 HGowtpSSQ17xpaWYlyTWYPZs36mgmpKz+JZ2J/7B0tB6GwqAs9SzEzJAfxXPmAESiyIeP
-	 gtxdYQuusIAsms5hA6hqslsvMXdZZHQhgsbntCjy6QHL2QScTsysxmNJzAZ5/NdWArhLj
-	 EhBuZS/ne4EDwOg7AWA96Zmz7SPe12uolihZUWoTlCCFdqZ4BuNxSgSctgDkmVdFRQQ3M
-	 IvKzSI8oVJlajDB2VXsJ/V79PfxcTzbqyTUYwiFxr6i+3kX90HJ4eayAAAfBBA8Eh2Q==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=5tZMctJrioVxoxV0xlJdIk51Jl8WEmpxbWX5cL9xYzM=;
+	b=EJbamOIpjVaPeKb5y8AwsSK8Q6XTVQi2yJwlsy5JO3cfkkso5pqF7SBS4qEASTRrx2S5
+	 mma40hNXuUdF/X5HJsbheFwiR/Qlak6iTNvosOijXo08m1q9Ty0wVpYD/tmzHeO7ogwFl
+	 6GbLFQhsKJWJCmZ7pbVS86IxuaHaN9+xaQ7HT+VzBNznhtsCOjILUWmnrMtRWKoPNCrT1
+	 2s1PznUwOJJaxBbOGIKbPWCAShH8AAVkVFJ+ybBGSiVykBJAT7l5GuhpZvNMxc4AWYqPJ
+	 NST9QydGOe0i9P0uhVtmxIRV4IkQ7TP5FATiwBiREim5sASFaEdkjGDP2GPHFzpgvhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lx0rH40W;
-	arc=none smtp.remote-ip=209.85.222.52
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MTXznjDH;
+	arc=none smtp.remote-ip=74.125.82.170
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB210606A6AB
-	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Nov 2026 03:32:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB210606A6AB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFE0606A320
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Nov 2026 03:58:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5AFE0606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lx0rH40W
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-9906870a9baso832541241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 19:32:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MTXznjDH
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-385c497bf94so2900396eec.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 19:58:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795231932; x=1795836732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TAKJX2eFfbSxexSFrpKVYNT5rJCAgJ+amarkA8wMwcg=;
-        b=lx0rH40WjAZuTpjzdSg282pS+q3j+eAu9Cy0K+veOkU0tDtEMXN41uf313jmctXIhQ
-         fdxevo5fL5v+L3Sl13PZnFrKz6VejvKgVUn8MoXflglOvT51hxXQ26wpnkVRmw40JWst
-         a7FdJ1mA7L0jBqsDyvZC3/dh9PyHqXNh1Ql01CZSCEOTEcn3OZwvFsOU5jb4mNDA4k8L
-         scV6vMXBTeKplGq2iX7PS8Z4xMic8sIhapOXqR73taxxVE+0dx5fJ6es4zPI9xwxNjOl
-         prPZk4Et9LNMc1/Jx1WVKh4I92PFC0V1WHU/F/21xUE6xr/NbIVXlPGoV8JNJViccL+B
-         xxzQ==
+        d=gmail.com; s=20260707; t=1795233520; x=1795838320; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=5tZMctJrioVxoxV0xlJdIk51Jl8WEmpxbWX5cL9xYzM=;
+        b=MTXznjDHv6vW3ILYK3eEZn143re04SqzhyLwsNsA3hRzRdRgPP60Bf1YhFUCr1zZe2
+         egTTZ7JRwiKszhsWFmd31f0j/vRpyTdusfu+R/vkdNLsUKedzO33NKZdFdPNd3RfulfU
+         ktYyfYJOFGc5JDz6z3quffldYkMd8eh+ijxehe5waXtDsSk+/3h5vlNI3IMnMtuNbnJ3
+         nkyiiolrceuR7o+37iDD8gwC3yCS5NU5BdKHDFe68qJKevIBUGdrn1lsoUZvN+WbC3wL
+         opdYWUyGXOPgJYgicATVLA414OtHjMN2/fCHh0lgJCQoFvdZ9FN4Ps1CBUCRTx2iqYnu
+         jmCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795231932; x=1795836732;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TAKJX2eFfbSxexSFrpKVYNT5rJCAgJ+amarkA8wMwcg=;
-        b=Oi7S/605Wc/Tt4nUJYbbF3a6+cxI+4cxOPtmWnrbOATxkUAUFTI5Vf3DQBmflWI2ta
-         dwa02A0Rakg8Dyr6j28tAKrsiaNck0MBeYxeug5ZVcnBqAu/kk1kBicqImOpSF0C4YsQ
-         dv+NimH3PJ3IaX8eb6eLEqIzWOhhg36lhZtaEoX1uUZyRQE3AZ78F3bQ1338y8tAtNGR
-         8F5CE7R4nrQxkkIt9ic8miy3wnnXSiugQ8PdfnJZGp+wsfmc8UvTdeyiRPZ5V9VSvx/C
-         zmSr7sbZ+PTc2kPTmnBXN6iA/OnfGstLY+jtVlfNiD1/NYuGGbQOTc4KHUiKVl2t8t3J
-         3OqQ==
-X-Gm-Message-State: APuU4Z8JriFrdmTYb6m8fvf+pKZjIMMvmYqiY6f2jER4hu/DEms5Y7Q/
-	6fDBaIkk4DdsFlKlT5oTvXU6jjfnKm5taZipL7LwNPUVrRZw//G7JbpwYB4GgePEw9k=
-X-Gm-Gg: AZFdTZfzoDKy9rLxb+hqMe5m3B2SYBxJYJCDdDiCOcYa9ipufmStRg6HeS9eqZlNfgp
-	zi8XELNuG5nvd4w9lOQdDJO4BBR4rEEAn+EON/86nEexewmpUmpJAPg3EbGgjMAxaQp+OevvNdo
-	T6XIa5agtjW/BXIWk9DEQNkKxzNUBD44MBk/qdKT2ORt4zuoD4YzxGouAEazONeItpmt37Z/ZCz
-	kjWfmA2h/Xez/09IjeaF+GQrNesxSe0a40YZxt2AbFqgled2voDuOn94oOZplCLUCk+ygHrqM9e
-	iFUnG+k4cckfAn4l7e3O/tOkcoZDTEEUyU8YF+m3HiH+1248rqGChZU4LlIDOnhTAcpqYcYuk2m
-	sC894MO2QDrHBPTAwE/L2T/qH2m9ctcTRTzunizmSIYPiftoSrdhcXaS9iFTS0YLGC+7lwt9vrL
-	4UxY1Bn8cHDNaOlx8NOsdHm38dBdx45zukMwEDE5mj+r/4BMFhvRfALpIvwdJOeo0+EfaFc7QyZ
-	LiiU8/y7TiHByJCfHbIWE7kYwjb8hFuTzun3JheWHJYMVctKqHaBUAlLMdEmoyUg0q8kg3bcUmM
-	cI6zCEGHKHOX3ezSRsUOv4ptUncTPYlbUMVLs3gVTRWm1K2v9WaveA==
-X-Received: by 2002:a05:6102:508f:b0:7cc:94e0:ad23 with SMTP id ada2fe7eead31-7d73967085bmr2738629137.31.1795231932385;
-        Fri, 20 Nov 2026 19:32:12 -0800 (PST)
-Received: from shine.local ([168.196.221.52])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7f3d7bcsm4871081137.4.2026.11.20.19.32.10
+        d=1e100.net; s=20260707; t=1795233520; x=1795838320;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=5tZMctJrioVxoxV0xlJdIk51Jl8WEmpxbWX5cL9xYzM=;
+        b=dlT/zjWOj5P77kqSKViZB5xesMI4TRg/SDZ+xfb22um8JP4KlFwNQE+xyuDlAeymnN
+         gpvFK8YTJin19pLYQkrOckQ0s4GIyGw4PqEV93urdqEkJSQk39Ek3tUJZxtoMk5q+1cj
+         S7jEOokhj5iWnNUPZpIb3XZVEpkulV/RREAklsbp698wccj1/Ij/hBI0Ytvn7tIjVsmU
+         4HTwMbc6brUIO8OnFXbUKOWhhOZ6VqBkoe/6Bigmkk8MMu9fOlLTJYVEXao3u7TXE7OL
+         LWSi8YTKjuTI1qgNHRT2QFzdILVJuORIw4qQY/dHYN2HWUHBM4/GVoBM3GL8PV/RAiDt
+         +6kQ==
+X-Gm-Message-State: APuU4Z+ECkJJUFhgQ++p6MN4LE2NpHlj3MwSa+mBuQvxI36EJ/DX9sh+
+	kCGksuE5p73NhVlfAzT1nhTGIC2y3KGpaXsGZMUqlKTBky8r/fXzcHCldfgDww==
+X-Gm-Gg: AZFdTZf+J9E5ykYQ/kXVN6SV03JHkEe8jDlirXEaEjmsiGOkdzS4VfjM+D/DwOj5vLc
+	eDhfTUXgigIXG6i8Jul3Fw9hoDu8CysW242pEwTjivi8+Dnx1vKRkhZxGFguCvY8KZiL+jzww6v
+	wxQLaua9c1y+PyJA70G+Fm+MSvALvgYMynRBTE+08ZzFX1tWVfb1JxBtirJqQ5NiZub7vQjAP70
+	2E+2SKTbjNyYw70dFOXI6x1MzqcPcHXZICQCkTxI8DNme3LcjfAx8pGkyv9uWp1CLEYs/y7mvVC
+	SZTuPueDy5eUhfi5QgD9zqkisAYcQQ6D6Edmo9n+HZHy9KN+SKqk+Qa4yXvDulVVcshzee+78Bb
+	/t0p8U/k0PN7FsG0K0RRzlFBf+FMjZW/Qit1ubveYO/spJJSyZp8lnv8c19woMee6Uxc0LH9fGd
+	zffiSXOg68Fox540bv9FDyZLuYvGROaFTwngh1nhIS03KdqYQSmQp9VD6dN4xifV5SqvYsYU+v7
+	Iqc1XulApJpPDNyrlFtth+A1e3zliO44adfy3lep8Z7z2zmqnrSYRShhM3zCr+XdYX1fyR4J3FX
+	JhVgQgBT
+X-Received: by 2002:a05:7300:ce93:b0:379:7251:9a1b with SMTP id 5a478bee46e88-3856f0421femr5183592eec.21.1795233520458;
+        Fri, 20 Nov 2026 19:58:40 -0800 (PST)
+Received: from [172.17.0.2] ([13.71.231.145])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-38566cd4efesm13049842eec.12.2026.11.20.19.58.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 19:32:12 -0800 (PST)
-From: "Andrei A. Bykov" <andreiab9019@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: hci_core: keep the LE feature hold until completion
-Date: Sat, 21 Nov 2026 00:31:04 -0300
-Message-ID: <20261121033104.441146-3-andreiab9019@gmail.com>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261121033104.441146-1-andreiab9019@gmail.com>
-References: <20261121033104.441146-1-andreiab9019@gmail.com>
+        Fri, 20 Nov 2026 19:58:39 -0800 (PST)
+Message-ID: <6b0116ef.7bf231e0.18dcf9.ad47@mx.google.com>
+Date: Fri, 20 Nov 2026 19:58:39 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3473327550593922118=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,52 +89,55 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, rolandschober1968@gmail.com
+Subject: RE: monitor: Fix reads beyond advertising data
+In-Reply-To: <20261120222624.150321-2-rolandschober1968@gmail.com>
+References: <20261120222624.150321-2-rolandschober1968@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-LE feature discovery owns a connection hold until
-le_read_features_complete() runs. If encryption finishes while the
-connection is in BT_CONFIG, hci_encrypt_cfm() also drops a hold after
-notifying the upper layers.
+--===============3473327550593922118==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When an ATT socket has taken its own hold, the sequence is:
-  feature discovery:        0 -> 1
-  ATT connection:           1 -> 2
-  encryption confirmation:  2 -> 1
-  feature completion:       1 -> 0
+This is automated email and please do not reply to this email!
 
-The final drop arms the incoming connection's disconnect timer despite
-the open ATT socket. After applying the event-waiter fix, four hardware
-attempts showed the same sequence and a local disconnect approximately
-four seconds later.
+Dear submitter,
 
-Restrict the drop in hci_encrypt_cfm() to non-LE links. BR/EDR connection
-setup takes its configuration hold in hci_conn_complete_evt() and still
-needs this drop. LE feature discovery releases its hold in its own
-completion callback, including error paths. Keep the state transition
-and upper-layer confirmation when encryption finishes first.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1217829/
 
-With both fixes on Linux 7.3.5, a hardware trace leaves the ATT hold at
-one after feature completion and drops it to zero only when the test
-explicitly closes the connection.
+---Test result---
 
-Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
-Signed-off-by: Andrei A. Bykov <andreiab9019@gmail.com>
+Test Summary:
+CheckPatch                    PASS      1.97 seconds
+GitLint                       PASS      1.37 seconds
+BuildEll                      PASS      21.72 seconds
+BluezMake                     PASS      320.55 seconds
+MakeCheck                     PASS      0.94 seconds
+MakeDistcheck                 PASS      149.82 seconds
+CheckValgrind                 PASS      160.43 seconds
+CheckSmatch                   WARNING   322.69 seconds
+bluezmakeextell               PASS      102.01 seconds
+TestFunctional                PASS      1252.88 seconds
+IncrementalBuild              PASS      364.47 seconds
+ScanBuild                     PASS      1179.33 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structuresmonitor/packet.c:2292:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:4220:52: warning: array of flexible structuresmonitor/bt.h:4208:40: warning: array of flexible structures
+
+
+https://github.com/bluez/bluez/pull/2861
+
 ---
- include/net/bluetooth/hci_core.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4aa0b49..227830f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2335,7 +2335,9 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 			conn->state = BT_CONNECTED;
- 
- 		hci_connect_cfm(conn, status);
--		hci_conn_drop(conn);
-+		/* LE feature discovery releases its own hold asynchronously. */
-+		if (conn->type != LE_LINK)
-+			hci_conn_drop(conn);
- 		return;
- 	}
- 
+
+--===============3473327550593922118==--
