@@ -1,97 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.21
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795264135;
-	b=ZUi7Qbhla047J59nCZe7jmWnw/ddmqW4dMzUy2rlkp9fKH7XT+d9GQuiYPQIo4ibZ42H
-	 J+17dO58wBJA0aOZtkVlntye+ACLp0HMzayraVAaNYWXw13CEOt2M41CBfwMpIwsb73LU
-	 uzpTz9Xx9ZVFtbYpaxvuFZkpNJrn2yRaeMi1tXTg6M0SIXibYNSvpf0UyH/XFOoShNbbn
-	 xlEjk09UjPK1HRKpAIMGXUCYq4L57Lac8NoTbtNxwtoQYRF3kqqCxvbB+8K4jWaLno55/
-	 02m7l1gkqoOruzI/kfiQSQIs0Qwl6F/Pa+jSefV3CxdJgAmYHum9iqMNAG6rUPNHFkw==
+	t=1795271782;
+	b=5EV3MJhlD6OMQa8xjwJtmSmD3UdCSDPpI0L1U+CGw7cUMdYh/O3A7mowDW9QG+oOFA/h
+	 OP9p2U9vIY3tFSdmnW9DjdjI4npcSLLhx9nAwi6MgVF8O8R6Q3XI7qUIVWq1GZhseTz2Q
+	 JP6aSVZhIimPWTTmmucguaObDFNJqu18K7HVPlgTpC/4CoTGCMPikferbeEyJoeMNhNiD
+	 lSDnpfo03KzQ0yZmemXwF++VZ05luR3s8OlqZqODd7rjT+TIwxi8XZ7qwfnnilwvGTL+i
+	 fzYcQpxEHRuRMFWB3il2nmY1lUujEcqDCfn34QrkzWSMo9nCpzU7QMRVUNPj/ZlawAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795264135;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=xbPlJS6qwfZzqUa056hpUcKGkd9cFIzccwWJm9phGjg=;
-	b=iDjb9JRvqx0HzQRzljeRSv+TXZ0LH7Y3+G76HFpC+mofjf/UTan64oeAYqOFjzBhMCpz
-	 mh4J+YBwOB9WR+dRcmuqeFjGvzpwRS2c1+zFGockNIKXmFzyySFQ2Qollo0rClv+JLHby
-	 fgBBMD6B3r6R/+RcG80EjnakVVWRYCyMSKNnaMWhkPgLHaDbjuTfnIcs0MmVv+DFS3CVu
-	 fN7p0LQqr0GzLIuroRvUSQnbxXxtyZhUYzeXW0IRObFfF5fy5urCPgjFOwKRqvwMu+Yb3
-	 m0RXCCNP/Fif4FIRD6aVJU16SH13KJp3EbMhiEv1Cohue9s2Nfb5gMa61mAfYgNqT0w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795271782;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=9nQN9/l1aeG2iZov/Qhemo8zZWreFmt6kut8e31XMuE=;
+	b=O8n+crEVPg6yRgx21SKvqYMwZNbHRr0ZqbRVhzC76RWXaqhiW6qQUNUrRqj4ZMlb6YrT
+	 H/ZsTNWLO3Q8VbedGfv649eK1ORAsXrvJKVIs0NRB3d2u773LQH3Smk0LCDJT4yfSAY+E
+	 TElF0Yf3mB7rTayEBzti16INzibUNBIaMC/OkSOSj1+tsmgoeD3K2Y/QAxVgxtAb4Mu7n
+	 uuSgRL4BW/JiWn1prLCgPiqI4WcQqyyMNXrXx8h3Z3F3IVjdBysqIKPd77tx0VghJ9wCN
+	 UdrKb5yl2+i5kh1nQu02J2f9mG1/og5odzE2gKxCKDjqkbg2f0q+tY4SJwqLFszMTLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lMREvsw4;
-	arc=none smtp.remote-ip=74.125.82.48
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=YI1C9cQV;
+	arc=none smtp.remote-ip=198.175.65.21
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66326606A320
-	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Nov 2026 12:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66326606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E6F606A320;
+	Sat, 21 Nov 2026 14:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76E6F606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lMREvsw4
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1b3acec6677so2595635c88.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Nov 2026 04:28:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795264134; x=1795868934; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xbPlJS6qwfZzqUa056hpUcKGkd9cFIzccwWJm9phGjg=;
-        b=lMREvsw4M7lZ1kgv7GSe+X02UOR03A0nw8vk5xpJ70qd+sSzBPAO7WLS8naehULzrp
-         1lbPwzCUrkA8Z7YABjVOQB+IBmHYwYEx73k7HH7Vc0yq2LfOGblwkuMYPjeq5CBXnDBB
-         wf8vhrmv7TSYOnKDYkQ5zA7oQoXvWB8zmOSU8NcBPn6lP9Y8uxdgI9AnnurZRI4qoB8Z
-         ARb+dloSVJy2rlBGUOvwEerwofgpnpZdmViT+kHwvmh555zKf9fnkDgVD1TpwzVE0mlA
-         GcuWTh3Vd8ojcIGNbNZ5lnoPhJx7aGq8EwXZ0DBUCH4XfzE5GujW+dnJscd/ZCCYqtoR
-         w/2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795264134; x=1795868934;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xbPlJS6qwfZzqUa056hpUcKGkd9cFIzccwWJm9phGjg=;
-        b=hM3faYvqbqAY6PJ0rWovf8zwE/52MoyUZR9Umt05Jg4LE/seXkLGOQpN13GELoU+fo
-         NU4qZHivpoul657W8II6q91CkJvhDkcMDszA0EFPgqsxmvsA+moF/bQmMdHrZM0q6eQR
-         CoKhT0cjWj//l1vT16uSlQWUBfZ06yKxIEE1fVsZUyc+hJZPrZX5/Hlq8/Pf9nf+ubvP
-         ORWzZ6JhhBwfWxaYCHzJ3+tpBovcmtaN5MAcxLk6L1B8mBd2PuaqlHHkuYy1vblV6v7y
-         H3RjSWvmKHGbD11emanXFLtXfAfJTaKeidUMvCw8DHOAWhIr4ZIv60TLXm4iVyJBN//x
-         VHpA==
-X-Forwarded-Encrypted: i=1; AL+hErHFl6xuCUlcBxjB/uluUoffHESWWKfa1cyYiZ5j8VdFK0b4u/sz7Z9XGbpZA5XJjrhjtOKenc75D4geVmGsFek=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/ObA/y4882AbVtx0fnKnJTg+Wta7hWEk5oR81yEBT2eMlYZ8vP
-	flZ5QNexL2TXfpjREp/XWpE3iZuzsFRLg1TJC92wjfv+ubiYrOWS6ZAb
-X-Gm-Gg: AZFdTZdnvf2Wc5tiKPXXQpuArOJpYdHdko0pTcfso01A8L+bvOMkkG9aOp99ZsNWfAr
-	o3RCYmoVeic4qzSvJiFKMUefMr2mt2IUrHj9gkMu+bigglermlpJbA16PSe7lpQWsDyDBUiYj8Y
-	IjNgRJhxETzIivbLBODhznGe7kBp0VnoY1LbZMlFi4jM9XmzhYVkkzOyP5izPs2zEhtnHmYUExm
-	ZzbpOIICxJdCNyWP8cX2o5QIEi+OT6sMFFYeGZHNGP64RuiWBZ9Q0VV57VIz5G//Cf9lEYAA3xD
-	EtkSea+OuOJuIajMPLW5NYWLmB/jQNgi7z1rPqSJ6ZPevyb9GIm7pR81S81nWrEJG3m5SAeY2kb
-	bu1+kJ5Z24UJ2j9LBTE646Tk+Ae1h2mEjpL7e4vVbU8yVcEbShU6hCYT133An/of9AeuvGxEzla
-	BNXqzpRvWpeIV9/CXW6Fsl7qm5ttCJ8w4fDBhDbPuxh2asX8LTumo9QVvew5d5U6WXIBsXa3xsi
-	ypwkUjJgbgN+B7MIAZ3R7BMhJqa7ePr8jPjBKWeaFHxSOl1EA5Nv84k0WAdU06vRilvZ7GB+w43
-	mHS1/xl3BMcM/mbewil+0QBxpQ1KFdDmpJgK5n9mEq6gQPyZvw==
-X-Received: by 2002:a05:701a:cc98:20b0:1a7:99b9:2eb9 with SMTP id a92af1059eb24-1b5568fbd8dmr5539812c88.27.1795264134374;
-        Sat, 21 Nov 2026 04:28:54 -0800 (PST)
-Received: from G7XWH7K1F3 ([139.177.225.235])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b562a82b3fsm9671917c88.5.2026.11.21.04.28.51
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 21 Nov 2026 04:28:54 -0800 (PST)
-From: Zhao Li <enderaoelyther@gmail.com>
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael McAllister <me@michaelmcallister.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: hci_serdev: stop write_work before closing the port
-Date: Sat, 21 Nov 2026 20:28:32 +0800
-Message-ID: <20261121122833.7545-1-enderaoelyther@gmail.com>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <CAFEp6-37+O4BoSL414Njogr-34G7se-8Nu+O7B0zjBY1Jw7UWg@mail.gmail.com>
-References: <20261120062048.40310-1-enderaoelyther@gmail.com> <CAFEp6-37+O4BoSL414Njogr-34G7se-8Nu+O7B0zjBY1Jw7UWg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=YI1C9cQV
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795271781; x=1826807781;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xL0K9+vP4paEUFHi3kZBlqtEBtHHC2I2LVqXj1ogESQ=;
+  b=YI1C9cQVRWEefACB+yUM5x7upnxL7/PSWAagA9gtdm3pKotC9YDIjVDm
+   DwVbghp1QVHM3aV+vPZvS6hx38u2iaE6V0KOT5CWLPjQigsSUNIf/k7VM
+   HNo3plraVSqWSaZ5U/V0DbZuKFYn3+WF3IfxDOP9nMIXqn/24uxuKlnHC
+   /Z7GnNsuvtjy3wbo6/D/tfdoYMrvEDczMcbCu8kJg87wMFXHar+eA1r8G
+   CtD4p/yu0pcZfbA+l7NU3zHabp9JMttJoyWfVlU6+flkkmNjxmMd5fPj4
+   rdQr7opHJGXSFDXvJyt8SI1ShPH27e121Jmlrez5UeX1tTSC1mSfVV0GJ
+   w==;
+X-CSE-ConnectionGUID: 80EpGjQaQcOS3ZEcprHHPw==
+X-CSE-MsgGUID: H8FjuDpuQO+/P5Biqi7s4w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11973"; a="4218603"
+X-IronPort-AV: E=Sophos;i="6.27,225,1787036400"; 
+   d="scan'208";a="4218603"
+Received: from fmviesa011.fm.intel.com ([10.60.135.151])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2026 06:36:21 -0800
+X-CSE-ConnectionGUID: 1axwqobeQn2jJjEb45OZyw==
+X-CSE-MsgGUID: vPr88j40SBuTdy5qzWllUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,225,1787036400"; 
+   d="scan'208";a="12748062"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa011.fm.intel.com with ESMTP; 21 Nov 2026 06:36:18 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xUmCN-00000001K8t-1GOx;
+	Sat, 21 Nov 2026 14:36:15 +0000
+Date: Sat, 21 Nov 2026 22:35:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hilda Wu <hildawu@realtek.com>, marcel@holtmann.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, alex_lu@realsil.com.cn,
+	jason_mao@realsil.com.cn, zoey_zhou@realsil.com.cn,
+	max.chou@realtek.com, kidman@realtek.com, arunr@valvesoftware.com
+Subject: Re: [PATCH v10 1/2] Bluetooth: btrtl: Add firmware format v3 support
+Message-ID: <202611212209.wBWI3Z2q-lkp@intel.com>
+References: <20261120082636.3834168-2-hildawu@realtek.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,43 +85,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261120082636.3834168-2-hildawu@realtek.com>
 
-On Fri, Nov 20, 2026 at 02:39:41PM +0100, Loic Poulain wrote:
-> > +               cancel_work_sync(&hu->write_work);
-> > +               clear_bit(HCI_UART_SENDING, &hu->tx_state);
-> > +               clear_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
->
-> Looks like you are mostly re-doing what has already been done in
-> hci_uart_flush()...
-> Wouldn't it be simpler to have a hci_uart_flush parameter to not
-> reschedule tx on flush?
+Hi Hilda,
 
-Good point. The only reason hci_uart_close() has to stop TX a second
-time is that hci_uart_flush() unconditionally re-enables write_work at
-the end.
+kernel test robot noticed the following build errors:
 
-Skipping just the final wakeup replay wouldn't be enough, though. Once
-hci_uart_flush() re-enables write_work and clears HCI_UART_SENDING, a
-serdev write_wakeup callback can still queue write_work before
-serdev_device_close() runs.
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master]
+[cannot apply to linus/master v7.4-rc3 next-20261119]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Instead, we can split out a __hci_uart_flush(hdev, bool resume_tx)
-helper (since hci_uart_flush() itself is the hdev->flush callback):
+url:    https://github.com/intel-lab-lkp/linux/commits/Hilda-Wu/Bluetooth-btrtl-Add-firmware-format-v3-support/20261120-162635
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20261120082636.3834168-2-hildawu%40realtek.com
+patch subject: [PATCH v10 1/2] Bluetooth: btrtl: Add firmware format v3 support
+config: i386-randconfig-1003-20261121 (https://download.01.org/0day-ci/archive/20261121/202611212209.wBWI3Z2q-lkp@intel.com/config)
+compiler: clang version 22.1.8 (https://github.com/llvm/llvm-project ca7933e47d3a3451d81e72ac174dcb5aa28b59d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261121/202611212209.wBWI3Z2q-lkp@intel.com/reproduce)
 
-- Normal flushes pass resume_tx = true and behave as today.
-- With HCI_QUIRK_NON_PERSISTENT_SETUP, hci_uart_close() passes
-  resume_tx = false, leaving write_work disabled and HCI_UART_SENDING
-  set across the close.
-- After clearing HCI_UART_PROTO_READY under hu->proto_lock (to drain
-  in-flight wakeups) and calling serdev_device_close(), hci_uart_close()
-  clears HCI_UART_TX_WAKEUP, re-enables write_work, and clears
-  HCI_UART_SENDING for the next open.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611212209.wBWI3Z2q-lkp@intel.com/
 
-That drops the duplicate cancel_work_sync() and tx_skb cleanup while
-keeping write_work completely disabled until the port is closed.
+All errors (new ones prefixed by >>):
 
-I'll send a v3 along these lines.
+>> ld.lld: error: undefined symbol: btrtl_recv_event
+   >>> referenced by btusb_main.c:2995 (drivers/bluetooth/btusb_main.c:2995)
+   >>>               drivers/bluetooth/btusb_main.o:(btusb_recv_event_realtek) in archive vmlinux.a
 
-Thanks,
-Zhao
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
