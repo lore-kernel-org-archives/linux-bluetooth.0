@@ -1,62 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795218812;
-	b=2PNXzt6VqONUiuJNzXlo9lnVnu/YEDrf5YSU83DbGqdFPKcDWy+QM02ZiAgeuCgKeqgV
-	 eQIZEQB2IaKiilUX8E7OrSTPf3kyHtAJLllLBwx9Lp/wW5mUfvtmoKk4ZzLLGzU1Mje/Y
-	 aSixPUHcqXv9qfPxTypVzG5fKf5rWrVlxB6vUUPQkEgHAurnAjvoJq+Z+A77+ywZof0ir
-	 uxbmdaCTE69Tm6mTsKaSMUd/yfdgBdkJw3eSGgzD8hlPPmrtDsxKSUQ9YxYqrINZ/g/Un
-	 8gu9ehHr9NIiE8OXcHCgwis/5QybD4oSzuBuxdOVA1x3VLqZq/Qw/qwfyyfmb/Vcaww==
+	t=1795231916;
+	b=nCk24aFPYEfMsZAPeEK7ZJ3OapyrHKyWV8kjomxoRDvokjix5U3hoh8LXBOilyH+ilVs
+	 cTCgUPx8hul160n2dETBkEeLAfVoL/6aK5niwyqnbwq5O/uJidoRtirtpaXBNvLbpGBU4
+	 1bGPXUarhkzFpTb1Z6HoqrbjNV0gp0KiLorn7jXYYNUZLxJdTwlSWsASYWkE7Afn/pU3Q
+	 B8wPbgS/u/KjD5BWpOtdC3CNLa5aJtDozSjqEwXGOsmyM+uWQPvdsLNW87VmSKZ7ajYhu
+	 1O1pyzu2e8/0/vsot3B9qBJwQFXgpVhAwvJvBfzzXTMh7qBYP7YIJwcgTcFAVi0vABA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795218812;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=GtYIm+rWOI2WR3mNBXOj58UxSxdzyvXp4UZh6Gfd/i4=;
-	b=KQ6vPGdeP3ckeh5q18HlcG6IxdpySzPbgDpQcbK7ONwHruwo9kUhehWe9muNFbMIOBWv
-	 d8ZvpVsBbs0NkUcR6ypWTTayIDlqBqEAXSLHAvgRYd2JxYL2FJcEyd5WdqwlT9afdYtJX
-	 iyKYWCexHkBltnWiu0sl3Zj5RnxqR7xhjRywGjatXio/Q4wPdMswdpw89ymZlxOfbqcLN
-	 YybZvm50OEBN7MKbFNhNb5fUDBYMtF9cb3MTKlZs3k5Bg3Zc2kWqyoay+CHPRP8lgQ5I6
-	 oeJiLkO4Li0tIjp1huHEEWS97hs8OOAQMepMTRAdScTSJDKaLndQn+N8jgaeQEu0v3Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795231916;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=yK3YzNJOcaQryEkHMlVlkCljfMMPLk0sVjUD9ogarBQ=;
+	b=gqgMoubtihN2ixV1+2q10UbfPVRF5WhOup7OdOvwlw2fHcTE7HLpr2+C557mmQmcCoiN
+	 K3jCAGr2QeE7+dF7E4/vnNUezEhPA3dtqdE1siugGRHOg0vue0EVGqGeBlhNdteUkVSHI
+	 Jmdhgis8CPR0hgwjX56/MdOE659DnFtl2VQGD4+ggWXQJf/nnvdHgchCaJx3z+TlojxCE
+	 Yjzy54Pld9aZMD6DGkFjUmhX9MrK3CONpasaLswEmXpXJ5dVh1X0Go4xdH/QEF88cZodE
+	 dsmh2NnWX1Hrl5D1zh7vMWCU3CB7qPhcB4ZHFLU5DSnoPsMQN6FKcVX0sXx5RvLYBWw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="i0ktJ/Vw";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SZzIGECD;
+	arc=none smtp.remote-ip=209.85.217.46
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5843A606A33E;
-	Fri, 20 Nov 2026 23:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0755606A6A7
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Nov 2026 03:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F0755606A6A7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i0ktJ/Vw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642B51F000C6;
-	Fri, 20 Nov 2026 23:53:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795218811;
-	bh=GtYIm+rWOI2WR3mNBXOj58UxSxdzyvXp4UZh6Gfd/i4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=i0ktJ/Vwel/HRt+z7HIvQtAFgN47Ptjdc8ml1p450ILd372E5nWUqjKOfydgYqOES
-	 rbjvLR1JS5+v1MJvWqf85KkjpEMzqmFKEto0Wj3uueyhM0Pr1ACfYxGTHqSrBFdM5D
-	 ysQ2hPLdU0Fcsr8cjOBnMr7KPMCKJPVMYnhh2EpOMsZl4scMWWCGMoUZlDDTMZ3Xvf
-	 Qo0qOYyctZp9JVuUG9cr/WNgd9pk0X8ctQtvMJ8W56byRwulu42OktYA6kdWjMkc4X
-	 lVtzQsX3FpxheFSS1r80E3IPribh4poKqCBncqIYBskgvZZx11iPdmro6cO1C4xE8c
-	 cCRzp0+Ink/ZA==
-Date: Fri, 20 Nov 2026 15:53:30 -0800
-From: Drew Fustini <fustini@kernel.org>
-To: Thomas Gerner <thomas.gerner@muenchen-mail.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] Bluetooth: btbcm: disable read tx power for
- BeagleV-Ahead
-Message-ID: <awDdetFNaeuxKkbp@x1>
-References: <20261020132604.90708-1-thomas.gerner@muenchen-mail.de>
- <20261020132604.90708-2-thomas.gerner@muenchen-mail.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SZzIGECD
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-7d2bf046d7fso882856137.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Nov 2026 19:31:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795231913; x=1795836713; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=yK3YzNJOcaQryEkHMlVlkCljfMMPLk0sVjUD9ogarBQ=;
+        b=SZzIGECDB24BDr48Lq/DjCuCBiOjqqQLs9gJuSzllplJD4NmV2JWE0ts6vzT1LVMJE
+         r3UGfmH/6yR77poN1fWHsTjI4CMOEswcDAgdUurIRyqy+PTz1OeXhM3TO0UZ+0p3R4tX
+         VmH0vSP/ooe7OxMaPTKDOT6pWPhBzS27SyVsz+XwKD7lDRE62ggAyJdqLNas+3k6wZ6z
+         ihvZis5sidfj4HpHL3QdAuDqq7p9J37oGpDtNQudkkmXpl1Dn0EnpKJoJ7xGdSrXuF20
+         0xDdj1vl0SsA0WhhqycD7zJgh0cVJprYM8jp1q6DR3AydKaOKB7X5XUpQ/wjycwBK7tS
+         gSxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795231913; x=1795836713;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=yK3YzNJOcaQryEkHMlVlkCljfMMPLk0sVjUD9ogarBQ=;
+        b=0I0k3S3pMRZKpqL44qxL9XXO1LChzbxzwegJM65C5+x9qGyLy4RGCPe7BnJtx+t6Tu
+         xxMfw1uEpSguQ/UK/uNsybNY6T8JO5gowlZ23r+4xTte+p5GtCKonpWSBoe7vCnfPheK
+         Cp0eVV+NC2KeT3Qq8AdvGbX0Uzai5MUJQOnEz1fWti/aXVOxupYDVInqsfrS9NheD/pa
+         BKz2nvlkd89+3yjeX9rlVoQ/MDX8scWmX/opMOVRaKbAT/oneLbpO4BxESYBfOtinth8
+         8/lUcpdeJiKvmNazZZnfolB92b5OWWTMRY3QtQnM9eCfG9wLA3ZyoduhDcVSqBPlPryX
+         bDGw==
+X-Gm-Message-State: APuU4Z/uhh4ztOZe2im2QUy6+SaxcL597y1z/f4f+muuzQOKkvPDuHDM
+	qFJK19hFB0HgUwoCrtZEgZD2kyUxMr9ejSqhWZEkxSzxlKz3skSCcR4yCgOjaKD6GQg=
+X-Gm-Gg: AZFdTZc2marEx8NVhYI5yOIhXDGxQIiPB95Wsx4h3JgY0+oPz0lwRGcYK4xTsqLy5D0
+	zg01blJ1ZXyF78eownV9UVSYxhzLqIw3i9A1N44CgnD0ALlHLsjUaksH0RZVu/vIoJcMfeyJmgb
+	zULHvuGrzA246ZiYOigiIqZgUgv6/8+SQnVlzxy8rdsH1XDqgpCbfMfJy5pQJt+3e4XyJwka1HN
+	JnDHrxZndrLf6zGX61c24HC65SM5UQpIW1plRmvEQLgo5A6z9KUoEZM/neyJZnP9XiCiX2YZdd8
+	7XpEoH1dvb077WDqiOIvZjoIdJL5+BrhwoCVlBfskiXTrhlHGPEhJM2vR9LrwM0dmLA3pn7F1dr
+	94LbbyxGzZm6Dv1W9fhgc+q9aw1hAZSjT34YslXfqMYLc3lLkBNiN2zmQPm0iZoEsvj/C7FiDM4
+	T8yeZXRaD+zvMBRIvW+CAgfcGdJoX/q3yFmfIJiaEsR5bwUWxJs3vHx+gLIitB6diMfo0K8Eiw8
+	5Nn3yVvvO4BgPFHpGhNxa4LHbuLcetfeadpeyuaZM0yfkeXMk5GC3F6mfpogMynnfOoJN7J255D
+	oB6TMqi6EJjQOdJ9bY0xbud5/WTBoUzq
+X-Received: by 2002:a05:6102:f97:b0:7cc:226a:f977 with SMTP id ada2fe7eead31-7d7396157a3mr2140380137.36.1795231912793;
+        Fri, 20 Nov 2026 19:31:52 -0800 (PST)
+Received: from shine.local ([168.196.221.52])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7f3d7bcsm4871081137.4.2026.11.20.19.31.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2026 19:31:52 -0800 (PST)
+From: "Andrei A. Bykov" <andreiab9019@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] Bluetooth: fix bonded LE peripheral reconnect completion and holds
+Date: Sat, 21 Nov 2026 00:31:02 -0300
+Message-ID: <20261121033104.441146-1-andreiab9019@gmail.com>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -66,81 +93,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261020132604.90708-2-thomas.gerner@muenchen-mail.de>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 20, 2026 at 03:26:03PM +0200, Thomas Gerner wrote:
-> The bluetooth module of the Ampak AP6203BM is identified by the btbcm
-> driver as BCM4362A2.
-> 
-> The firmware of the bluetooth module on the BeagleV-Ahead reports a
-> capability of reading LE tx power. However reading fails. To get
-> bluetooth working it is necessary to disable reading of LE tx power on
-> the BeagleV-Ahead board. The disable is implemented in a similar way as
-> for several Apple boards but uses the board compatible identification
-> from the DTB as there is no DMI.
+These patches fix two consecutive failures observed when a Windows
+central reconnects to a Linux LE HID peripheral using an existing bond.
 
-Thanks for sending this patch. Do you know if this is a problem on any
-other boards with the AP6203BM?
+Patch 1 prevents an asynchronous command reply from completing a different
+synchronous request that is still waiting for its terminal event. Once
+that is fixed, patch 2 prevents encryption confirmation from consuming the
+hold owned by asynchronous LE feature discovery.
 
-Also, is there an error message for the failed read?
+The series is based on bluetooth-next:
+  029d11a1a6e4c414eb87ed965ed6bc09f36322ee
+Both patches also apply to mainline:
+  5f22fb20497f4983094131f00a734362300d22d2
 
-> 
-> Signed-off-by: Thomas Gerner <thomas.gerner@muenchen-mail.de>
-> ---
-> No changes in v2
-> 
->  drivers/bluetooth/btbcm.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 463d59890bef..2d02cc1863d0 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-[..]
-> -static const char *btbcm_get_board_name(struct device *dev)
-> +static const char *btbcm_get_board_name(struct hci_dev *hdev)
->  {
->  #ifdef CONFIG_OF
->  	struct device_node *root __free(device_node) = of_find_node_by_path("/");
->  	char *board_type;
->  	const char *tmp;
-> +	const char **s;
->  
->  	if (!root)
->  		return NULL;
-> @@ -550,8 +556,15 @@ static const char *btbcm_get_board_name(struct device *dev)
->  	if (of_property_read_string_index(root, "compatible", 0, &tmp))
->  		return NULL;
->  
-> +	/* disable broken Read LE Min/Max Tx Power on first board found in list */
-> +	for (s = board_broken_read_transmit_power; *s; s++)
-> +		if (!strcmp(tmp, *s)) {
-> +			hci_set_quirk(hdev, HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER);
-> +			break;
-> +		}
+I tested the series on Linux 7.3.5 built from kernel.org sources and on
+the Arch Linux ZEN variant, using an Intel AX210 peripheral and BlueZ
+5.88. On ZEN, I observed successful operation during a session whose
+process duration was 3h13m11s. I also tested application restart, Windows
+Bluetooth off/on, Windows suspend/resume, and concurrent physical mouse
+and Bluetooth audio use on ZEN; these scenarios worked successfully.
 
-It seems that btbcm_get_board_name() only looks up the board name for
-the firmware file so I think it could be unexpected to set a quirk here.
-Maybe this would work better?
+On the kernel.org stable build with this series applied, repeated
+application restarts also reconnected successfully. An HCI/ftrace capture
+confirmed that feature completion leaves the ATT hold at one and that
+explicit test teardown releases the last hold. The same capture contains
+48 outgoing ATT test notifications.
 
-  static const char * const board_broken_read_transmit_power[] = {
-          "beagle,beaglev-ahead",
-          NULL
-  };
- 
-  [..]
+On selected files from the stated bluetooth-next base, extracted-function
+checks pass 121 dispatcher and 30 lifetime assertions with GCC and Clang,
+including an ASan/UBSan run. Unpatched negative controls fail 13 dispatcher
+assertions and 20 lifetime assertions. Dependencies are modeled; these
+checks do not replace a full-kernel concurrency test. Full kernels were
+built and booted for 7.3.5. A full GCC build of the stated bluetooth-next
+base with both patches also completed successfully (kernel and modules,
+including Rust and Bluetooth module BTF), using a configuration derived
+from the running kernel.org stable 7.3.5 build. That upstream build has not been
+installed or booted.
 
-  if (dmi_first_match(disable_broken_read_transmit_power))
-          hci_set_quirk(hdev, HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER);
+Separate unresolved observation: after suspending the Linux peripheral,
+the application and bond survive, but advertising is not re-enabled in
+the captured interval. Restarting the application re-enables advertising
+and permits reconnection. Its relationship to these patches has not been
+established. This series does not claim to fix suspend/resume.
 
-  if (of_machine_compatible_match(board_broken_read_transmit_power))
-          hci_set_quirk(hdev, HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER);
+OpenAI Codex was used to assist with the analysis, patch preparation and
+tests. No raw radio captures or pairing keys are attached. A sanitized
+trace summary is available separately.
 
+Andrei A. Bykov
 
-However, I am not very familiar with Bluetooth drivers so I am hoping
-Marcel or Luiz can comment too.
+---
+Andrei A. Bykov (2):
+  Bluetooth: hci_event: keep event waiters pending on unrelated replies
+  Bluetooth: hci_core: keep the LE feature hold until completion
 
-Thanks,
-Drew
+ include/net/bluetooth/hci_core.h |  4 +++-
+ net/bluetooth/hci_event.c        | 26 ++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+
+base-commit: 029d11a1a6e4c414eb87ed965ed6bc09f36322ee
