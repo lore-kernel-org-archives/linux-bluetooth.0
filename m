@@ -1,109 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795347417;
-	b=K+UUxFGm0HSQw2xPe5HYH8/1Yy+3qi5SrMeUThX4ARyCMkMSOGeyDHv7X+g4cZdYc7rn
-	 eczUyL8kv91RxCXnId5eFk9N4bDSR3ub0kndqFSYA3ONTe/pv0U5hXxtCK2rVQeAdESpV
-	 onrxuaQ9Qa8hAblOvTVxCvz0wpyf0Syfb+D/MpGepXPTaiZoO60n9fYLRnsHU/Z9c5S0w
-	 7pmkT3dOWZXrzahNTXLsXnRtZM272jLD8LUWD1G/lO73OMTknV+iNK2vk4lyiEhYSBLgs
-	 u7TQgSaA+PiiryTW8cVQhMYEEQ9IIUQfuxeGj1hCZ8p3Ue+A7cJt3+QlcH/N47dHUbg==
+	t=1795348168;
+	b=xa3k/DRLVrGYSSOE2XogN8X0uovP/2TrBvxBamzs/sYKyw18JJvHE4wqpDfYbjGleVEx
+	 db73tWwvrrZS8yH5oSkxPRa3x9SJC6wIa4AYgajE3fGDeXVtGC4u0ZlrRRvkqJKHyHO+A
+	 fRl1mwPORN6NunfFvjtmm0Bam04c7Qq1gJGxrKb70BgCh3kvqccKGeaj+YEZmnNCp74t/
+	 jjf/K03kBIKSzq+o5OVLwTSn0RYxn18CFZi8RdPpJC1dlIAxzMZzvg1bi8xfuNv1HJ5VU
+	 ifLQRUfiRJ4bnGmr8PhNqCgTMvrKhbapVlJYyjxKJeemlnsP3Vt1+yFqh0OBrYfQ96A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795347417;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
-	 X-Received:X-Received:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=qBWW5VUsys1Gyj9qyyCoCDYAGc39ft6gEvOmqVHSj3g=;
-	b=ZHU9XJl3UFFEfHm8CWZU7BU2H/UhbKSz4yScd05xQVFL06w6k/5zWnee5rxbEDoQrsk6
-	 9xr9LyTTplHWJsFFl/gkpYiYTAVCycKmHkxgKISn18S8N+gkou5I2Fysd8pJqxsJaVL+t
-	 poPJ6553PPI29NATrotyhgSV1O4zaWvpvUj/OuC8xuxnX8cuj5n4yxbMA38FoLav9X9N8
-	 YILiW5r5VMB6fzYInctaUUsw3VYgnJpWyED+sjO1okmhtlzUq1F3TQ5Fte9si73EaSymX
-	 MpquE4MGYBcstISTK4fPzZjJXIEdDPbEHCs9tv/7VQ+Y5hnPTQO/QlpOz5OmKVuA9dw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795348168;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=3A38uwWX7M0OXNKS4d2x6il4xpmdR7XmMpNdpN2gPYc=;
+	b=osMvOCcmGRFywPQXP4NvgSBNQtbPp9tku4+ez1NexisAfh5Tnk63GnVWxpJMjTTJqtQW
+	 OQXeUn71w81seKAz9v8X8xARdJjzeHsqSeVZE0quZH8YW44++eDvisOkbVLpvoUxB+RVP
+	 2Eh2umqBpXdIDakoQJDZEL9y3kWIJ51WN/Y9tpty6vp6JGsFRxgWR51GO3DLEHJ52IBpv
+	 dZ155qTwab1WkV97GVkCAREr+oghBcG2izTTb0fV+TEdTywh9zVQ6l+u1FwPJToOQpH9k
+	 xyTwFq5QWwI9JhidTPq3/27Vsm9dIxfQKWW7gqqXE2EdJGDYZQFiVQThesasNzgfk3w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=avhbo3eM;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=F57xYVHw;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="pmPb0lR/";
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548F5606A320
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 11:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 548F5606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0EA606A320
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 11:49:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F0EA606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=avhbo3eM;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=F57xYVHw
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AM86YBW2498216
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 11:36:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=qBWW5VUsys1Gyj9qyyCoCD
-	YAGc39ft6gEvOmqVHSj3g=; b=avhbo3eM3BxVHUkvmueu6n/H5DKcG7Um2k4c4O
-	9uoCa2rs1rQDwtRe5Vp0/gP4IUlhm+FEwMkdg5KUKLvwVOinyQhbjBfif+IaJOYz
-	h+gSXJdhFZvG5MN7hgLBypQoxKPrF5BWcXBUjUgkjGP1XlRVjo0/GyEk2U6bgVbp
-	eMXS3HB5t5mM1sm//h8ApwbLxYoUdeQV21pP5ym8Vz7ToxUeyVZ+VuCO3yeXM/TS
-	jrqf2/pVoBrRbqOZ1ese+xdYi+GckVxJ2XZBmdfg0qLsAv6CgmLdnjtF/0McIEeX
-	qZfdMy25y1TCjCpm4esTBgvEYokvQchlqyEq1s3HcKojOQyQ==
-Received: from mail-dl1-f69.google.com (mail-dl1-f69.google.com [74.125.82.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j33p7u7b3-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 11:36:56 +0000 (GMT)
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-1b23f91cd47so71872c88.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 03:36:55 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=pmPb0lR/
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so27894655e9.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 03:49:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795347415; x=1795952215; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qBWW5VUsys1Gyj9qyyCoCDYAGc39ft6gEvOmqVHSj3g=;
-        b=F57xYVHwxajRxKOI1Yidz5+mQgWX2s800FG/pJ2ZXzRLiKnDw01Qj86k/D3q+MhjJO
-         2qwFou69WU+YLlW7EsP3wuOJyWONGKjFIOJfJg+qiRb8wbiwixCXOT4X2j9uk1LsN4X0
-         MwyEKeIxurtRqHI9u0smoFmmm8ss6jULzkHKH7tHtFlnIFEsfNZyc5bHbRm9ZF9y+1D3
-         MP5sEbzhhLNmoaZ6XBVOqszuHDY60nYP7uq+xECcO7refY3JLRvrX5eFYEPdY3vNBYlC
-         RKBahZ+/0yfHoxrE1QN9AGSjVauEUOcRouRxCNdPZo37yEF9181KTCxEc24eqnKs1Lsi
-         CoiA==
+        d=streamunlimited.com; s=google; t=1795348166; x=1795952966; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3A38uwWX7M0OXNKS4d2x6il4xpmdR7XmMpNdpN2gPYc=;
+        b=pmPb0lR/dcf+2LsX6cxtxwMgbscXn7GGDNC24sbmCbZackj8JOWS/WnRfBf3GYAQP8
+         dqu9zUkz+GDe255s5OJuObwJdQgAgh46UueJ0bp0u1UKGo5/PSJ16vrvyZqwKUhJ088R
+         XJktXwxfuFV8KbSBQof880xf1RsgNNt2PiZBc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795347415; x=1795952215;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=qBWW5VUsys1Gyj9qyyCoCDYAGc39ft6gEvOmqVHSj3g=;
-        b=Fg4LxHLLJDzqt+2P1m9ZsA9Bm2wjrTBniq9m0KVG2WiyHrttD+mHc1yAS3CNmxo+q/
-         VTiA07Qw1WV1FkNctjBe2aWvY5WQwwBhl3elm0xwpgEjKbQQt77jaSY+vPXsf0GBvHWm
-         BWQoaY6mjOjZ1cPiJXb1jdYPIVg/eGXe2e88/mmaOLbZojHDcCHPra1bhvI9ISoJjB4D
-         H+gV/L+iMCywSpZma7QoixgajjmawhfSG0L5irY0LcCZdXki1rozpQuJswJlpffpxsaK
-         wpGJ8/f/g7QilZvtz0uqQb8hA+wJC6TE3mbVOj2Akt5mqqWtO3mc2dLTnHGpqHJjpCbt
-         uGAw==
-X-Gm-Message-State: APuU4Z+324bps1kuYhkBHrRT2nV6dKyyWYROmnvQ43gLF88NnXWpm7QU
-	9nvJ+QmO6brN6ZE6jUabiszk0R6hJGygJmoO+J+7TTifwnhm3+o+Gm17Fo3Sj6AVFasYc2bznZn
-	Wzz3k/ECtPwke+H96ajm5xJCoXrqlJI9tIw03hjjl3lp9O0Gfxtq+j0T78UcEVERAdUwql7k=
-X-Gm-Gg: AZFdTZdlUbPEBXp74oqVfSdFG6Qmebn21pMTughQ58VWWe4cvDgwYqnOXi9xU7iqOXM
-	RuKSXhTqBDGX8esZrlyPuUaLYRoKufbycvyinq5539bF73HKvWY3sEiHrJ0EV6jfzOsm29H1E2C
-	auOl0a6O8PX2chBVSqVuT6emscim8WI+mr1AA9HHFi+UOoUmUBG3QACd4pMU0mMzymflLXPHMhf
-	0pvEXHzT4ppDRnQtB5paUS3gtwT4uExIOSOLChIYWVjS9VYMJ6jiXH0G4WU5PFm5YzKL1ytQKox
-	f12jsI8qrpIih3YzbA7BCoGmC+iXyAuZ+UAQgm362n2dMKEVsr3l9eWPHrcQwgL75D7kCXNurZ8
-	U4JNKyGfF7xRBna1NWULDfzmjXHpKyMko9dhmp5EHEhIA4Mw4U/CDYfcqBZtkfHx7LYfFqX5NSJ
-	AT14/KZ2vrqaSPd0jOhXTz
-X-Received: by 2002:a05:701b:2919:b0:1b3:a881:a67b with SMTP id a92af1059eb24-1b5568a8a08mr11700053c88.1.1795347415128;
-        Sun, 22 Nov 2026 03:36:55 -0800 (PST)
-X-Received: by 2002:a05:701b:2919:b0:1b3:a881:a67b with SMTP id a92af1059eb24-1b5568a8a08mr11699982c88.1.1795347414454;
-        Sun, 22 Nov 2026 03:36:54 -0800 (PST)
-Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5567ff27bsm21693117c88.6.2026.11.22.03.36.53
+        d=1e100.net; s=20260707; t=1795348166; x=1795952966;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3A38uwWX7M0OXNKS4d2x6il4xpmdR7XmMpNdpN2gPYc=;
+        b=GfY7F7NCgRWWVlawt1PpHTL4rdqMHPCGz/Kat2HBoy6admMlgfYtAMXRSPBN7IE3dM
+         b7e2cbeu1/Y74xaGbjSvsHv8iszPWS2nmLl4yAszBZLM5r9nta8zjU0ZZrO1TwF1f1dZ
+         8HWfAWFX0GqViFRphXaFUpYl03vka3oTdE6y/HdHe1IWgF5Yf1M2oG2Pk6g8egzMGDht
+         XknlJUC1/3AQOsCCluvErKEkRgbtK0tdNoUdA6wLIYsJMSYo2X/1azEnNQ97CLUNCnh1
+         T8+7UGSYNG06G5WtfZhZuEDLsBU0hYa1C9xUl8hwXjvMXbZl3we5wNQrU4AU1SMPZA/l
+         v4cg==
+X-Gm-Message-State: APuU4Z+ohRrQH7rQsSamY4xzh9553nkwTcLgEXPqvvaYmgn0hcJUkj2j
+	bVzRrAgeaxJDjZnzUn9Z6kENpnecs023pNz0oIgFa15ryDpr18312lSKXR7iNOA3xmKMrsjI2Go
+	qABnr
+X-Gm-Gg: AZFdTZdp5Rs6G63NXflf0IMg500hAsTecmsSmjGQ+HrWGZz6cyfcJpiUVb8FOFIUoRQ
+	jkiUv6xu8McETyCDg6yrMJD9Zcd0ZVgKqLfbqfhkMLnHJaE6UU+yzJR6yKYA0Oha8UPmHZ9aMfr
+	/9vui3XpHQv7WRbGUACNoG2vvS8KJrz/FHPQvIsMiWvixXEbGlZIQ0Kep1kYC3k3EGbzh9PQpds
+	6sRnPud+2FrJrwuIRQVqS+GJj4/n7LeTFEsnb0A8PrzHisT/1uAstCn1Ht2QJ9pwXGnAQolvC4D
+	6UTQex7lsLklvw6K+VmbttvDVYx9ipFLqOWfht+De3n+u4XZOYal7LSKe7zsXFTII3E2WhbYHx8
+	oShM5wL9V5GeOZh7ekcy/1dPX60Z1laL8l3I43L1DE6MTqLuOSmwvJgcEPAxSulKMOmz/gktCPB
+	ggmb+Eh/et4MSnVsPv79lbKwP5u6xKFCgwqjrKvzRBVyDCGze6fhrAAEWhaNkKIA0n/vZvbJD7U
+	09+v2ygnbxuujce7wd51cGgnQX2PJnNEWgqpWH2q9HlYxKVOOALUeVzSghRhxBK2xrC68MuWQpX
+	WCGPYp+PtrB7xyxyEsZPIb0bJ/e5ihPfV6ixqvEKuIhcG9W5kQ==
+X-Received: by 2002:a05:600c:1d83:b0:4bb:687c:4fbe with SMTP id 5b1f17b1804b1-4bb88805c26mr162182635e9.8.1795348165371;
+        Sun, 22 Nov 2026 03:49:25 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb905f1489sm117367905e9.0.2026.11.22.03.49.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 03:36:53 -0800 (PST)
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Date: Sun, 22 Nov 2026 03:36:51 -0800
-Subject: [PATCH bluez] tools/test-runner: Add /usr/bin paths for btmon and
- btvirt
+        Sun, 22 Nov 2026 03:49:25 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@gmail.com>
+Subject: [PATCH BlueZ] bap: Sync to the BISes of a broadcast in ascending order
+Date: Sun, 22 Nov 2026 12:49:18 +0100
+Message-ID: <20261122114918.1063391-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -113,103 +89,126 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261122-tr_paths-v1-1-044cfb9521ac@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIANLTAmsC/yWMUQrCMBAFr1LetwE3VgteRUSS9mlXpJZsKtLSu
- xv1c4ZhFhiT0nCsFiS+1PQ5FJBNhbYPw41Ou8LwW38Q8d7ldBlD7s0xSt3sQ9cIdyj5mHjV929
- 1QnxMnHH+a5vinW3+brCuH2PH2+dzAAAA
-X-Change-ID: 20261122-tr_paths-eb1475ad71e3
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Zijun Hu <zijun_hu@icloud.com>
-X-Mailer: b4 0.15.2
-X-Authority-Analysis: v=2.4 cv=OrHaWC/t c=1 sm=1 tr=0 ts=6b02d3d8 cx=c_pps
- a=kVLUcbK0zfr7ocalXnG1qA==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=EUspDBNiAAAA:8 a=FAVf5eMEncyQ3ltaWo4A:9 a=QEXdDO2ut3YA:10
- a=vr4QvYf-bLy2KjpDp97w:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTIyMDA0NiBTYWx0ZWRfX539QB+VlHvPq
- /7PbbgpIO3FJFL6YHC1r0wkFyTNe8HvSKlUSk/XUMQe1USH4yxLifxBVJJxKdmbeX8JQB1VpnMR
- 9xErPg1yljLp9g2dnNa5SiTdNrSemYo=
-X-Proofpoint-GUID: X9tv-slfSduDge-4odoxwEsCZkI29EN9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTIyMDA0NiBTYWx0ZWRfX3+zxZDc9SdC8
- OOcjZzlf7lBZ4NghmRUoTpLlLqjY5WJ4Fws5kfvPAhx7YzCOhjIFTDWzisiTJKpe49zeNAkKdW5
- RTGhA64Qgbta++iScKrYPOuNvkcpoZ4XAwq4TM/c8qLkKA1QPsN2lpDV4XyW47ytMWjD4hyUwVI
- uV/AEhwzJktORzO/YaRCCYikzGIKrcoOJ+VFhtLrWYLggoMhp+aDu3/JrfGfkoDNcbHvhq5VsHX
- jxXNvLAk2HBsSmoUE9O0PMog/ZrOYQmQexOlg1wZq7ctj5Xbejcl7TflmYv5jV1EwFliSmcOFWy
- y1Ef0wiXfJY+ep1Hwl8vpqMMqhZpGfAH4wMiCtHcHcMea6jkjIlgQ1Hl0F7iNwCN+8TjdRK+3FL
- GJxkR0IOlkC4xoqGrT1Bn4Ou6Xapcn0W+eFsiWtGLzqfj2Zd21u9I694zI9gDZIfx7PLJNXp60C
- aGUGEUgwG+SzOeZsPvw==
-X-Proofpoint-ORIG-GUID: X9tv-slfSduDge-4odoxwEsCZkI29EN9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-22_02,2026-11-19_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
- suspectscore=0 priorityscore=1501 malwarescore=0 impostorscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611220046
+Content-Transfer-Encoding: 8bit
 
-btmon is installed to /usr/bin, but test-runner only looks in
-/usr/sbin outside the build tree, so -m fails with "Failed to locate
-Monitor binary".
+From: Simon Mikuda <simon.mikuda@gmail.com>
 
-Add /usr/bin for btmon, and for btvirt as well.
+The BIS list of a BIG sync is built in the order the transports were
+acquired, so when BIS 2 is acquired before BIS 1, the kernel sends
+LE BIG Create Sync with BIS 2 listed first. Core Vol 4 Part E 7.8.106
+requires ascending order, so the controller can reject the command with
+Invalid HCI Command Parameters (0x12). Nothing reports that, so the
+transports stay broadcasting and the stream is silent.
 
+Sort the BIS numbers in ascending order. The kernel notifies the BIS
+fds in that order, so give each fd to the stream with the lowest BIS
+that has no fd yet.
+
+Fixes: e59a915db9d8 ("bap: Remove PA idle timer logic")
 Assisted-by: Claude:claude-opus-5-5
 ---
- tools/test-runner.c | 2 ++
- 1 file changed, 2 insertions(+)
+ profiles/audio/bap.c | 54 ++++++++++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 0bca31a46351..8a8406642209 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -1628,16 +1628,17 @@ static const char *test_table[] = {
- 	"tools/bnep-tester",
- 	"tools/check-selftest",
- 	NULL
- };
- 
- static const char *monitor_table[] = {
- 	"btmon",
- 	"monitor/btmon",
-+	"/usr/bin/btmon",
- 	"/usr/sbin/btmon",
- 	NULL
- };
- 
- static pid_t start_btmon(const char *home)
- {
- 	const char *monitor = NULL;
- 	char *argv[3];
-@@ -1685,16 +1686,17 @@ static pid_t start_btmon(const char *home)
- 	printf("Monitor process %d created\n", pid);
- 
- 	return pid;
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 457ba5de8..98ef26997 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1672,10 +1672,23 @@ static bool stream_io_unset(const void *data, const void *user_data)
+ 	return !bt_bap_stream_get_io(stream);
  }
  
- static const char *btvirt_table[] = {
- 	"btvirt",
- 	"emulator/btvirt",
-+	"/usr/bin/btvirt",
- 	"/usr/sbin/btvirt",
- 	NULL
- };
- 
- static const char *find_btvirt(void)
++static void find_lowest_unset_bis(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
++	struct bt_bap_stream **lowest = user_data;
++
++	if (bt_bap_stream_get_io(stream))
++		return;
++
++	if (!*lowest || bt_bap_stream_get_qos(stream)->bcast.bis <
++				bt_bap_stream_get_qos(*lowest)->bcast.bis)
++		*lowest = stream;
++}
++
+ static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void *user_data)
  {
- 	int i;
+ 	struct bap_setup *setup = user_data;
+-	struct bt_bap_stream *stream = setup->stream;
++	struct bt_bap_stream *stream = NULL;
+ 	int fd;
+ 	struct bap_data *bap_data = setup->data;
  
+@@ -1685,12 +1698,15 @@ static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void *user_data)
+ 		DBG("BIG Sync completed");
+ 
+ 	/* The order of the BIS fds notified from kernel corresponds
+-	 * to the order of the BISes that were enqueued before
+-	 * calling bt_io_bcast_accept.
++	 * to the order of the BISes passed to bt_io_bcast_accept,
++	 * which is ascending, so the fd belongs to the stream with
++	 * the lowest BIS that has no fd yet.
+ 	 */
+-	if (bt_bap_stream_get_io(stream))
+-		stream = queue_find(bt_bap_stream_io_get_links(stream),
+-				stream_io_unset, NULL);
++	find_lowest_unset_bis(setup->stream, &stream);
++	queue_foreach(bt_bap_stream_io_get_links(setup->stream),
++					find_lowest_unset_bis, &stream);
++	if (!stream)
++		return;
+ 
+ 	fd = g_io_channel_unix_get_fd(io);
+ 
+@@ -3902,22 +3918,7 @@ static void append_setup(void *data, void *user_data)
+ {
+ 	struct bt_bap_stream *stream = data;
+ 	struct sockaddr_iso_bc *addr = user_data;
+-	char *path = bt_bap_stream_get_user_data(stream);
+-	int bis = 1;
+-	int s_err;
+-	const char *strbis = NULL;
+-
+-	strbis = strstr(path, "/bis");
+-	if (!strbis) {
+-		DBG("bis index cannot be found");
+-		return;
+-	}
+-
+-	s_err = sscanf(strbis, "/bis%d", &bis);
+-	if (s_err == -1) {
+-		DBG("sscanf error");
+-		return;
+-	}
++	uint8_t bis = bt_bap_stream_get_qos(stream)->bcast.bis;
+ 
+ 	DBG("Do BIG Sync with BIS %d", bis);
+ 
+@@ -3925,6 +3926,11 @@ static void append_setup(void *data, void *user_data)
+ 	addr->bc_num_bis++;
+ }
+ 
++static int bis_cmp(const void *a, const void *b)
++{
++	return *(const uint8_t *)a - *(const uint8_t *)b;
++}
++
+ static void setup_refresh_qos(void *data, void *user_data)
+ {
+ 	struct bt_bap_stream *stream = data;
+@@ -3957,6 +3963,10 @@ static gboolean iso_do_big_sync(GIOChannel *io, GIOCondition cond,
+ 	append_setup(setup->stream, &iso_bc_addr);
+ 	queue_foreach(links, append_setup, &iso_bc_addr);
+ 
++	/* The BIS list shall be in ascending order */
++	qsort(iso_bc_addr.bc_bis, iso_bc_addr.bc_num_bis, sizeof(uint8_t),
++								bis_cmp);
++
+ 	/* Refresh qos stored in setups */
+ 	setup->qos = *bt_bap_stream_get_qos(setup->stream);
+ 	queue_foreach(links, setup_refresh_qos, data);
 
----
 base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
-change-id: 20261122-tr_paths-eb1475ad71e3
-
-Best regards,
---  
-Zijun Hu <zijun.hu@oss.qualcomm.com>
+-- 
+2.43.0
 
