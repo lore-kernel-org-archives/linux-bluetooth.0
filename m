@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795378191;
-	b=oh+fNFSusc5va3e/US/raKr7+d88V+ZTnIb7SHENBZchVtVzDe6xBnNZytbbmNFJkCC+
-	 ajWPRwHDFddCHGJRD+mvbYgFdPWmDIJgwBQg7OpgSLXDYGu6oVTbqydZDFOPtM1Y+/kfG
-	 fqdZKVXAv9ks8AAtdijLLjfHTX4QoVHdgzZis7f/XgiZwI0taVlHeVV2l/p2HOvzlD28N
-	 15CUBAWZqnRurG7707gUuG1h4qaeK7qA2jYEHjouFZEnbY2Q6fF2acMH9m/HBQcsfxSVc
-	 X/6n5gCq9gyeqRuTW2ejeuMeIlxnqHGSsS4akLbFDWG0j8H/KQ9mA5LhhLRKA5C4xtQ==
+	t=1795378407;
+	b=zd2KO3Cu8kRUSiVmh4GW/Zb6Ebt/WXAsHQbVo8AhRtg1N6PdFlFq6Z63TrEab1w8Itot
+	 SIgdMKtihX/9NrCZy98lwZxtHPLr4rn6Grrd1FcOUagsPPRL8e4pICKxSzJQIqoW1ou0A
+	 et6nYm+O2QbYe8rrdcV3z7mo0+pKfHUPqqu30t7TPj8YEMYjlpThjm8siZIJ/wzCKUzrP
+	 KWYWQBFu9rpJK4lpYOK8jtXzoipOAMp+n9Kq8lg2GOyIm6VsRU+pT+jSXVeeA4DqfK1sC
+	 49RX1H5ySO6OJjl5wYtMbZhN1BxScFgvPxJkkkGLOfj/fDXIuQuR3SONIaxxOwwf7pw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795378191;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795378407;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=hMwq0jwnpGY5DDXXzn0wA2/J2r8j9XeuBLIl8Yfy6eU=;
-	b=GaQhf0aRqI0/iKzxq6d73g0GEc/HO0TFWMv+rA4rnCxBpPhxbCe9K0zd51KjMw3wP4eu
-	 uxZFK67fAVaEUM3PPn1Xkek7wZWnQ6KNG//1611xPkYhKCmPqGZfX9M2YtD2iCKDaQGnb
-	 +ZjepxDVNsMpElFAhO8GTyWq+SJb5KWA0KBt6Nzsk/1C2zMk0kdNMrBpt7YZHiUTA2y0P
-	 oFMneBB5UOQKTvyinyAK+mEZTSW4pMjRzphSTjvMwn/YOAuqGYZRQliirhpCBvM0d/SHk
-	 dTGZ5iF9GWR/hIRbiyD8p0odsIVKPtIPIWR3bo4aKbPEQL+6kGFIaV+/fON/lXEQYDw==
+	bh=8AxblH8Bt2Z0dAUNptioluuArRPLJb6+/w46pDsSOwY=;
+	b=KTyIEN2CSTprV81rT3q+0CsF08VMh+vATEIEFs2ZMwnrfmX3HQXOI+hleyEWdD4NdJeM
+	 TVylMmtJfog1q2xOKjNSNR8i90OTlrmWmSzIaCFPO2W1bNvE0yVmeHS2tE7l2H5f/Aiso
+	 Fhb5EPrz48R2LDt/cK4tFes5lQBb+U3i2C6+FxIRCyL8Aur31deUyV5f5M+wuPb86BCcH
+	 1y/ISxtF9lbSgyw1/RkL6AAuUnzZhXaHJ0N/WY3YgQ/IDJh17Z9OWIMMfrRwIHOh/aGS9
+	 /QDdq7LX6GsJMdbKE0jBg/eUz9ArKqhYHd16W57Ll1dNDgZbNi6diiEjnveBUCabFbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=cNppgfUB;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=pB41kxWT;
+	arc=none smtp.remote-ip=209.85.221.41
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDDA606A699
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 20:09:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CDDDA606A699
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D74F606A31A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 20:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0D74F606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=cNppgfUB
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a140e7405dso24969915e9.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 12:09:50 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=pB41kxWT
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4a3e706b5dfso1705849f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 12:13:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795378189; x=1795982989; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795378405; x=1795983205; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hMwq0jwnpGY5DDXXzn0wA2/J2r8j9XeuBLIl8Yfy6eU=;
-        b=cNppgfUB2S0u8no+JUTpWJR52lniSmJqK5UIW9HWGYH9tWFVj4E5PCci5E/6WsEfs/
-         Q3nSkGLIT1HQjIh6gjrZIaX9WLAdvYJDLtYsCi+uv8S2vOodrPysMvZ2XDHTymCgdASN
-         kZELVX4OudCt0MAQGdUb6gLSakSdFHOSoefIg=
+        bh=8AxblH8Bt2Z0dAUNptioluuArRPLJb6+/w46pDsSOwY=;
+        b=pB41kxWTi1TjxT/sdz25TTB5+6IZywe4X/VDEDsM1wwKFdRIbPorOPPA0qrGssGFAH
+         tqaEyd5xBeYfvDuYxn/Ulg5NNGL/uf1AoBdwpG6G8coYIcS68eXQEvQQ+MOQAEhdbWrv
+         +OwTbt+IZwONRX1u/s9KAsUy7xV0CM2b2eIx8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795378189; x=1795982989;
+        d=1e100.net; s=20260707; t=1795378405; x=1795983205;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=hMwq0jwnpGY5DDXXzn0wA2/J2r8j9XeuBLIl8Yfy6eU=;
-        b=ZK4SWBLoNI7c7ZDL8lVMWbCAs0iFo3gI88+kwy1VB2eZhCheqOJOHRY/faamdw1nkv
-         oCTURco3V01MEjpv8A5FMPRiW9c/DZORSeXt0UPh0KRz7/NNTAf/n+JkuY3nF+6yaN2u
-         CC+xxCvn+OId2Mt7jBWSGHrsDKtYLOSPqiA6kTZAAjf0jZzSGi+LuZzlxS+z/37DOXPU
-         qpmGcxtmTP+lzwTuxir3x71NHh7M87odHNhzCQ3LjADJZ7PUo9KoahpYGj1bIQWwBNnE
-         XpgWnMoowrgNnNiF0TMyM0zmmnmxjY25INoc5kTxdpjc4x7l76SkQNZIpFkuZfucs/TO
-         t17w==
-X-Gm-Message-State: APuU4Z+AvMY95i1KYuat+eQJvDOmqyQGHjw6eS5Yf0IuQVc05c611mw7
-	uePngHRQQDOAkYE5i6evH++9bTeYvmEgUydBSVcGSDUPg9PmUhiTH+Fv1j0xAGzYpXnkrvN5FEh
-	tdrB+
-X-Gm-Gg: AZFdTZelEGe3SGM3nu68rimnR1lnM74DoFf4iiQEF8KFQd9LW/wSqssBr9HmmsoNKBv
-	+LfWM83PV4DQtoJK6z1pRgtECV8qVplNSJRcYQOdFgsCP5ibBTTSLNjdYoLOqSH6XlINScVpI2I
-	AO5bLP9huJ1gObdlRys6YoN4OkXL9UrSS1AYZMzAg4v+0AESW3ducBIJnUrItCDx5svi5HexJrQ
-	nm1HsymWC/g4sNxY+5yRHdlKBdrzVTmdRNbLz7fDTY3AweJAIOdjFLOGwW9jM1RKsSXUosLzi5i
-	YX7oGuqfSvF0NdPUufcWNFpv9BrVEmUXeSzcLRYf8LrRN1+xndOQw/kHL6C6ZS8YN1J5U7xhGke
-	ZfoKNK35p323eEQ6SdMo2UJV23C/1t2o51Swx5nOD0Ir9Rct1nruFiJqENgQvZyVRbr4PVD8nDZ
-	GfGKsx/Eu2hPOZpfGRfpsHG1IB0m6AEatgp5Kc/IJkAWp4PGFrdllQOZ2uxQP321xsxOqjX4mX5
-	fZJS8Aqr5Xe03ZyW4BOg5khnsoSUp68BrkVkNlqFuhuYFG0R6nZauK/2MFVtGvoEilaaJ4Pn6cr
-	W2BJpGpBblvVV1fPm4JhwvX93vnsdW2Ci9gDMkev/7UskdPYagXP6962ryw6aqJqBAYNxQ4=
-X-Received: by 2002:a05:600c:4e0b:b0:49f:e772:6ddf with SMTP id 5b1f17b1804b1-4bb8881ae90mr209873685e9.32.1795378189248;
-        Sun, 22 Nov 2026 12:09:49 -0800 (PST)
+        bh=8AxblH8Bt2Z0dAUNptioluuArRPLJb6+/w46pDsSOwY=;
+        b=XcRgXmRII1CtMP8FywMo4fh+JpVQ5gl+ThZ/M0KjSsripoDyQfA/n/cu7A1iJPHtxm
+         QbPz4lWtwsOTWctSJzJlsX8F0laul0jmfGrb7K4S+Ba/uKaBiDPBYVwNbUtugHJDcGos
+         r54iwRpZnyFdS619BY8hhxtpMBp4jY8BxvCf/dzViUmQxFZLY6uAoylCA6P0wWC2srk5
+         +YEammI/4cPPoAGJcGGJBjLO/VHD7fkhxp9EMtBw7F23xa+TWLpFd8B0fl1lDT9AO2ma
+         hQq9xamLxruZIR0tYFQ1gPRBjZge0ncc3lHulMSIenw3k/4Gi5LCpe6JCN/0xnSPQcF4
+         OhSg==
+X-Gm-Message-State: APuU4Z9Gw48TkgSpNOgSrsb53AdQBxUMhIuZ/zuhz1Np9cX9Lm1YASov
+	jzHTACYcDCqOhbVB46DH8JOVXuKIk9u/JzkjYBsdOcffy/+RM0286UEMOyWFYU0jdLaCpcsXP2R
+	JVXOL
+X-Gm-Gg: AZFdTZdIIey4mrGihhvGFDsZwwdHp73pD+jbw3aAR0AOxViBmF+m9ZGSo5tN/PPOTkg
+	5Rk4dXeoBSgHPqqqjYxmecKMbZGScNMUlQU5d3kPDQ2p707PeHW9IFCa9Wh09qhUnaDtLCvozcW
+	NrLIyKAkZ8cIYOsoV9xV/+/lYt82dkkhK0uwqGu9TMVWOOCBmbFspxNR9wXxlwGpyZEZwXCncFK
+	JWOJjawzX2aIq6XfapONzwva8fQZThZqPOuuezqHy8uudrX/inkJucb/w5b98fHBCjZsvbLSuv8
+	+t7TugLvxch2k7AZImqDF+LFRFRZwicCbVk2Qnf6OIIsAKQbWcRi8axpVQMwI93kzy2MlItVlyb
+	oqJNbs0owdi7wzrxjv4+nFQpq2zmCJE/rDb+hm/w3zk9mhmhcoJYqSEUOsck/+buvkNdAI+DWi7
+	qH/dgOv8GNRGR7vVQoqqouFbFZyfdzT2cm2jO2jyuU548c6OnbZNAxdCSGdVlrU0MIhyIfSfyKw
+	zgDIoYSGuHkAHV9K42LwO0NKKZJ8i92kd20b9jEQJA3eZ2Gz5F5vMy1zEAg+xbU4L9efk38ZmmC
+	fGjjKICqJfPKlZMifEKH4NvvIfMPE8NnTiGdorXPNzN0t7ZgkQ==
+X-Received: by 2002:a05:6000:4b0f:b0:48e:d7c:4bc8 with SMTP id ffacd0b85a97d-4abad6a1782mr17497807f8f.7.1795378405415;
+        Sun, 22 Nov 2026 12:13:25 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8538b09bsm537907435e9.4.2026.11.22.12.09.48
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b1ed8b6a05sm3500696f8f.43.2026.11.22.12.13.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 12:09:49 -0800 (PST)
+        Sun, 22 Nov 2026 12:13:25 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: lib: Map Connection Failed to be Established to ETIMEDOUT
-Date: Sun, 22 Nov 2026 21:09:47 +0100
-Message-ID: <20261122200947.2780757-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH] Bluetooth: hci_event: Terminate PA sync transferred while not pending
+Date: Sun, 22 Nov 2026 21:13:19 +0100
+Message-ID: <20261122201320.2851760-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -93,37 +93,39 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Connection Failed to be Established / Synchronization Timeout (0x3e) is
-not handled by bt_to_errno() so it is reported to userspace as ENOSYS.
+hci_le_past_params_sync() sets the PAST parameters of the ACL connection
+so the controller synchronizes to the PA train transferred by the peer,
+but nothing resets them once the PA sync has completed, so a later
+transfer from the same peer is synchronized to as well.
 
-It is the error the controller uses when the first packets of an LE
-connection or CIS are not received, and when it cannot synchronize to
-a periodic advertising train or BIG in time, i.e. a timeout, so map it
-to ETIMEDOUT like Connection Timeout (0x08).
+HCI_LE_Periodic_Advertising_Sync_Transfer_Received is then received
+with no connection having HCI_CONN_CREATE_PA_SYNC set and is only
+logged, leaving the sync established in the controller, using its
+resources, without the host knowing about it. Terminate it instead.
 
-This changes what userspace sees: connect() on an L2CAP LE or ISO (CIS)
-socket that fails with 0x3e now reports ETIMEDOUT instead of ENOSYS.
-BlueZ iso-tester "ISO Connect - Reject" expects ENOSYS for this case
-and needs "iso-tester: Accept ETIMEDOUT for Connection Failed to be
-Established" to pass.
-
+Fixes: 33b2835f0b7e ("Bluetooth: HCI: Add initial support for PAST")
 Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- net/bluetooth/lib.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/hci_event.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index cea21a4c49a0..0f84c397891a 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -89,6 +89,7 @@ int bt_to_errno(__u16 code)
- 		return ENOMEM;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 039bcea98a5a..4b8fd3bfeba4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6279,6 +6279,12 @@ static void hci_le_past_received_evt(struct hci_dev *hdev, void *data,
+ 		bt_dev_err(hdev,
+ 			   "Unable to find connection for dst %pMR sid 0x%2.2x",
+ 			   &ev->bdaddr, ev->sid);
++		/* No PA sync is pending, the PAST parameters are just left
++		 * set from a previous one, so terminate the sync instead of
++		 * leaving it behind in the controller.
++		 */
++		if (!ev->status)
++			hci_le_pa_term_sync(hdev, ev->sync_handle);
+ 		goto unlock;
+ 	}
  
- 	case 0x08:
-+	case 0x3e:
- 		return ETIMEDOUT;
- 
- 	case 0x09:
 
 base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
 -- 
