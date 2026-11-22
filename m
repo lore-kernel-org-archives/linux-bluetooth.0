@@ -1,74 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795344634;
-	b=hXj5RjhxIb2PZaNjowdM59OiJuwkTVTbHyaX0idcFfjgz1GTruZF4eSYXhQ3EHmKUplP
-	 qfa4wyVQHqgH3v10slkcbkGk54JnWEe6H+I/AvYcpwIAo8LSSgKCbKHYQW0BBMWX2BeSu
-	 X07gRYrkH4BXNbrD/TB9xB6i53D+GX7gsmC7dAq5mtqrvKbJu8+dimZpPjvbtR4GXWpMm
-	 nUVT8oeEmnOIIxTY3tmHKZQ1Nfhi1EenqJHWhF6hTp8W/QBBErRst9CsgK60EZyY4/s2N
-	 vgCdYCjJPTT0YaeEl+I3KijUVqM6ONni045A9BVutuwpQ2M4FQiwZkVW3lVFaSNdBCg==
+	t=1795344635;
+	b=Ebo95iTWtIwTVgPeI1j9lG+VxAXq9xmdlavUgJLD2E0LgJ3c/hWUstv05hyX289hzjxX
+	 d+VidT7Gu942UQeK+/DUA+oh/sYAu1el1mjYkmeqeDRzy0XAxYb8fjp+qHqyCCzorRDjc
+	 eqL8l+243+KBe4u9TjpW5u+b6yayaaSERQLRON72lkMZg9XEnsJFIIz4udb+VlI0Tn3Uu
+	 QS7mEpqldpUIJOYbjfXGgfQWWCV9Qm3BZtPIwd7eZQ6nx9HkxPPHNrymtV1MGiPMGTS6z
+	 Ru6xxevi7htJIbeor9kBxI7m4S1LhCblqL91BCvclAeEG9ryGNKMxB4EBJHCjYse2pg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795344634;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795344635;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=mmSWuZe4I20vQb16mwQFwPmdmma90AmZItq7fAkb+e0=;
-	b=T4TLfupZoDCM28TterL58VEtYyycDpy1fdQtVBRreQgEAfHMtX2f4IXHi+X7UxgUzKMA
-	 mMnNKBEhVcn0TaZRzmZdBxMFJms6I1WMl2lm1hYpq7vu5yiYFDnSSp0lKGXRHnlMR7ZoP
-	 rKtie7pLtFiHvHi10X5Fv3pkpZLucUwV0dAOvONa67Ku+CsmA8/Z8LzuhAbUBc3BV6fDO
-	 ZlcOXzr7sGttEceI28U5nFESCl/zB451tPuO1wfV9GSctlFk+lkvVUv7qOsBb2+f8FHq5
-	 1H1tcogEyvtUNQONXjFlWyq1+v55j28v79gEzhnhp+kg57/kHNhT5v5KSXHdchw/KVA==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=9Gdgh9/HURZmqT/vmz3lgo52jcy8RCjBV1YiQb/mL/c=;
+	b=fQi5UHpNovZpzV8BTFZ5Gf/TrSut3S4ZpRbAZ35WpRbht+eqR5CsilN+UJqzjRdEHoUJ
+	 aqmLHgJ90A4/XrQ9AO7fpIDfwTjGbKfv2NIzKFH5A1bOFSZ/FbE2OwBGBpLyE5nMDnCpH
+	 54ZXCQcg/g186P6CEdc3O5qdzfhD2JpAK98c/BrOeYczm2P36wN163vF12AJ/ua7w/FrG
+	 TITpWo3hNWhtrJJhmjcyQr6HkHCcIxqzKF+bLaQZlf/h6Tp3gMgHMOlijUyWldZTzm2Qp
+	 JqwIupeoVJz3QNgFWV8p32vqkPGebS9C+BYJA77JlCInQAl5GK4mTaEHrBW74McDRTw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=FjC6Dtuu;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=W4u8IkNc;
+	arc=none smtp.remote-ip=209.85.221.48
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E14A606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD910606A333
 	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E14A606A32A
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD910606A333
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=FjC6Dtuu
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-490d59c3f0aso1036324f8f.1
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=W4u8IkNc
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-492f0a1b685so1609667f8f.0
         for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 02:50:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795344632; x=1795949432; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mmSWuZe4I20vQb16mwQFwPmdmma90AmZItq7fAkb+e0=;
-        b=FjC6DtuubIWQ5QVdkIrOE3h5e+zQbVKF2OuyCk1GAdGp+yFXREfLhF0fdRI0a4T6Al
-         tPB8uuEcU7xQWA1IY04HmFwG5ybxBFZ9+pF+R6RzWNe5j4E+NVGpy5U65PFSecaq+87S
-         wgQrwUJaS8+BQNnB21TkkZFH2h1eSyK3rSB70=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795344632; x=1795949432;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=streamunlimited.com; s=google; t=1795344633; x=1795949433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mmSWuZe4I20vQb16mwQFwPmdmma90AmZItq7fAkb+e0=;
-        b=rnwODNJI2b6FZGxOmPjeJVX13e1D+PlRC06vzWL0KtZ3XJmWFOd62prBrVrxSYvz5t
-         SOyrzjPRAdRdOP5xV9/8LjRZ9SrgySWu1iuV7uqfMjhgQQPYs/viLwGMQN7jWwoNpLjh
-         eSd69++haABX08Pglbi1pHFtdpcAAW1czEbWVYkD5kSHatHr8qnZMNVveP135zMRlvAk
-         c7PNRLLAbP3Ak+fNMxah/ALXwuGUL6dCdobp2Cqt+LhGILu7K05zvmsyIJCnsSDTwsC+
-         WU4wjMo5LIHkDwU+68d/7dNLpXvzlue5GoDF/gC4ShZSgblbqJmfqzNs73sFdxNyNYoH
-         2U3Q==
-X-Gm-Message-State: APuU4Z/PUDAT7YoKnsU0s4xm5jP89cy8FHVpI4K6yR0/eZCo+2G4SgoE
-	ImbG7Zw1CVwsloiAbnSjp3zf55Rf78XrEDkKE6BIL8Btds9h8oTlxVE/d0dajos8tKYbsaFafM0
-	UGhZj
-X-Gm-Gg: AZFdTZcXSojTvaZTgtP6eaki3dnbRMxJyPFl3CTVyqkrG5CnIcCD4qEtW/kQc1QmH5j
-	PhONLqGbjglqcfJx3uClTLCwMto9tOvqAa/iHw0WWEh8tkye/gli2PlKb16BY3bLxfjjOr8hOOz
-	upKi1E+ccCX+erWizBLHiNZJlHLmurRonFkOTiL+Zf8MVAWVAU9U3AUUYFYjmWy5mGN0Ymkthsn
-	yUog9syEoyP1jm5UbQ3Y3YDklX7rIi7uyH9wvlKBBhuPSe4M3FM7p69wcfrZCYDRAQpbwH2ERVt
-	iPx5tAyvUZA1otZqMIfYxWs51Ku6GZi/YABRI1zD0qsOBTuDmmwxjjywbQB/ewvUwo+LAC7fO+I
-	nH8z0TuQqCmBsB72ofxxiF7xCd56zg7P90ulxOx/luyCFEi7AYytA6Qxc1vVgTpmXA/s7eCSz82
-	t6ML7Zl1iWaClxZfTl5sXLhw/niVMYxU86Bihycu/hTB/968Ws0yy8hfaZm3wCbGGa6//bC/TiS
-	jj+OGtCFHM8v0mYxk2oVOG88/kl7G6UJSw9BESGz17cPhFzhxkd9IuFxztQ3JHaj0lHf/wwnhyD
-	X06nGOdhI2YEqugalb5Kuun4DB/L7nXtv83PvcylXzoQql6GWA==
-X-Received: by 2002:a05:6000:29d2:b0:4aa:2afc:ea30 with SMTP id ffacd0b85a97d-4abb3c37a38mr10368419f8f.19.1795344632556;
-        Sun, 22 Nov 2026 02:50:32 -0800 (PST)
+        bh=9Gdgh9/HURZmqT/vmz3lgo52jcy8RCjBV1YiQb/mL/c=;
+        b=W4u8IkNcIm76k9p50NbVz1mhks61agYV7NtQrR0Iu5RaAVB7J/Y7L7/Q/z24knoZew
+         3P0Vu7kMkoWosgKOUjf9Wp6EC/pyeYde+SDUBr4tx2/6qe/PvS6WKt3oKOO/9+nYEp3o
+         EeJS9RTVva20TI58f6idN8i/HJupiS6gwt6tM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795344633; x=1795949433;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=9Gdgh9/HURZmqT/vmz3lgo52jcy8RCjBV1YiQb/mL/c=;
+        b=x52X8nYLvTs9t7KPP3ijweNeo0+i4Fs9jB4cc74Ivjda0sFwKWJHPtg7ljaRpOsNFu
+         YgJH2uX3fqPjl6IvsGLhGiLIQHAkanPeDekBn1Z0H0YZ94F+kl+LXJ3tLeID3pO2NsRg
+         Ein8r5pTW7j1huy782wYqgiflCRtOkOSfh4X4odZMS9ZgvevZmroYbDXP6K+svIJArSe
+         jgsyycVY1OmF3qzRmrU+lNo95aWby1Xc269cc+PLvW47AmoudiO3ewM766mMQLSPGcBE
+         XwHPz6DucxD735RvhWvsTZfGSD4WTe4jDqK/mSUACRxIleZClZIRp0xp5nwMPi0F6d/N
+         X5HQ==
+X-Gm-Message-State: APuU4Z+7ZAE8HWuDya+gRpBUTQhPHyk6keaAAIwVVKRjkYFAC5i4ssXU
+	DUE+QvnRkrwLsCkAfOo7jOB1aLJOjXcHUvUss0GjuqYpYcji7PbdFoiIiSWO8CUffG6EsL/SXv0
+	zUF1W
+X-Gm-Gg: AZFdTZflUPeldUMGtQ22CCRv03+G9g4L88h/h9IeDSFNL0906itEap6TNJ90ZccypfL
+	8g91F4GQ+ZUX2ET0L1duhsufwkfL5z2/KWvKpP0c2VcabaJ/A5zHj/B3aVqJ+dvGB43C92HHI50
+	ShnV5CDofeGkW8oiI7jG8xhn7q0+OX4JR4YJ+e0hC8jN68kxxgxZ1YLw9FOa9AZG4Mots80IhBh
+	0vUXbC3DRkoVgF93gY6Prbc3HBjfsxF8RsCgoeJAtGpo3d7mdWUDYCtwxIfs61jsTLeTSbzMlbj
+	IyC3zQBf3HFWvqzL4thTXIPBPA0h86dkqOj1nwlvuq1MeLS3JXxylMgnXUMW+oH/Mb0GsyjOxsz
+	rtq0f/t3bk+UWHJ7/PYEV6zbPsoSXp4r+oOJ0QaTzmnM8GQIpeN4B4n2UoWCsZzCKsz7DeBVvVl
+	z5LENa0GFxjzGo6sCvkrG1ptHr2TnD1FUKkNSydQEgSmcsZkIa3dCJhOGXWvOTVfberZgQ+hAa4
+	7LyeW/PSt8eFNjx925B/icX3MaMTImfBdYywpUDpjZLORX7aRaekaNQ/2Pt+/P1SQmi578Aw5to
+	UTJ42n65lILrdvN05LjnzgaexjKUV8w+lOq0Z9NvM/yDEM8SpJs=
+X-Received: by 2002:a05:600c:3b84:b0:4bb:6f45:2a6d with SMTP id 5b1f17b1804b1-4bb888074bbmr210387445e9.12.1795344633031;
+        Sun, 22 Nov 2026 02:50:33 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
         by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6a67fe75sm17959915f8f.24.2026.11.22.02.50.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -76,10 +78,12 @@ Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 1/2] adapter: Notify adapter drivers of settings changes
-Date: Sun, 22 Nov 2026 11:50:25 +0100
-Message-ID: <20261122105026.753191-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 2/2] media: Signal SupportedUUIDs when the adapter's ISO settings change
+Date: Sun, 22 Nov 2026 11:50:26 +0100
+Message-ID: <20261122105026.753191-2-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261122105026.753191-1-simon.mikuda@streamunlimited.com>
+References: <20261122105026.753191-1-simon.mikuda@streamunlimited.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -91,55 +95,82 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a settings_changed callback to adapter drivers, called with the
-MGMT_SETTING_* bits that changed whenever the adapter's current
-settings change. The media driver needs it to follow the CIS and ISO
-broadcast settings, which the kernel only sets once the controller is
-up.
+Media1.SupportedUUIDs lists the LE Audio endpoints only when the
+adapter has the CIS or ISO broadcast settings, which the kernel sets
+once the controller is up. An adapter registered before that, such as
+a USB controller that finishes loading its firmware after bluetoothd
+started, first lists none, and no PropertiesChanged followed when the
+settings came on. PipeWire then registered its A2DP endpoints only, and
+the adapter had no LE Audio until PipeWire was restarted.
 
+Signal SupportedUUIDs from the media driver's settings_changed callback
+when a CIS or ISO broadcast setting changes.
+
+Fixes: f2a29899297a ("media: Check adapter CIS support to add BAP in SupportedUUIDs")
 Assisted-by: Claude:claude-opus-5-5
 ---
- src/adapter.c | 11 +++++++++++
- src/adapter.h |  2 ++
- 2 files changed, 13 insertions(+)
+ profiles/audio/a2dp.c  |  1 +
+ profiles/audio/media.c | 22 ++++++++++++++++++++++
+ profiles/audio/media.h |  1 +
+ 3 files changed, 24 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1439642cb..112312651 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -688,6 +688,17 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 3b29ec204..3eb3e3bfd 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -3893,6 +3893,7 @@ static struct btd_adapter_driver media_driver = {
+ 	.name		= "media",
+ 	.probe		= media_server_probe,
+ 	.remove		= media_server_remove,
++	.settings_changed	= media_settings_changed,
+ };
  
- 		trigger_pairable_timeout(adapter);
- 	}
-+
-+	if (changed_mask) {
-+		GSList *l;
-+
-+		for (l = adapter->drivers; l; l = g_slist_next(l)) {
-+			struct btd_adapter_driver *driver = l->data;
-+
-+			if (driver->settings_changed)
-+				driver->settings_changed(adapter, changed_mask);
-+		}
-+	}
+ static int a2dp_init(void)
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 3433a7b6e..78eb0982f 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -3864,6 +3864,28 @@ int media_register(struct btd_adapter *btd_adapter)
+ 	return 0;
  }
  
- static void adapter_set_power_state(struct btd_adapter *adapter, uint32_t value)
-diff --git a/src/adapter.h b/src/adapter.h
-index 18e6eaa78..63016c8e1 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -134,6 +134,8 @@ struct btd_adapter_driver {
- 						struct btd_device *device);
- 	void (*device_resolved)(struct btd_adapter *adapter,
- 						struct btd_device *device);
-+	void (*settings_changed)(struct btd_adapter *adapter,
-+						uint32_t changed);
++void media_settings_changed(struct btd_adapter *btd_adapter, uint32_t changed)
++{
++	GSList *l;
++
++	if (!(changed & (MGMT_SETTING_CIS_CENTRAL | MGMT_SETTING_CIS_PERIPHERAL |
++				MGMT_SETTING_ISO_BROADCASTER |
++				MGMT_SETTING_ISO_SYNC_RECEIVER)))
++		return;
++
++	for (l = adapters; l; l = l->next) {
++		struct media_adapter *adapter = l->data;
++
++		if (adapter->btd_adapter == btd_adapter) {
++			g_dbus_emit_property_changed(btd_get_dbus_connection(),
++						adapter_get_path(btd_adapter),
++						MEDIA_INTERFACE,
++						"SupportedUUIDs");
++			return;
++		}
++	}
++}
++
+ void media_unregister(struct btd_adapter *btd_adapter)
+ {
+ 	GSList *l;
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index a84634fff..eb95a8b06 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -17,6 +17,7 @@ typedef void (*media_endpoint_cb_t) (struct media_endpoint *endpoint,
  
- 	/* Indicates the driver is experimental and shall only be registered
- 	 * when experimental has been enabled (see: main.conf:Experimental).
-
-base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
+ int media_register(struct btd_adapter *btd_adapter);
+ void media_unregister(struct btd_adapter *btd_adapter);
++void media_settings_changed(struct btd_adapter *btd_adapter, uint32_t changed);
+ 
+ #ifdef HAVE_A2DP
+ struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint);
 -- 
 2.43.0
 
