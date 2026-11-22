@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795362615;
-	b=HAOHL7viD5STmILPH0ckMhjTUfMWn6pjUaIiUnTjXbI8eOlqQUa1gCVTyooqEnROvKMx
-	 m47Uc9CcNeAgQsoemnBGJ1aOnyIxYsvqP0yigvzn+8MS/EI2VfXJrqL9jYaKFe9s642zE
-	 pj+H2r0wx+aEICUt1ZFRIhvy4mJdGn1ein1RtG+70lEKJcc93QNiL3xCJSRXlSCyGxBhI
-	 wWP2P8T2kV/PqpbnIqyyGY/ZeVaAfKdnT8Bnp6b8GOwjQh+ibIG1bPO5ddQHm25/j4r1C
-	 AZhtVlc+N5dnK8WxZjN4UiH/4ekhOMIl2S5ugeBWZNLS2YfQ8Di6AE+a2TqfcJ8QvuQ==
+	t=1795362732;
+	b=ouSy1jzBCa1JSEfY9x2gAsPPxSd6dXGGFSv497Gb9N1OPSRCMPmgg5KuvxLgpsoSEvnw
+	 tYjg/6dJSmvIAgBw+UBvWij6TnpmoXUio79KxMFHhs3CTHqBA2dVAjYtFZHsE2OgR0vdj
+	 tSRgZ6g8lsV8Rnz0SCzAbfiT5N+D+PjsnfLg13yX989qSnSKMgPIN7ISvmme5tpakPjTh
+	 cZasCVmwoT4XhP+SXRPLPojJ+2zHh1xEsr7mdRDITbx77GoS25ItFtSEuyBSj7cylwq7B
+	 IwUOM8N/M9hsdZwflyB9zaTqD/vAKwH/HcD0fTjnbu2TAPq0TQVd2/pwh+lMe+bjJlg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795362615;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795362732;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=lt5tsqcP5LdnXFM2Hx8BHrqFAca6lFSEY3z3oVEvZ+w=;
-	b=Rzjs7dRB0/+iOsP6Pg0WJJQl3ABmOgc11zU8KypRm84owQx6NZpI3p2mYT4KQxsmcjcj
-	 Qv0pNxilcofPObG72IO1tRa8zr6Glpf8krF3slOqzzrawD4YgO05TzLS9TgOioHAP9hz4
-	 Lrm1ttXCijDqMXr0OX3MD4E00LxhwDlRFuvvIpyoNw5pqPviZXmVHkXqEAaZdsmsGPMM5
-	 //BoXbDhdRhX8F798zT0+qNyNfOzqgtPqVQQ4w24QrtrWsc5zLmFTBnuT0XyEatnzuflo
-	 qeoreVkwHMw74VCj5R0lt30qZTRGynET1Log/5/5bxzW6eubng754eHtQBX7cHIsK1A==
+	bh=YxIAABR+jMl4AhQaZ0kLUtleBQnLNmC7oOVwDxxSMCE=;
+	b=pTvhr439b8Iaw/GG/GIT5lOU7rY+SNIsve5GLFIf26VC4wxOiFk1jmWDFgJ/5g+B8AX+
+	 MXMILYQ+PysT06Nb9kB/pxVHHhZ5h/90AuvOYXcsAYi7t/rFXBZLYko21l+bcL5vAVES5
+	 M0xraUyjJYuib+sIoQJvaZgyhtxKT7KuLJ6ocDWFeWN+w83+4g4Y4aWs0UTBt8CwK+d5G
+	 lBRx/wWF8ohKDRo6Nu9g8ujSnKjTY1xBoZsWbMHLQJLISc1dGmxM/RT5jIoTyclqv2Smr
+	 2rIvrQRRbPtltMeSsYvIHTk/c6ab4UHn7FdTrBgwRWx/U5f1mSF54dgyfvh8g/C47qw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=YjbuCaAZ;
-	arc=none smtp.remote-ip=209.85.128.45
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="ul/rAZ04";
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558BF606A32C
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 15:50:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 558BF606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AFA606A320
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 15:52:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71AFA606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=YjbuCaAZ
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4bb69f5b161so15771385e9.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 07:50:15 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=ul/rAZ04
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb6ba3b244so22972395e9.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 07:52:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795362614; x=1795967414; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795362731; x=1795967531; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lt5tsqcP5LdnXFM2Hx8BHrqFAca6lFSEY3z3oVEvZ+w=;
-        b=YjbuCaAZESZUGGfHd19Q8SpxvAdcntHJNbTozrDVqZqDqinJ/BPqnL8LZSflaUvtde
-         EjEHPjjXmYpVDhdQ7f+a7jD05rPVY+2SYS3JwmqZUTXvWljIvOxSGvN+OaqIVVoeD0D8
-         cwLMBnRwrdntJfVsFXn7MHQMPf8uK0VMr2meA=
+        bh=YxIAABR+jMl4AhQaZ0kLUtleBQnLNmC7oOVwDxxSMCE=;
+        b=ul/rAZ04m02k7SmdKc8vjUqeYNAxCWK+Wafbi8oxiRtVBNSsaG37nVFFpg5tb5aWQv
+         /WhLG4/baJJqCpBbcWugO6HtNsihLrGdFAkr3aj06gzudbJfxPB9blpzTds2acIUMQBm
+         q9G36q1E6o/OyyNHik91ljnuQR1ux9hNYct+A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795362614; x=1795967414;
+        d=1e100.net; s=20260707; t=1795362731; x=1795967531;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=lt5tsqcP5LdnXFM2Hx8BHrqFAca6lFSEY3z3oVEvZ+w=;
-        b=t1WTYKH2dv6GSAVZaDdFf9sI5fseumsAbvWC82B1w8WOTs1Xb3rKbo8ZBApdhM1bs7
-         wdlDZYyFE2PZyc0sckY85aSkwv9IUDGIlQDz4fsqzwoohMGwAH+oLTC1CnAz6qg4Oj4Y
-         2WUrABuIoICNGPrHKgl4h3WLaDCVmoRUXvFdN45gNdMlpjrD462Q02+H5oc6XTH1jFgQ
-         o1PWUHTejYUohfQi544KRPPKT8pWOHuRQZhLWZCnobyHdSOcfnG2kbvL3AMA6nf+O0wd
-         xHyYbPjnNP+b2DvA2NS7cTtshD09VAQzALeSKFXTFKT6APyfzTagsJZljnl3Ram5D5R+
-         K9SA==
-X-Gm-Message-State: APuU4Z8DkQysoCLOdm2oLjlF5kJNInzx8y21/AwSloKUZ3dQEP0566lb
-	BuRrsF0vfGUpMiNq5snCuPrGccSM/ZQdZa0L46n9pAQ67SNcJt/kYQieof6dolb5Lg30d+kS39D
-	hj0l6
-X-Gm-Gg: AZFdTZdOMdJEdmYDBx6FKWaqBxRVqHV5hHsEcho++dSK2Xtp5eJYu0ioeqO3xKcOZPQ
-	XJnbmjUeacJ4Z1FByMqELvbyvigxHh7KJfNM2c8+8wuGusADXMVXXMUwNkmu5LBA+ZPfjy+SdHj
-	ZtiX7YaxyJM8DvpI1jTSDQi0+nN/6CH5+YMsTquRX6sN/RvWQMzJ13jqiKNxsB3KZsMLpeLF1NP
-	gqb+Xt4jBlhEe3tWpEiPImhP/HaEaRY3KtaEwAdtB4v7amajxVls9UktQ+yB2W17J38m8AEOfTQ
-	tDvncFMbKfR2V813gDdETK7rPfWGvsCR8lrfosYtl9XAB/cy2iUdFS2z09qYLhG72qfjO29+7pR
-	dNrNk6N2K0G1Txm9YId9IJeuqV39yzSTPAP3NfggqBq7es7yO/x3b+FjH4PNQ3cnek8DOie49v4
-	nAomsuyjCqKaHDLM62evhnybc2Yb8cxen+OqWmDHDBkC1CTrLve+JUlIS/r6Xu+s0fPjCq/fmJy
-	hRFgAK/xXiU1LJs5ckHrywwbwO9mZAfDYzyc+p911ETlNHzMsC0z9TenIonvP3ScCcebd7iGcNL
-	D13A4A2kq6154Wr0c5SJxEX7fCazXbgGhQlLbB+4tlW+c+yXMg==
-X-Received: by 2002:a05:600c:46c4:b0:4bb:6a5a:7834 with SMTP id 5b1f17b1804b1-4bb888106damr194535985e9.20.1795362613693;
-        Sun, 22 Nov 2026 07:50:13 -0800 (PST)
+        bh=YxIAABR+jMl4AhQaZ0kLUtleBQnLNmC7oOVwDxxSMCE=;
+        b=E5ew71pG7ahJwAws1IMJpi3UJEELcgm7vphybzrl6sN5wMxKmYR7oo6ARhmQO5uHhc
+         WOTFjk7FRmZsqCC5BOwDWyrl/tirfxjGoYwYbqFTd7W3xWPOFdFfL2d5UN0aLD7eRtSo
+         UEspSvTl6lCgsDT6CqwZF+W5SC0nRcOIobJhlE5306mxqFXXm6KideQeRU+dLN12cCd7
+         82N1FXFZ2XbOZHKi9kG7jUlTIVjKmRlvCRQuCi0I/AeeNT65CFYaJaGlsCZ1wQAQcyiM
+         PvVvt1S9gE4JgZgu46OriiymbRo1Gv/1ER1nPgW8S0l+UtJJnH+yyAwXskYitST6ulUd
+         GZcA==
+X-Gm-Message-State: APuU4Z9aX8jb7UOi1XJPT5IIBOUHHBZxBnKAxYthMgcRgxCaDexCebzQ
+	FHgQUkcNSVV2SWAXekXLAIz6gvJ9uE6spyI4gRGCwP7kHo8w7WdumyODjkYKxAjmCPVHHsKXfPJ
+	VAXoc
+X-Gm-Gg: AZFdTZd+jKSdBmscGrtJ1Q4O0N11HH8wtG0WNQdAC4Dt+LfL4Eb9VQdHfXmY2QA7zLz
+	cmOln3IfPtHCOnkY8TDbMfBtKaYM+1YWzPRbsIW/KAaCwOUkaMoZnoiZNDJWYF79D6Xz9Rae8FH
+	KgtDDf133McwtbPfcFChOYoamUsHXXDH4OJFCBtPZ1Hmz0YZrrSUvGXWIMKJnlw2FPqFhg8WkoR
+	Ao2TXru/Rd3vs5yU7vrUeMzQWW51LnEI3uh5kmB2nrYmQ9llWzYvOHt7NivF/ib7j/6JVLHiG/k
+	nzqY+I//a3K9fLPp6bIPTlPGrN9FBQ/IYjTn34xeiSa5ETCJ3n7IZz5rkXffUh+GtfBEwVhUkf4
+	Jy+avIIHzKdS+Bh1BFg8kz2GCuq3aSmGhQ2ewe1R0YpxwJHbqR1tZo6ein0oqUmq9/b6BclhkhF
+	vitQ74tCnxLvG0c4bP58K9A7QI5kFXZxbXcQGDIXFet8DIis/5uqjOSsRppPGodx2WUoDl/AixW
+	0O962LeRZN73Xziexh2hPomNZHEDqsot6RIrVDOBg+9BLx8YicnoVzGedtTCKouQ7Tf4PR+UQyL
+	dCF/E9mryYb6PAaFGZPOfEUv0unpOwG528ykeLokpZQ0glXjU/2bOGE4QxJD1EUVBYqhskI=
+X-Received: by 2002:a05:600c:4f84:b0:4bb:5f3b:25a9 with SMTP id 5b1f17b1804b1-4bb88820f39mr179933155e9.30.1795362730772;
+        Sun, 22 Nov 2026 07:52:10 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm237733025e9.8.2026.11.22.07.50.13
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853b2437sm419751475e9.13.2026.11.22.07.52.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 07:50:13 -0800 (PST)
+        Sun, 22 Nov 2026 07:52:10 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: L2CAP: Fit an auto-tuned MTU's PDU in one EDR packet
-Date: Sun, 22 Nov 2026 16:50:08 +0100
-Message-ID: <20261122155008.1545777-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH] Bluetooth: hci_h4: Ignore the RFU bits of the ISO data load length
+Date: Sun, 22 Nov 2026 16:52:08 +0100
+Message-ID: <20261122155208.1549223-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -93,67 +93,52 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-l2cap_mtu_auto() sets the input MTU to the payload size of the
-largest EDR packet the link allows. The MTU only limits the SDU though,
-and the 4-byte L2CAP header is added on top of it, so a full-sized SDU
-does not fit into that packet and is sent as two ACL fragments.
-Subtract the L2CAP header from each value, e.g. for 3-DH5 the MTU
-becomes 1017 instead of 1021.
+The length in an ISO data packet header has 14 bits and 2 RFU bits, but
+h4_recv_skb() reads all 16. Some controllers, for example an NXP one,
+set the RFU bits in the first ISO packets after a BIG sync, so the
+packet is rejected and the rest of the receive buffer is lost. If that
+holds the Command Complete of the second LE Setup ISO Data Path, the
+second BIS never gets ready and its channel stays silent.
 
-Fixes: 4b6e228e297b ("Bluetooth: Auto tune if input MTU is set to 0")
+First bytes of such packets, handle 148 and 149 with length 108:
+
+    94 60 6c c0  (handle 148, PB 10 and TS 1, length 108, RFU bits 11)
+    95 e0 6c 80  (handle 149, PB 10, TS 1 and RFU 1, length 108,
+                  RFU bits 10)
+
+Kernel log of a failing join:
+
+    Bluetooth: hci0: Frame reassembly failed (-90)
+    Bluetooth: hci0: Frame reassembly failed (-90)
+    Bluetooth: hci0: command tx timeout
+
+Steps to reproduce:
+1. Start a broadcast with two BISes on another device.
+2. Join it with such a controller on H:4. Often there is no sound or
+   only the left channel.
+
+Fixes: ef564119ba83 ("Bluetooth: hci_h4: Add support for ISO packets")
 Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- net/bluetooth/l2cap_core.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_h4.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index da947b65d26a..fb6fe760b147 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3433,37 +3433,37 @@ static void l2cap_mtu_auto(struct l2cap_chan *chan)
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_2DH1))
--		chan->imtu = 54;
-+		chan->imtu = 54 - L2CAP_HDR_SIZE;
+diff --git a/net/bluetooth/hci_h4.c b/net/bluetooth/hci_h4.c
+index 86f809018062..ae0224b36ace 100644
+--- a/net/bluetooth/hci_h4.c
++++ b/net/bluetooth/hci_h4.c
+@@ -120,6 +120,11 @@ struct sk_buff *h4_recv_skb(struct hci_dev *hdev, u8 *alignment, u8 *padding,
+ 				/* Double octet variable length */
+ 				dlen = get_unaligned_le16(skb->data +
+ 							  pkts[i].loff);
++
++				/* The top two bits of the ISO length are RFU */
++				if (hci_skb_pkt_type(skb) == HCI_ISODATA_PKT)
++					dlen &= 0x3fff;
++
+ 				hci_skb_expect(skb) += dlen;
  
- 	/* The 3-DH1 packet has between 2 and 85 information bytes
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_3DH1))
--		chan->imtu = 83;
-+		chan->imtu = 83 - L2CAP_HDR_SIZE;
- 
- 	/* The 2-DH3 packet has between 2 and 369 information bytes
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_2DH3))
--		chan->imtu = 367;
-+		chan->imtu = 367 - L2CAP_HDR_SIZE;
- 
- 	/* The 3-DH3 packet has between 2 and 554 information bytes
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_3DH3))
--		chan->imtu = 552;
-+		chan->imtu = 552 - L2CAP_HDR_SIZE;
- 
- 	/* The 2-DH5 packet has between 2 and 681 information bytes
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_2DH5))
--		chan->imtu = 679;
-+		chan->imtu = 679 - L2CAP_HDR_SIZE;
- 
- 	/* The 3-DH5 packet has between 2 and 1023 information bytes
- 	 * (including the 2-byte payload header)
- 	 */
- 	if (!(conn->pkt_type & HCI_3DH5))
--		chan->imtu = 1021;
-+		chan->imtu = 1021 - L2CAP_HDR_SIZE;
- }
- 
- static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data_size)
+ 				if (skb_tailroom(skb) < dlen) {
 
 base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
 -- 
