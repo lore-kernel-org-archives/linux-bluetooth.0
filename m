@@ -1,85 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795343604;
-	b=0ZmwQXhUA1vB9NClqoKePCgIQ8LhE2C1dozkAJbxBTYlE7faPXBOMc85G6CVvCOVPhpz
-	 NOHPt7cO/KKUwkzZZrdZnFtXoPKPiKs+zwz4VQ4BJ4l3CnfwCy7RB0nCMyWFEl4Dr9QR8
-	 0k7lDe3/Pabn3ktipG82wLSm8xMj7z+PedeidnxjaVWF3Bk+s3sxX4WXZ5ErTex6mlhX2
-	 zfS4YhzmXJFHTFtzFB54A8lgxpBT8zwyOTQHr0WsT9Ctx6o6GP2X1mEfjmBfIV+ZIOc6L
-	 leWCrIycs/RIxCyG0mBw0SJ+m2nWR0afba33zK1EvyhJ5APt1GRUMpRaU0mZ9mgfviQ==
+	t=1795343677;
+	b=CQgCmrMW1bRpPGJVEVde1nnC1p5R2P70aYDL7GUCYZcQCE0dVvEoxwK1HFTv0autIsRq
+	 ViObYW2EchdsHqxkXFHxPOQdo+k9YIvwzEbdDUPg3kv3ac6qgkD8vjDKKdJxLP9uNMxZV
+	 QdWNrqC46YzwX5YuYvV5wXQEnGE4MSoUfufj+/gc9pV1yRSC3O2f0fOVlSZKE6Kc5HA/h
+	 9Hqt644QmyEQkayKj9e1QCTDdmnOYBDx8AQTtx6P+YmD8VYSHzdbL6pGwaGjXSoOlnhoa
+	 5IFd77J6xXS1wvI+49UMCgNpGj/SPeselfMJWkPDr20poIAo3GF5Sny0OdG53vTVN+w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795343604;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=ANa8A2QqEJ0mqL11VcPldTrhjm5NdI6ZOz+YqyRlPic=;
-	b=TSjs0bOxo0AjL8PRcy3dkmT83ur8DNoZ8vDL5KpO1SDNuqzD2nbN9XCroMQgff9FSFaT
-	 hjGfeAVxQzeUOHj88koWUF8y90w72/OEExpuTy9NDvZY9knSdQNdOM3D+4coEnJgw420w
-	 aDhKy4L4nLdt46jV3UbYCQ6EKDw4OeOGFqYqrgcLmFjGVzrkrkre9VhSVYFcVwR4Zn81t
-	 Oc5drqYSmvZV/4lnGiN8fV4VR4MrjkSTIOkNoRXcvl7Fo9HoYccgrzfvvSGK/yZJompKv
-	 TsemlP9ZxdIvVnEE3rXfIblYf7MEu00A2g92g6cWQP+wYAzXDR9sIAgdLW1LGvl7BgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795343677;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
+	 X-Received:X-Received:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
+	 X-Authority-Analysis:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=fawW/RJ6p9WkDBO+22LM1YMSV+SsnB2qMUvTSZEmopY=;
+	b=g9YJ2lFX+qNeKDCxb0DN80e7hJ+oEEb3rI73RBA6NpeMfUW9lzDO4Ke3rmnjwMOrkFq/
+	 AohYNlSelSrosoLf6nM4q4Et0+zKS7de7dX0gW6qfdEggB/AOkQAUFccOtctjBNecmwGh
+	 ipFrStF1RRpOHuEV4W/zFCGZvVlOBXfpuWubjWr98P6Fjv273DlrosRRzedfuDagBmrXO
+	 RbMu/1IxX7QRPp2vLxjzioXPTi+/eX9Hj/6V52pO229fkHCHKJTDRqk86Njv/FQ8gNqo8
+	 8q23Gy8pHTE8EWU/AiicgNMWABAb4h3aT06GipCUNj+Q7wlypURlBFmX+2GeD6PG6aA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=streamunlimited.com;
-	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Yufr2xPt;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=bo9aTVxb;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=LS2AcO2v;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4933606A320
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:33:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4933606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EAA606A320
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:34:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8EAA606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Yufr2xPt
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a214c5c4c0so21029725e9.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 02:33:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=bo9aTVxb;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=LS2AcO2v
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AM877Ip365347
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:34:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=fawW/RJ6p9WkDBO+22LM1Y
+	MSV+SsnB2qMUvTSZEmopY=; b=bo9aTVxbpfuk945KrPY0XTihGHb46h78T+vviN
+	/gwQyxw1gwhErw+WZfryDXoVgENPfNI7+0zjBK/Q2oPkd8yULnR3uLbHu3mYW9QY
+	sHe4spT1XyhNxjysCcAdSu7LSGvW1LI7iB/5Sweb4zsMV9rLUHDZ3H7yqrowHzBQ
+	q0cSAaoBECa3m53mQvTct6VksVYO2IxfDOkjFhaI/MR3J8UbrtxZxcrfqR+1Xmmq
+	vmmi3s197/Ins33fsrabERihw5PhhWW+ohVYuldg5OhCmCCNt7f37QJRFLG8Qqua
+	OFHDfNDVP5c7HcYeCJ6cqsJsn7aoKW0fNaorIZSb5PVkGgJQ==
+Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j32w037d6-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:34:35 +0000 (GMT)
+Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-386a603517dso41687eec.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 02:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795343602; x=1795948402; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ANa8A2QqEJ0mqL11VcPldTrhjm5NdI6ZOz+YqyRlPic=;
-        b=Yufr2xPtJnvbV68V0pnQQB6lkwJyn+3cT1PVlotVlG6hHT3aW9x+fv3UrAPSCmxSzs
-         sc3V6W2Ot+twm+YO1oT8d4OExCQ/ULdge3rUE6/oENyRiy4i4VdggFfn/hyi5vz19WUt
-         l7Bf2/+DoKu80UcqYxAuusxMdu0oLLEk3sQIA=
+        d=oss.qualcomm.com; s=google; t=1795343675; x=1795948475; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=fawW/RJ6p9WkDBO+22LM1YMSV+SsnB2qMUvTSZEmopY=;
+        b=LS2AcO2vdhW7siT+x9LO9O6NZ58wedfOAZuxlnqMmGuZSCO49S9vIsJpBAEGv2oHc2
+         ZqUjf72efWD38VLFGofsCeGwihZW8+yipH9nfEVilv6Yp5Ne2dTnpdW27GGNz2pZSRAW
+         5f5Jrm2SjKXQdVDNJ4RTxb/XP9O5G6tI5Ngp+sXBvIyebIf7j4r2FxxZB5Q4dYB6yu0D
+         Tcqwtomsif+bWC7ks37GayzbrfjvSwSRa4DDOLl+O7tBBADAo9t8uQ/NSYbPQeNxIRz1
+         4M2Dk5U2jpBJfaC3GCIREQjd8wDeOn/FEtMZKVin00j/ibWw30I6F7fsWnUCP+C7Giat
+         jdAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795343602; x=1795948402;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ANa8A2QqEJ0mqL11VcPldTrhjm5NdI6ZOz+YqyRlPic=;
-        b=AUWu/NioEpNdVqcKNA8L7UZ+fZdK0yp98Yc+9xpHooTs08/y3K7j4xP7EX25oLyQ96
-         +uos7hq/ejKmnoV6eB2KYsohV/jWl99mR20/dMWaDw4LtoOwrA+57Qaa4gXgtq+M95St
-         gVI62FARJxeN0bX3dHUwb7bWErBlpsa3fBZ1/tw2qx6TJNbqCWArpdlEQ8Y/S4BKcsva
-         T7+9H0Jbco/fhrG32KSmu88uYiFDtkFVB6EI+ch/ks0zYHtzHbIXE7hsarZ+91pLX1s9
-         f7flp8f5ojMZarYMiglpWf0lZOexw2rUQU0H0WYdWJJTBaHABiWy3Gi5iCNaFqv8SFJt
-         rVZQ==
-X-Gm-Message-State: APuU4Z9IfP7qg6XER0E/g1oAcwfXCD31Nba8dCk1iobyzrNN+pWl88Mi
-	UpBUu9AcwXEcfkDdnJ3sPHF7Qd0VY9wAeCHmpz9oZUM+Fqsl+bNsU5rjk7qQg7T734mMb9uUQF7
-	6f+DT
-X-Gm-Gg: AZFdTZfUh2g/ga3lGvoKO9C2dRn3QkR9d4tu+OJpej6k7GNTL1cdSZ/LkDkJV6bX/Xl
-	PBmikesn/qQ8O9ykMbOnVvmCUsIC71ZgplTLvVirFyY5bWxE+lVOviwtfdcTGg0xovxrd7JhRFe
-	SkUSG4sO5rouZRNmeJksmgcHdB1vsQrDaadLbolqDYR9ceAgxDUISYQxYHCAN6pogLWbjtFDJMe
-	nVfNtWxACrIy+ir+gYNKyfTWQQGEeOjPhmLQT6Al15cUmtDSEL5M9Afcw5Ci2KZiL9eBa0vu/GH
-	7WhOhJ7/CgfARHx+Rp7I36G88Xdr0TBj72rGH8FB2zVpk7SvE9RtxPp4EVCF11/qeIYZj+2K2Wr
-	HUvAS1nwoK0y4F7qhnCFPOzM33hzuPyL+F7Ea6Vgir4EI+LO/RrESvu9UUaRnRzJBxIgNewmdNe
-	NRzBviJdU26TANcSGeGAZYj2J2Tle+By792Dv74o+Ti9Jzwf2No9rSIMzeGPMW+arb06Twfc1Zh
-	v0fjqNV3BFDBweWxWJGci5V7QhG9HFO5QImHQ/SsIhEr/mvmHj8L+gVl5ZLdh9AxbjfoRRBBF6R
-	N2r+R0Y40jwmmu5iVRmHiovh2uRWJ8yvvsGUamLkN+q3rJJ9+Q==
-X-Received: by 2002:a05:600c:5246:b0:4bb:60ba:49e0 with SMTP id 5b1f17b1804b1-4bb88930707mr191016785e9.26.1795343601748;
-        Sun, 22 Nov 2026 02:33:21 -0800 (PST)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849247asm247379925e9.7.2026.11.22.02.33.21
+        d=1e100.net; s=20260707; t=1795343675; x=1795948475;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=fawW/RJ6p9WkDBO+22LM1YMSV+SsnB2qMUvTSZEmopY=;
+        b=YAC1GA89T4qANF7t61bHZuAt/3tIuLs1NrvqWeaPF4/iwEe8EGvmCwI2emJXH+xqow
+         CLdNlpn2DEYfsfwVki0B6P6b9pU1aHA/gXM/WoUG2PGFdFvt676q8Zor0/VrWQbcw80+
+         9mahC4oBmdKlPtZTSMhWHI4i2z2fTDnMrLz8vxZFHhkl+ORwXWS+zmMcqQfo+d1W0Ekr
+         Rh+if6Zl6QLnYktFAyuhaDw82OjL3UITS6q2XAgNk/cGOaVFQVolLdWBoam8TTouQRB2
+         8kRfVxtrPAdH8JXDgp8DFm87kVuudIwJEUA64JjO1tGXUFg35+gnrumm4oPx97wa7+H7
+         +11g==
+X-Gm-Message-State: APuU4Z9xrwuRfDN2LxzO/dMQyLFnLJ2EVy8idritr49fgYlhTQLmPU0U
+	L77BBMqu2IseNblqj54Q48hwse9fpE/6xRCS+q0TDGfnz0njNrGIgWY1i2E8PZlPN6MJyyZhGX+
+	+Mm21s4yuz5sANExlg9yaCLJjUIJcmLo7K5ahg+d93682EOvvF/XGGe53yxN/6fSHWj2uXjT04G
+	IQEhg=
+X-Gm-Gg: AZFdTZfSRqNRtrNBzqftNEd0liidlHBU17UB0OFWmnL3wmv6i0vbJnGyObRc/X2rw4T
+	YBViuNaNaZshAWSRdweYR/0mdbzpuBuuvuNQC+JZTp2gwSUQtb5FTimnsK1Tpq8AHdCex5NDWpX
+	JYfx5tlhMFuExbkK7X4kWqnJnV2Mp6Uv5YciRFZV3BSlf3pGn73oqUIiXYMmSZaoiGMALVrZttp
+	7bqYHU12xnaLz2L6I57yeFv1NOZJCjpzT2fwYGfs40IT8zmWKjfK2tkjcoZtnNw+4oUKKq5soEl
+	j7veAgl8BMBl9Sexh4MaGje3DL0z4jVmgb+ukWDzeItSbz6smo7phWY2DAdnXEbv+4pPneS3hjW
+	YhiAvKlGb0ye8gFWZZrtdiHg17brGgDL1P/iFZu6IouvX/1fPabRbeD6vMWK34udZLJjuBR/cAj
+	u2hVcNNI1qzKTrBUc1DjkL
+X-Received: by 2002:a05:7300:caa:b0:385:4627:bd5e with SMTP id 5a478bee46e88-3856ec46bccmr17816154eec.2.1795343674471;
+        Sun, 22 Nov 2026 02:34:34 -0800 (PST)
+X-Received: by 2002:a05:7300:caa:b0:385:4627:bd5e with SMTP id 5a478bee46e88-3856ec46bccmr17816125eec.2.1795343673962;
+        Sun, 22 Nov 2026 02:34:33 -0800 (PST)
+Received: from hu-zijuhu-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385672ce402sm23747204eec.16.2026.11.22.02.34.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 02:33:21 -0800 (PST)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] advertising: Refresh only advertisements that depend on discoverable
-Date: Sun, 22 Nov 2026 11:31:24 +0100
-Message-ID: <20261122103136.620031-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 22 Nov 2026 02:34:33 -0800 (PST)
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+Subject: [PATCH bluez 0/3] tools/test-runner: Add arm64 host support
+Date: Sun, 22 Nov 2026 02:34:19 -0800
+Message-Id: <20261122-tr_arm64-v1-0-4eccf35daeca@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,44 +114,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACvFAmsC/yWM4QqCQBAGX0W+3x24S57gq0TEea25UhZ7GpH47
+ p32c4ZhFiQxlYSmWGDy1qTPMQMdCsQ+jDdxes0MLtkTMbvJLsEe/uiirysKVexKJuT8ZdLpZ1+
+ d0N5n+eL812luB4nTtsG6/gDzft13cwAAAA==
+X-Change-ID: 20261122-tr_arm64-c6751a5cf021
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Zijun Hu <zijun_hu@icloud.com>
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTIyMDA0MSBTYWx0ZWRfX39wE/LkGwg9i
+ zydYR1ZERGAIt7x5yW1KgBhctd24ZUU/rR+qoQjjxjVIMmgqDgTtrx5ugLT7yeK2+NXNP/nJK/r
+ 43R43x5hNlyXElGV5tBivmzStOl9QHAgbY9Bc1mLO+P/9X0c89qmjLjuA9ye+63fwJLYS7PIPR/
+ fymmGxoMVi8iedjt0DjsINZZgPepsyVp8nMbI8UN5hOTCtnginGUWj5wdXOTIWFx1Ol6zYKSokM
+ Eq40PD57yp8wCMENpQECI3ZRgfsA9t6cWCBd5BoSj9nJJaKewwvkLCoTtFm+Ey4+WT4QKgMLWO7
+ DhXrXXFIE4vQA44pfNrUHvKlSwRZLJjX6hdKkgFwE9CKhCbTh+pekZQkBJasW73dryi24TdYK4T
+ ED/Fr7q/pUSInt8hNSApGUG0WQvTZ0bs2ft6UaAg11a5Aqb1C6Dl+OOkkIgTDXIDT8T0ZN+FcDh
+ xPUQe62CuUnOY/GWDxA==
+X-Proofpoint-ORIG-GUID: OhcRgnEWtxals9e8-7R433FmKsJWQqUu
+X-Proofpoint-GUID: OhcRgnEWtxals9e8-7R433FmKsJWQqUu
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTIyMDA0MSBTYWx0ZWRfX58hPQZ0xbv5U
+ 7p9oTWoaHozsksGczwZHs/WfjEGEBSjxmSwgARSeToTj111WII1RPQg99KrHKzuVMVIiRTFU6Pe
+ Sdz93d29uzosG212F35OjPIupNYx8Hk=
+X-Authority-Analysis: v=2.4 cv=S+dMU4sP c=1 sm=1 tr=0 ts=6b02c53b cx=c_pps
+ a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=EUspDBNiAAAA:8 a=o5ry4vc4ejVyEOvdZuMA:9 a=QEXdDO2ut3YA:10
+ a=bBxd6f-gb0O0v-kibOvt:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-22_02,2026-11-19_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015 malwarescore=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 suspectscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611220041
 
-A change of the discoverable setting sets every advertisement again,
-although only a peripheral one without its own Flags depends on it.
-Some controllers can disturb a running BIG when the advertising set
-of its broadcast source is restarted (an NXP one skips every third BIG
-event after it).
+This series mainly:
+- Adds support for running test-runner on arm64 hosts
+- Allows starting bluetoothd without debug output
 
-Steps to reproduce:
-1. Start a broadcast source whose announcement is a registered
-   advertisement (LEAdvertisingManager1, Type "broadcast").
-2. bluetoothctl discoverable on
-3. The advertising set of the broadcast is disabled and enabled again
-   (btmon), under the BIG.
-
-Fixes: 91d4b17160b8 ("advertising: Configure discoverable flag based on adapter settings")
-Assisted-by: Claude:claude-opus-5-5
 ---
- src/advertising.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Zijun Hu (3):
+      doc/test-runner: s/CONFIG_BT_HCIBTINTEL_PCIE/CONFIG_BT_INTEL_PCIE/
+      tools/test-runner: Support running on arm64 hosts
+      tools/test-runner: Allow suppressing noisy bluetoothd debug output
 
-diff --git a/src/advertising.c b/src/advertising.c
-index b68ff28f5..d07068c6c 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -2180,6 +2180,10 @@ static void manager_refresh(void *data, void *user_data)
- {
- 	struct btd_adv_client *client = data;
- 
-+	/* Only a peripheral without its own Flags depends on discoverable */
-+	if (client->type != AD_TYPE_PERIPHERAL || bt_ad_has_flags(client->data))
-+		return;
-+
- 	refresh_advertisement(client, NULL);
- }
- 
-
+ doc/test-runner.rst |  26 ++++++++++--
+ tools/test-runner.c | 114 +++++++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 112 insertions(+), 28 deletions(-)
+---
 base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
--- 
-2.43.0
+change-id: 20261122-tr_arm64-c6751a5cf021
+
+Best regards,
+--  
+Zijun Hu <zijun.hu@oss.qualcomm.com>
 
