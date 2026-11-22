@@ -1,86 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795378441;
-	b=e9Ly+H3dleWOTpi+SScDgzkbKAj0Yh0Alp1OTwHQLdMblZc709l1AbvQ7gK8iFGprmMl
-	 imYFIDNKnXZslBic2SjCVg5YoJbn8elv4zbu9rwtgX60VO2zaeG4bT/+ELrD5BNHl2noP
-	 gf5UcHlvgBa9fWQ42xAFDkU2NBGqp8BjSh8kRofMN+TaukeRjDNMwP+e4ISHIhyiN2pwx
-	 2ImdArS3tVvZ0WcRSCLkXcHOUWORCzYjF1PJoncPRusg/VeJ3Dk3AAytnQ/MAyUzJcYlr
-	 yDwSnn0pxW2rgXEDe24g1L+SvL0Y1cS13kTu+iPZ4l2oxEvVSfsNsgj7JVN6pYKn4NA==
+	t=1795378456;
+	b=IpbedS9En4JjJu4AEa9pFdynfMyscqHx1H2ZRwNK/wjTMxmiKV7vRE2dCMmbyWPjMpC+
+	 MpkYZSLe1LV2/kmj+GxNhOSwdDh4DdKhXVzPrwcppuYhtKf3DQmjmTHBGAwS3MagGmt2r
+	 VLc9pPdizd3s2YbFexpnwow2mHyn8ULazas2/2g65zEw6OoAq34yyVBfZbfX/LsXXft8p
+	 QoTf3bP/4TPaSGH8OO1Z/Y8QQXXo+IGws7G2VoFUZ8bvrxgnJxes6tgotmFj329ePS0FT
+	 Pp34iZ5sQvV1xF/ojfGiKr+6Co1V19VpQrONnAjdetZJY5AjFXhKJ/pOlriDptrjh4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795378441;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795378456;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=CPKjjumpWwCCmfBFsSYSfMecOLmFzM5vA0ha+XXQ0iY=;
-	b=zCb5xwDKMNMgZuc+tNlz9DXz1fHCAOHFkCDHlNWrX6k+/tIsEcC2ovnbu96vkVGOBagW
-	 oO549Et5jGaWMRlRqLwfQ2nLJLzRNSXzOPWO3Q1kk/sJYPz18c/+Yri47asNHo2fkL5Sj
-	 HB/3LVYteLdQqRbYLX/EMxNMS7e5o9AMhmpye+0RE3nmGx4J6RGdBTxmpcvUdUWJsmR4+
-	 gTs5vvc+4ga/sbbHCpBhjoNTyq+FHNuYHqhS4gR8rPZrVOKh3sY/Y77u0GeJY1zlwjt3r
-	 YvLyp6x0WFLGA1mfspQKBvUUzvxF+WfIIY8a9dNElluX1ViXyHd3yFrvhwD+1vcYcvw==
+	bh=e5npmz5RHSlIwuo6Yz+PQPwD57PmmrakjKdijdvX3GE=;
+	b=BMKJtbZNJa2OcUBOYlWB85JCA59UQwi2W574QJtcjewksuVVUYiIFWiNTt1rvYNZ3/+A
+	 HIChLjTvPoJHNemkJtl85e2/dpcVMCZdEc3OdCRgTWYv7vLAx715bEzNRJu6T/pOTT8aK
+	 9bqhLpLCGM/3Js3nbWlWAroDlrVwbPHdDUe9Ty7U3sZTPIQb9A26YTw746VdJP84ofL3H
+	 qZDWp6dPdh0YI/JDq37ZVzvXwElUOUWNTwWELI2TBVdFzIt/4Y/0UqvHWq4QuBtHtsRc6
+	 i6O6d/N4XWAQjSKHehQBWYAyIjYWwURlWURji08fdnHdIzb97BCeKHo6sJCMZFE10tw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=VMUunERQ;
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=UTQIYkuS;
+	arc=none smtp.remote-ip=209.85.128.46
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34402606A31A
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 20:14:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 34402606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4153F606A31A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 20:14:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4153F606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=VMUunERQ
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4bb64ef5a00so19736725e9.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 12:14:00 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=UTQIYkuS
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4bb61185057so16805315e9.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 12:14:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795378439; x=1795983239; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795378454; x=1795983254; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=CPKjjumpWwCCmfBFsSYSfMecOLmFzM5vA0ha+XXQ0iY=;
-        b=VMUunERQBPSPW+Ufs/ShyMSTehR2OXeuJm6aBmM3noWD63SP5B3Eufmy2ZpoINboGU
-         m6eDJSgI3l/Wp6cwE5vVm9ZMlp7oFYaOdZM60jDQClPNzilHHuwKa2ktb/iAWsIzDrQj
-         KyI2LR7Zi1mKWyfaUhKOhemyADlvuozvdby50=
+        bh=e5npmz5RHSlIwuo6Yz+PQPwD57PmmrakjKdijdvX3GE=;
+        b=UTQIYkuSgOfFu/bLqVZCPZRMhObnaoCGccJhIvncEXMs9eqlBBxdHmvyLrNMkFY16W
+         qoCp+1FLDDT5ghkAp4tjhd8Ce1xRmqw6QGR99LGQfeA02BaBem7Ewp05tJq4B4I/MyhF
+         w3JMBGLHHd0TXtHp0mM2fYFUvT4pzGZdX6Rqs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795378439; x=1795983239;
+        d=1e100.net; s=20260707; t=1795378454; x=1795983254;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=CPKjjumpWwCCmfBFsSYSfMecOLmFzM5vA0ha+XXQ0iY=;
-        b=nVd+nD+YuiSbTHWzhYH8v9KuJn8SxIN7GqIMXAtSq/Y0TE1UU5oUUxWqNCnkMGaeMq
-         ovSRL+G5jjd65rOSCbi4x/Y3Qhhfr/Jnm7PpBCJ+wlTgTI3w15xHGhRFKDAexNjWTmS9
-         W7E5VV50q+1PWV2cUD9eJF5YtwGY6BkOJKTCpVu7ujfD+N2Ij/Axz1ZygjbedPSU59qI
-         h4NZ0DmkzLhHX5wIZkzK7gVOTWmplAPD5hEO3LAZ/cOkC0kfUyNnzNAk1sEhWZV+PszY
-         KLseDSFjf94N4z1WJ74/+Zog8oBH/MW+feZ3YOrNJgPLbItoyWF4agODG1K+aoY7Ajmg
-         hoeg==
-X-Gm-Message-State: APuU4Z+kp8TgyIOgtnDKFFM4LeBGn21RzM+zwAIXC5QADw51S2pSD6us
-	jFyumsJfvX3E5X/mB+zN1/Fq3UYqDP1Yih9o0bKGJzmIWQaiCJda0a+TTn8IOMTltyrFkHNuau/
-	gIMf8
-X-Gm-Gg: AZFdTZdKyYdZhxHPgK/OnMFtiwhmsa5QOZreHuPlyr13hCo7ILwdRR9548ey4Zy0cN2
-	RMb9/qlmCrjPH9ZdtuB4utuZbRnzIDQi2d6yJ2mpwBaekY/GYr2lsQUSDPsf8JZsGsqaXqF5cod
-	EInOqkZ8Lnw0YCfPUX/aNDLh8FtvT0FUnz1mP/z1jVCYU+yDzhaXiqXSNRqt7XkZTP0QDkDmZjL
-	FBXEeNdEhO6sG+DHFUe8Lph58K04km9HJRdQNOfyQ2oBOHJfYrTBVkbhzhfXTo/C4HyxLs+6MG7
-	2MRj2htzppwFCySO1I7iu7RSLmJaVLaBTYF52PrUOY/uGDhM/avihPSJ2YeUjYLMYB0McGzBt6u
-	AV7whta+lo3oIuToqRxGMOrpR+KSdiubA5LhiDZfT9dCGmzR3urK3lUrYOfvMt8WToG4cLBCt6C
-	WmwhwQLziQiaJV1VWLY9VsYJU3aicOy3k3un2fnRCUssz/KvrT1cbgD6x7znP6NwdOU3OvvZBDl
-	eXN28/ovgfYgeTr4Mo59gqnCx0OZKVxOo9fMwcNDjlHUZ9O8o627zfZ+an7QkOfXiNSOqgvG5Vq
-	qrmn5h2dxliWApB3oMGP1t9TF+up68xnCh9/cGWKR0vTwTC97A==
-X-Received: by 2002:a05:600c:64c8:b0:4a0:1c0e:b057 with SMTP id 5b1f17b1804b1-4bb887e2380mr183407565e9.4.1795378439579;
-        Sun, 22 Nov 2026 12:13:59 -0800 (PST)
+        bh=e5npmz5RHSlIwuo6Yz+PQPwD57PmmrakjKdijdvX3GE=;
+        b=jlEBq7M0UoHSgv6TkTzOhuW4hTtP363nJQk4LsmXSFyjWbxgnvNjcvKukWaTmxWZfs
+         MZ8Zo/m6BZfzck8kXtYA9JTQOSOOrLb4rHL2rSE+IRj8zz7cdDwB/4fCTuFEfA+Iz2SR
+         peNqdw0tyvqNg1i2AjWFd2gtV8CQmlf9i7mU6sun3GMJ5R2vDuu9k+jHVlqh1uXJ1FZQ
+         JrnMJQF5HFeiSJPbkhBpmI6VnMg2clJlSSREs6hlgHhdRa7I+oNpWGnCNX0yeBg7wd43
+         1veNMwssYqpc1hW12xciScuMM9YE+Ec6Ah4V6UcKf2dBqt84iShPlJOauoKVtIiRC01k
+         JC6w==
+X-Gm-Message-State: APuU4Z+0FAVa9f8yrkNZvrRPTrr6lKV6sJJmbSEHtgx0sxGyz2gwuQBQ
+	PhWFyBjoXwwsQMtV3tLBcPRsxqzM7IAipLG2ZKZ1Z7bpLMpMN2r+e9YofwbKwZBvRicoiNSihjr
+	Te5MZ
+X-Gm-Gg: AZFdTZfOiaMsmEpPM5vXuLtRritqOIV5lJMCH3Z85r862hTzBGC9AmxmTF14ORP4k5p
+	/E1XgnEKmX7vaIpIWuirQZMQA1BDLmXib3aSNrHnLI6WuCByNIuRp7XzTXPayN55xi638Aeusvu
+	MMWgnNZFcgailqlaNjWHttVw+rGIV0Tzo1UFHVQmYCWpNrsCVhMv3Xm+hreIPiVDDltcxpRwGjd
+	qKZquZsQZlqocXMK92gTEPe3wA6WESJcbJ1q60GRhBSZBeHg7WNHlOxIwYXL2DCMujgeadYu/k+
+	J7Tgzrlxc6lBL2CG8v0SujBpYst1hlMLJF4nQHXZN+loeYhTp3cOtraDUrrIJeWlxWhhSoAi/5b
+	1jBv7BVZ/04mCLJn5AVQoGBphWzOlhsTpOFKcd2fNcgFa4R2TJb1onq5R6DwhTn2uIiJemXSxel
+	2T5lMSs4BB9cJg1PXtWlbEkrYA964Xii76r9pgku6Wq2SfWyt4ur95UYeIgbg1nWTlojiJCXQT0
+	TL31Vm/WBS+zSEmnhsLxPgrFHSGGesVk943oYpM03sVECMnVVz+/03H76xngcvFxe//uM4CZx14
+	OKl7cn8sJGgA1RWi70CoF4CdoPJI5FFcMBcbV6gR4dChnFGhhg==
+X-Received: by 2002:a05:600c:e40b:b0:4bb:9a6c:8712 with SMTP id 5b1f17b1804b1-4bb9a6c8724mr9561175e9.12.1795378454538;
+        Sun, 22 Nov 2026 12:14:14 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884c3063sm293963685e9.15.2026.11.22.12.13.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90655f5asm136637825e9.1.2026.11.22.12.14.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 12:13:59 -0800 (PST)
+        Sun, 22 Nov 2026 12:14:14 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
+Cc: Michal Dzik <michal.dzik@streamunlimited.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: ISO: Release BISes left open for rebinding
-Date: Sun, 22 Nov 2026 21:13:56 +0100
-Message-ID: <20261122201356.2854729-1-simon.mikuda@streamunlimited.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH] Bluetooth: hci_sync: Don't make a periodic advertising set connectable
+Date: Sun, 22 Nov 2026 21:14:12 +0100
+Message-ID: <20261122201412.2856420-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -93,55 +94,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A BIS socket closed while another socket of the BIG is connected leaves its
-connection in BT_OPEN for a rebind, with the hold of the socket. Only an
-unbalanced parent drop used to release that hold. Now the first BIS is
-never deleted, the BIG isn't terminated and removing the advertising set
-fails:
+From: Michal Dzik <michal.dzik@streamunlimited.com>
 
-    Bluetooth: hci0: Opcode 0x203c failed: -16
+An advertising instance without MGMT_ADV_FLAG_CONNECTABLE follows the
+global connectable setting, and so does the instance of a broadcast
+source, which create_big_sync() starts with no flag but
+MGMT_ADV_FLAG_SEC_2M. Whenever the adapter is connectable, e.g. while it
+is discoverable, the set is configured as connectable extended
+advertising, and the controller rejects enabling periodic advertising on
+it with Command Disallowed ([Vol 4] Part E, Section 7.8.63), so the
+broadcast source fails to start:
 
-The next broadcast rebinds to the stale BIS and LE Create BIG fails.
+  Bluetooth: hci0: Opcode 0x2040 failed: -16
+  Bluetooth: hci0: Unable to create BIG: -16
 
-Drop the holds of BISes left open when the last socket of the BIG closes.
+Don't let the global connectable setting make an instance with periodic
+advertising connectable.
 
-Fixes: 4c94557dd025 ("Bluetooth: ISO: balance the parent hold in hci_bind_bis()")
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
+Signed-off-by: Michal Dzik <michal.dzik@streamunlimited.com>
 Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- net/bluetooth/iso.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ net/bluetooth/hci_sync.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 06f1e7ba2cb1..e6f0bec7b353 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -907,6 +907,15 @@ static void iso_sock_kill(struct sock *sk)
- 	sock_put(sk);
- }
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 638589f77081..11aeaa9feef5 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1519,10 +1519,12 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ 	flags = hci_adv_instance_flags(hdev, instance);
  
-+static void iso_drop_open_bis(struct hci_conn *conn, void *data)
-+{
-+	struct hci_conn *hcon = data;
-+
-+	if (conn->role == HCI_ROLE_MASTER &&
-+	    conn->iso_qos.bcast.big == hcon->iso_qos.bcast.big)
-+		hci_conn_drop(conn);
-+}
-+
- static void iso_sock_disconn(struct sock *sk)
- {
- 	struct sock *bis_sk;
-@@ -930,6 +939,10 @@ static void iso_sock_disconn(struct sock *sk)
- 			sock_put(bis_sk);
- 			return;
- 		}
-+
-+		/* Last socket of the BIG, drop the BISes left for rebinding */
-+		hci_conn_hash_list_state(hcon->hdev, iso_drop_open_bis,
-+					 BIS_LINK, BT_OPEN, hcon);
- 	}
+ 	/* If the "connectable" instance flag was not set, then choose between
+-	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
++	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting,
++	 * unless the instance carries periodic advertising, which can only be
++	 * enabled on a non-connectable advertising set.
+ 	 */
+ 	connectable = (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
+-		      mgmt_get_connectable(hdev);
++		      (mgmt_get_connectable(hdev) && !(adv && adv->periodic));
  
- 	sk->sk_state = BT_DISCONN;
+ 	if (!is_advertising_allowed(hdev, connectable)) {
+ 		if (instance)
 
 base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
 -- 
