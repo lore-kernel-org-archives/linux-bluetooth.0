@@ -1,85 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795345058;
-	b=xZT+MjRTk0NDWSoXKBnkd8P292qdTGtmAzoCDWQOiL0BuSl2X1awOsLCXPcyGvP0b7BG
-	 VbdLFoj5QCboCnVMvzgl/l9bjaW/KTTIpDLZ6Kv3imoF7akaL+zquLvWyCywLi9p8DE4q
-	 KKt4kZYxJnzQngTQrXtjD7zSundlVyXJiX3SP862g9yI/sb2zzWLY0zBfluZi/bTj/5n5
-	 2Z+6OEEj+Q8WSk5Odf6RU9R15sqD4TbVLyPLDn6Iw8zHOFUUAR7T12aluPDl2asn/TBqd
-	 Z3jp2huACFBZ+jB1+55b7n+gICSxZ9LXwvC/+Rk0Hse4Vee5XbKPixLAEOT1g80FVSw==
+	b=iuXjYSf/Wb9WB7GbfTOHqx89WwA8IHcUIgS18nd9Y3Vb2Gbj117q2n4vaj4fFPJlzhss
+	 hFnFvDvLVBNFWYq3T3nkfBcyrVO4KwOlccHXizbG5m04KSjlpIJWkYnCLwh4Z0PJzWQ+c
+	 CFIOmOUbR37Zd3mcux/9LpciqUxceFbK6A52zIr2Lgg82aQwTYs7kHjyNIAJ5wue72wE6
+	 FBjW5Ic7Y38+1C5urCXUk+Qecg2TdCofek0d8RhMpH/WWOY5Zb7MzHgMfmVnU5Fgc7su3
+	 HcV8LROscAjgF24zUVp0fjuCJfjY4CVAvJN/apVcz8gW1V4DPFgVlkcy91hafAa57rQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795345058;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=BFtP0ak6B2k15SIbBzafbABIFbGObDd32KiZPLlW6A8=;
-	b=febKrp7FTJZ3nx05vfBqEji3VA+H24hLX1/ta0028M+CVW3g/67UwphOtcEr6lXm5ytR
-	 VCD+kGKQhMbCJa5oemx9T3P3RPKip5BVO6NIa7w48dPRj8K5tNDROBdvIQwGUw1Pnxfya
-	 sMKnRAK1NOaLDgAiCqoolkRw4HsvwV7RMVM1wtmhKpnqAo8slEz/jmWJs9baHTI3tzy9r
-	 yIRg8oGSO1T9S2+hC9/t2bKa/O5XpNk/FMZqY0s9Rj+SwRsDZGo4SPg5nLKviQya8n9ry
-	 v+x22l3zCtkS7d4lbWUcuJ7G2RuqJqWalacK98aZ3Ekmm/egGodzYhi6poK8sh35UPw==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=GdLkTAZ2O3Ycy9Z1AyjkdYR4Zo8R86EDt88adU0Aaq0=;
+	b=c9XSXvunPBoDn2algfWDYWVROIFYk9sCR71jAbHM5uhVNGXEf263tqUyK6hTxPE2pHMz
+	 OxomHI57FGdlMPINhwmHeU4NB98ErU5MptFA7i4DzZblnPnUcCYQctjcCJ7jgLAEuXOOQ
+	 8/50ZBE4JzjRA+CO5SRkRJDzLoBpA6FgU77Xkj/YYD3P107zv6WOXm2NgWMGpmTQt6fhV
+	 kJR9lggtGP4pCPxZ2yPtH1EO05WXB7jwP3tpk/4thYgfniJwjlrRPUz6tIh4p9CSxLADz
+	 oe+mJd9Jb5EAIivvNPF2Kr8nlykA20MwCfdGtcH/6cY14At3rKP9qCRg3Cmez+Cp0jg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=hUYqRGAA;
-	arc=none smtp.remote-ip=209.85.128.54
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=J6J1gyu+;
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9557F606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB742606A32A
 	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 10:57:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9557F606A320
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB742606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=hUYqRGAA
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4bb77a462c6so25292765e9.1
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=J6J1gyu+
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb6ba3b244so21260005e9.3
         for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 02:57:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795345056; x=1795949856; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=BFtP0ak6B2k15SIbBzafbABIFbGObDd32KiZPLlW6A8=;
-        b=hUYqRGAAappRYmXSAnXOdvWUHx+xbG29ACWOciX+PrhOOZHl3F8VBoS5VX/VhSb/aq
-         MBQEyB8E73bvLN5zJD59xJhXE1XQYnrZboEdXdxJs81Yky0x9KUbsWlqFlU6hwNM9omU
-         ONiw7ZiYdOQtiOg1GYwJ1aD2OF88jS3q24hvM=
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=GdLkTAZ2O3Ycy9Z1AyjkdYR4Zo8R86EDt88adU0Aaq0=;
+        b=J6J1gyu+s571xVQa59DFzxOU5Gj85WgyFoPfhVTCbJgBEL21OME0WzpltE4H/veAcD
+         TwIyUrPNSdOONNzOqjNO8TSucALmmohGJggS2dG1lte+XUotFw/rsdx+gecKSMdPMV/q
+         CPye2VjVIf3SEby6TmbPZNO6mEu/Os1VWWhlM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795345056; x=1795949856;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=BFtP0ak6B2k15SIbBzafbABIFbGObDd32KiZPLlW6A8=;
-        b=j5Y0xxnJQmn7FJvL7n+P72hMnXFqVeKrcFls/6Fia++bZXJSr8Lww8g4SV1h37+sah
-         yi/uJfbMpNJwS8/UmKMOd44/0TshiOeY4oX6zLj61Spt/bKutnICTV4m7BX9Rg2Sj+nw
-         JLmuIHtjZDl6eJzt+VunaX4mJ53MZeoqqMhjujW9jlqo5RYuKHcO5MZ58AbLFTx/Zz7E
-         8QNiuCdD1CbOkhDktivOC4Fc2J8kpO3mDxdRMtsseqgOrJegLjPBd/QSBbbA6ioXa7mX
-         Woq/4BGxADhBPR7Ap4ixxUq1nTXdQoLgFT9YuwuKmUZsLDNCnwb3taJw+zWljfNsZsTQ
-         jgHg==
-X-Gm-Message-State: APuU4Z8gW60ufdDh9H2SvZdHr2k4cOsIOf3L89hl/GvtL4gLaQJnsFI0
-	W24irvYbmeRw10u4AlZD2/NcXc/EyDY36FCMi7yFXO5u6AnwSh3KiDAMOgsKSkJSH2H16kAIUr2
-	A5fh6
-X-Gm-Gg: AZFdTZe9pf8D9HBwY9ZlhajG7M7iHKRf/RL1vlvlD6H6kOSKYSDDWmZoiUJvYe2m2tW
-	/9BYOBIDMVeLfWkznrBCHP4PW66hXqrUE1nWJMwse3srKviOmzxwTvhaeFpkTNluT3iG5WDOtk4
-	SJyhwfQ+rA2c8Y+TrHuziIXdnv39TJrXfDm7iDn0ZyxxRlmbBOlV3WDg8suPj/NLisS/h8icQ1J
-	/u8Y2mnn9dDWGFJLfO1uFmqeq46/dMXbR5ITPGHK7IUFbSqg0378V87BzMNdmOHVmpzASGbrz8Y
-	TCQFv9u5o7WM5yFfzXpvHo378DyhlC4U/MMD/h+C100MEyqqtrT3KVD7ODmcaJD0M0kp71DxOKQ
-	hQD+LyLdVjSu02j41uqK5d6goOMyIhMSLd+c7d8LggawO+cDk8NkiiiJilxVF467WsRN1doOwak
-	oiRopwcKt6DotQ2Q1CQKHyPKpdwkj0NUspB8lTKMknRF6rb2907p+43TKc1zEJrtWFw+PvdCGRE
-	ozLO4BL1UCVgMeWwH5UVft1YeOU667bzTzOHAT/cx4Pg3j71PYmXOBdcaFOVp9fC/LjBIc7+DUE
-	bl0yeKcYs6C+c9mejggwO/W8X9x04pjW/b572M/jihBdXYAG/w5a0r8lVGByfDxdk1uG8sM=
-X-Received: by 2002:a05:600c:154c:b0:4bb:6a78:7c42 with SMTP id 5b1f17b1804b1-4bb887c3428mr185411235e9.1.1795345055903;
-        Sun, 22 Nov 2026 02:57:35 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=GdLkTAZ2O3Ycy9Z1AyjkdYR4Zo8R86EDt88adU0Aaq0=;
+        b=pbDy5IUIc0Qms9uYA6os0yGnrcq32zppt1G0iUCIdPMOYal3qc7+qLkghLexKQg7XU
+         Y2xaYp8h3fR0yropzKUIzDkdWhr7N5jzPMIdaCnHcwuyBI/F3K1I/oSnDAJutfqJO3Sw
+         RffQ0raTOQ0N3H5xvA+RZHteZzjThHlPuTf6I/XCo40U6SOF77Ho7qA5C/lFHTqP1/nN
+         d6VQ47TrtPX/29tp7X0uI2b9bF37uPefGbOLf8JU8r1Rvenhf6T9/Tl21sjKKm01laru
+         c1eoG5mLredJUR5+Wnj0AwkqzUouPQogzhOaEJ3NyYnBWR1+rdeHsCdX3PEe+lvG8Wjw
+         dQWA==
+X-Gm-Message-State: APuU4Z9dgx/ik75n9fjAb1EOwY4tYTLUp8MrqLhvO6OkZTPSJE4fgIIg
+	+AcBPVvFN5usCZiACZKIuLP+2oIFkg4wx+7u2S0Q9Xy4mBN2yfvpFnaSRSXkJM4mec5M553cikm
+	doNPU
+X-Gm-Gg: AZFdTZd4shI/EJAl6m7K/gHMCyIGLS2PWSYEuYRJZLnKTdf1pbMqJv13lJqiFD8KsKF
+	dJS3JnW2qaEGdGGm68sPT+VXYxkl9Qt06RuJE9bDQ6JwV8McMtEq9tWhUPJNDMztr70X1yriib/
+	5sW+Wr9CNLFxOtw2pHJqPbUWiJFzdBGk602sBWAme39sAZbyAptzyLWyE0xuEsGGUly5kKWiDx3
+	vW6lq1i079b/JH5SdVshnYVw1ds7Nc8a3dAQVrzcl+TsOKIrtwpzV1Q9qDBI2w3vbh2cnB7TA5r
+	aPMmSGPAC/paSTUp160CmYIuqZOetDCvLeOJi95vJJ1trnMgXx2LIkgEH1sPiStIwCgRbw2Ko5e
+	zOLCS+CzWQa/v7hoShfgwnVB7hI9f2nSkeXsZAbpc0HjrkA1PL0Id46X/qius/oXb7PIER6Ke5i
+	dcxFSjcskly/yY6i6BWCEcdHmdCM607AMR65Dpch0UyQ7mmZD4fzFZgjgJc+Te/yBQX6vkNzsHN
+	CM+SdeT4pw9Oz3ra98vixorbO7Vgs8eTXP4lRgGEMbT+6bzBzMfDk1fd4DeabCzn2b99kpZljlM
+	UdEKRIkvbWmXQ3Lkn+NYyxw2IzXHatbO6qOI7TYZivDJc7GUcyRcEY7QXeHpTfv5UCzFWgE=
+X-Received: by 2002:a05:600c:b8a:b0:4bb:7007:4a5a with SMTP id 5b1f17b1804b1-4bb88817772mr183458245e9.23.1795345056319;
+        Sun, 22 Nov 2026 02:57:36 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85399e2esm300138965e9.7.2026.11.22.02.57.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 02:57:35 -0800 (PST)
+        Sun, 22 Nov 2026 02:57:36 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 0/8] AVRCP browsing fixes, and browsing and cover art in the target role
-Date: Sun, 22 Nov 2026 11:57:23 +0100
-Message-ID: <20261122105731.799090-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 1/8] avrcp: Fix not checking browsing PDU parameter length
+Date: Sun, 22 Nov 2026 11:57:24 +0100
+Message-ID: <20261122105731.799090-2-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261122105731.799090-1-simon.mikuda@streamunlimited.com>
+References: <20261122105731.799090-1-simon.mikuda@streamunlimited.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -91,58 +95,58 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Patches 1-11 fix the AVRCP browsing code, mostly in the controller
-role: the browsing PDU parameter length is not checked against the
-bytes received, the media player list cannot be read up to item
-0xffffffff, ADDRESSED_PLAYER_CHANGED and TRACK_CHANGED are sent in the
-wrong byte order, a player addressed before it was listed is never
-browsed, Search in a folder whose name has a space crashes bluetoothd,
-and listed Now Playing items lose their Name and NumberOfItems. Each
-patch has its reproduction steps and the logs it showed. A unit test
-and a functional test (with its documentation) cover two of them.
+The parameter length of a browsing PDU is not checked against the
+number of bytes received, so a handler takes the parameters missing
+from a short PDU from whatever the buffer held before.
 
-Patches 12-13 prepare avctp to answer a browsing command later, from a
-D-Bus reply.
+To reproduce, send to the target a GetFolderItems with a parameter
+length of 10 but no parameters. It is answered from the zeroed buffer
+as a request for the media players 0 to 0:
 
-Patches 14-22 add browsing in the target role: a local player
-registered with org.bluez.Media1.RegisterPlayer can expose a folder
-tree (org.bluez.MediaFolder1 and org.bluez.MediaItem1 on the
-application's objects), which a remote controller browses, and cover
-art, offered in the target record for a player that registers an
-ObexPort. Documentation, the D-Bus
-policy and a functional test come with them.
+  btmon: AVRCP: GetFolderItems: len 0x000a
+  handle_browsing_pdu() AVRCP Browsing PDU 0x71, len 0x000A
+  avrcp_handle_get_folder_items() scope 0x00 start_item 0x00000000
+      end_item 0x00000000
+  btmon: AVRCP: GetFolderItems: len 0x002c
+  btmon: Status: 0x04 (Success)
+  btmon: NumOfItems: 0x0001 (1)
+  btmon: Name: Player A
 
-Testing: every patch builds in maintainer mode (-Werror, ASan/UBSan)
-and the unit tests CI maps to these files pass (make check). The series
-was developed and tried against phones and other BlueZ controllers on
-an earlier base (2026-10-12); rebased on this one it was build- and
-unit-tested only, and the functional tests (test/test-functional) were
-not run for this version. Valgrind, scan-build and distcheck were not
-run.
+Reject a PDU whose parameter length does not match, as the control
+channel does since commit e2b0f0d8d63e ("avrcp: Fix not checking if
+params_len match number of received bytes").
 
-Not included: the GetTotalNumberOfItems parameter length fix of the
-earlier version, as a80671987 ("avrcp: Fix GetTotalNumberOfItems
-command encoding") fixed the same thing.
+Fixes: 731aec9cae63 ("AVRCP: Add handler for browsing PDUs")
+Assisted-by: Claude:claude-opus-5-5
+---
+ profiles/audio/avrcp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-AI assistance: Claude (claude-opus-5-5) was used for analysis, code,
-tests and the commit messages; every patch carries Assisted-by.
-
-Simon Mikuda (8):
-  avrcp: Fix not checking browsing PDU parameter length
-  avrcp: Fix listing media players up to item 0xffffffff
-  avrcp: Fix byte order of ADDRESSED_PLAYER_CHANGED notification
-  avrcp: Fix byte order of TRACK_CHANGED identifier
-  avrcp: Fix not browsing a player addressed before it was listed
-  player: Fix crash on Search in a folder with a space in its name
-  player: Fix missing Name of listed Now Playing items
-  player: Fix NumberOfItems of Now Playing after its content changed
-
- profiles/audio/avrcp.c  | 35 +++++++++++++++++-----
- profiles/audio/player.c | 66 ++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 90 insertions(+), 11 deletions(-)
-
-
-base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 2f214e982..95b1d8c47 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2164,9 +2164,20 @@ static size_t handle_browsing_pdu(struct avctp *conn,
+ 	const struct browsing_pdu_handler *handler;
+ 	struct avrcp_browsing_header *pdu = (void *) operands;
+ 
++	if (operand_count < AVRCP_BROWSING_HEADER_LENGTH)
++		return avrcp_browsing_general_reject(operands);
++
+ 	DBG("AVRCP Browsing PDU 0x%02X, len 0x%04X", pdu->pdu_id,
+ 						be16_to_cpu(pdu->param_len));
+ 
++	if (be16_to_cpu(pdu->param_len) !=
++			operand_count - AVRCP_BROWSING_HEADER_LENGTH) {
++		DBG("AVRCP Browsing PDU parameters length don't match");
++		pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
++		pdu->param_len = cpu_to_be16(1);
++		return AVRCP_BROWSING_HEADER_LENGTH + 1;
++	}
++
+ 	for (handler = browsing_handlers; handler->pdu_id; handler++) {
+ 		if (handler->pdu_id == pdu->pdu_id)
+ 			goto done;
 -- 
 2.43.0
 
