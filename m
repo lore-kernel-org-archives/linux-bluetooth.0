@@ -1,79 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795324334;
-	b=RMN6rTDDIg3pah5MxVMgsmSNzCqS02WiuKFGCge8d5og6/ET6QJwRHVENMosG6ogvpR2
-	 l4GC04xqf52eA5GTU6HqCAgGvRePMlMAVAMKbg2mTVWL+Jc/j/pkcvwaah47NG/tlGGot
-	 /dUJUb+z87hB1KPFwkHGBwugH9xohm9/b4Z+tLsN3sCGijSJPJyzEO/7GCIy+4JkhpTk7
-	 TlBnGEk3aqGvOjqmiuNxJQNvIuDDW98R2zzKcQdxLrZZQcOpu0bfsbAAKw36jl2XAMM+d
-	 6Rbc8W+1MkX6gwr4ecfrfchL6rfwYsGLMB+OjqdIgx7qOIMKJ28/F21I+o2fy/AE6Pg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795324334;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=qm0wfk24ya2agwvJUggvv63GyJmzYEfnNvFV0dNw0f4=;
-	b=CUdPBDzfC7uTB1wfWCGsQEqgOLf3Xn5C+Gm2m0y67/MjMnE9Rfd8g0UUJrfuBxWbz4X8
-	 KHbAcNyp1UGVXOpLIINZweaAsRCezOb56ey8gcEfO3faIwVZxyynICdl55LLwG06MwQ91
-	 OBwP0BWwXVKkGKSCMfCKANh4sofSV41NPDztVp0DUYEwyCBaU4ELQ9jTqp0ZoVuaKwNsF
-	 /nAjc3CNZAUMa79vGT5puOVewEXw8M67Vlmk0p3WAe2bBEzYvrE8XHfOLSXzDM3+92msw
-	 BhnlcEUjIDb4lWxO8Y5j8iZ146UzLagWs23yEtkLfoSSI0XUb++ZBrBo7/k9UBug7eA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IITDDZKq;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46EE606A320;
-	Sun, 22 Nov 2026 05:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IITDDZKq
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795324334;
-	b=1Qvcx2hxDxNDHxq2jJbmli5rCVY/0VrZCx8Tq7mN6rI3WyMYrMJEOILTV2K5fTI4aYNZ
-	 sucdp5acNzoUQF2c063VP3jNmvLauXi7UYj7MCYwauTmY4oeKLyjYLe8tplRLs4vQNbPu
-	 gXnzTriFTn1c4pwHYR2nWxANJf6U8AwCkTM3kpIVar6ponw9eIOsyGeiUoSA70wG7r38z
-	 1i7ITSaxScIj1u7qZsHg2TMu3grfqVcQefZ5xiXTiK6RyhKqMezUrDWoxrkVfj65xbykl
-	 LG8KhdHn482XyGUFZ10XipNAIiCL7p9hXtjoEDIHECBBSDNwKx8LhpGtcoWiuvROEqw==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795324334;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=qm0wfk24ya2agwvJUggvv63GyJmzYEfnNvFV0dNw0f4=;
-	b=VGjnugoHNWVK9askPzDuyqQgZlmy9UKR23BUA7TjS18texnINf2Vpfngw0HnAzmFMW5r
-	 9KqmrKb6NTAsRZ9ARZE8oZOOt2YMtPjw2xx/20/AH7TLvqc7JYM5kJqlvIOxO0FY60Z/Z
-	 KeHHAUu0CywpigeQM5BlS0XopUk+BMDOhH+gkBTujL7hArX3+3d+5XHgknw2b3U/vrwaH
-	 2WY/YYqGE8ytQeKDCGDY/ArJYdT6hT7MWlEnoCt1o7x2Vj05hwyMnueJ0mI8qLHuczgBJ
-	 3lHf1Cir1XGfxWUT7EG87OhbfmymZ96XNlVea+2kZDcMxgAoGRgpg4kEYdri/WqSK8Q==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=141.14.17.11
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795336081;
+	b=Ui3nGj8CIUZ+FOQ3VSuDcsPS7gTc2dmjsyXfERMVPwicUe+eYjjl6Kk8NzWJ0ANMwsVv
+	 u5XJNtHtAkQ6A5wiMYXjAfAYYUkRQdW99E1Z5znvjyTW1euRL3VJAqssznJAyoLTBNO4H
+	 ghzY9orRN+UX7BvqtAjhtbhi+pNP2KRY8vEq/EfbkVy/TGXY6V+CZSOvSp64d0GZnsQWo
+	 gXyXNiobMACv8cyQfTxIQnpFJfX+1kRhrJkP99kU7rKmEPHa6MGaY4a1sxlrv5qgr13BX
+	 5WE9KMZpI0AyfkcMw40cpybP0I42NLHtmZyjoILMnBnvd0bM+VjjgtrbachoBxrE/eA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795336081;
+	h=DMARC-Filter:Received:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:DKIM-Signature;
+	bh=ihgvkoYQucaTgXWNPyV2fI7OOChbPQerR0cBOt/hVyc=;
+	b=aA/eD9UzR7PlPh4qltaMdCthCqyq4o2NNKyeeVRIqv4RbBMPffl4GN7ogjOi5aO9CiSg
+	 V6DWZTAveZix+UhlbD1J4si2uGMs24qyv3q8xqyZ+VF1kPtrlex90rJzj6EB047KKOuOr
+	 GK//RP/p6bOJPMAtC62gSzrWi72SmUqrJNsUjwYqijV+eCwwE1wPXm88IiWGmzqx3siV6
+	 +XtWaI09gfnIFJefWy3/n6xXjEeAJxsKUpwejDwOm4O+14vIdq//6icG1d4AN74Nhq03n
+	 ieNjvntJoAHlkQ+Ut9vDi0eS2E1C/cD6uqx6zCAnXOp/Yz+cyavIv8daLUcFzIxPuDQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=molgen.mpg.de;
+	spf=pass smtp.mailfrom=molgen.mpg.de;
+	dkim=pass header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=Ip862n04;
+	arc=none smtp.remote-ip=141.14.17.11
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id C6C3B1F000CA;
-	Sun, 22 Nov 2026 05:12:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795324334;
-	bh=qm0wfk24ya2agwvJUggvv63GyJmzYEfnNvFV0dNw0f4=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=IITDDZKqO0e3VwgtBu+xTaSow9ZE5GEvSYWySaT4BsM/2vlZ832cQaLGV1gOCZlwg
-	 cs0YP0Uj9mhCCGus329XpKalAD22aKIK+55Tqm9keBoCtVs6F9j3/+qD8kakDekW+I
-	 iKyeZOjwfBrFy8nidDguxrCabxpd1CRsmfRpUiFq63cChsZC9GBZ+cAhDfG5ETWyDM
-	 rltn0tj2Yn96/wSW/zLrt9IljdX6C5V8oP12EqnGhcNgCwtwKM8g3bwhwkxktrPMyv
-	 mQkPzA2pJDRlytEdzsJ1rw7k+r2lzXLuTs97IYbm/l5mZthqS/lYsYt44TA2LSs4iG
-	 VjDvTLZwjaseQ==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 57C574BF13;
-	Sun, 22 Nov 2026 05:12:13 +0000 (UTC)
-From: EMCP333 via B4 Relay <devnull+emcp.enser.io@kernel.org>
-Date: Sun, 22 Nov 2026 05:12:05 +0000
-Subject: [PATCH] Bluetooth: hci_ll: download the init script at the
- operating speed
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11B9606A320;
+	Sun, 22 Nov 2026 08:27:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F11B9606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=molgen.mpg.de header.i=@molgen.mpg.de header.a=rsa-sha256 header.s=20260906 header.b=Ip862n04
+Received: from [192.168.2.223] (p5b13a22d.dip0.t-ipconnect.de [91.19.162.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id EBA4E4C442F7ED;
+	Sun, 22 Nov 2026 09:27:50 +0100 (CET)
+Message-ID: <6f0b4dfc-4bb3-45f9-81ae-347e345cbe33@molgen.mpg.de>
+Date: Sun, 22 Nov 2026 09:27:48 +0100
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -83,190 +51,83 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261122-b4-hci-ll-oper-speed-v1-1-952a9c1edfde@enser.io>
-X-B4-Tracking: v=1; b=H4sIAKR5AmsC/yXMwQrCMBAE0F8pe3a1iSEFf0U8JOnGREpadmsRS
- v/dRI9vmJkdhDiTwK3bgWnLkudSoU4dhOTKkzCP1aB7bZXSGr3BFDJOE84LMcpCNCL1V2P9YE2
- MEep0YYr587u9P/6Wt39RWNtXa3gnhJ5dCalFjZdtOBvkoOE4vgwf0B+YAAAA
-X-Change-ID: 20261122-b4-hci-ll-oper-speed-e0346b764fff
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- EMCP333 <emcp@enser.io>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795324331; l=5332;
- i=emcp@enser.io; s=ultron; h=from:subject:message-id;
- bh=+1av/CAD+P2ReCY2LEXf8jR55fRsbXtZBigW9sg6n4Y=;
- b=omFo5tWcaF+GbD0ZUzRFYok1x5xHKCr3sFEc+Pu7YSGI4LCguUFJlwUI+Q+/H2Kb3Ck1dOWPt
- XLo+nq3Mnn6A5jIepaAq/DYEIPQZGfL9GkcXQTiH3TOBs1iJnwg8TTR
-X-Developer-Key: i=emcp@enser.io; a=ed25519;
- pk=5sG48Lul+Vn7OzXu3VZrCWk5uvEFPYMXYnAV0TZR/tY=
-X-Endpoint-Received: by B4 Relay for emcp@enser.io/ultron with auth_id=1598
-X-Original-From: EMCP333 <emcp@enser.io>
-Reply-To: emcp@enser.io
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btbcm: Add entries for BCM4364B3 UART
+ Bluetooth
+To: Jason Perlow <jperlow@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <4a1efe5e-ec67-4caa-bb84-35759e66ef42@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=molgen.mpg.de; s=20260906; 
+	t=1795336071; 
+	h=from:from:subject:date:message-id:mime-version:content-type:content-transfer-encoding; 
+	bh=ihgvkoYQucaTgXWNPyV2fI7OOChbPQerR0cBOt/hVyc=; 
+	b=Ip862n04nEPgSLwCvclmQNC6TFaBrUFKTcgLR0dp32fNXdOTEiMxGMIOwRM0NfbsSeyPQQ49UZdo
+	emi37oSX60Xe+P0eSb0+u2HDQ7EekpijgdlNA1ciq7bJveRlu1+s4XAhexpmUqsUh30TxIvdQkzFnB
+	swcPqg3BBfD/lXdfXMxTdPaeyEpXVWmS6t1+IMrhUarDolDoJTTSLbtZ4OCVm/+ERqXKC7XgYLAI+m
+	zBJFM72uLYYSwu4N2XBnSQoRgeCO5seaGUyVwYRB0DIF1MH/+rz9bGMqLkhBfXzgBBAd6cJU10a84Z
+	pqoc86pb0PQ9MzbHPpOY46XTynKYFEqw==
 
-From: EMCP333 <emcp@enser.io>
-
-ll_setup() downloads the TI init script at the 115200 init speed and only
-then moves both ends to max-speed. TI's own user-mode init manager does
-it the other way round: HCI_VS_Update_UART_HCI_Baudrate first, then the
-script at speed. For a WL18xx script (TIInit_12.8.32.bts, 293 commands)
-that is the difference between ~6 s and under 1 s.
-
-The length of that window is not only a boot-time cost. On a Tegra Note 7
-(WL18xx on a Tegra 114 hsuart, max-speed 3000000) the 6 s download
-overlaps the WLAN core's bring-up on the same chip, and one script
-command -- 0xfd82, the first after the PHY post patch -- then gets no
-answer. Every cold boot logs
-
-    command 0xfd82 tx timeout
-    download firmware failed, retrying...
-
-and the retry, with WLAN up and idle, passes. Bluetooth is ready ~35 s
-after boot. With the WLAN driver blacklisted the same command answers
-first time in ~140 ms. With this change the script completes 0.86 s
-after hci_uart loads, with no retry, on two cold boots; the controller
-then runs at 3 Mbaud and scans, and WLAN is unaffected.
-
-Send the speed change after every BT_EN toggle, because that resets the
-controller to its ROM default. If the speed change or a download at
-speed fails, the remaining attempts fall back to the previous order:
-script at the init speed, then the speed change. Setups whose max-speed
-equals the init speed are unchanged.
-
-Tested on the Tegra Note 7 on a next-20260422-based kernel. Not tested:
-the fallback path, and controllers other than WL18xx.
-
-The code and this changelog were prepared with the help of an AI coding
-assistant. The submitter has reviewed both and takes responsibility for
-them.
-
-Signed-off-by: EMCP333 <emcp@enser.io>
----
- drivers/bluetooth/hci_ll.c | 71 ++++++++++++++++++++++++++++++++--------------
- 1 file changed, 50 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 3c9d98eebc..8dffe5f219 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -608,11 +608,27 @@ static int ll_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- 	return PTR_ERR_OR_ZERO(skb);
- }
- 
-+/* Ask the controller to move to @speed, then follow it on the host side. */
-+static int ll_set_oper_speed(struct hci_uart *hu, u32 speed)
-+{
-+	__le32 speed_le = cpu_to_le32(speed);
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
-+			     sizeof(speed_le), &speed_le, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+	kfree_skb(skb);
-+	serdev_device_set_baudrate(hu->serdev, speed);
-+	return 0;
-+}
-+
- static int ll_setup(struct hci_uart *hu)
- {
- 	int err, retry = 3;
- 	struct ll_device *lldev;
- 	struct serdev_device *serdev = hu->serdev;
-+	bool at_speed;
- 	u32 speed;
- 
- 	if (!serdev)
-@@ -624,6 +640,23 @@ static int ll_setup(struct hci_uart *hu)
- 
- 	serdev_device_set_flow_control(serdev, true);
- 
-+	/* Operational speed if any */
-+	if (hu->oper_speed)
-+		speed = hu->oper_speed;
-+	else if (hu->proto->oper_speed)
-+		speed = hu->proto->oper_speed;
-+	else
-+		speed = 0;
-+
-+	/*
-+	 * Download the init script at the operating speed, as TI's own
-+	 * user-mode init manager does. At the init speed a WL18xx script
-+	 * takes ~6 s, long enough to overlap the WLAN core's bring-up on the
-+	 * same chip. If anything fails at speed, the remaining attempts use
-+	 * the init speed.
-+	 */
-+	at_speed = speed && speed != hu->init_speed;
-+
- 	do {
- 		/* Reset the Bluetooth device */
- 		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
-@@ -636,12 +669,26 @@ static int ll_setup(struct hci_uart *hu)
- 			return err;
- 		}
- 
-+		/* BT_EN just reset the controller to its ROM default speed */
-+		serdev_device_set_baudrate(serdev, hu->init_speed);
-+		if (at_speed) {
-+			err = ll_set_oper_speed(hu, speed);
-+			if (err) {
-+				bt_dev_warn(hu->hdev, "speed change before download failed (%d)",
-+					    err);
-+				at_speed = false;
-+				serdev_device_set_baudrate(serdev, hu->init_speed);
-+			}
-+		}
-+
- 		err = download_firmware(lldev);
- 		if (!err)
- 			break;
- 
- 		/* Toggle BT_EN and retry */
--		bt_dev_err(hu->hdev, "download firmware failed, retrying...");
-+		bt_dev_err(hu->hdev, "download firmware failed%s, retrying...",
-+			   at_speed ? " at operating speed" : "");
-+		at_speed = false;
- 	} while (retry--);
- 
- 	if (err)
-@@ -663,26 +710,8 @@ static int ll_setup(struct hci_uart *hu)
- 		hci_set_quirk(hu->hdev,
- 			      HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
- 
--	/* Operational speed if any */
--	if (hu->oper_speed)
--		speed = hu->oper_speed;
--	else if (hu->proto->oper_speed)
--		speed = hu->proto->oper_speed;
--	else
--		speed = 0;
--
--	if (speed) {
--		__le32 speed_le = cpu_to_le32(speed);
--		struct sk_buff *skb;
--
--		skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
--				     sizeof(speed_le), &speed_le,
--				     HCI_INIT_TIMEOUT);
--		if (!IS_ERR(skb)) {
--			kfree_skb(skb);
--			serdev_device_set_baudrate(serdev, speed);
--		}
--	}
-+	if (speed && !at_speed)
-+		ll_set_oper_speed(hu, speed);
- 
- 	return 0;
- }
-
----
-base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
-change-id: 20261122-b4-hci-ll-oper-speed-e0346b764fff
-
-Best regards,
---  
-EMCP333 <emcp@enser.io>
+Dear Jason,
 
 
+Thank you for your patch.
+
+Am 16.11.26 um 22:38 schrieb Jason Perlow:
+> The BCM4364B3 combo chip on Apple T2 Macs, e.g. the MacBookPro16,1, has a
+> UART Bluetooth controller that reports LMP subversion 0x3032 (001.016.050)
+> on some units and 0x305b (001.016.091) on others.  Neither has an entry in
+> bcm_uart_subver_table, so the controller is logged without a name:
+> 
+>    Bluetooth: hci0: BCM4364B3 Trinidad Olympic GEN (MFG)
+>    Bluetooth: hci0: BCM (001.016.091) build 0115
+> 
+> and the firmware lookup only tries the generic "brcm/BCM.hcd".
+> 
+> Add both subversions so the controller is named and its firmware is looked
+> up as "brcm/BCM4364B3.hcd" first.  Tested on two MacBookPro16,1 with a
+> v7.4-rc3 based kernel carrying an equivalent change, one reporting 0x3032
+> and one reporting 0x305b.  They now log:
+> 
+>    Bluetooth: hci0: BCM4364B3 (001.016.050) build 0082
+>    Bluetooth: hci0: BCM4364B3 (001.016.091) build 0115
+
+Is this only about the logs, or does functionality also change, that BT 
+starts working, or did it work before already?
+
+> Signed-off-by: Jason Perlow <jperlow@gmail.com>
+> ---
+>   drivers/bluetooth/btbcm.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 065536d4ec..92ba7aeac3 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -519,6 +519,8 @@ static const struct bcm_subver_table 
+> bcm_uart_subver_table[] = {
+>       { 0x2119, "BCM4373A0"    },    /* 001.001.025 */
+>       { 0x2128, "BCM4384A0"    },    /* 001.001.040 */
+>       { 0x4119, "BCM4384B0"    },    /* 002.001.025 */
+> +    { 0x3032, "BCM4364B3"    },    /* 001.016.050 */
+> +    { 0x305b, "BCM4364B3"    },    /* 001.016.091 */
+
+Sort it?
+
+>       { }
+>   };
+
+With my comments addressed, feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
