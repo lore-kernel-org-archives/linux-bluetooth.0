@@ -1,60 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795353574;
-	b=Bk/N+/O8nXmqcc52iswEogzCM1dBrRtakxFb4hbcBqCjHj5Jg6Brd6/k77SNEhDirNnG
-	 FK8yEEO3qLNhJlTnVGG/xkGYQJy+DJOox8IdS4ZkJ2X4/kGKAg1sw+HBcqkCwtDUdl6WW
-	 yfVStcTNS1/hdy6BDhvI+iFjXH1QXbV0ZyMCbFSQy44j9LDLP6QDzsO5N8BhOe1lyAc86
-	 /6HxD2dRvtR2LpJRSDKuyslFaqgDd9bz3eosR+JwG14AYlPxcbFXxy1H1tgPsl3z1Y8Cq
-	 awd7qpJIqrhJWqWNMGE18vuPp7EErKlDcIFg3zNRiga1kTc/jZb+rzwDEkbl/RzPdXQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795353574;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=HDvZmONCug0157g12f+0Zcf9P8MNQUPe122O8kSXMUE=;
-	b=oYZTHVQ6I53aax7dj30klDE5PRlJPhsdJNbeuRorcq6son06MMTflmZDk0fwK69fLaBv
-	 pPP7yDH9HqLSzZPhy+alegPoAXuSU5EoNuDlz8MZ/TwbsaWpaf+kgZNPCvtDB0lF1ql+j
-	 Np//Kk/gbSMuLrN2m4PKfTNQSnchtMuVtT2/uUDuftCCDbePcteTb/NZYZrqUEDmPIg0r
-	 x5yfvboJ6H/m2OiQLbu61WcExoi/zv1z/wR5NMAO98sqsGeOlIiGvAOEfGOJFlDnuf7V7
-	 PODOrLjwH4T9P+etcFq4Q/KBP1fCxX4fD8nrxjjv11e6h1NSKJB5ymUZDnvnwDovCeQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=stu.xidian.edu.cn;
-	spf=pass smtp.mailfrom=stu.xidian.edu.cn;
-	arc=none smtp.remote-ip=162.243.164.118
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41492606A320;
-	Sun, 22 Nov 2026 13:19:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41492606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32314606A320
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 14:55:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32314606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=VLINbZtC
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4a357b1c649so1442031f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 06:55:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=HDvZmONCug
-	0157g12f+0Zcf9P8MNQUPe122O8kSXMUE=; b=CMA7NDX5vL1p8VBwiOLfX8f/aq
-	Z0iHcMbxCi0pPuNgAtmcxTmGCyzgRioijHMhnUHv0pHHVR4b36enegCFbzzARvac
-	6dIo85Hd0qDWTTI5SmxzHKTtU50Erd9ah1t/fH6+M83Chx3TorSrau3Zrp7uq6ql
-	X8duqYQnk7gvUsrD4=
-Received: from LAPTOP-FRMFRHCN.localdomain (unknown [240e:454:8311:30f9:88d4:5e3b:b008:f171])
-	by hzbj-edu-front-3.icoremail.net (Coremail) with UTF8SMTPA id BbQMCkD2+fzM6wJr+1cQAg--.4331S2;
-	Sun, 22 Nov 2026 21:19:09 +0800 (CST)
-From: Haoli Zhang <26031212468@stu.xidian.edu.cn>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nicoyip.dev@gmail.com,
-	tim.bird@sony.com,
-	raghunathpalla.0209@gmail.com,
-	peter@hurleysoftware.com,
-	gregkh@linuxfoundation.org,
-	jirislaby@kernel.org,
-	25031212117@stu.xidian.edu.cn,
-	byu@xidian.edu.cn,
-	syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: RFCOMM: hold port reference during TTY registration
-Date: Sun, 22 Nov 2026 21:18:50 +0800
-Message-Id: <20261122131850.44042-1-26031212468@stu.xidian.edu.cn>
-X-Mailer: git-send-email 2.34.1
+        d=streamunlimited.com; s=google; t=1795359301; x=1795964101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NN7j+Whp+uu6bSKhfNBmSODqo0al6Q7oSpDJ5p80Cvk=;
+        b=VLINbZtCNhN7EwPGF1hBurUnGxwzTGKlh3mmPUf2lWxEkzcJUV9Rs40wpfPRtg/4Cy
+         qx7aj9+sCAAAmdbqlCWbkhL+uWvxefFtnZgX8stX9l6MKP8UhGjSrYwnd6jtPc1pHbzj
+         eUwyYfcrzhfjeNY7WcrPjiSIDcNtlgcM9ro+Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795359301; x=1795964101;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NN7j+Whp+uu6bSKhfNBmSODqo0al6Q7oSpDJ5p80Cvk=;
+        b=lK47Y3Q/t9BScuhYNgVaLKhADmgZh5dn1ba8xi8nHGieTs7TAVnTmZ2i84TAOU9RIT
+         cFvBlJxIBHX4SZbpclyTyV7ZEFyWdMCRHmA+vnLcZovG+d6r4Cvckxoq7ZPlXW1l81GP
+         WHqRrX0L0Cqj7aoe4ZOMvpyNp3lgwZRFWzXCIKs+4IeqwxzwZ5IreCIVriBvssv+qgDV
+         ARJABGAYYOfs695Pab0B+OZCfHHb4+cZOJMbGnYqmp5PDwqp9HD857cXUfZs7ixGuZB3
+         RRzFLCRbXEhIDhTAWDZzF+mZvsfCfKpi4gUPmixhME3AuYLgCpKUoj1RCIqKapj0pkSf
+         MTGQ==
+X-Gm-Message-State: APuU4Z9Vk13WbQT4d3DaKTUxSDQM7yV2MsRUhNu2qYIfZNwLzuhnIurM
+	2jUdRikZKNUkNzIynyj3lezcd0QdepVV1guoFhtHYXSiAT56nb75kVse3uDRMrfYomf7IUsog33
+	DIt0c
+X-Gm-Gg: AZFdTZdOjeDIKdBqmSY9cuLaK1LP7Rd4S0bdyXoSAfE+ZJwJcA4qDWCOMKcI/sC9tux
+	9VFgu0tOs77vSM31nu/v5v8gMTT9Z+a87jeLlXQWOJyLlCwNcJGsfJUn2aBNVO50K0qOMNTJZBL
+	yCduiUOqCelz0K76LZ+exAL8pPSRG+/JEfMZSI7g/wxlNrlnXUWFB+OyXeWdNCFebLmlXuuMka1
+	dfGtYCMcfCKQaal6coBXtTYxTgT2DtQGSTjm/zrYpQTU9lnHEN2uycfnXkqgf1Wrn4bElPRFYis
+	4A6ntrfFI70vTJ4yUj7BGFT4ubVumW9qY3mib28/5RRf/GnbIPYIOLa9beOkKapUaUH4wI6PKae
+	fkULijlRgN4vwFAxWFiPRGC6yKB84HwXRHSHka2qF0tDz28iVwQ1guMXXFkHSok/W4RTk/qiivo
+	mrS2YkhRFmtMYhQLehFx80pW0410QZuGF+e6IhU8Z343mDWtVgv/KsKsE6+3hvWcs67621Q0o/r
+	opJLPO1n6xpQR/xGvaT+rFdJ94FJ3BVK52L/8vcMGhMmOHCfbyO0b7Pwx4rPfC6K7nplH8ERXGm
+	jjdV/SvJk/HeclqXgt56QqEucoCje02sjG/habg9ELLYiq2JX4i4Bix+r44TIxG7m0lpvqA=
+X-Received: by 2002:a05:6000:1788:b0:492:3176:3d6f with SMTP id ffacd0b85a97d-4abb400aefcmr16796490f8f.47.1795359301320;
+        Sun, 22 Nov 2026 06:55:01 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab65cb4341sm17624002f8f.4.2026.11.22.06.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Nov 2026 06:55:00 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: hci_sync: Fix start/stop logic of default advertising
+Date: Sun, 22 Nov 2026 15:54:28 +0100
+Message-ID: <20261122145428.1499940-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -65,150 +68,51 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:BbQMCkD2+fzM6wJr+1cQAg--.4331S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWFWkGFykXFW7trWUuFyUKFg_yoWruF4Upa
-	y5XayrKFWqqr17Kr4fAF4DXa4F9rn7u3yxCry8Cw10krn5GrZ2yrWSg34jva1rArW8AFWj
-	qF4jvF48Wr9rurJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
-	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4
-	vEI74l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRZNVgDUUU
-	U
-X-CM-SenderInfo: yswqjiasrskluy6v33wo0lvxldqovvfxof0/1tbiAgUDEWr-E0nOXwABsK
 
-rfcomm_dev_add() registers the TTY after __rfcomm_dev_add() has made
-the device visible through rfcomm_dev_list. A concurrent TTY open can
-acquire a reference to the newly listed device while registration is
-still in progress. For RFCOMM_RELEASE_ONHUP devices,
-rfcomm_tty_install() can drop the initial tty_port reference. A
-subsequent close can then free dev while rfcomm_dev_add() is still
-using it.
+Default advertising (instance 0x00) was started even when it shouldn't.
+Setup:
+* adapter that supports extended commands
+* connectable off
+* advertising off
 
-Hold an extra tty_port reference across TTY registration and the
-remaining initialization. If registration fails, drop the initial
-reference only if the TTY has not already taken it, then drop the
-registration reference. Save the device id before dropping the
-registration reference so the return path does not access dev after it
-may have been freed.
+Steps to reproduce:
+* add advertising with instance 1
+* set connectable on
 
-The DLC state callback can run before tty_dev is published. Publish
-tty_dev with WRITE_ONCE() and use READ_ONCE() in the shutdown and
-reparent paths. Skip reparenting while tty_dev is unavailable;
-rfcomm_dev_add() calls the reparent helper again after publishing it.
+The kernel started advertising with instance 0x00, even when the
+advertising property is off. We should only update the default
+advertisement when the proper flag is set, and that is HCI_ADVERTISING.
 
-Fixes: 5b899241874d ("Bluetooth: Release RFCOMM port when the last user closes the TTY")
-Reported-by: syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com
-Closes: https://syzbot.org/bug?extid=11542ff1d167fdffa1fc
-Co-developed-by: Jinning Zhang <25031212117@stu.xidian.edu.cn>
-Signed-off-by: Jinning Zhang <25031212117@stu.xidian.edu.cn>
-Co-developed-by: Bin Yu <byu@xidian.edu.cn>
-Signed-off-by: Bin Yu <byu@xidian.edu.cn>
-Signed-off-by: Haoli Zhang <26031212468@stu.xidian.edu.cn>
+Other advertisements (with instance > 0) have a separate connectable
+flag, so we shouldn't update them at all when the connectable property
+changes.
+
+Fixes: 37adf701dd87 ("Bluetooth: Add per-instance adv disable/remove")
+Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- net/bluetooth/rfcomm/tty.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -127,9 +127,10 @@
- static void rfcomm_dev_shutdown(struct tty_port *port)
- {
- 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
--
--	if (dev->tty_dev && dev->tty_dev->parent)
--		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
-+	struct device *tty_dev = READ_ONCE(dev->tty_dev);
-+
-+	if (tty_dev && tty_dev->parent)
-+		device_move(tty_dev, NULL, DPM_ORDER_DEV_LAST);
+ net/bluetooth/hci_sync.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 638589f77081..efcca81ce284 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6648,11 +6648,9 @@ int hci_update_connectable_sync(struct hci_dev *hdev)
+ 		err = hci_update_adv_data_sync(hdev, hdev->cur_adv_instance);
  
- 	/* close the dlc */
- 	rfcomm_dlc_close(dev->dlc, 0);
-@@ -173,6 +174,11 @@
- {
- 	struct hci_dev *hdev;
- 	struct hci_conn *conn;
-+	struct device *tty_dev = READ_ONCE(dev->tty_dev);
-+
-+	/* The connection can become active before TTY registration completes. */
-+	if (!tty_dev)
-+		return;
+ 	/* Update the advertising parameters if necessary */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+-	    !list_empty(&hdev->adv_instances)) {
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+ 		if (ext_adv_capable(hdev))
+-			err = hci_start_ext_adv_sync(hdev,
+-						     hdev->cur_adv_instance);
++			err = hci_start_ext_adv_sync(hdev, 0x00);
+ 		else
+ 			err = hci_enable_advertising_sync(hdev);
  
- 	hdev = hci_get_route(&dev->dst, &dev->src, BDADDR_BREDR);
- 	if (!hdev)
-@@ -188,7 +194,7 @@
- 	 * guarantee the sysfs device has been added ...
- 	 */
- 	if (conn && device_is_registered(&conn->dev))
--		device_move(dev->tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
-+		device_move(tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
- 
- 	hci_dev_unlock(hdev);
- 	hci_dev_put(hdev);
-@@ -267,6 +273,8 @@
- 		((1 << RFCOMM_RELEASE_ONHUP) | (1 << RFCOMM_REUSE_DLC));
- 
- 	tty_port_init(&dev->port);
-+	/* Keep a reference until rfcomm_dev_add() completes TTY registration. */
-+	tty_port_get(&dev->port);
- 	dev->port.ops = &rfcomm_port_ops;
- 
- 	skb_queue_head_init(&dev->pending);
-@@ -316,6 +324,7 @@
- {
- 	struct rfcomm_dev *dev;
- 	struct device *tty;
-+	int err, id;
- 
- 	BT_DBG("id %d channel %d", req->dev_id, req->channel);
- 
-@@ -325,24 +334,29 @@
- 		return PTR_ERR(dev);
- 	}
- 
-+	id = dev->id;
- 	tty = tty_port_register_device(&dev->port, rfcomm_tty_driver,
- 			dev->id, NULL);
- 	if (IS_ERR(tty)) {
--		tty_port_put(&dev->port);
--		return PTR_ERR(tty);
--	}
--
--	dev->tty_dev = tty;
-+		err = PTR_ERR(tty);
-+		if (!test_and_set_bit(RFCOMM_TTY_OWNED, &dev->status))
-+			tty_port_put(&dev->port); /* Drop the initial reference. */
-+		tty_port_put(&dev->port); /* Drop the registration reference. */
-+		return err;
-+	}
-+
-+	WRITE_ONCE(dev->tty_dev, tty);
- 	rfcomm_reparent_device(dev);
--	dev_set_drvdata(dev->tty_dev, dev);
--
--	if (device_create_file(dev->tty_dev, &dev_attr_address) < 0)
-+	dev_set_drvdata(tty, dev);
-+
-+	if (device_create_file(tty, &dev_attr_address) < 0)
- 		BT_ERR("Failed to create address attribute");
- 
--	if (device_create_file(dev->tty_dev, &dev_attr_channel) < 0)
-+	if (device_create_file(tty, &dev_attr_channel) < 0)
- 		BT_ERR("Failed to create channel attribute");
- 
--	return dev->id;
-+	tty_port_put(&dev->port); /* Drop the registration reference. */
-+	return id;
- }
- 
- /* ---- Send buffer ---- */
+
+base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
+-- 
+2.43.0
 
