@@ -1,85 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.173
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795339867;
-	b=yJrOSeJrsecRbOJJ1XiLUSkvSHiTLMfB5cwnhkEb1Azg/Us0qzd/o3oSQglybfOZKD8C
-	 9YRxlzIhsYYsDNfU10fdVx8RHZ4LnZPdF2+WF+U0du7mOVv+TMvMG9pgmeg9RXV9xhrL8
-	 MSBqNhB0ukCYSPWnpekv09zAYsMRILfO2YdPBSMgJ/oHHgaGznQBcCtWkre8zU668SbIv
-	 g36qmsY5Sa3Y28CmDWZeyEW34rxEITjOY/SXqBy0GmLqZ38d00lXh47l9/n3PvVa1qi+D
-	 yJFNTVJiRAtDQVVY1wmQuLQ4UYvXqeDiELmqx9NEXUxkurvYssved2Mr8DcXTB8y9dg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795339867;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=4DNw/kimecgVpSgXGqGa/o9pSbqFztzGux4KuZTiZjY=;
-	b=MMasTg8qYg5NXFEto5mBW5Puyd82AlyVR1Tp8ijO71zOzuAkwAwjvMK3zwiDSai3HywP
-	 rbjbcTpUVMpMlhLI7cyysPxsIvib5VwfhCZGCMOJQcCDNNbhD+/+D+amsnFw1C3pCfExp
-	 AdNiroYvQgiJjq/Wjk/mRi3g1eUcfuEvqV4IJ192THN5SKFAU8INZK9sYr9c6lmG5OF7w
-	 VttmvIjBiVMr9lubGbF3GRJ98BfgWLMJN1Hq4K1oj0D/DVsxWScWASwCItg9yR5Bbt7ez
-	 Umds53vBK/uuqicrg/+AKV3xCASojaB62tzUkPn0TlJiUwuAqwHh9Jfsajyq9s4CCsw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cEWDptyt;
-	arc=none smtp.remote-ip=209.85.214.173
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795340161;
+	b=DkrMhJPR46iul4l7h1Ql8hcyrp3BQZB5X7evC3NItbKNA1RuJvaYm3wkPTE/rQZaZx0Q
+	 j2ay5mcgrNkKCZzOuvYRMZftoYbr/yd1EAk39JYeaJLUYBIB3ffa7nqffUK/ZY6SvBy+r
+	 SJ6k23ICozKwNuWQatAx+nLH02/Z4HMtoGWwn4FCjjIllOeu+dKUkY6JCSqcqCuAk/9ro
+	 siyf+urIncXBGLQlVjDnZvxM6r8FIHFWBA0tP0aXl2ibxlBhkAignDT4MAuYq1J6K1W58
+	 +Sa2C32hsc7j8wRoDxhyL5uRrcgpGFxni04K/F2nJDy0txI0EqLAxtHJkZNDy15OHOg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795340161;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=oFLBgFCgmaxQmxWfb6LVRPsrv/iiQMDieM1Nl0PLyM4=;
+	b=Hyk2aO9P2qnLHtQCRdrFQwb8YRTCWZkYQVrNs5SUaw71BE+akARwLE62YvQs/ms5GcGD
+	 obNWmmhpmeZ4G9jETRQ0WVgL9oqka8LTgMzZr4Yjw5ivrzh39PVZ7rRpTiHBTudZLDdpe
+	 cY3733qykfKXvzFz7kK71Q1PEWHjPa21BHTenzEZ9rECbr7S0oILcQUVoWXRuYujYPky/
+	 VyuaEC5LYe3UeOaux/Waa7gJq76pL9Go3T0mIYqyguf0oFCzo1c4n3wqdi8fs7A05ABfA
+	 bGDdo1OX4OG4pSStCqW9/WN2KQBQqK1iT8xq55nJgIQwTVDArTIJ9yrQv49oUHkmc0A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ftJiMAXT;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12FD606A320;
+	Sun, 22 Nov 2026 09:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ftJiMAXT
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795340161;
+	b=xnmLF9y3FPkwsK8HUfwxvNk8TJoEz3uz/G3OaK95IpEsjbK3SRnQl+yF+dscdTbjQ0DM
+	 g6+5R33Wz33U52JMoDaTgCQcE3fJ5fhmQdX3jjKIOOn4G90cPNFBAlqFYtLPsf6w1BLr9
+	 LEu9KSkQFPfqVWqzMW7XcRyfcmTkQPF2dmDscWzppjkRT+1D/ETGvaeA0wbZ5SS4E9Lrj
+	 /hmVci4m1yZi5dKM8rPZINw5C2vQzTb9vecmXaKap5twkpnlqfM7CtxPksSsB//fUoCtF
+	 rrZyun4kc5X6StNpJ/hXvn6myArS6seqHznny+KiRztKczhCTbaw3BZIAdrJuCWTBOA==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795340161;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:To:Cc:X-Mailer:X-Developer-Signature:
+	 X-Developer-Key:X-Endpoint-Received:X-Original-From:Reply-To:
+	 Content-Transfer-Encoding;
+	bh=oFLBgFCgmaxQmxWfb6LVRPsrv/iiQMDieM1Nl0PLyM4=;
+	b=N5hiBMx/PJgVbi2Sc9TUr9xipQk1TyS7H414VVjRxDw5MupAhGnG/S4/9BtZQFqDIw3B
+	 7ky4jQ+QbblK/BPvTtqqdwVPREV1jdVw7dBTiDuqg4BdNYeDASUE4cgBQHLKt0jqtFMzF
+	 xKgkRmH+6SgikNnGkN/jEQjxDZaBXp9mzCDJK130UEK08Utz8CbIm6Djpi6PRBCu2RNqu
+	 IBbr1B7CdFJ3isUCJ4VngUKsBq6wrOVnvV49mj0T4AbrZFvRLW3s6PFujGavDvAbKOrk6
+	 9DB73yBJy/3YypbUk5c+H/68GYwRf3DGDcfHzFCAdfgJN/YZtHuUfZsYQY1laMX0OZw==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6589606A32C
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 09:31:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6589606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cEWDptyt
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2f037bc348dso19361295ad.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 01:31:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795339866; x=1795944666; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=4DNw/kimecgVpSgXGqGa/o9pSbqFztzGux4KuZTiZjY=;
-        b=cEWDptyttQb98YKeb74496iwQyB/t8Hc6jzGWUMoD3R50damzavkOCwnlh1Oh5c8fv
-         Bni+FNW7V7f7GEejDHbOlVRn16cqkA1Y1ToqFtVTzL4ZFBrYNVq4JlaOCguogN9/ocJG
-         0eK35l0apXldL7QXVuIB7nQLkvhzINH6+LNuOMYhN88AX9s6ZilcvCZbAbt6iwGkmfH9
-         fhVyI5wJ6KgWjP+jI4Dg+YCJggQEeZnVVpOoEW/eJ4wfmwtCT1c+FowQ5J5iQuW3WVia
-         oU2zScyvw/bp9J6XBsZgaVXMwoyZpyyEl3xHPDkxjiDsx14iLVTsrQUa8Y3GYoz9OpEL
-         HQrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795339866; x=1795944666;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=4DNw/kimecgVpSgXGqGa/o9pSbqFztzGux4KuZTiZjY=;
-        b=zIW7qIJ/te4+ChCU2H7FYmw420UDZuaNYcrHyLya9CZQFzP0thfQVQGAauks9JJ5+C
-         FlUPj0XH7I5AkBYIvwwYKezCZecg5igCQRroKShnYbWXW+/EpVVsgFRQEgSu4gBol1np
-         /SoDqdHEaQvF7/VtWP2hP99dpm4QEk/NuxyYr9HdTsoT/UzXi1LXE3eCZk9N0k4D5Xbm
-         rxdhaP5qy7g/oasWnhs+otmKJW1Og4G1tnAIgiMhyTfUXmq1GcIPBb60Pu+y2CqwZNRi
-         nNuNyd+c/Rbeg0r+1Y3hPtbEir378xHeG7Cjzw299XaFufgUB/CaXjrve/+Jvabjs9R6
-         05LA==
-X-Gm-Message-State: APuU4Z85XLgkonVgqAGwvtw5yqYgxzRwPFwH+jmQPq9RMtUmakwgg8dM
-	CPpGBO3Gu5qPNdSKwJQmd70xxLMIHOO6+WVGF0O+3FkQVv+OUCOkwWCbrTlyrA==
-X-Gm-Gg: AZFdTZd4BF/J+Sxd70Abf54o7X+wBtQv+8VVd/V11KMEjj5Yul6xMXtlw00zgsgRfiO
-	mRbAZFShwZrmQkIVl8HzOzVORBOOyFv+B88FjpxWklUFvojp59ysgsfNR8xSXa8iLmBle24fBNx
-	fB7jdOiNV9VLbHxhGpY5sBlvOLCXc2NGmAp/WA0RkvItjYffqlA3/Vn2TOqPALmjJPicy//yDYY
-	BA44O/jFmKeBgvY/zgxPYuj0oawSR6rZzGz9MlzNErAioOk4IJgNuQbjKYw1EPJfl0ggqMVngYV
-	CWbekdkXlMI0Q49ip5nEn+AvhyvJKNEqSFHIfg6ZBavxTxS6SbogujkFD2IAbWm6RiRkAYFVZ6S
-	8K462y+16lHSHwRvzSkh/vQWx7we2HcrR3fBU7KmSb0GbuLPXITgoEDu9B4wz+mFg6+dnO9gw+1
-	tDPwyUmnGM31YhFrxs3A1DHlMl+/tiHboM7K4VK+LqxuiUSe+mqzmuG6ppPF+8jotkd0YeRMQGX
-	wn4QuVdIWgU3PuSCAVw7tXjd3zz7uVyeLN8iYYlmCCiAgKcm/jJbKDp3D65bAbW/hP47SaffHWt
-	uHBMBJK/Hr6KyH+Qiyvkl/Qag71CMeafl67+dE5guw==
-X-Received: by 2002:a17:90b:4c0b:b0:3b0:a38a:6715 with SMTP id 98e67ed59e1d1-3b41c95dd5emr9008352a91.59.1795339866016;
-        Sun, 22 Nov 2026 01:31:06 -0800 (PST)
-Received: from [172.17.0.2] (ec2-3-42-157-109.us-west-2.compute.amazonaws.com. [3.42.157.109])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6cfc613csm3511654a12.5.2026.11.22.01.31.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 01:31:05 -0800 (PST)
-Message-ID: <6b02b659.3b75116a.319588.3631@mx.google.com>
-Date: Sun, 22 Nov 2026 01:31:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4601543414647093808=="
+	by smtp.kernel.org (Postfix) with ESMTPS id C62821F000C0;
+	Sun, 22 Nov 2026 09:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795340161;
+	bh=oFLBgFCgmaxQmxWfb6LVRPsrv/iiQMDieM1Nl0PLyM4=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=ftJiMAXTy9XlnisQASWuKvcQsP8NdVpRUdRSFVMdG1EmCZVNa9sjZgSqhcEGTgqFO
+	 TInzAJVY06YUSQqex4/veB6THoTiFvVLVvmmT/2eOcNaZMFu343uZHw5JnWyWQjz++
+	 9KWRhShLnIFwMUOmrcBFXsALZOBJfj8j6Cl/FSd0A6vWCiKNrTvYhbJ5ivfGo0kBAo
+	 lCMSnzx3Iy6nciIq2E72qIbZHFFqZ+BX+B6NZn6xMlxr//hNeBS1qVBADPVwU6xS/K
+	 eugant2dvdPktc8A4htDPplDBSPNlcC1Yc+gFIn0mUG8ahM8Q6npWrTqWPG4Dg9ZR9
+	 AYMyHl8fEM12w==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 282CE4BFDB;
+	Sun, 22 Nov 2026 09:36:00 +0000 (UTC)
+From: Leicheng Xie via B4 Relay <devnull+leicheng.dev.gmail.com@kernel.org>
+Date: Sun, 22 Nov 2026 17:33:29 +0800
+Subject: [PATCH] Bluetooth: RFCOMM: Fix slab-use-after-free in
+ rfcomm_dev_add()
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,57 +83,115 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, emcp@enser.io
-Subject: RE: Bluetooth: hci_ll: download the init script at the operating speed
-In-Reply-To: <20261122-b4-hci-ll-oper-speed-v1-1-952a9c1edfde@enser.io>
-References: <20261122-b4-hci-ll-oper-speed-v1-1-952a9c1edfde@enser.io>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4601543414647093808==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261122-fix-rfcomm-dev-add-uaf-v1-1-cac5354752ed@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAOi2AmsC/x2MywqAIBAAf0X23EJr734lOoiutYcylCKI/j3pO
+ DAzDySOwglG9UDkS5KEPQMVCuxq9oVRXGbQpW6JtEYvN0Zvw7ah4wuNc3gaj9Zz3VcddTQ0kOM
+ jcjb/8TS/7wdFmz/PaAAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Gianluca Anzolin <gianluca@sottospazio.it>
+Cc: linux-bluetooth@vger.kernel.org, 
+ syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com, 
+ stable@vger.kernel.org, Leicheng Xie <leicheng.dev@gmail.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795340012; l=3276;
+ i=leicheng.dev@gmail.com; s=20261122; h=from:subject:message-id;
+ bh=wPiurJf5NAB3Lu8Avk81ILeINiSohz9dvVjdRquJVBo=;
+ b=6Q+PSt3gaZkOQ7tAFw438TjcTSry2NO0bq7tgnocaG0Af45XxeX3tdpcInxYtCuzgXpbMPTwT
+ b45gFQpGmg0DdahRCUttX80fmnMY/QBYxfLGSnB+OANXrPmPYYwCe7I
+X-Developer-Key: i=leicheng.dev@gmail.com; a=ed25519;
+ pk=3Wc835kaGsdFoMvE39Cn0NKn+/y+alxEDJs7LjGUmis=
+X-Endpoint-Received: by B4 Relay for leicheng.dev@gmail.com/20261122 with
+ auth_id=1600
+X-Original-From: Leicheng Xie <leicheng.dev@gmail.com>
+Reply-To: leicheng.dev@gmail.com
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+From: Leicheng Xie <leicheng.dev@gmail.com>
 
-Dear submitter,
+__rfcomm_dev_add() inserts the newly allocated struct rfcomm_dev into
+rfcomm_dev_list and releases rfcomm_dev_lock while holding only the
+initial tty_port reference. Back in rfcomm_dev_add(), the device is
+registered with tty_port_register_device() and further initialized
+(dev->tty_dev assignment, reparenting, drvdata, sysfs attributes, and
+reading dev->id).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1218434/
+When RFCOMM_RELEASE_ONHUP is set, a concurrent task can open and close
+the RFCOMM TTY device as soon as it becomes visible on rfcomm_dev_list.
+rfcomm_tty_install() takes over the initial reference by setting
+RFCOMM_TTY_OWNED, and rfcomm_tty_cleanup() drops it to zero, freeing
+dev via rfcomm_dev_destruct() while rfcomm_dev_add() is still running:
 
----Test result---
+  BUG: KASAN: slab-use-after-free in rfcomm_dev_add
+  Write of size 8 at addr ffff88800e85b3e0 by task rfcomm_uaf_poc/179
 
-Test Summary:
-CheckPatch                    PASS      0.42 seconds
-VerifyFixes                   PASS      0.06 seconds
-VerifySignedoff               PASS      0.05 seconds
-GitLint                       FAIL      0.16 seconds
-SubjectPrefix                 PASS      0.05 seconds
-BuildKernel                   PASS      20.00 seconds
-CheckAllWarning               PASS      23.75 seconds
-CheckSparse                   PASS      25.57 seconds
-BuildKernel32                 PASS      20.98 seconds
-CheckKernelLLVM               PASS      22.81 seconds
-TestRunnerSetup               PASS      495.77 seconds
-IncrementalBuild              PASS      19.37 seconds
+Hold an extra tty_port reference in __rfcomm_dev_add() before dropping
+rfcomm_dev_lock, and release it at the end of rfcomm_dev_add() after
+caching dev->id. On the tty_port_register_device() failure path, use
+test_and_set_bit(RFCOMM_TTY_OWNED, &dev->status) before dropping the
+initial reference to match __rfcomm_release_dev() and prevent a leak or
+double-put if a concurrent open took ownership.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_ll: download the init script at the operating speed
+Fixes: 5b899241874d ("Bluetooth: Release RFCOMM port when the last user closes the TTY")
+Reported-by: syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=11542ff1d167fdffa1fc
+Cc: stable@vger.kernel.org
+Signed-off-by: Leicheng Xie <leicheng.dev@gmail.com>
+---
+ net/bluetooth/rfcomm/tty.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-50: B2 Line has trailing whitespace: "--  "
-
-
-https://github.com/bluez/bluetooth-next/pull/1178
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 198c7dd1a95b..3a61c45b5b51 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -303,6 +303,9 @@ static struct rfcomm_dev *__rfcomm_dev_add(struct rfcomm_dev_req *req,
+ 	   holds reference to this module. */
+ 	__module_get(THIS_MODULE);
+ 
++	/* Hold an extra reference for rfcomm_dev_add() until setup completes */
++	tty_port_get(&dev->port);
++
+ 	mutex_unlock(&rfcomm_dev_lock);
+ 	return dev;
+ 
+@@ -316,6 +319,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ {
+ 	struct rfcomm_dev *dev;
+ 	struct device *tty;
++	int id;
+ 
+ 	BT_DBG("id %d channel %d", req->dev_id, req->channel);
+ 
+@@ -328,6 +332,8 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 	tty = tty_port_register_device(&dev->port, rfcomm_tty_driver,
+ 			dev->id, NULL);
+ 	if (IS_ERR(tty)) {
++		if (!test_and_set_bit(RFCOMM_TTY_OWNED, &dev->status))
++			tty_port_put(&dev->port);
+ 		tty_port_put(&dev->port);
+ 		return PTR_ERR(tty);
+ 	}
+@@ -342,7 +348,10 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 	if (device_create_file(dev->tty_dev, &dev_attr_channel) < 0)
+ 		BT_ERR("Failed to create channel attribute");
+ 
+-	return dev->id;
++	id = dev->id;
++	tty_port_put(&dev->port);
++
++	return id;
+ }
+ 
+ /* ---- Send buffer ---- */
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 4843f6873f7c4835e62f2c73ba0fd538e57a2f22
+change-id: 20261122-fix-rfcomm-dev-add-uaf-cfe483717195
+
+Best regards,
+-- 
+Leicheng Xie <leicheng.dev@gmail.com>
 
 
---===============4601543414647093808==--
