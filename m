@@ -1,85 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=162.243.164.118
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795348251;
-	b=qj5z+UnDDag8EL6eWztTpFMtI0gUtDHUCTYcZbDcLJZTH4heJRLaWrbzc2ptH591Gw3D
-	 Mjl+12GdcdcTcvcLaukY3cavo2p8sp3m3ajz5urt4/F1/Pe7/kFQN0uKXJZ87jlEpAx3G
-	 nRaFjEWkZn9lRRrc3AKrwCYSEgqauuugZxTdSPkRkQPqJAuhGyZXdEOoFPxtGMFTS8hGK
-	 HASZ6+5V0ON4Xp2JUvxgdQ7aXq7I1Q+Fw7mPd0fmGtUekPrFdiZZr19oaeQcEkPPEJrOt
-	 pS/+Xy0RnSDCYYTdNCNwjYDyVBTDvhi7SjAAKoxPwwOAOOVjVtcgOcMKJocMjYvDirg==
+	t=1795353574;
+	b=Bk/N+/O8nXmqcc52iswEogzCM1dBrRtakxFb4hbcBqCjHj5Jg6Brd6/k77SNEhDirNnG
+	 FK8yEEO3qLNhJlTnVGG/xkGYQJy+DJOox8IdS4ZkJ2X4/kGKAg1sw+HBcqkCwtDUdl6WW
+	 yfVStcTNS1/hdy6BDhvI+iFjXH1QXbV0ZyMCbFSQy44j9LDLP6QDzsO5N8BhOe1lyAc86
+	 /6HxD2dRvtR2LpJRSDKuyslFaqgDd9bz3eosR+JwG14AYlPxcbFXxy1H1tgPsl3z1Y8Cq
+	 awd7qpJIqrhJWqWNMGE18vuPp7EErKlDcIFg3zNRiga1kTc/jZb+rzwDEkbl/RzPdXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795348251;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=GcOQVzEiETB4OL7U9Zwh7hQgb4ZfgcSD/YTNMOb8+xg=;
-	b=cQ9A7eAKzl1OYXrLj5NEtNFufGRe5u/0/Rn/YCIt4KeXPKLaOjj0orTPcCmL7viCk24H
-	 ioks9tSvU9NL4vCK6Q6RGIriGjw2CqQ+le5P5yseabC8FBo0cp6ClGAbZCRavySJkDOxn
-	 4NLLB4T0hsCkppCRgB/fJkdoMIK+s0VnE7+olln4yqKsv8S1x+D8pw2EfLoZGa5D7bb9o
-	 cp3sAN2rekihp2ZzW6BX6fG9VGuF43F4NVitJ4qfjsyE2H3f3bdZVJzHykBUy8HK0ycWN
-	 Fu+y+vXO0GFkvG2m9iiZQcSTZGutfYRULHuC35WGv/5RqAbXNmM80DoiQBGo0dAWfdw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795353574;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
+	bh=HDvZmONCug0157g12f+0Zcf9P8MNQUPe122O8kSXMUE=;
+	b=oYZTHVQ6I53aax7dj30klDE5PRlJPhsdJNbeuRorcq6son06MMTflmZDk0fwK69fLaBv
+	 pPP7yDH9HqLSzZPhy+alegPoAXuSU5EoNuDlz8MZ/TwbsaWpaf+kgZNPCvtDB0lF1ql+j
+	 Np//Kk/gbSMuLrN2m4PKfTNQSnchtMuVtT2/uUDuftCCDbePcteTb/NZYZrqUEDmPIg0r
+	 x5yfvboJ6H/m2OiQLbu61WcExoi/zv1z/wR5NMAO98sqsGeOlIiGvAOEfGOJFlDnuf7V7
+	 PODOrLjwH4T9P+etcFq4Q/KBP1fCxX4fD8nrxjjv11e6h1NSKJB5ymUZDnvnwDovCeQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=streamunlimited.com;
-	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=gq8kyQ8o;
-	arc=none smtp.remote-ip=209.85.128.54
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3904606A320
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 11:50:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F3904606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=gq8kyQ8o
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a1fbd52ab6so16048085e9.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Nov 2026 03:50:50 -0800 (PST)
+	dmarc=pass header.from=stu.xidian.edu.cn;
+	spf=pass smtp.mailfrom=stu.xidian.edu.cn;
+	arc=none smtp.remote-ip=162.243.164.118
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41492606A320;
+	Sun, 22 Nov 2026 13:19:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41492606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.xidian.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.xidian.edu.cn
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795348249; x=1795953049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=GcOQVzEiETB4OL7U9Zwh7hQgb4ZfgcSD/YTNMOb8+xg=;
-        b=gq8kyQ8o8BczCBg62PhN6huHm9Mo4reiKTWdfrLZpky3Z+uLvRCF2QXV/IFc1WDRcK
-         Affc1coZdzwM107hLr96e0U/c0LC4hVxgId880QuvFj9ydQVVK95WGwxBdrTQmcNDvht
-         xlHq+IY5zu4Rb9SULTmDnxZwZNA+DvIarkrDs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795348249; x=1795953049;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=GcOQVzEiETB4OL7U9Zwh7hQgb4ZfgcSD/YTNMOb8+xg=;
-        b=xs/Ec5t3CS6yRdxrbvpq7GzngxytOtk034hhCaFLJJurtAfrWqEEiDctEZy55WTA/e
-         rtCV+AkmYjjJGhKfD7/v+WmDFv0zpUIsH1VJwxKyAe+PQGQQABPMY+t7blMlK5VjwEQV
-         yQ+NSX0Tr0cdQBb9SsNCMe+WYg/lM+yJGYzCS/uvv67LwpovkhW9J2gIb1eg4wDpd7Ul
-         fkoN2GwSo+gNB7OFnl0B3Sud7iEs5uTidILXRCKdBDb8f0Omij4yZHBpE876N9maTrYl
-         5Sxv2lo+AS7FnUfvs7HquFIISjgzuRCDsr5QoNofOXNIcuBNhAu5I4zy6IkggvKEHu2+
-         xldw==
-X-Gm-Message-State: APuU4Z9wE4Z+Nz/ucsgm+9vvr4vRHGjmpZZSSdTgYCkYudYyGrYqAs6I
-	j3+YZ+P1cwLn/WWCdQc4g9vPD5qKLoPYTiKciiMmeGOQ4Pm7lTIkuIO7r7HMsNLybofMlXRRIb5
-	3cPwF
-X-Gm-Gg: AZFdTZfTNboPIu3ihbmxYB4moHt+CJQ0KliSE/rRBOg8CqxAYN1sbEVzWdTK+s03wTL
-	FJDeqxLGZRu7tNecQP0wWt70UemJw7fa25A42VqDyHhWDHjP/GovcErv/pLllAtO636/KJprRI6
-	mBbg0hylG8+jF8DuExmyOTEt7bi8mFO7pvtZ5EAg/XU/lBc6l7+VHQmcvC8SUwwQGAhNRwIRHMw
-	Zw8oYfOCmpo1IS4OlkRYiFC7ZxOFjUD034C2VqhQ9T9i/YG4HtggMbST1pi6GxrcxohqK9GWqIu
-	ErlGtLKsmfGtm6iclXEBs7CmjKqTO4qK/PMBOZ/UDyfq271bHsvjgzTF2ctleVQoMO8plsR38Ee
-	+qzGrICmJoAKi0iSlCk9/YGB/cRSUhggOX5pRlXE387nyuAE86/9qEWQrwsx1owGjqGX6lh3qRW
-	uUEWW9YcARm7GQZztlI4W4P8xB/luUyagVz7AV1Yr5JgEBA770nS4GYpbw0PLIzycXvqtoFdqIe
-	14t5nyOFDTL3WvtQLtkZEE/i10nRuRPiQApmKwnjZlKAgQ7k+5wPtGMkAKJJEHEDSACAp85Qvmb
-	dnnBcYkw996RgWZ6OxGHfmrMBmf1OD9Wxr6jZ3IAff+JEXpE5w==
-X-Received: by 2002:a05:600c:5493:b0:4a2:8c5:5e5 with SMTP id 5b1f17b1804b1-4bb8881c734mr188423545e9.7.1795348249296;
-        Sun, 22 Nov 2026 03:50:49 -0800 (PST)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:f8cf:a1d9:90ed:c978])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c248b75sm16538513f8f.54.2026.11.22.03.50.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 03:50:49 -0800 (PST)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 1/4] shared/bap: Remove broadcast sink PACs in bt_bap_remove_pac()
-Date: Sun, 22 Nov 2026 12:50:42 +0100
-Message-ID: <20261122115045.1077168-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
+	d=stu.xidian.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=HDvZmONCug
+	0157g12f+0Zcf9P8MNQUPe122O8kSXMUE=; b=CMA7NDX5vL1p8VBwiOLfX8f/aq
+	Z0iHcMbxCi0pPuNgAtmcxTmGCyzgRioijHMhnUHv0pHHVR4b36enegCFbzzARvac
+	6dIo85Hd0qDWTTI5SmxzHKTtU50Erd9ah1t/fH6+M83Chx3TorSrau3Zrp7uq6ql
+	X8duqYQnk7gvUsrD4=
+Received: from LAPTOP-FRMFRHCN.localdomain (unknown [240e:454:8311:30f9:88d4:5e3b:b008:f171])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with UTF8SMTPA id BbQMCkD2+fzM6wJr+1cQAg--.4331S2;
+	Sun, 22 Nov 2026 21:19:09 +0800 (CST)
+From: Haoli Zhang <26031212468@stu.xidian.edu.cn>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	nicoyip.dev@gmail.com,
+	tim.bird@sony.com,
+	raghunathpalla.0209@gmail.com,
+	peter@hurleysoftware.com,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	25031212117@stu.xidian.edu.cn,
+	byu@xidian.edu.cn,
+	syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: RFCOMM: hold port reference during TTY registration
+Date: Sun, 22 Nov 2026 21:18:50 +0800
+Message-Id: <20261122131850.44042-1-26031212468@stu.xidian.edu.cn>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,44 +65,150 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BbQMCkD2+fzM6wJr+1cQAg--.4331S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFWkGFykXFW7trWUuFyUKFg_yoWruF4Upa
+	y5XayrKFWqqr17Kr4fAF4DXa4F9rn7u3yxCry8Cw10krn5GrZ2yrWSg34jva1rArW8AFWj
+	qF4jvF48Wr9rurJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
+	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4
+	vEI74l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRZNVgDUUU
+	U
+X-CM-SenderInfo: yswqjiasrskluy6v33wo0lvxldqovvfxof0/1tbiAgUDEWr-E0nOXwABsK
 
-bt_bap_remove_pac() looked for the PAC in the sink, source and broadcast
-source lists only, so a broadcast sink PAC stayed in broadcast_sinks
-after its endpoint was freed. When the endpoint owner goes away, like
-WirePlumber restarting, the next BIGInfo matches the stale PAC and
-bluetoothd crashes:
+rfcomm_dev_add() registers the TTY after __rfcomm_dev_add() has made
+the device visible through rfcomm_dev_list. A concurrent TTY open can
+acquire a reference to the newly listed device while registration is
+still in progress. For RFCOMM_RELEASE_ONHUP devices,
+rfcomm_tty_install() can drop the initial tty_port reference. A
+subsequent close can then free dev while rfcomm_dev_add() is still
+using it.
 
-  pac_bcast_config (endpoint=<freed>) at profiles/audio/media.c
-  pac_config () at profiles/audio/media.c
-  bap_bcast_config () at src/shared/bap.c
-  bt_bap_stream_config () at src/shared/bap.c
-  create_stream_for_bis () at profiles/audio/bap.c
-  bis_handler () at profiles/audio/bap.c
-  bt_bap_parse_base () at src/shared/bap.c
-  big_info_report_cb () at profiles/audio/bap.c
+Hold an extra tty_port reference across TTY registration and the
+remaining initialization. If registration fails, drop the initial
+reference only if the TTY has not already taken it, then drop the
+registration reference. Save the device id before dropping the
+registration reference so the return path does not access dev after it
+may have been freed.
 
-Fixes: d49ea14f70da ("shared/bap: Add support for BAP broadcast sink")
-Assisted-by: Claude:claude-opus-5-5
+The DLC state callback can run before tty_dev is published. Publish
+tty_dev with WRITE_ONCE() and use READ_ONCE() in the shutdown and
+reparent paths. Skip reparenting while tty_dev is unavailable;
+rfcomm_dev_add() calls the reparent helper again after publishing it.
+
+Fixes: 5b899241874d ("Bluetooth: Release RFCOMM port when the last user closes the TTY")
+Reported-by: syzbot+11542ff1d167fdffa1fc@syzkaller.appspotmail.com
+Closes: https://syzbot.org/bug?extid=11542ff1d167fdffa1fc
+Co-developed-by: Jinning Zhang <25031212117@stu.xidian.edu.cn>
+Signed-off-by: Jinning Zhang <25031212117@stu.xidian.edu.cn>
+Co-developed-by: Bin Yu <byu@xidian.edu.cn>
+Signed-off-by: Bin Yu <byu@xidian.edu.cn>
+Signed-off-by: Haoli Zhang <26031212468@stu.xidian.edu.cn>
 ---
- src/shared/bap.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 8fc28de52..9404bddba 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4864,6 +4864,9 @@ bool bt_bap_remove_pac(struct bt_bap_pac *pac)
- 	if (queue_remove_if(pac->bdb->broadcast_sources, NULL, pac))
- 		goto found;
- 
-+	if (queue_remove_if(pac->bdb->broadcast_sinks, NULL, pac))
-+		goto found;
+ net/bluetooth/rfcomm/tty.c | 42 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 14 deletions(-)
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -127,9 +127,10 @@
+ static void rfcomm_dev_shutdown(struct tty_port *port)
+ {
+ 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+-
+-	if (dev->tty_dev && dev->tty_dev->parent)
+-		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
++	struct device *tty_dev = READ_ONCE(dev->tty_dev);
 +
- 	return false;
++	if (tty_dev && tty_dev->parent)
++		device_move(tty_dev, NULL, DPM_ORDER_DEV_LAST);
  
- found:
-
-base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
--- 
-2.43.0
+ 	/* close the dlc */
+ 	rfcomm_dlc_close(dev->dlc, 0);
+@@ -173,6 +174,11 @@
+ {
+ 	struct hci_dev *hdev;
+ 	struct hci_conn *conn;
++	struct device *tty_dev = READ_ONCE(dev->tty_dev);
++
++	/* The connection can become active before TTY registration completes. */
++	if (!tty_dev)
++		return;
+ 
+ 	hdev = hci_get_route(&dev->dst, &dev->src, BDADDR_BREDR);
+ 	if (!hdev)
+@@ -188,7 +194,7 @@
+ 	 * guarantee the sysfs device has been added ...
+ 	 */
+ 	if (conn && device_is_registered(&conn->dev))
+-		device_move(dev->tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
++		device_move(tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
+ 
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+@@ -267,6 +273,8 @@
+ 		((1 << RFCOMM_RELEASE_ONHUP) | (1 << RFCOMM_REUSE_DLC));
+ 
+ 	tty_port_init(&dev->port);
++	/* Keep a reference until rfcomm_dev_add() completes TTY registration. */
++	tty_port_get(&dev->port);
+ 	dev->port.ops = &rfcomm_port_ops;
+ 
+ 	skb_queue_head_init(&dev->pending);
+@@ -316,6 +324,7 @@
+ {
+ 	struct rfcomm_dev *dev;
+ 	struct device *tty;
++	int err, id;
+ 
+ 	BT_DBG("id %d channel %d", req->dev_id, req->channel);
+ 
+@@ -325,24 +334,29 @@
+ 		return PTR_ERR(dev);
+ 	}
+ 
++	id = dev->id;
+ 	tty = tty_port_register_device(&dev->port, rfcomm_tty_driver,
+ 			dev->id, NULL);
+ 	if (IS_ERR(tty)) {
+-		tty_port_put(&dev->port);
+-		return PTR_ERR(tty);
+-	}
+-
+-	dev->tty_dev = tty;
++		err = PTR_ERR(tty);
++		if (!test_and_set_bit(RFCOMM_TTY_OWNED, &dev->status))
++			tty_port_put(&dev->port); /* Drop the initial reference. */
++		tty_port_put(&dev->port); /* Drop the registration reference. */
++		return err;
++	}
++
++	WRITE_ONCE(dev->tty_dev, tty);
+ 	rfcomm_reparent_device(dev);
+-	dev_set_drvdata(dev->tty_dev, dev);
+-
+-	if (device_create_file(dev->tty_dev, &dev_attr_address) < 0)
++	dev_set_drvdata(tty, dev);
++
++	if (device_create_file(tty, &dev_attr_address) < 0)
+ 		BT_ERR("Failed to create address attribute");
+ 
+-	if (device_create_file(dev->tty_dev, &dev_attr_channel) < 0)
++	if (device_create_file(tty, &dev_attr_channel) < 0)
+ 		BT_ERR("Failed to create channel attribute");
+ 
+-	return dev->id;
++	tty_port_put(&dev->port); /* Drop the registration reference. */
++	return id;
+ }
+ 
+ /* ---- Send buffer ---- */
 
