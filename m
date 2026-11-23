@@ -1,89 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795453184;
-	b=KNtgp2z4vSw2hhNCAvfhzEAeSW9RLmW26QaQnPVKp+myKK4y36YK4MhfqKoRpWTZ8i49
-	 vLmExiB4tYkuyVVBtY48f05VoliKp4qstuL1QjQFhIlFdS0wQWUKlyRv3TazWsRgao2cK
-	 nnhO5IbVk7ofPXuRke0nOih3yfP+/prQVxCCbkZ/dGGCMtomMaTukcRrcdofeVkM7+lKK
-	 x00j46uZtJtt+qQ0Vy5cbouenks4//t8DGHAT2BOnlW+AW/KcsuumMWGswRNnnW5evZc/
-	 BFbKFgpBbb4EbHk82eAQ+C2gfhP+6I5Ca51+Oz1UO4JyWCMOGPA0gyJmKaEcer0BpSA==
+	t=1795453970;
+	b=Uj7ZG+fRJP9Uk7ud0Y1i77R1mE5I0VDd1EloRAIF5SLHiM8EpYSKcPj3jc34Lhd/7Ps1
+	 oEs3V33/JzKUlMhJgw9T1O0evxOSD7AHviBoOxeVc39IPM3iEcU3xD+Z7ncZWJ6WCyvVg
+	 yPq4E4lpSVN7MG9wkybgbm5/tlX3BTv4meoLHO0mZdRFH6ciXCOVduCSFGBTWCyGGSZSs
+	 kMHxvB0iJ1IW+04Zhffq71BWtwy0jRzwXA5uyAGS5h3j1VVv6zIkiYsf+jtDZlAAeMsJM
+	 Bas7il7b72emdqAToCiWLpCcBWjycIC12Nb5LhEghSQ///bh31w622lo4c2uNL0+b0A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795453184;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795453970;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=hvJk4GF+DMqUotxCEafF2E/zDJC9tUs/EV5INVJ9aCc=;
-	b=e0I72n92gh8TWJvbZQ6ypKNfwGYo5dYfWuJ4I2c5qQ6acJLtZyPrhkkEMftZ4uk8Z2Pi
-	 BJeizf3QaLtM3EvQXYwLTxT844yt5vosyhBSrsKGbYlrHfODceyAHRdMlFgcwiOUhon8u
-	 imJCTxRyi3KZtsAGbHXweKDGzGeWsm3/NUX6gFYBfZamRlWgt7Fvp0FgdWbnnxVdj3Z3f
-	 /mFQSR4K2noVWmYP4x9uaOhFUYkZgCzHIm/sFqRUra1DPUFoEmTywGsyKKxRvoN8PJd0+
-	 0dCH1DdZpN/emF0D91grFwMqoSRs/bc/7ZAUEGk4cCb31mDPuYAoiSatZ148AozkUdQ==
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=n3O7B7P7teRxrGKxSp/blvXosjh/w0/Z+HciPn0+tVE=;
+	b=au/2hokaDT1Yh1Iq0xUlILXMypStJO4fLAfFlGG+fPmDNy/+3rIcoh7CV8IQO+PkBo5O
+	 C3KwvqtuqZIRWr2yT4iP3C6SWPTcbQK+KYk/eX8soJT5O/P1vSRTKWp8ezn3azUMUcsBx
+	 xtxUqqPq21dCPUn/gsBBrrFF5l+Qxh1dVx+9iuTVNX52Rktauk2vX9TuKezYPMgVA0rvs
+	 JUwaVi8llixP7q3lFm/p4yDvPp7Twj8YEFaUV2NxlqFyk8IzPc51Ax7fWTwld6gZkw/hI
+	 1hrxskFHnulVFRSPsOFU6QGU35dSwf25ccAP5f6BgSRu7E/q3xzl/gmiN0wba5jNTbw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=0nikYLv+;
-	arc=none smtp.remote-ip=209.85.128.46
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=X8XOM0UO;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDD9606A69E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:59:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FDD9606A69E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D968D606A31E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:12:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D968D606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=0nikYLv+
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4bb6886d30aso34537605e9.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:59:43 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=X8XOM0UO
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb6886d30aso34682875e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:12:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795453182; x=1796057982; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=hvJk4GF+DMqUotxCEafF2E/zDJC9tUs/EV5INVJ9aCc=;
-        b=0nikYLv+O1mfMxvYpZjywyDXidJjVk01T7+rIvNh+oI7Pa/NTwqsVeHkbgBq6/5I2J
-         TMRxZ7PHUlJkUtFgRxsFnAi2jPRamqun/9OyPWe87eYzyCVaNm7yrGb0QyJG2JELezkf
-         Py7PAL8X7+399al21cybc94FhzC+qzIgu7qRA=
+        d=streamunlimited.com; s=google; t=1795453968; x=1796058768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=n3O7B7P7teRxrGKxSp/blvXosjh/w0/Z+HciPn0+tVE=;
+        b=X8XOM0UOXVVgPVC6oyBX9lYHjfkIEyARxIyT7WmPgFMyYyDuqdZWviILbIdwnKSZS1
+         +ExDci4XkAX2HoA735UMqXmxZGk7xT+Ygx8b1fHUkJind0GiUB7pZkd4UtVoxIcpXp4N
+         szQYv1JHSRl0/eEUHs1nd98pw9TaJMB72B1oE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795453182; x=1796057982;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hvJk4GF+DMqUotxCEafF2E/zDJC9tUs/EV5INVJ9aCc=;
-        b=K7lH2BKI61MR6pv1JkqeMNKu8Ybr34qfplYg4FWFQ/safSIIzbBQzVAf9ntQz6GjWe
-         P77dXmHBVx9MzLombpgvAPjmLVN58kroqxIH6ol+/999a9pu1ESeD6x5sy4izixEjQ44
-         9E+8ljescNknBpYv3nbmD1bZ/VvUkZON6xyGH9ALVhsz/q8+kjMu89+WrqOci+dVhCJy
-         3SJ3Y3yu3oYQP8BMscoZHYyvjh5VHDMUEIeAJ+x5GUdOxw6F0tmNpz5rE4RFS9KcKtvE
-         llTieUy7p6cs3g/DGIKBwKQmUIFF+s+MW+XAc52JNrNqdXsuJ1EyC6ChW7HFzTRq7NzE
-         z5ZA==
-X-Gm-Message-State: APuU4Z8mjCe5mpmEMp+LJSsJycCJ76RoEl6RgTlzkHBX8ljW9HE5M6WW
-	dcs0br8Hr1eXuIxAP+kBj85Mgh5A7Kuv2npOozhzU8QKwmcTSoja3dTesv4Y0WrDCy6nAL7pals
-	VL32I
-X-Gm-Gg: AZFdTZfClnFIBpmcxk/0Sx+ssMSrac/ICDQ3SUazVk6Ka3LyWIM8y0mq2kbiHql3EtA
-	Epc7KcCSuIlHgJRGcbRUYgrUwSZ+SdASk2xK6UPgCk2FrvlmGVrC5UCZRnYZzp46Yxkbg+uiDFU
-	vYflxg37GhiY5Nj+SmB9r9Wv51XybW7/25PdWJctlNmhcv9fUync7Yhs5YwmVjj7m5q5e0GGmYK
-	qyd4jjrkiIHuVc7zv7BU/PtEh0/4p4NvyEIC3LjVHQuOurOL6MDk1XKZYHt9/fZlEVWKXtGcIMS
-	mNh9FFrV1jQbO780oqIRyoFTPM+YjtihQStKl55/XwSJg9fMgRd55hLp7wDdZRN+U+D5efpragv
-	ISFeG/n2WmdVvNzdHGjqZm0751pBXGhHxuwiCDX3RD3oiSYid5iO8fIKZpImlTAhbjncaVOBcnn
-	3XXRwO6Pj9ujhF3BBjAejfw+idRUznMwBEuq3rc3TUXtX2Vdz6DFG0RFvVCdTcwOsGjuRwnozIB
-	Lnt6neSW/5JVAzjvwLF+3/xPn3c9WvylVwBHMFagBLonecQ95cSFmN2kJ70UgrRDvX9qwInK3hS
-	c/mDA7WNTFZ/DCFyxk7h4ytVHGFN5zYRBwZryjpmvlyZfE3WqrGujH+IVFnaJAlDuUlwrw==
-X-Received: by 2002:a05:600c:3491:b0:4a2:c2b:a91b with SMTP id 5b1f17b1804b1-4bb8880014dmr258350885e9.10.1795453182478;
-        Mon, 23 Nov 2026 08:59:42 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795453968; x=1796058768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=n3O7B7P7teRxrGKxSp/blvXosjh/w0/Z+HciPn0+tVE=;
+        b=Bizqeoy3WNZQHZT+ZvDK7oA0ukg8vE32/RPJ7rneT/hAUqmZ/I3UugLZj1HFJe7ZK0
+         0I4efOqNGGMPaLeWPymh6DQ1jQg8oJ+1P4osVBzjoOeGToyupQ1T6Qe22a8+/sX/x/sp
+         xJhHbNE7Itu2Cu+t5ntsJyFWnzowUY3b5IvdOabD+gPD7qFpLMxiLfEHUeWoKiqxM8cr
+         rk2RL2b2J9ShN337OxqvNkuxn4gXckV14MStvIm/dk+7la07LHh3lYJJsi+Us6/+VVl6
+         T/6GYhhKBtvTtEvjsAFG4CnXqNC1OFWHYGuU4jYzp+aUQez93c94GkueOLFJlgbXBJAj
+         Hdvg==
+X-Gm-Message-State: APuU4Z/wYOCX0f/7Z3u2BFccDfH5NCHHfxfUQy3ZoaHDgkF1n3owYkvc
+	pT8iRaCWZvWR+Wm2usgSFKcFXG1GzvYfnk38on0gy2/LG/46H2RhLzT4N7vti99v7qS6uE5KMMV
+	kmvu4
+X-Gm-Gg: AZFdTZcc46GM6ARQrQoqB+KZUiZAa+o7Xx+IMIILR3kVPsXFiJ30PFRyug7j3skU8JP
+	JBqamIDjCQsoGuGP9C116RQCLdKt3NFf8MtlZjlKsIta6rhwsuylThtMr1Nc+mRrHLVsOH2J2o3
+	wrRUCekxkHA24y3KtxMviiW2C0Q+fXtVmEJ0WFwdiXR/uqhhtQUA331c+QoyJSorORJipxE7hUR
+	sbU1E2/wcE52rsZwJ6hjk6v0cUeGKaH+P5Yozf+oGKGvTTPSB5He8U7ZRIJJRIoq5yRVeiV1QYQ
+	eWRYphd+VLw819fqe5f8sEF0Hl+Fbpefni2dmARYwhCKMpURY5TwW8CgvdUUSbQHlGgPLkuzwf9
+	GfS5xQzVsCtqai/vknSzl5Gdm7jZg4W2UirZUvCWPyL1MUtJlOtihEZU7e9/mHvOskWJTKMK6x0
+	pSL/p7+ksJUuGWTHhVrVve4RzVdiEjM/eiF1oi2OTjENsYHQyJCQfSmE3l0dcWT0LfH0BBSmPY1
+	ufUBtOVi2H6I1xtj2Sezw7N32N1KEtUdU11NJ9BNkTNQzlDZSFos1a5J96ssiE2CKBPi6xhZuQ5
+	Wv7GGULiEYZtRirimTKNdNkdpE1o2k0pn7x279P3LI8r/W85
+X-Received: by 2002:a05:600c:83ca:b0:4a1:9661:14b5 with SMTP id 5b1f17b1804b1-4bb888176eamr250209645e9.29.1795453968222;
+        Mon, 23 Nov 2026 09:12:48 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90660cb4sm289748185e9.2.2026.11.23.08.59.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c43563esm24493082f8f.57.2026.11.23.09.12.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 08:59:42 -0800 (PST)
+        Mon, 23 Nov 2026 09:12:47 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v2 8/8] player: Fix NumberOfItems of Now Playing when its content changes
-Date: Mon, 23 Nov 2026 17:59:32 +0100
-Message-ID: <20261123165932.470612-9-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v3 1/2] shared/att: Confirm indications without a registered handler
+Date: Mon, 23 Nov 2026 18:12:40 +0100
+Message-ID: <20261123171241.511211-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261123165932.470612-1-simon.mikuda@streamunlimited.com>
-References: <20261123165932.470612-1-simon.mikuda@streamunlimited.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -95,311 +91,75 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-NOW_PLAYING_CONTENT_CHANGED clears the Now Playing items but keeps the
-number of items, which is requested again only when the scope changes,
-and ListItems does not list past it. So a controller that stays in Now
-Playing lists a grown list cut at its old length.
+When no GATT client is attached to the bearer nothing registers for
+Handle Value Indication, so handle_notify() answers it with an Error
+Response. That is not a valid reply to an indication (Core Vol 3,
+Part F, 3.4.7.2 allows only a Handle Value Confirmation): the peer
+keeps waiting for the confirmation and drops the link when its 30
+second ATT transaction timeout expires.
 
-To reproduce, list the 2 items of Now Playing, let the target add 3
-items, and list Now Playing again:
+This happens on incoming connections when ReverseServiceDiscovery or
+[GATT] Client is disabled in main.conf. iOS sends Service Changed as
+the first PDU on every bonded reconnect:
 
-  btmon: EventID: 0x09 (EVENT_NOW_PLAYING_CONTENT_CHANGED)
-  avrcp_now_playing_changed() NowPlaying changed
-  bluetoothd: profiles/audio/player.c:get_items() 2
-  btmon: AVRCP: GetFolderItems: len 0x0022
-  btmon: Scope: 0x03 (Now Playing)
-  btmon: StartItem: 0x00000000 (0)
-  btmon: EndItem: 0x00000001 (1)
-  avrcp_list_items_rsp() start 0 end 1 items 2 total 2
+> ACL Data RX: Handle 64 flags 0x02 dlen 11
+      ATT: Handle Value Indication (0x1d) len 6
+        Handle: 0x0008
+          Data: 0a00ffff
+< ACL Data TX: Handle 64 flags 0x00 dlen 9
+      ATT: Error Response (0x01) len 4
+        Handle Value Indication (0x1d)
+        Handle: 0x0000
+        Error: Request Not Supported (0x06)
+...
+> HCI Event: Disconnect Complete (0x05) plen 4      #113 34.912832
+        Status: Success (0x00)
+        Handle: 64
+        Reason: Remote User Terminated Connection (0x13)
 
-Only the 2 items listed before are listed again.
+bt_att never confirms an indication itself: the GATT client's
+indication handler does. When no handler is registered, send the
+confirmation from bt_att on the channel the indication arrived on.
+With a GATT client attached nothing changes, its handler still sends
+the confirmation.
 
-Reset the number of items, so that ListItems leaves the end of the list
-to the target until it is known again, and request it again when Now
-Playing is the current folder.
-
-That request can still be in flight when the client changes folder or
-player, and its reply would then set the number of items of the folder
-current by then, of whichever player is the current one. Give each
-reply the player and folder it was requested for, and drop it when that
-folder is no longer the player's current one.
-
-Fixes: 671f370a8e34 ("audio/player: Clear playlist on Now Playing Changed AVRCP event")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/avrcp.c   | 86 ++++++++++++++++++++++++++++++++--------
- profiles/audio/player.c  | 25 +++++++++++-
- profiles/audio/player.h  |  1 +
- unit/test-media-player.c |  8 +++-
- 4 files changed, 101 insertions(+), 19 deletions(-)
+ src/shared/att.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 128d7fe39..9486cb99e 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -252,6 +252,13 @@ struct avrcp {
- 	bool pos_changed_supported;
- 	uint8_t transaction;
- 	struct pending_pdu *pending_pdu;
-+	GSList *total_items_reqs;
-+};
-+
-+struct total_items_req {
-+	struct avrcp *session;
-+	struct avrcp_player *player;
-+	char *name;
- };
- 
- struct passthrough_handler {
-@@ -3554,50 +3561,71 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
- 	return 0;
- }
- 
-+static void total_items_req_free(void *data)
-+{
-+	struct total_items_req *req = data;
-+
-+	g_free(req->name);
-+	g_free(req);
-+}
-+
- static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
- 	struct iovec iov = { operands, operand_count };
--	struct avrcp *session = user_data;
--	struct avrcp_player *player = session->controller->player;
--	struct media_player *mp = player->user_data;
-+	struct total_items_req *req = user_data;
-+	struct avrcp *session = req->session;
-+	struct avrcp_player *player = req->player;
- 	uint32_t num_of_items = 0;
- 	uint16_t uid_counter;
- 	uint8_t status;
- 
-+	session->total_items_reqs = g_slist_remove(session->total_items_reqs,
-+									req);
-+
-+	/* The player may be gone */
-+	if (!g_slist_find(session->controller->players, player))
-+		goto free;
-+
- 	if (operands == NULL)
--		return FALSE;
-+		goto free;
- 
- 	if (!avrcp_pull_browsing_header(&iov) ||
- 			!util_iov_pull_u8(&iov, &status))
--		return FALSE;
-+		goto free;
- 
- 	if (status == AVRCP_STATUS_OUT_OF_BOUNDS)
- 		goto done;
- 
- 	if (status != AVRCP_STATUS_SUCCESS)
--		return FALSE;
-+		goto free;
- 
- 	if (!util_iov_pull_be16(&iov, &uid_counter) ||
- 			!util_iov_pull_be32(&iov, &num_of_items))
--		return FALSE;
-+		goto free;
- 
- 	player->uid_counter = uid_counter;
- 
- 	if (!num_of_items)
--		return FALSE;
-+		goto free;
- 
- done:
--	media_player_total_items_complete(mp, num_of_items);
-+	media_player_total_items_complete(player->user_data, req->name,
-+							num_of_items);
-+free:
-+	total_items_req_free(req);
- 	return FALSE;
- }
- 
--static void avrcp_get_total_numberofitems(struct avrcp *session)
-+static int avrcp_get_total_numberofitems(struct avrcp *session,
-+							const char *name)
- {
- 	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 1];
- 	struct avrcp_player *player = session->controller->player;
- 	struct avrcp_browsing_header *pdu = (void *) buf;
-+	struct total_items_req *req;
-+	int err;
- 
- 	memset(buf, 0, sizeof(buf));
- 
-@@ -3606,8 +3634,26 @@ static void avrcp_get_total_numberofitems(struct avrcp *session)
- 
- 	pdu->params[0] = player->scope;
- 
--	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
--				avrcp_get_total_numberofitems_rsp, session);
-+	/*
-+	 * The reply is matched to the folder it was asked for, since the
-+	 * player or its folder may change while the request is in flight.
-+	 */
-+	req = g_new0(struct total_items_req, 1);
-+	req->session = session;
-+	req->player = player;
-+	req->name = g_strdup(name);
-+
-+	err = avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+				avrcp_get_total_numberofitems_rsp, req);
-+	if (err < 0) {
-+		total_items_req_free(req);
-+		return err;
-+	}
-+
-+	session->total_items_reqs = g_slist_prepend(session->total_items_reqs,
-+									req);
-+
-+	return 0;
- }
- 
- static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
-@@ -3631,9 +3677,7 @@ static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
- 	else
- 		player->scope = 0x01;
- 
--	avrcp_get_total_numberofitems(session);
--
--	return 0;
-+	return avrcp_get_total_numberofitems(session, name);
- }
- 
- static const struct media_player_callback ct_cbs = {
-@@ -4556,6 +4600,8 @@ static void session_destroy(struct avrcp *session, int err)
- 	if (session->position_timer > 0)
- 		timeout_remove(session->position_timer);
- 
-+	g_slist_free_full(session->total_items_reqs, total_items_req_free);
-+
- 	if (session->controller != NULL)
- 		controller_destroy(session);
- 
-@@ -4618,7 +4664,15 @@ static void state_changed(struct btd_device *device, avctp_state_t old_state,
- 
- 		break;
- 	case AVCTP_STATE_CONNECTED:
--		if (session == NULL || session->control_id > 0)
-+		if (session == NULL)
-+			break;
-+
-+		/* The requests of a lost browsing channel get no reply */
-+		g_slist_free_full(session->total_items_reqs,
-+						total_items_req_free);
-+		session->total_items_reqs = NULL;
-+
-+		if (session->control_id > 0)
- 			break;
- 
- 		session_init_control(session);
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 5f29be749..166279f91 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -758,11 +758,13 @@ done:
- }
- 
- void media_player_total_items_complete(struct media_player *mp,
--							uint32_t num_of_items)
-+						const char *name,
-+						uint32_t num_of_items)
- {
- 	struct media_folder *folder = mp->scope;
- 
--	if (folder == NULL)
-+	/* The scope may have changed while the request was in flight */
-+	if (folder == NULL || g_strcmp0(folder->item->name, name) != 0)
- 		return;
- 
- 	if (folder->number_of_items != num_of_items) {
-@@ -2073,9 +2075,28 @@ struct media_item *media_player_set_playlist_item(struct media_player *mp,
- 
- void media_player_clear_playlist(struct media_player *mp)
- {
-+	struct player_callback *cb = mp->cb;
-+
- 	if (mp->playlist) {
- 		g_slist_free_full(mp->playlist->items, media_item_destroy);
- 		mp->playlist->items = NULL;
-+
-+		/*
-+		 * The number of items may have changed: leave the end of the
-+		 * list to the target until it is known again.
-+		 */
-+		mp->playlist->number_of_items = 0;
-+	}
-+
-+	if (mp->playlist && mp->scope == mp->playlist) {
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+						mp->path,
-+						MEDIA_FOLDER_INTERFACE,
-+						"NumberOfItems");
-+
-+		if (cb->cbs->total_items)
-+			cb->cbs->total_items(mp, mp->scope->item->name,
-+							cb->user_data);
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 366ee83d8..10ac4a3c4 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -1086,12 +1086,19 @@ static void handle_notify(struct bt_att_chan *chan, uint8_t *pdu,
  	}
  
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
-diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index dcd7df286..5d2e0a962 100644
---- a/profiles/audio/player.h
-+++ b/profiles/audio/player.h
-@@ -108,6 +108,7 @@ void media_player_change_folder_complete(struct media_player *player,
- 						int ret);
- void media_player_search_complete(struct media_player *mp, int ret);
- void media_player_total_items_complete(struct media_player *mp,
-+						const char *name,
- 						uint32_t num_of_items);
+ not_supported:
+-	/*
+-	 * If this was not a command and no handler was registered for it,
+-	 * respond with "Not Supported"
+-	 */
+-	if (!found && get_op_type(opcode) != ATT_OP_TYPE_CMD)
+-		respond_not_supported(att, opcode);
++	if (!found) {
++		/*
++		 * An indication can only be answered with a confirmation, an
++		 * Error Response leaves the peer waiting until its ATT
++		 * transaction times out. If this was not a command and no
++		 * handler was registered for it, respond with "Not Supported".
++		 */
++		if (opcode == BT_ATT_OP_HANDLE_IND)
++			bt_att_chan_send(chan, BT_ATT_OP_HANDLE_CONF, NULL, 0,
++						NULL, NULL, NULL);
++		else if (get_op_type(opcode) != ATT_OP_TYPE_CMD)
++			respond_not_supported(att, opcode);
++	}
  
- void media_player_set_callbacks(struct media_player *mp,
-diff --git a/unit/test-media-player.c b/unit/test-media-player.c
-index ef2d5dff3..7dfee7681 100644
---- a/unit/test-media-player.c
-+++ b/unit/test-media-player.c
-@@ -53,6 +53,7 @@ struct context {
- 	bool destroy_on_play;
- 	bool check_total_items;
- 	unsigned int total_items_calls;
-+	char *total_items_name;
- };
- 
- static struct context *context;
-@@ -145,7 +146,8 @@ static gboolean complete_total_items(gpointer user_data)
- 	if (context == NULL)
- 		return FALSE;
- 
--	media_player_total_items_complete(context->mp, TOTAL_ITEMS);
-+	media_player_total_items_complete(context->mp,
-+					context->total_items_name, TOTAL_ITEMS);
- 
- 	call_get_number_of_items(&context->pending2, number_of_items_reply);
- 
-@@ -165,6 +167,9 @@ static int test_total_items(struct media_player *mp, const char *name,
- 
- 	ctx->total_items_calls++;
- 
-+	g_free(ctx->total_items_name);
-+	ctx->total_items_name = g_strdup(name);
-+
- 	if (ctx->check_total_items)
- 		g_idle_add(complete_total_items, NULL);
- 
-@@ -240,6 +245,7 @@ static void destroy_context(void)
- 	dbus_connection_unref(context->dbus_conn);
- 
- 	g_free(context->play_item_name);
-+	g_free(context->total_items_name);
- 	g_free(context);
- 	context = NULL;
+ 	bt_att_unref(att);
  }
+
+base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
 -- 
 2.43.0
 
