@@ -1,78 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795472615;
-	b=vhQ5/ETUZpcQLsUiLQDpwgfoXrLjip9tyqQGCbW2ibqYPYgqqIMdC6aLti7HFzajGlfH
-	 FKOGYvB43XP6SvPx1zf5wHEl7eNRpQyLHQ9RRkJkMTus0ub96A2RVGO3v5ero1L5v0ule
-	 GT6spOBbz4yiRv35o0Sb6GB3ONxKT9wYzgYdPwDeHbXnzkV49SKOutZwPqcIjW3f20TAc
-	 GK4HflJbzGHyUGOD34WClHW10hnbDjJhxEAkzOzvfvSB47STQPjDOVi2CIjWvC5o/0PKD
-	 4KqxWO8CNv+VwPMNK+pl5iUo5T+nWdacrjdi2CrUlwpw9RWBqfhgMz1vQi5gzeYKRmg==
+	t=1795472616;
+	b=MXEefMhTOctKxLglnavgCsRnsCDJ+mEh1fuh0WCOw/3v/sh8WCsKCD3AfUSXVQj5+c9L
+	 c2k+9xTin5mGQSWPbK4l6H5NxSGZINd3B+SG9NNefNEvgOEs4sUAXIeBMlZxG+Qby7k08
+	 Lba/1QdsUiPYKCzj3lanmmyxWqlCNpkVAtObPkauENiAiilMtuf5vQGYesPUeK2z+r/sU
+	 GrYwxHhFjfBNkCgIkKie03Z9r5DIm5no7l6RE4DYV6V7JDSI6TDsyPOTYl2SECzrwEDMJ
+	 uCUkA5h+zAaiwQ0yqC6VroJjmMqe5HoDL9DLVJP+JLHObn6NAR6q0njqp+8qqI/jllw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795472615;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795472616;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=yBI3DykBcTF9tWQp+AAl/WWHa3FuDurnYiSblchHTCs=;
-	b=3cXtD06m1Ies3SeTwlsTzBfH622gmGVJryXd/IB+NDZhkVVih/ZM1n6BIJB4OBXXT75s
-	 3bjv7PRuvbANtk3R3P5mjer+ZsdESwD5nuhwIyrMVDpOzVyrjb9pniElIaINAP7/Ov0aU
-	 4yrVTtej9nxaexdVprXTBrMLB0CzouX8baa0wjtRDbRcs5uu9Y3yQRwVZDGR92F48JLHg
-	 xUuRWFE+KFU56hATGm2hDfn39cx5KzB7ootOqkp2wPo0JfrjrAcfjmLn2wdGqQJ8YWq6G
-	 ZNLJAQa7Zhb6tOtN6RHdp+Y+kHgqVn495mOsOOiqEQpvqRYWIMWnEJDf0WP2q2nl77Q==
+	bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
+	b=I0jELVNsd2K2o0y0B4dHHu9Qxo0ALYDZH8c78tqxbNg6bRfTFMiTO3o3/h3MrbUFAn57
+	 Sc0cAcPR7Yi/2DK9flMKfzoUVSSmirZm2otckCAzBapGAAiicYwz/c8bT9J7fHzFAE9YK
+	 2SVHdzTqNGjRDDIFO8dTXGV9G4RkvDqGnREJJi0Z741OQQYph3ETgblcoE0yJzMSIs7+Y
+	 PoIiONaXLhsIBpLCPKuyVqitRhFoIy0hsww9C+Nm/o6hyISdD+BHn6QFFEsVNRFaaMmwr
+	 MLVCNNETgavC7XgqyJ7ozU/Y7lCHRpjyZ+Dn3meKXWQJjBiIk9by2UFG8gKQq5kUHKg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ep8rtv+l;
-	arc=none smtp.remote-ip=209.85.128.46
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2w0oljD;
+	arc=none smtp.remote-ip=209.85.221.54
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABBF606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00F4606A336
 	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 22:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3ABBF606A326
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B00F4606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ep8rtv+l
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4bb5f0c5348so1993755e9.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2w0oljD
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-49083b985d2so244226f8f.2
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:23:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795472613; x=1796077413; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795472614; x=1796077414; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=yBI3DykBcTF9tWQp+AAl/WWHa3FuDurnYiSblchHTCs=;
-        b=ep8rtv+lt0XeEjT8CuJNXqFb4LZtsbQF0PZlrLSR7dcO1Pir83NUssI/cPwAswcYz7
-         MgQdtuFcJb/Je6Qpe7M9VdwycD4G1VioQvofFDzp5w727HtBF2vgE2AQagnZqZk31Fxy
-         NG1z37nEBLIGP9Vc8WTe6VYpQx4Qsv4gAxPcjkLBmOF82Gwq04j++wi110WF7TvvagKg
-         IcQR3F/iTulEfim90jXxJkpx/UC6tTptpxDLmBPoZbNu0O5rvQjLVaSgX5VgWzsNtS3L
-         vT88ddbSQkGZwON8MY5aAzwgZVX40IaM7jz7XmyS4xejadbrBq31AqDaNUr0Hv4qxE0P
-         TXmw==
+        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
+        b=k2w0oljDLaM9FAYv6yOtIo+hCHXBqT7mpz6R5PbFmVHBO0go05cTQFqcADSICYdcEa
+         qUwi+Rsv+NlmlUKa9/za9RgPNFnTAJk6droAiO6my10NF6y3+m8qJrwxtOFUv/XnWwIH
+         aokvzyxtJFJjaSWHDYT6ZBnECCP93Yoile70eXwGJ7oRdAveUjEdzVD3ohFls16zGI4J
+         pKSSUUu8W0nx/VaflLovCOyyFRYKF+1TvuKYuYKVrscYRm19YOhthv83vfcX3M3Gwjfb
+         7GfMRCuLOWfDxoeFaG4I9hPfGv1jvUMVIeL0YuoXeTRKfm7uqwHElzTrz19ueCwVwUo/
+         Aomg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795472613; x=1796077413;
+        d=1e100.net; s=20260707; t=1795472614; x=1796077414;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yBI3DykBcTF9tWQp+AAl/WWHa3FuDurnYiSblchHTCs=;
-        b=d4dvcyk5RKHmPhgD4tJXQrPn0W60XqTX1UVTcTiN0H05ABrpWMJCaxTcl+7zmgGoIz
-         8CDOhlVYKQeQ34CeRJ6eaFID1wqjArc0/kDL0+3EPZ/SXPuMDhvnEsMZb9CyODZu7nX9
-         E/kzyttuqQ4PBe1R9CNIrAY2bbYXtzBEfBKfWJovUo8+mKyfGx6PJkQTq920q9TNujWn
-         Cm1ly6CiFD6ccr6IIooJkBp6wKVm1/of4jXPI/Y8p9UToSnRUdpPa5SZt/1auboqLg+G
-         9fus5STV+7KbWbQ/qDaIPRUnt99ISEK5DslvkjdJvWWa0dp1ogJyI9TZGZWSKsgw2/dK
-         sJZg==
-X-Gm-Message-State: APuU4Z/7umFL395qUKct5EkVCbYhwEau7v+iMvMfyKx1bhwg+FxstqqI
-	GOvrZmmFa6KMgtHTQM4C4CmcyChhv5/GvlZMJpgKpDExBSqVqhiW0jt93TibNw==
-X-Gm-Gg: AZFdTZfiGCGv+XGX0oxDRp5hFalykt7OCa6HX1du+y+r1BilZXfft6CNrXHxPE3/ZdI
-	INitEwD83QaBh/oWA3wItPrL67W0YK8xdIwFHAKDQrJL03XHgAOfpirzLFDjJdNDB1SLJNX1/XJ
-	ff0Ps8JIEcAJQpvyVWwnoZuUfQIUd+1mZEjlKvn6ZzAPdIeMoKpEbbJQMpv2KjXQ6UJmISzseCw
-	QFCKn1t3PGg+3DISCSeWwjGEPtcfW/psqH6umAOHr0dYvUNQJTtAemVN/SvE/tYbxVq+MDmwk+F
-	+bZZIBklZz+MAXHxLODYUNd2r17rrHdc9NERoouaLadHu9901lAgOdS6Qq458I/MgRpXTBThufI
-	a3vhK483iEF1OVDvbJyrPxwasSnQQaEfXB8khu6ZW1Gr3RumnK4a7RbQYidE79RVbjB11RdWA/Q
-	k4B0pKRrbZbgYnDaVuz6fI6nx05mWmlNSQWB2uU6nSEfGBcu2GU0PEzmocUe2X121jFNBYX3xFB
-	ITeSgExZPE5wBKewKqxMpDzTXzGJlQbQp6RxN16H8jCxLI/b+R/1EL7Pn9iitIy3g1N4XsNB8/Y
-	NyFGrLWpA7Rt9kwGLqbkmoA1hmXrbL0fYGovdYBD8FvENT2f
-X-Received: by 2002:a5d:5e01:0:b0:4a8:eed3:770 with SMTP id ffacd0b85a97d-4abb47b25eemr26171187f8f.4.1795472613611;
-        Mon, 23 Nov 2026 14:23:33 -0800 (PST)
+        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
+        b=drc7dbjl5EFoxO7rsphIgl/akGU9kCEQDLX6DVVw8b+37vYFZmd3psEBg67t7DLjxL
+         DGCbbg78CAN/98QOunWayoyTqpIlElwNZJv9z3osKX5bQCLETcu3WUOTjCy83AKG9KJX
+         PimeBDSCM8dGttuX064upUdGcspw5YJDB31Lx11vysVe82H5ctiP6DLWCbccpvBi1n8u
+         iUDo3LmXb7/Pnd9kMD9R/WB1svEVk9r+oVA6r8AnYIjMj8UR7Dgh0yVmGK2nxkz+DjSh
+         0ncc7obwvbEkuyyqPr6lCa3WtqW0alg0o+hJFpgzrhTMXqK/3YDeOEZPtDTrOM8QHqIF
+         Y6pQ==
+X-Gm-Message-State: APuU4Z8BiXGVIu5e5HmaJzzwo1ivXvfQwZrXUaIHOoMCJJVGtShj2X+n
+	UEARw7MvrZpeDUnx/j5R91O7iXDWroJaKNdm3kwWzB5oFSqcYeqR+13G9NB0pw==
+X-Gm-Gg: AZFdTZecmtlGYYIO1vuUc9QprHFP5xuWJXM/DELl09dXHuJVrXvYpxStGYQrtNpMjGd
+	WYczwQdmqFULdY1Jsolv5qCYFIb6e4/wLLN7k1E4ye6Ky+DxWL95IER33Fr3/Jeka4/oTKEjPxh
+	eYZjebHhhxj0d8DvFA2EB0XBAvR8uR09bUYIbTsb7tVGi3BaYr2SfwBvGOupr4ezEbhl3HHGBV9
+	bOZlHgC18DbGPWXB2Btx36A4gX8rG+JqQuvs4h1TXObW3A11Z/o6dN1J5l6QacKvPHKdWqjiaSB
+	CPDaIIE0ODdjd8eVLtUUfTE5X8Z9J/aFMf4mZlMrVarji56wZeMkaCVtukjrio4xsGZs541pZs/
+	A6UG5Vku2aze6becdxychHrdmUVvG2agfZVM78Vlt4eF0cKPp4WogSCtbZWLCSUmIfTCC7cvbT8
+	GosGSHmD1nQLkrLrberwTk87rQ6DdxKblkCV9ne0RILCF3/22vVgtnzDAuVGDrXN8O9nxw4iwDv
+	jTSqPqW0aQkp48tePtCouVgpPliyXC7I1JPfwJ1zzNxTmpTzU5gSljshPAcAls3baFVcWDz1Phh
+	Azz4IHdKdOoM4EuqglAId5KY72lpEe1IkG6vINa0kyGCxvEW
+X-Received: by 2002:a5d:5d81:0:b0:4a3:1468:c483 with SMTP id ffacd0b85a97d-4abb4b85a38mr25287392f8f.4.1795472614064;
+        Mon, 23 Nov 2026 14:23:34 -0800 (PST)
 Received: from schinder.fritz.box ([2001:9e8:b398:6b00:c303:57b6:d70:952e])
         by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4abbd84e661sm23019015f8f.18.2026.11.23.14.23.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -80,9 +80,9 @@ Received: from schinder.fritz.box ([2001:9e8:b398:6b00:c303:57b6:d70:952e])
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 3/6] monitor: Fix reading beyond a short Mesh Beacon
-Date: Mon, 23 Nov 2026 23:23:12 +0100
-Message-ID: <20261123222315.223450-4-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v2 4/6] monitor: Fix reading beyond the Apple manufacturer data
+Date: Mon, 23 Nov 2026 23:23:13 +0100
+Message-ID: <20261123222315.223450-5-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261123222315.223450-1-rolandschober1968@gmail.com>
 References: <20261123222315.223450-1-rolandschober1968@gmail.com>
@@ -97,39 +97,45 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Unprovisioned Device Beacon has the beacon type, 16 octets of
-Device UUID and 2 octets of OOB Information, but print_mesh_beacon()
-decodes the OOB Information of a beacon with 18 octets, which lacks its
-second octet. Require 19 octets, and dump the octets after the OOB
-Information, not from its second octet on, if there is no URI Hash.
+print_manufacturer_apple() reads the type before it checks that there
+is one, and prints the identifier as a string although nothing
+terminates it, so up to 98 octets which follow the AD structure are
+printed with it.
 
-Fixes: 0ba12681f3e4 ("monitor: Add basic decoding for Mesh Beacon")
+Check the length first and print the identifier with its length.
+
+Fixes: 35b0d0c7c281 ("monitor: Decode Apple identifier and iBeacon data structures")
 Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/packet.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ monitor/packet.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 4f63cc0fb..6646dc147 100644
+index 6646dc147..042a2ecb6 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -4205,7 +4205,7 @@ static void print_mesh_beacon(const uint8_t *data, uint8_t len)
- 	switch (data[0]) {
- 	case 0x00:
- 		print_field("  Unprovisioned Device Beacon (0x00)");
--		if (len < 18) {
-+		if (len < 19) {
- 			packet_hexdump(data + 1, len - 1);
- 			break;
- 		}
-@@ -4218,7 +4218,7 @@ static void print_mesh_beacon(const uint8_t *data, uint8_t len)
- 		print_bitfield(4, oob, mesh_oob_table);
+@@ -3763,18 +3763,16 @@ static void print_fec(uint8_t fec)
  
- 		if (len < 23) {
--			packet_hexdump(data + 18, len - 18);
-+			packet_hexdump(data + 19, len - 19);
- 			break;
- 		}
+ static void print_manufacturer_apple(const void *data, uint8_t data_len)
+ {
+-	uint8_t type = *((uint8_t *) data);
++	uint8_t type;
+ 
+ 	if (data_len < 1)
+ 		return;
+ 
+-	if (type == 0x01) {
+-		char identifier[100];
++	type = *((uint8_t *) data);
+ 
+-		snprintf(identifier, sizeof(identifier) - 1, "%s",
++	if (type == 0x01) {
++		print_field("  Identifier: %.*s", data_len - 1,
+ 						(const char *) (data + 1));
+-
+-		print_field("  Identifier: %s", identifier);
+ 		return;
+ 	}
  
 -- 
 2.47.3
