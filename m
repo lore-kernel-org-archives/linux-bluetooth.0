@@ -1,95 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795451644;
-	b=x/UOSeRfWkW4DMftGoUgWarXubptgNtCq5Xb685itRefQxL5W4cdwOmLyFwF4Z3xGAi/
-	 lVqOBrBzjAd2SW7Na7bgeRjIEaRGzVgwomtf+Ug8XdWvSaeKGgmfmHKR68s5YkObiaVLD
-	 gEZwkkUSvA5kCQag3MuQMNF7psnl4Ww6sj1Yx1y8hfGE9Ng1Q/DKhej0yZoMdBgM3KUm7
-	 h7cFtzZEdUIQPGiZlQtOdk9/SkpnvN0ZWnFDK4gLQb276aP1xUJ5sbBq+HAq/2lEqLD7i
-	 i4k2q6M2U6QwqcCVKT89KU+QB2Ae+O2kDwgGz46AExxH4VMbFIDLDNQMME2d91paNEw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795451644;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795453180;
+	b=tWCNUBRoHRdM6f24a2Q+l+Tp2Yz1E4PcpjpZTuZkR1JKgGFF83LtyY52lyl89tVd4Oh7
+	 XCBHDCD9L5gfhHuR8qzzbB1zEJQ94trfXAeUDMLUK1jp8y/o2eJCVZxOFghPdTZszVZEb
+	 7Y8eDJw80XyUGzuc0TxbB7737TiF0ZUF38p4kCPM7Dn3Z51ZpiPte+IoHhKiThz2Ppycp
+	 FOqlNsMJ3XRwkCtLQKQ7TYBKole8p5jCBSxpV3ot60/7DnfPH9LjptIVK66bBGdY6l8HL
+	 mBPX6rxzyIoCtIsnrVUKPMpn9Vofzk6pHGjZT9cI6ctWedFhtgCxuDCtP4UBa3yZv9g==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795453180;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Content-Type;
-	bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
-	b=yLIHtNNZHw8591MVzKdGs4oHEZdoxiWttaDbpdHz/qtgj0JpQ41Pq0U+QFDpGezSC1p6
-	 GwxgEnyzSTiiR7BDHG63XKBE4fuxTZD/E5Rw1j1oLvs+cy6Ltic5+y+p89si7pMsLSnkI
-	 VrziTbmwuUlR1t6hV0Qagd159IBZp/MeFJbwas5scfQaLSVc+qsOHSgsUdaMPNRx443aH
-	 Y5rI+Ahds51fYDT81GBzuF+19L/hqoFdU1o9SP18wJNumRt9eiWUSdZausbC0wURuFLvZ
-	 TfpKB9eD/H50TC0yyzaB6nOEflKr0MexG/gQxpNkm3W2aYi0yloLRSXMC8Zw3zwq2FA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wx+rA5Ps;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=6FmnNpK17soGCQglebfnXYuF+wgD4bIkStduBGOdMkc=;
+	b=u96RklQ7k2ORnLUfYJ3vCRPduA/vTAMvcjjX9Saq2dGww2UOrvmRuS9pGHh0ym8Ffl/W
+	 jVLZj/hPBo+Mdfh3CBQ5J5hRnA83068l/Siu/98sepXdkjBnnit0h/ZPfF7UZX+1bzEpT
+	 Sh2f7txGPPByocLR9Kc/SmKPZjFKwqi+ilAqB0mhP1t9qs1INg4oBC2L2YmkuI6kioLNM
+	 eLoFqMfepjJpbE08diL8uEnroBS8+Fx/TarzZTzGGsU9ICRL63E83Yq7ilsAwA9SBzZlj
+	 CWUFLcP2W02OWN3QfPKJQbeo/GAWGBA+rJ+Muu2Pw1kLmaiCAx1ah0UYpH7X6UyK02Q==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Ic5fbnya;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916DE606A32E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:34:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 916DE606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6102B606A337
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:59:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6102B606A337
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wx+rA5Ps
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c50cc7540b7so478565166b.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:34:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795451642; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SLjjo5YM9DUjGB91JcKJzfyCplPk+pgGXIarF82vhmhEWbPrVrfUbl7tl3kmtnPcLj
-         0y3eU7AW/PTlD+5iZG1mzZaiDfHJFbEgldv6T3DbUcUCaFJAdk8hQmKK0+KGHXJPaHy1
-         KOBmGocAAyZrvAol/VEscv8kDNn7+ch8JIXiJaziab6sJJdv6Ri5i7ZDYuR67F8tkB9h
-         lbKnDOuXZLmh9qOLdnSB1oNxcabcM5DO9yoJ0BRCfm3MaGE+CLZsAh7UZNR8LogG9pNI
-         fWwz3O9DObpzutRWjxAOM5CyA+7stUQ8OCchiCjVTFGICudvZqBy+JTR2d6lQpphxaKP
-         Ut0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
-        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
-        b=MIQYnV/vhBfzqdqO9uR9wOaRiPzh1KVmfNE6ewUvq/n6yL1EIdQZGMZn6m+d9Fd3kD
-         OkTF7rk2HDa0T3+mOvZ7fFNY3FXhE+eOLRNybEOiTmNqlaxN4tOvlyaHYnN+I2ljwtXj
-         eIsjTl8lDZJunIdT84lxcxgpTw/+ngbNlVW6/YuamPsnvjXxV41ZFzqIZ4JZDGgN/63X
-         WYRrMCVmbDf/iK1bmX4S8CX2I05pa6dNXH349443MNC6Ic8/qNpMSW+746NjU2XCde2U
-         82FwB3/jrn2v84quuMA4rFIE2dldu9mN656GqeRUP6Zs5nUWtnlWmPmzGS3QR29JLqj1
-         +ZSQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Ic5fbnya
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a210470b49so34248845e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:59:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795451642; x=1796056442; darn=vger.kernel.org;
-        h=content-type:to:subject:message-id:date:from:mime-version:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
-        b=Wx+rA5Psr9fnSVwhsUbvrft1OFL4a9dAZw3NxUlwzgIvXEF4JLgRISNrJyWSbSFzZO
-         cjpVR6hyjCyq+XYLIxBXv+kh3MAcn+bxaGJhk1PzNM6MoMSz8UXDCgGU0ScBbCPOvmel
-         vDM1rMW9bKlkU0pNM/Ob0PEM6xSPZv3Srk5n32omnAyZXD9+q3XWx/cLgqghWijBlkcm
-         ijHUxVJE9C6se488idIiYhuB9iMrMJE7mIpBLDfwYNkGuGKsfENqfgBEx7pF5dpUlpn8
-         cN6Bcsp/Ng/Z6uDTAA2Wpn+DvSPC5plZJvJ+9+KhQ6/AB9ufBYSrM8sdht5zRsqxgDnl
-         4U4w==
+        d=streamunlimited.com; s=google; t=1795453179; x=1796057979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=6FmnNpK17soGCQglebfnXYuF+wgD4bIkStduBGOdMkc=;
+        b=Ic5fbnyaSRaWBHd9AQ8/Dg7ZXkXuMrPtpa/yj3dp11PBs4l6+pttk3sSU1HYqzmhPf
+         y5khMKYQEKjHw5uRHO8ePFLiWCKevQeY1Bw9+Ka+TRvN9OcPf07CxXhxyS8lHUShIxti
+         0QN1B52BysPtSOFvoxyM1uzz5Z+nYgoYZxgbA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795451642; x=1796056442;
-        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
-        b=nD3TIyKS5ijHx/k/2Vf/C7s0y7V8pIxXGE7NHTuPYfd+vKtkHRWQgdSubbn81hKCE2
-         BK1fNanOkU61smQU9VpJm3VcJS9HNBurWJBa1Q49Pj+O7TxxmlZ8u2Pihy7bQKgmf+0L
-         sS2VXOukoU4fFF8Haoe75ELiiyfD9mwIAvzTj8LU2DmI3cB5cBYiLaoZ0qJdFysXpYWI
-         93icQPJY+yHBcPH6VbZnGRBpe0fPk287QMdHzbmycGiCv/vhVzRIfX/0gLTw1BIZLgy/
-         3jofyeNWlUnQR2pia0uob08Pk2uoAvM+TN3c7MsPl/ACGGP8B6KmuQT9N5HVV/5cKlyN
-         3EdQ==
-X-Gm-Message-State: APuU4Z9inaCS15bJ3sYC5eygiaCIegHVbS7dUPOj1ODwt8e29u+eGYe7
-	PIpM2ZapwDoon6HTmKA0aIuGluveTPO5ULREr66Yyq/OrdyaNFHqR7BSIALM8U0BXOOtV2dYKkj
-	hrpCYysqYjEi8/g20u5kb9yD4smNSjgwU4Vkl
-X-Gm-Gg: AZFdTZdJNm1jEVbsKnYRnUo8eIrpJlyaPvP9TgLPTnchIj0aLiVSohE3mjHYbcgd5AV
-	4zelgmDNhEwD8TbdRsz2EGvNWHzKugjbO8R36RSNCoU4tLGhhd0ygXqddKjHp/I1BkSXGKOpIhS
-	p6k57H5bovXyVs7EDTNzkQ5J8pu5951Nk7eTwv0cfXO3OiJ8fqxP/PNYzafI9JrJIRTgX4R6iS2
-	4/hqF8HsV+ZepORc/yxMB0YgdgjdnQ/oWVOwIA/Lul9BX2YQyhFkK25fd9A4DjyOs4pc2YnP76J
-	323g80jJaCSqXEriDll0yKR4SDY29eYIDvIQwQpUrtlE+dQ0hQTNYGCjRMDDGhf6IxhjqBYdhtK
-	AVASwSqe/O7n5L6jsggG+HrM+GrPTx2Eh8A==
-X-Received: by 2002:a17:907:a88f:b0:c46:d493:501a with SMTP id
- a640c23a62f3a-c513a8410d9mr1057622866b.22.1795451641708; Mon, 23 Nov 2026
- 08:34:01 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795453179; x=1796057979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=6FmnNpK17soGCQglebfnXYuF+wgD4bIkStduBGOdMkc=;
+        b=UuMqwTxEBt1FNLPZZaUtZdjAgMbu1VEDPRoQ9EZLRsRsdaYTF0WbPyfH7E9iIioKGy
+         Zv34P7INSxhV90U9eguia6JyZXncrFuJpj2hlrP1UJBGBy5CFzB8R341BDFjnWNm2VIl
+         5JcsoZ9kX/Sn1QxNU6r9WdL/Qq1Koy+T34Msq/OQx+A8/otIQnWs2VZoe+7PbX4WFl/i
+         ZGbAHVU4Lky2rx6PmjrzapXwlyg9Ds5tsAGr0h/KgGHEfJVT5lWtKOyq+Y9Dn2zm92ec
+         cc7EOeVUfscxeSR8zF4IB+1K6wHbBcK2ENIHGTZQZuFLMvr0RBvabIfZ5kqwBO+TEaVU
+         9M7Q==
+X-Gm-Message-State: APuU4Z+nruURLAunSk8UrpsE9XsJpM0XMjYNIDpzc8xKx2NwBZYGOy/Y
+	PIUdGeqV8ib/sa96TRz7D47hgnNtnZVtnouCkJ9iLzrz8EhdtxLwXfCosylrVoRb4Fxxn9laSI7
+	B7WE0
+X-Gm-Gg: AZFdTZdMq0uUL9gq0OqYk02hojQR8mRMLPzEQWX3SmCHtOIU3j6Pc0U9gMcPtLFtH7T
+	/St06BY+C7nAOybuf2esqNj7tdKKx9Lf31Oj2HzZX8pGmgNfd4jK6suTkqHP0d0vJgBgrNgkRUG
+	gHfMtOBOVxCy0nId+Y5ZOckLNm3WHG4zL1JWQaCeLLSxUX5X2+iKzXfgVWie0B++y/TMrjSc2v7
+	MAKAwfZE8fvnorUoOIjOsKSnJCfNaBLswLdHbB7bqk3j5n1boX3MGCo8h/wEka/b+Fj3v45PtSZ
+	AtiUnPlMgcPhx7I4E5JJVMFrRt6y0EDGc8Cc+BqY233qNq5Cc2HzRfD5LwcE8/P/8ITTi+hPOKd
+	ZcF8jJjY52yTKFKLpBBYKoTR4hageM80H5sxaOGeVz3wvihBNVqQ5WJ8VhXKL8V2alYHtSNY+0e
+	qH9HMrD3gRoIA7Wq6YTEMIv5ddVeHrtMtaUmn+S7b4+ntx/KX/3GAiwgtWY+xHuOpbgLUdelOzQ
+	HIt2e0EOY1sa0pDESGPoXcAZCxVa7XdlQe2q3qJORluRHefu8RPYDzGXXZkDX4Tm3ISJncfOUtk
+	ndghE2ZmXmsn65DZS+hth8LmG8fZl8nHIhM9BJd1Gsesbvt38w==
+X-Received: by 2002:a05:600c:470a:b0:4a1:d459:db4b with SMTP id 5b1f17b1804b1-4bb8893071fmr250455215e9.24.1795453178847;
+        Mon, 23 Nov 2026 08:59:38 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90660cb4sm289748185e9.2.2026.11.23.08.59.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 08:59:38 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v2 0/8] AVRCP browsing fixes, and browsing and cover art in the target role
+Date: Mon, 23 Nov 2026 17:59:24 +0100
+Message-ID: <20261123165932.470612-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,87 +89,62 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: Sandeep Datta <datta.sandeep@gmail.com>
-Date: Mon, 23 Nov 2026 22:03:49 +0530
-X-Gm-Features: Aa3M54qkXXCOBbHEBYyQXcWQRxtyLx1Dd6MQqgiqg1iaj5QFTldYHZ9rWM1Y570
-Message-ID: <CABMMkDOX1Q92yq98+Jhr9D+VgrC128bcY13cvA-KhC5r6x5ZNA@mail.gmail.com>
-Subject: Incoming BR/EDR ACL links never get EDR packet types; A2DP stutters
- (MediaTek MT7922 0e8d:e025)
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Patches 1-11 fix the AVRCP browsing code, mostly in the controller
+role: the browsing PDU parameter length is not checked against the
+bytes received, the media player list cannot be read up to item
+0xffffffff, ADDRESSED_PLAYER_CHANGED and TRACK_CHANGED are sent in the
+wrong byte order, a player addressed before it was listed is never
+browsed, Search in a folder whose name has a space crashes bluetoothd,
+and listed Now Playing items lose their Name and NumberOfItems. Each
+patch has its reproduction steps and the logs it showed. A unit test
+and a functional test (with its documentation) cover two of them.
 
-Note: this report was written with an AI assistant (Claude), which also did
-the btmon analysis. I ran the tests on my hardware and confirmed the results
-(the manual packet-type change fixed the stutter), but please treat the
-kernel-code statement below as unverified.
+Patches 12-13 prepare avctp to answer a browsing command later, from a
+D-Bus reply.
 
-A2DP to a neckband headset stutters badly when the headset opens the ACL
-link (its normal auto-connect at power-on), and is perfect when the host
-opens the link. The difference is the packet types the link may use.
+Patches 14-22 add browsing in the target role: a local player
+registered with org.bluez.Media1.RegisterPlayer can expose a folder
+tree (org.bluez.MediaFolder1 and org.bluez.MediaItem1 on the
+application's objects), which a remote controller browses, and cover
+art, offered in the target record for a player that registers an
+ObexPort. Documentation, the D-Bus
+policy and a functional test come with them.
 
-Setup
-  Kernel 7.0.0-43-generic (Ubuntu), BlueZ 5.72,
-  PipeWire 1.0.5 / WirePlumber 0.4.17
-  Controller: MediaTek 0e8d:e025 (btusb, btmtk), BT 5.x
-  Remote: "Harmonics Z7" neckband earbuds; LMP features include
-          EDR ACL 2 Mbps,
-          3- and 5-slot EDR ACL; no 3 Mbps
-  A2DP SBC 48 kHz joint stereo, bitpool 2..38, identical in both cases
+Testing: every patch builds in maintainer mode (-Werror, ASan/UBSan)
+and the unit tests CI maps to these files pass (make check). The series
+was developed and tried against phones and other BlueZ controllers on
+an earlier base (2026-10-12); rebased on this one it was build- and
+unit-tested only, and the functional tests (test/test-functional) were
+not run for this version. Valgrind, scan-build and distcheck were not
+run.
 
-Outgoing link (host-initiated, good)
-  < HCI Command: Create Connection (0x01|0x0005)
-          Packet type: 0xcc18   (DM1 DH1 DM3 DH3 DM5 DH5, EDR not excluded)
-  > HCI Event: Connect Complete (0x03)  Status: Success
-  > HCI Event: Max Slots Change (0x1b)  Max slots: 5
-  > HCI Event: Connection Packet Type Changed (0x1d)
-          Status: Success   Packet type: 0xee1c
-          (2-DH1/3/5 allowed, 3-DH* not, BR DM/DH 1/3/5 allowed)
+Not included: the GetTotalNumberOfItems parameter length fix of the
+earlier version, as a80671987 ("avrcp: Fix GetTotalNumberOfItems
+command encoding") fixed the same thing.
 
-Incoming link (remote-initiated, bad)
-  > HCI Event: Connect Request (0x04)
-  < HCI Command: Accept Connection Request (0x01|0x0009)  Role: Central
-  > HCI Event: Role Change (0x12)  Role: Central
-  > HCI Event: Connect Complete (0x03)  Status: Success
-  > HCI Event: Max Slots Change (0x1b)  Max slots: 5
-  (no Change Connection Packet Type from the host, no 0x1d event)
+AI assistance: Claude (claude-opus-5-5) was used for analysis, code,
+tests and the commit messages; every patch carries Assisted-by.
 
-A2DP media on each link, same stream, from btmon's Number of Completed
-Packets latency and the TX timestamps of the media channel:
+Simon Mikuda (8):
+  avrcp: Fix not checking browsing PDU parameter length
+  avrcp: Fix listing media players up to item 0xffffffff
+  avrcp: Fix byte order of ADDRESSED_PLAYER_CHANGED notification
+  avrcp: Fix byte order of TRACK_CHANGED identifier
+  avrcp: Fix not browsing a player addressed before it was listed
+  player: Fix crash on Search in a folder with a space in its name
+  player: Fix missing Name of listed Now Playing items
+  player: Fix NumberOfItems of Now Playing when its content changes
 
-                                incoming link      outgoing link
-  TX completion latency median  385 ms             14 ms
-                        p95     677 ms             47 ms
-                        max     912 ms             75 ms
-  media packets/s               ~19 (gaps <=480ms)  ~54 (steady ~19 ms)
+ profiles/audio/avrcp.c   | 121 +++++++++++++++++++++++++++++++--------
+ profiles/audio/player.c  |  78 +++++++++++++++++++++++--
+ profiles/audio/player.h  |   1 +
+ unit/test-media-player.c |   8 ++-
+ 4 files changed, 178 insertions(+), 30 deletions(-)
 
-Test: on a stuttering incoming link, sending by hand
 
-  hcitool cmd 0x01 0x000f <handle lo> <handle hi> 0x18 0xcc
+base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
+-- 
+2.43.0
 
-(Change Connection Packet Type, same 0xcc18 mask the kernel uses for
-outgoing connections) returns Command Status success and a 0x1d event with
-0xee1c, and the stutter stops immediately with no reconnect. Doing this on
-every incoming ACL Connection Complete (small userspace daemon on a raw HCI
-socket) fixes the problem completely.
-
-As far as I can tell, hci_conn_complete_evt() only sends Change Connection
-Packet Type for incoming links when hdev->hci_ver < BLUETOOTH_VER_2_0, so on
-modern controllers incoming links are left with whatever packet types the
-controller picks by default, and this controller apparently doesn't enable
-EDR there.
-
-Questions:
-  1. Is the host expected to set packet types on incoming links, or should
-     the controller allow all supported types by default (i.e. is this a
-     MediaTek firmware issue)?
-  2. If the former, would dropping the hci_ver < 2.0 condition (always
-     sending Change Connection Packet Type with conn->pkt_type for incoming
-     ACL links) be acceptable? I can test a patch on this hardware.
-
-I have a full btsnoop capture of both cases and can share the relevant parts
-(link keys redacted) on request.
-
-Thanks
-Sandeep Datta
