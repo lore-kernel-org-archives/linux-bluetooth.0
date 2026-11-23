@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795462812;
-	b=NdvhIY1tsWVkAMJ88dlM7UKaR4NiikU1eTMGV4ejvRGZywcw7H6ptuyIIRCqL4U42ImD
-	 u6RbtflFaa/i16quhInYNl5hK0Q7JhTZJo9cJ7Mi1sdfJdH6hHx01XFKprk8k29Bg9Cg2
-	 Zlhsy1Y+ulDChrYpdayvRdVhB1Ru7ufC3DvfjPSI7EfKjS5P3rBRrHqRUfXJ4RDnbw6dt
-	 US785QugvQj2qfXuSpriSgagBpG43aG7fnKbH8RSNZRytTfoMSIR4Z/Myegbl/zhgC0p9
-	 h+lMKAH7Unmx5xZx3AM7pnm/ur3m++p/mRIM4pD25P0NamU3kMvSw7s9pHS4dSxgqNg==
+	t=1795462814;
+	b=jLcjzAo2QPwCE1xe0XPtlHMrXGWf3QkpjvIbVEC1VNku1KAURXeL0jAXqtUCO3sC26Cp
+	 UVoEYBfuGwAcSBpXH48SQpprPCUJ5JFqeBCYnLteWOPoXWiqoqfw0/hESrLxYpR4aAOyN
+	 FIgAIPXpxzaW6GxkAyURKkrP7WMNUYKbizbcRfPX3Qk99E6sL/qE/gxdd6n7iKKyfbvvc
+	 L1P700+r90biNPH3HVBrKrDmdwVSwKCraI8VtWSaLn4++f9zhC5D5StvU7syUIKAEsWd5
+	 Ap2sGbEWTJ9KM/8YrAKkJ4k+C+j69CNRrQutUGBqQcxvQfqAWvve6GEpOdZf/rPAjpQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795462812;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795462814;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=AFBoJzQQ4+aNW+F2g6PdB2mjnLlLQvHcVLCNKGs5k4U=;
-	b=VJchGFJ5zNc+JXAQ1wfXtH4tqaIu1ZgbMC2zOWpAkCLR8KortVeCLj7FR2To8vwfEool
-	 RPzuR8pHy23Fvy+LHSCkJ3XgjLam3PsvHpEtPa8o8KTWbBpqR2HUfrGbgzD28G+rjBjaW
-	 yMB3+Lycw3rbggMcGCDxbh2h+iDma2I6bBqEpfjPeGQyaVou/5klb6K3a4PWe81cxDdT3
-	 FvVV2MKfyk2xjF3m6uIz+hM5s2PFyFQFOZQKInertzJnOQRVw2OG2ZiDDLHUnGq3gN5tY
-	 24hfFiGzHTo+6KdF9JMPp6u4hrxCmB2SyVRxC739cKTUXHnFdLUyprftUwlX/JiP80g==
+	bh=0VEwrGikg9I4DT4AAgV4BRGQXnGrBXn/3w+rkzJENGw=;
+	b=a2+EF9VDB2+UYsUrhuPhpyjvl6htp/WlHFBkZGOW624U7qNVI0GZQqfB5wfvMXHIVNEf
+	 3Thcz+cARzmN1WM58JMwlqtoGt1kidyoOOI4pVQ/5j6VDwuCcPaARtilbL/PCBuO9pW/W
+	 /KxIh5z+Lbo9cuX9vm7FFBpuqbuu5lmLXfCrQLkxp1ioenY04ZFjhPv49FxoI9n/4b2yn
+	 MLBpWhxu4o4rdRcE/JrcKsAxyBsGuisaD3eM15Q7mtEXy7ZEk2ZGhh7awyccJfCPVh2Kf
+	 PXVmm9rC5B0Fh3eJdE11W2NOi5Ic2AqOGNU9ErMg8OR6Da/DKNaZICYFKhMcharv83w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OzxatAwm;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mhm4BorQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BF4606A681;
-	Mon, 23 Nov 2026 19:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE26606A31F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OzxatAwm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C083F1F00AD4;
-	Mon, 23 Nov 2026 19:40:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mhm4BorQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42DA41F000EF;
+	Mon, 23 Nov 2026 19:40:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795462811;
-	bh=AFBoJzQQ4+aNW+F2g6PdB2mjnLlLQvHcVLCNKGs5k4U=;
+	s=k20260515; t=1795462813;
+	bh=0VEwrGikg9I4DT4AAgV4BRGQXnGrBXn/3w+rkzJENGw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=OzxatAwmvVCC09YTX3UL5HSzv9KyzUAcr6SqY9F9XfNFFbh+99kPY6Dc1P9ktjLpo
-	 elUudpZKad9403hBrN6hz6f2zqQetPzlqJBblAFp8azf+VuRLUwwdLBfjzaAz2fRN+
-	 4NPBWIx6rCpzycLPqF7oStS66FXzrV9rXZdb9kIPQIn3sC56cxPDkjexENgnKVn3QH
-	 prDH1sCbipxH251p/14gZa7zVIyvMmb6lQ8sAuOr7PQ0FrJCANoxvhASOdg+lCzm/F
-	 d4e9oznOf8if+gJk8PmNs5BNOzLAT4xy69+LSy2uO7X4w2Y3ydK1gRQw+TGFkH4dXJ
-	 3tAqmsQBoqwKA==
+	b=Mhm4BorQq0L3EVpJ66CezhTXPLiY7Quf0OT7TwlVy1xbybdHQ6J7lzyiD7jgV/is+
+	 PKKxEHXqH6bxhPb4MgjiXhHD+oPwxJSTkG6hW2esVf57SQy1yLJahw8lwh6yk7rGQd
+	 lZAITz+QtzasSusfPUekdIZr/49bNZ4I84KgYQuzUcW4rSucZNh2cgYqcH3dG7okBT
+	 BS17o4LBwdT6a8CM8WtUH+brYB6nhl0TQVZ7R8CskvwAxqkuVSyJ1OWsDGinFyd/RN
+	 m4gYx+Z1oecDuBuK+ttFyIhmkPPAPnWBkzf8QEniJcHxOjY+apEoHIso8vkn3yuw6q
+	 y/LP6fU9eJaeQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B44E9392EE3B;
-	Mon, 23 Nov 2026 19:40:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A38D392EE3B;
+	Mon, 23 Nov 2026 19:40:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,38 +54,44 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btbcm: Add entries for BCM4364B3 UART
- Bluetooth
+Subject: Re: [PATCH v1 1/3] Revert "Bluetooth: btintel_pcie: sync mbox tlv
+ parsing
+ with GP0 alive interrupt"
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179546281026.3078240.5509562284219485596.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Nov 2026 19:40:10 +0000
-References: <20261122165132.14015-1-jperlow@gmail.com>
-In-Reply-To: <20261122165132.14015-1-jperlow@gmail.com>
-To: Jason Perlow <jperlow@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- pmenzel@molgen.mpg.de
+ <179546281177.3078240.11094667377301570869.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Nov 2026 19:40:11 +0000
+References: <20261123065523.2769017-1-kiran.k@intel.com>
+In-Reply-To: <20261123065523.2769017-1-kiran.k@intel.com>
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com, ravindra@intel.com
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 22 Nov 2026 11:51:32 -0500 you wrote:
-> The BCM4364B3 combo chip on Apple T2 Macs, e.g. the MacBookPro16,1, has a
-> UART Bluetooth controller that reports LMP subversion 0x3032 (001.016.050)
-> on some units and 0x305b (001.016.091) on others.  Neither has an entry in
-> bcm_uart_subver_table, so the controller is logged without a name:
+On Mon, 23 Nov 2026 12:25:21 +0530 you wrote:
+> This reverts commit d572ea4b621ce60279da5179a0c338660c8b7331.
 > 
->   Bluetooth: hci0: BCM4364B3 Trinidad Olympic GEN (MFG)
->   Bluetooth: hci0: BCM (001.016.091) build 0115
+> That commit worked around invalid mbox TLV reads by making the mbox
+> worker wait for the GP0 alive interrupt before the target access. The
+> controller must not see an access to HBUS_TARG_WRPTR at the same time as
+> an access to the PRPH_DEV_ADDR/PRPH_DEV_RD register pair. Waiting for GP0
+> is not exhaustive: it only narrows the window for the mbox worker, and
+> there are other cases where these accesses overlap, such as the other
+> users of target access (hwexp, fwtrigger, coredump) and the TX doorbell.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btbcm: Add entries for BCM4364B3 UART Bluetooth
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fe88794c9e0f
+  - [v1,1/3] Revert "Bluetooth: btintel_pcie: sync mbox tlv parsing with GP0 alive interrupt"
+    https://git.kernel.org/bluetooth/bluetooth-next/c/35eb0a106542
+  - [v1,2/3] Bluetooth: btintel_pcie: Serialize doorbell writes and target reads
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4c7812123eac
+  - [v1,3/3] Bluetooth: btintel_pcie: Serialize MAC access requests
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5bf3a9b6b720
 
 You are awesome, thank you!
 -- 
