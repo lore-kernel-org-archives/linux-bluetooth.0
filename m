@@ -1,90 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.43
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795455253;
-	b=ZiuXNIsqjKXS3PQuSUPpRk9HHdZO+r6FGTXmcLa+sitIyOF4w4w5pcQP61uIvFsyuLW2
-	 tRRYrQcwiRCRkCYp9PbqsnqI8ZUVTabEtAdwGl/TD1mfzjb6sJpVPQ+Guo+AgtqIix/Tz
-	 raFF0WaOB/2z63AgXp85xKlyihdJkC+dss4RKhp1jnFOJ5FBbjAupzrEPAVuOscT9e7dp
-	 gfEqRoUOdRAB2GdEEIe8c8unYiLn1CXNFDI/LSaedi1yZy+0OgaIVetG/sy9FRX35ugoP
-	 xKrE/y1EUZzO+GQWMCmhhJffrvBbBW4QaUaCX56enoCnzHrlMi+4QTLZSyTwqBpc1yQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795455253;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.50
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795455392;
+	b=n2cAGDOeXafiDY5iIbOqMG3ZV2H4tmHdP4DXaJWS428ELObR/gWprXqmVU+RY2tUZhJc
+	 6bj0Rx7gh9EHMVw4OhBRZwD4HjcHf/nYU0gtHX7iYSW99eIY1CC/O+NQRnMj1lT2qPwki
+	 Bfn4LGOLSRuOTXWbFHymYegIEmm+ilnibhoPVT0urq54x3Xi8syqsnO5rzOPEV7wJavMN
+	 H6sWN3ss5vBJ1d8o5NuPoQKTsEYXUFcvpkTqozB/4cQI8s2XpNGvxNh9Mky4BtR8HLRUZ
+	 pvjHfsC7hLZ/TSVWaITW3fqKqvnJq6RAR34yLxjna2h/cwQG/U/Oo5LgkczcH70P2Zw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795455392;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=pTxUnvDjANJ9l3Kj71UoNPPJRMztFFW3BLCmjld/5QU=;
-	b=F/8tPPe3lpg1ChYKNFn3xUXUhykbPFx806uooYOD0mXBnV+ZnmiF5GZDAd35ce4eaSZl
-	 C9Y4RyLyDbiP9Dg+8sJOJQ9mxJhdVtixXuVnFvlzxXT7yirPoUtsPaaHoTDpk9fCs6YLm
-	 290I0rolfhkf/9P6sxQ3y/dzInFkPkpQZC4QIBgw+ZO/E9LmGvAdNCduaVYlOWbBFAxkw
-	 PJthmG/8Jyd2GF3JDcA7nfP78Q3DtoE76EZRSesWx0QPDxd8ozrbrFSh2moLH01biyfpv
-	 qzSIN+SbMcjx1/zs2n04daCyRb/nmXP8udwPf1Sj9lsoXN7caoLZf5YdEKLPFseFtLw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=6CJJol2UnnCSRf90ZCwi6nbyMtPtlrdOLnPh/Efp4Fo=;
+	b=zYVbveteur6rPLz86Vy+DXCF1iOrXt7t7R2RAvxXwIm6OswpOlgrXRV6KN8svL8PeQ7Y
+	 3hmVQMgZJRyAxPPLrEAQyHDmMV2R6NTyytcCtxs6gJ7QoBmiFJ75evDL+L++LioSWUCRk
+	 wjS+DLRIM1rtIr7+lsbnZfHPqenk18NfLXClnpzGtM7cIWlmPdB5sDM5Ze3DNmGMMfvo7
+	 StkrCi24K2+dpp6uErL6D0k7rl8SoJSPtMw06KG1Lyv2qGl61pT2Tv32bep2tlkH07ilT
+	 JctQVJVnsjgrGS9H8FS2OKIvFiaxAdDd7P1YWN+Vg/zx+fGDBmWOxlEziBmp4618w6A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="u1uw1e7/";
-	arc=none smtp.remote-ip=209.85.217.43
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=f5UFC92k;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.50
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93104606A69C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:34:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93104606A69C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9164F606A31E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:36:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9164F606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=u1uw1e7/
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-7777fa8f1ccso1250315137.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:34:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=f5UFC92k
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-67c6a0abc2eso3740510d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:36:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795455390; cv=none;
+        d=google.com; s=arc-20260327;
+        b=arqq9Qr4CCku8V8TULb6iMXQK3WAjhsdf7nzhFyLS7TAIYqPktDaNTgJmBViNQjTt6
+         vud0NIZRl+R+r91ZICK8Xozvuhs9CTJgYfJNaYEkDgxilQ0nRi2QGrDp3qfYaCMmbe6w
+         Yg0Rp/vTWL50oDI5hsjj4Ej/v3ZyPsR1OrMww7lKlWqvVsFfK+Wj+nIwqOLHudhDcOVS
+         36GKJt97oF0Y5JZYNXoH4QA46mORA8ZjVsQcVldUPtVJ/KcECqoQy4sMxOyUZKquI3NZ
+         3hUAiGxixcaJFZb96rTfvk6fNXMW5kUoQR4Y1t/VQAS+bOg7bSHX3dAMKW8YelGuwkA4
+         JK1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6CJJol2UnnCSRf90ZCwi6nbyMtPtlrdOLnPh/Efp4Fo=;
+        fh=fJTvNhOwO3AM3tYUbNMUqA+BVc/up3gAa8zqoR5nDD4=;
+        b=B29hEhYBWAHudPBeAStWjI7IQUOAMJoUJbmHp6x1JsA2NcKsmufmNcRhZgNnhpWjmH
+         CCuWEXdvPxYnvYBQQF++vtWrQreQ2DRze1KEhBtbCNSjImrBLAyxtq7vDG09ccMA9kL9
+         CEtIbAaNl28G/uC0JkYhCvvM65uxj/qtHPfTHt1205fgr/eq6uj6fUu3V0CVhmm2IT/2
+         PLaGqqPaRQkearKXJ0Xo2KmnL5gFs7FaVGZYRajDMvCl8mXDbggLPoRF91MuxjtCR91D
+         E3XfKotCAdzO/qb9YsJYX2VTEBmfSdmHm52xNkPGEtk8iyFTWWj7cumTJWnxEAfIJU+7
+         TlIw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795455251; x=1796060051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=pTxUnvDjANJ9l3Kj71UoNPPJRMztFFW3BLCmjld/5QU=;
-        b=u1uw1e7/ldotRYzQiqhdMXwBwX/do6GuppzXT7t26WdY5wCItLn2mHAybEoOh6K1sV
-         edhmhM/2wmic1XFgM87SKigjkf7TMZ17XdVsILe84q69AlxZj+JPDqJmPQDZfahxhnnD
-         k8tz1vivuzMigWmAp3gP8qBF5YpcwTjrt59OZUa0NWvPVJUlkgTTPyXswIBhyam5aBKv
-         xjkhnqw9MrqOA9egrqNv35zw6uen2VnJkmnMvb//y+xcX/mYB7ZhZSO05DvPdD86BPJF
-         wTcNZZMh4E8kkVZV3vcospU53oDpuiY5+tTtxI7wNVChAWOu6A3qXQ2rE5LVGZ0f3m+x
-         ZJAA==
+        d=gmail.com; s=20260707; t=1795455390; x=1796060190; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=6CJJol2UnnCSRf90ZCwi6nbyMtPtlrdOLnPh/Efp4Fo=;
+        b=f5UFC92kEZpcCpGD8fst+fgQ5Zsx5S1c60ZcCcyAaqnyxz09IX5v8L4nJZj9zd5pbX
+         dUhxHYi9D9CfFtlcUaYGzejTzy+DA4bzhNHQcIjQyEbWdU+c/h8fPaY31uKBfz3W/oLw
+         zBNeV1zIEjTyg30aqJtXDaxN5M5pOya/4Qxheoj4xWwWn/OsnHXUeg2td6vA4Aqefud3
+         RZFHWlObx2R03EVtweRaVRhmFhr1IArfSH61SY1CYxXifr2EIY+L4aU6L/0Q5VP2e7qD
+         odMcvHc1yHVKyQyNJ5Nvy6qi0NAqtCXtvq5cFdW76VDmwP09eJxvC7uAmYoDq6wbBJvx
+         q9Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795455251; x=1796060051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pTxUnvDjANJ9l3Kj71UoNPPJRMztFFW3BLCmjld/5QU=;
-        b=UiTrnZbJarrqk7h3/XeB54NXoC1+ctaYmSZYNy7MDRp6GMJIsQUOfqhXSgHVyfCMTo
-         iLWTbMpb+9ivAm/vhASOvrV98tbOiA3acOkatQS+F0TJwe/FReoYuMsaGdglQQQCot8y
-         rPa/Ef5ADBMDand1ovNNQ2+6DKGS5m8KrGRjxdtRFrUOWNEFpA7AoAjPccYV6AjIZZ7M
-         B+hcXZOrj2Zxw0rkwmrBZFv+8MOCTLwq3FAHCunFNsnGPAV+sNVsq3/14IsPpXpOqOJK
-         zgg5dTvrsjILlVGXT7HKaINYKGGYYyBzq3QiMOEltP4zHTtT0Z8qLn1xxVJSx90nQ3Z5
-         F1zA==
-X-Gm-Message-State: APuU4Z9lOzfEEiJq502fFfAlv7g+9Vp1HCZLCbEgPtdaYrBWWrhAIAVa
-	F1zre+ctXrY+vuSp5dydqEiqswuK9ouzRMtsKn21i5S0UWYboCLePEm17TU32A==
-X-Gm-Gg: AZFdTZf7vt1WJGB/DoGCFGC6trd40FvUe5k2qFkQRIS5s+jwILiF1ps3V61DEHZYVMC
-	aPbnOiy6PpWsmNEutKyUfxrKqpnEIcDVHJyzjHtP1NFUkP6OPp4Bql85xYdIoH5UJrGUmwm890I
-	QqA7ojjemWy9IM/r+KCn8IBv6sxt2K3VPQfWzgzSCXrT5y4qYdvimWm64CT9kf8GW4w7Flk4c2c
-	ONxbH6yV4r6H4N4qe0vpAuNkN55vQ6jA/vSNN1MYz64emeHRiQ1TLNAUEWgalp1JdG/LHR7DwA9
-	9bc41zZJhdh632K0xuHaHiVyACfxhSU4999AwfMGfggXJI5Lsu1TjfVjB95ybgYC0TL5feJLBVM
-	EMnhcrI3eQMG3H2ZjXv5/J5nj2dAi0MBg0sgVUkEBT30hkFYqgAe6DdESn1B7FAspyjZii1li06
-	dZm+ZWvTGKt1O5XJkgO5jv6roro/lWrg4XDTfcMZf3lNTbZAoAJa7cF7uXcH0NNoHYatVd3V9B1
-	e92IaD2EQ4XBoUehkitXJVYVpZMqlOmp+RGzHEqSpqDlRuXZoEyQRDekSvjDQH5WXj+uMAhQSma
-	bR7kjXPkckfsN7Kdepk/FBYbnUmmYjzC9W3rHxDzen1R+7FQhrKB96VCzrwTKH6mBaf7Axl7HPF
-	bMYoNJ6VJk68/POTpsmBQg/OcmKbt3/hErgk+4pSqb71phzUF9UD6qBAMYHdbU7O1
-X-Received: by 2002:a67:e706:0:b0:7d2:cdd6:6be with SMTP id ada2fe7eead31-7d73942ad2emr4987813137.21.1795455251020;
-        Mon, 23 Nov 2026 09:34:11 -0800 (PST)
-Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e8265e55sm12635830137.11.2026.11.23.09.34.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 09:34:10 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-11-23
-Date: Mon, 23 Nov 2026 12:34:08 -0500
-Message-ID: <20261123173408.3632176-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1795455390; x=1796060190;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6CJJol2UnnCSRf90ZCwi6nbyMtPtlrdOLnPh/Efp4Fo=;
+        b=Ms184fcVkspMid9A7PvTBf2PKOLPj/HEVr6YHk5Sj2WlEbe6HKPg7rBEdq5ECGJvDz
+         9Z609d9O9nPeV4bYyZUilWWc2eFI7oFgd6JcZNal/FeHjgPri12IsCEiFcOQg0u/sDWe
+         AonA8bcugRYv7Tu9A/DQjfGLTaWSw0exwnPd9+PzCFJqkebPqFN+xquM8orDM4T6emYs
+         o0r4OcEJQrFHXGZsKLjZe46BkWk93oJA5qVJ8jzQQ4/8BPL5QRWhvTQnFkQLkQnnEw2T
+         +3q2n+hcbvFwmoO0YEHFJABnLI1QfHS0Au2do0Hw5aRa1CtXjdtWh9re8as6r34os9SG
+         NabQ==
+X-Gm-Message-State: APuU4Z+LudDaCflfZ9P41AScsGgV9YVHugN80aJMc0AUzZ8HyhdTsFTu
+	xdw10rGdIQo7U4PExdjlLcSxeKyaRlC6OGGKZ9vfbb23qX06wb+QAJuF+ItYqbdAqF8s+1ERiYV
+	fnkYbPA0gKX1Mckd5b36DIJm10EfEZNMnvLST
+X-Gm-Gg: AZFdTZdGn/BUKOhq2mVI7MmSgmoEeQX36/o9hkrLQW6h35mXjsBc8/6n/rvL+UWobgX
+	soGt93tTCYQmEaaREUCLA9UKRZlZcDROtN5EIaG0YT7qPuxXJ7NWB9v9qONV0tCqWVTdSAzKlp8
+	lSWnu+tyTu5Gr6EtdCut26a8VggoDePTPzE/tM3jcx5RNUyfWi0fqsuXyop1Q/mHfNAj+yKprEw
+	94PjAPHeiXw/eZL/aGN/REtwSJWPgFRJwOPy/hk4TITZNiyG4GDEkqEYm/GRVHcFmxZdUoBYlXf
+	xX1a8x8cu7sMrqXjPl3i/tqsJ3HbpcqjB6aMiAJ9FiK0iRv7kEHPOQIOaYr30UhxiS9tTxx+ZeR
+	e25rZzigIy9W1wCLy9UvPR9yjbDlOCxX/pLPQLVBX31NGjQlXNYpGaDZJ/4gogcbz+4P8+c/y5c
+	PsJRqr+na7GBGfccTxwwY27aJe8iYzTnDJ0+zx8sQbjJB6kS0o1YeexdSQzUGW
+X-Received: by 2002:a05:690e:14c7:b0:679:a2c3:b2dc with SMTP id
+ 956f58d0204a3-67df44d7f6amr3735978d50.92.1795455390332; Mon, 23 Nov 2026
+ 09:36:30 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -94,110 +104,71 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261120222624.150321-1-rolandschober1968@gmail.com>
+In-Reply-To: <20261120222624.150321-1-rolandschober1968@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 23 Nov 2026 12:36:19 -0500
+X-Gm-Features: Aa3M54rRUAUlV0SqqvkWDp8la-vTyOvXC6h-JmmMQlWedsJNRR4DgWgS1GScOLg
+Message-ID: <CABBYNZLfTDE=0Ny7Bb7QiX01SmAbhpr5UnxeURbE40AWjNS4dw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/5] monitor: Fix reads beyond advertising data
+To: Roland Schober <rolandschober1968@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit 5beb86f98c3d45f6d64be5b6d6c77480487b41b4:
+Hi Roland,
 
-  Bluetooth: L2CAP: return LE credits from recvmsg under the conn lock (2026-11-17 11:39:36 -0500)
+On Fri, Nov 20, 2026 at 5:27=E2=80=AFPM Roland Schober
+<rolandschober1968@gmail.com> wrote:
+>
+> print_eir() and the decoders it calls take advertising data, which a
+> remote device chooses. This series fixes five places where btmon reads
+> or writes beyond that data, or decodes it from the wrong place:
+>
+>  - a Shortened Local Name, Complete Local Name or Broadcast Name of
+>    240 or more octets is copied beyond a buffer of 239 octets,
+>  - the Flags and the Security Manager OOB Flags are read from an AD
+>    structure which has no data,
+>  - an Unprovisioned Device Beacon of 18 octets is decoded although its
+>    OOB Information lacks an octet,
+>  - the Apple identifier is printed as a string which nothing
+>    terminates,
+>  - a Public Broadcast Announcement is reported as invalid when it is
+>    well formed, and decoded from uninitialised variables when it is
+>    too short.
+>
+> Copilot found the first one in its review of "monitor: Decode Periodic
+> Advertising with Responses" v4, whose new decoders hand advertising
+> data to print_eir() as well. The bug is older than that series and
+> can be reached without it, e.g. by an LE Periodic Advertising Report,
+> so the fixes come as a series of their own. A v5 of the decoding
+> series will follow on top of it.
+>
+> The others were found by feeding print_eir() one AD structure of every
+> type with every length up to 250 octets, in a buffer of exactly that
+> size with AddressSanitizer, and by review. The same test passes with
+> the series applied. The reads of patches 1 to 4 show there as
+> AddressSanitizer reports; patch 5 was tested with hand-made btsnoop
+> traces only.
+>
+> Roland Schober (5):
+>   monitor: Fix overflow of the name buffer in print_eir
+>   monitor: Fix reading Flags beyond empty AD structures
+>   monitor: Fix reading beyond a short Mesh Beacon
+>   monitor: Fix reading beyond the Apple manufacturer data
+>   monitor: Fix decoding of Public Broadcast Announcements
+>
+>  monitor/packet.c | 29 ++++++++++++++++++-----------
+>  1 file changed, 18 insertions(+), 11 deletions(-)
+>
+> --
+> 2.47.3
+>
+>
 
-are available in the Git repository at:
+Copilot flagged another problem:
+https://github.com/bluez/bluez/pull/2861#pullrequestreview-6025049968
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-11-23
 
-for you to fetch changes up to 4fe38719e6738feaa90486e36b0790dd5d960a96:
-
-  Bluetooth: btintel_pcie: Fold MAC_INIT into btintel_pcie_get_mac_access() (2026-11-20 10:57:23 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
-Core:
-
- - hci_core: Take req_sync lock in hci_power_on()
- - hci_core: Hold hdev->lock when removing advertisement monitors
- - hci_core: Don't fail removing a monitor unknown to the controller
- - hci_sync: Lock the lookup in hci_disable_ext_adv_instance_sync()
- - hci_sync: Hold hdev->lock in hci_schedule_adv_instance_sync()
- - hci_sync: Fix remaining advertising instance UAFs
- - hci_sync: Use controller handles for periodic advertising
- - hci_event: Validate sent command length in LE Set Ext Adv Enable
- - hci_debugfs: Fix racy toggling of debugfs controlled flags
- - L2CAP: Use a reserved ident for L2CAP_LE_CREDITS
- - L2CAP: Don't use uninitialized EFS in l2cap_parse_conf_rsp()
- - SMP: Serialize link key updates from smp_notify_keys()
- - SMP: Check smp_data before using SMP_DEV()
- - SMP: Don't create the BR/EDR channel while unregistered
- - MGMT: Fix read_index_list() buffer overflow
- - MGMT: Reject zero multi advertising rotation duration
- - MGMT: Fix mesh transmission locking and lifetime
- - MGMT: Fix use-after-free in mgmt_powering_down()
- - MGMT: Retain the selected legacy advertising schedule ID
- - MSFT: Protect the event prefix with hdev->lock
- - MSFT: Free the response of the monitor commands
- - MSFT: Record the filter state on Command Disallowed
- - MSFT: Only enable the advertisement filter with monitors
-
-Drivers:
-
- - btintel_pcie: Set only MAC_INIT in btintel_pcie_mac_init()
- - btintel_pcie: Fold MAC_INIT into btintel_pcie_get_mac_access()
- - btrtl: Propagate errors if btrtl_vendor_read_reg16() fails
- - btrtl: Return -ENOMEM if bt_skb_alloc() fails
-
-----------------------------------------------------------------
-Cen Zhang (2):
-      Bluetooth: hci_sync: Fix remaining advertising instance UAFs
-      Bluetooth: hci_sync: Use controller handles for periodic advertising
-
-Kiran K (2):
-      Bluetooth: btintel_pcie: Set only MAC_INIT in btintel_pcie_mac_init()
-      Bluetooth: btintel_pcie: Fold MAC_INIT into btintel_pcie_get_mac_access()
-
-Luiz Augusto von Dentz (17):
-      Bluetooth: mgmt: Fix read_index_list() buffer overflow
-      Bluetooth: hci_core: Take req_sync lock in hci_power_on()
-      Bluetooth: hci_sync: Lock the lookup in hci_disable_ext_adv_instance_sync()
-      Bluetooth: hci_sync: Hold hdev->lock in hci_schedule_adv_instance_sync()
-      Bluetooth: SMP: Serialize link key updates from smp_notify_keys()
-      Bluetooth: SMP: Check smp_data before using SMP_DEV()
-      Bluetooth: SMP: Don't create the BR/EDR channel while unregistered
-      Bluetooth: hci_event: Validate sent command length in LE Set Ext Adv Enable
-      Bluetooth: mgmt: Reject zero multi advertising rotation duration
-      Bluetooth: L2CAP: Don't use uninitialized EFS in l2cap_parse_conf_rsp()
-      Bluetooth: mgmt: Fix mesh transmission locking and lifetime
-      Bluetooth: MGMT: Fix use-after-free in mgmt_powering_down()
-      Bluetooth: MSFT: Protect the event prefix with hdev->lock
-      Bluetooth: hci_debugfs: Fix racy toggling of debugfs controlled flags
-      Bluetooth: hci_core: Hold hdev->lock when removing advertisement monitors
-      Bluetooth: MSFT: Free the response of the monitor commands
-      Bluetooth: hci_core: Don't fail removing a monitor unknown to the controller
-
-Nguyen Ngoc Thang (1):
-      Bluetooth: L2CAP: Use a reserved ident for L2CAP_LE_CREDITS
-
-Thomas de Gruijter (2):
-      Bluetooth: MSFT: Record the filter state on Command Disallowed
-      Bluetooth: MSFT: Only enable the advertisement filter with monitors
-
-Tzung-Bi Shih (2):
-      Bluetooth: btrtl: Propagate errors if btrtl_vendor_read_reg16() fails
-      Bluetooth: btrtl: Return -ENOMEM if bt_skb_alloc() fails
-
-Zhao Li (1):
-      Bluetooth: MGMT: Retain the selected legacy advertising schedule ID
-
- drivers/bluetooth/btintel_pcie.c |  31 +---
- drivers/bluetooth/btrtl.c        |   9 +-
- include/net/bluetooth/hci_core.h |   7 +
- include/net/bluetooth/l2cap.h    |   5 +
- net/bluetooth/hci_core.c         |  81 ++++++++-
- net/bluetooth/hci_debugfs.c      |  32 +++-
- net/bluetooth/hci_event.c        |   9 +-
- net/bluetooth/hci_sync.c         | 344 +++++++++++++++++++++++++++--------
- net/bluetooth/l2cap_core.c       |  33 ++--
- net/bluetooth/mgmt.c             | 377 ++++++++++++++++++++++++++++++---------
- net/bluetooth/mgmt_config.c      |   8 +
- net/bluetooth/mgmt_util.c        |  23 ++-
- net/bluetooth/msft.c             | 118 ++++++++----
- net/bluetooth/smp.c              |  58 ++++--
- 14 files changed, 861 insertions(+), 274 deletions(-)
+--=20
+Luiz Augusto von Dentz
