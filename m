@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795456295;
-	b=WHcNlXcEj6438joAPg2uQeeC5tNFPaZrhP56DhHKWurN2dWS8IOkLTXoURdWlybADrpV
-	 6VF1/WCsUf7wVao3BiElrN0TQd5CcX4qEtpctYie4QQ1GHG6q9XUE0gjpSvhpkB26sdGz
-	 f7pbCYJdzCYN3mWsGBGilK9phXitCaxFfmG2jyOy6x3pkI56aeFdtI+XNxxTenMmMi9Ua
-	 AEekyeEQ1w8xnfTja4ikQMe7VRpx94hMjQzcsdUZOHOskCp4XGdklL2HtXtivVK224T2i
-	 MdRZBHNX2qNrmgHUne63e19S3ZdZxQVgWCl0kzr9/IbOCByG4EZyaCdGSloRVSFPRbQ==
+	t=1795456296;
+	b=DKBqWLQWrIxmGCnZo2hkkneO0LbfnrqE6fx7BfOPYYI44qQaW0xZmqpsY4DLtRyiwkGD
+	 LDdbePydC/x1R5JST4qlMEL3GoprnYYeGXo5y35cUMm6FLyt8VUv3TXsbVeFq/pqDrtfn
+	 k0pnn0mHj4KWLCOr7Ig/EM2urkQFdzl2A7deTLds0xQppXSKgq44yp+mNI//1CiMI3toF
+	 3z9HS94/OwCsfj+6cJXrn/rhKrY7j5KD5arGNurJejLV17qXlA+gaR7r7RFsefUtvhE0s
+	 OArec4aVnyFfAU/fn/g7HjFxdLNW+OS/dJhioNGnr2DBDRptQk5eI905aoz0YQbTn2Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795456295;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795456296;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=JplftcisRZsqFBDbe+JoCHZ7SVTMMpx8C2MmZ2L7ADU=;
-	b=sdcVE9NyT5BjFi409D3LzN+E+21/U9jGmQqZFGnw73w1YlmEGhXKg8sNGN8xiLTgM3ls
-	 79zVJeV4Vjkrvm5cZjh5g/DESDR3G8m+g7l+mDFm1uQG8b7zuQYNVtP/CCVjDS2jVxepg
-	 5D2f0eaFsVR2f0SULePDCPECbObYkaXds71Ij2xJrX9E+qM4FaWvKQW2eRgXBqvDzV5N7
-	 L/PxQzHRXJj6YVNSriP4lt0dSUPlT2i2EX+jk7X5TWJY079RbjkS4W88og0ULC8GP/HD8
-	 6dcwLKRsPz1HsTqU8bVO1l4/MWzSk5BxYMXeAZSkH6FI+ZVNYXlheNllj8+SZC6WHFQ==
+	bh=WwoylUVjr+iEAlXPsyZXRA1E6c4PH1t3s204TzCZlVo=;
+	b=QWQqbsRrSkRj/JSfiElM8ObbpFD8WCdfazwFFEyLDEBd4y92ijXMhry1FCEHCUz6Jivt
+	 zl5YkSsMG90iEF2B3KiVkN/TtCi6nBu7vDwwInF4oLAYwYW5TNguO6DtTZLG0wYze4FdY
+	 pLX662G+JrgwfycypIU3hUXTHXOCrC1299W2z01YoV4lIn6ftlvyxvJTy+61ejpmCVJVK
+	 L1nhNTuGgbPrR011qPPVwDMiHyB6cZ78MfO+tlJ9hGSd/in33nFGiM3d4pUbqIuL4Gfv/
+	 f/Jb5bCmQAUcYpsfQ3E//g+lnCsju6VAd5PW+cdMJhysqhOnXaYpIQ3EyIbjxIwebvw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Z/erfdlt";
-	arc=none smtp.remote-ip=209.85.222.50
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F0GpmiLI;
+	arc=none smtp.remote-ip=209.85.217.47
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C00D606A33E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A417606A32C
 	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:51:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C00D606A33E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1A417606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z/erfdlt
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-98c7798ce74so913313241.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F0GpmiLI
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-7cc1cf48a39so1490966137.1
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:51:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795456294; x=1796061094; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795456295; x=1796061095; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=JplftcisRZsqFBDbe+JoCHZ7SVTMMpx8C2MmZ2L7ADU=;
-        b=Z/erfdltR7dlGTKXIVzrVooLLDX3IVu5UY5BKDFqEvqPhW/fD9ADHLpKmIkcMJj0Qf
-         VphAjEjLVF6zipz4E6oR3X+8xHZeTSOzUOMsf9Ubxu6/BNWrghoJwLua0Lt5ZOtlwZh4
-         gKNC2CoS/tKASkZX4ZxiYnBictSl3UdjoYIx7MmqQNPBT8G81uNhoII1bO2mebjj19A4
-         /bXQub13Mcy/5wHUVrIls2huMj2lrFbKWWFFrT8KqNyLcv5Ov+ckuz/xkddPWMC8RUW/
-         QPEr27EN2Si8WnyJIrCu1xBteYdDpcxs05jwSOCTlZUer7locDTYgpSoYCnlysIpweCq
-         HF0w==
+        bh=WwoylUVjr+iEAlXPsyZXRA1E6c4PH1t3s204TzCZlVo=;
+        b=F0GpmiLIy5OpxS7l7BkYwGq9efqt9MVd3CbT14hjfyZ2iEFPtBvsJVo8zl56j+Gn0Q
+         izfUylnQy3547XYjOfHctg/UBkBKm/JHg2+LfnmMx7cdiMDANHsxrroaQfSsN5VM36yA
+         xh36GbFXbtz/Si32vH3O1DuBbqS5dsutWmWHFc7sMvgLy2sW5yD8NREkTe2wk47MZ49r
+         yk/8LhfCXhBA7aOt1P38SYkhmCk3z4Uw1rQcqt3Jmew1IRYd6Xkw6T/VKueX6jy/rDFv
+         65wZfkJmGo7KurAdyTxGxawbyRJhRBeX8GoNr25J2QEVW+w5RHpkCXOWCA55WyOjc/O2
+         Q33w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795456294; x=1796061094;
+        d=1e100.net; s=20260707; t=1795456295; x=1796061095;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=JplftcisRZsqFBDbe+JoCHZ7SVTMMpx8C2MmZ2L7ADU=;
-        b=BWk5cABvU1W4LV5RIs2SB/ZefVTIaDOpamG6VbVqCw10rK0IJ1jpoQfLAiXPANF5Ka
-         V9P9+DSRsXsc9QIuPEILF5ceZIVZ4XCrUtvlqHVCyxxL0LSF4/HCkAoZ+nUI4qbIMSXH
-         ogw+Gp11lLat1MwkE65Apv16D4Qap/pCg0yT188RiiMeiTBB63gygXoFNktbEqNDIXu/
-         cec/X5RGr49UqXIWIKG5VUPoD5kFI1pJNXbfRgNWFq6zQWd0QDpZoZz6crl68iE9l8tB
-         3Dxm/qI5tC+2tqOSgDLbmWXLWSYqtzso/QASvxMzQ8QJomkOoINhKl+Ig7hdI/a+Wha9
-         n5rQ==
-X-Gm-Message-State: APuU4Z+JkEpK5zdz6N8lvQtITLyDfqrK8POrrtsTrUb6TFhEt15z771l
-	sSECbFZRPI2doCeUZflxUARcHXAv2JPmBfjXWTySynRmJarm94J89estQ/LbCg==
-X-Gm-Gg: AZFdTZc7xEJ05OgW97p+Ou4vCIX1gzj3cTGYA0E0DwDXeFwsRHeYNuNhc678IfEPQBO
-	DVV6YnPJ01Dy66QoOnoP5Cde5Pn8IMiGI7KgXHgFVie1C4sGu3NBUiy/qgtngN4w7RG4PNqjtZy
-	ltQELJUHLySov5i5h4r9zKfXnvBdFHQvp0KkI+t9R+rmjaMMWlk0NA/10jt4jd88ewuTVSExb9a
-	Bzp2WRaRVBaikf8GwhdoFgGDwUhEmtpg8mGq/fDoa81J3zvoyXG7YNbKEj38VBuz7ZoCP6Gon4s
-	ZGUHuo3t9a06E2BgKvtg7u8E6ql5+cmDjpTTdhdff0u8eCTtChV+XDFJm+zblrv75yKC3JT4B0q
-	NAtChPfxdKLhmXWpkLGi8ej3dp/C6t4ceagj8C/J2io9ZEBdmClCMYHp4XOnF3qoidaoQURNZec
-	qc+XZnUv19rm1Z4wdqyPa0uin9o/BX2e5crI5l3Wy5JpM1rjJJvgdiLbieMvLm3LVCYejVAEjrR
-	0hr6+WaOYfDMD2sjTdUmFC5EFGO5VMwWCi96XdYNlErgsfXYBtgeAT5MyIqIP0/wG/nVZtBHcbP
-	YfZgsmRwfn6xulJhuSwrQSyag+oB4Q7xoJFPqLURuNzF+5MDxz4sa9Ml/n8+U91Qf0Lrta36QrT
-	Znp+L0VaFEljDWw6zoQAhGHZBxBnhnDAcQvNJ4nc19D2VtL+9ZLkG594vMVw0OZdh9TeLW3Bi9u
-	FQl0E=
-X-Received: by 2002:a05:6102:5127:b0:7d2:d65f:b479 with SMTP id ada2fe7eead31-7d73962b75amr4755518137.28.1795456294128;
+        bh=WwoylUVjr+iEAlXPsyZXRA1E6c4PH1t3s204TzCZlVo=;
+        b=AItGyi+t0gRMw0dBuf0PVIr+pIREEHmgAWCwTa9sUcyKftX0FG34ufAXeLLfrSXwmA
+         AO9eF6x179G46858GSB5an90dAGE0YBPIMJK8+uvcQJ4kLsIcEzzBbG3XBM9GP51c5HL
+         nR53w1KkZ21T0MVjUSHYcx4xD4gnX0vyxNqaZuxbXXxBbNWypuPb/1ChvBIZ1tWtKntT
+         CKBGK5ouqcjbaG2M9CVgbLmk93NOoT77eLVGYcJr8JZjowPa4S2J+8aZ0C6Ew037dlGl
+         sQI2u8R3ChJfOKvkYeKe8AJSzD4sidYL1WHnAKhIHiBNTk55IEa2Am7UA6KMR7mxW2R3
+         HCOQ==
+X-Gm-Message-State: APuU4Z/PmUWoGHSVSPyGUQzzIQGheCwLp/W6ri/BWJNW2/HqBOJVBADk
+	bNjn01oWqP9Ux3krfAbgld/rp5Cm9jP/m/mkilviX+dWPKWn4TJdOo64lIA6ew==
+X-Gm-Gg: AZFdTZcREBIle+6KCk6z7aaHJBPDYVLezdnD1uc/FinSsdVRD0kk+zZbXE0/jPRXNUR
+	p6b1qCy0O+97tVNg8ZVRzp6zNusTRf3EulcvAomImWlRpPXqOPNUXABLuLqmkXltAJOnCQicfu9
+	WDK8EcfuWa8HIcdO3CW6fhxJ2GDyGE8jPABPGKSL36HC8fctOvfc6INn/mbb2wVFAxMvaNFw7MK
+	hePDtAAG8l9rFiJO0gWd/S5FRjV87cFipWg3pkByYetIcwDxr6MJC+tGyRHZfzlRXVpFOcZ99U4
+	3jA6FzHulBS4UiNnJjiDn8pnbvNt927WKGpp9AhQ96KVDowhqBIFKGXMZ/1PvgcGMyKwwXCfsew
+	/imeDmxlKGKRih+LIk+hGqr8++g2a4R2O/ceL7LEx4opZNJUi3XRYKBkygNDfAfWbNl6EyAA/ys
+	3AXsCpzjYC11P2DmN2u/k3DTvsAdO3+/0OAzR7s97LlLg97GSm8htplXOXfFly6UAftNHbR6RMu
+	cv96J3TO7QCYV6mTx1b75eajRA4ISk9CG69FcJnMvBZUZHhomCzVzJwgR8+AKJo+tIvGLpS6X5q
+	a/dcbEDkVTVAzbA7A0YjU3pqBPoNJdCbOlk/RUlJQ0Si62+RkTsUvIsYyjLhv24IMY2PosAjrdb
+	Zp7tifHseICRrDYR25qpAmxjWJymFBj7P0fGGPrDU48vtrIyxN/dLLStBbKV9rjeYuc9fZJp6un
+	5Ckqk=
+X-Received: by 2002:a05:6102:644c:b0:7c3:873c:b3fa with SMTP id ada2fe7eead31-7d7392a4bddmr5827862137.4.1795456294932;
         Mon, 23 Nov 2026 09:51:34 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7f92680sm12795393137.5.2026.11.23.09.51.33
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7f92680sm12795393137.5.2026.11.23.09.51.34
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 09:51:33 -0800 (PST)
+        Mon, 23 Nov 2026 09:51:34 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 09/18] profiles/ranging: Take the CS role from Config Complete
-Date: Mon, 23 Nov 2026 12:51:12 -0500
-Message-ID: <20261123175125.3642617-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v5 10/18] profiles/ranging: Act on a CS configuration created by the peer
+Date: Mon, 23 Nov 2026 12:51:13 -0500
+Message-ID: <20261123175125.3642617-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261123175125.3642617-1-luiz.dentz@gmail.com>
 References: <20261123175125.3642617-1-luiz.dentz@gmail.com>
@@ -101,143 +101,100 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-The LE CS Config Complete handler stored the CS role it reports in
-cs_opt.role, overwriting the Role_Enable value set by StartMeasurement().
-StartMeasurement() seeds its settings from that field, so a second call
-without a role key sent Set Default Settings with the negotiated role
-instead: 0x00 for an Initiator, which is not a valid Role_Enable, and
-0x01, Initiator only, for a Reflector.
+LE CS Config Complete is also generated when the local Controller has
+responded to a configuration request from the remote one (Core v6.2
+Vol 4 Part E 7.7.65.42). The handler required CS_STATE_WAIT_CONFIG_CMPLT
+before parsing the event, which is only reached between the Set Default
+Settings response and Config Complete of a StartMeasurement(). A remote
+Initiator does not wait for that: it can create the configuration as
+soon as the link is up, before the local setup phase has run, or again
+after an earlier procedure. The event was then dropped along with the
+role it carries, Security Enable Complete and Procedure Enable Complete
+failed their own state checks, and no ranging data was produced.
 
-Keep the negotiated role in its own field, known only once Config
-Complete has arrived, and report Role_Enable back to StartMeasurement().
+Parse Config Complete in any state. Every state machine on the adapter
+receives the CS events of all links, which the state check used to
+hide, so ignore Config Complete and Security Enable Complete events
+whose handle is not mapped to this state machine, so that they cannot
+overwrite this link's role or advance its state.
 
-With the Reflector now running the setup phase, StopMeasurement() can
-also be reached on a Reflector whose procedure is running. Only the
-Initiator enables a procedure, so do not send Procedure Enable from a
-Reflector to stop it.
+A successful removal (action 0x00) leaves the remaining parameters
+undefined, yet it went on to the role check and, if the undefined role
+happened to be permitted, to Security Enable. Ignore it whatever the
+state.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/ranging/rap_hci.c | 29 ++++++++++++++++++++---------
- src/shared/rap.h           |  1 -
- 2 files changed, 20 insertions(+), 10 deletions(-)
+ profiles/ranging/rap_hci.c | 42 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 7 deletions(-)
 
 diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
-index 103431847538..84b94d8d453d 100644
+index 84b94d8d453d..91dea3d91a9e 100644
 --- a/profiles/ranging/rap_hci.c
 +++ b/profiles/ranging/rap_hci.c
-@@ -75,6 +75,13 @@ struct cs_state_machine {
- 	bool procedure_active;
- 	struct bt_rap_hci_cs_options cs_opt;  /* Per-instance CS options */
- 	uint8_t role_enable;  /* Role value for HCI commands (1, 2, or 3) */
-+	/* Negotiated CS role for this config (CS_INITIATOR/CS_REFLECTOR), taken
-+	 * from LE CS Config Complete. Unknown until that event arrives, which
-+	 * is why it is kept apart from role_enable: the latter is the bitmask
-+	 * of roles the host permits, not the role actually in use.
+@@ -890,13 +890,6 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("size=0x%02X", size);
+ 
+-	/* State Check */
+-	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT) {
+-		DBG("Event received in Wrong State!! ");
+-		DBG("Expected : CS_STATE_WAIT_CONFIG_CMPLT");
+-		return;
+-	}
+-
+ 	/* Pull the entire structure at once */
+ 	evt = util_iov_pull_mem(&iov, sizeof(*evt));
+ 	if (!evt) {
+@@ -906,6 +899,35 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
+ 
++	/* Every state machine on this adapter sees every CS event, so ignore
++	 * the ones for other links: acting on them would overwrite this
++	 * link's negotiated role and advance its state.
 +	 */
-+	uint8_t cs_role;
-+	bool cs_role_known;
- 	struct queue *conn_mappings;  /* Per-instance connection mappings */
- 	uint16_t active_conn_handle;  /* current measurement handle */
- 	struct timespec last_chan_class_time;  /* For 1-second rate limit */
-@@ -129,7 +136,6 @@ bool bt_rap_set_default_settings_params(void *hci_sm,
- 		return false;
++	if (!find_mapping_by_handle(sm, evt->handle)) {
++		DBG("Not for this link, ignoring");
++		return;
++	}
++
++	/* Action 0x00 reports that the configuration was removed, and leaves
++	 * the remaining parameters undefined (Core v6.2 Vol 4 Part E
++	 * 7.7.65.42), so there is no role or configuration to act on.
++	 */
++	if (evt->status == 0 && evt->action == 0x00) {
++		DBG("Config %u removed", evt->config_id);
++		return;
++	}
++
++	/* This event is also generated when the local Controller responded to a
++	 * configuration request from the remote one, which is how a Reflector
++	 * learns a procedure is being set up for it. The peer can do that
++	 * before the setup phase has run here, or after an earlier procedure,
++	 * so do not require WAIT_CONFIG_CMPLT, which only the local setup
++	 * phase reaches.
++	 */
++	if (cs_get_current_state(sm) != CS_STATE_WAIT_CONFIG_CMPLT)
++		DBG("Config created by the peer while in %s",
++			state_names[cs_get_current_state(sm)]);
++
+ 	/* Both sides asked for a configuration at the same time. The Central
+ 	 * rejects the Peripheral's request with LL Procedure Collision (0x23)
+ 	 * and completes its own, which the Peripheral handles instead (Core
+@@ -1052,6 +1074,12 @@ static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
+ 	DBG("status=0x%02X, handle=0x%04X",
+ 		rap_ev.status, handle);
  
- 	sm->role_enable            = settings->role;
--	sm->cs_opt.role            = settings->role;
- 	sm->cs_opt.cs_sync_ant_sel = settings->cs_sync_ant_sel;
- 	sm->cs_opt.max_tx_power    = settings->max_tx_power;
- 	return true;
-@@ -167,7 +173,7 @@ bool bt_rap_get_default_settings_params(void *hci_sm,
- 	if (!sm || !settings)
- 		return false;
- 
--	settings->role            = sm->cs_opt.role;
-+	settings->role            = sm->role_enable;
- 	settings->cs_sync_ant_sel = sm->cs_opt.cs_sync_ant_sel;
- 	settings->max_tx_power    = sm->cs_opt.max_tx_power;
- 	return true;
-@@ -277,7 +283,7 @@ static void cs_state_machine_init(struct cs_state_machine *sm,
- 
- 	/* Store role_enable for HCI commands (1, 2, or 3 from config) */
- 	sm->role_enable = role;
--	sm->cs_opt.role            = role;
-+	sm->cs_role_known = false;
- 	sm->cs_opt.cs_sync_ant_sel = cs_sync_ant_sel;
- 	sm->cs_opt.max_tx_power    = max_tx_power;
- 	sm->cs_opt.rtt_type        = 0;
-@@ -964,7 +970,8 @@ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
- 		return;
- 	}
- 
--	sm->cs_opt.role = rap_ev.role;
-+	sm->cs_role = rap_ev.role;
-+	sm->cs_role_known = true;
- 	sm->cs_opt.rtt_type = rap_ev.rtt_type;
- 
- 	DBG("config_id=%u, action=%u, ",
-@@ -1050,7 +1057,7 @@ static void rap_cs_sec_enable_cmplt_evt(const void *data, uint8_t size,
++	/* Shared HCI channel: drop events belonging to another link. */
++	if (!find_mapping_by_handle(sm, handle)) {
++		DBG("Not for this link, ignoring");
++		return;
++	}
++
+ 	if (rap_ev.status == 0) {
+ 		/* Success - proceed to configuration */
  		cs_set_state(sm, CS_STATE_WAIT_PROC_CMPLT);
- 
- 		/* Check if role is initiator */
--		if (sm->cs_opt.role == CS_INITIATOR) {
-+		if (sm->cs_role_known && sm->cs_role == CS_INITIATOR) {
- 			DBG("Initiator role: Sending CS Set Procedure Params");
- 			if (!rap_send_hci_cs_set_procedure_parameters(
- 							sm, handle)) {
-@@ -1524,7 +1531,7 @@ static void rap_cs_subevt_result_evt(const void *data, uint8_t size,
- 		return;
- 	}
- 
--	cs_role = sm->cs_opt.role;
-+	cs_role = sm->cs_role;
- 	cs_rtt_type = sm->cs_opt.rtt_type;
- 	max_paths = MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
- 	steps = MIN(num_steps_reported, CS_MAX_STEPS);
-@@ -1616,7 +1623,7 @@ static void rap_cs_subevt_result_cont_evt(const void *data, uint8_t size,
- 		return;
- 	}
- 
--	cs_role = sm->cs_opt.role;
-+	cs_role = sm->cs_role;
- 	cs_rtt_type = sm->cs_opt.rtt_type;
- 	max_paths = MIN((num_ant_paths + 1), CS_MAX_ANT_PATHS);
- 	steps = MIN(num_steps_reported, CS_MAX_STEPS);
-@@ -1840,9 +1847,12 @@ bool bt_rap_stop_measurement(void *hci_sm)
- 	 * there is nothing to disable, and the Controller answers Procedure
- 	 * Enable with Invalid HCI Command Parameters. A procedure that is
- 	 * being enabled has not reported yet, so still disable that one.
-+	 * Only the Initiator enables a procedure, so the same holds for a
-+	 * Reflector once the Initiator's procedure is running.
- 	 */
--	if (!sm->procedure_active &&
--			cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) {
-+	if ((!sm->procedure_active &&
-+			cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) ||
-+			!sm->cs_role_known || sm->cs_role != CS_INITIATOR) {
- 		DBG("No local CS procedure active, nothing to disable");
- 		return true;
- 	}
-@@ -1899,6 +1909,7 @@ void bt_rap_clear_conn_handle(void *hci_sm, uint16_t handle)
- 	DBG("Clearing connection mapping: handle=0x%04X", handle);
- 	remove_conn_mapping(sm, handle);
- 	sm->procedure_active = false;
-+	sm->cs_role_known = false;
- 	sm->current_state = CS_STATE_UNSPECIFIED;
- }
- 
-diff --git a/src/shared/rap.h b/src/shared/rap.h
-index 7ee51143c0ef..7ff5de227d70 100644
---- a/src/shared/rap.h
-+++ b/src/shared/rap.h
-@@ -19,7 +19,6 @@ struct bt_att;
- 
- /* Channel Sounding Events */
- struct bt_rap_hci_cs_options {
--	uint8_t role;
- 	uint8_t cs_sync_ant_sel;
- 	int8_t max_tx_power;
- 	int rtt_type;
 -- 
 2.56.0
 
