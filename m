@@ -1,87 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795472614;
-	b=A5xepxvJHxHX+AcoSEsfpBJlBWNZuAPqYcDpQeuatoiXUw0QzDQ/gIOc3BuLYtr4IrBG
-	 km5v8hKJyj5FJ+bWQrHfqLDR+8SilWvwbAQ1xoCr4Quom8Ds7XG5IyEmsC6+eCDgmnYKA
-	 q08ZLXYgBwLHJu6T+5hLlqfrPM4fHth+DQLVhV4Rn6yVNoeOa42YvFTL+Zk2cXsG5Ln/H
-	 CINaNW8VHUyaXy4RHzibytIyxFW6p8dhh3s2V3dJiiQo5xpb2pBUWQig6bVM3yYYcDwqX
-	 s5k4xiZO5u//5ajaaRwOJYABsbAILyeArMWn5YxIa7vRoctCvUQ01//UO2mxEeO6cEg==
+	t=1795476482;
+	b=GHVb8sApXOJcrdctxcSxjhkZMtlQ2kqeZ63qPohtTELpSYbQPF+fSLh7Z0hjIHgchn9Y
+	 NX6BSq+4lgrvPdIDF4HgDNfQXKHXinBndE3bXc9TqbTS4ucRRxOUD1Z/E5oThVXiCtbbo
+	 p+WGZnBMDqe1pQV+qkRIuL5FF7rgpuN7KRClDn4Ly/5jpWsafLTE0iszBhVcQbooWIu1p
+	 nCeFyEBwCG67bfyf1FVwkE2+h6GdJvGvhxptsNvSYeqod9wtVxIYF/8b+ALRWuuIM55eo
+	 nibUF9CbpxFHGjsqTM0AAZUf5J0Yj5TQDzxtIcxMAv/KrkKT2mjK48wUDHII8cf03XQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795472614;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795476482;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=zqkTt6F7nsuT6zPVTmD1WONSZhzN0HyCbLVeGgDIyCU=;
-	b=OSjrzSPj21SGCFMvaBuUUJZoed2L3W04375S+g1m/uguIVCN2xzqwU+ogmBH4n91sj7V
-	 /h78ie9uQMvSD4p4MLrytU4Yky04YuBI2au14lGV4oaAYArBno9bylGysHsxGhsLzP7aT
-	 qrSy/pc/O4Mn1aQLm/Xzl0IXUXI1eBbHcBZCmq3oTupMpYKxskwJD9zGzoxkyqFd0VF/Q
-	 EmdqIPymc4POsb1UlwOcY/Q2cO8r8DFvKeZ7MH+mfwCJ03F0y2LWRpaMr9KDjol2dj4cc
-	 NQKfIrMrodZubvkMe/fqipI9kti/0k/RbE/lXQeNteVu16vWTgylBtIbwKzFDP4UYTA==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=KZb40d81kTnSgf9EnhrFvRgrOMuFY/egCeETDoEiZUM=;
+	b=kjxWAukR2GvrZLAxZaVrohal7QAUlAn3aJBl1CgyUHoQ61LDi2DW2H7EeMlNSlc0YaFA
+	 mSY3Q8bHzlGzFMP+ZaqKjP9aANfc7wNkii2AR8p4m8zH/vRxWVcKpANl5FLmydso+7N/x
+	 wFslKEYrkY7H6Zi4iMz5dM4uk1brQU9O6RnU+qjCOiRD2E4r/nAEdGbQD1yLE2bLMMNCH
+	 76V1jMCoXi8DrHgW/FMgceEqBWrwS7CWFWHo3AKHUS+unK72R/BjX78RIMdU+ohBjkqjp
+	 UsOfyRfods5yiS+BcMKE45+vJudo6Yc7PleTOursE7fOcSXoFnDP4baxvWFpJWyOJSQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WpWuYJnX;
-	arc=none smtp.remote-ip=209.85.221.53
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VQhRibLN;
+	arc=none smtp.remote-ip=74.125.82.48
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30190606A31E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 22:23:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30190606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A25E606A31E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 23:28:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0A25E606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WpWuYJnX
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-49083b985d2so244225f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:23:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=VQhRibLN
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1a2af4c8d00so494140c88.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 15:28:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795472612; x=1796077412; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zqkTt6F7nsuT6zPVTmD1WONSZhzN0HyCbLVeGgDIyCU=;
-        b=WpWuYJnXhsj6G9IFLwwaF628JtwbZvnr5CJQHVzRsQvK4jS0bNcj6SZ8+bYORZlfJe
-         WfQNyRv0ZmllwptEuYL2xsv1UFmK8TglZ2OgKxW3x0A5uWne9EXT1W6eyQYcbagAxxDI
-         vcdzTIcvaTb2f522suvdZIug7manzEO0kZlRbCoTQqZil/tMq5m3hmICfM8104h8g8bm
-         zu9htr2yGQRM/A5kQF5UjVYiKQdgUGCeGHJGazFFlGLPakgsZZZrnuYR5IPevWXak3LC
-         eFzkUYiSSJ3/LjRlDx2nIxoIJ/9rWuEdIFPGv31whLP6/9KrVk0y9lQ4qQR1MQpo6nyy
-         5Oyw==
+        d=gmail.com; s=20260707; t=1795476481; x=1796081281; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=KZb40d81kTnSgf9EnhrFvRgrOMuFY/egCeETDoEiZUM=;
+        b=VQhRibLNy5Yfsfzm3/3oM0GygdPbxNj8iwb5MIje4htXP85co08QLs18VfP7CbOqxs
+         SvnKNVx+dzZ9e2IM/I5m42INiMVv3RKvuOFolhSyhKPbLb3Ta//czcdm9lzUWh7EfiHp
+         7cwNHw+A7/WijuJ4iQQZnX1TuCOB3I7ZSJU7lJh58YeEYVV8eV3v6ZV1+vhW14x7wQS2
+         DnWdu5MNzX0qaHUuCmlxD6QZMQTo2t99Z51VdhbgGhTuzweoWNTBWokXAAHW4f9wWDXn
+         hSkT7hHy2jSjTzWFzp5RTMiZfLVN5Gxh4ExFMGoydxjtn8Q1+QZ+N8Ok7ioIjmc1t3LT
+         ZzcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795472612; x=1796077412;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zqkTt6F7nsuT6zPVTmD1WONSZhzN0HyCbLVeGgDIyCU=;
-        b=f2BCcdXzI8PRYBRpOixUwCokbRFFd30lTfdtvvuH5ofH4593KtgS0y1XoV27vcYD/k
-         rrQSklLctQ7etPilJgMLUUGy5ln7CZ0A+qV96rFfkce7g43TdiyfhHMzFRuBbF2HMEBP
-         xSoEN5kevbflqPJiVgrMP7FFzQoHbbZC+rBL5zlrC9eMJ9ENrVySAXaRYzGCeF5p8Yxz
-         HTfp2h1SW3wOFZ+i/MMFtXdp9ITIT1Hnf/rE/jDLcrTZbjmOOvg2ImXHXYOkM4Mp8F68
-         WZX8XwbjXjxy4n/FEaIshT504rszeSZ6NkTdK9YpbrC88NXqVprg8RcJciCrTJuaOZLt
-         9okg==
-X-Gm-Message-State: APuU4Z8pFDvp7jiX5JNP6+x5bigz2ePTyBRlXk0KOxCfmt2o9q0p+RIL
-	fUAcCfOYxHPaEpd8blYL4jn5GX21O9Hu8hC3Y3osWPxgDO+l4KpyQUdI6lBk3Q==
-X-Gm-Gg: AZFdTZeTy/cVYGgLcElH4o62GCiu4X/12uQfqVYxDPEdB0RvpUJk/g1nb3S818Ef/9J
-	YELh5R9y/JZmxdJQXhJ7fON6ySDGz/sd6qAPYHiDOsg76k/OboJTBrVfJzybbK3YK0u5pmCpPns
-	LrTw7tCZKLwdw1A2XIFZmr3zZm+9i/Ws2qQvou1SrwPcrqa8ilBXczbjb7yYtKD1Gva+ySv4dbs
-	v+JLDu2nvfGbUndee7YUkN7b+pefgJUqQVuYN+crSxkTkBs4gTPHFNP2NjaA3/zIHL/iFEgY7Ef
-	8Z62yXdwTHfJLxOrt2liquE72lkmHw6V9un+IFA7tFXz3NXzLmwkYLd0rEYNMAsjfU/xcw4M76f
-	w8OTVMizqrFMxthfNvbzuPxXhmkbADXU5AlcIeeFes43dBFC0Q+SboVx8TG86L7KJsRt5hiFiN3
-	TyhEZx8dVi9yqS/3Huo/0uQoL4IkcsXyGJl7GOjgGvzfqvQAsj4gytpUQtsmxOPAwJaag1yH+ZO
-	2jBCeZXdbni7rep3GH1mD+hBKDJmfeBdLjDWzYnicB9jg+hWDUT0ZT/tKv62h0JCvJfEh/Ughnk
-	WPX0Xqb9ClC57LTENbzu9alKwswKWp84PCUFg9u+cBujClkW
-X-Received: by 2002:a05:6000:2210:b0:4aa:8fc3:28fc with SMTP id ffacd0b85a97d-4abad0dedc8mr25847850f8f.1.1795472611950;
-        Mon, 23 Nov 2026 14:23:31 -0800 (PST)
-Received: from schinder.fritz.box ([2001:9e8:b398:6b00:c303:57b6:d70:952e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4abbd84e661sm23019015f8f.18.2026.11.23.14.23.31
+        d=1e100.net; s=20260707; t=1795476481; x=1796081281;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=KZb40d81kTnSgf9EnhrFvRgrOMuFY/egCeETDoEiZUM=;
+        b=napl8iNV9RKMq/wiCDlt3FmmXuwE8dm0H4DElsFQNJc3fAGatEakYS4s2R3FoNdh+9
+         64y/QPXkbCPfGkTLw7+eiDlcRkhsYmfWES9o1wa7qDuv4o4u9riglg+RpnIE5ryDx8tU
+         Mmxg4cRZOQLQvc46t5IVdrNVVEasqnvghCNdHJZrGPDLq1LaizfRGPoXC0vfJxjLY9Uj
+         YbyCokH6TwD66oFPBi8qSh3tJSCyqSz2tzoJSRep8P3OcpnN1aLfPlWjixmPDMrA9x3Z
+         NVn7+CE6mnLej4o5qxI3ObQDVLHxoqQoR0QLnjuIrG6KjaQ34W10vNCoYMgrpv2xdqDR
+         maFA==
+X-Gm-Message-State: APuU4Z/8kSCfH5MxdC4RF5kByN5n04DX0lkoPDT2unZenBYp4OhuJxPI
+	VYcTDBUndxoUeyky13k1OU/If6HXC99D3QYZSHIfLu8D5Bk7hrqBqUj0izd+KA==
+X-Gm-Gg: AZFdTZejAM7ydaem9+CpbNL1lYjlVOe3nGD9GqtY9GXEF7j+TWk/HhCaj3duIMvIqXV
+	D6LDjoDPqOQ/LYM89qAHPM0ziJMSyXnZGmaZCfBhvwfc1tvnHsAhqoCF6aUXvctl6e25x2NnT9o
+	TAVhJx+UbAcnB4SvjyxYd/xsaVQfSPyuUApMpaNy0RwpOEm35QGRv8VcwbYg8GHfVYeaTIou01q
+	MQnFQNLg55Ze0WL0hbmqTVHMYc+21O4vgGrPI5pX57zTMm5NSeZnMiuZeq90tvGzxcoTpcGjtCN
+	Ll3GKS0TD4/YmhULNMzwVk9EdaRB1zTdxBrpPL5awY/dIBgKR0HqX9FkH8+AR75/FFsWpIzXegn
+	WRthF66sUVySlwOwXSx5EaZkQ5gWxS1m/r3Crjr0YwDqSdSO1f9t799NTNhmD72y+sFjVMI1kyj
+	XEo9lZEnW5ndkd8hyOVl77w3Hhqra7cVvukEUtGzG1KMTMmlVRjv3KujgJXw/Yj6tZd2WwN/a/Z
+	XQLRy8ed+E1pu5DqTxTKThcCCf2wkFQ27T2T6HJwYlesWJKaPZ8AuzDghk=
+X-Received: by 2002:a05:7022:38b:b0:1b5:2dce:1b6d with SMTP id a92af1059eb24-1b55689ab30mr15430080c88.17.1795476480709;
+        Mon, 23 Nov 2026 15:28:00 -0800 (PST)
+Received: from [172.17.0.2] ([57.154.7.99])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5568592adsm30137507c88.15.2026.11.23.15.28.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 14:23:31 -0800 (PST)
-From: Roland Schober <rolandschober1968@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 0/6] monitor: Fix reads beyond advertising data
-Date: Mon, 23 Nov 2026 23:23:09 +0100
-Message-ID: <20261123222315.223450-1-rolandschober1968@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        Mon, 23 Nov 2026 15:28:00 -0800 (PST)
+Message-ID: <6b04cc00.8af4976c.1dde1b.a425@mx.google.com>
+Date: Mon, 23 Nov 2026 15:28:00 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6600330742638809439=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -91,66 +88,89 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, loic.poulain@oss.qualcomm.com
+Subject: RE: Support for block device NVMEM providers
+In-Reply-To: <20261123-block-as-nvmem-v13-1-96ffe1f59332@oss.qualcomm.com>
+References: <20261123-block-as-nvmem-v13-1-96ffe1f59332@oss.qualcomm.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-print_eir() and the decoders it calls take advertising data, which a
-remote device chooses. This series fixes six places where btmon reads
-or writes beyond that data, or decodes it from the wrong place:
+--===============6600330742638809439==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
- - a Shortened Local Name, Complete Local Name or Broadcast Name of
-   240 or more octets is copied beyond a buffer of 239 octets,
- - the Flags and the Security Manager OOB Flags are read from an AD
-   structure which has no data,
- - an Unprovisioned Device Beacon of 18 octets is decoded although its
-   OOB Information lacks an octet,
- - the Apple identifier is printed as a string which nothing
-   terminates,
- - the Program Info metadata is printed without a limit to its
-   length,
- - a Public Broadcast Announcement is reported as invalid when it is
-   well formed, and decoded from uninitialised variables when it is
-   too short.
+This is automated email and please do not reply to this email!
 
-Copilot found the first one in its review of "monitor: Decode Periodic
-Advertising with Responses" v4, whose new decoders hand advertising
-data to print_eir() as well. The bug is older than that series and
-can be reached without it, e.g. by an LE Periodic Advertising Report,
-so the fixes come as a series of their own. A v5 of the decoding
-series will follow on top of it.
+Dear submitter,
 
-The others were found by feeding print_eir() one AD structure of every
-type with every length up to 250 octets, in a buffer of exactly that
-size with AddressSanitizer, and by review. The same test passes with
-the series applied. The reads of patches 1 to 5 show there as
-AddressSanitizer reports; patch 6 was tested with hand-made btsnoop
-traces only.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1219596/
 
-For v2 the advertising data was also fuzzed with libFuzzer and
-AddressSanitizer, part of the time with UndefinedBehaviorSanitizer as
-well, as LE advertising data and as an Extended Inquiry Response.
-Without the series it finds the reads of patches 1 to 5 within a
-minute, the one of patch 5 through a Basic Audio Announcement. With
-it, more than 200 million inputs, which run every line of
-print_eir(), found nothing.
+---Test result---
 
-v2:
- - Add patch 5. Copilot found that the fix of the Public Broadcast
-   Announcements, now patch 6, lets them reach the Program Info
-   decoding, which reads beyond the string.
- - Rebase.
+Test Summary:
+CheckPatch                    FAIL      2.72 seconds
+VerifyFixes                   PASS      0.08 seconds
+VerifySignedoff               PASS      0.08 seconds
+GitLint                       PASS      0.46 seconds
+SubjectPrefix                 FAIL      0.15 seconds
+BuildKernel                   PASS      23.96 seconds
+CheckAllWarning               PASS      26.87 seconds
+CheckSparse                   PASS      29.70 seconds
+BuildKernel32                 PASS      23.97 seconds
+CheckKernelLLVM               PASS      25.61 seconds
+TestRunnerSetup               PASS      551.31 seconds
+TestRunner_l2cap-tester       PASS      15.28 seconds
+TestRunner_iso-tester         PASS      11.58 seconds
+TestRunner_bnep-tester        PASS      2.85 seconds
+TestRunner_mgmt-tester        PASS      85.05 seconds
+TestRunner_rfcomm-tester      PASS      4.07 seconds
+TestRunner_sco-tester         PASS      5.13 seconds
+TestRunner_ioctl-tester       PASS      4.27 seconds
+TestRunner_mesh-tester        PASS      4.23 seconds
+TestRunner_smp-tester         PASS      4.00 seconds
+TestRunner_userchan-tester    PASS      3.07 seconds
+TestRunner_6lowpan-tester     PASS      4.06 seconds
+IncrementalBuild              PASS      40.29 seconds
 
-Roland Schober (6):
-  monitor: Fix overflow of the name buffer in print_eir
-  monitor: Fix reading Flags beyond empty AD structures
-  monitor: Fix reading beyond a short Mesh Beacon
-  monitor: Fix reading beyond the Apple manufacturer data
-  shared/bap: Fix reading beyond the Program Info
-  monitor: Fix decoding of Public Broadcast Announcements
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v13,2/2] block: implement NVMEM provider
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#287: 
+new file mode 100644
 
- monitor/packet.c       | 29 ++++++++++++++++++-----------
- src/shared/bap-debug.c |  2 +-
- 2 files changed, 19 insertions(+), 12 deletions(-)
+total: 0 errors, 1 warnings, 279 lines checked
 
--- 
-2.47.3
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15012731.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+
+
+https://github.com/bluez/bluetooth-next/pull/1203
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6600330742638809439==--
