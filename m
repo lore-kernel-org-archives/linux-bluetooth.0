@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795444263;
-	b=r2hd9XCU5C2Q0QfWRZctVhG1O5cU/fLjqxZ7PhUFb7gSs9tyievXGb9JJd9HvuzdAKjW
-	 sYG+1LF7Ncexn6L81pRwperKuQB38oSxYmWDh4j4Uvab28eUDnIBcQiKdRPLGi209aAQL
-	 jgbMhWfJ4QTvPUZlDk2Kfj3yN+yPbuC8FmygFcHOZEvayZMxYM/jc05+LETfjcfnFp3gs
-	 qd18cL3D7D+4/8Sgn4kvaf2Zbo26YimX6t6ibKUS7zlKm42bHrVQzMz6FNkyJcxfE9UkR
-	 TBYzVXn5DnqXuhY8XHuIbQPJrE5ztclhrgl3uZn9BzEzQM71/k7clQsSJvsoML5mcYQ==
+	t=1795444262;
+	b=0xu73160ZyMAzY7KB7YqvAwcUGb9VRjMfo4uxF9QT0ILhL8KKUoVE8roR6KNTgNf7euk
+	 aiyx83DQMdSjySxmSEtWP1Hayt6Xsuc/LKMQvqdCngTGgWEHoFOiepv8unCB4Ou4Zik6h
+	 P2W9f2K5b+0adNq9rMVoLdzBb3Fk+lBLbuSjPDLdT80izSXcvsxAYXCR6RnG0bVDIWijQ
+	 S8l5M4oFX2x3skjA8C3hOODDhD8K+A1apUV8qBsKFwHy2yRYhIfQqkEykvWeJCZY2ZC3l
+	 WvTiYmt1T1hAPQGnUfYf+OFZoc/j+vMmGp0eKV5usE8uQ8FxwxkhaJfjCSO1W2OzJww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795444263;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795444262;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=YLF87eN/uU/wqvmvlFHoOiiN67mCEi5yALyn3P/yr8o=;
-	b=xTbupfz/NJnG+vZaJr4iDoXrkFMZ9///z8l0SGDaNM5fR3HSkS6DxSozfkuhmvKn0TEN
-	 y2Q+2UtzKEXEHU6eyudXAeFxxDVQiW9AYlut3Fa8X42E+mgz1ZgZw+ZKwteejDsrviy1w
-	 6HfbSBbi+/nWFBep+eLYbnUK3CrFKBSO35J25jAR1X09PaDyz1HSYytOzmf+GmOytvpIF
-	 GCOsS5xmnaayO57Z7ABssvTfJOhopQ25r/EIecQ7eRG5AbNJOdcUkgsryKUq5jcOb7/K8
-	 38iwYeWQ40570SKhrjSDsB9q5xNhHgPkbfrkaqANCKSFaMq9Cmt4/CNmx+60hCf+HjQ==
+	bh=aANZmmafEPCsA2D3Asv+uU7udoTJg15JVxDLrxz+9ZY=;
+	b=tKJ5GaVo+MacfUKjZViCwvcaMn4BRxfXqOAiIW6GaI0Qm4DBQJmsiNf6B8cwHn0PmghK
+	 H8klGrS28NQ3RNTyyFskUVsxNauP0vm8YjZMajlHqq3gw6WQRMTfu7TNkhbzg+a8Wb749
+	 8W8LsWWz791qehHMyK9DNhze+6wQGfXJFsUNom3Ia5If4Gv1h3KXk3o1QDbp6RtNWntIt
+	 RPOptORS0xUMB0TAuCCV3SZcVkrCNQy1uGlBLJhjR8090183eGcuOQ2BxX0R6nFwTWJUG
+	 u8G34HmHt9BQQKESS63kdyCDOCgf1KgCd0NZEFiKeSjvFqTKV+tVSA7Yj37038w0zLw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=Kw0dAo4n;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=V7DDqc1b;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350A7606A33C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:31:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 350A7606A33C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3651606A338
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3651606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=Kw0dAo4n
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=V7DDqc1b
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1795444260;
-	bh=WsBRTtICNGWnSvJhfOS8taVkxqUOxDW6E23Q4+HWFtY=;
+	bh=XoV5C8XP1zktVnSpx9GZKx2sgMo8SWgw4iUyt9DmdlM=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Kw0dAo4n/9jK8SUkf4hJK+re7TksUlvi75JQrU8AHT6C2xEJ85XmYamXrGpYsMt1Z
-	 zHqes51x+VP/J0w2EZ2P9bxlX6PIz9puxgTs0i+pz3Myi1irF6qqGWliCLy32mTxkU
-	 bYf1+EPDMYqp/eKUyD0y3biPBfjL+QP2605NoPj1HrXr69PtRCV8tim+S1dCrG/wRJ
-	 5S01rWHFevtCtHJiInQ+2YnNYRqv6y8LOk1hxj+soDC9OsO/yUyYqvH5lec2lqfIXG
-	 pgh42O6phmc6EOVenIflSOC7EQPQ7ZCi4WvIZ0q9gu+wuO4qKeza6D81C+y1EvYf2N
-	 N3jL1mg0+lO2A==
+	b=V7DDqc1bj8tK7bGjAeQ6lnvgS5hAVEe94XxscA9+LvTqK0aL/Swv9/Zz8F+xZKs7Z
+	 l1m+wVvHOBiscT/yTH7T/T3ynHUUcEt1z5zSKL5hmpnck8uTsIzKUNp47QhL/fo9ql
+	 +3xVVGFk+cLo1B4aBZA1z6z/rGVZe1DMuIrllPP7VdXXttsATxzJaOIpGPzmkmFV40
+	 uh+mmg4K6XFYLArJ8YvSKtt7ahwpYquWZDr+tDGoSGA6pXI7SFV1eVtwVCLp9U9ny7
+	 93tDwsQf3Ot4tHBc7RbLn0qp4BLE52TWEAjU/8g9BleVg5hpfK8z+3wtL7AGBZtH37
+	 87WS8LyTNJ5UQ==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id A84C717E0FB8
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6D37817E0F76
 	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 15:31:00 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/4] monitor: Reassemble L2CAP ERTM/Streaming fragments before dissecting
-Date: Mon, 23 Nov 2026 15:30:54 +0100
-Message-ID: <20261123143054.116007-5-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 3/4] monitor: Decode PBAP/MAP/BIP Application Parameters tags
+Date: Mon, 23 Nov 2026 15:30:53 +0100
+Message-ID: <20261123143054.116007-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261123143054.116007-1-frederic.danis@collabora.com>
 References: <20261123143054.116007-1-frederic.danis@collabora.com>
@@ -72,523 +72,433 @@ Content-Transfer-Encoding: 8bit
 
 From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-L2CAP ERTM/Streaming mode can segment a single upper-layer SDU across
-several I-frames (Start/Continuation/End SAR values). Previously each
-fragment was dissected independently, so OBEX PDUs spanning more than
-one fragment failed to parse ('frame too short') and S-frames (which
-carry no SAR field or payload) were incorrectly sent to the upper
-layer dissector as empty frames, adding further false positives.
+Application Parameters (Tag/Len/Value) were only shown generically
+as 'Tag 0xNN len N' plus a hexdump, with no knowledge of what each
+tag means. Add per-profile tag tables (name + value type) for PBAP,
+MAP and BIP, sourced from their respective specifications, and decode
+known tag values as numbers/strings instead of a raw hexdump.
 
-Add per-channel, per-direction SDU reassembly buffers
-(chan->sdu_rx[]), filled across Start/Continuation/End I-frames and
-handed to the upper layer dissector only once the full SDU is
-available. S-frames are now skipped entirely before PSM dispatch.
-
-While an SDU is still being reassembled (Start/Continuation
-fragments), the raw per-fragment payload is still hexdumped so no
-bytes are lost from the trace, but OBEX decoding itself only runs
-once on the complete SDU (on the End fragment).
-
-To avoid printing bytes twice (once as a raw Start/Continuation
-fragment dump, and again inside a header value dump once the full
-PDU is decoded), obex_packet() now also takes the base and size of
-the fragment that triggered the call (the whole buffer for RFCOMM/
-Unsegmented/untracked channels, or just the last physical I-frame's
-payload for a just-completed SAR reassembly). Internal hexdumps in
-obex.c are routed through a small obex_hexdump() helper that clips
-output to only the bytes carried by that fragment.
-
-Since headers are serialized near the start of a PDU while a SAR
-reassembly's last fragment carries only its final bytes, restrict
-this clipping to Body/End-of-Body: Application Parameters and
-Target/Who header values are always shown unclipped, otherwise their
-contents would be dropped whenever they land in an earlier fragment
-than the one that completed reassembly.
+Since Application Parameters headers don't repeat which profile a
+session belongs to, remember the profile classification learned from
+a session's CONNECT Target/Who header (already decoded by the
+existing Target/Who profile lookup) in a small per-session table,
+keyed the same way as the existing last-request tracking. Sessions
+with no recognized Target/Who (or none yet seen) keep today's
+generic Tag/Len/Value dump.
 
 Assisted-by: Claude:claude-sonnet-5
 ---
-v1->v2: Fix commit title issue
+ monitor/obex.c | 323 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 310 insertions(+), 13 deletions(-)
 
- monitor/l2cap.c  | 175 ++++++++++++++++++++++++++++++++++++++++++-----
- monitor/obex.c   |  63 +++++++++++++++--
- monitor/obex.h   |   3 +-
- monitor/rfcomm.c |   2 +-
- 4 files changed, 216 insertions(+), 27 deletions(-)
-
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 3e7f2f97a..8a196f2fe 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -86,9 +86,21 @@
- #define L2CAP_SAR_START		0x01
- #define L2CAP_SAR_END		0x02
- #define L2CAP_SAR_CONTINUE	0x03
-+#define L2CAP_SAR_NONE		0xff	/* S-frame, no SAR field */
- 
- #define MAX_CHAN 64
- 
-+/* Reassembled L2CAP SDU for ERTM/Streaming mode channels using
-+ * segmentation (SAR Start/Continuation/End). Tracked separately per
-+ * direction since a bidirectional channel may have independent SDUs
-+ * in flight each way.
-+ */
-+struct l2cap_sdu {
-+	uint8_t *data;
-+	uint16_t len;
-+	uint16_t total;
-+};
-+
- struct chan_data {
- 	uint16_t index;
- 	uint16_t handle;
-@@ -102,11 +114,19 @@ struct chan_data {
- 	uint8_t  seq_num;
- 	uint16_t sdu;
- 	uint8_t  fcs;
-+	struct l2cap_sdu sdu_rx[2];
- 	struct packet_latency tx_l;
- };
- 
- static struct chan_data chan_list[MAX_CHAN];
- 
-+static void reset_sdu_rx(struct chan_data *chan)
-+{
-+	free(chan->sdu_rx[0].data);
-+	free(chan->sdu_rx[1].data);
-+	memset(chan->sdu_rx, 0, sizeof(chan->sdu_rx));
-+}
-+
- static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
- 			uint16_t psm, uint8_t mode, uint8_t ctrlid)
- {
-@@ -146,6 +166,7 @@ static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
- 	if (n < 0)
- 		return;
- 
-+	reset_sdu_rx(&chan_list[n]);
- 	memset(&chan_list[n], 0, sizeof(chan_list[n]));
- 	chan_list[n].index = frame->index;
- 	chan_list[n].handle = frame->handle;
-@@ -182,11 +203,13 @@ static void release_scid(const struct l2cap_frame *frame, uint16_t scid)
- 
- 		if (frame->in) {
- 			if (chan_list[i].scid == scid) {
-+				reset_sdu_rx(&chan_list[i]);
- 				chan_list[i].handle = 0;
- 				break;
- 			}
- 		} else {
- 			if (chan_list[i].dcid == scid) {
-+				reset_sdu_rx(&chan_list[i]);
- 				chan_list[i].handle = 0;
- 				break;
- 			}
-@@ -480,8 +503,11 @@ static char *mode2str(uint8_t mode)
- 	}
- }
- 
--static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
-+static uint8_t l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl,
-+							uint16_t *sdu_len)
- {
-+	uint8_t sar = L2CAP_SAR_NONE;
-+
- 	display_printf("      %s:",
- 		ctrl & L2CAP_EXT_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
- 
-@@ -493,16 +519,14 @@ static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
- 		if (ctrl & L2CAP_EXT_CTRL_POLL)
- 			display_printf(" P-bit");
- 	} else {
--		uint8_t sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
-+		sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
- 						L2CAP_EXT_CTRL_SAR_SHIFT;
- 		display_printf(" %s", sar2str(sar));
- 		if (sar == L2CAP_SAR_START) {
--			uint16_t len;
--
--			if (!l2cap_frame_get_le16(frame, &len))
--				return;
-+			if (!l2cap_frame_get_le16(frame, sdu_len))
-+				return L2CAP_SAR_NONE;
- 
--			display_printf(" (len %d)", len);
-+			display_printf(" (len %d)", *sdu_len);
- 		}
- 		display_printf(" TxSeq %d",
- 			(ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
-@@ -514,10 +538,15 @@ static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
- 
- 	if (ctrl & L2CAP_EXT_CTRL_FINAL)
- 		display_printf(" F-bit");
-+
-+	return sar;
- }
- 
--static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
-+static uint8_t l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl,
-+							uint16_t *sdu_len)
- {
-+	uint8_t sar = L2CAP_SAR_NONE;
-+
- 	display_printf("      %s:",
- 			ctrl & L2CAP_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
- 
-@@ -529,17 +558,13 @@ static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
- 		if (ctrl & L2CAP_CTRL_POLL)
- 			display_printf(" P-bit");
- 	} else {
--		uint8_t sar;
--
- 		sar = (ctrl & L2CAP_CTRL_SAR_MASK) >> L2CAP_CTRL_SAR_SHIFT;
- 		display_printf(" %s", sar2str(sar));
- 		if (sar == L2CAP_SAR_START) {
--			uint16_t len;
--
--			if (!l2cap_frame_get_le16(frame, &len))
--				return;
-+			if (!l2cap_frame_get_le16(frame, sdu_len))
-+				return L2CAP_SAR_NONE;
- 
--			display_printf(" (len %d)", len);
-+			display_printf(" (len %d)", *sdu_len);
- 		}
- 		display_printf(" TxSeq %d", (ctrl & L2CAP_CTRL_TXSEQ_MASK) >>
- 						L2CAP_CTRL_TXSEQ_SHIFT);
-@@ -550,6 +575,8 @@ static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
- 
- 	if (ctrl & L2CAP_CTRL_FINAL)
- 		display_printf(" F-bit");
-+
-+	return sar;
- }
- 
- #define MAX_INDEX 16
-@@ -2704,6 +2731,70 @@ static void smp_packet(uint16_t index, bool in, uint16_t handle,
- 	opcode_data->func(&frame);
- }
- 
-+/* Reassemble ERTM/Streaming mode SAR fragments (Start/Continuation/End)
-+ * into a single SDU before handing it to the upper layer dissector.
-+ * Returns true when frame now holds a complete payload ready for
-+ * dispatch (either because sar is the end of a multi-fragment SDU, or
-+ * because reassembly could not be tracked and the single fragment
-+ * should be dispatched as-is). Returns false while more fragments are
-+ * still expected.
-+ */
-+static bool l2cap_sdu_reassemble(struct chan_data *chan, bool in,
-+					uint8_t sar, uint16_t sdu_len,
-+					struct l2cap_frame *frame)
-+{
-+	struct l2cap_sdu *sdu;
-+	uint32_t len;
-+
-+	if (!chan)
-+		return true;
-+
-+	sdu = &chan->sdu_rx[in ? 1 : 0];
-+
-+	if (sar == L2CAP_SAR_START) {
-+		if (sdu->data) {
-+			print_text(COLOR_ERROR,
-+				"incomplete SDU replaced by new Start segment");
-+			free(sdu->data);
-+		}
-+
-+		sdu->len = 0;
-+		sdu->total = sdu_len;
-+		sdu->data = malloc(sdu_len);
-+
-+		if (!sdu->data) {
-+			sdu->total = 0;
-+			return true;
-+		}
-+	} else if (!sdu->data) {
-+		print_text(COLOR_ERROR, "unexpected continuation segment");
-+		return true;
-+	}
-+
-+	len = sdu->len + (uint32_t) frame->size;
-+	if (len > sdu->total)
-+		len = sdu->total;
-+
-+	if (len > sdu->len)
-+		memcpy(sdu->data + sdu->len, frame->data, len - sdu->len);
-+	sdu->len = len;
-+
-+	if (sar != L2CAP_SAR_END)
-+		return false;
-+
-+	if (sdu->len != sdu->total)
-+		print_text(COLOR_ERROR, "reassembled SDU length mismatch");
-+
-+	frame->data = sdu->data;
-+	frame->size = sdu->len;
-+
-+	sdu->data = NULL;
-+	sdu->len = 0;
-+	sdu->total = 0;
-+
-+	return true;
-+}
-+
- void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 			uint16_t psm, const void *data, uint16_t size)
- {
-@@ -2712,6 +2803,10 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 	uint32_t ctrl32 = 0;
- 	uint16_t ctrl16 = 0;
- 	uint8_t ext_ctrl;
-+	uint8_t sar = L2CAP_SAR_UNSEGMENTED;
-+	uint16_t sdu_len = 0;
-+	uint16_t frag_len = size;
-+	void *sdu_buf = NULL;
- 
- 	switch (cid) {
- 	case 0x0001:
-@@ -2778,7 +2873,8 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 						frame.psm, mode2str(frame.mode),
- 						frame.mode, frame.chan);
- 
--				l2cap_ctrl_ext_parse(&frame, ctrl32);
-+				sar = l2cap_ctrl_ext_parse(&frame, ctrl32,
-+								&sdu_len);
- 			} else {
- 				if (!l2cap_frame_get_le16(&frame, &ctrl16))
- 					return;
-@@ -2791,7 +2887,8 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 						frame.psm, mode2str(frame.mode),
- 						frame.mode, frame.chan);
- 
--				l2cap_ctrl_parse(&frame, ctrl16);
-+				sar = l2cap_ctrl_parse(&frame, ctrl16,
-+								&sdu_len);
- 			}
- 
- 			display_printf("\n");
-@@ -2805,6 +2902,44 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 			if (chan && chan->fcs && frame.size >= 2)
- 				frame.size -= 2;
- 
-+			/* Size of just this I-frame's own payload, before
-+			 * it is possibly replaced by the full reassembled
-+			 * SDU below. Used so the OBEX dissector can limit
-+			 * fallback/binary hexdumps to the bytes carried by
-+			 * the final fragment, instead of repeating bytes
-+			 * already shown while earlier fragments (Start/
-+			 * Continuation) were buffered.
-+			 */
-+			frag_len = frame.size;
-+
-+			if (sar != L2CAP_SAR_UNSEGMENTED &&
-+					sar != L2CAP_SAR_NONE) {
-+				if (!l2cap_sdu_reassemble(chan, frame.in, sar,
-+								sdu_len,
-+								&frame)) {
-+					/* Still buffering (Start/Continue):
-+					 * show the raw fragment payload, the
-+					 * upper layer dissector only runs
-+					 * once the SDU is fully reassembled.
-+					 */
-+					if (frame.size)
-+						packet_hexdump(frame.data,
-+								frame.size);
-+					return;
-+				}
-+
-+				if (sar == L2CAP_SAR_END)
-+					sdu_buf = (void *) frame.data;
-+			}
-+
-+			break;
-+		}
-+
-+		/* S-frames (supervisory, e.g. RR/REJ) carry no SDU payload
-+		 * and must not be handed to upper layer dissectors.
-+		 */
-+		if (sar == L2CAP_SAR_NONE) {
-+			free(sdu_buf);
- 			break;
- 		}
- 
-@@ -2833,16 +2968,18 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
- 			break;
- 		case 0x1001:
- 			obex_packet(&frame, l2cap_chan_key(index, in, handle,
--									cid));
-+								cid), frag_len);
- 			break;
- 		default:
- 			if (obex_psm(index, handle, frame.psm))
- 				obex_packet(&frame, l2cap_chan_key(index, in,
--								handle, cid));
-+							handle, cid), frag_len);
- 			else
- 				packet_hexdump(data, size);
- 			break;
- 		}
-+
-+		free(sdu_buf);
- 		break;
- 	}
- }
 diff --git a/monitor/obex.c b/monitor/obex.c
-index 873e3b538..de76f347e 100644
+index c1ac76937..873e3b538 100644
 --- a/monitor/obex.c
 +++ b/monitor/obex.c
-@@ -903,6 +903,36 @@ static void print_unicode_header(const char *label, const uint8_t *data,
+@@ -45,6 +45,18 @@
+ #define MAX_OBEX_CHAN 64
+ #define MAX_OBEX_REQ  32
+ 
++/* Profiles with a known Application Parameters tag set, used to
++ * select the right tag table when decoding the Application Parameters
++ * header. OBEX_PROFILE_UNKNOWN falls back to a generic Tag/Len/Value
++ * dump.
++ */
++enum obex_profile {
++	OBEX_PROFILE_UNKNOWN,
++	OBEX_PROFILE_PBAP,
++	OBEX_PROFILE_MAP,
++	OBEX_PROFILE_BIP,
++};
++
+ struct obex_chan_data {
+ 	uint16_t index;
+ 	uint16_t handle;
+@@ -303,6 +315,69 @@ static bool obex_last_request_is(uint16_t index, uint16_t handle,
+ 	return false;
+ }
+ 
++/* Profile classification (PBAP/MAP/BIP/unknown) of an ongoing OBEX
++ * session, learned from a CONNECT's Target/Who header and remembered
++ * per session so that later Application Parameters headers (which
++ * don't repeat the Target/Who UUID) can be decoded using the right
++ * profile-specific tag table.
++ */
++#define MAX_OBEX_PROFILE 32
++
++struct obex_profile_data {
++	uint16_t index;
++	uint16_t handle;
++	uint16_t channel;
++	enum obex_profile profile;
++};
++
++static struct obex_profile_data obex_profile_list[MAX_OBEX_PROFILE];
++
++static void obex_set_profile(uint16_t index, uint16_t handle,
++					uint16_t channel,
++					enum obex_profile profile)
++{
++	int i, n = -1;
++
++	for (i = 0; i < MAX_OBEX_PROFILE; i++) {
++		if (obex_profile_list[i].handle == 0x0000 && n < 0) {
++			n = i;
++			continue;
++		}
++
++		if (obex_profile_list[i].index == index &&
++				obex_profile_list[i].handle == handle &&
++				obex_profile_list[i].channel == channel) {
++			n = i;
++			break;
++		}
++	}
++
++	if (n < 0)
++		return;
++
++	obex_profile_list[n].index = index;
++	obex_profile_list[n].handle = handle;
++	obex_profile_list[n].channel = channel;
++	obex_profile_list[n].profile = profile;
++}
++
++static enum obex_profile obex_get_profile(uint16_t index, uint16_t handle,
++							uint16_t channel)
++{
++	int i;
++
++	for (i = 0; i < MAX_OBEX_PROFILE; i++) {
++		if (obex_profile_list[i].handle != handle ||
++				obex_profile_list[i].index != index ||
++				obex_profile_list[i].channel != channel)
++			continue;
++
++		return obex_profile_list[i].profile;
++	}
++
++	return OBEX_PROFILE_UNKNOWN;
++}
++
+ /*
+  * Minimal SDP Data Element reader, mirroring monitor/sdp.c's
+  * decode_data_elements() size/type decoding, but returning the decoded
+@@ -739,24 +814,31 @@ static const struct {
+ 	const uint8_t uuid[16];
+ 	uint8_t len;
+ 	const char *str;
++	enum obex_profile profile;
+ } obex_target_table[] = {
+ 	{ { 0x79, 0x61, 0x35, 0xf0, 0xf0, 0xc5, 0x11, 0xd8,
+ 	    0x09, 0x66, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66 }, 16,
+-					"Phonebook Access (PBAP)" },
++					"Phonebook Access (PBAP)",
++					OBEX_PROFILE_PBAP },
+ 	{ { 0xf9, 0xec, 0x7b, 0xc4, 0x95, 0x3c, 0x11, 0xd2,
+ 	    0x98, 0x4e, 0x52, 0x54, 0x00, 0xdc, 0x9e, 0x09 }, 16,
+-					"File Transfer (FTP)" },
++					"File Transfer (FTP)",
++					OBEX_PROFILE_UNKNOWN },
+ 	{ { 0xbb, 0x58, 0x2b, 0x40, 0x42, 0x0c, 0x11, 0xdb,
+ 	    0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66 }, 16,
+-					"Message Access (MAP)" },
++					"Message Access (MAP)",
++					OBEX_PROFILE_MAP },
+ 	{ { 0xbb, 0x58, 0x2b, 0x41, 0x42, 0x0c, 0x11, 0xdb,
+ 	    0xb0, 0xde, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66 }, 16,
+-					"Message Notification (MNS)" },
++					"Message Notification (MNS)",
++					OBEX_PROFILE_MAP },
+ 	{ { 0x71, 0x63, 0xdd, 0x54, 0x4a, 0x7e, 0x11, 0xe2,
+ 	    0xb4, 0x7c, 0x00, 0x50, 0xc2, 0x49, 0x00, 0x48 }, 16,
+-				"Basic Imaging (BIP, AVRCP Cover Art)" },
++				"Basic Imaging (BIP, AVRCP Cover Art)",
++					OBEX_PROFILE_BIP },
+ 	{ { 'I', 'R', 'M', 'C', '-', 'S', 'Y', 'N', 'C' }, 9,
+-					"Synchronization (IrMC/SyncML)" },
++					"Synchronization (IrMC/SyncML)",
++					OBEX_PROFILE_UNKNOWN },
+ 	{ }
+ };
+ 
+@@ -775,6 +857,22 @@ static const char *obex_target_str(const uint8_t *data, uint16_t len)
+ 	return NULL;
+ }
+ 
++static enum obex_profile obex_target_profile(const uint8_t *data,
++							uint16_t len)
++{
++	int i;
++
++	for (i = 0; obex_target_table[i].len; i++) {
++		if (obex_target_table[i].len != len)
++			continue;
++
++		if (!memcmp(obex_target_table[i].uuid, data, len))
++			return obex_target_table[i].profile;
++	}
++
++	return OBEX_PROFILE_UNKNOWN;
++}
++
+ static void print_unicode_header(const char *label, const uint8_t *data,
+ 						uint16_t len, uint8_t indent)
+ {
+@@ -805,8 +903,200 @@ static void print_unicode_header(const char *label, const uint8_t *data,
  	print_field("%*c%s: %s", indent, ' ', label, buf);
  }
  
-+/* When an OBEX PDU was reassembled from multiple L2CAP SAR fragments,
-+ * the Start/Continuation fragments have already been hexdumped as raw
-+ * bytes by the L2CAP layer while they were buffered. Limit hexdumps
-+ * done while decoding the fully reassembled PDU to the bytes carried
-+ * by the final (End) fragment, so the same bytes aren't printed twice.
-+ * base is the start of the reassembled PDU and from is the byte offset
-+ * (from base) where the final fragment begins, or 0 when the whole PDU
-+ * came from a single, unsegmented frame.
++/* Application Parameters (Tag/Len/Value) tag tables for profiles whose
++ * tag assignments are known. Tag IDs and names are taken from the
++ * PBAP/MAP/BIP specifications; types indicate how to decode a tag's
++ * value when its length matches what the spec defines for it.
 + */
-+static void obex_hexdump(const uint8_t *base, uint16_t from,
-+					const uint8_t *data, uint16_t len)
++enum obex_aparam_type {
++	OBEX_APARAM_U8,
++	OBEX_APARAM_U16,
++	OBEX_APARAM_U32,
++	OBEX_APARAM_U64,
++	OBEX_APARAM_U128,
++	OBEX_APARAM_STR,
++	OBEX_APARAM_BYTES,
++};
++
++struct obex_aparam_tag {
++	uint8_t tag;
++	const char *str;
++	enum obex_aparam_type type;
++};
++
++static const struct obex_aparam_tag obex_pbap_aparam_table[] = {
++	{ 0x01, "Order",			OBEX_APARAM_U8	},
++	{ 0x02, "Search Value",			OBEX_APARAM_STR	},
++	{ 0x03, "Search Attribute",		OBEX_APARAM_U8	},
++	{ 0x04, "Max List Count",		OBEX_APARAM_U16	},
++	{ 0x05, "List Start Offset",		OBEX_APARAM_U16	},
++	{ 0x06, "Filter",			OBEX_APARAM_U64	},
++	{ 0x07, "Format",			OBEX_APARAM_U8	},
++	{ 0x08, "Phonebook Size",		OBEX_APARAM_U16	},
++	{ 0x09, "New Missed Calls",		OBEX_APARAM_U8	},
++	{ 0x0a, "Primary Folder Version",	OBEX_APARAM_U128 },
++	{ 0x0b, "Secondary Folder Version",	OBEX_APARAM_U128 },
++	{ 0x0c, "vCard Selector",		OBEX_APARAM_U64	},
++	{ 0x0d, "Database Identifier",		OBEX_APARAM_U128 },
++	{ 0x0e, "vCard Selector Operator",	OBEX_APARAM_U8	},
++	{ 0x0f, "Reset New Missed Calls",	OBEX_APARAM_U8	},
++	{ 0x10, "Supported Features",		OBEX_APARAM_U32	},
++	{ }
++};
++
++static const struct obex_aparam_tag obex_map_aparam_table[] = {
++	{ 0x01, "Max List Count",			OBEX_APARAM_U16	},
++	{ 0x02, "List Start Offset",			OBEX_APARAM_U16	},
++	{ 0x03, "Filter Message Type",			OBEX_APARAM_U8	},
++	{ 0x04, "Filter Period Begin",			OBEX_APARAM_STR	},
++	{ 0x05, "Filter Period End",			OBEX_APARAM_STR	},
++	{ 0x06, "Filter Read Status",			OBEX_APARAM_U8	},
++	{ 0x07, "Filter Recipient",			OBEX_APARAM_STR	},
++	{ 0x08, "Filter Originator",			OBEX_APARAM_STR	},
++	{ 0x09, "Filter Priority",			OBEX_APARAM_U8	},
++	{ 0x0a, "Attachment",				OBEX_APARAM_U8	},
++	{ 0x0b, "Transparent",				OBEX_APARAM_U8	},
++	{ 0x0c, "Retry",				OBEX_APARAM_U8	},
++	{ 0x0d, "New Message",				OBEX_APARAM_U8	},
++	{ 0x0e, "Notification Status",			OBEX_APARAM_U8	},
++	{ 0x0f, "MAS Instance ID",			OBEX_APARAM_U8	},
++	{ 0x10, "Parameter Mask",			OBEX_APARAM_U32	},
++	{ 0x11, "Folder Listing Size",			OBEX_APARAM_U16	},
++	{ 0x12, "Listing Size",				OBEX_APARAM_U16	},
++	{ 0x13, "Subject Length",			OBEX_APARAM_U8	},
++	{ 0x14, "Charset",				OBEX_APARAM_U8	},
++	{ 0x15, "Fraction Request",			OBEX_APARAM_U8	},
++	{ 0x16, "Fraction Deliver",			OBEX_APARAM_U8	},
++	{ 0x17, "Status Indicator",			OBEX_APARAM_U8	},
++	{ 0x18, "Status Value",				OBEX_APARAM_U8	},
++	{ 0x19, "MSE Time",				OBEX_APARAM_STR	},
++	{ 0x1a, "Database Identifier",			OBEX_APARAM_BYTES },
++	{ 0x1b, "Conversation Listing Version Counter", OBEX_APARAM_BYTES },
++	{ 0x1c, "Presence Availability",		OBEX_APARAM_U8	},
++	{ 0x1d, "Presence Text",			OBEX_APARAM_STR	},
++	{ 0x1e, "Last Activity",			OBEX_APARAM_STR	},
++	{ 0x1f, "Filter Last Activity Begin",		OBEX_APARAM_STR	},
++	{ 0x20, "Filter Last Activity End",		OBEX_APARAM_STR	},
++	{ 0x21, "Chat State",				OBEX_APARAM_U8	},
++	{ 0x22, "Conversation ID",			OBEX_APARAM_BYTES },
++	{ 0x23, "Folder Version Counter",		OBEX_APARAM_BYTES },
++	{ 0x24, "Filter Message Handle",		OBEX_APARAM_STR	},
++	{ 0x25, "Notification Filter Mask",		OBEX_APARAM_U32	},
++	{ 0x26, "Conversation Parameter Mask",		OBEX_APARAM_U32	},
++	{ 0x27, "Filter Message Source Type",		OBEX_APARAM_U8	},
++	{ 0x29, "MAP Supported Features",		OBEX_APARAM_U32	},
++	{ }
++};
++
++static const struct obex_aparam_tag obex_bip_aparam_table[] = {
++	{ 0x01, "Number of Returned Handles",	OBEX_APARAM_U16	},
++	{ 0x02, "List Start Offset",		OBEX_APARAM_U16	},
++	{ 0x03, "Latest Captured Images",	OBEX_APARAM_U8	},
++	{ 0x04, "Partial File Length",		OBEX_APARAM_U32	},
++	{ 0x05, "Partial File Start Offset",	OBEX_APARAM_U32	},
++	{ 0x06, "Total File Size",		OBEX_APARAM_U32	},
++	{ 0x07, "End Flag",			OBEX_APARAM_U8	},
++	{ 0x08, "Remote Display",		OBEX_APARAM_U8	},
++	{ }
++};
++
++static void obex_print_apparam_tag(enum obex_profile profile, uint8_t tag,
++				const uint8_t *data, uint8_t len,
++				uint8_t indent)
 +{
-+	uint32_t offset;
++	const struct obex_aparam_tag *table;
++	int i;
 +
-+	if (!len)
-+		return;
-+
-+	offset = data - base;
-+
-+	if (offset + len <= from)
-+		return;
-+
-+	if (offset < from) {
-+		len -= from - offset;
-+		data += from - offset;
++	switch (profile) {
++	case OBEX_PROFILE_PBAP:
++		table = obex_pbap_aparam_table;
++		break;
++	case OBEX_PROFILE_MAP:
++		table = obex_map_aparam_table;
++		break;
++	case OBEX_PROFILE_BIP:
++		table = obex_bip_aparam_table;
++		break;
++	case OBEX_PROFILE_UNKNOWN:
++	default:
++		table = NULL;
++		break;
 +	}
 +
-+	packet_hexdump(data, len);
++	for (i = 0; table && table[i].str; i++) {
++		if (table[i].tag != tag)
++			continue;
++
++		switch (table[i].type) {
++		case OBEX_APARAM_U8:
++			if (len == 1) {
++				print_field("%*c%s: %d (0x%02x)", indent, ' ',
++						table[i].str, data[0],
++						data[0]);
++				return;
++			}
++			break;
++		case OBEX_APARAM_U16:
++			if (len == 2) {
++				uint16_t val = get_be16(data);
++
++				print_field("%*c%s: %u (0x%04x)", indent, ' ',
++						table[i].str, val, val);
++				return;
++			}
++			break;
++		case OBEX_APARAM_U32:
++			if (len == 4) {
++				uint32_t val = get_be32(data);
++
++				print_field("%*c%s: %u (0x%08x)", indent, ' ',
++						table[i].str, val, val);
++				return;
++			}
++			break;
++		case OBEX_APARAM_U64:
++			if (len == 8) {
++				print_field("%*c%s: 0x%016" PRIx64, indent,
++						' ', table[i].str,
++						get_be64(data));
++				return;
++			}
++			break;
++		case OBEX_APARAM_U128:
++			if (len == 16) {
++				print_field("%*c%s: 0x%016" PRIx64 "%016"
++						PRIx64, indent, ' ',
++						table[i].str, get_be64(data),
++						get_be64(data + 8));
++				return;
++			}
++			break;
++		case OBEX_APARAM_STR:
++			print_field("%*c%s: %.*s", indent, ' ', table[i].str,
++							len, data);
++			return;
++		case OBEX_APARAM_BYTES:
++			break;
++		}
++
++		/* Known tag but unexpected length (or a raw-bytes type):
++		 * still show the tag's name, with a length + hexdump
++		 * instead of a decoded value.
++		 */
++		print_field("%*c%s: [len %d]", indent, ' ', table[i].str,
++									len);
++		if (len)
++			packet_hexdump(data, len);
++		return;
++	}
++
++	print_field("%*cTag 0x%02x len %d", indent, ' ', tag, len);
++	if (len)
++		packet_hexdump(data, len);
 +}
 +
- /* Application Parameters (Tag/Len/Value) tag tables for profiles whose
-  * tag assignments are known. Tag IDs and names are taken from the
-  * PBAP/MAP/BIP specifications; types indicate how to decode a tag's
-@@ -1081,7 +1111,10 @@ static void obex_print_apparam_tag(enum obex_profile profile, uint8_t tag,
+ static void obex_print_apparam(const uint8_t *data, uint16_t size,
+-								uint8_t indent)
++				uint8_t indent, enum obex_profile profile)
+ {
+ 	uint16_t pos = 0;
  
- 		/* Known tag but unexpected length (or a raw-bytes type):
- 		 * still show the tag's name, with a length + hexdump
--		 * instead of a decoded value.
-+		 * instead of a decoded value. Application Parameters are
-+		 * small labeled values (not bulk payload like Body), so
-+		 * always show them in full instead of clipping to the
-+		 * current SAR fragment.
- 		 */
- 		print_field("%*c%s: [len %d]", indent, ' ', table[i].str,
- 									len);
-@@ -1117,7 +1150,8 @@ static void obex_print_apparam(const uint8_t *data, uint16_t size,
+@@ -819,15 +1109,15 @@ static void obex_print_apparam(const uint8_t *data, uint16_t size,
+ 			break;
+ 		}
+ 
+-		print_field("%*cTag 0x%02x len %d", indent, ' ', tag, len);
+-		if (len)
+-			packet_hexdump(data + pos + 2, len);
++		obex_print_apparam_tag(profile, tag, data + pos + 2, len,
++								indent);
+ 
+ 		pos += 2 + len;
+ 	}
  }
  
- static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent,
--							uint16_t channel)
-+					uint16_t channel, const uint8_t *base,
-+					uint16_t dump_from)
+-static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent)
++static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent,
++							uint16_t channel)
  {
  	while (frame->size > 0) {
  		uint8_t hdr_id;
-@@ -1186,6 +1220,16 @@ static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent,
- 						obex_get_profile(frame->index,
- 							frame->handle,
- 							channel));
-+				else if (vlen && (hdr_id == OBEX_HDR_BODY ||
-+						hdr_id == OBEX_HDR_BODY_END))
-+					/* Body/End-of-Body can carry large,
-+					 * reassembled payloads spanning
-+					 * several SAR fragments already
-+					 * hexdumped individually; clip to
-+					 * avoid duplicating those bytes.
-+					 */
-+					obex_hexdump(base, dump_from, data,
-+									vlen);
+@@ -868,6 +1158,10 @@ static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent)
+ 				if (profile) {
+ 					print_field("%*c%s: %s", indent, ' ',
+ 							label, profile);
++					obex_set_profile(frame->index,
++						frame->handle, channel,
++						obex_target_profile(data,
++								vlen));
+ 				} else {
+ 					print_field("%*c%s: [len %d]", indent,
+ 							' ', label, vlen);
+@@ -888,7 +1182,10 @@ static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent)
+ 
+ 				if (hdr_id == OBEX_HDR_APPARAM)
+ 					obex_print_apparam(data, vlen,
+-								indent + 2);
++						indent + 2,
++						obex_get_profile(frame->index,
++							frame->handle,
++							channel));
  				else if (vlen)
  					packet_hexdump(data, vlen);
  			}
-@@ -1251,7 +1295,8 @@ static bool obex_setpath_fields(struct l2cap_frame *frame, uint8_t indent)
- 	return true;
- }
- 
--void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
-+void obex_packet(const struct l2cap_frame *frame, uint16_t channel,
-+							uint16_t frag_len)
- {
- 	struct l2cap_frame obex_frame;
- 	struct l2cap_frame *f = &obex_frame;
-@@ -1262,9 +1307,15 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
- 	bool is_request = false;
- 	const uint8_t *trailer;
- 	uint16_t trailer_len;
-+	const uint8_t *dump_base;
-+	uint16_t dump_from;
- 
- 	l2cap_frame_pull(f, frame, 0);
- 
-+	dump_base = frame->data;
-+	dump_from = (frag_len < frame->size) ?
-+					frame->size - frag_len : 0;
-+
- 	if (f->size < 3)
- 		goto fail;
- 
-@@ -1318,7 +1369,7 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
+@@ -1021,7 +1318,7 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
  			goto fail;
  	}
  
--	if (!obex_print_headers(f, indent, channel))
-+	if (!obex_print_headers(f, indent, channel, dump_base, dump_from))
+-	if (!obex_print_headers(f, indent))
++	if (!obex_print_headers(f, indent, channel))
  		goto fail;
  
  	if (is_request)
-@@ -1328,12 +1379,12 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
- 	if (trailer_len) {
- 		print_field("%*cTrailing data: [len %d]", indent, ' ',
- 							trailer_len);
--		packet_hexdump(trailer, trailer_len);
-+		obex_hexdump(dump_base, dump_from, trailer, trailer_len);
- 	}
- 
- 	return;
- 
- fail:
- 	print_text(COLOR_ERROR, "frame too short");
--	packet_hexdump(frame->data, frame->size);
-+	obex_hexdump(dump_base, dump_from, frame->data, frame->size);
- }
-diff --git a/monitor/obex.h b/monitor/obex.h
-index 5af28ea8b..019ed6174 100644
---- a/monitor/obex.h
-+++ b/monitor/obex.h
-@@ -101,7 +101,8 @@
- #define OBEX_HDR_TYPE_UINT8	0x80
- #define OBEX_HDR_TYPE_UINT32	0xc0
- 
--void obex_packet(const struct l2cap_frame *frame, uint16_t channel);
-+void obex_packet(const struct l2cap_frame *frame, uint16_t channel,
-+							uint16_t frag_len);
- 
- void obex_add_channel(uint16_t index, uint16_t handle, uint8_t channel,
- 							const char *profile);
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index 89cbf6087..d830684a9 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -405,7 +405,7 @@ static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	}
- 
- 	if (obex_channel(frame->index, frame->handle, channel, NULL))
--		obex_packet(frame, channel);
-+		obex_packet(frame, channel, frame->size);
- 	else
- 		packet_hexdump(frame->data, frame->size);
- 
 -- 
 2.43.0
 
