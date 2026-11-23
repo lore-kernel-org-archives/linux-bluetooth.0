@@ -1,76 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795453181;
-	b=BLvvvHYUHTvpSIeYoqG/I3p86M4SjL1xFXVaFN2heOm0dMsA+Zm5noz77YATfwluLbDY
-	 dzDSz05CPgL7bSfcrEKKqeMTimmSolsb9Z1B8sB6jr1Bu5P70NS4EPYYsojIPnWk3kvFf
-	 A64SqxfsUi9xm/exc3ORB7hab1H3BK6ZyVPdKeG6dBr+jMm+31V2toeZV2xV9HBRdXJtI
-	 E7wB2j6qn3zzNinsXcy4spgQ3E58oHGU85SwZK40+6620I0zjMWFN2W13wr0gGPCenb+g
-	 Nu8C+jKr6O9JbgRAo/HTwdqrcTG2YEm8NhZK40jy/mNJQ9G2f35XwSt12h9aOy6+YZA==
+	b=y6aaD8oZUr5Byt35V1QvRAvg6WXXCBQNmeisjLvOxgp7EBYtiyCp8ZO3wAqUeYe5rmb/
+	 zAf0rtRAELwSyBg7dd0t+heas5OH7sbj8P2niuYYysH1SGEnzsR9+9b7SDVWg7VPPTTRv
+	 rHE+ss22CRuZZEv918RpKRTxA8e7RL7Uu15rGVEp+NNyzQoVnlaNOKOeLsvNHrHD1Tu5b
+	 NGlChiNGgeuVp98MWV9D6a1DCRDUTXSn3carCm1EpybSXVSzhRgPSYIjVB7mouz4r+hhM
+	 FqZIACoJydthdn5bXaGgmH4QhPdCLeUnGwJkOa+wL5Sij+s1fZwfGAr6Mcxkfx5B3Cg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795453181;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Ng0JWsIQGAdG89dHvGYT0Auv5cwYct9D/A6o/8HaVwA=;
-	b=g9EDMGm7g2NRohI+Xh5QSPQw3ir4+IwTflPife79+AfQI8IhGVm51U+YKUNgjx7WBGWn
-	 s8V43IWrgeX6/rMOjTVMyH6INaFfXhJggfDxzv29e4L9bSw1jLJxsK/JMJ2AmmshqxkJh
-	 c9Mlqdmh4gHUziGqxlLyeHbPKRtVjvgb3WdQPYRWP+Z53MvESxem4kIC+rQoh1ejHf2TT
-	 oYBOfuOYfhycH68Zoa1zpCfVvFmAfcLCT3iN49jVgTfoIp12LrwkYz4tFcSXpMgxIWBvB
-	 gHq7ntcRCuPSr1y+znHayryx6QHMXYGkwNGh98k++tVfDesl+uHW+UApu1SOMjnUESg==
+	bh=ok36cVkgdN5+9HDWeupMbyoD3lHZfqjSHBscaD2voJY=;
+	b=1ve42Jp3fG+3p/0Yq3AccKLnQHhMb1JaqniTx8+k0S7XsYTvoK9w6CtTFI13P1QWeLrL
+	 l2MReKNX2LM/0kj27sAixd8KH4sTBDKCoKodG5Q/Whw3a7c9NYHFZP04hZB0ajxGfuX8s
+	 fWXUo72UUAcUxh0qxI5lmGNo7cih6gNZkmEShXGWQezAJSZoMe+kl19OQCZ2sNk0d7V6p
+	 Uwu5A9RwxYIevL2ncrQKp/0NNHHd696S5FgT85HG487IBHRVliq7HznqMeeGUhuo6b99w
+	 tvZTx2OSZKzPSgAN4dhL68cxz0BGImm++zXRrTZmzX1OabzQFHHeZl/mwpHyYpv5scQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=x2Dd7cwN;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=BMbgHh1p;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5BC606A682
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F6A606A687
 	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:59:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B5BC606A682
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91F6A606A687
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=x2Dd7cwN
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4bb64ef5a00so27992605e9.3
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=BMbgHh1p
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb6ba3b244so35469975e9.3
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:59:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795453180; x=1796057980; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Ng0JWsIQGAdG89dHvGYT0Auv5cwYct9D/A6o/8HaVwA=;
-        b=x2Dd7cwNFrEyhHUqkdnIRp/SIjLC855qgNYPSEbVdH1zbXwNoHVxFXZuaiJwt1kFIC
-         SIK5S2ZlvKEEhWEDTMWgcyboQ92o7MYCxkK0vje2oZKmv1WSDZ38Y9InKoC6oymNvqG0
-         aQNTmkwpviL6ULCFvTfqZZmCqekRfXClCxNAs=
+        bh=ok36cVkgdN5+9HDWeupMbyoD3lHZfqjSHBscaD2voJY=;
+        b=BMbgHh1pYOZXSgMOASQ72lxBhP5Aj4HBHTwH4Z6IYN7fy7oKcygXhSj4G/WlIIbiAI
+         0vKkxkuaSFls7qOk/7bji6ziDxHAHMCz7DGdwjl+khNEAl8Lg3IR+lsBZ9bsXjhCxj12
+         S4ubvxNJpyc9Er1GF8eEm27ebhEdILCbC052Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795453180; x=1796057980;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Ng0JWsIQGAdG89dHvGYT0Auv5cwYct9D/A6o/8HaVwA=;
-        b=WIf7w9f8GjuS9Xt71ZpeTjEIZE15iP/tvbMuGUF3k75fj4vCe0tkRvEr8Gb3PocaWV
-         UFhHQ4YgvISq7LYbTBgqUxyMGKidbk+2Idf7F/j12ff+/Qnn71jKauxfDTJcCopnYsNo
-         +nBZ8QWwqQIQU3wF+qJJcvaMRVfQiY2ISc2eqFHek3NIcQvRryWNgU5BFU+PC/vcuGX0
-         N/uy9Y0Gsm2jhUfUjTW9JwmU5yN54TFG5UMmkSjx/ux878uuklNC5Tbc3ur4EHfcIT2g
-         AY34LmWpqH6Guk6iWh8iZBx8eBBkDrAzMfbn9CUn8Gdna56kXH4yeKLakwUbaTAsk676
-         NHCA==
-X-Gm-Message-State: APuU4Z+c6xQgbj0MUxS3ReVSggltFK9AEO0yeMA+hqlPgqEWgyKHruW9
-	9Ixpr7/NkbviGnK9yXc7Eg7cMnZEa74fX2bwTZo4R2rjW623VzHo8gXRtt28c1nG8VxDZo94yWN
-	syHPw
-X-Gm-Gg: AZFdTZfpCLhcopFFOLuTCWAz2GQRxx9cEfFnIvZJgMuC71DULwe7VuNjtxYLQOP9Z02
-	03SqqtPHUAQI3KXJfB2oPzS/oNu45I7tNrrT5aPJI4SraaHd8qX2ZWKt+4ki4ExaGatDFddnenw
-	nDsnOHPP+GJFxgdeDrU4m+n1UgaF1u/chmRrAIx7ck6h1KiIgSzUVjGxftxtQwjvqk0Qcb/l1GY
-	s2aLv0WkVqxieMMZ2rhFml2zExcd8VQjIINWvgohEH63kNO6OCTU3C4biRhQtaHEzE7xHSnt+vN
-	ydrlZuyHPRoSCRTF/eyVSUwve/6tquI8KtnXuQR1+Y+SrZ4rC8AkiqFi834kWrFGi9rQtCD0YWc
-	LSwKcAgMh0O7g+cx5DS5rOLl/fVLmmFlRZSgrPSbstq+PvFJ2DL/HMj3xjjRzl7VbzG/tI58XQq
-	DVnsZbkgeHSVMpY+vNuMljvosArCYIaNnNq3o0EopkMbxvcDhoq15gy55lkYk7c+JQcbThrANvl
-	XOkgyWWKySUGGJK72kiCGDLwxeU95aNrccPR2d63AEDoBlXJkbpWHAlQUQL/r7sHMlUsDxU2rjM
-	RGrT951bu5g3b6KW3q5IjMu/W/sx6iUgzdnCEcgSngSkoGOb
-X-Received: by 2002:a05:600c:4f4e:b0:4bb:6c71:b268 with SMTP id 5b1f17b1804b1-4bb8882672fmr264103215e9.6.1795453179606;
-        Mon, 23 Nov 2026 08:59:39 -0800 (PST)
+        bh=ok36cVkgdN5+9HDWeupMbyoD3lHZfqjSHBscaD2voJY=;
+        b=r9lxsQhrEIzXbsvMIPVj2sDq5TcWw0hjiwRfMglGV6expA54ndfpCNAJKwL/FEdd/0
+         BsKyq8kUj6T7HGdM8MKct390aZXZlAdjkCXqjmEiEygRR9LbPVw3ThSiEwOAcT6eTaU/
+         f1PCxABfWKKLxy2yD0QcdMKB3t1VBWWTRdab9OKghwso70GAVHGKQY10LZAoSvrz2er9
+         RRZAXj5QVPbN0wSjEwkT5fnFRsSM2EY3Cn+PyNJsZh+rL3m6hzKfGHSDiiCKlp65CCe0
+         fkhx5u5MYd8zsith6KE4KPniveoaRBM+UUq3uxvrJvvpUUVXdsEa54B5TfTmznN2Y6/h
+         vE2A==
+X-Gm-Message-State: APuU4Z+4fJyo0UY1Fls6/H4hdGQ0twjTo7LGERm9NyNFgN2l7Z7KXz6v
+	DADs2Pvfkr/5jPebYjoC4adOnxjjlU/iNEZ1drf+WLXVJZ1hDBgADXdbSouqbIqaK9jbKqb82mQ
+	9kAVX
+X-Gm-Gg: AZFdTZckBRBP7yiDS+Dme6qJ4F73HFQfzKT/cF4kqxjCBU9oi6eFhmvl/B3lA6afOX8
+	tNWhH1PwKjxOdaxDckHtqhGS3J0MFXkwu+Nqu6/ekVTORBV54n/Bo2Yf3haQP5+kA1APM/bTJVU
+	Y3ObYdHMTV3VV9ug0xwGwWsngXYI/nxsPNq+0+Ai9Xd2gutqsOKNXF6Qvqp1ff/1iIynZtNaRb9
+	dCiKm79uLWNtlUJkLWQSXQwuXXgacexDTGJLQiLCaPGeYyA5gB6XUixH8M+LEd+qfOW6AcaZ3A9
+	QgLN9667Ov5RNC8Hube88DMeeIk2oxoIpaA8gmLJTpzZXHurE4cgMGsl5ogRBzYltVmarlbycW7
+	iuxKp8Gc6l0/4ep9iHbqsBsrCQCA94qv80n7cjQ0HLhK6VXgmCLGLTcoPnMe+5da+6dXmyXUqLJ
+	cYGaS8xvmCsjb9u2On8xzx++bYgw69+HMndgXz9mw2YAj/pG4tVVpLYQGu75W0U2QML66ZXQ4lF
+	gc05sKc7i2uOpuyHsyap5tFEiYR1D+WYHEoJEZJqsAgoEP8QxTeTrA8QtHK+V5y+FQ1vpNklbNR
+	hEimzX0NyGEZ5yiV56lUtsQ+WaC8LIayJzoXCZtbHTFGjcImag==
+X-Received: by 2002:a05:600c:4f0d:b0:4bb:5c97:f4b1 with SMTP id 5b1f17b1804b1-4bb8881941bmr281632765e9.24.1795453180027;
+        Mon, 23 Nov 2026 08:59:40 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb90660cb4sm289748185e9.2.2026.11.23.08.59.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -78,9 +78,9 @@ Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v2 2/8] avrcp: Fix listing media players up to item 0xffffffff
-Date: Mon, 23 Nov 2026 17:59:26 +0100
-Message-ID: <20261123165932.470612-3-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v2 3/8] avrcp: Fix byte order of ADDRESSED_PLAYER_CHANGED notification
+Date: Mon, 23 Nov 2026 17:59:27 +0100
+Message-ID: <20261123165932.470612-4-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261123165932.470612-1-simon.mikuda@streamunlimited.com>
 References: <20261123165932.470612-1-simon.mikuda@streamunlimited.com>
@@ -95,43 +95,43 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-GetFolderItems for the media player list stops once it has
-end_item - start_item + 1 items, which overflows to 0 for a request
-from 0 to 0xffffffff, so the list stops before the first player and is
-answered with Range Out of Bounds. That is the request the BlueZ
-controller sends, so it never learns the target's players.
+The Player Id and UID Counter of the CHANGED response were copied in
+host byte order, so on a little endian host player 1 is announced as
+player 256. The interim response already sends them in big endian.
 
-To reproduce, register a media player on the target and connect AVRCP
-from a BlueZ controller, whose player never gets a Name:
+To reproduce, register for EVENT_ADDRESSED_PLAYER_CHANGED and send
+SetAddressedPlayer for player 1:
 
-  btmon: AVRCP: GetFolderItems: len 0x000a
-  btmon: Scope: 0x00 (Media Player List)
-  btmon: StartItem: 0x00000000 (0)
-  btmon: EndItem: 0xffffffff (4294967295)
-  avrcp_handle_get_folder_items() scope 0x00 start_item 0x00000000
-      end_item 0xffffffff
-  btmon: AVRCP: GetFolderItems: len 0x0001
-  btmon: Status: 0x0b (Range Out of Bounds)
+  AV/C: Interim  AVRCP: RegisterNotification  EventID: 0x0b
+      (EVENT_ADDRESSED_PLAYER_CHANGED)
+  btmon:         PlayerID: 0x0001 (1)
+  btmon: AV/C: Control  AVRCP: SetAddressedPlayer pt Single len 0x0002
+  btmon:         PlayerID: 0x0001 (1)
+  btmon: AV/C: Changed  AVRCP: RegisterNotification pt Single len 0x0005
+  btmon:         EventID: 0x0b (EVENT_ADDRESSED_PLAYER_CHANGED)
+  btmon:         PlayerID: 0x0100 (256)
 
-Fixes: d6bb0111b569 ("audio/avrcp: Add GetFolderItems support")
+Fixes: 4827d6b61fd4 ("audio/avrcp: Add Set Addressed Player support")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/audio/avrcp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 95b1d8c47..3ab7b6d7c 100644
+index 3ab7b6d7c..aff1c381a 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -1997,7 +1997,7 @@ static void avrcp_handle_media_player_list(struct avrcp *session,
- 		struct player_item *item;
- 		uint16_t namelen;
- 
--		if (rsp->num_items == (end_item - start_item) + 1)
-+		if (rsp->num_items > end_item - start_item)
- 			break;
- 
- 		folder = (void *)&pdu->params[pdu->param_len];
+@@ -803,8 +803,8 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 		break;
+ 	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+ 		size = 5;
+-		memcpy(&pdu->params[1], &player->id, sizeof(uint16_t));
+-		memcpy(&pdu->params[3], &player->uid_counter, sizeof(uint16_t));
++		put_be16(player->id, &pdu->params[1]);
++		put_be16(player->uid_counter, &pdu->params[3]);
+ 		break;
+ 	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+ 		size = 1;
 -- 
 2.43.0
 
