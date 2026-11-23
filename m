@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795461010;
-	b=FEo3d/lelL0KkCu1NHS9HgeCpYUKxlkMz/81cuVIOZgDFHxREE/lNR86a+lGpuHTLMiQ
-	 ldyppHapwAzN2T+0zx+dvQeR3UVSBZHqk8d5pqTHEzyMBxUm7GTpyObf/iKX1wdALKq7g
-	 jG4Q2V9eidAaX2JPiOMhM3MpqX8HmJeVuHk5EBbs/JxaiJR6wkKzpTisYLa9OfQBRRCD1
-	 wL+RNrGs+jgJSuBw5RXNSsi3h2/eFR/zso9wz4gDX9oVMZXcVTsKTQH6YVTocErFwXAz/
-	 rGyT9lAayB4IhHovVCpD2Q1uMBXZZEIKCgIhxCoT9qg+hL0kx/O52o/f9jhGOT95l0g==
+	t=1795461011;
+	b=CE1CPglmDeFy7JM2fxDm7XI7EIxzG/oojV7FVWceeVzl7cFaIl0Lata2l+oZmRtvocQ9
+	 wKBc58dZ4q/CPvMziyG1EG7eYehhIM9ElIesI1T4GwkWSCwFIa3WPlZQ7Dudi7kMAW5pN
+	 VXM4aYEmWK5LuwO8JxtBEX67FxyFX+HomvFi/ojy7d5hzSLxMXQOu1Q7WRbggA2lf7MF1
+	 a9AY+kCm8bCxv9WCkRpWTpg9DOZ8B+XUp3EYpa4sQw+Svrie58Q8uXL90QgMkO4mH+FD/
+	 2dCv4Pc3JGqJxZt+6GPbalapTJylEFrXER3Y9q4/3/5IZJQCaixXTVsI4Se6+5cY2xA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795461010;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795461011;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=Ucq/S5sMsOFO1DiWhqcLilgfDf0RwqxjNqIslSHBbnM=;
-	b=ZkbCrU1csf94hTkZEIDfX3J2kFVeidgfUEYXl5I2sGJbMgd9uMeGZh+gY6MKd7nC7t/m
-	 XFP1jJb7HjIFjQ1myZvwAun9NydKTQigZ1h9ZI12CxKVdz0x8DC9DrotmvQtrxJaHu24V
-	 ujKhg6+4JD2ThdGGdsEgR9a6fwzJ635VxJ90pszGdyLoMuw3+eCPG9EsCad0DKb4+EuoX
-	 8vpd9HLtZO7COtYlfwK3P0Jf3/r23QogiaDjdP/FJ16gtCQTNor1zrRyAn/1bjPBaHV9M
-	 r8dqSAZeS+NWgAPE2Ae4esSc4YwPV3YzQtwtMv8AKbzIS7fx42b498wTZyqM3j4EJPA==
+	bh=1gznRcXRUYP2iIIohO8gtElTV/7IDbBcPS1AKp7XNfk=;
+	b=O/SsGBihq3cNHil3pipVttWCtYn5A65tzbRhs31y+F4KWi6G/AHgKl0iIm7EDOGn4myE
+	 KGP+ir4KZzM8mnPbhMCQwtppEkTYABFibq+ftC2hwUJYBSvg6/a+cw7Rx24Wdy+P+rmdj
+	 /yIhI2EX+h/DZLlEWvQjJzwNDihd/zl/xf0ovQ0sBc3G11wUhWZ5879AsbwsCdpNpzilM
+	 bKgpCokg9Bde67TxLM/0c0R/CYcYcl8f0MZHCbn47AtainCwUOs46G38CJF6UHkccaprM
+	 KPqlNhLhhDXZhKziOXdgbSFVb/I5xE7Cfdczv30KRYkrjSnvQtBR5ndUXxZfe21jY4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KXc1UCOq;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GYrZBeNY;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF2E606A332;
-	Mon, 23 Nov 2026 19:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3588E606A336
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KXc1UCOq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42DB01F000D3;
-	Mon, 23 Nov 2026 19:10:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GYrZBeNY
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD5F91F000C0;
+	Mon, 23 Nov 2026 19:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795461009;
-	bh=Ucq/S5sMsOFO1DiWhqcLilgfDf0RwqxjNqIslSHBbnM=;
+	s=k20260515; t=1795461010;
+	bh=1gznRcXRUYP2iIIohO8gtElTV/7IDbBcPS1AKp7XNfk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=KXc1UCOq0C+M5cfehtm3pXT5VEqEy4cMsK5yDPvT6d0Fz5UwKEYZwzL3q16RErSPX
-	 uYgjN2I7hsgr/yt1H0XGiN89RsYcuLj1M9h5pJV7QDTmiFYABTMxMID1QEcCPuupjp
-	 42EkkcW31ZFo99bOxx0NEHmQ5jP/st/AJLyllZhtJ015QAhrHS1XgU5HEdY3KjxQ7M
-	 3nefrrfxIsfEhYUBQVMeRe6No6RLs0H+QCULqZH2zd/gdYXEDfsb3tmPcgHc8X+j+X
-	 mnXJfsC5oa1sDfQ0/YNR+EsKfxZcapRrgQ84HOIVyYlqut54Ph5E9OnjdTzDjMx690
-	 ozqhDeuYoC4oA==
+	b=GYrZBeNYdLeChKn4s6pzw69bYZM1ZXsBWfpr8xEIIBuRlgXdjq+EDNqlyBls+w3tt
+	 rCxskA9lHJUtV3ZkCuTbaSjVeP76j0e+802grolKx2TdC/3CK/8RdKoMRbsnO08rZV
+	 W/T3Y9bZm5Zk2vVXfPdFTfkQPISbRHJeyJpo7YXK5/Z92bec4r67xeRQeNIlU2xaZZ
+	 zgYUM/GTim8S51xtzrKdrtVByq21Oj4H1gOMhR0iCeBh8GN3O8UMQ678ovvne63k2Y
+	 6Kn3Y8wToumvv+jaQn9QOIx9tzObGtYeUTiNpOD3+YKwfyC3HBV0scOHAE4hQIRTTY
+	 DXo6l0DDjbtAw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A3CE392EE35;
-	Mon, 23 Nov 2026 19:10:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4445392EE35;
+	Mon, 23 Nov 2026 19:10:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,36 +54,36 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sync: invoke destroy callbacks outside
- lock
+Subject: Re: [PATCH] Bluetooth: hci_h4: Ignore the RFU bits of the ISO data
+ load
+ length
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179546100789.3063022.8839982539012275088.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Nov 2026 19:10:07 +0000
-References: <20261121120121.576-1-viennaoffh@gmail.com>
-In-Reply-To: <20261121120121.576-1-viennaoffh@gmail.com>
-To: Zheng Shuhao <viennaoffh@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, linux-kernel@vger.kernel.org
+ <179546100927.3063022.13155835076768217377.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Nov 2026 19:10:09 +0000
+References: <20261122155208.1549223-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20261122155208.1549223-1-simon.mikuda@streamunlimited.com>
+To: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 21 Nov 2026 20:01:20 +0800 you wrote:
-> hci_cmd_sync_clear() cancels queued command-sync entries while holding
-> cmd_sync_work_lock. Cancellation invokes entry->destroy(), and
-> add_ext_adv_params_complete() takes hdev->lock. In the opposite direction,
-> le_conn_complete_evt() holds hdev->lock while hci_update_passive_scan()
-> queues work and acquires cmd_sync_work_lock. This creates the circular
-> locking dependency reported by lockdep during controller teardown.
+On Sun, 22 Nov 2026 16:52:08 +0100 you wrote:
+> The length in an ISO data packet header has 14 bits and 2 RFU bits, but
+> h4_recv_skb() reads all 16. Some controllers, for example an NXP one,
+> set the RFU bits in the first ISO packets after a BIG sync, so the
+> packet is rejected and the rest of the receive buffer is lost. If that
+> holds the Command Complete of the second LE Setup ISO Data Path, the
+> second BIS never gets ready and its channel stays silent.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_sync: invoke destroy callbacks outside lock
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f99caa0d2467
+  - Bluetooth: hci_h4: Ignore the RFU bits of the ISO data load length
+    https://git.kernel.org/bluetooth/bluetooth-next/c/59d19fc7eced
 
 You are awesome, thank you!
 -- 
