@@ -1,88 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795472616;
-	b=MXEefMhTOctKxLglnavgCsRnsCDJ+mEh1fuh0WCOw/3v/sh8WCsKCD3AfUSXVQj5+c9L
-	 c2k+9xTin5mGQSWPbK4l6H5NxSGZINd3B+SG9NNefNEvgOEs4sUAXIeBMlZxG+Qby7k08
-	 Lba/1QdsUiPYKCzj3lanmmyxWqlCNpkVAtObPkauENiAiilMtuf5vQGYesPUeK2z+r/sU
-	 GrYwxHhFjfBNkCgIkKie03Z9r5DIm5no7l6RE4DYV6V7JDSI6TDsyPOTYl2SECzrwEDMJ
-	 uCUkA5h+zAaiwQ0yqC6VroJjmMqe5HoDL9DLVJP+JLHObn6NAR6q0njqp+8qqI/jllw==
+	b=Bg5cnLfRusZExY1Z4sD28LMTJn5EoXlWK2hsyVmEODyQr338kq9F+pxz/s0cyTD4g7EL
+	 VC5TH1Pp2bB6N3XvBCobBTwpHDWiPeP6CAdsFYUFfHTXckcInQRcJp+ldsaE2TUenSVNM
+	 6NQS4eTSzyMtNsbqZxIBy1TpvU+HnYSUHFXTKBCjLRmnNZ4KtHSJmBwiNeif8dTPnngSw
+	 XQmcKTG2zPv8PjlnfZZZDtScH6hgqpX37G8MEWBBqUyRaPFqIaQsgGdJbOdrU13apkkr/
+	 FHQe0MbYnh7TdxrAmSFFdYiEgo4BEpm/gcV4ZbPTBr5cIc8RdA9nioStoMBgODulgeg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795472616;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-	b=I0jELVNsd2K2o0y0B4dHHu9Qxo0ALYDZH8c78tqxbNg6bRfTFMiTO3o3/h3MrbUFAn57
-	 Sc0cAcPR7Yi/2DK9flMKfzoUVSSmirZm2otckCAzBapGAAiicYwz/c8bT9J7fHzFAE9YK
-	 2SVHdzTqNGjRDDIFO8dTXGV9G4RkvDqGnREJJi0Z741OQQYph3ETgblcoE0yJzMSIs7+Y
-	 PoIiONaXLhsIBpLCPKuyVqitRhFoIy0hsww9C+Nm/o6hyISdD+BHn6QFFEsVNRFaaMmwr
-	 MLVCNNETgavC7XgqyJ7ozU/Y7lCHRpjyZ+Dn3meKXWQJjBiIk9by2UFG8gKQq5kUHKg==
+	bh=1DIEtRf/JpaQCeC2vD2/ZvWcgo+WI0jopYsB7AGprKk=;
+	b=cuClw2YJJ0x0hnJaNDBzoBqi0o8v5tYF0jUiKYh+28XoJCUAexivHcLVnhoOE+sZuopp
+	 i5o0k3QQTiy2zrA1M29flOiH254wQOILUG1RuI+irUyUFcMdSTwycMrYOps0i+U/+Scmn
+	 MvQM3nBNz0S+wHTa0QZzKRW1cbsw8ju69MC/iERmhGPdsGeTjQZIEdp/VmmxVfvCyl+t1
+	 AtTigQIjC8YIUrLoEpY7McCjMBQBIKfd4nMJWrlL2swuIyEZRVU/qLJfAhMYvjs7dYcG1
+	 S49P/ub3IgWfW3ml0A+/pPY+i9xeIWmutL7DztNIA4fK74cIgEKORorhWLyQ2O7lVcg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2w0oljD;
-	arc=none smtp.remote-ip=209.85.221.54
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cnaZj9Vx;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00F4606A336
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 22:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B00F4606A336
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63546606A326
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 22:23:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63546606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=k2w0oljD
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-49083b985d2so244226f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:23:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cnaZj9Vx
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4bb609d9bf4so8678495e9.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 14:23:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795472614; x=1796077414; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795472615; x=1796077415; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-        b=k2w0oljDLaM9FAYv6yOtIo+hCHXBqT7mpz6R5PbFmVHBO0go05cTQFqcADSICYdcEa
-         qUwi+Rsv+NlmlUKa9/za9RgPNFnTAJk6droAiO6my10NF6y3+m8qJrwxtOFUv/XnWwIH
-         aokvzyxtJFJjaSWHDYT6ZBnECCP93Yoile70eXwGJ7oRdAveUjEdzVD3ohFls16zGI4J
-         pKSSUUu8W0nx/VaflLovCOyyFRYKF+1TvuKYuYKVrscYRm19YOhthv83vfcX3M3Gwjfb
-         7GfMRCuLOWfDxoeFaG4I9hPfGv1jvUMVIeL0YuoXeTRKfm7uqwHElzTrz19ueCwVwUo/
-         Aomg==
+        bh=1DIEtRf/JpaQCeC2vD2/ZvWcgo+WI0jopYsB7AGprKk=;
+        b=cnaZj9VxukftJv+7dVn15ifaRjCJPdvuXBlWfVJS8HagVSvdtG1Cy3hPbtA+02io09
+         aptwjmc2LVRqKFjtC0GkTQGa/pRbcmJNaxvE4B00dqXJUyqxeQWEoVJmhvqo+8SfCDdG
+         LwI1ElsHmIOewgXII1Ruxv7GpfwjLqONrPX6ViJwgw9/U5VoSwkICzz0bIbTRR7ThGrS
+         YQZMl+athckWgB6T6k8UdZmDXIbIhtiL9aUjmPufpeEX9pzhlN7trIi05HTtr6cebg7h
+         JkuL71YQ9TQ/s0QiNGROm09pknbT2rBPvx5VFl2hfozJlqt16mDhB+UTDu7q0o6WUXtr
+         dbrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795472614; x=1796077414;
+        d=1e100.net; s=20260707; t=1795472615; x=1796077415;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3V+HVypldNzo11w0bqpA0iQ7+Jer4tTEa/Eelyx5n+Y=;
-        b=drc7dbjl5EFoxO7rsphIgl/akGU9kCEQDLX6DVVw8b+37vYFZmd3psEBg67t7DLjxL
-         DGCbbg78CAN/98QOunWayoyTqpIlElwNZJv9z3osKX5bQCLETcu3WUOTjCy83AKG9KJX
-         PimeBDSCM8dGttuX064upUdGcspw5YJDB31Lx11vysVe82H5ctiP6DLWCbccpvBi1n8u
-         iUDo3LmXb7/Pnd9kMD9R/WB1svEVk9r+oVA6r8AnYIjMj8UR7Dgh0yVmGK2nxkz+DjSh
-         0ncc7obwvbEkuyyqPr6lCa3WtqW0alg0o+hJFpgzrhTMXqK/3YDeOEZPtDTrOM8QHqIF
-         Y6pQ==
-X-Gm-Message-State: APuU4Z8BiXGVIu5e5HmaJzzwo1ivXvfQwZrXUaIHOoMCJJVGtShj2X+n
-	UEARw7MvrZpeDUnx/j5R91O7iXDWroJaKNdm3kwWzB5oFSqcYeqR+13G9NB0pw==
-X-Gm-Gg: AZFdTZecmtlGYYIO1vuUc9QprHFP5xuWJXM/DELl09dXHuJVrXvYpxStGYQrtNpMjGd
-	WYczwQdmqFULdY1Jsolv5qCYFIb6e4/wLLN7k1E4ye6Ky+DxWL95IER33Fr3/Jeka4/oTKEjPxh
-	eYZjebHhhxj0d8DvFA2EB0XBAvR8uR09bUYIbTsb7tVGi3BaYr2SfwBvGOupr4ezEbhl3HHGBV9
-	bOZlHgC18DbGPWXB2Btx36A4gX8rG+JqQuvs4h1TXObW3A11Z/o6dN1J5l6QacKvPHKdWqjiaSB
-	CPDaIIE0ODdjd8eVLtUUfTE5X8Z9J/aFMf4mZlMrVarji56wZeMkaCVtukjrio4xsGZs541pZs/
-	A6UG5Vku2aze6becdxychHrdmUVvG2agfZVM78Vlt4eF0cKPp4WogSCtbZWLCSUmIfTCC7cvbT8
-	GosGSHmD1nQLkrLrberwTk87rQ6DdxKblkCV9ne0RILCF3/22vVgtnzDAuVGDrXN8O9nxw4iwDv
-	jTSqPqW0aQkp48tePtCouVgpPliyXC7I1JPfwJ1zzNxTmpTzU5gSljshPAcAls3baFVcWDz1Phh
-	Azz4IHdKdOoM4EuqglAId5KY72lpEe1IkG6vINa0kyGCxvEW
-X-Received: by 2002:a5d:5d81:0:b0:4a3:1468:c483 with SMTP id ffacd0b85a97d-4abb4b85a38mr25287392f8f.4.1795472614064;
+        bh=1DIEtRf/JpaQCeC2vD2/ZvWcgo+WI0jopYsB7AGprKk=;
+        b=anxgR+6BXbnrG2LdI77mU+3fwgTixPz6qLvEN2YC+/xgz3mBlYRUmam01ajqWi8Dg4
+         FdOHjmNS5sKlsE7UP9OSyg2ubAGbvu+/Cl73Y7fJLec0i2a8JbE0a3nI3cVIsyMXz6yJ
+         J/GA2wi8WetM1xjAt16rh663DxfDY3c4780zddc2282MxQu82U9oABQb9zr+D0qSxwW5
+         Z50aY+AI7rUulSZsx3sGWlRnJ5FbblZz4+oaENBH1PLIygKkLSeuRQ4XIYqFqS5XULwJ
+         hZJf+huRRIyD9SRPXSwzP2+ElpijrrQzMeGINoSaMmoHRTb7cJr7tPBAwp/sv2SE4Nzv
+         nNeQ==
+X-Gm-Message-State: APuU4Z/GrSrIMxfCsHb1xg4pogsLIyJccL9ZXObEy0fh3Kf3t5KGG4PB
+	acdJS7UZ6NEwxUwtdqZKHDSXjs8zx+JEXoNebvu27WhwqX4gvUy1fM+eR9fdnA==
+X-Gm-Gg: AZFdTZf2s5G1igZHSD1uQYfqpFy+3LthSff1O/V9I+OqtYfKTY12wjCyRMUdZPBF8X3
+	XVmud0h0bA6+IualQYe4/p0Je/LbPwVz9G7Mq/qsG1v2i/7z0WUi3Oq3Rh0b3+I6Erq1V8gVh/J
+	tgKB62WxmhncCM9OxL6LEUuNcun7jUqF45Y+66ctO+cv3/AEE6maF6ogfnUdBbXbAXMLqv97+QZ
+	kioDbt04piUC4xUOxTv4vIu1Rfob/dz3aoal5BrcGpeUK0fE3BdUCNduiGrA2xdWf/qRjMUTEVC
+	4xsUJ2UP83OSVHDnsfHJwf48jTWssLNCvTUGDg7aHoodwqnjx7luHp5Yhen41h6ech0NE4q1fd4
+	WFoVJsevTewyrT0nDCnhdV+bwLHpSfz3rQHQ5yqGEb2/ExE/UfDXqtxwuQMzmM1d0XrEI2zt7Vv
+	w/3YvLyujymcPA91K3QJduvibUAdU00S//EDsrLmASVF4cvljww481VM5RbyKEI5dkq/vmztLZq
+	ZbJgoMmGKg4EQYLnZuZNgI+SHmTkyWzzdHp+sqjojZ9L6cb/zy9ZtDTQhEOTSWR7MQwghrct+fZ
+	dP7hEkSROLEEOQgZSYLmfpoDPQl5zbdW9p5KHbVxdDPOiHZkhw==
+X-Received: by 2002:a05:600c:8a18:b0:4bb:7ad9:301f with SMTP id 5b1f17b1804b1-4bb88806505mr189861445e9.2.1795472614690;
         Mon, 23 Nov 2026 14:23:34 -0800 (PST)
 Received: from schinder.fritz.box ([2001:9e8:b398:6b00:c303:57b6:d70:952e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4abbd84e661sm23019015f8f.18.2026.11.23.14.23.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4abbd84e661sm23019015f8f.18.2026.11.23.14.23.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 14:23:33 -0800 (PST)
+        Mon, 23 Nov 2026 14:23:34 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Roland Schober <rolandschober1968@gmail.com>
-Subject: [PATCH BlueZ v2 4/6] monitor: Fix reading beyond the Apple manufacturer data
-Date: Mon, 23 Nov 2026 23:23:13 +0100
-Message-ID: <20261123222315.223450-5-rolandschober1968@gmail.com>
+Subject: [PATCH BlueZ v2 5/6] shared/bap: Fix reading beyond the Program Info
+Date: Mon, 23 Nov 2026 23:23:14 +0100
+Message-ID: <20261123222315.223450-6-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261123222315.223450-1-rolandschober1968@gmail.com>
 References: <20261123222315.223450-1-rolandschober1968@gmail.com>
@@ -97,46 +97,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-print_manufacturer_apple() reads the type before it checks that there
-is one, and prints the identifier as a string although nothing
-terminates it, so up to 98 octets which follow the AD structure are
-printed with it.
+The Program Info metadata is printed with "%*s", which sets a minimum
+field width and not a limit, so the string is read up to the next zero
+octet, beyond the metadata and possibly beyond the packet.
 
-Check the length first and print the identifier with its length.
+Print it with "%.*s" like the Program Info URI.
 
-Fixes: 35b0d0c7c281 ("monitor: Decode Apple identifier and iBeacon data structures")
+Fixes: 6d4491649e06 ("shared/bap: Add debug helpers")
 Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/packet.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ src/shared/bap-debug.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 6646dc147..042a2ecb6 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3763,18 +3763,16 @@ static void print_fec(uint8_t fec)
- 
- static void print_manufacturer_apple(const void *data, uint8_t data_len)
- {
--	uint8_t type = *((uint8_t *) data);
-+	uint8_t type;
- 
- 	if (data_len < 1)
- 		return;
- 
--	if (type == 0x01) {
--		char identifier[100];
-+	type = *((uint8_t *) data);
- 
--		snprintf(identifier, sizeof(identifier) - 1, "%s",
-+	if (type == 0x01) {
-+		print_field("  Identifier: %.*s", data_len - 1,
- 						(const char *) (data + 1));
--
--		print_field("  Identifier: %s", identifier);
- 		return;
+diff --git a/src/shared/bap-debug.c b/src/shared/bap-debug.c
+index b4352bdd3..772bd0a71 100644
+--- a/src/shared/bap-debug.c
++++ b/src/shared/bap-debug.c
+@@ -501,7 +501,7 @@ static void ase_debug_program_info(const uint8_t *data, uint8_t len,
+ 		goto done;
  	}
  
+-	util_debug(func, user_data, "Program Info: %*s", len, str);
++	util_debug(func, user_data, "Program Info: %.*s", len, str);
+ 
+ done:
+ 	if (frame.iov_len)
 -- 
 2.47.3
 
