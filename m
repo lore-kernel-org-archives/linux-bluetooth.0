@@ -1,90 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.217.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795456293;
-	b=rvAkptBo7vBvxTLwnZJalm134pr9Kf8X1p0L/y7wB3zK3p+dSBEpWVdPvkZfN0OuPQ4n
-	 tqvqrMzA0A+UHthT0zEeqmEQQh0l8XZBi8wn211hF0lsqU3rNftOR30BJ+1UabexF2YY+
-	 c8SpLLKIX5zwQChmd1R00sUOtwgwONghMRZm8UY3+o52ExXqb3qIBlK10aoE+hcDUETE+
-	 4DF3R4UO6SlSvAXG7w+C3TGF2GnRulDjIkMSw20kWeuKOf/ZF4k3VnFG+qKQyIlSIFfTu
-	 +51rGWlZod75B30e6n70F6V/XqJT03rIOFdluxD8GaDK/sQFuG7mCyRtSgQjkKdkZsQ==
+	t=1795456294;
+	b=R8CxKW4PUOL2gj3rzeFaY88ADaTsGJ2zYeoR/pyQMBWDuEzzntgiSA6Khw65qHezgPXl
+	 G5c5RHzbVG6RFkiRyJq9HH0OT1eidHLDCOltqqCoKMCZ05y8SyKNkX/bGlf6UnTWF7S46
+	 q6itt/IK4pBhIEx1BsXHLqFm3NP0xBj/tfB4dZ/yFHy6rpCvQPClwln8CJmXA0yBgOj6N
+	 j/3V5KdhHJ8vsZlUdvlB1WnQ2fs5xcpbskgk17UOq137XublU2/U4qYrTPCohhMXa7ClM
+	 1RQ17yJsdivj5HPD1q/TVqgO0wAguGLFe1+FDlcvBt3J0SKLJ78/RL/kmZfHzwYAgaQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795456293;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795456294;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=OS9VzfL5jwx67/K9XcB9Ff302hqOeUEgTDlnKQPmW4c=;
-	b=wZ9Oips4nFmZ8g3FAH1hD6/Hekotoz0BTT1Zr/wCIDu2B1QiQBSroAhaX8OtPK0Q2H+U
-	 YQpnFrnezh8YWfnE05vT72A8hjBR2QzhNG+8BEA9JM2nDlBiCjfm3kIMDeT6MPs9BKW90
-	 BfZVgmo5uQC1iioG1kT5ELg6LuO4PjDrxlXsstOvUhUZrb7x/pgMdnNabEETQTmBCfkMr
-	 YFGzPVdd3K8fSWWsRTMm91BanomWvcPf4D/uLDIKLukCqTJ1sGxQLeARbv/Lf+j+A+8GW
-	 H9kemZYkobPRLweGqzySHliXK0FyY+dO4M7bzDJuYa2adJBYBPblVriPVONmycEUCxA==
+	bh=+Y+TE+Tx0yDhbICHeyMhiUDF/j0xFrXpFkthqsl+fxI=;
+	b=L/1HVvnq/iQxvik3AKCOPrKUYKkFNm6le5pTfw5EqcTqcoTVNZ9qrS6KwO1K0QIISA6O
+	 7Wg1VzdnAEmUMG3B4w9EOkqXRS9wCIXPpRQvea69xf5q9uqv+NCn4LhDhI7ijbYOot0MZ
+	 y2lCc5sWKiTQAdNr3pPYVSfLwJP7bHF/11bQKVYUgVGAW3eZzSwAD8FCm4YjMHuhI7zD6
+	 omouFqd0IvZHmgj+VniWZdNj8Nc+V6MzanY9dExBcG0QZMKzk54aovjW+yFUtRDjFDB1D
+	 o9/a703yuylUUOXqsP8pWm5aeGokGKwVYkevpGiLcmaenZJ6NyqUnA7VhW4D+I2RJtA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=mkTTJu79;
-	arc=none smtp.remote-ip=209.85.222.44
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sEs9U2bv;
+	arc=none smtp.remote-ip=209.85.217.52
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD59606A32C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:51:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EFD59606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3803606A334
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:51:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3803606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=mkTTJu79
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-992f6d8cb51so671902241.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:51:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sEs9U2bv
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-7d2dbc0a8d4so1134156137.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:51:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795456292; x=1796061092; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=OS9VzfL5jwx67/K9XcB9Ff302hqOeUEgTDlnKQPmW4c=;
-        b=mkTTJu795aQ0b5hYt85uaLxju2enFDJPT4TaLy0xqorhWjE4ys8NtGxIV6F67zWNyB
-         Ygw3qPX90N4bgFX1A8/JL5dBt5d4kwVfxAIJXunyVWw+DThEhU0po7B2Nh8X8DbnuaAy
-         J1lBRA+iz2+ZcGfk8LqTlj6aVh2/Vb+y8D55uNrpwXooFDGEAGss66d7MFmJ09r8zAjh
-         GS/4Xj6wzDam8kD2+QNE2jFcg59P+NvWmknUdIXo5X+XtPmNWGaUt2lduyaSlIQNgt/G
-         NLknhkMrSqcvEXZbY3fyJuJE+wVPTv3zWS5d7vtHx9cRmrSx/v9P0XO9nFEfcWzzSaD/
-         jj2w==
+        d=gmail.com; s=20260707; t=1795456293; x=1796061093; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+Y+TE+Tx0yDhbICHeyMhiUDF/j0xFrXpFkthqsl+fxI=;
+        b=sEs9U2bvgOWaHSpTSKVETa0WD642fAqH2Ik93jJE/o4e2NZE0O4S24fZSU3QC0PZoS
+         JA/5JUBHn3w0v0Etj5IcOeelQR7jX3W0zs+UYr7eP8V94GuBdBP/p5Tb4zPeVtJmoZba
+         Hf1VOUD3pmaLY9FzYaMxETOmW/5nZ2dNYfQFQmpR4uX8DNxCIPgUwBXsEcPD8starqA5
+         tmr0K2ayiH/1ApGmGeN1G9MOe8gqf47vBlsWYnxDIyDye+Xm5+AneSa0kiJW5XZHEKH4
+         YpbnK76PRhmNciMP6On0c6K+kNk9kiFfbPhX4Pjf7UJ61TJZfne3YQ+Z3n/44zGeK2u8
+         m/GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795456292; x=1796061092;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=OS9VzfL5jwx67/K9XcB9Ff302hqOeUEgTDlnKQPmW4c=;
-        b=dNWgG01w0p8M94tnBEUNMN/Dkbyomk4xG1AVPKHYkHdh/4LCZQI4RrGMDAIbDI6V2+
-         VwAEviMsOeOqWAR2jdDIrdlxjDqitlgnvuHvPi5tKBPOQUnUtPMpJ1yeZUlJAgyIGcNX
-         RSixr/7hFunTN4gBvaEZHyWMthF6QsAW3rKfSWgDpAMquvQkSRRvW01Q8nMl3oYhNwC1
-         DG2WCTn2P7ZLfYe6Y+HwYGXiniS2IAQuQ3rrg/RSaja8iZca5huFx5BDjIlISntZTD1L
-         RjlyyZkVhfOU2gcTVCu86SiDOAnQAFbX4YcErKo2gdMtuv3klWrhVq5FtLtzsckr4IGB
-         n6lw==
-X-Gm-Message-State: APuU4Z9uBBa8+qBDtSAkDg5IBw57M1Vh9isWGe+XbUUvl5HuY3UR5GW+
-	SPRP+3hDBlPiZzcHeTuXxKs2ZQVt73WgtRFoY0F+L2igjtq35R5a+PYqzNUa1A==
-X-Gm-Gg: AZFdTZdkajh+UCaL7EQEQ4YFwcZ5nGwjXlGMDKqbBfxh3cMBOAl1TwiB8v9quWdFUiR
-	IGfnaaIuRFgBLkgaFLhD0sLiTwpsXKAbGA30RD14hQf+1BZ6wu/FKWXvw355tJKGPajFrrYBAQi
-	oecbmv77Q384eLfyXJNOGUZDH4mtruTV/AzwSU/mGOLIw7zJsySkaPSJ7H2xDlV6CrS4AnI9bLj
-	QbMviC+rIK9x6T1tQKiBmbjMjCSOHhGge97zK+vnUj7OF7d35FGJoI5T9Wscsn+E8Cdbu+T0TLI
-	YWSQVfHT5pr8eZmfy3wAjcsLvscTWYD8gnIKOAwR62Wf68uzK7GYDe41fuHn+nnpMvE5SjPtaVk
-	1HVsL1UW5ENGEmrX9Yrw2z/XCNqRA9eX5k378jIabD7KXXTclXWI2v3xZy1erNEoOW99K+hlxSi
-	zdLd07dHUMY+hP7MQSUGmV+ctjQojDK1Ml3vvBFSGuom3qtHhviWKTypBCGSJe/Eaq56QFSTqwD
-	5fyTmRrfudaJJe2Kd76969TV4IN0waW9xh/O3h0xWbzHKQ3fjqB7EL+7en63el+TuheSSDfWKpU
-	WIRqfRWUc2oK2DZhbkeAhOZiF6AaGUH6pj9JHs8QDlLrrR53IIR6310IbiURdxeKKt5hOWD8sWs
-	YQajS4Ti4cOm+Uqh6o0Gw0YLi85lUvtg2vxvU9bOz6Cr/cLRT/J4zQV5qLjejl7k84rXjBPT8/h
-	VLfCU=
-X-Received: by 2002:a67:e104:0:b0:7ce:78f9:adfe with SMTP id ada2fe7eead31-7d739457064mr4504324137.18.1795456291830;
-        Mon, 23 Nov 2026 09:51:31 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795456293; x=1796061093;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+Y+TE+Tx0yDhbICHeyMhiUDF/j0xFrXpFkthqsl+fxI=;
+        b=ggMcLUa2F7IC0tAKCDVXI0/3oHjE7ZZfalVQLgAcrOeCL7tT1qJvSVL5LP57agBFHi
+         3BMFdQNSlfT5TM9WzF1DeMLYoLLa4007GV9NTd2otyBNnZmHHTI+9oxqGTfV6Gubsg6f
+         LvPNNjPSKGBd9pRl6oZUZMXpvHd+FxsRckDJy2SAvtDRrBu01ioR11Z21AEj3qiEsmKO
+         amZET+fC4qSyZfAFtwqLSG0vcbyu9jMTFM+U3+IbWskFYNZqJzX9z45glF+S06w40vnl
+         C5GptpqByBxWZ9PfLE5c2Ur6hXNsu5CaArxqsrupe4EF0o5sSrNPONOI9yofpAunL00l
+         PeqA==
+X-Gm-Message-State: APuU4Z/t7y5zJG13PSjGjsu1HIGU3695qLqH3rubIbob8T1hqCDqiQc4
+	rlKuzrNUlKfPgV7JY8vKdqJujNU53si/uCL4l0n2Ir/jYx+YIwjVD/tJrAbVwA==
+X-Gm-Gg: AZFdTZc5H8UJz5lkbRLX8uA/r0oV5K3fdY5ZQ3dZjPmR7dajA8Ql8QDOrDDAYh2NHfm
+	YE9KiQNWjFKswhvTskxcfUV0NNAd00AvHHt472TmwtCRWlV8KmisJYKkzbx9Q9o3rVurSSVawGc
+	RiVGgJdYnjTTBxQuU2ULtYeBzB5AKh2CWDcJZ+us194VXg5+wVu+OJpujcjZ+ciDboWSzUF4cXh
+	TthrmWn+8BC2qiy/l9/UMxWDbJ0hb2m7RYm7TMrJB63NzCynVyme0NytOeZJCrUw1ZRrkd8UOd4
+	ROHU0i5lGSBuaYJC4NbO+y5GYL7YqwxBI4z1z61CBhX4QdbAUXwOTijGfioWb+pI5DoH0jCVuRc
+	ffv6J95B6ez98TS7aYumFPI0xXeecFGJMBU6g5qYNVdbntpcTsohS6SNzV45Zo9eEcPGYQOEdjz
+	U5N/J6yaFGp/Xn0QiLuOe2VBByH2wSVaR5B7K26aNaSheEQ5IWxWNbmn9ds6iF8kuClEkfVi/sr
+	VwEaL+HkGEVHwDcv+GMFW1gpKN8mJ47pO314RgxGb5teVD1e5dCuQJSziTlQWcPjtGictJUaFA0
+	rYk1MdPk5A+VsH/ASiVS8b9T+/5kSZn+J4lwtB9VHIKJkqyWT1+aGfdus+WvGiweTjB9PEITMQz
+	MU8RpxiYbi/IQZdUviFWZie6MtMM79riysbgXeSvWFLxmlL/rLxJw9xuWnVfFZ0spI6pYxzSZI3
+	urhyo=
+X-Received: by 2002:a05:6102:688c:b0:7ce:a69d:b020 with SMTP id ada2fe7eead31-7d72b36164amr4909437137.5.1795456292544;
+        Mon, 23 Nov 2026 09:51:32 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
         by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e7f92680sm12795393137.5.2026.11.23.09.51.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 09:51:31 -0800 (PST)
+        Mon, 23 Nov 2026 09:51:32 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 06/18] shared/hci: Look up the connection handle on the right link
-Date: Mon, 23 Nov 2026 12:51:09 -0500
-Message-ID: <20261123175125.3642617-7-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v5 07/18] profiles/ranging: Let the Reflector run the CS setup phase
+Date: Mon, 23 Nov 2026 12:51:10 -0500
+Message-ID: <20261123175125.3642617-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261123175125.3642617-1-luiz.dentz@gmail.com>
 References: <20261123175125.3642617-1-luiz.dentz@gmail.com>
@@ -97,147 +98,324 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-bt_hci_get_conn_handle() set dev_id to 0 in its HCIGETCONNLIST request,
-expecting the ioctl to fill it in. The kernel reads it instead, to pick
-the controller whose connections it lists, so the lookup always went to
-hci0 whatever adapter the channel was opened for.
+StartMeasurement() returned early for a Reflector, so the local Host
+never read the CS capabilities or sent LE CS Set Default Settings, and
+the state machine never left its idle state. The events driven by the
+remote Initiator (Config, Security Enable, Procedure Enable) were then
+dropped as out-of-state, and the Reflector role could not be used.
 
-The list also holds every link of that controller, and the first one
-with a matching address was taken. With a dual-mode peer connected over
-BR/EDR first, that is the BR/EDR ACL, and after a quick reconnection it
-can be the old link that is still being torn down.
+Run the setup phase for the Reflector as well. The FAE Table paths
+skipped Set Default Settings for a Reflector, and for Both on the
+Peripheral; send it on every path, and leave Create Config to the
+Initiator, which rap_def_settings_done_cb() already decides from the
+role.
 
-Remember the index the raw channel was opened for and use it in the
-request. Take the link type from the caller and only accept a connected
-link of that type, so that the function works for any link type. Add
-LE_LINK next to the other link types for that, which also replaces the
-local copy in hcitool.
+The early return also skipped the Ranging Data subscription. The RAP
+roles are independent of the CS roles (RAP v1.0 2), so a Reflector that
+is the Ranging Requester still needs the peer's Ranging Data, and it is
+now subscribed the same way as for an Initiator.
+
+A Reflector can now reach StopMeasurement() before any procedure has
+started, and the Procedure Enable it then sent was rejected by the
+Controller; skip it while no procedure is running or being enabled.
+
+bluetoothctl now keeps a session for a Reflector too, so that stop and
+the Active property work for it, and the ChannelSounding1 documentation
+describes the setup phase.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- lib/bluetooth/hci.h    |  1 +
- profiles/ranging/rap.c |  3 ++-
- src/shared/hci.c       | 12 +++++++-----
- src/shared/hci.h       |  2 +-
- tools/hcitool.c        |  3 ---
- 5 files changed, 11 insertions(+), 10 deletions(-)
+ client/cs.c                        | 25 +++++------
+ doc/org.bluez.ChannelSounding1.rst | 20 +++++----
+ profiles/ranging/rap.c             | 34 +++++++++++----
+ profiles/ranging/rap_hci.c         | 66 +++++++++++++-----------------
+ 4 files changed, 75 insertions(+), 70 deletions(-)
 
-diff --git a/lib/bluetooth/hci.h b/lib/bluetooth/hci.h
-index 2e4aa394e13e..6f51a2e10fe5 100644
---- a/lib/bluetooth/hci.h
-+++ b/lib/bluetooth/hci.h
-@@ -210,6 +210,7 @@ enum {
- #define SCO_LINK	0x00
- #define ACL_LINK	0x01
- #define ESCO_LINK	0x02
-+#define LE_LINK		0x80
- 
- /* LMP features */
- #define LMP_3SLOT	0x01
-diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
-index 2d8b1a7a1364..d23c3f8e2e96 100644
---- a/profiles/ranging/rap.c
-+++ b/profiles/ranging/rap.c
-@@ -18,6 +18,7 @@
- #include "gdbus/gdbus.h"
- 
- #include "bluetooth/bluetooth.h"
-+#include "bluetooth/hci.h"
- #include "bluetooth/l2cap.h"
- #include "bluetooth/uuid.h"
- 
-@@ -1099,7 +1100,7 @@ static int rap_setup_reflector(struct rap_data *data)
- 
- 		if (att && data->adapter_data->hci) {
- 			if (bt_hci_get_conn_handle(data->adapter_data->hci,
--				(const uint8_t *)bdaddr, &handle)) {
-+				(const uint8_t *)bdaddr, LE_LINK, &handle)) {
- 				DBG("conn handle 0x%04X for %s", handle, addr);
- 				data->conn_handle = handle;
- 				bt_rap_set_conn_hndl(data->hci_sm,
-diff --git a/src/shared/hci.c b/src/shared/hci.c
-index e8586ab5014c..f1d663be111f 100644
---- a/src/shared/hci.c
-+++ b/src/shared/hci.c
-@@ -34,9 +34,9 @@
- #include "src/shared/timeout.h"
- #include "src/shared/hci.h"
- 
--
- struct bt_hci {
- 	int ref_count;
-+	uint16_t index;
- 	struct io *io;
- 	bool is_stream;
- 	bool writer_active;
-@@ -463,6 +463,7 @@ struct bt_hci *bt_hci_new_raw_device(uint16_t index)
+diff --git a/client/cs.c b/client/cs.c
+index e029da881898..01d92cd9b53d 100644
+--- a/client/cs.c
++++ b/client/cs.c
+@@ -1120,29 +1120,26 @@ static void start_measurement_reply(DBusMessage *message, void *user_data)
+ 		return;
  	}
  
- 	hci->is_stream = false;
-+	hci->index = index;
+-	if (cs_role == 0x02) {
+-		bt_shell_printf("Default settings applied on %s;"
+-				" Reflector role does not start a local"
+-				" measurement\n",
+-				g_dbus_proxy_get_path(proxy));
+-		return;
+-	}
+-
+ 	s = g_new0(struct cs_session, 1);
+ 	s->proxy    = proxy;
+ 	cs_sessions = g_list_append(cs_sessions, s);
  
- 	bt_hci_set_close_on_unref(hci, true);
- 
-@@ -972,7 +973,7 @@ bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id)
+-	bt_shell_printf("Measurement started on %s\n",
+-			g_dbus_proxy_get_path(proxy));
++	if (cs_role == 0x02)
++		bt_shell_printf("Reflector armed on %s; waiting for the remote"
++				" Initiator\n",
++				g_dbus_proxy_get_path(proxy));
++	else
++		bt_shell_printf("Measurement started on %s\n",
++				g_dbus_proxy_get_path(proxy));
  }
  
- bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
--				uint16_t *handle)
-+				uint8_t link_type, uint16_t *handle)
+ static void cs_print_role_hint(uint8_t role)
  {
- 	struct hci_conn_list_req *cl;
- 	struct hci_conn_info *ci;
-@@ -992,7 +993,7 @@ bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
- 		return false;
+ 	if (role == 0x02)
+-		bt_shell_printf("Note: Reflector role only uses"
+-				" role/cs_sync_ant_sel/max_tx_power;"
+-				" other CS config/frequency parameters"
+-				" are ignored.\n");
++		bt_shell_printf("Note: Reflector role runs the setup phase and"
++				" then waits for the remote Initiator to create"
++				" the config; it does not start a procedure"
++				" itself.\n");
+ 	else
+ 		bt_shell_printf("Note: Initiator role requires dev_addr"
+ 				" and duration_secs; CS config/frequency"
+diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
+index e75535b97092..d3496accb899 100644
+--- a/doc/org.bluez.ChannelSounding1.rst
++++ b/doc/org.bluez.ChannelSounding1.rst
+@@ -37,23 +37,25 @@ Only one measurement per device object may be active at a time. Calling
+ ``org.bluez.Error.InProgress``.
  
- 	memset(cl, 0, 10 * sizeof(*ci) + sizeof(*cl));
--	cl->dev_id = 0;  /* Will be filled by ioctl */
-+	cl->dev_id = hci->index;
- 	cl->conn_num = 10;
+ When ``role`` is Reflector (``0x02``), this method does not start a CS
+-distance measurement: a Reflector never initiates a procedure locally,
+-so it cannot start one via this call. Instead, all given configuration
+-is applied and stored so the controller is ready to respond once a
+-remote Initiator begins a procedure, and the method returns success
+-without arming a local measurement session. The ``Active`` property
+-only transitions to ``true`` when a remote-initiated procedure
++procedure: a Reflector never initiates one locally. It runs the setup
++phase (reading the capabilities of both sides and applying the default
++settings) so the controller is ready to respond once a remote Initiator
++creates the configuration and begins a procedure. The ``Active``
++property only transitions to ``true`` when a remote-initiated procedure
+ actually starts, which may happen well after this method returns (or
+ not at all, if the remote never initiates one). Clients that watch
+ ``PropertiesChanged`` for ``Active`` (as **bluetoothctl-cs(1)** does)
+-are notified of both the remote-initiated start and its eventual stop.
++are notified of both the remote-initiated start and its eventual stop,
++which also ends the Reflector session: **StartMeasurement** has to be
++called again to respond to another procedure.
  
- 	/* Get connection list via ioctl */
-@@ -1001,10 +1002,11 @@ bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
+ For Initiator role (or Both), ``duration_secs`` and the device object
+ path are the parameters that matter to start a measurement; every
+ other key below is optional configuration with a usable default. For
+ Reflector role, only ``role``, ``sync_ant_sel`` and ``max_tx_power``
+ are required or have any effect — the remaining keys are accepted but
+-otherwise unused, since no local procedure is armed.
++otherwise unused, since the configuration comes from the remote
++Initiator.
+ 
+ Supported dictionary keys:
+ 
+@@ -229,7 +231,7 @@ Examples:
+ 	| [cs] > start AA:BB:CC:DD:EE:FF
+ :bluetoothctl start with defaults:
+ 	| [cs] > start [dev_addr] [duration_secs]
+-:bluetoothctl configure as Reflector (applies settings, does not start a measurement):
++:bluetoothctl configure as Reflector (runs the setup phase, does not start a procedure):
+ 	| [cs] > role 0x02
+ 	| [cs] > start
+ 
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index d23c3f8e2e96..8f99572574c0 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -837,19 +837,16 @@ bad_type:
+ 		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
+ 					   "Set CS freq params failed");
+ 
+-	/* Reflector never initiates a CS procedure locally: apply the
+-	 * settings so the controller is ready to respond to the remote
+-	 * Initiator, but do not arm a local measurement session.
+-	 */
+-	if (settings.role == 0x02)
+-		return dbus_message_new_method_return(msg);
+-
+ 	/* Nothing is subscribed at connection time unless On-demand is
+ 	 * configured, so subscribe now if SetRangingDataMode() was not called.
+ 	 */
+ 	if (!bt_rap_ensure_ranging_data(data->rap))
+ 		DBG("Unable to subscribe to Ranging Data");
+ 
++	/* The Reflector runs the setup phase too, so that the state machine
++	 * acts on the remote Initiator's events; rap_def_settings_done_cb()
++	 * leaves Create Config to the Initiator.
++	 */
+ 	if (!bt_rap_start_measurement(data->hci_sm, data->conn_handle,
+ 							duration_secs))
+ 		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
+@@ -940,12 +937,20 @@ static const GDBusMethodTable cs_dbus_methods[] = {
+ 	{ }
+ };
+ 
++#define CS_ROLE_INITIATOR	0x01
++
+ static gboolean cs_property_get_active(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+ 	struct rap_data *data = user_data;
+-	dbus_bool_t active = data->active_session.active ||
+-				bt_rap_is_procedure_active(data->hci_sm);
++	dbus_bool_t active = bt_rap_is_procedure_active(data->hci_sm);
++
++	/* A Reflector session is only armed while waiting for the peer, so
++	 * only report the procedure state for it.
++	 */
++	if (data->active_session.active &&
++	    (data->active_session.settings.role & CS_ROLE_INITIATOR))
++		active = true;
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &active);
+ 	return TRUE;
+@@ -976,6 +981,17 @@ static void rap_proc_active_changed(bool active, void *user_data)
+ {
+ 	struct rap_data *data = user_data;
+ 
++	/* A Reflector session only lasts for the remote procedure it was
++	 * armed for. End it with the procedure, so the Active=false that
++	 * follows leaves no session behind that StartMeasurement() would
++	 * refuse to replace and StopMeasurement() could not be reached for.
++	 */
++	if (!active && data->active_session.active &&
++	    !(data->active_session.settings.role & CS_ROLE_INITIATOR)) {
++		bt_rap_stop_measurement(data->hci_sm);
++		memset(&data->active_session, 0, sizeof(data->active_session));
++	}
++
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
+ 				device_get_path(data->device),
+ 				CS_INTERFACE, "Active");
+diff --git a/profiles/ranging/rap_hci.c b/profiles/ranging/rap_hci.c
+index 62760b5c092e..d0610a22c160 100644
+--- a/profiles/ranging/rap_hci.c
++++ b/profiles/ranging/rap_hci.c
+@@ -716,7 +716,6 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 	struct cs_state_machine *sm = (struct cs_state_machine *) user_data;
+ 	const struct bt_hci_evt_le_cs_rd_rem_fae_complete *evt;
+ 	struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete tmp_ev;
+-	struct rap_conn_mapping *m;
+ 	struct iovec iov;
+ 	int i;
+ 
+@@ -736,25 +735,24 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 
+ 	DBG("status=0x%02X, handle=0x%04X", evt->status, evt->handle);
+ 
++	/* Every state machine on this adapter sees every CS event, so ignore
++	 * the ones for other links before acting on the status.
++	 */
++	if (!find_mapping_by_handle(sm, evt->handle)) {
++		DBG("Not for this link, ignoring");
++		return;
++	}
++
+ 	if (evt->status != 0) {
+ 		/* Status 0x11 (Unsupported Feature or Parameter Value) means
+ 		 * the remote has zero FAE, the procedure continues
+ 		 * to the Default Settings step.
+ 		 */
+ 		if (evt->status == 0x11) {
+-			m = find_mapping_by_handle(sm, evt->handle);
+-
+ 			DBG("Remote FAE=0 (No_FAE), proceed to Def Settings");
+-			if (is_initiator_role(sm) ||
+-			    (is_both_role(sm) && m && m->is_central)) {
+-				memset(&tmp_ev, 0, sizeof(tmp_ev));
+-				tmp_ev.handle = evt->handle;
+-				DBG("Init/Both: send def settings (No_FAE)");
+-				rap_send_hci_def_settings_command(sm, &tmp_ev);
+-			} else {
+-				DBG("Reflector role: continuing after No_FAE");
+-				cs_set_state(sm, CS_STATE_INIT);
+-			}
++			memset(&tmp_ev, 0, sizeof(tmp_ev));
++			tmp_ev.handle = evt->handle;
++			rap_send_hci_def_settings_command(sm, &tmp_ev);
+ 			return;
+ 		}
+ 		error("Remote FAE Table read failed with status 0x%02X",
+@@ -774,18 +772,9 @@ static void rap_rd_rem_fae_cmplt_evt(const void *data, uint8_t size,
+ 	}
+ 
+ 	/* After receiving FAE Table, send default settings */
+-	m = find_mapping_by_handle(sm, evt->handle);
+-
+-	if (is_initiator_role(sm) ||
+-	    (is_both_role(sm) && m && m->is_central)) {
+-		memset(&tmp_ev, 0, sizeof(tmp_ev));
+-		tmp_ev.handle = evt->handle;
+-		DBG("Init/Both: send def settings after FAE");
+-		rap_send_hci_def_settings_command(sm, &tmp_ev);
+-	} else {
+-		DBG("Reflector role: Proceeding after FAE Table");
+-		cs_set_state(sm, CS_STATE_INIT);
+-	}
++	memset(&tmp_ev, 0, sizeof(tmp_ev));
++	tmp_ev.handle = evt->handle;
++	rap_send_hci_def_settings_command(sm, &tmp_ev);
+ }
+ 
+ static bool bt_rap_read_remote_fae_table(void *hci_sm, uint16_t handle)
+@@ -821,7 +810,6 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ {
+ 	struct cs_state_machine *sm = user_data;
+ 	const struct bt_hci_evt_le_cs_rd_rem_supp_cap_complete *evt;
+-	struct rap_conn_mapping *m;
+ 	struct iovec iov;
+ 	uint16_t subfeatures_supported;
+ 
+@@ -871,18 +859,8 @@ static void rap_rd_rmt_supp_cap_cmplt_evt(const void *data, uint8_t size,
+ 		return;
+ 	}
+ 
+-	m = find_mapping_by_handle(sm, evt->handle);
+-
+-	if (is_initiator_role(sm) ||
+-	    (is_both_role(sm) && m && m->is_central)) {
+-		DBG("Init/Both: send def settings for 0x%04X",
+-			evt->handle);
+-		rap_send_hci_def_settings_command(sm, evt);
+-	} else {
+-		DBG("Reflector role: send def settings cmd");
+-		cs_set_state(sm, CS_STATE_INIT);
+-		rap_send_hci_def_settings_command(sm, evt);
+-	}
++	DBG("send def settings for 0x%04X", evt->handle);
++	rap_send_hci_def_settings_command(sm, evt);
+ }
+ 
+ static void rap_cs_config_cmplt_evt(const void *data, uint8_t size,
+@@ -1844,6 +1822,18 @@ bool bt_rap_stop_measurement(void *hci_sm)
  		return false;
  	}
  
--	/* Search for the connection with matching bdaddr */
-+	/* The list holds every link of the controller, so match the type too */
- 	ci = cl->conn_info;
- 	for (i = 0; i < cl->conn_num; i++, ci++) {
--		if (memcmp(&ci->bdaddr, bdaddr, 6) == 0) {
-+		if (ci->type == link_type && ci->state == BT_CONNECTED &&
-+				memcmp(&ci->bdaddr, bdaddr, 6) == 0) {
- 			*handle = ci->handle;
- 			found = true;
- 			break;
-diff --git a/src/shared/hci.h b/src/shared/hci.h
-index 5be48577f9db..a91d245233a1 100644
---- a/src/shared/hci.h
-+++ b/src/shared/hci.h
-@@ -49,4 +49,4 @@ unsigned int bt_hci_register_subevent(struct bt_hci *hci,
- bool bt_hci_unregister_subevent(struct bt_hci *hci, unsigned int id);
- 
- bool bt_hci_get_conn_handle(struct bt_hci *hci, const uint8_t *bdaddr,
--				uint16_t *handle);
-+				uint8_t link_type, uint16_t *handle);
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index 1903d859bff1..fc4fc1709ff2 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -34,9 +34,6 @@
- 
- #include "src/oui.h"
- 
--/* Unofficial value, might still change */
--#define LE_LINK		0x80
--
- #define FLAGS_AD_TYPE 0x01
- #define FLAGS_LIMITED_MODE_BIT 0x01
- #define FLAGS_GENERAL_MODE_BIT 0x02
++	/* With no procedure running - a Reflector still waiting for the
++	 * Initiator, or a timeout left over from an earlier measurement -
++	 * there is nothing to disable, and the Controller answers Procedure
++	 * Enable with Invalid HCI Command Parameters. A procedure that is
++	 * being enabled has not reported yet, so still disable that one.
++	 */
++	if (!sm->procedure_active &&
++			cs_get_current_state(sm) != CS_STATE_WAIT_PROC_CMPLT) {
++		DBG("No local CS procedure active, nothing to disable");
++		return true;
++	}
++
+ 	return rap_send_hci_cs_procedure_enable(sm, sm->active_conn_handle,
+ 						false);
+ }
 -- 
 2.56.0
 
