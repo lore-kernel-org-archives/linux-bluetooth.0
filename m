@@ -1,101 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.48
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795462170;
-	b=eETxywK0V+hrAPx7CNSix491498Zgd1yXhaGiZ5sbMG2QWWljBlvWASPNsfBg7i47A1E
-	 LdriVYV6l6xPLCjcT32viycWsPajU05lqAkZRbC5GPaFJNquOmz8KIDU4+iKxckQDUZ3d
-	 4iQILr4Dhwf/nmKZZWfPT5vMTxaBfta60uhWyuIiz1sa61A1NdAKPQE39dyDFKw1ogsgE
-	 AZmL3KCFkdnumHxhTuJsJgofGZmNtCY1+aLpYwsxZ4zegwDYLSMaygzDA1HzqUoIefN7M
-	 aMtmYkxbD8rT9D27D4m8v6XLNFp22BMS3iXFKXRXGShu+nw54qZPf4KfSJkEWdQBing==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795462170;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=l9YBlkQvJhzeLkIHDtyxOfbv0l9Brm6xhCvS00bPQC4=;
-	b=pOqHYB6kTV817H246hY242RUKDWDrHewZpCIad7/jr2cwjBG4mT2sI9mFKxtn+UHXHSg
-	 z5WrO0iWxDZ063bwQ1Trs7srV2QIVxhNUSKhtoSoOsx+Tm1V52WFVZJCsQJuCOYPrkcZi
-	 Pp1FCpm76GhtcnRUKDoqHVBRO2t9hDuF0lb+qmdoEf7rpC0EPR8cc4+9hUxoYcs1Jh3oV
-	 XLxCAC6D2eTHRxM9SaBAlWiAgVG1+renpz2KzJCaQD10C1Irb6yNQIZyDuDipMEzIdDa2
-	 r0xntilumaIgxPZSJWVzyWm53IHdhJaHETbWk8Vd4OzqrYLEYNR20nlbB3QZpJA742g==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YeC4yJsq;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.48
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795462809;
+	b=psbMnx21AXxgEf9ZE31qDdLV9shtCuqtI31yHKCuTrldTHOABQvYfTTS3pw7XplYRoVV
+	 Q9qpf/OMN8UuqNBnAzZVaYEKXZ1TXgJKr4X/gZ0yv1DZekMtiU8X+BsgrUoLeENQJlJ1w
+	 qjC1Wvj2RfOnf8SBgbvnz3FMp68SMwKrelVDtYHKttEf9qX7RnvXHF8gQNflKxWgxNzmP
+	 n7c5FIrbSP/91kNMmRydRtoR368nFaUv62VyTGHcJ0ilPTU8NeQYcwP/FbF5+Sl0KtCNG
+	 dAwVTungyo4ctNatISdSXkKN5R1M/H7afVBO1GsOxHHkNP0B4cvBDoDRzZzjQMWpf9w==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795462809;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=GENkBhjt9jCQL9ztMCG1lg3AsyAfCt88HgVI5C9B0qU=;
+	b=j7DrObTorOtLvpJ3pBNbz1K6gkDgwtI8n93WAeH10QYzxc98lBLMPI2VP+GropmAgkZM
+	 wpWrS3nkDIMbzHEge04MEVey8qxodK/HYXQ1oaXOZazhFaWBvfOsfrOGyCgx/mJq2erLN
+	 Cg7eUdTCqwr16qfTblIZrTYWVd5hhDnXGnmeWp9+HqpnF6ZH76w6GpwNU038ntqXnSBRa
+	 jXzSSrX/mGjrIYalue1mh/VKzWhNTv0/ECP99tuhuGVh8q6pmyBW/TMfNr43XkWTIeyLV
+	 iVXHxPEsMuixI4POX0ljoFLYl6CKdMI6V2a9UDgxLw5iFcmN4J0HbuKTZA6UChFRfeQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H0cBGp6Z;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE30E606A337
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:29:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CE30E606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8785C606A31A;
+	Mon, 23 Nov 2026 19:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=YeC4yJsq
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-67db6d4054eso4161819d50.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 11:29:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795462169; cv=none;
-        d=google.com; s=arc-20260327;
-        b=MBLQVlUQrYVmCbiM3vvTcKxqWwHsYcqks2hvdBlqykxOWvTou5yjisQ0KWuxnMs3dF
-         NytKqMTlcA/vi9T2JoyOm9d9pEddhSe/GDBH5ACS62FxjDnZU+RAzGjNzyHvvMs2mgBu
-         V8Hd1BvpnqwniTVNL/qSyRZtvWd8brDNay+2voOp7OVHvO0fC3U7zRjYqTlOIY1c4kGM
-         gHxp+Cr62BJZxQtH6qpvJIAAjU+Hmpm5fGUIka0+Mhv6Y5L25kvOOPwhyP+2sY/oGzAR
-         7mLdBCtAcjuSskP0qZ5DHcabJ+xjtF9tps03D1Cq/etwquwwWhM+LQhod+SG63bylC3V
-         tv5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=l9YBlkQvJhzeLkIHDtyxOfbv0l9Brm6xhCvS00bPQC4=;
-        fh=UA/cNErwqknDfefZj80dwpXzGaUZl6eKpR9TO5+4Joc=;
-        b=T9J4h1r/5k5J5JHIHtINZFWwQxaksz+hl7pyLLOmyRaumzpT+Im7n0pE7oe5PmxKlv
-         XkUcbhy1H0Vi250NYqu0+yCOwiR78z517WWfNXg3QXfEYouKtPiwrpWMT94QYqCuB9Fy
-         kH3tWzR5ba8I2K4u/H6UBJzSH2OaRAme1/lYjP+Q3G7azCJ1MudwKfGuc24hZ2c5HNoJ
-         cSd0zNjKGSc1Bo3S7oe+uUphNzwdGX6EEpQkPuuAGMu/X+yMP+vWieigZMGi+uqSX0mp
-         KWeMvazEXrygDF6Ls7eznuKY4CVRqeyxgxTiuMHuyRhbXYHlIXyb5yPWX5GxDGbqtxub
-         hI9g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795462169; x=1796066969; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=l9YBlkQvJhzeLkIHDtyxOfbv0l9Brm6xhCvS00bPQC4=;
-        b=YeC4yJsqwOZigqx+OUStXGHl6kVYFAmICv150Rt4cXHvBqarDOAnGCgJNTHdpCNcsB
-         CIDwG0tsqmnLJXkkictmrae4vvcd1hMeLe/LkY4CAavfx/ZYGsypLLU+WtHdBZ6pGWb/
-         7QJDywpKJqSEYL2if6xMcLyemRxYMaJMkSropLGzaIx5vDY/eDUVIZhn0dgSfr/Xy98q
-         aPQJM7WbTCy4qTcqe23EJjPfamen2Q3zgmpp32u4OQo6yX/5Hs+AruDfilkAZdG1XjOn
-         ZIYcsu7I6+inPrNmVeAu7v05owb+O5ZmCJ35f95kbDGeKHqNBDrzm67hf2IE3AKw6+Y1
-         rYbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795462169; x=1796066969;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=l9YBlkQvJhzeLkIHDtyxOfbv0l9Brm6xhCvS00bPQC4=;
-        b=JlGGcWxKbYWNEWfFkW/7PXTspQU6IpS/9KRJxht/VRGMMyEgfHrCFL5jqdL+OTZyWR
-         yqSMVUej8cyf+upBc+WYNqisI+7WAaOe7atAw+hrnQcMa/H52iidt7C9c4tlPvlMlFwF
-         5L9Off9lIVQBsx84/kW36O81rwKBW2T8qwDhsG4W1yKt6WPwgvbjoabGC+L+pQU8Qecb
-         OkrjHq6zVCHcryFF0bZWxMC3qXT6c6QAhHAydMsNB/9F9+154t+znas9Bya7cyoX95z5
-         YqD3TPxx2FYX5hUttrh98xoet/Pr2a3bRf9mLcMsZJEKiWCRVroPszShHHbO0r73dW+2
-         qyTA==
-X-Gm-Message-State: APuU4Z8HbxJQErnQ5TDIbSe43LY8vBeW0gOAVKMrmnpdt4v0ril/6Enq
-	DkAgDb8/stqukVexVmxD4VtN3cU3vQutlGsHgcAIgTifuLVWT/dJLG81GOlgTrE1xfZsJU8n64Z
-	9st66Zd344y5kqXKktRLt1LkK4PWKsnLQWYgf
-X-Gm-Gg: AZFdTZeK7UTOUKlY5xq/WC1U9iVIH/JKKOg4HETeNxyqOzBEVaF9uNi/oLxYoYVG2+s
-	H39tZGKY178qH7cRIuAssrBuS8HWZTP2wJ1l8IHK6FhgwS5DZ9sUNQS4nf2PheslbHWOArg4GKZ
-	XbbAnUGygwyKuudV9psp32urEWBCwpEzoDOY9GorNAPErxuNVI2Ize1XOx8BxRKjA2qNxr5eR6A
-	nRfRJbeIUXxxPUVnWGvoe3h59IgWcCusJwISowpR5Kri70Vs2A+w2M3jksFExBvwvL2RjoAhjOc
-	CKCsDh7yEFlQ/NfwjYm00ukn1TBGpIvQs8eIM0AXFxtDXJNGD0vyw9sqNC3r+p1aZZ9VZBgESX+
-	3hLqbWLBKrV21fDzoj1wgpZAWKrzZLl2e47CoopF4p66UZc/EodRMAhQMJpAiMg97awmxNFJq6c
-	tkzY55WkDeo6aKMEQblkrIedQsZ0bBRPu0at9zvDKqmVSxjspfpJxr/++DbSZzOi6Ydp5WBa9YT
-	/K1iHlt
-X-Received: by 2002:a05:690e:4890:10b0:67d:bb89:acb1 with SMTP id
- 956f58d0204a3-67df4441bc5mr3034628d50.75.1795462168686; Mon, 23 Nov 2026
- 11:29:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H0cBGp6Z
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD7A71F000CF;
+	Mon, 23 Nov 2026 19:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795462808;
+	bh=GENkBhjt9jCQL9ztMCG1lg3AsyAfCt88HgVI5C9B0qU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=H0cBGp6ZHsm7VRxM/OEEGivd1KW31o2+Vg/7savaCiwopM0qP+GuWSzMMifgK5Cid
+	 y5nrkGqUxQ+KVkzgVcHa+8S9crSPrDrhH0/TPYBkepn/AKJ94abJAETKoB5n7jm8mk
+	 Cma42wRrtnBqPkUL9jKKx5hI4yTHiauLBerwgZL44EzKy4adx1ysdnMmMQg0F23Vvc
+	 xvfffr8j4ix3JkQeQwsWGN+lXCtTYEr8wMDkveQrvk6lCPEOae/Hkxc5imRArXqaud
+	 IxuaXXcZYOWVfy1ZkMSxUDu9HXdERUTDVr8sTE2cAgl29EO8a0uRTva9pQ3kaV5PMq
+	 ZuCQnH6NN3RlA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4447392EE3B;
+	Mon, 23 Nov 2026 19:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,63 +53,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261122200947.2780757-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20261122200947.2780757-1-simon.mikuda@streamunlimited.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 23 Nov 2026 14:29:14 -0500
-X-Gm-Features: Aa3M54omQbXLV90wjW8o8Pr9B9_9D9foHp1KK2DC2lMT1Dy_gUYxY39xQQynIrg
-Message-ID: <CABBYNZKK7et_CfHMq4wtz1sohqYxbns=_BcA6vR5YgwzSn3o7w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: lib: Map Connection Failed to be Established
- to ETIMEDOUT
-To: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v9 0/8] arm64: dts: monaco-arduino-monza: Add support for
+ LGA WiFi/BT module
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179546280752.3078240.14805483957076909592.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Nov 2026 19:40:07 +0000
+References: <20261123-monza-wireless-v9-0-450d7d764aea@oss.qualcomm.com>
+In-Reply-To: <20261123-monza-wireless-v9-0-450d7d764aea@oss.qualcomm.com>
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: mani@kernel.org, brgl@kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, andersson@kernel.org, konradybcio@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+ manivannan.sadhasivam@oss.qualcomm.com, bartosz.golaszewski@oss.qualcomm.com,
+ dmitry.baryshkov@oss.qualcomm.com, wei.deng@oss.qualcomm.com,
+ jesse.casco@gmail.com, krzysztof.kozlowski@oss.qualcomm.com,
+ konrad.dybcio@oss.qualcomm.com
 
-Hi Simon,
+Hello:
 
-On Sun, Nov 22, 2026 at 3:09=E2=80=AFPM Simon Mikuda
-<simon.mikuda@streamunlimited.com> wrote:
->
-> Connection Failed to be Established / Synchronization Timeout (0x3e) is
-> not handled by bt_to_errno() so it is reported to userspace as ENOSYS.
->
-> It is the error the controller uses when the first packets of an LE
-> connection or CIS are not received, and when it cannot synchronize to
-> a periodic advertising train or BIG in time, i.e. a timeout, so map it
-> to ETIMEDOUT like Connection Timeout (0x08).
->
-> This changes what userspace sees: connect() on an L2CAP LE or ISO (CIS)
-> socket that fails with 0x3e now reports ETIMEDOUT instead of ENOSYS.
-> BlueZ iso-tester "ISO Connect - Reject" expects ENOSYS for this case
-> and needs "iso-tester: Accept ETIMEDOUT for Connection Failed to be
-> Established" to pass.
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I don't see any patch for userspace, though; did you forget to send it?
+On Mon, 23 Nov 2026 14:56:07 +0100 you wrote:
+> This series describes support for the onboard WiFi/Bluetooth module
+> present on the Arduino VENTUNO Q (monaco) platform.
+> 
+> The board provides LGA pads for a wireless module. On the VENTUNO Q
+> these pads are populated with an NFA725B module featuring the
+> QCA2066 WiFi/BT combo chip. While implemented as an LGA footprint,
+> the design is functionally compatible with the M.2 Key E.
+> 
+> [...]
 
-> Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
-> ---
->  net/bluetooth/lib.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-> index cea21a4c49a0..0f84c397891a 100644
-> --- a/net/bluetooth/lib.c
-> +++ b/net/bluetooth/lib.c
-> @@ -89,6 +89,7 @@ int bt_to_errno(__u16 code)
->                 return ENOMEM;
->
->         case 0x08:
-> +       case 0x3e:
->                 return ETIMEDOUT;
->
->         case 0x09:
->
-> base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
-> --
-> 2.43.0
->
+Here is the summary with links:
+  - [v9,1/8] Bluetooth: hci_qca: Add M.2 Bluetooth device support using pwrseq
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7fea07497112
+  - [v9,2/8] Bluetooth: hci_qca: Rename 'power_ctrl_enabled' to 'bt_en_available'
+    https://git.kernel.org/bluetooth/bluetooth-next/c/139c8e574116
+  - [v9,3/8] Bluetooth: hci_qca: Set 'bt_en_available' from pwrseq controllability
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a9783ebd40da
+  - [v9,4/8] Bluetooth: hci_qca: Embed bt_power in struct qca_serdev
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a482935cee71
+  - [v9,5/8] Bluetooth: hci_qca: Support QCA2066 on M.2 connector via pwrseq
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f6fdb04bfc1e
+  - [v9,6/8] Bluetooth: hci_qca: Flatten struct qca_power into struct qca_serdev
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ca2e671a82f0
+  - [v9,7/8] dt-bindings: connector: pcie-m2-e: Add vendor LGA connector compatible
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d10bd5678905
+  - [v9,8/8] arm64: dts: qcom: monaco-arduino-monza: Add QCA2066 M.2 WiFi/BT support
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ac2cf809626d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
