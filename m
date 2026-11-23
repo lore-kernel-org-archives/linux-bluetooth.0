@@ -1,85 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795451430;
-	b=EuNKuk7Hyn1InFyq4dCLvlEi0+AtXEVkSuxDlbqQv7mqIZHtPv9WIbaBcxWbJ20GcUDT
-	 JO7KHi9aNnf4e2lNRtxVX3qomGlSZxjP8/y4uwSB+Kz1D9P9+rmZ1PGHPN/c6CZUGPy9q
-	 IGiW03Rg7kvX5KKuEUrMgVSHyGY4s443g/wrJ91O4FTIFJj7Bm0isw/QzTzQ8kbpnk07E
-	 px7k9GcgULtBVSW3vIIbuqtsKNrLsS0K5If9q/W2PZWx4MYJ7Hhzqe2VlWiQIcXsg3Bcs
-	 /Uc0Bf3RtSwkyQnshPUXTU7apspr7YoxeObNkI3fB06wgVfty3xOIiNwD2K53FgrfEw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795451430;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795451644;
+	b=x/UOSeRfWkW4DMftGoUgWarXubptgNtCq5Xb685itRefQxL5W4cdwOmLyFwF4Z3xGAi/
+	 lVqOBrBzjAd2SW7Na7bgeRjIEaRGzVgwomtf+Ug8XdWvSaeKGgmfmHKR68s5YkObiaVLD
+	 gEZwkkUSvA5kCQag3MuQMNF7psnl4Ww6sj1Yx1y8hfGE9Ng1Q/DKhej0yZoMdBgM3KUm7
+	 h7cFtzZEdUIQPGiZlQtOdk9/SkpnvN0ZWnFDK4gLQb276aP1xUJ5sbBq+HAq/2lEqLD7i
+	 i4k2q6M2U6QwqcCVKT89KU+QB2Ae+O2kDwgGz46AExxH4VMbFIDLDNQMME2d91paNEw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795451644;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=25lmtpIgQCUpFSTbWmyAJ5jnxhl65ntPcGFJAS3exQE=;
-	b=tap0EOGD2HNH6+ZndWxxzRG6WIwkHiSMeYY6f6LziCbz2G7AK+G9Ti6ilrcnqE14Jd9e
-	 eKGLLtjBR9ibRZjs5HP5UsMrd0DsC0jvwMiZKzJnBv1qe/RVd2hW3yh++UqXU2A8GP0wr
-	 I9ZisgRFvttGabGRVlZSW7HjMT2lCHmIvvmt7pq+a6owZuyLc0gR1YQYz2QKibINpYzCw
-	 qyyGeZFapvJdYy5whZOqpza2ZmKPsu0WYDP2O82oa8WvTAkbKUOD/TOMlUgoBh08VK2L6
-	 6XVfe2hWGhszk5xg47j07vVqnOaWpiaEDPzSgfYgjaC89caz7O77GPmxD/UvXr6G3rg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=streamunlimited.com;
-	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=IaVwEjaT;
-	arc=none smtp.remote-ip=209.85.128.45
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Content-Type;
+	bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
+	b=yLIHtNNZHw8591MVzKdGs4oHEZdoxiWttaDbpdHz/qtgj0JpQ41Pq0U+QFDpGezSC1p6
+	 GwxgEnyzSTiiR7BDHG63XKBE4fuxTZD/E5Rw1j1oLvs+cy6Ltic5+y+p89si7pMsLSnkI
+	 VrziTbmwuUlR1t6hV0Qagd159IBZp/MeFJbwas5scfQaLSVc+qsOHSgsUdaMPNRx443aH
+	 Y5rI+Ahds51fYDT81GBzuF+19L/hqoFdU1o9SP18wJNumRt9eiWUSdZausbC0wURuFLvZ
+	 TfpKB9eD/H50TC0yyzaB6nOEflKr0MexG/gQxpNkm3W2aYi0yloLRSXMC8Zw3zwq2FA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wx+rA5Ps;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.42
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10B6606A31A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:30:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B10B6606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916DE606A32E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 16:34:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 916DE606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=IaVwEjaT
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4bb72b44a97so29807795e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:30:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Wx+rA5Ps
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c50cc7540b7so478565166b.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 08:34:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795451642; cv=none;
+        d=google.com; s=arc-20260327;
+        b=SLjjo5YM9DUjGB91JcKJzfyCplPk+pgGXIarF82vhmhEWbPrVrfUbl7tl3kmtnPcLj
+         0y3eU7AW/PTlD+5iZG1mzZaiDfHJFbEgldv6T3DbUcUCaFJAdk8hQmKK0+KGHXJPaHy1
+         KOBmGocAAyZrvAol/VEscv8kDNn7+ch8JIXiJaziab6sJJdv6Ri5i7ZDYuR67F8tkB9h
+         lbKnDOuXZLmh9qOLdnSB1oNxcabcM5DO9yoJ0BRCfm3MaGE+CLZsAh7UZNR8LogG9pNI
+         fWwz3O9DObpzutRWjxAOM5CyA+7stUQ8OCchiCjVTFGICudvZqBy+JTR2d6lQpphxaKP
+         Ut0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
+        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
+        b=MIQYnV/vhBfzqdqO9uR9wOaRiPzh1KVmfNE6ewUvq/n6yL1EIdQZGMZn6m+d9Fd3kD
+         OkTF7rk2HDa0T3+mOvZ7fFNY3FXhE+eOLRNybEOiTmNqlaxN4tOvlyaHYnN+I2ljwtXj
+         eIsjTl8lDZJunIdT84lxcxgpTw/+ngbNlVW6/YuamPsnvjXxV41ZFzqIZ4JZDGgN/63X
+         WYRrMCVmbDf/iK1bmX4S8CX2I05pa6dNXH349443MNC6Ic8/qNpMSW+746NjU2XCde2U
+         82FwB3/jrn2v84quuMA4rFIE2dldu9mN656GqeRUP6Zs5nUWtnlWmPmzGS3QR29JLqj1
+         +ZSQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795451428; x=1796056228; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=25lmtpIgQCUpFSTbWmyAJ5jnxhl65ntPcGFJAS3exQE=;
-        b=IaVwEjaTPZnUfI7aiUB45B9vU/0G8ky1uu60112FcHvapJDUA+sQdTZFNC4qy0K3jD
-         oEl+dLxveD9yT4oDHSrIg06J9nTrJsDYaVEX4AtQ2QNgyJkfxJy4K9oZaohKBIviBsry
-         wGs4A1a0hLZDZfoc6DA9hGpAyvOPdFQZIDT1o=
+        d=gmail.com; s=20260707; t=1795451642; x=1796056442; darn=vger.kernel.org;
+        h=content-type:to:subject:message-id:date:from:mime-version:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
+        b=Wx+rA5Psr9fnSVwhsUbvrft1OFL4a9dAZw3NxUlwzgIvXEF4JLgRISNrJyWSbSFzZO
+         cjpVR6hyjCyq+XYLIxBXv+kh3MAcn+bxaGJhk1PzNM6MoMSz8UXDCgGU0ScBbCPOvmel
+         vDM1rMW9bKlkU0pNM/Ob0PEM6xSPZv3Srk5n32omnAyZXD9+q3XWx/cLgqghWijBlkcm
+         ijHUxVJE9C6se488idIiYhuB9iMrMJE7mIpBLDfwYNkGuGKsfENqfgBEx7pF5dpUlpn8
+         cN6Bcsp/Ng/Z6uDTAA2Wpn+DvSPC5plZJvJ+9+KhQ6/AB9ufBYSrM8sdht5zRsqxgDnl
+         4U4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795451428; x=1796056228;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=25lmtpIgQCUpFSTbWmyAJ5jnxhl65ntPcGFJAS3exQE=;
-        b=HJbcyEdf14fRbBUgs7o6lYjVirh9C7rJdveyQcHzwX0qrmMrXGWDtumtpdpf1/CzRI
-         lVGwgDbKmeOV6+BEHO0g8kEBdAqnMBSR2KZJqs+pmIoWlzWpXcEbcv1ncRr8DLk4tFpN
-         fJrPGEsSTB363zYgpQNdDT2TRYtW8OOXonGxkkepCp1ih3BFXgy0sfDB3QP6yLbz8Ea7
-         wGz2B7MhOYF2hsCdvpqkTCEu8cbYYVXU5biQglcoUTPNru+WTYsVeNMpSQ46XBcCqBCn
-         xOApEf7INA+6nQff+0c9NX48wZWCgbgbuPOBSOy8nJtwCTPvGrANNTsQFtmINOvBe+Po
-         NluQ==
-X-Gm-Message-State: APuU4Z+2HofN9mP6JsUupQu4/m8b4Q0H6viXJ9DZ//CtaFf56Z66H8wT
-	c5YeVgaDLUykelFRPxHwhN1GehMX828MiIPj4uGntE5+hmZefJr4/mMUFgYcO0Fnb2SS20KsXgc
-	tFSED
-X-Gm-Gg: AZFdTZf/aML6c7Nepw+zThZzAxwqdg2EDl9gxtszDpHzeiAb8j13xDZ9QoJMweDHCC3
-	47VIyy3z5LVrTx3sjfQcF2F1XKAAlbDPBKBzoPiKPOa/HkJ4RoMB9Ws1NLOA5hqa9Sdqc643z7U
-	pUma6UmZOlRaSbBmpkJWjIZ24kTFEfk2hgbUKVbJiK+OIioAHOvlIDAmdxI8jc6gwjAu9jOw/Y/
-	ANLq7hrrlTrm3Be+ZtJ2A8v8J1iHSh9r7HO0VhUgewZU/MHCJw26j+vlu8quxd39YY+OwKAuigg
-	XYDuN3GOEolbbm9HB90cR2wcUiurzSkdpLRTnZb0HN+HPLHIx6DG0wueCquM325tvOmoTTwV0h0
-	JHLtlAmCEOe46b2CHDq7oLg3ehzvZc+dA/gH8yVwbE+6cBCVkQ7wUeXpmavp67w/FNMEiy92LP6
-	Zv4sGdeQGwaxHMSIscXfxd/oWCUeiRvwgZGhmfnlaIF4CpsmHecMX+FyhQ8CxBO3TrZ8btSXge4
-	ZBG8UclCtPsO5fuGI732EvzTvEQa4hShoukvuvYCKnQXLwWVFOD2FEdQk64swCQaHtZKnM8ivrA
-	gqO4rQpv7KVsmnLbiTHUKVN42xKcsTfJEDRJWt9LuKx73Kv88YztliwjeLQQeLUL7xghy+Q=
-X-Received: by 2002:a05:600c:c8c:b0:4b7:6942:39bd with SMTP id 5b1f17b1804b1-4bb88820e06mr243945915e9.26.1795451427900;
-        Mon, 23 Nov 2026 08:30:27 -0800 (PST)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6bc8ce06sm22589169f8f.47.2026.11.23.08.30.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 08:30:27 -0800 (PST)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v2] bap: Reset broadcast source stream when ISO io is lost
-Date: Mon, 23 Nov 2026 17:30:21 +0100
-Message-ID: <20261123163021.391908-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1795451642; x=1796056442;
+        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AzKiAkOTTHX2gLj91Zr3SVsYjr5iGJFZNzEcUAwvW98=;
+        b=nD3TIyKS5ijHx/k/2Vf/C7s0y7V8pIxXGE7NHTuPYfd+vKtkHRWQgdSubbn81hKCE2
+         BK1fNanOkU61smQU9VpJm3VcJS9HNBurWJBa1Q49Pj+O7TxxmlZ8u2Pihy7bQKgmf+0L
+         sS2VXOukoU4fFF8Haoe75ELiiyfD9mwIAvzTj8LU2DmI3cB5cBYiLaoZ0qJdFysXpYWI
+         93icQPJY+yHBcPH6VbZnGRBpe0fPk287QMdHzbmycGiCv/vhVzRIfX/0gLTw1BIZLgy/
+         3jofyeNWlUnQR2pia0uob08Pk2uoAvM+TN3c7MsPl/ACGGP8B6KmuQT9N5HVV/5cKlyN
+         3EdQ==
+X-Gm-Message-State: APuU4Z9inaCS15bJ3sYC5eygiaCIegHVbS7dUPOj1ODwt8e29u+eGYe7
+	PIpM2ZapwDoon6HTmKA0aIuGluveTPO5ULREr66Yyq/OrdyaNFHqR7BSIALM8U0BXOOtV2dYKkj
+	hrpCYysqYjEi8/g20u5kb9yD4smNSjgwU4Vkl
+X-Gm-Gg: AZFdTZdJNm1jEVbsKnYRnUo8eIrpJlyaPvP9TgLPTnchIj0aLiVSohE3mjHYbcgd5AV
+	4zelgmDNhEwD8TbdRsz2EGvNWHzKugjbO8R36RSNCoU4tLGhhd0ygXqddKjHp/I1BkSXGKOpIhS
+	p6k57H5bovXyVs7EDTNzkQ5J8pu5951Nk7eTwv0cfXO3OiJ8fqxP/PNYzafI9JrJIRTgX4R6iS2
+	4/hqF8HsV+ZepORc/yxMB0YgdgjdnQ/oWVOwIA/Lul9BX2YQyhFkK25fd9A4DjyOs4pc2YnP76J
+	323g80jJaCSqXEriDll0yKR4SDY29eYIDvIQwQpUrtlE+dQ0hQTNYGCjRMDDGhf6IxhjqBYdhtK
+	AVASwSqe/O7n5L6jsggG+HrM+GrPTx2Eh8A==
+X-Received: by 2002:a17:907:a88f:b0:c46:d493:501a with SMTP id
+ a640c23a62f3a-c513a8410d9mr1057622866b.22.1795451641708; Mon, 23 Nov 2026
+ 08:34:01 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -89,51 +99,87 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Sandeep Datta <datta.sandeep@gmail.com>
+Date: Mon, 23 Nov 2026 22:03:49 +0530
+X-Gm-Features: Aa3M54qkXXCOBbHEBYyQXcWQRxtyLx1Dd6MQqgiqg1iaj5QFTldYHZ9rWM1Y570
+Message-ID: <CABMMkDOX1Q92yq98+Jhr9D+VgrC128bcY13cvA-KhC5r6x5ZNA@mail.gmail.com>
+Subject: Incoming BR/EDR ACL links never get EDR packet types; A2DP stutters
+ (MediaTek MT7922 0e8d:e025)
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-When a broadcast source transport is released while its ISO connect is
-in flight, the late callback still moves the stream to STREAMING and
-the io closes right after. Nothing resets the stream, so every later
-Acquire() fails with "Request Acquire Reply Input/output error" and the
-broadcast shows as active with no BIG on air, until bluetoothd
-restarts.
+Hi,
 
-Move such a stream back to CONFIG.
+Note: this report was written with an AI assistant (Claude), which also did
+the btmon analysis. I ran the tests on my hardware and confirmed the results
+(the manual packet-type change fixed the stutter), but please treat the
+kernel-code statement below as unverified.
 
-Steps to reproduce:
-1. Start and stop a broadcast source (a PipeWire BAP broadcast sink
-   node) a few times in quick succession.
-2. The broadcast shows as active, but nothing is on air, and stopping
-   and starting it again doesn't help until bluetoothd restarts.
+A2DP to a neckband headset stutters badly when the headset opens the ACL
+link (its normal auto-connect at power-on), and is perfect when the host
+opens the link. The difference is the packet types the link may use.
 
-Assisted-by: Claude:claude-opus-5-5
----
-Changes in v2:
-- whitespace change
+Setup
+  Kernel 7.0.0-43-generic (Ubuntu), BlueZ 5.72,
+  PipeWire 1.0.5 / WirePlumber 0.4.17
+  Controller: MediaTek 0e8d:e025 (btusb, btmtk), BT 5.x
+  Remote: "Harmonics Z7" neckband earbuds; LMP features include
+          EDR ACL 2 Mbps,
+          3- and 5-slot EDR ACL; no 3 Mbps
+  A2DP SBC 48 kHz joint stereo, bitpool 2..38, identical in both cases
 
- profiles/audio/bap.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Outgoing link (host-initiated, good)
+  < HCI Command: Create Connection (0x01|0x0005)
+          Packet type: 0xcc18   (DM1 DH1 DM3 DH3 DM5 DH5, EDR not excluded)
+  > HCI Event: Connect Complete (0x03)  Status: Success
+  > HCI Event: Max Slots Change (0x1b)  Max slots: 5
+  > HCI Event: Connection Packet Type Changed (0x1d)
+          Status: Success   Packet type: 0xee1c
+          (2-DH1/3/5 allowed, 3-DH* not, BR DM/DH 1/3/5 allowed)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 457ba5de8..3864e1722 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -2919,6 +2919,13 @@ static void setup_io_disconnected(int cond, void *user_data)
- 
- 	setup_io_close(setup, NULL);
- 
-+	if (bt_bap_pac_get_type(setup->ep->lpac) == BT_BAP_BCAST_SOURCE &&
-+			bt_bap_stream_get_state(setup->stream) ==
-+					BT_BAP_STREAM_STATE_STREAMING) {
-+		DBG("stream %p: io lost while streaming", setup->stream);
-+		bt_bap_stream_disable(setup->stream, false, NULL, NULL);
-+	}
-+
- 	bap_update_cigs(setup->ep->data);
- }
- 
+Incoming link (remote-initiated, bad)
+  > HCI Event: Connect Request (0x04)
+  < HCI Command: Accept Connection Request (0x01|0x0009)  Role: Central
+  > HCI Event: Role Change (0x12)  Role: Central
+  > HCI Event: Connect Complete (0x03)  Status: Success
+  > HCI Event: Max Slots Change (0x1b)  Max slots: 5
+  (no Change Connection Packet Type from the host, no 0x1d event)
 
-base-commit: 1adfe662efeff12997df9ddd0960dbd0de9c8ea7
--- 
-2.43.0
+A2DP media on each link, same stream, from btmon's Number of Completed
+Packets latency and the TX timestamps of the media channel:
 
+                                incoming link      outgoing link
+  TX completion latency median  385 ms             14 ms
+                        p95     677 ms             47 ms
+                        max     912 ms             75 ms
+  media packets/s               ~19 (gaps <=480ms)  ~54 (steady ~19 ms)
+
+Test: on a stuttering incoming link, sending by hand
+
+  hcitool cmd 0x01 0x000f <handle lo> <handle hi> 0x18 0xcc
+
+(Change Connection Packet Type, same 0xcc18 mask the kernel uses for
+outgoing connections) returns Command Status success and a 0x1d event with
+0xee1c, and the stutter stops immediately with no reconnect. Doing this on
+every incoming ACL Connection Complete (small userspace daemon on a raw HCI
+socket) fixes the problem completely.
+
+As far as I can tell, hci_conn_complete_evt() only sends Change Connection
+Packet Type for incoming links when hdev->hci_ver < BLUETOOTH_VER_2_0, so on
+modern controllers incoming links are left with whatever packet types the
+controller picks by default, and this controller apparently doesn't enable
+EDR there.
+
+Questions:
+  1. Is the host expected to set packet types on incoming links, or should
+     the controller allow all supported types by default (i.e. is this a
+     MediaTek firmware issue)?
+  2. If the former, would dropping the hci_ver < 2.0 condition (always
+     sending Change Connection Packet Type with conn->pkt_type for incoming
+     ACL links) be acceptable? I can test a patch on this hardware.
+
+I have a full btsnoop capture of both cases and can share the relevant parts
+(link keys redacted) on request.
+
+Thanks
+Sandeep Datta
