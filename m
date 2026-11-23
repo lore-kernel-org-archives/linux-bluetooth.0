@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795461011;
-	b=CE1CPglmDeFy7JM2fxDm7XI7EIxzG/oojV7FVWceeVzl7cFaIl0Lata2l+oZmRtvocQ9
-	 wKBc58dZ4q/CPvMziyG1EG7eYehhIM9ElIesI1T4GwkWSCwFIa3WPlZQ7Dudi7kMAW5pN
-	 VXM4aYEmWK5LuwO8JxtBEX67FxyFX+HomvFi/ojy7d5hzSLxMXQOu1Q7WRbggA2lf7MF1
-	 a9AY+kCm8bCxv9WCkRpWTpg9DOZ8B+XUp3EYpa4sQw+Svrie58Q8uXL90QgMkO4mH+FD/
-	 2dCv4Pc3JGqJxZt+6GPbalapTJylEFrXER3Y9q4/3/5IZJQCaixXTVsI4Se6+5cY2xA==
+	t=1795461012;
+	b=IP7OF/OH8XCnktKoYerlrjcM6iHT1Ab5Tg839lRN/KrWEJmcfgJ94ALmkvQy2kKxAlIj
+	 /g2g5yooMyPnxWaZK/AQHWb0YIRKVJ0KJ8rgU272xNGorEAFxjM175bm8LGMcLZGueq2F
+	 wSaxVIR1TL2zS4suu0NqcVyIfstbbxsJCIr8q5uy80asXy3vtou+QVxYWX3FqI+D5hvHp
+	 9SAJbT93zSCly5tfW7XjibKOMFSjPZ5gpWZeKtBszndfdAIPviN0HwIUISyDzvMzI6pEv
+	 5LpfjZmS6+bQYjTLRDpji+idOtfhC6B5mkGoQknhWjeHlOtvlf1TOKg20GHGFdLcnPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795461011;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795461012;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=1gznRcXRUYP2iIIohO8gtElTV/7IDbBcPS1AKp7XNfk=;
-	b=O/SsGBihq3cNHil3pipVttWCtYn5A65tzbRhs31y+F4KWi6G/AHgKl0iIm7EDOGn4myE
-	 KGP+ir4KZzM8mnPbhMCQwtppEkTYABFibq+ftC2hwUJYBSvg6/a+cw7Rx24Wdy+P+rmdj
-	 /yIhI2EX+h/DZLlEWvQjJzwNDihd/zl/xf0ovQ0sBc3G11wUhWZ5879AsbwsCdpNpzilM
-	 bKgpCokg9Bde67TxLM/0c0R/CYcYcl8f0MZHCbn47AtainCwUOs46G38CJF6UHkccaprM
-	 KPqlNhLhhDXZhKziOXdgbSFVb/I5xE7Cfdczv30KRYkrjSnvQtBR5ndUXxZfe21jY4w==
+	bh=3dFdAOJw6LgKjKdtdO9qeTBR8PDXj1lmZyWllPmEF4Q=;
+	b=5hsrLCqsU+G22+tWWOEvAEYuRT5JV3t+u9O2TPMaXTG850tWNfsC30+E8clvm5Rr1hoq
+	 Q7Q4eH9AEr10RxGiE8H2mASR0noTVsCN94yTYJoH1waLtq94kqCngqvQ+LoOpiBpUAcKi
+	 MSKkYgYHrn1Oak94DPzQBaJ5+QrSPRniGgxFIMjYpXYBr7pWiW/Q2cM+R2RrN6OrlqDBN
+	 fhEuySBCCCv7RBnWY/ZDYbPw9Bh52YBzajBI6+x3RTURiiP/K8srKtCigwoa08pOZT43g
+	 hJw3yQuReqGzhhZuqXsBn/xkdsQSUtBGeorkaS7QhRt2Q7B6ATRsglbOtIK/AsCjFLA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GYrZBeNY;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GimilVR8;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3588E606A336
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEAE606A331
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GYrZBeNY
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD5F91F000C0;
-	Mon, 23 Nov 2026 19:10:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GimilVR8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 446F71F00A19;
+	Mon, 23 Nov 2026 19:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795461010;
-	bh=1gznRcXRUYP2iIIohO8gtElTV/7IDbBcPS1AKp7XNfk=;
+	s=k20260515; t=1795461012;
+	bh=3dFdAOJw6LgKjKdtdO9qeTBR8PDXj1lmZyWllPmEF4Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=GYrZBeNYdLeChKn4s6pzw69bYZM1ZXsBWfpr8xEIIBuRlgXdjq+EDNqlyBls+w3tt
-	 rCxskA9lHJUtV3ZkCuTbaSjVeP76j0e+802grolKx2TdC/3CK/8RdKoMRbsnO08rZV
-	 W/T3Y9bZm5Zk2vVXfPdFTfkQPISbRHJeyJpo7YXK5/Z92bec4r67xeRQeNIlU2xaZZ
-	 zgYUM/GTim8S51xtzrKdrtVByq21Oj4H1gOMhR0iCeBh8GN3O8UMQ678ovvne63k2Y
-	 6Kn3Y8wToumvv+jaQn9QOIx9tzObGtYeUTiNpOD3+YKwfyC3HBV0scOHAE4hQIRTTY
-	 DXo6l0DDjbtAw==
+	b=GimilVR8L4ZuCJMhBHqz5FYU13+ed9QCO+2cTkD30XO865RpxsVDYgdJ6EmbT6V4J
+	 dmoLG5JdZAYRwsADG6YdTxq/cKIHgpaN4/O5nS9RZouoFrqCpsVGibivW8pVHJKbxV
+	 6nUap04izClYnNXlf0yf8MEOBk6Fi1cM9Nkv7oAc+WQHGZABPQZGS3u+0nHXHCfwFM
+	 iYIT9lG/J4JhCUAwJ2Rs72V9Lihb8HrG232A3K90xUf6lQhhAC3rFFVFJfcgIXypl1
+	 2vKVQPXqxY1eioZjSr0+geAsaxRtARTUNcuVvkEtxZgTQcs6xW+ttF2LwL5WSm0LE5
+	 B8e6F+MT7lcbw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4445392EE35;
-	Mon, 23 Nov 2026 19:10:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A2D8392EE35;
+	Mon, 23 Nov 2026 19:10:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,15 +54,15 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_h4: Ignore the RFU bits of the ISO data
- load
- length
+Subject: Re: [PATCH] Bluetooth: hci_sync: Write the default page timeout to
+ the
+ controller
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179546100927.3063022.13155835076768217377.git-patchwork-notify@kernel.org>
-Date: Mon, 23 Nov 2026 19:10:09 +0000
-References: <20261122155208.1549223-1-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20261122155208.1549223-1-simon.mikuda@streamunlimited.com>
+ <179546101076.3063022.1483348650610357584.git-patchwork-notify@kernel.org>
+Date: Mon, 23 Nov 2026 19:10:10 +0000
+References: <20261122153450.1532145-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20261122153450.1532145-1-simon.mikuda@streamunlimited.com>
 To: Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
 
@@ -71,19 +71,20 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 22 Nov 2026 16:52:08 +0100 you wrote:
-> The length in an ISO data packet header has 14 bits and 2 RFU bits, but
-> h4_recv_skb() reads all 16. Some controllers, for example an NXP one,
-> set the RFU bits in the first ISO packets after a BIG sync, so the
-> packet is rejected and the rest of the receive buffer is lost. If that
-> holds the Command Complete of the second LE Setup ISO Data Path, the
-> second BIS never gets ready and its channel stays silent.
+On Sun, 22 Nov 2026 16:34:50 +0100 you wrote:
+> MGMT Set Default System Configuration takes a page timeout (0x0007),
+> and Read Default System Configuration reports it back, but nothing
+> sends it to the controller: HCI_OP_WRITE_PG_TIMEOUT is defined and
+> never used. BlueZ's PageTimeout in main.conf therefore has no effect,
+> and the controller pages for its default 5.12 s. A page sent without a
+> clock offset can need longer than that, so connecting to a device fails
+> with a page timeout that a longer setting was meant to avoid.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_h4: Ignore the RFU bits of the ISO data load length
-    https://git.kernel.org/bluetooth/bluetooth-next/c/59d19fc7eced
+  - Bluetooth: hci_sync: Write the default page timeout to the controller
+    https://git.kernel.org/bluetooth/bluetooth-next/c/807f90650d22
 
 You are awesome, thank you!
 -- 
