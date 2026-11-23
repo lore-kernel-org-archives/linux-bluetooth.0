@@ -1,78 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795415724;
-	b=R7RB7s/Pf8j9phLZWjBWCLPK9j9gd1FPh7uSU/XthEPivoeHP+mEak5+g15TvugTYXpD
-	 8LJo0u9G4O75RAWWkHT4nqVZlqjV5/gg3mSPwbknfjp2L2ZdcYwo5KOMMh8Edu5ap98tC
-	 KJs8xcZVlLasUzZKhhRf9m4hqvPCLB3FUa7FLWoQ5DcmD7ItAoG/pcCwJOAIxjbxOytHu
-	 6xhaxOPz4/NDH/2PfOsUiOGNIwOUArqM3wm3EClwgZjZhrbU/1bJavW7j8T1qtwLq6J2s
-	 Lc3jeowezXZBtwoOl0BsYOgxy9NpfZf/GwWN4r51EDmTYqjECRkN+icYjT+RttvF29g==
+	t=1795425920;
+	b=cPi+ccjv2GIj+m7fd45XeCeDwGYEmpDQxdMENkQI0x0QO5pNaUPuw/5xVU5fxAJymS/K
+	 R7PxCCe0upiPoa+0OA5MnSgFhjaI3j/xAvkPTfs5NCxdzuf4V0RyBe8ovf1cLFtE4F7dX
+	 Zo9zUcwLj1KMy3tp6mphMc/BQfts8ZrfRtDf2ks992Vo60j+NQd+cdEvHHKv8e94yO8dK
+	 nnzaD5+JjePDjKtmnepneRgkl188ZHluVluXcLYPtcBWBjjeUrVNbKgrWJw2iDNCCceWN
+	 qB/XZghbJhkG1BnRSq7ImGW0eubkwOajuqvTCcgqQWzggcZYJjN7Gt3dPCmPBR4vJuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795415724;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=DPUMvnBMfymSZYzX/NzoGlsYJ3farPsLNDSOZJLNOR4=;
-	b=SiwiLICpSPPwp3jHOZ+mnHq1e0neMlWzTDiak5ebVjRaojWndNCvbwuOzewVRvmvz35c
-	 WPrdTSgKS8lteTXwopLwb/hBYdu3uDkEb9S/urJHXOzzWC8Pmucr2axB3pb9IO1G3lw0m
-	 8xbtjYeZ1pWULZFl5H2ctC0ON+8SUF5Qs5RzLDMNXybgiPyu/pVcD5CU5MFm3RlrOeN/8
-	 o0GxXCLLbFsSK2MoHH93lajSvq6Kk1v+B1pmtoT3SUbiRlXBLHEXxjD86xj8FoAYBsLZf
-	 q9/aSV1FDEiK6RQL2c8f0Wbe3F3dWAIaEdSlcEdhGHEtdmdp+pNPQC1RPdVhASQWjSA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795425920;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=SouaPJ9Vaz0OO59zLnVz9up+Kde5MYxluRvOXTlywj4=;
+	b=IiyZ9+/soC47kUW+AyRMvOz1TSIBU8J/Wan1bCTsyaAHaVCCTAG4/RAIZFbVQKsoNGJz
+	 A/dnkZoIzZKAiZ9oa/oeaOBFuvd0szNrOGiCbXK6Wo9QweJDSXAWRKtaDOQjrAe5VoW1l
+	 3i7Dfo7dRZpAsFciEN+O9usWvs8AIyj99cj+KMzrBkL0ka0aBKb8KzDPu9SYsxwpbRq64
+	 i/2CT9ODR9nDlPl97zYgz9dXIE0RsxGHhsbuMOlg6WA/gEpBik2GxmUpkbBRiVvAGuzsY
+	 tBNo2tHaDzqX8i3CnboHFHNzh2GNiFrmzsI7bCjqToeZzWR7Bxjx5YacvQQefd+Njzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=X49Of7Nh;
-	arc=none smtp.remote-ip=192.198.163.19
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=uZHmgd3g;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C00606A31A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 06:35:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61C00606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0B9606A31E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 09:25:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6A0B9606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=X49Of7Nh
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795415725; x=1826951725;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y8r4rZTyvasttV9sPzeJkC1Id14OJpexpfzXtGNjQnw=;
-  b=X49Of7NhAWIwFPSH0do7ZNbW86miXnCF1OXeKMBf2L+RfS3VaOVow2kc
-   dQ0MFjOT6Z4wKbrrShHG+FnRPN9lWezl2emsvcEt2a0KJeyTw97N5Lt+h
-   Zna8iWVa9ZkVHfHwqycL/tEa/CQiEyyQEOUHNDyPQ+GTqHqdTZIdwn27t
-   y+w6qMmS0yVtTvLF9/Sy1dmktEJTJMDeF/2px710ELxsxooSNvHKphN/3
-   uOo7M2n8/ezHzjSembU3n+Gowr9xZ2FL69vZMA9dSKYMekogonOSHUT05
-   6eWXrGwUjJZXnguGnlwNKWGyK8C9Dp0QRPrySOvFfelcgjZNJt3PxQ6hF
-   w==;
-X-CSE-ConnectionGUID: oprg/LfdRMiGA4PwZAbKOg==
-X-CSE-MsgGUID: AnxWpmF9T1OrL7hRfVYEPQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11974"; a="4316350"
-X-IronPort-AV: E=Sophos;i="6.27,227,1787036400"; 
-   d="scan'208";a="4316350"
-Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2026 22:35:24 -0800
-X-CSE-ConnectionGUID: jWVJAoIuQ4e9rLnD9NqkMg==
-X-CSE-MsgGUID: A9IqsVYfTxOr//EFAItxQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,227,1787036400"; 
-   d="scan'208";a="12925790"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa012.fm.intel.com with ESMTP; 22 Nov 2026 22:35:23 -0800
-From: Kiran K <kiran.k@intel.com>
+	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=uZHmgd3g
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4ba013938d7so27550585e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 01:25:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1795425918; x=1796030718; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=SouaPJ9Vaz0OO59zLnVz9up+Kde5MYxluRvOXTlywj4=;
+        b=uZHmgd3gSMW1RYFB3vkZ2AO2BLdyiTGbCgeN9M1UbTLkKPJBiweOTOOgospG2RHdrF
+         xmtgzBfS6Msscl/DArBJTMSHlxXDMJ50GCVMi70koG4FFGgWJC4Jhe5eA5AzUUV83X0Z
+         RSToxfJvmu0kWd04FSl5APA9x7W2OSZeiluaY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795425918; x=1796030718;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=SouaPJ9Vaz0OO59zLnVz9up+Kde5MYxluRvOXTlywj4=;
+        b=VlyUNZct9NI6JbD2CAW/1Is1wRkRAJJsIMbhyFLIYNf/ERbtOLQT89IzwfcDQWQ/YU
+         odkr1wNjOP3pqU8K5Uk+JvWHnS9HNjYiCiqzbxAB8zypnQzGvb/0TJnTFrYUXTkNTO0F
+         UqFtWVy+P8h5W4YarlIu+5eB/MQl2EphWQxDidHQ62MIy2OOrz5CwtXou7q7N01+Mnm5
+         kNrj++WoPnkMH3OwX4NC3RJVPSVQ5nIfIQG0CSciXxGW+GxlmUT6NPA9cFvAgboJ0vhb
+         oGVfUSSUA2fw0WVwrihT02s/E4kGmdPvdUy7iApVfQu9DBhLqgXhhFO6Nq6alcuGKUry
+         mKGQ==
+X-Gm-Message-State: APuU4Z8444dp8Af0fbliyKB0trfkWcPxazq/N1N+kzSMDI049SwEZWMw
+	uFKzjsGQhjoDcz0OzfvibMNRa4DF4cbwOvxgskPJrrrqOxX6S5txXU8JiwMP1iHRDO/L1dxnzpz
+	wRwSv
+X-Gm-Gg: AZFdTZfF1XfO4pn1hdVDFgoUGDwI/BrOyu32oV3ksLi1bOiHK1SOWpXiJFtWdL7x5CY
+	JhnZLU+h2GsxSnP1r4sV0liWrRnCD3IpLvID1z/HBUg+XwGnvYIFrWsOutRyMLEHmWfQf4J2gs4
+	jJV0FgnfpupugJCbxRhZygSdgkC9FRePhvyaRRAQgpYfLa8b5thhG35yrwIynnBfo6rNgvZJ+AP
+	ef4cAeDwgc/HhzskOk0JvKR5QMmOrsbUAzGpzeZHJ9zk54KMFoBpEWVNA1s8+cWNGiCn5KkpCOl
+	Poj+Zphi8NaIla+qDY9fAb2Rz2WkoWJwowARhbNGqsjJyw8xmygctZmx1wOGpRba5S+8j06ElNu
+	ec22KPudsgZWoNZrdhrIEy9aKSFuna8ZBdMQqyf6tHf2r7Jab8S977TWzY7JiMFvdKXvFBDldmF
+	PFBHcjcScDWZvYz9pYYnoeRhn/DsJoc6oSEBidBCqtKA6uRszsL0yXY0JT2xVGi8F6cqZnBc1t3
+	phKlk8r2YMQ5RoleOdzWk58A7bZSfB9ELsmZ1AmxxRDHV03boF/RJ2geT51V3CNh5BSdv9l9P9Y
+	tyEZ1+MVD+VxBKqRrDWWmKBdt+cAtsmMlCwpJL9g+rGSfBaH
+X-Received: by 2002:a05:600c:8287:b0:4a1:6992:f861 with SMTP id 5b1f17b1804b1-4bb887e064dmr232155635e9.1.1795425917538;
+        Mon, 23 Nov 2026 01:25:17 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:4fbf:a0ba:28e9:473])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849247asm333751695e9.7.2026.11.23.01.25.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 01:25:17 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	ravindra@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 3/3] Bluetooth: btintel_pcie: Serialize MAC access requests
-Date: Mon, 23 Nov 2026 12:25:23 +0530
-Message-ID: <20261123065523.2769017-3-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261123065523.2769017-1-kiran.k@intel.com>
-References: <20261123065523.2769017-1-kiran.k@intel.com>
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH v3] Bluetooth: hci_sync: Don't enable instance 0 on Set Connectable
+Date: Mon, 23 Nov 2026 10:25:10 +0100
+Message-ID: <20261123092510.4085202-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -84,121 +93,89 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MAC_ACCESS_REQ is requested and released with an unlocked
-read-modify-write of FUNC_CTRL. The YoYo config set path and the dump
-workqueue (device memory read and trace dump) can run it concurrently.
-One path can then release MAC_ACCESS_REQ while another is still
-accessing the target, or their FUNC_CTRL updates can overwrite each
-other.
+hci_update_connectable_sync() restarts the advertising of
+hdev->cur_adv_instance whenever the Advertising setting is on or an
+advertising instance exists. cur_adv_instance can be 0 while instances
+exist, for example after the current instance was removed while another
+one keeps advertising. On a controller with extended advertising, Set
+Connectable then sets up and enables advertising set 0x00, the set of
+the Advertising setting, although that setting is off.
 
-Hold a new mac_access_lock across the whole request, access and release
-sequence in these users. Also release MAC_ACCESS_REQ when the request
-fails, so a timed-out request is not left set.
+Steps to reproduce, after a boot, on a controller with extended
+advertising:
 
-Fixes: 68e0925f16c0 ("Bluetooth: btintel_pcie: Add yoyo support for config set TLV")
-Assisted-by: Copilot:claude-sonnet-5.5
-Signed-off-by: Kiran K <kiran.k@intel.com>
+  btmgmt advertising off
+  btmgmt connectable off
+  btmgmt add-adv -d 06097465737431 1
+  btmgmt add-adv -d 06097465737432 2
+  btmgmt rm-adv 2
+  btmgmt connectable on
+
+btmon of the last step:
+
+  @ MGMT Command: Set Connectable (0x0007) plen 1
+          Connectable: Enabled (0x01)
+  [...]
+  < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036)
+          Handle: 0x00
+          Properties: 0x0013
+            Connectable
+            Scannable
+            Use legacy advertising PDUs: ADV_IND
+  [...]
+  < HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 6
+          Extended advertising: Enabled (0x01)
+          Number of sets: 1 (0x01)
+          Entry 0
+            Handle: 0x00
+            Duration: 0 ms (0x00)
+            Max ext adv events: 0
+  > HCI Event: Command Complete (0x0e) plen 4
+        LE Set Extended Advertising Enable (0x08|0x0039) ncmd 1
+          Status: Success (0x00)
+
+To fix this we will also check that cur_adv_instance is not 0, because
+that indicates that no added instance is the current one: instance 0
+is the one of the Advertising setting, and with that setting off there
+is nothing to restart.
+
+Fixes: de181e887ac2 ("Bluetooth: Impmlement extended adv enable")
+Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- drivers/bluetooth/btintel_pcie.c | 15 ++++++++++++++-
- drivers/bluetooth/btintel_pcie.h |  4 ++++
- 2 files changed, 18 insertions(+), 1 deletion(-)
+Changes in v3:
+- The !list_empty(&hdev->adv_instances) check is kept next to the new
+  one. v2 dropped it: with cur_adv_instance naming an instance removed
+  during a peripheral connection, Set Connectable then failed with
+  Invalid Parameters on an extended advertising controller and enabled
+  advertising on a legacy one.
+- Commit message: steps and trace are from a run on hardware
+  (RPi5 with Intel BE200), on a kernel built from bluetooth-next (7.3-rc2)
+  plus patches of ours that are not upstream. I test it against other devices
+  StreamKits (Synaptics, Realtek, NXP controllers - but kernel is not latest)
+- Missing in the v2 changelog: v1 failed six mgmt-tester cases in CI,
+  the "Add (Ext) Advertising - Success ... (Connectable -> on/off)" ones.
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 75f1724336ae..3b2c8bbb36e9 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1035,6 +1035,7 @@ btintel_pcie_apply_yoyo_config_sets(struct btintel_pcie_data *data,
+v2: https://lore.kernel.org/linux-bluetooth/20261122191904.2261177-1-simon.mikuda@streamunlimited.com/
+v1: https://lore.kernel.org/linux-bluetooth/20261122145428.1499940-1-simon.mikuda@streamunlimited.com/
+
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 638589f77081..9896917c973b 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -6649,7 +6649,7 @@ int hci_update_connectable_sync(struct hci_dev *hdev)
  
- 		if (config_set->config_set_type == BTINTEL_PCIE_CFGSET_PERIPH_MAC ||
- 		    config_set->config_set_type == BTINTEL_PCIE_CFGSET_DEVICE_MEM) {
-+			mutex_lock(&data->mac_access_lock);
- 			ret = btintel_pcie_get_mac_access(data);
- 			if (ret) {
- 				BT_WARN("YoYo: MAC access failed for config set (%d), skipping",
-@@ -1044,6 +1045,7 @@ btintel_pcie_apply_yoyo_config_sets(struct btintel_pcie_data *data,
- 				 * request bit is not leaked.
- 				 */
- 				btintel_pcie_release_mac_access(data);
-+				mutex_unlock(&data->mac_access_lock);
- 				continue;
- 			}
- 		}
-@@ -1104,8 +1106,10 @@ btintel_pcie_apply_yoyo_config_sets(struct btintel_pcie_data *data,
- 		}
- 
- 		if (config_set->config_set_type == BTINTEL_PCIE_CFGSET_PERIPH_MAC ||
--		    config_set->config_set_type == BTINTEL_PCIE_CFGSET_DEVICE_MEM)
-+		    config_set->config_set_type == BTINTEL_PCIE_CFGSET_DEVICE_MEM) {
- 			btintel_pcie_release_mac_access(data);
-+			mutex_unlock(&data->mac_access_lock);
-+		}
- 	}
- }
- 
-@@ -1752,15 +1756,19 @@ static void btintel_pcie_dump_traces(struct hci_dev *hdev)
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 	int ret;
- 
-+	mutex_lock(&data->mac_access_lock);
- 	ret = btintel_pcie_get_mac_access(data);
- 	if (ret) {
- 		bt_dev_err(hdev, "Failed to get mac access: (%d)", ret);
-+		btintel_pcie_release_mac_access(data);
-+		mutex_unlock(&data->mac_access_lock);
- 		return;
- 	}
- 
- 	ret = btintel_pcie_read_debug_regions(data);
- 
- 	btintel_pcie_release_mac_access(data);
-+	mutex_unlock(&data->mac_access_lock);
- 
- 	if (ret)
- 		bt_dev_err(hdev, "Failed to dump traces: (%d)", ret);
-@@ -1884,9 +1892,12 @@ static int btintel_pcie_read_device_mem(struct btintel_pcie_data *data,
- 	u32 *val = buf;
- 
- 	/* Get device mac access */
-+	mutex_lock(&data->mac_access_lock);
- 	err = btintel_pcie_get_mac_access(data);
- 	if (err) {
- 		bt_dev_err(data->hdev, "Failed to get mac access %d", err);
-+		btintel_pcie_release_mac_access(data);
-+		mutex_unlock(&data->mac_access_lock);
- 		return err;
- 	}
- 
-@@ -1899,6 +1910,7 @@ static int btintel_pcie_read_device_mem(struct btintel_pcie_data *data,
- 		*val = btintel_pcie_rd_dev_mem(data, dev_addr);
- 
- 	btintel_pcie_release_mac_access(data);
-+	mutex_unlock(&data->mac_access_lock);
- 
- 	return 0;
- }
-@@ -4863,6 +4875,7 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
- 	spin_lock_init(&data->hci_rx_lock);
- 	spin_lock_init(&data->ipc_lock);
- 	spin_lock_init(&data->dev_mem_lock);
-+	mutex_init(&data->mac_access_lock);
- 	mutex_init(&data->rfkill_doorbell_lock);
- 
- 	init_waitqueue_head(&data->gp0_wait_q);
-diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
-index 124e837da94b..97267a7e9762 100644
---- a/drivers/bluetooth/btintel_pcie.h
-+++ b/drivers/bluetooth/btintel_pcie.h
-@@ -773,6 +773,10 @@ struct btintel_pcie_data {
- 	 * PRPH_DEV_RD target access register pair. Never sleep while held.
- 	 */
- 	spinlock_t	dev_mem_lock;
-+	/* lock to serialize the MAC_ACCESS_REQ get/release sequence together
-+	 * with the target accesses done under it. Held across sleeping calls.
-+	 */
-+	struct mutex	mac_access_lock;
- 
- 	void __iomem	*base_addr;
- 
+ 	/* Update the advertising parameters if necessary */
+ 	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+-	    !list_empty(&hdev->adv_instances)) {
++	    (!list_empty(&hdev->adv_instances) && hdev->cur_adv_instance)) {
+ 		if (ext_adv_capable(hdev))
+ 			err = hci_start_ext_adv_sync(hdev,
+ 						     hdev->cur_adv_instance);
+
+base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
 -- 
-2.54.0
+2.43.0
 
