@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795531613;
-	b=24M5n8YT59QgerDxLN50bujAR77AsmFgRiVfACsFrS6+aL1y/bggFRiryieGOMoSTeXY
-	 h8GJUvJYB1aEADg1C1UMqPg+oeszZSPKnp451fyVlpZgxJp/OukmV7EYv3hblpmqR7Cnb
-	 671ZgSszgVhWu2VBi2FA1rqSKUilwC06qxnaulxqddIlkfF7lcsh5MB1Wa1ENt+CnBP8G
-	 i8hvXnygX00uiv791F3xd2ui9RybDX2aj6Cong2B0XTMKMqfcO8PD/3+fhHw/y69EAEI4
-	 3ECeLzfA6njMKvMev3Fnqqbfs/7mMpPXm/P3UG7AXs+Vur0en81/Gf33YOtZcfmau3g==
+	b=ZqDx6A9jSw6N0LR/rttcfHw1lDLpkniRm7wzNgBD3GV0USPZC8C2lxAqRuoz/W1+u/+6
+	 Qhrr9t6YIXrThu0441po/7hgB4cNJUCiTgZbtNKq3vYrsxarjGCqcwRsQxKKElcnnar0e
+	 /rFFqo5KYoBLV54V13vvH/y4iLRQVEXFFw7qQqRZf2dz4VMOqLUqjZtgQ+4yKa5GByeal
+	 7NtQHNA6m3Yw6fIpzM795s9fPbd8A1yxUHi5D2CGv6M4AW2qCfGvNPZ7GGWS1Zzmzs4Rl
+	 CmHqidaixCbwRxpnCRpD+LS5SdQDy8VOwFT34C9TTUZYF4L1D/GXyTUNKTzAhnKaPuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795531613;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=nUcRi7ic0KcBfl9CtoVtyvtu+5aAO1mSYhuOO9VKKgM=;
-	b=aGqgv3vkY6Q2H77cB4lXgXPaCxC3HAuCQzQIfyNLcbS9vcfVprg9Q7s9gh6HZwiEhMI/
-	 4V5X3/aGYXOSpm1TR25Ry4iVMbhIoIQRSrP5uXwzzcWKKYlKCaGA3C2ruHWO/8vTNJ48A
-	 RD0qe3VYKO51DxWx/Cx8knqq2Sm7Isg7T/xzqVirLeUfPs9zKdGHsXy6hx9VZ17bsPAhz
-	 zwgHcJgPsbmpH1D0vbnJ+D9K2PQQvKXndN94MAa0lpn+roNkdosKd/G5UrrV1e1AEa6+S
-	 iMeRDI1Wlke6LdUYfbNV6hhwSERJ8Z5GNfeBv/trJfebJgO1Sd0f3HDsJyTUOudYIkQ==
+	bh=mdld0D1yE/J63qgOC2C+zzh5Ht1TFl4rC872bUAhPJw=;
+	b=rjV0gGBeg3Yy8LvF7WqQ0iuD723UMdX2VvuPkm17SO0xnpiir6SXUitNuIoIUKaDNF0s
+	 bhRvl9DoJSsMJAMdbiqjF4CP/cMprOPTIbkpcWvh6yxuvyQQrYkjq38T4dOmdTHSYyDP7
+	 3/hkWE7KcDnYJbHsuMSEUciB5RUYaIYauGIDopwQZ/ncybK8iMZPdUClNY0lu8o4M9Eq8
+	 fJGMq0CQH21iHC7zEcnS6bpwrG9MamMeQDtw7/qJAwnovrQvk85nxQEtvle329VpQupVX
+	 kbkd6ZsMWynxrRBVxlOAxJBCPzCAYEbMgo7FSX/z8PBmCfWwO9KnLjG4Z8f9HAsWa3A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kLMWx17g;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=HQrNqMwF;
+	arc=none smtp.remote-ip=209.85.221.44
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24C0606A333
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E24C0606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF4F606A338
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:46:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5CF4F606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kLMWx17g
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4bb702a7548so39026965e9.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:46:52 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=HQrNqMwF
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-498f5fa5103so2755078f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795531611; x=1796136411; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795531612; x=1796136412; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=nUcRi7ic0KcBfl9CtoVtyvtu+5aAO1mSYhuOO9VKKgM=;
-        b=kLMWx17gmk3VNPqeAT+aSlqH4ZIdvdcKAMiRITJa05P6cns4oCG9o/zvj9eXgOgxhs
-         GvPQRRQmzOX+sx8oSAvZeBHw4sy0zjH9WO7+zg7KY4YxZiT6E5MOC3ZBYoTTxRCebYRV
-         Bxro3P3nwcKZQUEkdcgRdk1xgirJpZvNb21D8=
+        bh=mdld0D1yE/J63qgOC2C+zzh5Ht1TFl4rC872bUAhPJw=;
+        b=HQrNqMwFLBQ4mxWRiQoHSq7dNt0mFeix56mzpG71GPhIFpPnLY3mblP28fijihBKbl
+         +30ZJN2Qb372t8eV0uOvpldO2lU4xjctqUuQrMNnv/b0bPnLVtSu/2ji5+CtuU7E+32o
+         HOQ2MARnrLC75M3VKDXMMT961Ku71HdjnWCm0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795531611; x=1796136411;
+        d=1e100.net; s=20260707; t=1795531612; x=1796136412;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=nUcRi7ic0KcBfl9CtoVtyvtu+5aAO1mSYhuOO9VKKgM=;
-        b=rI1q4IlOUXpa3ADJsr5b/A7nM75AZGnM2zuIbi/HZqd31EfLSEO39s4/dGDMUmWSEd
-         cdTKUM5/U0y1FB7Q4iP3zr2+LgUJ9jqJ4dl0XzGHxKYlkaJBVbqnaYfw3sIqRitwt5jn
-         ArMq5ZC4oLmYsPLtUkszIjDEQxf0HupO3vuPQbchgu7Sgb2YXcg/L/QETmNbkqmkg5L7
-         NtMy4vZvbDrQRmTDLM6MnYf8Wd+1jeQrILLlMoCEdxSKe0VgOf+EaSg1rmdpl0LsbW4Z
-         RGA0wlUvKGU4S9Z1IC6jburQjDhLjNtecwnjrdVzLAw2o5GIthTbKhB2LhdQ29M0uQp9
-         Y4iQ==
-X-Gm-Message-State: APuU4Z+v1Fp9aBZjGCVqzap3xA9IuyYJaP6KDGSqkozIEFbQgqcMJXhh
-	MNeomNvZM1riKiMIhhNr7iAj1FO8Z5SKY/qc5s+dAXntCruuzdxB4pJh35rAt2AdmW/gt4ycKpj
-	FqZuX
-X-Gm-Gg: AZFdTZdQhE/mmE+yx8XMssBFugl6XnUQaEUJQKoo4IwX3unb+nHDEaENJh3ekT8sLTS
-	7zBOnd6s4efp2nNo2knm+PmkqaA8cbfnW6fbFeGJgmjyTvlBy8zRwbsJgqO4DLr8Fl1y/NG1WW+
-	ESn+v0svAGrXF0ZMsZ5Anv7F/LPYyiPdZqETuSYNmtiI6clCZl/kMpsQMrArbo81idBpAOnlntg
-	cKklQOVGHoAcgM3calRZ9SSzwxyzfq7hstX6E73ZHYaToMx1Jheozx0w4B5nykd3vff5/H+zrff
-	lTjtyxsW63+fQdKcOchO7hsVuQAQosdBrfd0wk8iT5mXGmyh7dNvn1F0brTLPPC1G7jExL3rt5w
-	XG+HilE4BNW+18ILJ/AgoEVfOWfhbjt8FgWWVsxLcimQpg6RfLNN5e9OIMZWuYlznUoye+R2zZv
-	xsgchMTmARt8Z0gSRLSuo43qpw7q7gmxqy/hTljXjFWdqm6tQ8W3wcmys80zEWCRToLbVRFEUtO
-	nt1xYqQ+BbQRiLk0XkF7F7qiGhmFO1khgkkD/jS050Wo15epKjEOKH5CrET1n0vXOwpsMS+Pd6C
-	NkP3xHEqB5NhEY69AXzpWpi9kKQ5slIrVIKwFVUOP1cTVfTgmtcbc0bwKXOi+eAW3OSfGDM=
-X-Received: by 2002:a05:600c:1c1b:b0:4a7:a5db:a93e with SMTP id 5b1f17b1804b1-4bb887e2677mr356911005e9.4.1795531611283;
+        bh=mdld0D1yE/J63qgOC2C+zzh5Ht1TFl4rC872bUAhPJw=;
+        b=ofVsdNN5OqqSBUNJ4Csn521jSvnS74NvsDX9NfeZX9uOk0TsVc1qdScf5wUm1ERtQM
+         SF/iI2FeVYYuTAZsVF1kpb65VhLCVsZl2mvZJjNT/XYh+B2HY9p6S5kPo4bU3RO/uJ/o
+         tPnv2U28vRjIkzSILdw+LQ9scr7/23/KsdYdJHNZB7hq4BkLcrKSBib+uYIPS7TOx+Fm
+         QS7wO3a+yy0GMvg6BJsjkl/27pxbAsF7L0UsCdKCzzeN8qXHJJuz3hRKTkFUQftOdkRN
+         eG1URDiSjuMFJnbzB8hjCAllQLYHxMkpRYDSht2Xn3cawgRJoqryIgbKxOl2mP2Ph/Wa
+         hgVw==
+X-Gm-Message-State: APuU4Z8aFcM018zqsaldDZdjcgRJflGBD032fuV2sMF+sXM4P1yyjsT3
+	xuVYebni/5wcpjxORLjcD3pdXXifkI0g0zbxFIhhs+tRtaDicIHMeh7v5V0dim3bIE0sqrCJD0s
+	QJN2M
+X-Gm-Gg: AZFdTZfAiYoWLiFFXHCYhSWlOMoeXGJC5juvePUcVWNra9ZFOlA44EjGOOvO/jH1Xd2
+	XXM9JzNDcc3QO9IlfjvbQY/K1ad/igGE2nCw1WdfSOlnDsAbB56uOTPSnFYgeA99x7Se6LhtnI2
+	2o1JkcsMcZPmPiYRsN7nwrwTuZaTjXj4MxN6Xf4gEHZ/hf6t8ox3xgqU6HBL/uK735mt6Mc8UM8
+	q+AaGqWB3QUzT/7r21PsVmDHRChOtFFjhSWgKfw2/J7j2eTkp3XYg+vgA9LjeU8gcAHEJlKuCdt
+	7O/QYo6u+CYsan5IsR4IIdWsgPyMeT9zhgrYKvgBo8OEdrZI1KYA5Iks/x/FAp7ZKZufnLlgyX4
+	QuyKP5PP6emPdRHMqexzLRUHg89FvfOfzkzYQcDe81RBqH9or70w1bp2qbqXjfk9T8gE4v+RZRM
+	lePwH3e+dFJ59nuQ7SuTDI0nWaOi0K1wvKL8VMYZSMjLJ8wtmMWw4hWyScCRO3J9crSwPAUgetC
+	xYLuvlPGTJJEfk2ZvDPyWqlfXQ3a70WJciAey22OBbcMgySP577sav+cR5/K6CZpg86kQTKZ6Cr
+	aY9ZJnn+tHYKol4v/DjlnsaANMLvxwclyWIMxy2p0nXbmIFlzw==
+X-Received: by 2002:a5d:5888:0:b0:4a7:8406:1e91 with SMTP id ffacd0b85a97d-4abb532eaf0mr25645015f8f.30.1795531611725;
         Tue, 24 Nov 2026 06:46:51 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab69bf61e8sm29891561f8f.11.2026.11.24.06.46.50
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab69bf61e8sm29891561f8f.11.2026.11.24.06.46.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 24 Nov 2026 06:46:51 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 3/8] device: Don't override the ATT MTU over BR/EDR
-Date: Tue, 24 Nov 2026 15:46:37 +0100
-Message-ID: <20261124144642.298366-4-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 4/8] device: Don't resolve services on GATT over BR/EDR
+Date: Tue, 24 Nov 2026 15:46:38 +0100
+Message-ID: <20261124144642.298366-5-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124144642.298366-1-simon.mikuda@streamunlimited.com>
 References: <20261124144642.298366-1-simon.mikuda@streamunlimited.com>
@@ -95,62 +95,54 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-device_attach_att() sets the ATT_MTU of a BR/EDR channel to our incoming
-L2CAP MTU, as g_attrib_new() did before commit 9d09a446ace8 ("device:
-Use bt_att instead of GAttrib"). The ATT_MTU is the smaller of the two
-MTUs of the channel (Core Vol 3, Part G, 5.1.1), so when the remote's
-incoming MTU is smaller, bluetoothd sends PDUs it can't take.
+When GATT discovery over BR/EDR completes, gatt_client_ready_cb() calls
+device_svc_resolved() for device->bdaddr_type. For a BR/EDR device this
+marks the bearer resolved and runs the device_wait_for_svc_complete()
+callbacks while SDP may still be running, so they find none of the
+device's profiles. For a device with an LE address type it resolves the
+LE bearer instead. iOS opens ATT over BR/EDR right after pairing.
 
-On the remote, paired over BR/EDR:
+Over BR/EDR, leave resolving the services to SDP.
 
-  btgatt-client -t bredr -d <address> -m 48
-  [GATT client]# services
-
-The discovery never completes, and bluetoothd logs:
-
-  bt_att_chan_write() (chan 0x...) write failed: Message too long
-
-bt_att already uses the smaller MTU: leave it.
-
-Fixes: e758ebb6a144 ("src/device.c : Fix BREDR-ATT MTU issue")
+Fixes: 4b5bb941c380 ("core/device: Use shared/gatt-client for GATT")
 Assisted-by: Claude:claude-opus-5-5
 ---
- src/device.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ src/device.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index 36a980d1e..be3267368 100644
+index be3267368..7a85403f0 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -6670,14 +6670,12 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	struct bt_att *att;
- 	BtIOSecLevel sec_level;
- 	uint16_t mtu;
--	uint16_t cid;
- 	struct btd_gatt_database *database;
- 	const bdaddr_t *dst;
- 	char dstaddr[18];
+@@ -6423,12 +6423,15 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
+ 								void *user_data)
+ {
+ 	struct btd_device *device = user_data;
++	bool bredr = bt_att_get_link_type(device->att) == BT_ATT_BREDR;
  
- 	bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
- 						BT_IO_OPT_IMTU, &mtu,
--						BT_IO_OPT_CID, &cid,
- 						BT_IO_OPT_INVALID);
+ 	DBG("status: %s, error: %u", success ? "success" : "failed", att_ecode);
  
- 	if (gerr) {
-@@ -6724,13 +6722,6 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 		return false;
++	/* Over BR/EDR, SDP resolves the services of the bearer */
+ 	if (!success) {
+-		device_svc_resolved(device, BROWSE_GATT, device->bdaddr_type,
+-									-EIO);
++		if (!bredr)
++			device_svc_resolved(device, BROWSE_GATT,
++						device->bdaddr_type, -EIO);
+ 		return;
  	}
  
--	if (!bt_att_set_mtu(att, cid == BT_ATT_CID ? BT_ATT_DEFAULT_LE_MTU :
--							dev->att_mtu)) {
--		error("Unable to set ATT MTU");
--		bt_att_unref(att);
--		return false;
--	}
--
- 	/* The fd is closed once the ATT instance is freed */
- 	g_io_channel_set_close_on_unref(io, FALSE);
+@@ -6436,7 +6439,9 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
  
+ 	btd_gatt_client_ready(device->client_dbus);
+ 
+-	device_svc_resolved(device, BROWSE_GATT, device->bdaddr_type, 0);
++	if (!bredr)
++		device_svc_resolved(device, BROWSE_GATT, device->bdaddr_type,
++									0);
+ 
+ 	store_gatt_db(device);
+ }
 -- 
 2.43.0
 
