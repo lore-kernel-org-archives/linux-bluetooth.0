@@ -1,76 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795526411;
-	b=ldT3K0InmwTnaqByv3oWh1dn1lun44G1rU3dK1xN2as3MRyrbwHgDb/dr/oK5dC1qe5v
-	 v0QweQsM5xileB0Ir/FGyGQRuaSL9ksr/71r5XrQOiYQkyl60OkDo74bTu82hyLTLkJVm
-	 sT6K1j+Tu41PkisnSqmttAd3WTxiTXy5M5e6cZa7DLJksiv6aDdmTR1KJn4MxuwO/O8ga
-	 3MbMKK8jVIi0cSP6+5+CYuUYF66+3McoS+SDqXWyUakQTDqD/oveDKBKYW8M0T0MZIGKw
-	 OQ1+kragNk6okrzWcL6yZrG81zykJg58kNkHitKRUgE6ws1v0092Ouecvf+SEwNWi9w==
+	t=1795526412;
+	b=hHTUwZtcc4OBqVvmLHDopJ2yByt8X0Sc+XK7iCiccVtl8dt3qYdyUle8Ab89HuxT3ecd
+	 NIU06Y70qVmiDwtH/jLNXbG8bmf2B6pm9H66gMabjxFlqOGC4oOp4kJbS4bOzxRBgoniq
+	 YknFnIj6GlKVaVExTNLbi6KMn5qgFm+4afdHn3E/dLN03ZuCBrrOoSYat7vOVOuSENqkL
+	 Gv5SYqyz0HI7/fTjv4em4ciQqu1c2bZYCsP1ZPush5QQVyyr982CaPyIKlHFIFKm2Olpz
+	 TIJfDEj+2stnAF6XQfkFwosD7+xQ5ciKYPbgnnpanf/rTGL17j95cZ1XdyTrWOH0POw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795526411;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795526412;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=U7w43LkP2xl8tQJhRCXzrPilDCpphxlZSv9kmfU2Uj8=;
-	b=I6qIH0VutUxRBZBKRgenU53pDpILsaydsPj1yYoN04Iapv2m1yx5hk5o/mo+0MNOahu5
-	 YmH+bQHTYHM86cvJGCxZ5SFI6ubiyqidFw4QveANWOLxDbWi9TTnlurkEKwPQf4LfboCg
-	 a5W9wNDHiUYAApY22Ugbjv35+Ckg77aGhagyvuyIK2PEO9vQj3RGo2L0s0OYxpNdmEWNo
-	 JiR8lC4pm72jnILNCPoJ8dwHsmCIwAM3g9yWoaH+HohhxAOAxLr5PhQCObsZwaEfCGxTj
-	 bcEfDsQYKWJX7xzya/w+shEKP3HsuCr7bX4zuvozYdl00Ux1QRDv4SiZ+zxmOi4ENqQ==
+	bh=4NhLCsyM7AEyj3ui997kE4c1tel5BAKPR/TxNBzzPcg=;
+	b=WaL8wsseXTqRxBsubNrQlqersaOvfcUYxGH3Lno397YxwzfnrSKy08cJwAbc1cy7QLgT
+	 LSF2dT1y3+encHxe/bvVyTDa5ih6flXjS7GkxXROKkaMjKWhdUM8A/pAbaILGHv6ywEd4
+	 BcK0SlkZ/0InjoBLuWxbs2BtT47lvA25IeNI5mfnk9IaWi+xLJzMFqu1O43YO+IzY5mEj
+	 YsqP3bcAJt0GnCEavhGfsg2TDuH017iW5UutCAW7kRNVDp/2P6HfLi7sYCfRNkG4vokfQ
+	 RUdCDQXc0xps3j8DXeA/MALZSnUAwXv+be1EVhVL+GY8IKF67/+pgByQxASSzkctOPg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Vh1yiEk8;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=tdtxU94m;
 	arc=none smtp.remote-ip=209.85.128.46
 Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E24606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A54606A321
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 13:20:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 77E24606A32C
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A9A54606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Vh1yiEk8
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4b467581b98so43382525e9.0
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=tdtxU94m
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4bb702a7548so37711545e9.1
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:20:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795526410; x=1796131210; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=U7w43LkP2xl8tQJhRCXzrPilDCpphxlZSv9kmfU2Uj8=;
-        b=Vh1yiEk8isdxhj7/lELSbfUoW/XaAveHXvmVX3Dq3Q6YhHBk38BlQjsf8C8n4PWMWa
-         GXIKs2B+vXYQ93cfcFIgshJEPA7MnD+7Azi/4G8ASjn254ryR0cMRJnA1D7kU4QElWFm
-         4hHh5SCJDcY1edthAypyl275Q+P42tsN0DxLs=
+        bh=4NhLCsyM7AEyj3ui997kE4c1tel5BAKPR/TxNBzzPcg=;
+        b=tdtxU94mKeqirXXUAH4fVZYNmpRr+dPhk2DU1ozHXWm75NAYqkZfwLnW0+ucX3sGmf
+         2C0ZU9rvjuHxOOG9i4Og/potuYbIfCLPhiEJa1Dy2gAVCg6X1/hZcrYhZ1pav7p/ftb5
+         AEtEfIbzVCikauld1LdwteDQdtRDGvAloLR+s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795526410; x=1796131210;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=U7w43LkP2xl8tQJhRCXzrPilDCpphxlZSv9kmfU2Uj8=;
-        b=iRQQ2fgl7lKgJYs/SM6u2bSEoIEmah/4W41CbpStLg1uKr6JFLtiWrKkXl39m6oxJ7
-         eaHJlXgml0XxuSr3c4UijbLpe2rKnGb/5hLGVcTDsmX73rpdQdI06jcOgnjDNkpglaUi
-         zvuAvnXd22dcF7r+8G5qANcBjTZBJ4v5j5eoy7sThavo/sGvrlbnvWfd9yXJI/qkgR5/
-         RgrICbPV63dwCAwRoZRAXtthgzTLcFXvDGyUoVQG2cUaAgBdKh1u689Txw/wxm2DSRWL
-         ddib/eJu7nJKiLd5MApMVWhrgBbKRl4UQM9HD8lHby6qR/TnaShHz7LQdEoc4/h0oHZ6
-         x5+w==
-X-Gm-Message-State: APuU4Z+zsK4mX4UpfMtFPR7JaQtl5IT2jj3nwHdZB7Qtz7pBIKsfXPE+
-	Y5sfMT6tNXhXS43VmZTBpR5GI5VTUS2VqljiDuHr0AD7rUE/KtA12xTILWEetFEHtCvj2zZBurX
-	4oRJC
-X-Gm-Gg: AZFdTZdCZSUEt9srfHiMamCHr/+YAXzkp7O8tXLHVvNdcMNQbrlgnW67qcBnyjlrlqz
-	I8as7J6c929vIYFgDRfWom2htqi/vxqKvHXM6imPnMdaUsrY3TY4BsGv/pIl8dh2GrsknVK8iSS
-	D+QB1Z8XeMIyvJVPLfvzQV3vwTn3jdaCrKZRGOknWAT+2peFn0nPnj013mOWgOh9tL3njisRews
-	GrNCC6Gaxf/saW7pzO5bt/l1bDsSrtjSUx0Ec3uKiIgDpJPyVKLqp2Ye3Me38qNiiu0vaR/QKMt
-	QqrjCqAq77Jjeoq2uUgKqgv3hj04o4D8SnnVwJWNhDj4C3BImHVXwTKuKGhL77ZHmcz/TPkq5wY
-	Yc/DP3yhLYr+iTek/rf32BBPlI540YD9qzL70QHnPn9HGCu7sDgIguz+uKJ3e0ku9J8U7oxQViW
-	6RDZpuY5FrJVJsq9VStn2BuYarw6q5agX9BbkkNB6vDXWQ3yY7xdN702t+6FNpHcuMHf5oN7lzW
-	oL3QN8rs9NXlw097IFbVxKZ8uxMQcMGsaJcWe4uyd/DF26PRczgocjitFnDyiSDnUstpHjUP/0P
-	fkZGGwle/EWZa/g5MwfHfNb3YkyTrnyH8C8F1qu42erAZrUOclZdGvGayudWW1tXPkkWC0Q=
-X-Received: by 2002:a05:600c:1c1b:b0:4bb:87be:c138 with SMTP id 5b1f17b1804b1-4bb8893e021mr329442345e9.32.1795526409677;
-        Tue, 24 Nov 2026 05:20:09 -0800 (PST)
+        bh=4NhLCsyM7AEyj3ui997kE4c1tel5BAKPR/TxNBzzPcg=;
+        b=PjRidVzX940N39SQ2f24d9wV3sbRkLnpJHs6GD3HOWO/8Pt9WgWHjQlvS5KIVhMqqt
+         LbDYUyS/OyG+ZSOrFqIe8RnNVJ5UwGDAQEBvSK8nz7FLA8GMF8lvo9VP9dGr88JN9gla
+         5hF0LsHllDd1E4WgEzUDgrxz0O6RH0TJ24oEalupiIu77cJHEwAyLhQT4HayB7EX7dXh
+         wDS+k9GxZKD6GTb1DeM7OJJvQGmafuTWEtPDHzdq3PVvVCy0X93IGuFJBN7CCM6FDDxz
+         9kLYpw9HV2DVkQGf++9bi1qDMtV+g8K+00TsweBozFa9FPBJGIRxN3GxuZJs/JJx5H6K
+         TL6Q==
+X-Gm-Message-State: APuU4Z8HFpiyk3ZqVxVAJaIyTfUuo51zp/RwwsuepA1vKF/jWdFI4HBp
+	IYi5xJ+Stx7eYJYl1/aohc/9iOmCEqlSw/xiiFVHeNQ44pJaSZ1eRHjnl8N+EMpwiNlmT3laZX1
+	OBp+d
+X-Gm-Gg: AZFdTZfDrzSNEd3cxJFTtoPm79FXbbhURVWbKcyIhy81r34YpgxhsrScZzGnWb4ThQX
+	5cLGJ5SeqVnyVEfmvAazkX8kRbQ4M0rCNtVD8IGh79vTWr3Xk3SOikkOMbcFWVcoY+z5lBcPZom
+	OWz1PjqUhvqMgrTcOUGfNriV9jXvgDmNkDJzSCdqlKGZr2ldfZEqsBHHvI0HqhnSApzST3ObBRW
+	gdy2BAeA875RK8VPezDVS4GZUxdhR5p9c+GIAg/pMtskoDY13WDmJe/EPEmbsWGaW/Fx+Xmoa5/
+	GG1J0hxCTflZ+0I5t/SdzjRRW5POSGnBRjJxcq6z3H4mNiqUgxLdAGsDSSDK9tAKIzWGJx11b/x
+	yQRQkmpo/l7h90296QVfsBsCoWeRAuPQubKCPo/6iI6HKpjU/twSdzt0mMubUPzA3PVQHFIdt67
+	fnoX3hwWBCKUh/a2Qe3VJwNyMZSfibjacNJMKCkz1zQ+gwr0/by1QlqOSCrTyLTS32EbmYwaXV/
+	4ssYa3yqoN7TSyw27JmRhNZtPLO8vxvrujAy9oKrtFOcjikgIU9bA1dyYl1OF6R+kifZ/NMopk+
+	Iu42TS9ffuTUYvgpgmKO7Ud3V3lE0Zn8HB8Y67eVeHljJinFvg==
+X-Received: by 2002:a05:600c:638e:b0:4bb:6c5e:b006 with SMTP id 5b1f17b1804b1-4bb887e265fmr278162435e9.3.1795526410149;
+        Tue, 24 Nov 2026 05:20:10 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb9067846esm270963015e9.4.2026.11.24.05.20.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -78,9 +78,9 @@ Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 3/4] audio/transport: Add Mute property
-Date: Tue, 24 Nov 2026 14:20:02 +0100
-Message-ID: <20261124132003.3899120-3-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 4/4] client/player: Add transport.mute command
+Date: Tue, 24 Nov 2026 14:20:03 +0100
+Message-ID: <20261124132003.3899120-4-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124132003.3899120-1-simon.mikuda@streamunlimited.com>
 References: <20261124132003.3899120-1-simon.mikuda@streamunlimited.com>
@@ -95,215 +95,82 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add Mute to BAP unicast transports that have a VCP session, read and
-written through VCP like Volume. A2DP transports don't get it: AVRCP
-has no mute.
+Get or set the Mute property of a transport, like transport.volume.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/transport.c | 93 ++++++++++++++++++++++++++++++++++++++
- profiles/audio/vcp.c       | 20 ++++++++
- profiles/audio/vcp.h       | 12 +++++
- 3 files changed, 125 insertions(+)
+ client/player.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index ad2fc2c1c..ca5bda560 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1267,6 +1267,64 @@ static void set_volume(const GDBusPropertyTable *property,
- 	g_dbus_pending_property_success(id);
- }
- 
-+static int transport_bap_get_mute(struct media_transport *transport);
-+static int transport_bap_set_mute(struct media_transport *transport,
-+								bool mute);
-+
-+static gboolean mute_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct media_transport *transport = data;
-+
-+	return transport_bap_get_mute(transport) >= 0;
-+}
-+
-+static gboolean get_mute(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	dbus_bool_t mute;
-+	int ret;
-+
-+	ret = transport_bap_get_mute(transport);
-+	if (ret < 0)
-+		return FALSE;
-+
-+	mute = ret;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &mute);
-+
-+	return TRUE;
-+}
-+
-+static void set_mute(const GDBusPropertyTable *property,
-+			DBusMessageIter *iter, GDBusPendingPropertySet id,
-+			void *data)
-+{
-+	struct media_transport *transport = data;
-+	dbus_bool_t mute;
-+	int err;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Expected BOOLEAN");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(iter, &mute);
-+
-+	err = transport_bap_set_mute(transport, mute);
-+	if (err) {
-+		error("Unable to set mute: %s (%d)", strerror(-err), err);
-+		g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed",
-+						"Internal error %s (%d)",
-+						strerror(-err), err);
-+		return;
-+	}
-+
-+	g_dbus_pending_property_success(id);
-+}
-+
- static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct media_transport *transport = data;
-@@ -1620,6 +1678,7 @@ static const GDBusPropertyTable transport_bap_uc_properties[] = {
- 	{ "Metadata", "ay", get_metadata, set_metadata },
- 	{ "Links", "ao", get_links, NULL, links_exists },
- 	{ "Volume", "q", get_volume, set_volume, volume_exists },
-+	{ "Mute", "b", get_mute, set_mute, mute_exists },
- 	{ }
- };
- 
-@@ -1635,6 +1694,7 @@ static const GDBusPropertyTable transport_bap_uc_test_properties[] = {
- 	{ "Metadata", "ay", get_metadata, set_metadata },
- 	{ "Links", "ao", get_links, NULL, links_exists },
- 	{ "Volume", "q", get_volume, set_volume, volume_exists },
-+	{ "Mute", "b", get_mute, set_mute, mute_exists },
- 	{ "Desynchronized", "b", get_desync, set_desync, links_exists},
- 	{ }
- };
-@@ -2620,6 +2680,22 @@ static int transport_bap_set_volume(struct media_transport *transport,
- 		return -ENOTSUP; /* TODO: MICP */
- }
- 
-+static int transport_bap_get_mute(struct media_transport *transport)
-+{
-+	if (transport_bap_is_playback(transport))
-+		return bt_audio_vcp_get_mute(transport->device);
-+	else
-+		return -ENOTSUP; /* TODO: MICP */
-+}
-+
-+static int transport_bap_set_mute(struct media_transport *transport, bool mute)
-+{
-+	if (transport_bap_is_playback(transport))
-+		return bt_audio_vcp_set_mute(transport->device, mute);
-+	else
-+		return -ENOTSUP; /* TODO: MICP */
-+}
-+
- static void transport_bap_destroy(void *data)
- {
- 	struct bap_transport *bap = data;
-@@ -3198,6 +3274,22 @@ static void media_transport_emit_volume(struct media_transport *transport)
- 					MEDIA_TRANSPORT_INTERFACE, "Volume");
- }
- 
-+static void media_transport_emit_mute(struct media_transport *transport)
-+{
-+	const char *uuid = media_endpoint_get_uuid(transport->endpoint);
-+
-+	if (strcasecmp(uuid, PAC_SINK_UUID) &&
-+				strcasecmp(uuid, PAC_SOURCE_UUID))
-+		return;
-+
-+	if (!mute_exists(NULL, transport))
-+		return;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					transport->path,
-+					MEDIA_TRANSPORT_INTERFACE, "Mute");
-+}
-+
- int media_transport_get_a2dp_volume(struct btd_device *dev)
- {
- 	GSList *l;
-@@ -3272,6 +3364,7 @@ void media_transport_volume_changed(struct btd_device *dev)
- 			continue;
- 
- 		media_transport_emit_volume(transport);
-+		media_transport_emit_mute(transport);
+diff --git a/client/player.c b/client/player.c
+index 932338ef5..591c73a62 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -6160,6 +6160,54 @@ static void cmd_volume_transport(int argc, char *argv[])
  	}
  }
  
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index 00ee2b64b..7adac4dd5 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -185,6 +185,26 @@ int bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume)
- 	return -ENODEV;
- }
- 
-+int bt_audio_vcp_get_mute(struct btd_device *device)
++static void mute_callback(const DBusError *error, void *user_data)
 +{
-+	struct vcp_data *data = queue_find(sessions, match_device, device);
++	if (dbus_error_is_set(error)) {
++		bt_shell_printf("Failed to set Mute: %s\n", error->name);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +
-+	if (data)
-+		return bt_vcp_get_mute(data->vcp);
++	bt_shell_printf("Changing Mute succeeded\n");
 +
-+	return -ENODEV;
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +}
 +
-+int bt_audio_vcp_set_mute(struct btd_device *device, bool mute)
++static void cmd_mute_transport(int argc, char *argv[])
 +{
-+	struct vcp_data *data = queue_find(sessions, match_device, device);
++	GDBusProxy *proxy;
++	dbus_bool_t mute;
 +
-+	if (data)
-+		return bt_vcp_set_mute(data->vcp, mute) ? 0 : -EIO;
++	proxy = g_dbus_proxy_lookup(transports, NULL, argv[1],
++					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
++	if (!proxy) {
++		bt_shell_printf("Transport %s not found\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +
-+	return -ENODEV;
++	if (argc == 2) {
++		print_property(proxy, "Mute");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!strcasecmp(argv[2], "on") || !strcasecmp(argv[2], "yes") ||
++				!strcmp(argv[2], "1"))
++		mute = TRUE;
++	else if (!strcasecmp(argv[2], "off") || !strcasecmp(argv[2], "no") ||
++				!strcmp(argv[2], "0"))
++		mute = FALSE;
++	else {
++		bt_shell_printf("Invalid argument: %s\n", argv[2]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!g_dbus_proxy_set_property_basic(proxy, "Mute", DBUS_TYPE_BOOLEAN,
++						&mute, mute_callback,
++						NULL, NULL)) {
++		bt_shell_printf("Failed to set mute\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
 +}
 +
- static void vcp_remote_client_detached(struct bt_vcp *vcp, void *user_data)
+ static void set_metadata_cb(const DBusError *error, void *user_data)
  {
- 	struct vcp_data *data;
-diff --git a/profiles/audio/vcp.h b/profiles/audio/vcp.h
-index b538cebf0..35ffc09f8 100644
---- a/profiles/audio/vcp.h
-+++ b/profiles/audio/vcp.h
-@@ -12,6 +12,8 @@
- 
- int bt_audio_vcp_get_volume(struct btd_device *device);
- int bt_audio_vcp_set_volume(struct btd_device *device, uint8_t volume);
-+int bt_audio_vcp_get_mute(struct btd_device *device);
-+int bt_audio_vcp_set_mute(struct btd_device *device, bool mute);
- 
- #else
- 
-@@ -26,4 +28,14 @@ static inline int bt_audio_vcp_set_volume(struct btd_device *device,
- 	return -ENODEV;
- }
- 
-+static inline int bt_audio_vcp_get_mute(struct btd_device *device)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int bt_audio_vcp_set_mute(struct btd_device *device, bool mute)
-+{
-+	return -ENODEV;
-+}
-+
- #endif
+ 	if (dbus_error_is_set(error)) {
+@@ -6278,6 +6326,9 @@ static const struct bt_shell_menu transport_menu = {
+ 	{ "volume",      "<transport> [value]",	cmd_volume_transport,
+ 						"Get/Set transport volume",
+ 						transport_generator },
++	{ "mute",        "<transport> [on/off]", cmd_mute_transport,
++						"Get/Set transport mute",
++						transport_generator },
+ 	{ "select",      "<transport> [transport1...]", cmd_select_transport,
+ 						"Select Transport",
+ 						transport_generator },
 -- 
 2.43.0
 
