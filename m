@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795512525;
-	b=3MAbFxDEGGGl4VhVGxRZ+eFKxCi+npaE1FAU4evsTeQome3EoN4ohHDcZsaZY7TJEgx5
-	 vWw1L2UgZuCOQ1hjkYJmLC5svaAr3zMBj+MKQeDjHY74sv/kG0WBxhzJXmxbMsqnzcRfQ
-	 Cu+8OKCjsy5JJFejrJAmb1qOhgHV2wfPxjlYlG+cs5J/TvSM6mCeBKPIWmN+7JLapdDXU
-	 KtAVAqAErIyV1kgW6gRbRaVP5Js8uZCAj/2jG3k8HcqJ3pVNGsIlxHBvfxOeNz1jiiuOi
-	 /mTfiji3f+iuidXEYluMCzWbhxzsskzDIVnnw3V9FeHJavTll6B/SK/UGarMMyQaXkQ==
+	b=EkEs8pVF4dRobBAVicR+zt+N4u23U5RDrxIQqdb6Nkl6E7qXpgQlAqlm+9DrVe0RtShk
+	 0Z4tF5/FUHH7F4EAoO5qYRd+NBxurkTyOV8AgGGr4b3ZjWq5N/TS1mbTaTBWJeLmlsOHL
+	 4ZeQY0TibObe+K6hID6bC8bnQZJysWI0te4N0vbwEltlzMDvK7GDu2+drdwjxGW4A0HlW
+	 e5ComXkrj1qKswFeLwgyOnrRfBPL9x/eG1Acy08Y2Yt1WCjV0+Tsbcowlex0+XoIyTu/7
+	 TTp4S1LTT6ac3dmDQiRSnErES+BCn55ZHVfmUFQKp7rjpLqO3XtlTrFRiyFc+qDNNWQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795512525;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-	b=JMm9edtvW7AYalZVwhgs+Su26YCcVbKrzi8nb23xOzCYbAOWoeIsl/KhNON22L6tApGm
-	 87lORfq36xqrK9L8ILNltEPqi7YIxF5Rn/EoY2plkj9P5C5KPLOYmV8KaCUV2J95Son5A
-	 mXNGIv4C7Uw5xnCAFAzY6udB4dC+s2Av1LGUeo8sSMLWNcWgSbO51GtzgcFo07f6VeMnO
-	 qpGCaCdnDFVXijbA/qoyZF4awlZo5cCoFjzqJdzqK+3K/6ps7p7H9TFMpV2a9qigR25Zk
-	 uyo4y0K4vLlPFbzQpTjsbKVkaUE15P8hqlbRMRghtMQTntBTX4Vobsvhvp3GrfjmLnw==
+	bh=lCjLbFDdb8SjSG0eENWUrTp3EDVO3afbfnsSWDsgrcA=;
+	b=RUJ4sfD4T83eNSxCr5nVj7BxU+1roqJ2e3vUa7yXqzxED1JFBbp0AIjP90S38vZFh0Ax
+	 g5Gn1APXUVwEGbJDaKwuu9QOVapsP2C8bMBUFpRu/wPKFExyT7fbgCa7Iby1VQJ5MaJv1
+	 VKL82x/dkXHRxCZuO3i6F4vpOX78TWMkS5B79VqHEZxMPS2Vl5aksNhrEXJ8A81FJQHtd
+	 5HQY5KHnBuHJ/5MVniRmZTRx7wHj97xuozDi8YqSYG8xw7B46yBxWMw6Ty/0ZqLln9FG4
+	 Wx6Yly59rpIDHp9KbMxAHRQON+OIhnQfy3fqwKHtU29nQ3qWMKx7i5UP+LTqafR4w4g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="0wrxdb/j";
-	arc=none smtp.remote-ip=209.85.221.51
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=h79YpZgy;
+	arc=none smtp.remote-ip=209.85.221.42
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591EA606A683
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636F2606A338
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 09:28:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 591EA606A683
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 636F2606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=0wrxdb/j
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-4a42b34e930so3734142f8f.2
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=h79YpZgy
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4ac08f4a0b2so3029878f8f.3
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 01:28:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795512524; x=1796117324; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-        b=0wrxdb/jzqyopgTEDCOGFYdczNtyfKJe603cftxvVJ3efUQlZ1nquzc8mhsB/Fo31l
-         u0rxWN7/rQ0V+i/z5s3KHtb5XELUyOzv6omw+grwKJPs3yh5LUSooerfdjwpPO8Inbem
-         rWYjLntGk2fUfwiKmqpVLq+ZsBNlzXCcCaAO4=
+        bh=lCjLbFDdb8SjSG0eENWUrTp3EDVO3afbfnsSWDsgrcA=;
+        b=h79YpZgy/L6SzChBNmSd3yv9eVq42KPKek5wnB1s84FLHnMdDLs62UYhf/8VZpZfLN
+         K3YF0tCxuREWEwK32j0DB/hTDLbqjrySt9UJZv8ik/COjTbVwwnT2bnu0v1WXNgP/Qtz
+         MaGA0+pkIhWXQ68H2jSkf4aC2KjwNgGAbNumE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795512524; x=1796117324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-        b=sFWwNEFXDUmYa0cNv+MB99PMDFZSkh3mX/qxvrrTMblgOqCk0TUA6numpruk8Zx04w
-         fAmovSEnH5G+/ClEWime7ZPyTRDUnIrxVj5PM1aFETJkOfHkRgtVZKPlDuKw47/HAcTr
-         FeK7gMmsHHVkBZ2jOMsBTITRghSY9ijZuuWDgVadPGbV/U+zFj1eFCjdUbD+LT1us52V
-         aj69ru+P8HI1ZC2SocKlPoYbfdIX/HxHWGIV0pQ7MA1c4tIp6lIGZsFStgs8JEjDfrNJ
-         JyhAL1PKZRJrPM/mXPKzUCKc/3HeBCZybi9Qo5itwNwd5F1cbVvj/1/3wUFhUL7QDafN
-         JoAA==
-X-Gm-Message-State: APuU4Z877+11X0xnAVW0Vz1PSz1ehanRktmPqI/e4LjLs78H6tJjMTUr
-	vg4s+o0nNlNfiRhOnegNVf2zYuXduxaW/BTsQmNxDdEuLN77LUNS3DdaHDxsHfEqIMqvbfs6NM/
-	Ko09K
-X-Gm-Gg: AZFdTZcrdQJW61zErEJELtfeuzff5jOZGLjKJJ41htcbuhQekJYihxEv414ZNXPMt7s
-	NroRF0rWPMoJqZgAlhUK9LghISylmWgVQNDHSxoY5Ji53Y4mNtJAugfjdo3IOxpknwHH/MY5eQm
-	SkCPg3vTc7St31ifr2DOgHGw6fe3n5/FUg99uYF1nGqupkrLzz+XT/HRYyNXxHeOXUChPCe/QM7
-	HMpr+4DpV3vx7NohLPfJrWcFYA9FTiYEurj8Ytit0zYHbznB8K/wokFDISW9DuU0Xx8O+nSaY8x
-	f//944BuBbaQUHeoR+TgI+242VhoDd6WkSch/gUofaYAAPvb8kK8op9ePStBeflRxujOhQJ/EQ7
-	KrfWzQn9j92gHG8szKomzA6wSOhf05G+5QumEaDh6c8lv2mEAMDvuLLwncHpAhd7i2Z5ePCSh9b
-	eeyxxm/KATtQgik70YsxDLmceIuHQX+ryMh7DXmrCeqEMSbNEdYpx3y03iCXZGB93XbflhybKwQ
-	3HpA6mS6c3mn7PKkJOk1K9Lzrt588JOXsfv8Vr3UNXZsLBBl1SXdwPtME6j1I6Yy3GNPn6Ie8Dn
-	v7U20Y/Tt7b9+jUkJaauH9tzskxe9wO9tARVxCtCL5hSE1MGyw==
-X-Received: by 2002:a05:6000:2b85:b0:498:be72:6371 with SMTP id ffacd0b85a97d-4abb27268f2mr16540676f8f.21.1795512523821;
+        bh=lCjLbFDdb8SjSG0eENWUrTp3EDVO3afbfnsSWDsgrcA=;
+        b=hzDz/ROiZhnplPPSmlL37CxklHnKpVe1ZRc2uPcP5bByYxxKTSRlye1ky1ZUJtbHkR
+         io15EGB0l9vMM9Qr37uIw2LpIH58gSiuDIf/Zo6xNFFBLK7+rDceC85yEX6NwEOUWF+6
+         4G0ukJURNttKLd7Nx+qI+z/LPqjRfQ2+RpqWu0TE3rwc6ZpcyLKs/2T57flGlsJ2bwED
+         6NVIntY6a9sRtSJmY4V5LHaMjNkNq4F6uNw01BKIwTx8/VOIWxhUu/9cq7wOac4uz3Q3
+         0YKzXMIIbYzxQCCtPTPtiS+wXEpbMoiVwl9ncT6Wouyf17hdxWjxh2NxjIyCufAxyKLE
+         fDcw==
+X-Gm-Message-State: APuU4Z8gdF+c0iiu+YhnWEqnq6krMEnnBZP59Hq1aDWQhtMt+bJGzISu
+	P53WguW4ITHa11jhziW1vveZAoAG4KhtpiCe40WlzUrI6ctG1m/qsfXKGMriyD1tQfH6PbQd7SO
+	e7whC
+X-Gm-Gg: AZFdTZfbu9llY3abX6UYVUmNeOznoI5cE5RPiMbLCdglybE38Q1PoEYmDJxG8aeVoxN
+	LA6PcvXDsbXVdVGHnGuUAoiSYx/T7IdILOu8La+cLqzEjVMfxPeX+aAqP94UjxhgC3kG1rTN5xh
+	NFKcWaZvLBo+Sc5v2CHGhdHNe0i0u8dPEcMpdvEXmXoh40BH0XXJO2qk8fOe/l5Qr5WWrDH7AVy
+	Ty9NQPfturtlLgGXjP7Nl77lW7DaohEERZlB6WRJ7DrwppCjEtq2rbRnp5kdMfxvtM0CcoP33zF
+	ahxIS07ZPF6dtBs5MTLdQPuRdgxD95GbKerkQrWyKgM7TdNb/mVBoepEUjX0WwxDi2x5TzikiHV
+	z7oiJmaqdYdttS2hf0WKDjZtbYunsR3XfUlhvm51LP8ZE64XmJKLN1uXKVpWYw8ws3ZICixuGDG
+	x/MimQDisSuiOHg0ZT0gX3gG2khUmJkdArKHi6AYXwwiVxFUhIiTkAxxBuHWLABEuKBewSqhzEG
+	+fFQrqxTuJO6im8OBMfZzt7T1L3yOxETtO76mDo6Ax9twfVTW5u0jVL4bcv26xTwY1q/u04rBNa
+	LxGVrKYyIa4yovCBwRVpUYa13yzkkbjXOIYhWsF7DvYACD+rLw==
+X-Received: by 2002:a5d:64cc:0:b0:4b6:28a0:2b2c with SMTP id ffacd0b85a97d-4b628a02b39mr4844477f8f.21.1795512523387;
         Tue, 24 Nov 2026 01:28:43 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c61e53asm27870362f8f.59.2026.11.24.01.28.43
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c61e53asm27870362f8f.59.2026.11.24.01.28.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 24 Nov 2026 01:28:43 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v3 06/10] player: Fix crash on Search in a folder with a space in its name
-Date: Tue, 24 Nov 2026 10:28:29 +0100
-Message-ID: <20261124092833.1191053-6-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v3 05/10] avrcp: Fix not browsing a player addressed before it was listed
+Date: Tue, 24 Nov 2026 10:28:28 +0100
+Message-ID: <20261124092833.1191053-5-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124092833.1191053-1-simon.mikuda@streamunlimited.com>
 References: <20261124092833.1191053-1-simon.mikuda@streamunlimited.com>
@@ -95,81 +95,113 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The search folder object path is made from the name of the folder
-searched, e.g. /Filesystem/My Music/search. A name with characters an
-object path cannot have, such as a space, fails to register, and
-media_player_search_complete() dereferences the NULL item.
+SetBrowsedPlayer is sent for a browsable player from the player list
+only if the player is addressed. But ADDRESSED_PLAYER_CHANGED does not
+mark the player addressed when its id is already the id of the current
+player: the player 0 of a target that has no player at connection, or
+a player whose id was taken from the player list. Neither that
+notification nor the SetAddressedPlayer response sends SetBrowsedPlayer,
+so the player never gets the MediaFolder1 interface.
 
-To reproduce, browse a target with a folder named "My Music", change to
-it and call Search:
+To reproduce, connect AVRCP to a target without a player, then register
+a browsable player on the target. The controller gets the player from
+the list as browsable, but never browses it:
 
-  media_player_create_subfolder() /Filesystem/My Music/search
-  media_folder_create_item() D-Bus failed to register
-      org.bluez.MediaItem1 on
-      /org/bluez/hci0/dev_00_AA_01_01_00_42/avrcp/player0/Filesystem/My
-      Music/search path
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  dbus_message_iter_append_basic () from libdbus-1.so.3
-  #1  dbus_message_append_args_valist () from libdbus-1.so.3
-  #2  g_dbus_create_reply_valist (...) at gdbus/object.c:1572
-  #3  g_dbus_create_reply (...) at gdbus/object.c:1587
-  #4  media_player_search_complete (mp=..., ret=2) at
-      profiles/audio/player.c:741
-  #5  avrcp_search_rsp (...) at profiles/audio/avrcp.c:4460
-  #6  browsing_response (...) at profiles/audio/avctp.c:964
+  btmon: EventID: 0x0a (EVENT_AVAILABLE_PLAYERS_CHANGED)
+  btmon: AVRCP: GetFolderItems: len 0x000a
+  btmon: Scope: 0x00 (Media Player List)
+  btmon: AVRCP: GetFolderItems: len 0x003a
+  btmon: PlayerID: 0x0001 (1)
+  btmon: Browsing
+  btmon: Name: BlueZ Browsable Player
+  bluetoothd: profiles/audio/player.c:media_player_set_browsable() true
+  media_player_set_name() BlueZ Browsable Player
 
-Replace those characters with '_' in the object path of a folder named
-by its path, as the search folder and the folders of the browsed player
-are, and fail the search if the folder still cannot be created.
+and no SetBrowsedPlayer follows.
 
-Fixes: 0a232a434d4b ("audio/player: Add implementation of MediaFolder.Search")
+Mark the player addressed also in that case, and send SetBrowsedPlayer
+once the player is addressed. As SetBrowsedPlayer may then be sent
+again while the one sent with SetAddressedPlayer is in flight, mark the
+player browsed when the request is sent, and clear it if it fails.
+
+Fixes: 39a62aaa29b8 ("audio/avrcp: Don't send SetBrowsedPlayer if player is not browsable")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/player.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ profiles/audio/avrcp.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 4c94dcab4..bfc51ac4b 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -730,8 +730,17 @@ void media_player_search_complete(struct media_player *mp, int ret)
- 	}
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index fbd212511..f65d394e8 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -344,6 +344,8 @@ static const uint32_t company_ids[] = {
+ static void avrcp_register_notification(struct avrcp *session, uint8_t event);
+ static GList *player_list_settings(struct avrcp_player *player);
+ static void avrcp_get_play_status(struct avrcp *session);
++static void set_browsed_player(struct avrcp *session,
++					struct avrcp_player *player);
  
- 	if (search == NULL) {
-+		struct media_item *item;
-+
-+		item = media_player_create_subfolder(mp, "search", 0);
-+		if (item == NULL) {
-+			reply = btd_error_failed(mp->msg,
-+					"Unable to create search folder");
-+			goto done;
-+		}
-+
- 		search = g_new0(struct media_folder, 1);
--		search->item = media_player_create_subfolder(mp, "search", 0);
-+		search->item = item;
- 		mp->search = search;
- 		mp->folders = g_slist_prepend(mp->folders, search);
- 	}
-@@ -1890,11 +1899,16 @@ static struct media_item *media_folder_create_item(struct media_player *mp,
- 	item->player = mp;
- 	item->uid = uid;
+ static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *version)
+ {
+@@ -2883,20 +2885,18 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
+ 	uint16_t uid_counter, charset;
+ 	uint8_t status, depth, count;
  
--	if (!uid && name[0] == '/')
-+	if (!uid && name[0] == '/') {
- 		item->path = g_strdup_printf("%s%s", mp->path, name);
--	else
-+
-+		/* Replace what a D-Bus object path cannot have with '_' */
-+		g_strcanon(item->path + strlen(mp->path), G_CSET_A_2_Z
-+					G_CSET_a_2_z G_CSET_DIGITS "_/", '_');
-+	} else {
- 		item->path = g_strdup_printf("%s/item%" PRIu64 "",
- 						folder->item->path, uid);
+-	if (operands == NULL)
+-		return FALSE;
+-
+-	if (!avrcp_pull_browsing_header(&iov) ||
++	if (!operands || !avrcp_pull_browsing_header(&iov) ||
+ 			!util_iov_pull_u8(&iov, &status) ||
+ 			status != AVRCP_STATUS_SUCCESS ||
+ 			!util_iov_pull_be16(&iov, &uid_counter) ||
+ 			!util_iov_pull_be32(&iov, &items) ||
+ 			!util_iov_pull_be16(&iov, &charset) ||
+-			!util_iov_pull_u8(&iov, &depth))
++			!util_iov_pull_u8(&iov, &depth)) {
++		player->browsed = false;
+ 		return FALSE;
 +	}
  
- 	item->name = g_strdup(name);
- 	item->type = type;
+ 	player->uid_counter = uid_counter;
+-	player->browsed = true;
+ 
+ 	folders = g_new0(char *, depth + 2);
+ 	folders[0] = g_strdup("/Filesystem");
+@@ -2942,8 +2942,10 @@ static void avrcp_set_browsed_player(struct avrcp *session,
+ 	memcpy(pdu->params, &id, 2);
+ 	pdu->param_len = cpu_to_be16(2);
+ 
+-	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+-				avrcp_set_browsed_player_rsp, session);
++	/* Set while the request is in flight, so that it is sent once */
++	if (!avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++				avrcp_set_browsed_player_rsp, session))
++		player->browsed = true;
+ }
+ 
+ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
+@@ -3067,6 +3069,7 @@ static gboolean avrcp_set_addressed_player_rsp(struct avctp *conn, uint8_t code,
+ 		return FALSE;
+ 
+ 	player->addressed = true;
++	set_browsed_player(session, player);
+ 
+ 	return FALSE;
+ }
+@@ -3990,8 +3993,11 @@ static void avrcp_addressed_player_changed(struct avrcp *session,
+ 	struct avrcp_player *player = session->controller->player;
+ 	uint16_t id = get_be16(&pdu->params[1]);
+ 
+-	if (player != NULL && player->id == id)
++	if (player != NULL && player->id == id) {
++		player->addressed = true;
++		set_browsed_player(session, player);
+ 		return;
++	}
+ 
+ 	player = find_ct_player(session, id);
+ 	if (player == NULL) {
 -- 
 2.43.0
 
