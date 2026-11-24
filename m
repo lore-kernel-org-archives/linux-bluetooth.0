@@ -1,64 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795477593;
-	b=lqvDk7KRhSNnSOxHWEPZ/PwAg4mQlsZD4uoCN1vaPY6NwIiGnB9xZA0d1cKD4dj9OeOH
-	 CWJyJniim8iuFKn0sJgesGk0ToFzj5i6g9sRZ3MQ+ZXCInFwg8QA4PMkVafa61kWsw5cY
-	 kVBE+XiM/Lt0inT0RjqWnElk/JQK/9uEfbA6Eh6s7NsmXhCbps0Sbsui4wEZkzk4JU3MI
-	 p5Hrj/ltmbNOkJ+nr69H6pBmUm9bpt0lY69Nm84J9/G8OWpZy0IeCVN+S7AaWQDGiBcMI
-	 6PqYH41ZzbnkMkjTDm7X2J4MBvfoH0fOkzK5RmFcn0oLrTgLNSQovRJR3SvSccDDn1A==
+	t=1795480770;
+	b=RMwPRVeIX1bAXMRunULzSmWn1zAns1tNzDBR9vYmlJsLsikdGj0YUBRiQRINCJq7JHMW
+	 lerMswQJVdhIsP7kBcl5BOpZilErR21KG0m/KX0J+ku57Z4noAa7dwD1gATWvE+2sIFNB
+	 hjKlntyIQs2/an4J8BMbTyKTqZw2pc6qioXkKVcAlZZW01CZVGqFxPSBfRzptfNbTXN+K
+	 uXjAEZ5nyQi6NZEqCvM7N+w6Y5vckSpGqvXuitVGuDE8UjDbRz5MwvZHwHW4VTILWglyB
+	 Z0rdJbKmfFI1OMYctjulHGBYHSs8vNrM0wR3jts79pnuoqvyjEyoRRRZ4GZqzDFYf4g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795477593;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=vP+ADNOiSpoNKhzRfreKdcuyfRb2mBj2cg+6BGIcmWA=;
-	b=UYdsEqJg170mA9eG3BPQR2C9P3726lc0tnneumezikKB8TxiaH9N6hzpRXQAsne417xU
-	 wS3cvPpmJv/RmQTXheLaN5AfO4lNmAD2iUFkVVEDl7WbNYraH32je0cW3HknbfmMWjV14
-	 os4ntM0QhdcnU1qCXzhyGWykGMVr4KqhTdbpMRnrgTY+kspUnCRw5LhwyJZB8FYn7sbDB
-	 cZCUWIEOWObh+FgGxvuAnOtR+mYj8zkzXYGLsTTz+lNos10a1frcKQnpGwPSlNedxH2RC
-	 vze8AEFb03SFEpj5iwQCJ0IW+uAB0rJNZ8XNstkpUIBsUAEUfrbFIoKZMYiQuTfWDHQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795480770;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=E7lHDRoZZDlLF9Vk6ZjGwMQE93FuNNjxt06lTW8nudE=;
+	b=WJmzAHQuhowAx52/R7iSwTNCYFex8exQ4qXctwqFBOKu7mWmyvM1Ek+29W6xq9bhSMHa
+	 aAQRlvU0D8/v9J/zIRHY/wl3NCsFvl6W2kuOg7ON6e0tWQ1cddsir6B2Z79+1Sj6g0Nbt
+	 yKwn6rDzYZcnaZUsv5EEXLo+xen3En+rwaSkBM4dbGUlKvK/lnJYY56FhsVGw7IFx2SLc
+	 W+8hGiQ30ZmmNBfhZuWxO6/A+pWvA7HQvoe90AjgKh4DXTTOi1Z3lZPCDV98LruKiMpA1
+	 nQC59BMG+hDgxNU1mrO3wY9mhAYdj1R25Pt6jknD7t/Xo/TryuLfD6C6fvf7NG1oQcQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JTCO8u41;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=JUpf+S0P;
+	arc=none smtp.remote-ip=192.198.163.11
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDFF606A321;
-	Mon, 23 Nov 2026 23:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83DC606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 00:39:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C83DC606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JTCO8u41
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B20F1F000C4;
-	Mon, 23 Nov 2026 23:46:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795477592;
-	bh=vP+ADNOiSpoNKhzRfreKdcuyfRb2mBj2cg+6BGIcmWA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=JTCO8u41i5Bb63hP2HzKMLTu5crJT75CuGJBKjDW9CVzdAiH9b/q2NiyQXnq06ysN
-	 H+JC5kMU8GuxnJ13S18qOoAnHU+W0zg3nRvfMTddR1TdBCNVZ/Qg4n0rER/VhxFdm/
-	 HQf5Yhwa2mg7d6Og6Q/qFQ5aSPq7zLM59V6HaoPxRYHT+0IlngnLoDArP+WU78u6eX
-	 kt7gVcGOG9jlHpyo7ic1sxFDh6uSkWfAN4eYOLfVdl7fBy6XxoxPFnAnpYBoqbWDIL
-	 y14H4zJnW30ARhaWfLhc+B4cWyq62UHAQ/7OZrkMRb+dd6c/TnjmBr0M76L5mn36da
-	 I/UK0uuJKoQPQ==
-Date: Mon, 23 Nov 2026 15:46:31 -0800
-From: Drew Fustini <fustini@kernel.org>
-To: Thomas Gerner <thomas.gerner@muenchen-mail.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] riscv: dts: thead: Enable bluetooth on
- BeagleV-Ahead
-Message-ID: <awTQV54SY8-p0rCx@thelio>
-References: <20261020132604.90708-1-thomas.gerner@muenchen-mail.de>
- <20261020132604.90708-3-thomas.gerner@muenchen-mail.de>
- <awDZBiX1VoSkO6F3@x1>
- <a1b47af8-72bf-4f3e-9ece-e2ceeb97a682@muenchen-mail.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=JUpf+S0P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1795480770; x=1827016770;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rvoPIcDxz61ipvcJsgnGaUH17DDTTZIeJKG2qxhXxJ4=;
+  b=JUpf+S0P7/AZqoD7WWRCLRoaKc/qUq+8YPs6aD8xQyykpZU79zXq6S/r
+   Ck/FKcXaDqaQs9x8A8BUKNNhM1MU3hwvgLYLhtJHn9hmppqxHxyLJLBbu
+   AMQIPHEYuVUlwyyNWAXlGmXb1snoBAuAMETVkJtlb6gRUKcRJ9lOP+iKK
+   pJxAY24wnfHXiEeHBLWvSXH0negcn4CriuHJrTkkWW68IgoIwU7sujcGz
+   mB4OKRYr1u7WdvmsCaOCrodjo0zkNFRGfLNBFCY3RQBRsKfZQMIn57bHB
+   F4B0KrKdYl9Jmg7qjlN8uIT3WJy1+BbkSAf1drWPwmtjxQE03kYnZL/P1
+   g==;
+X-CSE-ConnectionGUID: O7uqIO1sQ1CYXEfnislwow==
+X-CSE-MsgGUID: Ab4WJisqSGCoF/w2hbGqCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="4210287"
+X-IronPort-AV: E=Sophos;i="6.27,229,1787036400"; 
+   d="scan'208";a="4210287"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2026 16:39:29 -0800
+X-CSE-ConnectionGUID: bvjCpGlSQvam/fo9AJ6quQ==
+X-CSE-MsgGUID: 1ETKpyZ4RPijNpfydud6pg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,229,1787036400"; 
+   d="scan'208";a="11207069"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa008.jf.intel.com with ESMTP; 23 Nov 2026 16:39:28 -0800
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Fix RX hdev publication race
+Date: Tue, 24 Nov 2026 06:29:39 +0530
+Message-ID: <20261124005939.2981368-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -68,76 +78,105 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1b47af8-72bf-4f3e-9ece-e2ceeb97a682@muenchen-mail.de>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 21, 2026 at 12:09:29PM +0100, Thomas Gerner wrote:
-> Am 21.11.26 um 00:34 schrieb Drew Fustini:
-> > On Tue, Oct 20, 2026 at 03:26:04PM +0200, Thomas Gerner wrote:
-> > > On the BeagleV-Ahead the bluetooth module of the Ampak AP6203BM is
-> > > identified by the btbcm driver as BCM4362A2. The module is connected by
-> > > UART4, several gpio pins and an I2S interface. The I2S is currently not
-> > > used as there is currently no driver.
-> > > 
-> > > Signed-off-by: Thomas Gerner <thomas.gerner@muenchen-mail.de>
-> > > ---
-> > > Changes in v2:
-> > > 	- use default pinctrl definition for bluetooth in and out pins
-> > Thanks for sending v2. Sorry for the delay in review.
-> > 
-> > > 	
-> > >   .../boot/dts/thead/th1520-beaglev-ahead.dts   | 85 +++++++++++++++++++
-> > >   1 file changed, 85 insertions(+)
-> > > 
-> > > diff --git a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
-> > > index e16484a47653..7161a9d4c61f 100644
-> > > --- a/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
-> > > +++ b/arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts
-> > > @@ -76,6 +76,23 @@ led-5 {
-> > >   		};
-> > >   	};
-> > > +	reg_vbat_1v8: regulator-vbat-1v8 {
-> > > +		compatible = "regulator-fixed";
-> > > +		regulator-boot-on;
-> > > +		regulator-max-microvolt = <1800000>;
-> > > +		regulator-min-microvolt = <1800000>;
-> > > +		regulator-name = "vbat-1v8";
-> > > +	};
-> > > +
-> > > +	reg_vbat_3v3: regulator-vbat-3v3 {
-> > > +		compatible = "regulator-fixed";
-> > > +		enable-active-high;
-> > enable-active-high has no effect without a gpio.
-> > 
-> > > +		regulator-boot-on;
-> > > +		regulator-max-microvolt = <3300000>;
-> > > +		regulator-min-microvolt = <3300000>;
-> > > +		regulator-name = "vbat-3v3";
-> > > +	};
-> > Nothing can switch these two rails so regulator-always-on describes them
-> > better than regulator-boot-on.
-> 
-> 
-> I see. With the next version I will consider this. The regulator
-> definitions are here only to prevent the hci driver form printing a
-> message about missing regulator. Once we have the final regulators for
-> the AON subsystem we should check this definitions and replace them if
-> appropriate.
+hci_register_dev() queues hci_power_on without waiting for
+hdev->setup(), so setup can run before btintel_pcie_setup_hdev()
+returns and publishes data->hdev. Publish data->hdev at the start of
+hdev->setup(), when the hdev is fully registered, so the command/event
+exchange finds it. Publishing before registration would expose a
+partially initialised hdev to RX and the dump workers.
 
-I looked at the schematic. VBAT is fed from VDD_3V3 and VDDIO from
-DVDD18_AP, so I think the two regulators should be named after those
-nets, something like this:
+The race is seen as a NULL pointer dereference in the RX work while
+hdev->setup() is still running:
 
-    reg_dvdd18_ap: regulator-dvdd18-ap {
-            [..]
-            regulator-name = "dvdd18_ap";
-    };
+  Oops: general protection fault, kernel NULL pointer dereference 0xc28: 0000 [#1] SMP NOPTI
+  CPU: 0 UID: 0 PID: 904 Comm: kworker/u35:1 Tainted: G C OE 7.3.0-nvl-ww44-2bkc #2 PREEMPT(lazy)
+  Hardware name: Intel Corporation Nova Lake Client Platform/NVL UPH/UL LP5X T3 MEMSKT RVP5, BIOS NVLPFWR1.R00.3414.D22.2610141025 10/14/2026
+  Workqueue: btintel_pcie btintel_pcie_rx_work [btintel_pcie]
+  RIP: 0010:btintel_pcie_recv_frame.isra.0+0xc8/0x3c0 [btintel_pcie]
+  Call Trace:
+   <TASK>
+   btintel_pcie_rx_work+0x24/0x40 [btintel_pcie]
+   process_one_work+0x1dc/0x3f0
+   worker_thread+0x1b8/0x360
+   kthread+0xf9/0x130
+   ret_from_fork+0x2c3/0x380
+   ret_from_fork_asm+0x1a/0x30
+   </TASK>
 
-    reg_vdd_3v3: regulator-vdd-3v3 {
-            [..]
-            regulator-name = "vdd_3v3";
-    };
+Drop received frames when data->hdev is unavailable to avoid NULL
+dereferences.
 
-Thanks,
-Drew
+Fixes: 6e65a09f9275 ("Bluetooth: btintel_pcie: Add *setup* function to download firmware")
+Assisted-by: Copilot:claude-sonnet-5.5
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel_pcie.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 3b2c8bbb36e9..4aff83ba1bbd 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -2533,7 +2533,15 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+ 	u32 plen;
+ 	u32 pcie_pkt_type;
+ 	void *pdata;
+-	struct hci_dev *hdev = data->hdev;
++	struct hci_dev *hdev = READ_ONCE(data->hdev);
++
++	/* RX can start before hdev is published (see btintel_pcie_setup()).
++	 * No command can be pending yet, so drop the frame.
++	 */
++	if (!hdev) {
++		kfree_skb(skb);
++		return -ENODEV;
++	}
+ 
+ 	spin_lock(&data->hci_rx_lock);
+ 
+@@ -2953,10 +2961,11 @@ static void btintel_pcie_coredump_worker(struct work_struct *work)
+ 	struct btintel_pcie_data *data = container_of(work,
+ 					struct btintel_pcie_data, coredump_work);
+ 
+-	/* hdev is NULL until setup_hdev() succeeds, and is cleared on
++	/* hdev is NULL until it is registered and published by
++	 * btintel_pcie_setup() or btintel_pcie_setup_hdev(), and is cleared on
+ 	 * teardown after disable_work_sync() drains us; bail in that case.
+ 	 */
+-	if (!data->hdev)
++	if (!READ_ONCE(data->hdev))
+ 		goto out;
+ 
+ 	/* When firmware routes debug traces to the WiFi DBGC, no host
+@@ -4273,6 +4282,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
+ 	bool fips_crc_failed;
+ 
++	/* hci_register_dev() only queues setup(), so it can run before
++	 * setup_hdev() returns. hdev is registered by now; publish it so RX
++	 * and the dump workers can use it.
++	 */
++	WRITE_ONCE(data->hdev, hdev);
++
+ 	btintel_pcie_fatal_err_load(data);
+ 
+ 	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
+@@ -4846,11 +4861,8 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 		return err;
+ 	}
+ 
+-	/* Publish hdev only after successful registration; the coredump
+-	 * worker bails on !data->hdev, so it never observes a half-set-up
+-	 * device.
+-	 */
+-	data->hdev = hdev;
++	/* Idempotent: setup() may already have published hdev. */
++	WRITE_ONCE(data->hdev, hdev);
+ 	data->dmp_hdr.driver_name = KBUILD_MODNAME;
+ 	return 0;
+ }
+-- 
+2.54.0
+
