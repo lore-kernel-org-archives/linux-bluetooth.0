@@ -1,61 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.76.89
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795512682;
-	b=JahueIjPdsmP9xXQVP8fsMxjpIXm7tl0xeeTPwV2gKWSoQLPTxIk8N8rboAN75Aas0Vj
-	 rzCFid2RBqxHxrWNkLdrqlXt82KhNiinHjZV1OzImpNKBdszrxDrwo3kkZn2ozhR3EcCP
-	 vX2uN+s3HtGF0K/JvY82gGb76csHCd4mh2cCGxk+4WYuN5jghPWrqlSPhYg4/Het6Ie5J
-	 uQ+THQnZEH0g4BOA41EV/HbNrLrivlhm8ned32w6VkoB7kG70GNriDSkgsd6gHITBbZwR
-	 zBnYYiMtQpOZJRVVtgdN8FMs9n9GzzQpzcliTx9vDRqx9icRtSb/7G7k3aKDTE1fX4w==
+	t=1795513457;
+	b=MXDvT1veisZNEbpckXlUNmubq3qvDs10bLw7xROHnCUgbhgftn8KNBPfaD6QmHu4oqF/
+	 1DW38P5Ub2JVawzH02f9JpN4DgoWzkCKFEZzN5MtQm+ku78drVYvonZRJVAXq1TF86uWO
+	 QERRQmzv8rzQdDhVGAxW/1tgLrTavEo9YIBKy4afElMR0IX81XScHvgmkh4TmlKxaa3AW
+	 pYN+hQFWmNK5oL7ijX39gfFSbaMpcz5dKiA/u0cuDoSwMdChQFK2iaMY4fP8/Muqvfqtn
+	 gEO15uKGd/Pg0eyQsVLg1PzjyhAx5jDNVsh80tYcIvQOhtoqBd/Fn6AFjqgTGESeZCw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795512682;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer;
-	bh=FzbVfcPRNou4tA4fnO7EvJRFEff/xs4EhP8qiIC3aCw=;
-	b=moXDrXPyidsCJYnETPLwvalXXSOV0v9SWCpoA8EYtv9oHuZB6CaiLccUz9oH/XFaY5Dv
-	 lSgfZf0SVAjhO6GrraemxXH3NwR48SJzuaFJE5hZTu5JD1gva/5yAnRiT63eTH5vZ3+Yd
-	 O++jZvVqfl5Yrq9+Z8BzsvZzXP4DoVHeKTOJ3CyEE9XyGEeg9ENL9e543M45BW3wWdqXV
-	 IfwvIP2QIEw/3MgyEeYR+KSsJMJvgD3RfmgLO4Ohw1i3KYn36NokgfgL4f73axn8gP++U
-	 rG5xrBgzB3kkB0RZmsieWWAnGUG6ZOX2CObDs/aKWdGCYI299nElmkbKK8iBCwfmmJg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795513457;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Type:X-Change-ID:X-Mailer:
+	 Content-Transfer-Encoding;
+	bh=MVyh89LSnjdyTdIzBNZRkbM9Weu4yYexQ4Ew0x0v/rQ=;
+	b=VaZMYQUpuLoFjJNs4yBMst+ZztBG9QMqwE44Xz2pEb2INQNNINa6jcVA/G7MzzH2D6LO
+	 /c7oqyb+HXR0t0G9OYueczLYHKu1slF9xejmWdXLXwWay55bRtE+7V68eknWbg9hK15fQ
+	 2w15KRWzQJE2uS4HqYN/CMkYRF+Gzvb0cPeXJKOL1a/HyoyO7WhYCmx8iH9y/3FeyQHZs
+	 1h7O5eRTeYWL0aZiH5DCHpoS2Bk3CpD/bRUXWfRuamcdf3KyTUoTlXiumPSZSScrHi7rv
+	 E4phhCe35S90wSHoo9h8+dxdLT+7gHIcamuvAHBL7foxnyjO31ORISjryEKA+hWmCSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=podgorny.cz;
-	spf=pass smtp.mailfrom=podgorny.cz;
-	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=qfaWiWU1;
-	arc=none smtp.remote-ip=77.75.76.89
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dPz5Kqpd;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11E3606A33B;
-	Tue, 24 Nov 2026 09:31:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C11E3606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F11F606A336;
+	Tue, 24 Nov 2026 09:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=qfaWiWU1
-Received: from email.seznam.cz
-	by smtpc-mxb-5bd84c9575-j92sp
-	(smtpc-mxb-5bd84c9575-j92sp [2a02:598:96:8a00::1200:505])
-	id 1c64b775aa5e1a6c19ebad3d;
-	Tue, 24 Nov 2026 10:31:06 +0100 (CET)
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
-	t=1795512666; bh=FzbVfcPRNou4tA4fnO7EvJRFEff/xs4EhP8qiIC3aCw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc;
-	b=qfaWiWU1HGsnaq2+4N9gbwOXww5ihu98bNyOjswZSVX/iNv4gCi74Kz7DyzJxshv4
-	 AYB5VB42oAg7cNklFM/58OQTDqYebJpZ5JeGul1QGdYiK6Z/3ztlb5nR42TkIj5kH1
-	 gMDb9YGdTOCIxXZiMEPf0iTY3UTc5ouVP1LcNsp1F3kLr1cWZ5///5yNJeyr9/Wq5J
-	 QHzPmSqursKLWv4nNiqx29I+rSV2aK4ky1ovB70SQMzIGp8PUsGtE1OSOCeot5Xvjp
-	 ZKyGhd9u8YwDur2G+y5ZRYcY+XIlc6u3P0ztCINDSiz+Pdu4k9xPvUdkIORKvK+Kmj
-	 zCYjFI7z3RNRA==
-Received: from [192.168.31.57] ([2a01:9422:904:1ee:e65e:37ff:feee:e29c])
-	by smtpd-relay-584bc557d7-pqx9t (szn-email-smtpd/2.0.97) with ESMTPA
-	id 049b94d3-d632-4051-91ef-bdac6b7bd993;
-	Tue, 24 Nov 2026 10:31:02 +0100
-From: Radek Podgorny <radek@podgorny.cz>
-Date: Tue, 24 Nov 2026 10:31:00 +0100
-Subject: [PATCH v4 4/4] Bluetooth: find an RPA peer's connection parameters
- by its identity
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dPz5Kqpd
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270941F000C0;
+	Tue, 24 Nov 2026 09:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795513457;
+	bh=MVyh89LSnjdyTdIzBNZRkbM9Weu4yYexQ4Ew0x0v/rQ=;
+	h=From:To:Cc:Subject:Date;
+	b=dPz5KqpdK9nRPKUG6HUSe0vOj09Sy3JXT3OmWwG6jKg0jPV//81DZIrqZ9cs4jXkP
+	 e5jysJUgPxSHDEdvRIBPlMnRhve/j0ygvAMePt1RCUH45XYZvtV/aeyfIK/X1Ifn2B
+	 ctYWo+8swz85c0hjAjpMsVLPTHzme8kWcSexD1DD291wZLjXDenM0/ykH4wFjGdmCo
+	 +NEsrDDUg5fjAhyDjb5L5BMmR/S5qSXaJotzaodPFCvmwbSA5grmcSX1/GcsctGDt/
+	 UtKyMHvV7Vr4u82Zoh4tL4cn07Ykj9ze1498N1xgF/MZn7PEu+qOtnZEmsE7mJUa73
+	 hyuQsDuJkX2cw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Johan Hovold <johan@kernel.org>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Chris Lu <chris.lu@mediatek.com>,
+	Mans Rullgard <mans@mansr.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Cornelia Huck <cornelia.huck@de.ibm.com>,
+	Andrew Morton <akpm@osdl.org>,
+	Jeff Garzik <jeff@garzik.org>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+	Dan Williams <djbw@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	driver-core@lists.linux.dev,
+	linux-input@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	linux-sound@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: [PATCH v4 00/33] driver core: Authorize device trust before driver binding
+Date: Tue, 24 Nov 2026 11:43:31 +0200
+Message-ID: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -66,177 +114,186 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261124-for-upstream-le-conn-params-rpa-v4-4-f2dd5eb41f45@podgorny.cz>
-References: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
-In-Reply-To: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- Johan Hedberg <johan.hedberg@intel.com>, 
- Jakub Pawlowski <jpawlowski@google.com>, linux-bluetooth@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Radek Podgorny <radek@podgorny.cz>
-X-Mailer: b4 0.15.2
+X-Change-ID: 20260915-device-trust-core-12934e618489
+X-Mailer: b4 0.15-dev-18f8f
+Content-Transfer-Encoding: 8bit
 
-A bonded peer's connection parameters are stored under its identity
-address, but hci_conn_params_lookup() matches only the exact address it
-is given, so a caller holding the peer's RPA misses the entry.
+Device trust policies need to precede driver setup, including manual
+attachment, so userspace can authorize devices before they operate.
 
-hci_le_create_conn_sync() is such a caller: hci_connect_le() puts the
-peer's cached RPA in conn->dst, and __hci_conn_add() no longer converts
-it back when the controller cannot translate an identity address. The
-connection is then created with the controller-wide defaults in hdev
-instead of the peer's interval, latency and supervision timeout.
+This series introduces device trust policy, authorization, and lifetime
+commitment. Authorization does not reconfigure ATS capabilities or replace
+IOMMU domains selected during discovery and further ATS and IOMMU integration
+will follow in a separate series.
 
-Resolve an RPA to its identity in hci_conn_params_lookup(), so every
-caller finds the same entry whichever of the peer's addresses it holds.
-The identity is looked up instead of the RPA, not after it: Pair Device
-creates an entry under the RPA the peer had before bonding, and that
-entry stays behind with default parameters. Matching it first would hand
-it out for as long as the peer keeps that RPA. Such an entry is no
-longer reachable by its RPA once the IRK is known; it is cleared with
-the other disabled entries the next time all connection parameters are
-loaded.
+The table below tries to summarize the possible kernel command line
+options and system behavior after that:
 
-hci_conn_params_del() goes through the same lookup, so given a
-resolvable RPA it now acts on the identity entry. hci_conn_params_add()
-resolves the address once and uses the result both to look for an
-existing entry and as the key of a new one, so a new entry is created
-under the identity and a later lookup by the identity or by a rotated
-RPA finds it. hci_connect_le_scan_cleanup() and le_conn_complete_evt()
-free the explicit connect's entry they already hold instead of deleting
-it by address, since that lookup now resolves the address again and
-could reach another entry if the IRK arrived in between.
+Command line                        Initial behavior
+----------------------------------  ---------------------------------------
+No device_trust options             General: existing driver binding.
+                                    PCI: existing ACPI/topology
+                                      restrictions.
+                                    USB: existing authorized sysfs flow.
 
-The returned entry can therefore hold a different address type than
-the one the caller passed. load_conn_param() and load_conn_subrate()
-look up the connection by the entry's address with the caller's type;
-use the entry's type with it.
+device_trust.default=default        General: use each bus's initial policy.
+                                    PCI: keep the platform classification
+                                      and its restrictions; device rules
+                                      can replace it.
+                                    USB: devices and interfaces denied by
+                                      USB defaults wait for authorization
+                                      before binding.
 
-Set Device Flags and Get Device Flags given an RPA now act on the
-identity's entry, where Set used to create a separate one under the RPA,
-which only a lookup by that same RPA could find, and Get failed. Their
-reply and the Device Flags Changed event still carry the address the
-caller gave, as other mgmt commands do.
+device_trust.default=blocked        General: block driver binding until
+                                      authorization.
+                                    PCI: restrict every device from
+                                      discovery; authorization does not
+                                      revisit domain and ATS decisions.
+                                    USB: leave devices and interfaces
+                                      unbound until authorized.
 
-Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Radek Podgorny <radek@podgorny.cz>
+device_trust.default=adversarial    General: allow adversarial binding.
+                                    PCI: restrict every device as
+                                      adversarial.
+                                    USB: allow adversarial binding,
+                                      overriding USB authorization
+                                      defaults.
+
+device_trust.default=unrestricted   General: allow unrestricted binding;
+                                      freeze trust policy changes.
+                                    PCI: replace the platform
+                                      classification; removable devices
+                                      lose their DMA restrictions.
+                                    USB: authorize devices and interfaces
+                                      regardless of USB defaults.
+
+device_trust=...                    General: matching rules select policy;
+or device_trust.driver=...            unmatched devices stay blocked.
+without an explicit default         PCI: rules replace the platform
+                                      classification; a device rule of
+                                      default resolves to unrestricted.
+                                    USB: matching rules select device or
+                                      interface policy.
+
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- net/bluetooth/hci_conn.c  |  3 ++-
- net/bluetooth/hci_core.c  | 30 ++++++++++++++++++++++++++----
- net/bluetooth/hci_event.c |  4 ++--
- net/bluetooth/mgmt.c      |  4 ++--
- 4 files changed, 32 insertions(+), 9 deletions(-)
+Changes in v4:
+- Documentation, commit messages e.t.c
+- Don't fail BT device initialization if WiFI USB claim fails/
+- Rename "adversary" to "adversarial" as was agreed at the beginning.
+- Added new patch to drain usbfs during disconnect.
+- Added another new patch to reject usbfs connect requests for
+  unregistered interfaces.
+- Link to v3: https://patch.msgid.link/20261118-device-trust-core-v3-0-d655875c4bfb@nvidia.com
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 791df930650e..c37271586345 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -117,7 +117,8 @@ void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status)
- 
- 	switch (params->auto_connect) {
- 	case HCI_AUTO_CONN_EXPLICIT:
--		hci_conn_params_del(hdev, bdaddr, bdaddr_type);
-+		hci_conn_params_free(params);
-+		hci_update_passive_scan(hdev);
- 		/* return instead of break to avoid duplicate scan update */
- 		return;
- 	case HCI_AUTO_CONN_DIRECT:
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a87c92dccd4f..568c99bf86db 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2379,9 +2379,14 @@ void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
- 	rcu_read_unlock();
- }
- 
--/* This function requires the caller holds hdev->lock */
--struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
--					       bdaddr_t *addr, u8 addr_type)
-+/* Like hci_conn_params_lookup(), but without resolving an RPA to its
-+ * identity.
-+ *
-+ * This function requires the caller holds hdev->lock.
-+ */
-+static struct hci_conn_params *__hci_conn_params_lookup(struct hci_dev *hdev,
-+							bdaddr_t *addr,
-+							u8 addr_type)
- {
- 	struct hci_conn_params *params;
- 
-@@ -2395,6 +2400,17 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
-+					       bdaddr_t *addr, u8 addr_type)
-+{
-+	bdaddr_t id_addr;
-+
-+	hci_rpa_to_identity(hdev, &addr, &addr_type, &id_addr);
-+
-+	return __hci_conn_params_lookup(hdev, addr, addr_type);
-+}
-+
- /* This function requires the caller holds hdev->lock or rcu_read_lock */
- struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
- 						  bdaddr_t *addr, u8 addr_type)
-@@ -2439,8 +2455,14 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
- 					    bdaddr_t *addr, u8 addr_type)
- {
- 	struct hci_conn_params *params;
-+	bdaddr_t id_addr;
- 
--	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	/* Resolve once, and use the result both to search and as the key
-+	 * of a new entry.
-+	 */
-+	hci_rpa_to_identity(hdev, &addr, &addr_type, &id_addr);
-+
-+	params = __hci_conn_params_lookup(hdev, addr, addr_type);
- 	if (params)
- 		return params;
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b6c7f9a9f55a..f7dbfb484d01 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6551,8 +6551,8 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 
- 			switch (params->auto_connect) {
- 			case HCI_AUTO_CONN_EXPLICIT:
--				hci_conn_params_del(hdev, &conn->dst,
--						    conn->dst_type);
-+				hci_conn_params_free(params);
-+				hci_update_passive_scan(hdev);
- 				break;
- 			case HCI_AUTO_CONN_REPORT:
- 				hci_pend_le_list_add(params,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d21538634bc3..64886b0a9091 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -8456,7 +8456,7 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
- 			 * a connection update.
- 			 */
- 			conn = hci_conn_hash_lookup_le(hdev, &hci_param->addr,
--						       addr_type);
-+						       hci_param->addr_type);
- 			if (conn && conn->role == HCI_ROLE_MASTER &&
- 			    (conn->le_conn_min_interval != min ||
- 			     conn->le_conn_max_interval != max ||
-@@ -8571,7 +8571,7 @@ static int load_conn_subrate(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 			conn = hci_conn_hash_lookup_le(hdev,
- 						       &hci_param->addr,
--						       addr_type);
-+						       hci_param->addr_type);
- 			if (conn && conn->state == BT_CONNECTED &&
- 			    (conn->le_rate_interval < min ||
- 			     conn->le_rate_interval > max ||
+Changes in v3:
+- Rewrote all commit messages
+- Split USB patches to smaller chunks
+- Introduced special device attach function which works only in
+  untrusted mode
+- Remove the special PHY -EBUSY IRQ handling.
+- Clarify that further ATS and IOMMU integration follows separately.
+- Link to v2: https://patch.msgid.link/20261109-device-trust-core-v2-0-3b12d9a9f861@nvidia.com
 
--- 
-2.56.1
+Changes in v2:
+- Replace the serio and PHY attachment conversions with
+  device_driver_attach_unrestricted(), restricted to device_trust.default=unrestricted.
+- Add USB authorization on top of device trust: export
+  device_trust_set_policy() and convert the USB authorized attributes.
+- Documentation and commit messages fixes
+- Small USB patches rewrote and split
+- Link to v1: https://patch.msgid.link/20261105-device-trust-core-v1-0-1e536825b4eb@nvidia.com
+
+---
+Leon Romanovsky (33):
+      wifi: mac80211_hwsim: lock device for manual driver binding
+      Bluetooth: btusb: Fix MediaTek ISO claim locking
+      USB: Lock interfaces during manual driver binding
+      USB: serial: Register USB drivers with their owning module
+      USB: Reject claims of DT-disabled interfaces
+      USB: Reject usbfs connect requests for unregistered interfaces
+      USB: Release interface claims according to binding state
+      USB: Reject claims after interface registration failure
+      ALSA: usb-audio: Release interface claims when probe fails
+      USB: Pin modules for unregistered interface claims
+      USB: Add helpers to release unpublished interface claims
+      USB: Unwind interface claims after registration or binding failure
+      PNP: Attach card devices through the driver core
+      cdx: Propagate DMA configuration errors
+      driver core: Report deferred probes through sysfs drivers_probe
+      driver core: Add a compatibility API for manual driver attachment
+      Input: gameport - use the compatibility driver attachment API
+      Input: serio - use the compatibility driver attachment API
+      net: phy: Use the compatibility driver attachment API
+      USB: Drain usbfs when a device is unregistered
+      driver core: Introduce a generic device trust level
+      driver core: Expose device trust authorization interfaces
+      driver core: Accept device trust policy on the kernel command line
+      driver core: Accept device trust policy by driver name
+      driver core: Expose committed device trust level
+      driver core: Cover trust authorization and binding with KUnit
+      driver core: Document trust admission and initrd authorization
+      PCI: Use device trust for platform restrictions
+      iommu: Use device trust for DMA restrictions
+      driver core: Allow driver attachment with the device lock held
+      USB: Retain the result of configuration requests
+      USB: Authorize interfaces through device trust
+      USB: Authorize devices through device trust
+
+ Documentation/ABI/testing/sysfs-bus-drivers-probe  |   14 +
+ Documentation/ABI/testing/sysfs-bus-usb            |   18 +
+ Documentation/ABI/testing/sysfs-devices-trust      |   37 +
+ Documentation/admin-guide/kernel-parameters.txt    |   37 +
+ .../driver-api/driver-model/device-trust.rst       |  343 +++
+ Documentation/driver-api/driver-model/index.rst    |    1 +
+ Documentation/usb/authorization.rst                |   37 +
+ MAINTAINERS                                        |    2 +
+ drivers/base/Makefile                              |    2 +-
+ drivers/base/base.h                                |   52 +
+ drivers/base/bus.c                                 |    9 +-
+ drivers/base/core.c                                |   52 +-
+ drivers/base/dd.c                                  |  192 +-
+ drivers/base/test/Makefile                         |    1 +
+ drivers/base/test/device-trust-test.c              | 2487 ++++++++++++++++++++
+ drivers/base/trust.c                               |  509 ++++
+ drivers/bluetooth/btusb_main.c                     |   55 +-
+ drivers/cdx/cdx.c                                  |    2 +-
+ drivers/input/gameport/gameport.c                  |   22 +-
+ drivers/input/serio/serio.c                        |   29 +-
+ drivers/iommu/amd/iommu.c                          |    3 +-
+ drivers/iommu/dma-iommu.c                          |   14 +-
+ drivers/iommu/intel/iommu.c                        |   14 +-
+ drivers/iommu/iommu.c                              |    9 +-
+ drivers/net/phy/phy_device.c                       |   28 +-
+ drivers/net/wireless/virtual/mac80211_hwsim_main.c |    2 +
+ drivers/pci/ats.c                                  |    4 +-
+ drivers/pci/pci.c                                  |    5 +-
+ drivers/pci/probe.c                                |   18 +-
+ drivers/pci/quirks.c                               |    7 +-
+ drivers/pnp/card.c                                 |   12 +-
+ drivers/usb/core/devio.c                           |   12 +-
+ drivers/usb/core/driver.c                          |  118 +-
+ drivers/usb/core/generic.c                         |    2 +-
+ drivers/usb/core/hub.c                             |   42 +-
+ drivers/usb/core/message.c                         |  104 +-
+ drivers/usb/core/sysfs.c                           |    9 +-
+ drivers/usb/core/trace.h                           |    2 +-
+ drivers/usb/core/usb.c                             |    6 +
+ drivers/usb/core/usb.h                             |    7 +-
+ drivers/usb/serial/usb-serial.c                    |    4 +-
+ include/linux/device.h                             |   21 +
+ include/linux/device/bus.h                         |   10 +
+ include/linux/device/trust.h                       |   54 +
+ include/linux/pci.h                                |   18 +-
+ include/linux/usb.h                                |   25 +-
+ include/linux/usb/serial.h                         |    4 +-
+ sound/usb/card.c                                   |    7 +
+ 48 files changed, 4246 insertions(+), 216 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20260915-device-trust-core-12934e618489
+
+Best regards,
+--  
+Leon Romanovsky <leonro@nvidia.com>
 
