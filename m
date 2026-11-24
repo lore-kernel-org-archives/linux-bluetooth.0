@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795534743;
-	b=o5uykWImb1zOo3Wt2bjT4/u8a+6o1HSUcTfu3RB/xhrCEl4fOjuqzcyW0u7gDj+h3iEq
-	 2IDAvih/0sF8zl+54Varv5gLJSMTw/P0s33/FzzukCCCFn91+jVCVxTtXbu48EbUXWuCK
-	 P9vaTcTLAHbrX99V6WBD+OrvhiPJCxzIDrXrjEDpal9x4eVcK1G0yg0r5PQ4axm3rKRWR
-	 5z9Tk1R3tnRaSQbwGWQiYBgHyPHFn9Rs+CwQC9B/RgCbsHyvU6fAQfW1qY1C1Ok7IrH9e
-	 OkJKW5iL7/sIRVG9Pj/9iL03rk6/mWXA46Mw+UoJhVl9SzJukl0rN+sKJEwkQootb2A==
+	t=1795534744;
+	b=5sk4DTJzXWSOeAEsGRXlIaPw/VCZg8H/B5+H3rN82XZMjtMdkSQJ26a4yIu9PvlpF1R9
+	 X+ExGXfNN2wYFTfITzFnhL41L0o8CXFwynHmDx7seRc8EQpobBdOYErWhC2mLNAYNhw2Q
+	 Q4NGuUi3oNmC6fJpgYzjc7jsbKyiuXWTjOXe15AOXPCaSWa+qDER6pzbSUf71ZmNmxGYL
+	 zB+ePClu0eXJNXM7Igj6E066x6xIqY1b4V2sXlXOHB/Y4WTmOOWc+QxbSzBqeZ6lcY7IF
+	 Gq7qrErACzU5MQ0Mf+PUKC4m7EgxjJY0OdXYTXIYBmtbUkhjtxQy+sktoqFt0gRNnmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795534743;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795534744;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
-	b=s/qohkJBiVYWDFYO5McFyESVl7rH5xeKvHrIyZSwVpuuCCvcgcH/AWUFNqOCvLTr4+Ht
-	 JVekGo+M1Pu+njBjPmvx3BRX+q51eLabcRRIuLLtPlRqt0PQI0qVKMUV2AmYxIVazYW+N
-	 TnBTf7B3F6ABo+yi2IHiHI2WFFZ/YyQupJGwWJ+g7e2Kd0RXutKdqcMYsCDU19DmgZej9
-	 UwLvdZIUeSqUrS2EvrxWZjSBfmKvlmO1HmXw1B14zui3SfAlADmYN1QPREQTbzc7wX3/U
-	 j4yWy/OI2DQcOOoglB8ShBYJdKSkp7BaBUh1ge/zndVx7Efoz0ns90GbnyV1H+j5iww==
+	bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
+	b=FRx+rddYS6ZkDGD3Wr+UN5QPJ8rtfbABwiNesb4Or4x1T8qQUxGlnNkhBqtzt0H9T/VV
+	 8fqtwwVVVSrCTlrvyCItG83CPxUubYSqIJVtJ8bbTgOuM6F7/LsjL5HNXlVjK3gbhzHwx
+	 Ig0cnJCt70dzDV2g9M6pFwmz67CzehwK7gGBzk+AJJFHljie/3O9kqNbq2lGdpmcjFcrN
+	 imW1z4uvEf1NZLprTq6OkDEzJNoI8z2goSnOUTgSEVnjlQLlmzA12/zu5ojJ49Mv0YP9r
+	 0w+zNLJq7pxzjXt54K93ltA+0CrztGn0u04W1BKR/ykLn1UrgxjUpr9I8rj/cs6H6iA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=geg7Ytzu;
-	arc=none smtp.remote-ip=209.85.221.170
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=I9ZZEhZA;
+	arc=none smtp.remote-ip=209.85.222.41
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E8A606A335
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:39:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C3E8A606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1311F606A323
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:39:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1311F606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=geg7Ytzu
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-5ec690faf85so1622475e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:39:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=I9ZZEhZA
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-98301b325c4so1214535241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795534742; x=1796139542; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795534743; x=1796139543; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
-        b=geg7Ytzuc6NjRgmKopJNHiuwFdb+5TWfjXDBh494Z8gZsEeDDrRlJhLa4g3rD5eqmC
-         4j+rVPaxuHYivSHFmLipQ5iX9jj4ikpVHJzSYxERuPKbkGqvbkpuGj+A5rattrH18XiS
-         EAe2mxRh7X/l+hxlutrUmjHS7l0VRuAXy4xk4tMdhicgzAKTX4mDZ3u3RWPyiMLZsIKG
-         JQFGtyPNeiFwuGoyDVzZ2vzB7qrf+3BR/4CzYe6CaLRjNCvZ/blUoCJIcTlf3Zw6cT1+
-         /ZzByduf0KBfp0c5oUOeAY/+iIMES4vjuwRdqxHooElztCAf9qbXlDBEYc1uMjM37aSJ
-         Uo6Q==
+        bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
+        b=I9ZZEhZACVZYX8m/dSN2mCFnCZ9idigHxJfxFZbJ77TUfM/uUSLiv+oHDVPYi1sopG
+         ME8/8w/pSZGwdzxS5Su37NOXBKzSe9tT62V8klnb73H5AMyz8gMs6l+lthuxoyDZXT9+
+         rZvawW3fq43JjEjSvLuX2otWVSwGf4VFdSzhb7T+OaWw8AOI6QLpwNLuP40AJ2X8T3hO
+         tKMgUkR2wwoVDNe6xQkJmIlCtHEYYjqn3Ms7Ux4TWcUvEeTDoa7pQLZRRUxjVZWO+Ct5
+         qtq1smeKkLsRXEGgXUNI7mrYLSp7lyVNmcVRZ8j8hNjKblrpC4AcnsEvhILbF2gNh1wp
+         LQ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795534742; x=1796139542;
+        d=1e100.net; s=20260707; t=1795534743; x=1796139543;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=G+7q7zymhQTc4eKcMtAr/buHoRyWJV+MAtC4j6V4TBs=;
-        b=WPeTG10BfTOtpBputKLOEqX/QTfHEoi3oO8OqCV3QULArcSc38tkkI/oMd+hjAgkJr
-         gR2F9itLrOKaa3RSGfiIFjMwtxuDi+rNFYdev1ZtZFHvq1RQ8YdSd21xHW2lT7shj/1o
-         d8jBLg40cj39NHnCbxvHJIxsyz4sJ0vzaVfu7dJo0WmR33CVeAfJdmOKZkhKUlEkiVfd
-         N7Q9Y0mPtB1ytJ7NrgFh4JHDAkJsnta2Cfsgg2ArAOpP/hD0H2lmIWofYLUUD0jnLwnc
-         hFziHMQh2uVl5msIUW/Y9GGLhNJBHMbi+Z1mEB1Gl678hdzSN2xl+5r/8+PZoBeoBgP8
-         CLfw==
-X-Gm-Message-State: APuU4Z/H4hk6FW+sRrEphHZLdBQpzOYuzOzmwyA0bffzRBwKtcX7xban
-	DGe6yXyqkX0FA3kvYsHYuN4jZnbi/tRAJR16QW4GsHE20XL0cIvS6L5Cp2Iabw==
-X-Gm-Gg: AZFdTZfWfu7RUHkjBK9VIGmMQ6zwNmtGRdEAny4JN7MUvodp2U0vyRilQEbP+AdT5V/
-	3XIk73sLGZnU4GkaJuFGVpKxL6g5NTySUp/C0pFK+s6E8+NTifdBFgPIwGnjpUApJz8K13OUuvP
-	tTe7FBeS3Wo0YeQ/g3Q+05abcBr4Y8J7S64i9pfMrs/34l/VMKJtMBxotTWEPEZ6BLIRmWmiNFl
-	xpvch/7KqsaOwLbIhmBD2aqw2wBw8Xc7vkZNzboDoTNZila6hf0A3/LclqSr+Up4t8d8BTPmYUf
-	Ix7rlhR7pKJYrFywHj9r6VSBJptmFx0hmMzFFMtaWxt8SOFlGiotv67RnJpAmeJLm/ATPe7wqnI
-	wXG8THXU8jpFInZRKsZVWIcaGjRYSxCjZopKdb/zqz1FfnmvNYrXhAHYWVTyu4P+z81lVUgr08k
-	ORMUvcODQM3REJrWpLrKvPK5OuGEvsjTtF1h3JA7ITAgKkYLR9iPvnNBvxa0cr3BiPKH3h0ag0F
-	+uwQ3LBEVAgB3ANqcy1gJLSLANB46m884Fp+FHlmWFBfK2PjjdltG9B3XOScHMPQTaIuh4wHvqh
-	80PW3mUwGWd4ISHMax6nTIKgHwL2C1L4pGM7TnkGsssBNsLdZehSxWZu2bB4LOufStZe/GMUI+d
-	LH3bioukjjiZBIFYoP3Z1j8g0hyIbnEfbk9L4WIyIP7gr6iMtzHsOzbiajhvRjwIqgLAeoNU47Q
-	S3fEc=
-X-Received: by 2002:a05:6122:1d0f:b0:5ea:d649:d1bc with SMTP id 71dfb90a1353d-5ee8af45319mr9044065e0c.18.1795534741626;
-        Tue, 24 Nov 2026 07:39:01 -0800 (PST)
+        bh=vAl/b7hMYAIDcmGXFZYO+BcVuKc9G5RZS9zq595xucY=;
+        b=fXbf8YNRDmW0xyT1SqzDWqBq6SevzD1sLfrH2qNtHCLKo1Wy4EquFPiP5n/xZ4qNO8
+         UO3nTvHNGPinLG509Gmbp5ShKFjIaQpHG8p7C3qU7q8DWoWVE6wF/58j3v/HtJZ9Lkw1
+         vz0j01BRShoc9HO53PtMCxKLJOAlM9BzYEyG/0WoepKmNBSRC2AWbhqyuVt2L1+2pGCH
+         faXabn3uMe7VYOqk2UPC06GlZ/ImEYsLwZyxN7csjIfpGH82ni1mOMh3o7cfBvnk/90U
+         T7aBiOmszmNrjjOU6H1/1Y0fPbi3z89MBUI++d8fotkYt5uMy+1vK5CTxnY5Vhvh8D9n
+         cs+A==
+X-Gm-Message-State: APuU4Z8rGrjgkLpc4hx6GDvSlTz8+7/+++aoTyxZTmh4Ch8Hnrh38kfL
+	dI47g/ndzfEwx1ss7EkBd0ylaz6XEFLq3n6jJI4IUoumJhWQVCmk51KTRkSpTw==
+X-Gm-Gg: AZFdTZdSCs8+01AmvdZdaTaIk3E4v6syV6AmdRvUwIMX7Ke6wFoboFbGwBKsbGJtetU
+	7r4S/PfNHaLSEgGh89JG4Mt1blet2jGUQubS6A2hZpjUiXGytIPLQ5mVbarUriLWFL4fDBhJ7LZ
+	/IRUqoLb2Twzb2CTfiFa7kmBE+fxZdeeOt4Yp5V94E6N5uiddvEDYmMBRADyfmX+9nTqEeZd0DL
+	8veoFB9HZy8H3noQ2lsIRoNva9vxIrx8ZKqBB/iHUUU4xqmQvcOwvUjorSKimEoAGQJDNKEIf9K
+	7kVv9i56uIB0Al1JjfFszKng4Y4+PlS3MlMg+ENwMYajgVTkJmMIWTGNZSa7UAeg1LHqo9L4OZk
+	H2qWZy/msHaTyZtnPTsv4kac39yoiI/WnXbS3MtDYZA3WU3dKg88/jIXBj3mLUh68ZMRY0AaYN2
+	Sxu9uCrKzHx/1D0L/PJV5jpDEk+bdiyLBYBMMm22VMnF9WxOqaBnnCs2IGv2pZjtyrFpdowL8O4
+	CQvJlPXMeplVTV3bPGqiYKTXflydkYOWfDEsC1MourPVLs7onR3k9AuWmnjc7drCaL/gvEkzqn+
+	fBcy93gOCWzsdcQPUzKS06anOZ7b6e1DQZaUPk+MiyAs8sqlz/YMfNgVvYD5hkkr0v7kN8CxM/S
+	l5XEkgod74nn2GPgwVOdLdqIZ+W7QXbfRpT75gMl4nXxL8dOIB8O8QBe8JF90Qe+y4F9j9KAvf2
+	ydMss=
+X-Received: by 2002:a05:6122:328c:b0:5ea:389c:51fe with SMTP id 71dfb90a1353d-5ee8af32dd5mr7992329e0c.17.1795534742834;
+        Tue, 24 Nov 2026 07:39:02 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5564a9sm14343463e0c.5.2026.11.24.07.39.00
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5564a9sm14343463e0c.5.2026.11.24.07.39.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 07:39:01 -0800 (PST)
+        Tue, 24 Nov 2026 07:39:02 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 03/18] shared/rap: Subscribe on-demand data with the requested transport
-Date: Tue, 24 Nov 2026 10:38:40 -0500
-Message-ID: <20261124153856.216054-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 04/18] shared/rap: Subscribe to Ranging Data when a measurement starts
+Date: Tue, 24 Nov 2026 10:38:41 -0500
+Message-ID: <20261124153856.216054-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261124153856.216054-1-luiz.dentz@gmail.com>
 References: <20261124153856.216054-1-luiz.dentz@gmail.com>
@@ -101,104 +101,108 @@ Content-Transfer-Encoding: 8bit
 
 From: Cheng Jiang <cheng.jiang@oss.qualcomm.com>
 
-The On-demand Ranging Data characteristic was always subscribed with
-notifications, so an indication request from the Upper Tester was
-ignored for the data characteristic, while the RAS Control Point,
-Ranging Data Ready and Ranging Data Overwritten followed it.
+Reading RAS Features subscribed to Real-time Ranging Data whenever
+On-demand ranging was not configured. The subscription also arms the
+5 s first segment timer, and at connection time there is normally no
+CS procedure running yet, so the timer fires and writes 0x0000 back to
+the CCCD. The connection-time subscription therefore only adds an
+enable and a disable write that no application asked for, and a test
+that expects the IUT to enable Real-time Ranging Data only when told
+to (RAP/REQ/RRD/BV-01-C) sees both. It also subscribed to nothing when
+the peer does not support Real-time Ranging Data, although the RREQ
+has to enable On-demand Ranging Data then (RAP v1.0 4.4.2).
 
-RAS v1.0 Table 3.1 has it the other way around: On-demand Ranging Data
-must support both notifications and indications, the RAS Control Point
-supports only indications, and notifications are optional for Ranging
-Data Ready and Ranging Data Overwritten. With notifications selected
-the Control Point subscription was rejected, so no On-demand transfer
-could be requested.
-
-Use the requested transport for On-demand Ranging Data, always
-subscribe to Control Point indications, and subscribe Ready and
-Overwritten with indications when the server supports them, falling
-back to notifications only when it does not. A server may send Ready
-only as indications: PTS does so in RAP/REQ/ORD/BV-01-C.
+Subscribe at connection time only for the configured On-demand mode.
+When StartMeasurement() is called and SetRangingDataMode() has not
+subscribed to either mode, subscribe to the configured one, using
+On-demand if the peer lacks Real-time Ranging Data.
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- doc/org.bluez.ChannelSounding1.rst |  5 +++--
- src/shared/rap.c                   | 32 +++++++++++++++++++++++-------
- 2 files changed, 28 insertions(+), 9 deletions(-)
+ profiles/ranging/rap.c |  6 ++++++
+ src/shared/rap.c       | 28 +++++++++++++++++++++++++---
+ src/shared/rap.h       |  5 +++++
+ 3 files changed, 36 insertions(+), 3 deletions(-)
 
-diff --git a/doc/org.bluez.ChannelSounding1.rst b/doc/org.bluez.ChannelSounding1.rst
-index 32c83e36f536..e75535b97092 100644
---- a/doc/org.bluez.ChannelSounding1.rst
-+++ b/doc/org.bluez.ChannelSounding1.rst
-@@ -275,8 +275,9 @@ CCCD subscriptions, then enables the selected mode.
+diff --git a/profiles/ranging/rap.c b/profiles/ranging/rap.c
+index f1717d932eab..2d8b1a7a1364 100644
+--- a/profiles/ranging/rap.c
++++ b/profiles/ranging/rap.c
+@@ -843,6 +843,12 @@ bad_type:
+ 	if (settings.role == 0x02)
+ 		return dbus_message_new_method_return(msg);
  
- ``transport`` selects the CCCD value for Real-time or On-demand mode. It is
- ignored for Disabled mode. Use ``0x01`` for notifications or ``0x02`` for
--indications. For On-demand mode, this applies to Control Point, Ready, and
--Overwritten; segmented On-demand Data always uses notifications.
-+indications. For On-demand mode, this applies to On-demand Data. Control
-+Point always uses indications, and Ready and Overwritten use indications
-+if the peer supports them, notifications otherwise.
- 
- Raises ``org.bluez.Error.Failed`` when remote RAS discovery and Features read
- have not completed, or the selected mode is unsupported by the peer.
++	/* Nothing is subscribed at connection time unless On-demand is
++	 * configured, so subscribe now if SetRangingDataMode() was not called.
++	 */
++	if (!bt_rap_ensure_ranging_data(data->rap))
++		DBG("Unable to subscribe to Ranging Data");
++
+ 	if (!bt_rap_start_measurement(data->hci_sm, data->conn_handle,
+ 							duration_secs))
+ 		return g_dbus_create_error(msg, DBUS_ERROR_FAILED,
 diff --git a/src/shared/rap.c b/src/shared/rap.c
-index 6de8111d1067..1c4b5239e1ba 100644
+index 1c4b5239e1ba..bc6f133b5da9 100644
 --- a/src/shared/rap.c
 +++ b/src/shared/rap.c
-@@ -4556,6 +4556,21 @@ static void ras_cp_response_notify_cb(struct bt_rap *rap,
- 	}
+@@ -4712,6 +4712,28 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
+ 	return rap_subscribe_ranging_data(rap, mode);
  }
  
-+/* Indicate Ranging Data Ready and Ranging Data Overwritten when the server
-+ * supports it; otherwise let the client fall back to notifications.
-+ */
-+static uint16_t rap_status_ccc(struct gatt_db_attribute *chrc)
++bool bt_rap_ensure_ranging_data(struct bt_rap *rap)
 +{
-+	uint8_t props;
++	enum bt_rap_ranging_data_mode mode;
 +
-+	if (gatt_db_attribute_get_char_data(chrc, NULL, NULL, &props, NULL,
-+								NULL) &&
-+			!(props & BT_GATT_CHRC_PROP_INDICATE))
-+		return 0;
++	if (!rap || !rap->client)
++		return false;
 +
-+	return BT_RAP_RANGING_INDICATE;
++	if (rap->realtime_notify_id || rap->ondemand_notify_id)
++		return true;
++
++	/* The RREQ has to enable one of the two (RAP v1.0 4.4). Real-time
++	 * Ranging Data is optional for the RRSP, so fall back to On-demand
++	 * when it is not supported (RAP v1.0 4.4.2).
++	 */
++	if (rap->ondemand_mode || !(rap->ras_features & 0x01))
++		mode = BT_RAP_RANGING_DATA_ONDEMAND;
++	else
++		mode = BT_RAP_RANGING_DATA_REALTIME;
++
++	return rap_subscribe_ranging_data(rap, mode);
 +}
 +
- /* Initiator role: subscribe to a single on-demand-related characteristic,
-  * logging (not failing) on any missing attribute/handle so a
-  * partially-capable peer doesn't block subscription to the others.
-@@ -4637,21 +4652,24 @@ static bool rap_subscribe_ranging_data(struct bt_rap *rap,
- 	if (mode == BT_RAP_RANGING_DATA_ONDEMAND) {
- 		uint16_t value_handle;
+ static void read_ras_features(struct bt_rap *rap, bool success,
+ 			uint8_t att_ecode,
+ 			const uint8_t *value, uint16_t length,
+@@ -4771,9 +4793,9 @@ static void read_ras_features(struct bt_rap *rap, bool success,
+ 		return;
+ 	}
  
--		/* Data is segmented and can be large, so keep it on
--		 * notifications. The control and status characteristics use
--		 * the requested transport.
-+		/* Only the data characteristic follows the requested
-+		 * transport (RAS v1.0 Table 3.1). The RAS Control Point can
-+		 * only be indicated, and Ranging Data Ready and Ranging Data
-+		 * Overwritten are indicated whenever the server supports it,
-+		 * since a server may send them only as indications.
- 		 */
- 		rap_subscribe_ondemand_chrc(rap, ras->ondemand_chrc,
--			BT_RAP_RANGING_NOTIFY, ras_segment_notify_cb,
-+			rap->ondemand_ccc_value, ras_segment_notify_cb,
- 			"on-demand", &rap->ondemand_notify_id);
- 		rap_subscribe_ondemand_chrc(rap, ras->cp_chrc,
--			rap->ondemand_ccc_value, ras_cp_response_notify_cb,
-+			BT_RAP_RANGING_INDICATE, ras_cp_response_notify_cb,
- 			"RAS Control Point", &rap->cp_notify_id);
- 		rap_subscribe_ondemand_chrc(rap, ras->ready_chrc,
--			rap->ondemand_ccc_value, ras_data_ready_notify_cb,
-+			rap_status_ccc(ras->ready_chrc),
-+			ras_data_ready_notify_cb,
- 			"Ranging Data Ready", &rap->ready_notify_id);
- 		rap_subscribe_ondemand_chrc(rap, ras->overwritten_chrc,
--			rap->ondemand_ccc_value,
-+			rap_status_ccc(ras->overwritten_chrc),
- 			ras_data_overwritten_notify_cb,
- 			"Ranging Data Overwritten",
- 			&rap->overwritten_notify_id);
+-	if (!rap_subscribe_ranging_data(rap, rap->ondemand_mode ?
+-				BT_RAP_RANGING_DATA_ONDEMAND :
+-				BT_RAP_RANGING_DATA_REALTIME))
++	if (rap->ondemand_mode &&
++			!rap_subscribe_ranging_data(rap,
++					BT_RAP_RANGING_DATA_ONDEMAND))
+ 		DBG(rap, "Failed to subscribe to requested Ranging Data mode");
+ }
+ 
+diff --git a/src/shared/rap.h b/src/shared/rap.h
+index af4fab057e97..7ee51143c0ef 100644
+--- a/src/shared/rap.h
++++ b/src/shared/rap.h
+@@ -322,6 +322,11 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
+ 			enum bt_rap_ranging_data_mode mode,
+ 			enum bt_rap_ranging_transport transport);
+ 
++/* Subscribe to the configured Ranging Data mode unless one is already
++ * subscribed, falling back to On-demand if the peer lacks Real-time.
++ */
++bool bt_rap_ensure_ranging_data(struct bt_rap *rap);
++
+ /* Initiator role: stop receiving Real-time Ranging Data. The GATT client
+  * disables the characteristic CCCD when this is its final subscription.
+  */
 -- 
 2.56.0
 
