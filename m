@@ -1,59 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795491541;
-	b=eNj9e1fig22R4Gs3zz3kVvA7nPEvOTaorqYbsf94arH1jLQnNEpMWRuST1ph+ISYifY8
-	 z9bnqNxeWHLEBQ7QYg8GnSpSqQ6+kWNY+rAl2sLyDs4T0hA1JB6ZJpfqsgKU0PY2Gb8qU
-	 OXi5H+A8DwWSKjwru44yiRxG+vpsdzlOSGT31HBNVOPVWCQ+u6YUkZuNN/Ms1xPiHTQ1r
-	 zeRrEDvlvUM/58rlmuYv5IMh3AUgJdeVwmrupnhmURFyobHORRsWUUFv9a8yc2donBccf
-	 D4uP9QHNucrv/0VOK9FOgvItk8YnTWhX0i52KbWd2mp6vx/8nUFYaZp5S7qnTTPVPGQ==
+	t=1795491556;
+	b=qmGaB+iOt2bN0t5Jd7aOlizx5w2N7nQ9g2IwDYaPqwKxql+zXVN0cOvDBQrQ5NDpgXLl
+	 qyZVyOjMaGDc4PIMh3WPuThnQw8c9AQCB7QuK+9tKF+53kNNnHHg15JcvYDkKYhc4/1EZ
+	 ZlBAGLEvSkmnjae0UfiBHUJJTnemdGjueclgpYCWHC+DOe/gE473rUygP2V8EXyOKMiq3
+	 UPH5tG7tL7a7jxMRgLmbZYab33LUZfoJa5jBetuJIxxrS7D5StKxnK5sQZsEb8QMKgFBU
+	 mXbQLa+0THfvrsGUO1ySB1m5WSJ9XRSo7UaJ+INYNGp7BDkuDe9w2PVQpEahsAbRBlw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795491541;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795491556;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
 	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=FT+bgA0s9JXqV/Fmn2mv7D9VqUUuax75pskvJfWb8aE=;
-	b=ZxV+LBVnwAmmNvM5F4Fzp8F9ok4pm0S/3WQqEJWWp7GA1dgYCX3NcwD44JcyRCHwPbk/
-	 8NOTF0/ClDgpmVAOtI/EG44Dz93Q2qrgCl8ignec6myGGtYkQaAIdZRZrWVTf9FTWPOuX
-	 TvI3oXj2w3uwXpXiVli2ncWAoByXFBB3uzMpVlf9G9nYOZigArP8itAfZzH9NwJFG51Sk
-	 +EiZhoZISYR73rJWJ3ydapJIa9oLsNvCEJma3NAQEppvx0UatixuWR79sMRL1Qjh3eN8o
-	 lhXrVQOFHGF6+W4/gKVg/K7+iiK/7gfCP7mPSN0ethWoZutJ5a4aAHSqldTQuwpOpDw==
+	bh=fbIdkZ6yYSD2/2vsHu+ZzN4N/nInFByxeQsga5sSZjQ=;
+	b=q9Qc9uffm0IHkX9NhKMcbVjFV6nLze/QxCWsb9LCLLzjkhizku7NDqNOJm27XLyWNK9+
+	 NbKxeTuXD7UKIglAM2cIAz7oab2kSeqyQoWYGGSTffai0EF5fp6tdctDq4dfs/e1lvwVO
+	 IttNYIwxFP8lccooc1/JtSdYhQI3yb2WGp5W9owqotboTNNa1Ht9L8Qf3BI5WzBUwHXwC
+	 lio3aGqysZZ4yOblm8Uyopxw15aGxAI248vsF2eRK00vxPbsSNwgcgfuclGTFxNxelEe/
+	 BEIZavoC/yCZqt8lumMK0XyE29DePwL61ZfJaUp/WM4TNyETe/LpyFdJ9bMLTcMKrDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=jo7nnkym2vfppa5i43knfwhk2a.protonmail2 header.b="N/4OqT4b";
-	arc=none smtp.remote-ip=185.70.43.22
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b="a/NY/75R";
+	arc=none smtp.remote-ip=185.70.43.102
+Received: from mail-43102.protonmail.ch (mail-43102.protonmail.ch [185.70.43.102])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0400A606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:38:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0400A606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732C0606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:39:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 732C0606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=jo7nnkym2vfppa5i43knfwhk2a.protonmail2 header.b=N/4OqT4b
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=a/NY/75R
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=jo7nnkym2vfppa5i43knfwhk2a.protonmail2; t=1795491538;
-	x=1795750738; bh=FT+bgA0s9JXqV/Fmn2mv7D9VqUUuax75pskvJfWb8aE=;
+	s=protonmail2; t=1795491553; x=1795750753;
+	bh=fbIdkZ6yYSD2/2vsHu+ZzN4N/nInFByxeQsga5sSZjQ=;
 	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=N/4OqT4b4GirJBOIFugeXVVLdvshHWa+oIPqq52wdVUkuGGoOQBkgz4vL5ywRQznh
-	 +NDsWNpovxepgNK23PMCBABdSDauV/hE8QWbzlfMoizD5KbbziXx6rceQuIigWdOkr
-	 vy9WQZC/vpO0Y1Q85R3DnttUqjLgCuy5hzgmGtBeQBrScURuvux3jx18Rol6Al6ywm
-	 g3zMLE587zvm6VqqaO5U8maascRHskTh5ObuDkdCE8p1tkgKgdRMNKJwhJqT7n7ZYs
-	 9SHYHuYar0svDy8CPEhWxEwnboajIiKdOSx+EZ+cTjqgawLgrFmLNTzys7qj9VvFKY
-	 ugOwOz5b00gsA==
-Date: Tue, 24 Nov 2026 03:38:55 +0000
+	b=a/NY/75RCOkcOWCzg3auaAQjY+2/9UbeJ0n4uDLg9fcfXtOeB5PtwwuWxPNSCQ+qM
+	 JoICeaaCejA2Vf8D5ybcKv7A3pqro3i7WwKcohfFRU270wqDDPlQxkQ0uMqm5fcPPp
+	 Rur5987+oDd6DPfxWOrONv1QYc1mn09kZkqgTSIosc+dQElnqNEPyaRyR+PV/63/xZ
+	 fIkuymoId2hsYxKqIl9QImHEj53d0j3Stxy1bp19MyJQZyNMvqGeN83swDKXleBjoH
+	 EdBYLY9nN9adppO/nmuGT1TRpwC5RCNsQVd2JG2XPMvLKefhcBvt/tcW59rdJuUFgl
+	 5ofh6m1ETzUIA==
+Date: Tue, 24 Nov 2026 03:39:07 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
-Subject: [RFC PATCH BlueZ v4 1/4] shared/asha: Unregister set members by object
-Message-ID: <378719dfbe498086a4af54cca7b8808e09b5132f.1795489294.git.cochcoder@proton.me>
+Subject: [RFC PATCH BlueZ v4 2/4] asha: Add connection interval STATUS helper
+Message-ID: <2d1043401d8290bdb12ac1c15cdff6338f8788d6.1795489294.git.cochcoder@proton.me>
 In-Reply-To: <cover.1795489294.git.cochcoder@proton.me>
 References: <20261029002158.1036153-1-cochcoder@proton.me> <20261106235122.719665-1-cochcoder@proton.me> <cover.1795489294.git.cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 7d9ea410fe74671faea7dcdce0cd10128ba40218
+X-Pm-Message-ID: be62daf4b35da5762ee77149808d12ca863570b8
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -66,89 +66,85 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-bt_asha_reset() clears the HiSyncId before calling update_asha_set(),
-whose removal path finds the set by HiSyncId. The lookup then fails and
-the set keeps pointing at the reset object. bt_asha_free() cannot
-unregister it either, since the HiSyncId is still clear, so once the
-object is freed the other side of the pair follows a dangling pointer,
-for example in asha_set_send_status() when it is stopped.
-
-Find the set that holds the object by pointer and clear only the slot it
-owns. A reset or freed object that never joined a set, or was already
-removed, is now a quiet no-op instead of a "Missing ASHA set" error. An
-object that was replaced by a newer one for the same side also no longer
-removes its successor when it is released.
-
-Fixes: 1b137c4bad24 ("profiles/audio: asha: Only expose device after we hav=
-e attributes")
+Send the observed interval to both attached hearing aids, including a
+peer that has not started streaming. The format follows Android's
+hearing aid stack, which sends STATUS with a connection update type and
+the new interval in 1.25 ms units to this side and the other side.
+Reject intervals that cannot be encoded in the one-byte parameter
+instead of truncating them.
 
 Assisted-by: OpenCode:gpt-6.1-sol
 Assisted-by: Codex:gpt-6
 ---
- src/shared/asha.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ src/shared/asha.c | 37 +++++++++++++++++++++++++++++++++++++
+ src/shared/asha.h |  1 +
+ 2 files changed, 38 insertions(+)
 
 diff --git a/src/shared/asha.c b/src/shared/asha.c
-index 2ce61fd..b8e9d3f 100644
+index b8e9d3f..e85c5c1 100644
 --- a/src/shared/asha.c
 +++ b/src/shared/asha.c
-@@ -51,6 +51,13 @@ static bool match_hisyncid(const void *data, const void =
-*user_data)
- =09return (memcmp(set->hisyncid, asha->hisyncid, 8) =3D=3D 0);
+@@ -260,6 +260,43 @@ static int asha_send_acp_without_response(struct bt_as=
+ha *asha,
+ =09return 0;
  }
 =20
-+static bool match_set_member(const void *data, const void *user_data)
++bool bt_asha_set_connection_interval(struct bt_asha *asha, uint16_t interv=
+al)
 +{
-+=09const struct bt_asha_set *set =3D data;
++=09struct bt_asha_set *set;
++=09struct bt_asha *other =3D NULL;
++=09uint8_t cmd[] =3D {
++=09=090x03,=09=09/* STATUS */
++=09=090x02,=09=09/* LE connection parameter update */
++=09=090x00,=09=09/* Interval, in 1.25 ms units */
++=09};
++=09bool success;
 +
-+=09return set->left =3D=3D user_data || set->right =3D=3D user_data;
++=09/*
++=09 * Android's ASHA document lists only the update type for this STATUS,
++=09 * but its hearing aid stack appends the new interval as one more
++=09 * byte and sends it to both sides. Reject a value that does not fit
++=09 * in that byte instead of truncating it.
++=09 */
++=09if (!asha || !asha->client || !asha->acp_handle ||
++=09=09=09=09interval < 0x0006 || interval > UINT8_MAX)
++=09=09return false;
++
++=09cmd[2] =3D interval;
++=09success =3D asha_send_acp_without_response(asha, cmd, sizeof(cmd)) =3D=
+=3D 0;
++=09set =3D find_asha_set(asha);
++
++=09if (set)
++=09=09other =3D asha->right_side ? set->left : set->right;
++
++=09/* Notify an attached peer even if it has not started streaming yet. */
++=09if (other && other !=3D asha && other->client && other->acp_handle) {
++=09=09if (asha_send_acp_without_response(other, cmd, sizeof(cmd)) < 0)
++=09=09=09success =3D false;
++=09}
++
++=09return success;
 +}
 +
- static struct bt_asha_set *find_asha_set(struct bt_asha *asha)
+ unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
+ =09=09=09=09=09=09=09=09void *user_data)
  {
- =09return queue_find(asha_devices, match_hisyncid, asha);
-@@ -83,9 +90,9 @@ static void update_asha_set(struct bt_asha *asha, bool co=
-nnected)
- {
- =09struct bt_asha_set *set;
+diff --git a/src/shared/asha.h b/src/shared/asha.h
+index 9e62fcd..e6b2e7a 100644
+--- a/src/shared/asha.h
++++ b/src/shared/asha.h
+@@ -66,6 +66,7 @@ unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_=
+cb_t cb,
+ unsigned int bt_asha_stop(struct bt_asha *asha);
 =20
--=09set =3D queue_find(asha_devices, match_hisyncid, asha);
--
- =09if (connected) {
-+=09=09set =3D queue_find(asha_devices, match_hisyncid, asha);
-+
- =09=09if (!set) {
- =09=09=09set =3D new0(struct bt_asha_set, 1);
- =09=09=09memcpy(set->hisyncid, asha->hisyncid, 8);
-@@ -101,15 +108,24 @@ static void update_asha_set(struct bt_asha *asha, boo=
-l connected)
- =09=09=09DBG("Left side registered for ASHA set");
- =09=09}
- =09} else {
-+=09=09/*
-+=09=09 * Find the set by object: the HiSyncId is cleared on reset and
-+=09=09 * a replacement for the same side shares it, so it cannot say
-+=09=09 * which slot, if any, still belongs to this object.
-+=09=09 */
-+=09=09set =3D queue_find(asha_devices, match_set_member, asha);
-+
- =09=09if (!set) {
--=09=09=09error("Missing ASHA set");
-+=09=09=09DBG("ASHA object not registered in a set");
- =09=09=09return;
- =09=09}
+ bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume);
++bool bt_asha_set_connection_interval(struct bt_asha *asha, uint16_t interv=
+al);
 =20
--=09=09if (asha->right_side && set->right) {
-+=09=09if (set->right =3D=3D asha) {
- =09=09=09set->right =3D NULL;
- =09=09=09DBG("Right side unregistered for ASHA set");
--=09=09} else if (!asha->right_side && set->left) {
-+=09=09}
-+
-+=09=09if (set->left =3D=3D asha) {
- =09=09=09set->left =3D NULL;
- =09=09=09DBG("Left side unregistered for ASHA set");
- =09=09}
+ bool bt_asha_attach(struct bt_asha *asha, struct gatt_db *db,
+ =09=09struct bt_gatt_client *client, bt_asha_attach_cb_t probe_cb,
 --=20
 2.56.1
 
