@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.48
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795536414;
-	b=OKc21zhdit3S3j1qWd9G+2iTcd8bAoZHr4dSVRo12k1xxzv30EAwxujxBnNlzZ4dgCuY
-	 6L7gkU5+DcUhINCR0GC4e1glDoURSVTA5/T6PJKNFxFOyH6rvOv7mV9E9kb6fFBBLl6O6
-	 OiRg84hSQ8j29nT77wu7Ij7Vt6wh2akZvb4baNqoP3aQGMd6x3knKx62+CZZf33El6aT0
-	 Br+XU2h7r64TtE8/fg1nATRpBp+gXXlIwf7SBsppEUK8zd17ZE7SlIwS0tiN6qhGkDsRy
-	 FNlXw0fogbtlu7U5YpDtjt0S+HcrdtI0L1jBzm0w0aStWTpKT7actP2dnWWfgKt0JgQ==
+	t=1795536960;
+	b=RVV0gVzx8u59NgkVwTGutNb2jZHMLhzfyFZluzM/mJvJiTtM7fjkubaxYhAsKUfxvHjF
+	 KDzTiOmKvE087WSQTnfIePXwgqeR/HWUB9+87DmDrpwIQM18hcmp+PbRC3ir6KLsdJI0J
+	 W3GlXkEsyHgqaySQ5RgVWvi2nb7EOxlA3zf3yOYEHI8Byz6Ib2ZR75S/oDl8EEl//XeOF
+	 J+c7dDPuk1ohsAAiDkz0/kI0fgc3tW6ArAZ35dZMO7Q7zvm1PA10/i0fM56oY0n0BvgvX
+	 KiTyXssuk0irRfSJ7OrXOUnH2upLrh7zsVkEr/EQHcD8Ja8/tzRN0JKEafSk2rJKsHQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795536414;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795536960;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
 	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=mqhyR5P3CcCcnLzK5Z7ThujOw1dcTZgll7UggE2+Alo=;
-	b=GvhJvo7FJJVtUZxI9GSMSKd1j5egbob6eXiiuemzbsBHUpPA+FQwwWCJlJTcmDfq4pPd
-	 Pi4duSqbBBVe1trvKcwtvYQoGfF0NvgLh8SuCA+tR5a/gvKM8mrzJxwheEC2lrILykIJt
-	 zaDANPVWldbeqbQJfpr25Ny3061aLFBMMlxMfhkStQ60SfQRK4s12B33W6JYbEoRmaxZR
-	 CmS4GR2l+mxnPxFS02+hldhxOqzwhTkygB0W5ZJOfvgO2AT4CFdPA4Lm9vxjzTC7Ak/hs
-	 4fH5PWpswlslhtYITiL2olh6KcK1k3ZhZ55OAQ6UAa+3Q+ZY2EfvtFlH5I0GqqDsOOQ==
+	bh=TH5xMsKYDQssC9Oo4SOCAKqT+vr+cXpvI+9eJsZLkqQ=;
+	b=IO3Ut5pO/Vh4wYcMHvGJ6wNrAC+HvJLB4vKiLv8h7KXNEjP0eyeuF2GJzuxNigW9T6xf
+	 GCsPUWL0gHcn8Choo+3yxTdR0IUHLZGtms++y9/+fT6OwizRsYQpVJZYTABLgeokk1lFR
+	 rnL8eIeCP1k+TOLabWD5ercn4ljZQN7FKJXVDAFYVKoxdnLL/cCUU2IJO01L8V2kHLT/0
+	 s8YcfRwy2Q/QGwDw6htXAFKyUUeDKtNRSeLP5+QjMVhu3TWIvNbYfIxmSrs8yTXDyjhwI
+	 HXy9YHOG9eGuyQb47A48AFTq7Somx/qlw3cE7o6CRK1PHowJllxaXTfub/57MokakHA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="E6NVA/Hs";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.54
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MaEO6iFO;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.48
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB56606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 16:06:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CB56606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BBA606A323
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 16:15:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18BBA606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=E6NVA/Hs
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-67c246c0c60so4227346d50.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 08:06:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795536413; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MaEO6iFO
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-67db35e7953so4855823d50.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 08:15:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795536959; cv=none;
         d=google.com; s=arc-20260327;
-        b=QRgK43DIsSmRf60xyVJUNILQhMmU4sb07O/KRHe1IdjsiFtavjsuVcvl1Id33zeopJ
-         X2gwQBuPCQncSb9qKBB32Lv6lh4WaZWiLG6gitSYUJUkX0FTfhnkxygcjBiNW/tNpQnT
-         Mu1VO+W0p8wiQolVofKrJPvCoEgGwwsIyxp2KDVpkyQw7TAQfySsq5b94QacotxHdW+e
-         iPw0IMrOwOJGxrBW2NiOuwCOUYYYv7oPzWT9Le/L8M0vSiz0FBPZ1lY9sUMor65sax2F
-         PKcOmMXxCc5OSjFD2bmkec0UjoaXdpwms71DMiJvhItM5oXs7AfsMpAQluuL/i2UHr/T
-         7qVA==
+        b=FdR93DM86UeSmw/ANZYVzHSu0DnVViiXK2C+2wsWxLYeGl9sqnVyIFZCwNf2O6aynj
+         96CqYRwAVK4a9r+hMg5V+OQxO1k2bDPmvHG1txAHP/3AAjUuHqILJlHFYB7NJaKqdSos
+         1/4dGMVcXGfov54Mta5MCt3s1P5jdnEEYhJUXPvez8fedax2iwBBk9WXxOVo6H+1vK7M
+         +ccfXzlghLh0gM9kmOh5ijcL9EP6epGb/bILNTe39u4WAH3+LwT+bPj86D/yzsIKKXbd
+         WEJcggSXw8RTSTWjJnloUchLTXqK5CrLGvj8Vkk0EYgIX+q9u+dFTyBCSfF4fg+UDQP2
+         vvXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=mqhyR5P3CcCcnLzK5Z7ThujOw1dcTZgll7UggE2+Alo=;
+        bh=TH5xMsKYDQssC9Oo4SOCAKqT+vr+cXpvI+9eJsZLkqQ=;
         fh=tyq0gYhA4cMcqn+bWakZSAdnDDyh/si+tlAcgOGyoy0=;
-        b=U5mr6d4m1H9Kg4Qm+csPsK3P5Gd8Kxo9pDL+pFKuox8o2dEgb8o4vWzhroFkWXK+m+
-         lp75gvI3H0iDZGyrGfD5lTNq4x9QN89hjEokEKUyXs5nvzpKz7FHcjymcTQe3DY+0d2h
-         i/uY+rA3rEpIInaRYVIvm0hYJa9G5VfFfiYLzyDKU8/Ztug+cUOWR5S4b/Q+PGcO5W4a
-         tIr6spRZLCaBDiuDBhQsv83fauGRHllfbT04gHHvfoiY+39rgzW8d+JK2IoGf6CNdAjN
-         L9QCva31LEf4/qR3Su2WdTVy2qfNy/py6M/pej0v/VO6/w/pBGBpLtBFzI09dW+2C3+j
-         cZRA==;
+        b=PDoZuFz+2yfDqVygI6fh5aPDBPOUNMOU000Q/Jm/htxsB4VFs9XrY92lpzubygrUzV
+         IXmyDe1OvrkntjCnJApveJ6+qFFZK2UYmEDy9PaJVLUlUeC3TSiNl92ec8nEOGAvDkux
+         gvi0k/zPC1pixXZoYxivmUDAsgNonxfbg3nc6dXu5+/youS6BVg+5MEYy2zRMyjDTbet
+         IirD3192L6S04YVLsQZItjeMrKMM2Q/ZhxhxlR5nJ5FwWlIWCqlDa4jWdgynIJvaO6td
+         7lEWA2R9wSMIzBTd793ysWIHvnEIv4tupEiL84FWzlOrf3GHVGP0WIqeDEgDu8UG1yRA
+         ym/w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795536413; x=1796141213; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795536959; x=1796141759; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=mqhyR5P3CcCcnLzK5Z7ThujOw1dcTZgll7UggE2+Alo=;
-        b=E6NVA/HsG4PsL3cyP+K0JvuFSLH3yk+6WLZeTeQMwX2NhxS6vBVGRxbYo7tWwh95Hl
-         KHEWwn7Q88hnxLeMWQ0iMcFRx3k5JVzMNvGDpsuz0QNes0fBxA8GZerKei7wRSGHegeR
-         394UVKPolSdDPpHxSvnVqU2CBdsBDnaLYyswvY4swy+3YojrjZULv/guM4FL5J+6evv9
-         rIxsb30WVCKA/ejVa/jTcVX1zuG9eXkmuFpjnnVUX/AQl2rrv2i4SW/aIUCWx+mgXv52
-         Zgp7iP9P8mpTKoGzNQ7jj/gUEywMWtuo8NcJHi4QBCJnMdehLpkDojjlkClW2/4OKmGI
-         dN9w==
+        bh=TH5xMsKYDQssC9Oo4SOCAKqT+vr+cXpvI+9eJsZLkqQ=;
+        b=MaEO6iFOPkgEP408RMmqtF8OyEP3MQpWkdp3T9ehP7R/+SOJJOlVSMElN8jUqwrRtq
+         wzbu+3x44hgpl0e72ZcqYpLjyZixMxO3OTb322IfhmI3pjpCHoEtOlq02H9BTRNSMHE5
+         mfBkAThTiBBv5QeOJ3E3+62ABbZovys7y8ITnht+tU9WEoJ8PoPZrssGTdE+8LfimgL9
+         8++zSHBARgfnoZDZ8G4dPoxn4+TUMKxNZnDk6dRFKqEeSVoW4BK8BaqvleJVKXMhmxuR
+         CIig1Lx0hvOTPNdPNMHtdIa2bGzk/hnsu31D+kRswVzViaADZMzWv2/smtBrEiVvquXN
+         CHGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795536413; x=1796141213;
+        d=1e100.net; s=20260707; t=1795536959; x=1796141759;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=mqhyR5P3CcCcnLzK5Z7ThujOw1dcTZgll7UggE2+Alo=;
-        b=FE5ef55uEAHA2YhwpNVL/f+26QWkO1N49ALBNWTK4wj1bxzM4Arw3BgI+BtsweLIZp
-         svzTGoYLC5u5vXDF25cdHxr9n7DSrWDjOKEc5FQXy4HeoFH9KRjasVSL6jm59xVK78IK
-         CmgIlMhiUjgDW0n08ec5eIJSBKVcN8Na8qgqTBawuBs1e7N1emnEHX2qv0TsfTbBpWzV
-         e0L/iu2Q7RLALxEoHZ9nTbW5jgUZgEvov8YDDQ0fmW7oovl95qdLuwpd1QAFiDmxZ9ME
-         MVMcR+KJVHqJoFbcuS6yqaV8r51gqMc+wi/SfPxcgawBP05137VszDG/gCWL7gnCNW0C
-         979A==
-X-Gm-Message-State: APuU4Z/eyxdfId8R7Oi7ruk0x4AlN0cu2bSniq8SfF0n0KYDZi42En1h
-	hp6W+hKLNWzdwPnR+Hu/CzDQulrG2k/UWNWT3w4g4SPHQbg+2uhsjg8JTAa9if+JE/gg8Qn/fjC
-	sRXKPcMpHQYpREu/35+e47XCv36fjXnGQBw==
-X-Gm-Gg: AZFdTZd3wGUWFMGO/w+0dN3S4gL7leTWS8uIhVqfMbPQ9B2Ny2WjjGTXloX/SbS7cE2
-	cpLiLvGGAraXijX5SeCZ4a+ljqQ2hHCUvsddllOQigUD8ApranuyvZbjH1lySSzWHsgojzS0a/p
-	vpFb/D68RfS6souP69PmAZZXet/7du5EEYq6b+94SccJ7rCy5fG/8XfIkkQDjprHym7CzaflIjh
-	A/+RPT5v49JLVzWU0RBUwJ6CWYlhuW//Np19Xd2zSUZi2M46lsrTqXLM+nLfDA3eN2QDt1WbFNT
-	yzB1n2zIdEGa4xDFelmPZB4PLoSSLJKoLlvThYShxoHi5lB2jyOB7a1VAJrsgN9Dijr8A573sPd
-	eMxrFOfEcqNnCrElIb15RCwby0609hESmygs5Ng8j7mpbvGcWZLnXnEgWuNTixlL1NZtH0uyctV
-	6TWSeMDAz8a/nWj7s5ZYty8e9bha/giOZ1NFLWa2SrB6qe5uS8joWKGYgY
-X-Received: by 2002:a05:690e:1c0b:b0:67d:bf51:700f with SMTP id
- 956f58d0204a3-67dec450158mr6830133d50.23.1795536413246; Tue, 24 Nov 2026
- 08:06:53 -0800 (PST)
+        bh=TH5xMsKYDQssC9Oo4SOCAKqT+vr+cXpvI+9eJsZLkqQ=;
+        b=1oPDnSoLYU/d3VjnY1GuCw90Yeh/4ihRK+099rThj9vNmgRp38wjHUvtVdZ8cpfu5O
+         H0N252tjHKdrjwwgdxfVdpgPnomnx9DE1RSiz782K8D3FyHq25jnolucw4f0Tcz27o9E
+         ILRb6VFRd32PQoRFsM7wXU2mxiTNvNRZqaNvrqD2HPzMTLk6UFEUntY/rB0C32AxoGxm
+         G/TqerXHqXt1uklVSMp7dyNNlvNeA4sreR3IiTZy+J+SlvwN4p7h5XSXt85zH7le+RfE
+         53tY1bjOGZkPMt7KQVrsBHS8V+qHe+iXZOM8kbpbuTGnsF5MYQeiQtsvMBf3BQbKB7SQ
+         tNOw==
+X-Gm-Message-State: APuU4Z/DxqWlMHljFsGHVIFKHJz2YNikhy2/D22iTloPTVn57hLZrgLb
+	dxfDaMDkutX+S31rraimuT1mss8Kqu7sGCsYJb9HgJNcbgISv30IQcDIxZSHxN3PX9zgtsi09XM
+	bHWesCzYwNHBTVA8wwZG68LBopMRMBBOdtg==
+X-Gm-Gg: AZFdTZfh4H3ESAqV+okBWupn6pTO2AuUJujlNXbmUqQKhY0/a2mQ61ZKrSO83fKN7SH
+	FFqimYo5e6qtwU08k0XygT1bw+xYa0UjNZFukh5o5U/OS1iHqcLt0UUSG+YPdNJ4Ghb89uaTSN0
+	xSPbBVgkgOcuZfDOV14UQeQnJ0mm9VQ0fBCxh6Pxyf/tQbrDd32p1su+zhSY19k0iwwCVE6I34k
+	WOBMjS9X5Y9UuXs8gP31VsiCF1OLvNtA4uT0e+8Tem+bFV3N2VUq+f9KeP/uSDOihisoeRcnAWn
+	RRT7XQXcCwgatIfSjaiI7zwISJR2T3tZp+aGNctbT9abQRfuwRFjmkX9G9IGlsjXm1VddTbPzFc
+	eZs7z9gJAOd9QGEejRkZWFHjI+pRKb7Xi0imd0vE2MVGcsdN1pWcbjz80xE3GxfWBWv8kLH6nXJ
+	qBPilV08nT3GWKWhOrXEQwHZ67Gj0WLfqeVrhK849tpLRqlPQ39RGwz+Z/
+X-Received: by 2002:a05:690e:bca:b0:679:b16a:8dae with SMTP id
+ 956f58d0204a3-67df4528c2emr5493456d50.103.1795536958893; Tue, 24 Nov 2026
+ 08:15:58 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,13 +104,13 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261124131823.3848364-1-simon.mikuda@streamunlimited.com> <20261124131823.3848364-2-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20261124131823.3848364-2-simon.mikuda@streamunlimited.com>
+References: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Nov 2026 11:06:40 -0500
-X-Gm-Features: Aa3M54p4A3CvwJFOGF7gPkq8S_cQZBgaeyaDfW12z0oFUXry75dZVw_9eDhCEmw
-Message-ID: <CABBYNZLxMmL0T6rTiMi+B+oJGTE_=2BqORgAqCUw1VW7+h7gtA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] main.conf: Add 'paired' to ReverseServiceDiscovery
+Date: Tue, 24 Nov 2026 11:15:45 -0500
+X-Gm-Features: Aa3M54ourkYDUojCKH8D-f1S8theGRa86zK6fCTY5GWJKuB3Fwb7kHTVhnwedMM
+Message-ID: <CABBYNZL7ekOUHtuvw5e-J_b+AESLYJ5E=gABnNfjaELhBoo_Og@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] avrcp: Defer init until service discovery completes
 To: Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -118,226 +118,272 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Simon,
 
-On Tue, Nov 24, 2026 at 8:18=E2=80=AFAM Simon Mikuda
+On Tue, Nov 24, 2026 at 8:40=E2=80=AFAM Simon Mikuda
 <simon.mikuda@streamunlimited.com> wrote:
 >
-> Reverse GATT discovery on a device that connected to us but is not
-> paired reads characteristics that may need encryption. The remote
-> answers those with ATT error Insufficient Authentication (0x05) or
-> Insufficient Encryption (0x0f), and bt_att then raises the link's
-> security level to retry the read, which sends a pairing request to the
-> device although nobody asked for pairing.
+> When the remote connects AVCTP before SDP has found its AVRCP records,
+> as iOS does on the first connection after pairing, neither controller
+> nor target is initialized and the session stays without them. Wait for
+> the service discovery with device_wait_for_svc_complete() instead.
 >
-> Add 'paired' in addition to true and false to reverse discovery conf
-> it waits until the device is paired, and the GATT client of an LE link
-> that connected without one is started once it is.
-
-Hmm, actually it is not the reverse discovery isn't what triggers the
-read, etc.; it's the accept callback which causes the profiles to
-start the 'attach' procedures.
-
-> Set the default ReverseServiceDiscovery to new 'paired' option.
+> The remote uses the session meanwhile: iOS asks for the supported
+> events and registers for EVENT_VOLUME_CHANGED right away, and would
+> not get absolute volume otherwise. Report every supported event from
+> the start, the remote registers only those it uses, and create the
+> target when the control channel connects so these registrations are
+> kept; target_init() completes it from the SDP record. A volume
+> registration with no volume set yet starts at max volume, which
+> target_init() set only for 1.4 controllers with category 2.
 >
 > Assisted-by: Claude:claude-opus-5-5
 > ---
->  src/btd.h     |  8 +++++++-
->  src/device.c  | 26 +++++++++++++++++++++++---
->  src/main.c    | 29 ++++++++++++++++++++++++++---
->  src/main.conf |  7 +++++--
->  4 files changed, 61 insertions(+), 9 deletions(-)
+>  profiles/audio/avrcp.c | 102 ++++++++++++++++++++++-------------------
+>  1 file changed, 55 insertions(+), 47 deletions(-)
 >
-> diff --git a/src/btd.h b/src/btd.h
-> index 9bf310271..2c897756c 100644
-> --- a/src/btd.h
-> +++ b/src/btd.h
-> @@ -48,6 +48,12 @@ enum bt_gatt_export_t {
->         BT_GATT_EXPORT_READ_WRITE,
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 2f214e982..f7c988ec0 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -252,6 +252,7 @@ struct avrcp {
+>         bool pos_changed_supported;
+>         uint8_t transaction;
+>         struct pending_pdu *pending_pdu;
+> +       unsigned int svc_complete_id;
 >  };
 >
-> +enum reverse_discovery_t {
-> +       REVERSE_DISCOVERY_NEVER,
-> +       REVERSE_DISCOVERY_ALWAYS,
-> +       REVERSE_DISCOVERY_PAIRED,
-> +};
+>  struct passthrough_handler {
+> @@ -1614,12 +1615,6 @@ static uint8_t avrcp_handle_register_notification(=
+struct avrcp *session,
+>         if (!(session->supported_events & (1 << pdu->params[0])))
+>                 goto err;
+>
+> -       if (!session->target) {
+> -               pdu->params_len =3D cpu_to_be16(1);
+> -               pdu->params[0] =3D AVRCP_STATUS_INVALID_COMMAND;
+> -               return AVC_CTYPE_REJECTED;
+> -       }
+> -
+>         switch (pdu->params[0]) {
+>         case AVRCP_EVENT_STATUS_CHANGED:
+>                 len =3D 2;
+> @@ -1648,6 +1643,10 @@ static uint8_t avrcp_handle_register_notification(=
+struct avrcp *session,
+>                 len =3D 1;
+>                 break;
+>         case AVRCP_EVENT_VOLUME_CHANGED:
+> +               /* Start at max volume if none has been set yet */
+> +               if (media_transport_get_a2dp_volume(dev) < 0)
+> +                       media_transport_set_a2dp_volume(dev, 127);
 > +
->  struct btd_br_defaults {
->         uint16_t        page_scan_type;
->         uint16_t        page_scan_interval;
-> @@ -144,7 +150,7 @@ struct btd_opts {
->
->         struct btd_defaults defaults;
->
-> -       bool            reverse_discovery;
-> +       uint8_t         reverse_discovery;
->         bool            name_resolv;
->         bool            debug_keys;
->         bool            fast_conn;
-> diff --git a/src/device.c b/src/device.c
-> index 40d17bae4..3ece82c8d 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -350,6 +350,18 @@ bool btd_device_is_initiator(struct btd_device *dev)
->         return dev->att_io ? true : false;
+>                 volume =3D media_transport_get_a2dp_volume(dev);
+>                 if (volume < 0)
+>                         goto err;
+> @@ -4263,16 +4262,15 @@ static void session_init_browsing(struct avrcp *s=
+ession)
+>                                                         destroy_browsing)=
+;
 >  }
 >
-> +static bool reverse_discovery(struct btd_device *dev, uint8_t bdaddr_typ=
-e)
-> +{
-> +       switch (btd_opts.reverse_discovery) {
-> +       case REVERSE_DISCOVERY_ALWAYS:
-> +               return true;
-> +       case REVERSE_DISCOVERY_PAIRED:
-> +               return device_is_paired(dev, bdaddr_type);
-> +       default:
-> +               return false;
-> +       }
-> +}
-> +
->  static GSList *find_service_with_profile(GSList *list, struct btd_profil=
-e *p)
+> -static struct avrcp_data *data_init(struct avrcp *session, const char *u=
+uid)
+> +static struct avrcp_data *data_init(struct avrcp *session,
+> +                                       struct avrcp_data *data,
+> +                                       const char *uuid)
 >  {
->         GSList *l;
-> @@ -6471,7 +6483,8 @@ static void gatt_client_init(struct btd_device *dev=
-ice)
+> -       struct avrcp_data *data;
+>         const sdp_record_t *rec;
+>         sdp_list_t *list, *protos;
+>         sdp_profile_desc_t *desc;
+>         int port =3D 0;
 >
->         gatt_client_cleanup(device);
+> -       data =3D g_new0(struct avrcp_data, 1);
+> -
+>         rec =3D btd_device_get_record(session->dev, uuid);
+>         if (rec =3D=3D NULL)
+>                 return data;
+> @@ -4348,14 +4346,9 @@ static void avrcp_connect_browsing(struct avrcp *s=
+ession)
 >
-> -       if (!btd_device_is_initiator(device) && !btd_opts.reverse_discove=
-ry) {
-> +       if (!btd_device_is_initiator(device) &&
-> +                       !reverse_discovery(device, device->bdaddr_type)) =
-{
->                 DBG("Reverse service discovery disabled: skipping GATT cl=
-ient");
+>  static void target_init(struct avrcp *session)
+>  {
+> -       struct avrcp_server *server =3D session->server;
+>         struct avrcp_data *target;
+> -       struct avrcp_player *player;
+>         struct btd_service *service;
+>
+> -       if (session->target !=3D NULL)
+> -               return;
+> -
+>         service =3D btd_device_get_service(session->dev, AVRCP_REMOTE_UUI=
+D);
+>
+>         if (service =3D=3D NULL) {
+> @@ -4363,47 +4356,22 @@ static void target_init(struct avrcp *session)
 >                 return;
 >         }
-> @@ -6970,6 +6983,12 @@ static int device_browse_gatt(struct btd_device *d=
-evice, DBusMessage *msg)
->         if (!req)
->                 return -EBUSY;
 >
-> +       /* Connected without a client, as reverse discovery waited for th=
-e
-> +        * device to be paired: start it on the existing link.
-> +        */
-> +       if (!device->client && device->att)
-> +               gatt_client_init(device);
-> +
->         if (device->client) {
->                 /*
->                  * If discovery has not yet completed, then wait for gatt=
--client
-> @@ -7627,7 +7646,8 @@ void device_bonding_complete(struct btd_device *dev=
-ice, uint8_t bdaddr_type,
->                 }
->                 bonding_request_free(bonding);
->         } else if (!state->svc_resolved && !state->browse &&
-> -                       !state->discov_timer && btd_opts.reverse_discover=
-y) {
-> +                       !state->discov_timer &&
-> +                       reverse_discovery(device, bdaddr_type)) {
->                 /* If we are not initiators and there is no currently
->                  * active discovery or discovery timer, set discovery
->                  * timer on the bearer that was bonded.
-> @@ -7672,7 +7692,7 @@ unsigned int device_wait_for_svc_complete(struct bt=
-d_device *dev,
+> -       target =3D data_init(session, AVRCP_REMOTE_UUID);
+> -       session->target =3D target;
+> +       target =3D data_init(session, session->target, AVRCP_REMOTE_UUID)=
+;
 >
->         dev->svc_callbacks =3D g_slist_prepend(dev->svc_callbacks, cb);
+>         DBG("%p version 0x%04x", target, target->version);
 >
-> -       if (state->svc_resolved || !btd_opts.reverse_discovery)
-> +       if (state->svc_resolved || !reverse_discovery(dev, BDADDR_BREDR))
->                 cb->idle_id =3D g_idle_add(svc_idle_cb, cb);
->         else {
->                 if (dev->bredr_state.discov_timer > 0)
-> diff --git a/src/main.c b/src/main.c
-> index 3a051c5a4..4003a9627 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -924,6 +924,30 @@ static bool parse_config_bool(GKeyFile *config, cons=
-t char *group,
->         return true;
+>         btd_service_connecting_complete(service, 0);
+>
+> -       player =3D g_slist_nth_data(server->players, 0);
+> -       if (player !=3D NULL) {
+> +       if (target->player !=3D NULL) {
+>                 int8_t init_volume;
+> -               target->player =3D player;
+> -               player->sessions =3D g_slist_prepend(player->sessions, se=
+ssion);
+>
+>                 init_volume =3D btd_device_get_volume(session->dev);
+>                 media_transport_set_a2dp_volume(session->dev, init_volume=
+);
+>         }
+>
+> -       session->supported_events |=3D (1 << AVRCP_EVENT_STATUS_CHANGED) =
+|
+> -                               (1 << AVRCP_EVENT_TRACK_CHANGED) |
+> -                               (1 << AVRCP_EVENT_TRACK_REACHED_START) |
+> -                               (1 << AVRCP_EVENT_TRACK_REACHED_END) |
+> -                               (1 << AVRCP_EVENT_SETTINGS_CHANGED);
+> -
+>         if (target->version < 0x0104)
+>                 return;
+>
+> -       if (avrcp_volume_supported(target)) {
+> -               session->supported_events |=3D
+> -                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+> -               /* Check if transport volume hasn't been initialized then=
+ set it
+> -                * to max so it works properly if the controller attempts=
+ to
+> -                * subscribe to AVRCP_EVENT_VOLUME_CHANGED.
+> -                */
+> -               if (media_transport_get_a2dp_volume(session->dev) < 0)
+> -                       media_transport_set_a2dp_volume(session->dev, 127=
+);
+> -       }
+> -
+> -       session->supported_events |=3D
+> -                               (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGE=
+D) |
+> -                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANG=
+ED);
+> -
+>         /* Only check capabilities if controller is not supported */
+>         if (session->controller =3D=3D NULL)
+>                 avrcp_get_capabilities(session);
+> @@ -4430,7 +4398,8 @@ static void controller_init(struct avrcp *session)
+>                 return;
+>         }
+>
+> -       controller =3D data_init(session, AVRCP_TARGET_UUID);
+> +       controller =3D data_init(session, g_new0(struct avrcp_data, 1),
+> +                                                       AVRCP_TARGET_UUID=
+);
+>         session->controller =3D controller;
+>
+>         DBG("%p version 0x%04x", controller, controller->version);
+> @@ -4460,8 +4429,35 @@ static void controller_init(struct avrcp *session)
+>         avrcp_connect_browsing(session);
 >  }
 >
-> +static void parse_reverse_discovery(GKeyFile *config)
+> +static void session_svc_complete(struct btd_device *dev, int err,
+> +                                                       void *user_data)
 > +{
-> +       char *str =3D NULL;
-> +       bool val;
+> +       struct avrcp *session =3D user_data;
 > +
-> +       if (parse_config_bool(config, "General", "ReverseServiceDiscovery=
-",
-> +                                                               &val)) {
-> +               btd_opts.reverse_discovery =3D val ? REVERSE_DISCOVERY_AL=
-WAYS :
-> +                                               REVERSE_DISCOVERY_NEVER;
-> +               return;
-> +       }
+> +       session->svc_complete_id =3D 0;
 > +
-> +       if (!parse_config_string(config, "General", "ReverseServiceDiscov=
-ery",
-> +                                                               &str))
-> +               return;
+> +       if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) !=3D =
+NULL)
+> +               controller_init(session);
 > +
-> +       if (!strcmp(str, "paired"))
-> +               btd_opts.reverse_discovery =3D REVERSE_DISCOVERY_PAIRED;
-> +       else
-> +               warn("Invalid value for ReverseServiceDiscovery: %s", str=
-);
-> +
-> +       g_free(str);
+> +       if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) !=3D =
+NULL)
+> +               target_init(session);
 > +}
 > +
->  static void parse_privacy(GKeyFile *config)
+>  static void session_init_control(struct avrcp *session)
 >  {
->         char *str =3D NULL;
-> @@ -1096,8 +1120,7 @@ static void parse_general(GKeyFile *config)
->                                                 &btd_opts.pairto,
->                                                 0, UINT32_MAX);
->         parse_device_id(config);
-> -       parse_config_bool(config, "General", "ReverseServiceDiscovery",
-> -                                               &btd_opts.reverse_discove=
-ry);
-> +       parse_reverse_discovery(config);
->         parse_config_bool(config, "General", "NameResolving",
->                                                 &btd_opts.name_resolv);
->         parse_config_bool(config, "General", "DebugKeys",
-> @@ -1473,7 +1496,7 @@ static void init_defaults(void)
->         btd_opts.pairto =3D DEFAULT_PAIRABLE_TIMEOUT;
->         btd_opts.discovto =3D DEFAULT_DISCOVERABLE_TIMEOUT;
->         btd_opts.tmpto =3D DEFAULT_TEMPORARY_TIMEOUT;
-> -       btd_opts.reverse_discovery =3D TRUE;
-> +       btd_opts.reverse_discovery =3D REVERSE_DISCOVERY_PAIRED;
->         btd_opts.name_resolv =3D TRUE;
->         btd_opts.debug_keys =3D FALSE;
->         btd_opts.refresh_discovery =3D TRUE;
-> diff --git a/src/main.conf b/src/main.conf
-> index c9906148d..b2c834244 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -34,8 +34,11 @@
->  # BITE tester doesn't like us doing reverse SDP for some test cases, for=
- LE
->  # this disables the GATT client functionally so it can be used in system=
- which
->  # can only operate as peripheral (see also GATT Client option).
-> -# Defaults to 'true'.
-> -#ReverseServiceDiscovery =3D true
-> +# Possible values: 'true', 'false' or 'paired'. With 'paired' it is done=
- only
-> +# once the device is paired, so that reading the services of a device th=
-at
-> +# connected to us does not start pairing when they need encryption.
-> +# Defaults to 'paired'.
-> +#ReverseServiceDiscovery =3D paired
+> +       struct avrcp_player *player;
+> +
+> +       /* The remote may register for events before its records are know=
+n,
+> +        * target_init() completes the target from them.
+> +        */
+> +       session->target =3D g_new0(struct avrcp_data, 1);
+> +
+> +       player =3D g_slist_nth_data(session->server->players, 0);
+> +       if (player !=3D NULL) {
+> +               session->target->player =3D player;
+> +               player->sessions =3D g_slist_prepend(player->sessions, se=
+ssion);
+> +       }
+> +
+>         session->passthrough_id =3D avctp_register_passthrough_handler(
+>                                                         session->conn,
+>                                                         handle_passthroug=
+h,
+> @@ -4473,11 +4469,19 @@ static void session_init_control(struct avrcp *se=
+ssion)
+>                                                         session);
+>         session->control_handlers =3D control_handlers;
+>
+> -       if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) !=3D =
+NULL)
+> -               controller_init(session);
+> +       /* Report every event supported: the remote registers those it us=
+es */
+> +       session->supported_events |=3D (1 << AVRCP_EVENT_STATUS_CHANGED) =
+|
+> +                               (1 << AVRCP_EVENT_TRACK_CHANGED) |
+> +                               (1 << AVRCP_EVENT_TRACK_REACHED_START) |
+> +                               (1 << AVRCP_EVENT_TRACK_REACHED_END) |
+> +                               (1 << AVRCP_EVENT_SETTINGS_CHANGED) |
+> +                               (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGE=
+D) |
+> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANG=
+ED) |
+> +                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
 
-I can leave with it being an optional argument, but not the default,
-that said this may overlap with the [GATT] client support, although
-this maybe cleaner, but we can't really anticipate if any profile,
-etc, is not depending on the auto pairing logic.
+So this seems to disregard what version we are operating on so we
+don't foresee any problems with sessions getting unknown event bits
+being set? I guess we can only do that if we are absolutely sure
+PTS/Qualification will never ever be updated to check bits considered
+RFU (e.g 1.3).
 
->  # Enable name resolving after inquiry. Set it to 'false' if you don't ne=
-ed
->  # remote devices name and want shorter discovery cycle. Defaults to 'tru=
-e'.
+> -       if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) !=3D =
+NULL)
+> -               target_init(session);
+> +       session->svc_complete_id =3D device_wait_for_svc_complete(session=
+->dev,
+> +                                                       session_svc_compl=
+ete,
+> +                                                       session);
+>  }
+>
+>  static void controller_destroy(struct avrcp *session)
+> @@ -4513,6 +4517,10 @@ static void session_destroy(struct avrcp *session,=
+ int err)
+>
+>         session_abort_pending_pdu(session);
+>
+> +       if (session->svc_complete_id)
+> +               device_remove_svc_complete_callback(session->dev,
+> +                                               session->svc_complete_id)=
+;
+> +
+>         service =3D btd_device_get_service(session->dev, AVRCP_TARGET_UUI=
+D);
+>         if (service !=3D NULL) {
+>                 if (session->control_id =3D=3D 0)
+>
+> base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 > --
 > 2.43.0
 >
