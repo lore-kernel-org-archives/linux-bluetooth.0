@@ -1,61 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.76.89
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795512683;
-	b=IP3hteoSAPZoHdfjZzHf9c5umF0CCkpmiXWQg1DtXBBLrXQJGBz04wlR0C4JOltcy4tP
-	 mh1XJFfkaP7PLgmwk3mkAELPuLWnr8y3BQxkEFGt8ZMfOGlC000E0M4Z6VHxza8xh5+Wl
-	 7a3emoYWRPJ4iz0wRliCczcuIejS6LyWadKN0cOfRd7GGCJBlGtZ9B2qQCjF8MVTiYZV4
-	 083Di8GebLu3exxJlt/WD+GVy5468ifVy9plzttxY1vSwQ3ZGCVx4DTqEajBH4Yg/YUdr
-	 BHGRqGYRzH+92LvdEYQTWVu2XuJ4rqbMfue+OS7NGh12AAYxJK8rTfRz5OJuiJEqkaw==
+	b=QNlMpOB/T4OiQzIxwoyFhOSxZnPYNfwEKmok98zfy4Ie56wJpbuvseaAdtLwBHQTd06G
+	 pCwP7iXsUADAH8EgKghFOn/914BHtZhcv3PrTX+uWm8JZXAFokY9uoVvwmEl0em6qmx1t
+	 1Dil5JzdZZmn2y0FkVIJRcLZd0k9NuHfqazx1qngo0uC6TkiLKkt42pyWdLRfXdK7WX4M
+	 DZurTD/qjivplemO6AUWM6kbuyxK7S63DozUgG1C+9Ye7a6BrLniJsaXBXTdbU0jIWzhm
+	 Lo4uUuo96a513JNjD5lQ0zMiFxqzZ0yNqsUqtSdNzLtKAY55ugsqTm33V97GDwYTgGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795512683;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 References:In-Reply-To:To:Cc:X-Mailer;
-	bh=E/vY5+juqBKGKVLd19Cts9FnfOJW38omoiBgC93MpJ4=;
-	b=s5tmmIFAKIB4Rg7iRwIRNe7NZSmGFA5z5IAJdfeQDzFmOULBSCEYPikaO2RFmDtaGXoR
-	 /cuJojPnVEos8aqdNS7UmTa8OA8zOAFSVzxLyL0UvyONJFo6xXemes15EHZNzXn363HaX
-	 mY2PTOt2FvPj6qWyNZ+wcqGPUjZC5X2yJMEBdZurlhMkifDzv/TOvKv7xUNP52MQdCdQY
-	 f1+umyst1f6rSZkXcrtFEf87gpg4zIVz/FGqaL6vY55qb1OaiDaCC0RP9Ew/yLFkp6sAK
-	 IgMMy6vneBXeKpcjg7nCZfkxvgCkmYxCDea2gHUIXfU7Be7PhUUXYKaka8j+einXCgQ==
+	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Subject:Date:
+	 Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer;
+	bh=07NIsoUlOpVS4uyd/2oU3IRCI7BLAE4hFajjT9Gbcr8=;
+	b=NJ+d3EjMG4SQ0fFSWnTohkPBnYxTFJyoTHB5Gy/b2WerhfJ7GIahrbLLn7OyC0PpxjnV
+	 k3FCq88pti2ztxcPdY/TrnwfA/3mxtos5P5rzy+e3AtQiIuG7z4RmuRwA0lEouUnDqYg2
+	 bFSvZrhrs5lqVhAu9xL6dZEE9ovfGsr5eLNF5kogAyu5XMM11DI9vgTx/cveeYFjVnow2
+	 TIZ97PjGS5BYWV+4g01X8OlGV1svs/7Gh7uWBe2Vu+8s7tUg073CnmilSzDRqckyQtVsC
+	 Y+55a7GOsMuEmdUCMyr1q9bz+Gw69nG9nvNBMcRgISXLgzgY1SrtHP4sgHyYrJrm7NA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=podgorny.cz;
 	spf=pass smtp.mailfrom=podgorny.cz;
-	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=jaz+zoSj;
+	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=Zfx2apd3;
 	arc=none smtp.remote-ip=77.75.76.89
 Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF36606A326;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1154606A33A;
 	Tue, 24 Nov 2026 09:31:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFF36606A326
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C1154606A33A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=jaz+zoSj
+	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=Zfx2apd3
 Received: from email.seznam.cz
-	by smtpc-mxb-5bd84c9575-j92sp
-	(smtpc-mxb-5bd84c9575-j92sp [2a02:598:96:8a00::1200:505])
-	id 20729de0964830f925fd87a8;
-	Tue, 24 Nov 2026 10:31:14 +0100 (CET)
+	by smtpc-mxb-67bf8c997c-nxznx
+	(smtpc-mxb-67bf8c997c-nxznx [2a02:598:128:8a00::1000:93f])
+	id 0d45cb79bb7f666008cad131;
+	Tue, 24 Nov 2026 10:31:02 +0100 (CET)
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
-	t=1795512674; bh=E/vY5+juqBKGKVLd19Cts9FnfOJW38omoiBgC93MpJ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc;
-	b=jaz+zoSjvOWbDU3OO3qdmvgSl+UuEkHB395i9UYgmqCge+2UopWRUWbAdIveHZzFV
-	 MvHCEUamsXgBG5W5NtxAD4WnG11k0Pk70euxK8fXtwknqCEL61pRcOOJIBwyo0X63E
-	 NBcMWAIZf+o7KanXMz2txX7HBqFnQM85fW9/1XnwZ1WbdBYDMHW6dazDkrzfF0SrMT
-	 qW9s7VQemsdhvd0YWixwBPfaTOrUJmDdWBTEMoATGyxf6U3zMaWntCLBJ6x3W6Ky7i
-	 RbINOLyRLQzQMNYp8hqCg+jvK/85vWCd9H4LnMJ8BS9HSblSnw2epEcHcl29TzvUDl
-	 5KsQXTV3ewQBA==
+	t=1795512662; bh=07NIsoUlOpVS4uyd/2oU3IRCI7BLAE4hFajjT9Gbcr8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:To:Cc;
+	b=Zfx2apd3kEzVmvIE1qvLBIuVweXTXX4THCzqimOC/HhjK6MB6s2OUIHc4Qd/wQj3a
+	 es2NjBb43/qXggX2t14WY8YqPYXOVdcPTgudbSqc8Bu+Iz44J3y52hzyaaRlpvsfD8
+	 +B0SM/fvOaT8f5IHbwnYRNIs7rVmBJ9jxDWMhFEX0cXYJwuLcCa1vNc9XR15BkQ1pw
+	 1Tr7d88ymTwCvAtpKlOOdmdSdJYtV3ReVo0Tzm1KNjiAuSCAxIiYMx+NLNxWP9IwZs
+	 MQPPBV1hL4ycdDWb6pn4PxoLcUZ58fiSI8+LvfuhJ2ifEHquQVrDJnKEVbx8hrCS48
+	 3AgxsQg0/3w1A==
 Received: from [192.168.31.57] ([2a01:9422:904:1ee:e65e:37ff:feee:e29c])
 	by smtpd-relay-584bc557d7-pqx9t (szn-email-smtpd/2.0.97) with ESMTPA
-	id 93b309d2-9b89-4c4c-a118-6755e88030bd;
-	Tue, 24 Nov 2026 10:31:01 +0100
+	id da947f30-7c08-4e98-b716-1c6f96e6b293;
+	Tue, 24 Nov 2026 10:31:00 +0100
 From: Radek Podgorny <radek@podgorny.cz>
-Date: Tue, 24 Nov 2026 10:30:59 +0100
-Subject: [PATCH v4 3/4] Bluetooth: refuse to dial a peer whose connection
- is under its RPA
+Subject: [PATCH v4 0/4] Bluetooth: find an RPA peer's connection parameters
+ by its identity
+Date: Tue, 24 Nov 2026 10:30:56 +0100
+Message-Id: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,9 +68,12 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261124-for-upstream-le-conn-params-rpa-v4-3-f2dd5eb41f45@podgorny.cz>
-References: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
-In-Reply-To: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42Oy07DMBBFf6XymikZ59GEFf+BWIztSRMgdjR2o
+ 5Yq/05cNkUsYHlH9545VxVZRo7qaXdVwssYx+C3UD3slB3IHxlGt2WlC90gFgh9EDjNMQnTBB8
+ MNngPMwlNEWQm6HVZVr2pnaOD2iizcD+ebx9eXr9zPJk3tiljc8NQZDBC3g75ZBJ4PqfHiWJiy
+ YVhjCnI5ea4YAb9X2dBQOjattEdFZ2x3fMc3DGIv+ztp8pCi74nVqgLLNs9YlMfsN7GQo7ff6/
+ K+1X3t0e5ocih1rUxhWn7n8R1Xb8AL13DqYsBAAA=
+X-Change-ID: 20261101-for-upstream-le-conn-params-rpa-f2334fb5dda7
 To: Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
@@ -78,51 +82,125 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  linux-kernel@vger.kernel.org, Radek Podgorny <radek@podgorny.cz>
 X-Mailer: b4 0.15.2
 
-hci_connect_le() creates the connection under the peer's RPA when the
-controller cannot resolve it, and the connection stays BT_OPEN, out of
-sight of hci_lookup_le_connect(), until hci_le_create_conn_sync() runs.
-A second advertising report in that window looks the connection up by
-the identity, misses it, creates another hci_conn and overwrites
-params->conn.
+v4 answers Luiz's question on v3 about hci_conn_params_add() resolving
+the address before a lookup that resolves it again, and fixes what
+Sashiko raised on v3:
+https://lore.kernel.org/all/CABBYNZLFtpr8xFjnimRZ9VKOsEgUV-Gzf61bomK4u+SMEyqBxA@mail.gmail.com/
+https://sashiko.dev/#/patchset/20261109-for-upstream-le-conn-params-rpa-v3-1-ad1225bb0b8f%40podgorny.cz
 
-When the lookup by address misses, look the peer's connection up by its
-IRK and refuse with -EBUSY. That includes a scanning connection: under
-an RPA, it has either been started by an earlier advertising report
-already, or it belongs to an explicit connect made before the IRK was
-known, and so to other params, which taking it over would hand a
-reference they do not own. In that last case the explicit connect can
-no longer be started either, since the peer's advertising reports now
-resolve to its identity, and auto-connect to the identity waits until
-the owner of the explicit connect gives it up.
+The single v3 patch is now four. Patch 4 is the v3 fix itself. The
+first three fix bugs in bluetooth-next that it exposes or sits next to,
+and each stands on its own:
 
-Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Radek Podgorny <radek@podgorny.cz>
+1. hci_connect_le() keeps pointing into an IRK after leaving RCU.
+2. A connect to a peer's RPA misses the connection the peer already
+   has under its identity and adds a second hci_conn.
+3. A second advertising report before LE Create Connection is sent
+   adds a second hci_conn for a peer dialled under its RPA.
+4. The connection is created with the controller-wide defaults instead
+   of the peer's own parameters.
+
+Patches 3 and 4 use helpers added in patch 2; patch 1 is independent.
+
+Tested on v7.3.5 (the flags tests need &c->flags there) on a Raspberry
+Pi CYW43455 central and a peer on a resolvable private address whose
+parameters are loaded under its identity: first with three successive
+builds of v4 applied as one patch (17 of 17 connects), then with this
+series for three days (6 of 6 forced reconnects and 179 connects in
+normal use). Every connect was one Create Connection to the RPA,
+including across RPA rotations between attempts, and those captured on
+air carried the identity's parameters. With the peer connected, an
+L2CAP connect to its current or a previous RPA now finds the existing
+connection, as one to its identity does; without the changes it adds a
+second hci_conn under the RPA and waits until it times out. Not
+exercised: a controller that resolves the address itself and a peer
+with no cached RPA, which this controller and peer cannot reach, and a
+second advertising report before LE Create Connection is sent.
+
+Known limitations, raised by a local Sashiko run and left as they are:
+
+- Patch 3: if an explicit connect was made to a peer's RPA before its
+  IRK was known, auto-connect to the identity gets -EBUSY until whoever
+  made that connect cancels it, which for Pair Device is userspace: a
+  connect that was never started has no timeout. Reusing that
+  connection instead hands the auto-connect params a reference they do
+  not own. Avoiding both needs the explicit connect moved to the
+  identity when the IRK is added, which is a separate change.
+- Patch 2: Cancel Pair Device by an RPA no longer finds a pairing
+  started by that RPA when the IRK was already known. It now behaves as
+  a pairing started by the identity, which is how bluetoothd starts one
+  for a peer whose IRK it holds.
+
+Per Documentation/process/generated-content.rst: the patches and this
+message were done with the Claude coding assistant (model as in the
+Assisted-by trailer). The prompts asked it to fix the issues Sashiko
+raised on v2 and v3 and the question raised on v3, then to review the
+result with a local run of Sashiko and with Sashiko's published review
+prompts, and fix what that turned up. The author directed the work and
+reviewed the result.
+
 ---
- net/bluetooth/hci_conn.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Changes in v4:
+- Split into four patches (Sashiko)
+- hci_conn_params_add(): resolve once, through a new
+  __hci_conn_params_lookup() that does not resolve again (Luiz, Sashiko)
+- New patch 2, hci_connect_le_scan(): resolve an RPA to the identity
+  first, so a connect to an RPA neither creates its connection under
+  the RPA nor misses one the peer already has under its identity
+  (Sashiko). Add Device, which Sashiko also named, accepts only
+  identity addresses
+- New patch 3, hci_connect_le(): when the lookup by address misses,
+  find the peer's connection by IRK and refuse it with -EBUSY, also
+  while scanning, since a scanning one then belongs to other params. A
+  second advertising report before LE Create Connection is sent no
+  longer creates a second hci_conn (Sashiko). This replaces v3's reuse
+  of a scanning connection found by IRK, which patch 2 makes
+  unnecessary
+- New patch 1: copy the RPA dialled out of the IRK under RCU
+- Rebased on bluetooth-next
+- Link to v3: https://patch.msgid.link/20261109-for-upstream-le-conn-params-rpa-v3-1-ad1225bb0b8f@podgorny.cz
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c1583cb6c28a..791df930650e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1600,6 +1600,15 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (conn && !test_bit(HCI_CONN_SCANNING, conn->flags))
- 		return ERR_PTR(-EBUSY);
- 
-+	/* A connection found by the peer's IRK instead is under one of its
-+	 * RPAs. It is refused even while scanning: it has then either been
-+	 * started by an earlier advertising report already, or it belongs
-+	 * to an explicit connect made before the IRK was known, and so to
-+	 * other params.
-+	 */
-+	if (!conn && le_conn_lookup_irk(hdev, dst, dst_type))
-+		return ERR_PTR(-EBUSY);
-+
- 	/* Check if the destination address has been resolved by the controller
- 	 * since if it did then the identity address shall be used.
- 	 */
+Changes in v3:
+- Look up the identity instead of the RPA, not after it, so an entry
+  left under the peer's pre-bonding RPA cannot shadow it
+- Copy the identity out of the IRK under rcu_read_lock(), since SMP can
+  free the IRK without hdev->lock
+- hci_conn_params_add() stores a new entry under the identity
+- load_conn_param() and load_conn_subrate(): look up the connection with
+  the entry's address type
+- hci_connect_le(): find the scanning connection of a connect made to
+  the peer's RPA by its IRK, so it is not duplicated once the identity
+  entry is pending, even after the peer has moved to a new RPA, and
+  also when the controller resolved the advertisement or no RPA is
+  cached for the peer. Kept in this patch, since on its own it would
+  leave a reference imbalance until the lookup is fixed
+- Rebased on bluetooth-next
+- Link to v2: https://patch.msgid.link/20261104120138.1165715-1-radek@podgorny.cz
+
+Changes in v2:
+- Resolve the RPA inside hci_conn_params_lookup() rather than at the
+  hci_le_create_conn_sync() call site, as Luiz suggested, so no other
+  caller can miss the entry
+- Rebased on bluetooth-next
+- Link to v1: https://patch.msgid.link/20261101-for-upstream-le-conn-params-rpa-v1-1-988629a09bc9@podgorny.cz
+
+---
+Radek Podgorny (4):
+      Bluetooth: copy the peer's RPA out of its IRK under RCU
+      Bluetooth: connect to an RPA as to the identity behind it
+      Bluetooth: refuse to dial a peer whose connection is under its RPA
+      Bluetooth: find an RPA peer's connection parameters by its identity
+
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_conn.c         | 75 ++++++++++++++++++++++++++++++++++++++--
+ net/bluetooth/hci_core.c         | 50 ++++++++++++++++++++++++---
+ net/bluetooth/hci_event.c        |  4 +--
+ net/bluetooth/mgmt.c             |  4 +--
+ 5 files changed, 125 insertions(+), 10 deletions(-)
+---
+base-commit: ffb95458a0f70dcab620eee0ecf5ef7750971b2f
+change-id: 20261101-for-upstream-le-conn-params-rpa-f2334fb5dda7
 
 -- 
-2.56.1
+Radek Podgorny <radek@podgorny.cz>
 
