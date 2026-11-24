@@ -1,74 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795480770;
-	b=RMwPRVeIX1bAXMRunULzSmWn1zAns1tNzDBR9vYmlJsLsikdGj0YUBRiQRINCJq7JHMW
-	 lerMswQJVdhIsP7kBcl5BOpZilErR21KG0m/KX0J+ku57Z4noAa7dwD1gATWvE+2sIFNB
-	 hjKlntyIQs2/an4J8BMbTyKTqZw2pc6qioXkKVcAlZZW01CZVGqFxPSBfRzptfNbTXN+K
-	 uXjAEZ5nyQi6NZEqCvM7N+w6Y5vckSpGqvXuitVGuDE8UjDbRz5MwvZHwHW4VTILWglyB
-	 Z0rdJbKmfFI1OMYctjulHGBYHSs8vNrM0wR3jts79pnuoqvyjEyoRRRZ4GZqzDFYf4g==
+	t=1795484211;
+	b=z+QFGbCjwD8osZMaegnmqXukzuZtu6sz9gIxYIjKJCbha5IBxamlRjjIazEsn9uYYm4a
+	 xjEnUO70H3mEGnk9JlNiHRM4e3xIF5XUNPijku1DVp/STRbrpfoPkMkBxe4X+YgXdzTV+
+	 Lxc8X8eecITiFQBYfYS/xwE/XYYFh/c+M0/DnTDnMUU/fKgPM+KbzKSKQhnlTcwYP/4wG
+	 20i1cAB4QE8iTWUbEaptxpLYX1fQ/mb+icFX0R3zo+J/uAGbT52vzVZ9EBRDPIM5xvs/I
+	 tfmOBxIZ/trnSh+xFfvHJPzGyu5VQJuvmX8zL3EvdHh58F+QN8rkphZEmQYsO6ZqX7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795480770;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=E7lHDRoZZDlLF9Vk6ZjGwMQE93FuNNjxt06lTW8nudE=;
-	b=WJmzAHQuhowAx52/R7iSwTNCYFex8exQ4qXctwqFBOKu7mWmyvM1Ek+29W6xq9bhSMHa
-	 aAQRlvU0D8/v9J/zIRHY/wl3NCsFvl6W2kuOg7ON6e0tWQ1cddsir6B2Z79+1Sj6g0Nbt
-	 yKwn6rDzYZcnaZUsv5EEXLo+xen3En+rwaSkBM4dbGUlKvK/lnJYY56FhsVGw7IFx2SLc
-	 W+8hGiQ30ZmmNBfhZuWxO6/A+pWvA7HQvoe90AjgKh4DXTTOi1Z3lZPCDV98LruKiMpA1
-	 nQC59BMG+hDgxNU1mrO3wY9mhAYdj1R25Pt6jknD7t/Xo/TryuLfD6C6fvf7NG1oQcQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795484211;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=phZ3/wAVdcKHh5uB27l9bKN9z/XarVuqiPGQPZXwWeI=;
+	b=XHbwM8lyUBJTmS60JPODRYIi5/bG34g6Yl/hTzsSriEwXOZmW4fKCACl0ds2DbdoAHxQ
+	 5Jbm5lPY2AakLb9AwIPS39KV4HhcebQjG82jEpgcKOA1hb37OjdjWJ0tCOe/zLM4uxxap
+	 PLrpv1WTRT+PHrG4duJKr3e5lWsx+zvdzC+Kbf87awjwYDXnoaqpWlq276LJ6dVOXP7JL
+	 DPS16I20UpUuhgiHoFlGiBPHwc8c0dQ5vxQKZ27AqcFSZtG/zYBTIPorwEt5V+MqNA85t
+	 YbVYKriy+GSgyoBw6BadtnqtxNa4bMKhqW7ZPvU5Tq6aMPJIOiSdCF95q8kzpQfdRnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=JUpf+S0P;
-	arc=none smtp.remote-ip=192.198.163.11
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=01zr2RbA;
+	arc=none smtp.remote-ip=209.85.210.174
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83DC606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 00:39:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C83DC606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88C2606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 01:36:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D88C2606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=JUpf+S0P
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795480770; x=1827016770;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=rvoPIcDxz61ipvcJsgnGaUH17DDTTZIeJKG2qxhXxJ4=;
-  b=JUpf+S0P7/AZqoD7WWRCLRoaKc/qUq+8YPs6aD8xQyykpZU79zXq6S/r
-   Ck/FKcXaDqaQs9x8A8BUKNNhM1MU3hwvgLYLhtJHn9hmppqxHxyLJLBbu
-   AMQIPHEYuVUlwyyNWAXlGmXb1snoBAuAMETVkJtlb6gRUKcRJ9lOP+iKK
-   pJxAY24wnfHXiEeHBLWvSXH0negcn4CriuHJrTkkWW68IgoIwU7sujcGz
-   mB4OKRYr1u7WdvmsCaOCrodjo0zkNFRGfLNBFCY3RQBRsKfZQMIn57bHB
-   F4B0KrKdYl9Jmg7qjlN8uIT3WJy1+BbkSAf1drWPwmtjxQE03kYnZL/P1
-   g==;
-X-CSE-ConnectionGUID: O7uqIO1sQ1CYXEfnislwow==
-X-CSE-MsgGUID: Ab4WJisqSGCoF/w2hbGqCg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="4210287"
-X-IronPort-AV: E=Sophos;i="6.27,229,1787036400"; 
-   d="scan'208";a="4210287"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2026 16:39:29 -0800
-X-CSE-ConnectionGUID: bvjCpGlSQvam/fo9AJ6quQ==
-X-CSE-MsgGUID: 1ETKpyZ4RPijNpfydud6pg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,229,1787036400"; 
-   d="scan'208";a="11207069"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa008.jf.intel.com with ESMTP; 23 Nov 2026 16:39:28 -0800
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] Bluetooth: btintel_pcie: Fix RX hdev publication race
-Date: Tue, 24 Nov 2026 06:29:39 +0530
-Message-ID: <20261124005939.2981368-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=01zr2RbA
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8a06cc097c7so2683027b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 17:36:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795484210; x=1796089010; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=phZ3/wAVdcKHh5uB27l9bKN9z/XarVuqiPGQPZXwWeI=;
+        b=01zr2RbAU0BM28Vk/Y9NFDulsNcezaRyvp90gisA3ll8c++Y2DNq7//i+65142DaX5
+         QnT7rOb2LD6X7z20LUXJbzdwdo10W8OkegDbb2doBjGVCdop/LP4PC4eF0a9fFzRL/6p
+         8KPcybIi8U5TUB3DU3u8JZcYGZMKzMvwYrkNa/P/6WDUFd84xJquUb+KJbKwVFa3cbRN
+         tBN1755O9PZj7DMpNRhZx2JI9n4Z6K7tSrrSLqsnS9hrPlV6NCe7Xs+elo/43Eqi6jK1
+         io4Y2/KIdkcNpGL8DxFllIbAHHVr6AqgFCb7d7dmkXletVS7TiLCw7GRhz+MP8bmgtEt
+         q3lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795484210; x=1796089010;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=phZ3/wAVdcKHh5uB27l9bKN9z/XarVuqiPGQPZXwWeI=;
+        b=z/8K5M5WQ9iTHIqTHEarI79muDXh8acgtl50DmMuXEwFbsakdfNAk9YdExfG1sY4Ps
+         d1Pgz8aSx7xGLbMkLyr1Z/BBNs+rBoo+YnFd548ZaLnGW40UmVizHKSFfSHleABbly6n
+         7NcQG6N1e56erYH75zsGgoiXuK7VIOpxR3Bvos5DvZUgqdpYp86/vjY9VyXOuNvcYBSr
+         4Ff26g5hNfIzYxv4CckzzuFODLlsMfE+sg7wNOUWPKwsKXyMrz09pdvGSe3xKf6FqHwV
+         wEL4dt2mfinP5V01ufwtQapqFxbeAXX6UKL9LrQfzfE30ao2qM40NA2DMpaQy5PCo0is
+         +eGA==
+X-Gm-Message-State: APuU4Z/QtAXlOjzm/a+d0fF0s1MQS/ryYaXKYquHIeclijJ91WZCi1zg
+	qnxAs6KqWjO52RjudlHsqMQh9/X13/JH1W1jdq7JkPr9DGqMXDYpyXdORye4/Q==
+X-Gm-Gg: AZFdTZeP81qcuOAkTTUb661D3dQ+7myO9/nvyDTXNTsKe6sNn7bH3eXCsjlqcSsndtC
+	oigDMZGvrVWhS/E9RkMCXNMxBTHw/J2XOyJPLA3J+vo96bFeaF6s+7Oae64t/mXAr1FgcPv9OrX
+	HxtkrFnh0Cu8PS1s8mDPO34LojGCZ203NPT5DU9c2DJrAvpBh31gsUyzcgPIeJZP4XMwPV2d7/C
+	70U9377sA+M2oVJgLuvlaTu4srXHR1kO93ems4Xg7Nv/FnQWicY3YXU7Ygwbm/U4JSS7CKJDRvq
+	t2KUWBRi3h2CgUgWIu5dpuWYq4Ro3+bU7HN9uyHtjrTnDzfL/Y0tcOVXpIgGae0F9J26AdP6g8f
+	cqtPxRspAvMcpc2tapat4tDTwdDOcfF4d1e0Z2mYYcMwiR1BK2GRbcgbX0WU96YJSR0etX9KDSP
+	GC9LT8pyVitMS0aXSMcYfDQNPei7ZuukzPjpf85wEc7QcXAP+XuvnW7HDdagaZy9STs3yvd3JaR
+	u0HG/h1iUd7d750T2JjcL91X+EpQnRYnu0UPZfBsmew/V+EaVF0DYV2Np59y2Bj9jtjlvByJ3w8
+	jTIIAvxfpIS8zkgSJIhkKX6Hg/zfmP7gJgwefA==
+X-Received: by 2002:a05:6a00:1818:b0:899:67fe:3c52 with SMTP id d2e1a72fcca58-8c87b4efad8mr12702288b3a.15.1795484210004;
+        Mon, 23 Nov 2026 17:36:50 -0800 (PST)
+Received: from [172.17.0.2] (ec2-3-42-157-18.us-west-2.compute.amazonaws.com. [3.42.157.18])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8cbe173453dsm3067887b3a.25.2026.11.23.17.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 17:36:49 -0800 (PST)
+Message-ID: <6b04ea31.a9f1f356.38c09e.659f@mx.google.com>
+Date: Mon, 23 Nov 2026 17:36:49 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4410863865304866080=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -78,105 +89,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
+Subject: RE: [BlueZ,v2] adapter: Fix discovery filter RSSI and Pathloss matching
+In-Reply-To: <20261123162240.387240-1-simon.mikuda@streamunlimited.com>
+References: <20261123162240.387240-1-simon.mikuda@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_register_dev() queues hci_power_on without waiting for
-hdev->setup(), so setup can run before btintel_pcie_setup_hdev()
-returns and publishes data->hdev. Publish data->hdev at the start of
-hdev->setup(), when the hdev is fully registered, so the command/event
-exchange finds it. Publishing before registration would expose a
-partially initialised hdev to RX and the dump workers.
+--===============4410863865304866080==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The race is seen as a NULL pointer dereference in the RX work while
-hdev->setup() is still running:
+This is automated email and please do not reply to this email!
 
-  Oops: general protection fault, kernel NULL pointer dereference 0xc28: 0000 [#1] SMP NOPTI
-  CPU: 0 UID: 0 PID: 904 Comm: kworker/u35:1 Tainted: G C OE 7.3.0-nvl-ww44-2bkc #2 PREEMPT(lazy)
-  Hardware name: Intel Corporation Nova Lake Client Platform/NVL UPH/UL LP5X T3 MEMSKT RVP5, BIOS NVLPFWR1.R00.3414.D22.2610141025 10/14/2026
-  Workqueue: btintel_pcie btintel_pcie_rx_work [btintel_pcie]
-  RIP: 0010:btintel_pcie_recv_frame.isra.0+0xc8/0x3c0 [btintel_pcie]
-  Call Trace:
-   <TASK>
-   btintel_pcie_rx_work+0x24/0x40 [btintel_pcie]
-   process_one_work+0x1dc/0x3f0
-   worker_thread+0x1b8/0x360
-   kthread+0xf9/0x130
-   ret_from_fork+0x2c3/0x380
-   ret_from_fork_asm+0x1a/0x30
-   </TASK>
+Dear submitter,
 
-Drop received frames when data->hdev is unavailable to avoid NULL
-dereferences.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/series/1219836/
 
-Fixes: 6e65a09f9275 ("Bluetooth: btintel_pcie: Add *setup* function to download firmware")
-Assisted-by: Copilot:claude-sonnet-5.5
-Signed-off-by: Kiran K <kiran.k@intel.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.21 seconds
+GitLint                       PASS      0.15 seconds
+BuildEll                      PASS      13.25 seconds
+BluezMake                     PASS      201.94 seconds
+CheckSmatch                   PASS      182.15 seconds
+bluezmakeextell               PASS      65.55 seconds
+TestFunctional                FAIL      962.14 seconds
+IncrementalBuild              PASS      202.53 seconds
+ScanBuild                     PASS      694.65 seconds
+
+Details
+##############################
+Test: TestFunctional - FAIL
+Desc: Run test-functional
+Output:
+FAIL functional.test_bap::test_bass_past_earbuds_transport_acquire[hosts11-vm3]: AssertionError: Failed to acquire: org.bluez.Error.Failed
+
+
+https://github.com/bluez/bluez/pull/2885
+
 ---
- drivers/bluetooth/btintel_pcie.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 3b2c8bbb36e9..4aff83ba1bbd 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -2533,7 +2533,15 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
- 	u32 plen;
- 	u32 pcie_pkt_type;
- 	void *pdata;
--	struct hci_dev *hdev = data->hdev;
-+	struct hci_dev *hdev = READ_ONCE(data->hdev);
-+
-+	/* RX can start before hdev is published (see btintel_pcie_setup()).
-+	 * No command can be pending yet, so drop the frame.
-+	 */
-+	if (!hdev) {
-+		kfree_skb(skb);
-+		return -ENODEV;
-+	}
- 
- 	spin_lock(&data->hci_rx_lock);
- 
-@@ -2953,10 +2961,11 @@ static void btintel_pcie_coredump_worker(struct work_struct *work)
- 	struct btintel_pcie_data *data = container_of(work,
- 					struct btintel_pcie_data, coredump_work);
- 
--	/* hdev is NULL until setup_hdev() succeeds, and is cleared on
-+	/* hdev is NULL until it is registered and published by
-+	 * btintel_pcie_setup() or btintel_pcie_setup_hdev(), and is cleared on
- 	 * teardown after disable_work_sync() drains us; bail in that case.
- 	 */
--	if (!data->hdev)
-+	if (!READ_ONCE(data->hdev))
- 		goto out;
- 
- 	/* When firmware routes debug traces to the WiFi DBGC, no host
-@@ -4273,6 +4282,12 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
- 	bool fips_crc_failed;
- 
-+	/* hci_register_dev() only queues setup(), so it can run before
-+	 * setup_hdev() returns. hdev is registered by now; publish it so RX
-+	 * and the dump workers can use it.
-+	 */
-+	WRITE_ONCE(data->hdev, hdev);
-+
- 	btintel_pcie_fatal_err_load(data);
- 
- 	while ((err = btintel_pcie_setup_internal(hdev, &fips_crc_failed)) &&
-@@ -4846,11 +4861,8 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
- 		return err;
- 	}
- 
--	/* Publish hdev only after successful registration; the coredump
--	 * worker bails on !data->hdev, so it never observes a half-set-up
--	 * device.
--	 */
--	data->hdev = hdev;
-+	/* Idempotent: setup() may already have published hdev. */
-+	WRITE_ONCE(data->hdev, hdev);
- 	data->dmp_hdr.driver_name = KBUILD_MODNAME;
- 	return 0;
- }
--- 
-2.54.0
 
+--===============4410863865304866080==--
