@@ -1,89 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795520416;
-	b=hFT6SZsDGKPhM5kvJcyAr6QK+tDyi4+rVy5LNyR8/S2ZNydw4auUhOHlW54X93qafWlC
-	 5SM2ogQlrl4y3KKC67lK8XVpRh3OFSLywh0jiO21m6h5iXw1FYeHgV/Lxprnxz3urT4u5
-	 PAq6MOuaAMrHTRUNnI2rLPqcinQFAIVJmJwbvOFhNb4L00OMLbEv2+buc/Q8HU6m0a0k+
-	 8AWR9PVJzhtPJk7lDbKmHMoH1R/vKZpdWIDpgROTYN9ABvRNaPzYzzAef5J6A9hJklZwI
-	 J6Di5PUOEpowXb27veluFWnFpxKWGkROP22ehD2KdNhXMTFvI/NdkekoNOvGLH0MWTQ==
+	b=NhIzqw+sGYCcxWlMpHUPLI4sX9Ki828lwTCBlIRknttzMEXzS7U3SpM8VE8W2R7x3PY/
+	 L4aa7hOYSkW8wXMmN8+LvRIOxxe3Pz8aEAV9yvmd2MeFZO+4HrRjz4zI6UX/4yuRwjpab
+	 6X4mQ+n7mTnn7jHU4aZ3K1tuiPOQLtsgl7ziL1ksIdG+/IuiBqRMutphzxLwQrHGgl+ME
+	 MlBQh5ESi0so7SomOgSeUew8wi/xmMLq1wQmKbzClGqIt6jJ3s0okp0qXrI4DGlgEOGBM
+	 InmRPJsqqXX3e+JVq3J3CvjNRFrRWgBjtmi3Gg1G3USEeQqTQVW/tUdvETgOF1EV9BA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795520416;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=repa4hp/LZZuu6VCFIADamXYleK2K4V5dwOc9ov38SI=;
-	b=o2ot0GE9RdRViCMsGh1din3w9NY0sgu07NYHEZsFMArWEsBGb9MLuoBoaSfxjQw+Qbfq
-	 psebB7NMh/3UzseQaqWB2GnhT2PQVc/PtBt9QSz9ql4zsPKsN7GRRPFoPuEeYUmiwBa59
-	 +L9f5nCSrXTDyj4Gzg4DRE+laFpEhK6efiwqazRnnwHdQJjc8bQX6kjFdu8TD687cDKfp
-	 BCqhrWr5KC4mUHF/fOTfgnd4BYkdA/NeS24L+0K4efs29usmwWQXYSUNnocEaekIfx8Cw
-	 PdZOu4rXqT6AFlc7bMSJi4yAFHU+X0cxPviS+EBYjJfs7Prcx0KgeT63JW15zmQZrew==
+	bh=NDYjESqBLUg1GNm1AyKfWdsE1IVDEH8BqTkPogtKPPg=;
+	b=FTkE/jjiYDWe8eR/v3FJ9fBZzlvqMQMO1FrOGPmkDsp94qgqlWdH01xsmsvUwk6n4UGz
+	 p95YqYCWORLESCHoYvphO8LOBZDUSjalCdjCzQYQoRIi6Y1Y8qeQMxsU78/+oYYabup9R
+	 dZyDAPIEvh7LcrksX/v1TE2ph6WIrFN2YUClZPhN2EDxUsZwlRQnHv+z0vlESRCKsaASM
+	 ja9IIYpryMF7VZEd+sKj/zPZ75f7sRjOqY82ds8inJ9BqzrFN9KlxaQbyaM+qBC+04/y8
+	 B4vELwE+1qZmVOTUsGW6+CtL9kR6Yfp5MAnaNp8lXye6dTzUXQrZ+P+9JffMsycLW8w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=boORlZ2p;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=yvQQvQ6U;
+	arc=none smtp.remote-ip=209.85.128.49
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1685606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320F3606A32D
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 11:40:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1685606A322
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 320F3606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=boORlZ2p
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4bb64ef5a00so34991935e9.3
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=yvQQvQ6U
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4ac95761c85so33930195e9.2
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:40:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795520414; x=1796125214; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=repa4hp/LZZuu6VCFIADamXYleK2K4V5dwOc9ov38SI=;
-        b=boORlZ2pzRl+o+knN9S6deKr0/aQBDiy7bHphg2lwgdOYMYnrhS83StzCM75lErG8P
-         tmhRRn/qZgEyNVOtGy5N597eynpTtHGE7qTsZi+LiB08dHUImq/cC5pGogZtM/ilMmxd
-         4CNQ9tzNLDDgC0JRmSqlLCr7jnFzd2ym7w6b0=
+        bh=NDYjESqBLUg1GNm1AyKfWdsE1IVDEH8BqTkPogtKPPg=;
+        b=yvQQvQ6Un72maWSRLRe7fsBylDdg2eliFyxENvzgQJ36fz8i98BP5o8/cLT+7t3ELC
+         HPB7RDPqSXC2x9sB8rLmXf6AjhXHVVmneaA95H/Bc3yBJS+sHF3e9R8Rj1Ec2llCcDMg
+         wZkeZbCCWjOilgPjAdjYNZpZmLEJ2LrAANkVg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795520414; x=1796125214;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=repa4hp/LZZuu6VCFIADamXYleK2K4V5dwOc9ov38SI=;
-        b=Go4yOEq3oO4v1cAkvW1UHmOTFFqgB3q9UmZYbMs5UIKwi38+keuXcuN5qYn1wE9cpY
-         nSZ3sOaVesqvHeBk5jeFd4t1dgsO2KR1uSrRz0xlKRnqoIO+rTfucWCIZJSErQwYQZdK
-         9l0eJPwlPyshSXMTzeM78/ZEX5oJ1OszhmSJvoHJgRsAt07rQ9nFjOFivba3hoVBHUh8
-         9glodIN91v8aXxKSs41EX11fBO8wsmeJoqMtFYGfki7zxYYhNppeG/AzgFNv0w74wjnc
-         6I9ZDqk6HBl5lyvzcTkdzCWRjuFMMU/bKwjNOp70vH9stqyUSGdZ9OxhdqOqfth9g2Rv
-         3A2w==
-X-Gm-Message-State: APuU4Z8QaspF+rqpzJ+Q293aL7T6/uRHKXaRkhh83uupnQrqE+1seFYA
-	HBONCsP50BIgTatVn1YwMNc3G/I3YVtUxZTBVzyhJFjRetaDQQplvm5+gfMFf8K5EZ9xLiYWmAh
-	NHXKw
-X-Gm-Gg: AZFdTZde8xxcFXInhZcmSabjZT/Xc197oX0tCySQ7eDikkHnmLNzvwlW4Qo88XqqICl
-	C0cna7ooTnKnXPQmOZ4P3XuZiJrWlq91xTBhiLR0PnVy22Ie2GXwcCWb88r4KKOo6vSs5GCnaYz
-	GoFeM8UYNKbDh4CfH8gTdaJjdtHlqpqGen0wMDazrJwSHhAYt+75KG61pv49jrTu/DcEw93eskY
-	YOFxv758Gk5y3mZZz72WSAeRIZRO1BVjcSSNNvmJ79jRswbY75SgjAn5Cs1tiN4jw4JyqCpzfXO
-	jtyizkz/tpszvJiEOZPciDbyFPLZExYRzLuc6PaQgu7JNVSkj1eiCwfRofv5gBRbpA7BnZiyjxY
-	crxCRsxRygn+X16QIIgjGFQGQCoQ6DTSeQ4KWmFNuxzL5hdn7rq4tfpQOztoBXXjUf6Kme5ov3K
-	jdvaoZ+vP0QYhdy9OjzdT8X3TDWjOCBrpeimUB1lRsTdSLeWUQ+0t3aZiCaS//ziGy+DSWkvf9h
-	dVpK7ljlZe8WKX4A9ig/bjMMwFh/mvFrGDgK/D92QYIkSJUl4mUShTF0V/5zseHtbJ//RLnVhTK
-	1F34ZslGWT5aCUl50TdFLtCZVeMG6zKYUShWj9YHHyf8/7vN+Q==
-X-Received: by 2002:a05:600c:1389:b0:4bb:7347:d5c0 with SMTP id 5b1f17b1804b1-4bb88826937mr268281595e9.9.1795520413951;
-        Tue, 24 Nov 2026 03:40:13 -0800 (PST)
+        bh=NDYjESqBLUg1GNm1AyKfWdsE1IVDEH8BqTkPogtKPPg=;
+        b=qntMqRt79rhRfwpVy+p1SZHIKJTCtH7Uc9aWKpJ8qA78B7f4tcuXuJgxrh/gWsjfvW
+         D4EPm2oeW3h6BnoJ2Kk4rY6TIm23ZK8Xq6pJxUekWGB8Tl7qYwEBA5dN4ydHPtTt+W46
+         uDWc3V7hHbImSrUdjccpRKcH9OnjvyzaR8sprbgYqJV2o5bj/rvYpIzgGoBJy9lVtRNz
+         risZ8BHg4F5qtSIXU8ajUfI/0VaeKQ0ADpEQiaRo/o8rQ9PnweHWepitCzhjymy/OEjM
+         K9o+kaE4vf3G8kYUWLQBprX6TYgWVKNsP6940J72nqNklEwFnXX2XTHqDi73PDkRhP5Y
+         BoEg==
+X-Gm-Message-State: APuU4Z+Cq70JxOhFCXhdHrKPMQVGgpD5FOL2GnWXaRR1h+v97v462HTE
+	Yl2YTksu7ab2pkuHefQ5gROM0GpYD1y82coxsNha8JIkmMBykQJtFMGDhQoI4VUFJe92rnx3uAE
+	drkmN
+X-Gm-Gg: AZFdTZe80UyGAjvwLWZTufgpEXpK0Q5Nf4u3xJkS2vbJA3/E/f1+QGxiksK/AkOSuU5
+	zPZj6MZRiGlSC+t1bsjLf3+ryPqbBVfxEb0iMdP97ymqsAwtUIKWVPlRf8jWGdxvDyvECWt6RAx
+	YiHMfI8x91PLTXbntKEr4fxfkbSvQTZ/x/3wbrzbce+rVhIKA8tX8Fhq5vTX2ZfofEpdHgaJgpC
+	WQmdt8LZOd3z/43RBH7GCzQezlxzt7plRadPmCaPHfY65S6RhgeK8Mf4Xs/5Qwy5CaILCXkQHYv
+	6BDsUCHa+yLYiPMZE7hSQ0VYMJ7EuqDR9z5M4fzOZcx3A3hT9essKC/HmfaMYmJnQTQlecjHXvP
+	tF1QKkIfx1JDZ3dKrJpek2bytGpjNkuBD+/9Ov1GifegWzA+4kC8CoSOSmxOykMG05+5H3iwvh/
+	7/1rRaV+lEo0thoGj5A7f4WjuHaf8xg9kjK6sEuMgKQ9X0gM38/gOzqhIx4V9159HPRFYFrbuje
+	qM7osy49Lg0W/kAB6qGKsm8LTEbE1F1Iz6r/+KyaV8oTrs3bAq771ZnLKODITxA51gwD0mW0iu6
+	BnlYpH+MGlBywM+FFqJpJvEvl8U68XYhPAZFu0BfQB/a/odfbiGuYDkKu5J+DL0SNXAEdNI=
+X-Received: by 2002:a05:600d:82d0:b0:4bb:818d:8d8f with SMTP id 5b1f17b1804b1-4bb88818955mr346872705e9.23.1795520414476;
+        Tue, 24 Nov 2026 03:40:14 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853a9846sm506581225e9.11.2026.11.24.03.40.13
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853a9846sm506581225e9.11.2026.11.24.03.40.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 03:40:13 -0800 (PST)
+        Tue, 24 Nov 2026 03:40:14 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michal Dzik <michal.dzik@streamunlimited.com>,
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH v2 2/3] Bluetooth: hci_conn: Terminate a BIG before its periodic advertising
-Date: Tue, 24 Nov 2026 12:40:09 +0100
-Message-ID: <20261124114010.1696510-2-simon.mikuda@streamunlimited.com>
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/3] Bluetooth: hci_sync: Fix closing all BISes while their BIG is created
+Date: Tue, 24 Nov 2026 12:40:10 +0100
+Message-ID: <20261124114010.1696510-3-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124114010.1696510-1-simon.mikuda@streamunlimited.com>
 References: <20261124114010.1696510-1-simon.mikuda@streamunlimited.com>
@@ -98,26 +97,24 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Dzik <michal.dzik@streamunlimited.com>
+LE Create BIG does not wait for LE BIG Complete. If all BIS sockets of
+the BIG are closed in between, their BISes are still bound and the BIG
+is not marked as created, so the cleanup of the last one disables the
+periodic advertising and removes the advertising set the BIG is being
+created on. The BIG is terminated only afterwards, when LE BIG Complete
+finds no BIS for it.
 
-terminate_big_sync() disables the periodic advertising of a broadcast
-source and removes its advertising set first, and only then terminates
-the BIG: the same order in which they are created rather than the
-reverse. Every BIG has an associated periodic advertising train, which
-carries its BIGInfo ([Vol 6] Part B, Section 4.4.6.9), and the BIG
-exists until the controller reports HCI_LE_Terminate_BIG_Complete
-([Vol 4] Part E, Section 7.8.105), so removing the set first leaves a
-BIG without its train.
+Steps to reproduce, with btmon running: open two ISO sockets for one
+BIG as BlueZ does (BT_ISO_QOS and BT_ISO_BASE on both, BT_DEFER_SETUP
+on the first, then connect() both, the second one non-blocking, which
+sends LE Create BIG) and close() both right after that connect().
 
-Steps to reproduce, with btmon running: open an ISO socket for a BIS
-with BT_ISO_QOS and BT_ISO_BASE, connect() it, which creates a BIG
-with that one BIS, and close() it 3 s later.
+With the Zephyr controller (on an nRF54L15) and a 7.3-rc2 based kernel,
+in 5 of 5 runs:
 
-A Synaptics SYN43756 controller, with a 6.18.2 based vendor kernel,
-answers LE Terminate BIG with a Command Status, then sends 2690 vendor
-events instead of LE Terminate BIG Complete and answers no command
-after that, in 5 of 5 runs:
-
+  < HCI Command: LE Create Broadcast Isochronous Group (0x08|0x0068)
+  > HCI Event: Command Status (0x0f) plen 4
+          Status: Success (0x00)
   < HCI Command: LE Set Periodic Advertising Enable (0x08|0x0040)
           Periodic advertising: Disabled (0x00)
   > HCI Event: Command Complete (0x0e) plen 4
@@ -128,116 +125,113 @@ after that, in 5 of 5 runs:
           Status: Success (0x00)
   < HCI Command: LE Remove Advertising Set (0x08|0x003c)
   > HCI Event: Command Complete (0x0e) plen 4
-          Status: Success (0x00)
-  < HCI Command: LE Terminate Broadcast Isochronous Group (0x08|0x006a)
-          BIG Handle: 0x01
-  > HCI Event: Command Status (0x0f) plen 4
-          Status: Success (0x00)
-  > HCI Event: Vendor (0xff) plen 244
-
-The Zephyr controller (on an nRF54L15), with a 7.3-rc2 based kernel,
-does not remove the advertising set of a BIG, in 5 of 5 runs:
-
-  < HCI Command: LE Remove Advertising Set (0x08|0x003c)
-  > HCI Event: Command Complete (0x0e) plen 4
           Status: Command Disallowed (0x0c)
+  > HCI Event: LE Meta Event (0x3e) plen 23
+        LE Broadcast Isochronous Group Complete (0x1b)
+          Status: Success (0x00)
   < HCI Command: LE Terminate Broadcast Isochronous Group (0x08|0x006a)
 
   Bluetooth: hci1: Opcode 0x203c failed: -16
 
-It terminates the BIG, but the advertising set stays in the controller
+The BIG is terminated, but the advertising set stays in the controller
 and as an advertising instance in the host.
 
-Terminate the BIG first, and make hci_le_terminate_big_sync() wait for
-HCI_LE_Terminate_BIG_Complete, as hci_disconnect_sync() waits for
-HCI_Disconnection_Complete, before the advertising is disabled and
-removed. A controller that does not send the event delays the teardown
-by HCI_CMD_TIMEOUT, after which the advertising is disabled and removed
-as before. hci_iso_term_big_sync(), which terminates a BIG created after
-its BISes were closed, waits for the event too. The wait is in the
-cmd_sync work, so the teardown of one BIG cannot interleave with the
-creation of the next one on the same advertising set.
+With a Synaptics SYN43756 controller and a 6.18.2 based vendor kernel,
+LE BIG Complete came 2 to 66 ms after LE Create BIG and the cleanup
+started 43 to 55 ms after the command, so there the order depends on
+timing: 5 of 10 runs went wrong. In 4 of them the set was removed
+first, with Success. LE BIG Complete then never came, and the next LE
+Create BIG with that BIG handle got Command Disallowed. In the fifth,
+LE BIG Complete arrived during the cleanup; the controller answered the
+LE Terminate BIG that followed the removal of the set with a Command
+Status, then sent 2690 vendor events instead of LE Terminate BIG
+Complete and answered no command after that.
 
-With that, both controllers send LE Terminate BIG Complete, and the
-periodic advertising is disabled, the advertising disabled and the set
-removed after it, all with Success, in 5 of 5 runs with each.
+Wait for LE BIG Complete, or LE Create BIG Complete v2 on an HDT capable
+controller, for up to conn->conn_timeout, as LE Create CIS waits for LE
+CIS Established. Delete a BIS closed meanwhile as one of a created BIG, so
+that the last one terminates the BIG first.
+
+Both test kernels lack hci_le_create_big_sync() and send LE Create BIG
+from hci_le_create_big() in hci_conn.c, so the same wait was tested
+there, and LE Create BIG v2 was not run on either controller. With the
+wait, both controllers get LE Terminate BIG after LE BIG Complete, and
+the periodic advertising is disabled, the advertising disabled and the
+set removed after LE Terminate BIG Complete, all with Success: 5 of 5
+runs with Zephyr, 15 of 15 with the Synaptics controller. In these runs
+one of the two BISes is connected at LE BIG Complete and gets LE Setup
+ISO Data Path before LE Terminate BIG.
 
 Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Signed-off-by: Michal Dzik <michal.dzik@streamunlimited.com>
 Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
- include/net/bluetooth/hci.h |  2 ++
- net/bluetooth/hci_conn.c    | 17 +++++++++++------
- net/bluetooth/hci_sync.c    |  9 +++++++--
- 3 files changed, 20 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_event.c | 11 +++++++++++
+ net/bluetooth/hci_sync.c  | 23 +++++++++++++++++++----
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index efb85c781e4e..7dd968ca25ec 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -3335,6 +3335,8 @@ struct hci_evt_le_create_big_complete {
- 	__le16  bis_handle[];
- } __packed;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b6c7f9a9f55a..25bf13a06179 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7894,6 +7894,17 @@ static void hci_le_create_big_complete(struct hci_dev *hdev, u8 status,
+ 			continue;
+ 		}
  
-+#define HCI_EVT_LE_TERM_BIG_COMPLETE	0x1c
++		/* A BIS closed during LE Create BIG is still bound. Delete it
++		 * now, so that the last one terminates the BIG first.
++		 */
++		if (conn->abort_reason) {
++			i++;
++			set_bit(HCI_CONN_BIG_CREATED, conn->flags);
++			hci_connect_cfm(conn, conn->abort_reason);
++			hci_conn_del(conn);
++			continue;
++		}
 +
- #define HCI_EVT_LE_BIG_SYNC_ESTABLISHED 0x1d
- struct hci_evt_le_big_sync_established {
- 	__u8    status;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9fa8dab2520e..5b7526a85442 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -769,18 +769,23 @@ static void bis_list(struct hci_conn *conn, void *data)
- static int terminate_big_sync(struct hci_dev *hdev, void *data)
- {
- 	struct iso_list_data *d = data;
-+	int err = 0;
- 
- 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", d->big, d->bis);
- 
-+	/* Only terminate BIG if it has been created. Terminate it before the
-+	 * periodic advertising that carries its BIGInfo, in the reverse order
-+	 * of creating them: some controllers fail to terminate a BIG whose
-+	 * advertising set has already been removed.
-+	 */
-+	if (d->big_term)
-+		err = hci_le_terminate_big_sync(hdev, d->big,
-+						HCI_ERROR_LOCAL_HOST_TERM);
-+
- 	hci_disable_per_advertising_sync(hdev, d->bis);
- 	hci_remove_ext_adv_instance_sync(hdev, d->bis, NULL);
- 
--	/* Only terminate BIG if it has been created */
--	if (!d->big_term)
--		return 0;
--
--	return hci_le_terminate_big_sync(hdev, d->big,
--					 HCI_ERROR_LOCAL_HOST_TERM);
-+	return err;
- }
- 
- static void terminate_big_destroy(struct hci_dev *hdev, void *data, int err)
+ 		if (hci_conn_set_handle(conn,
+ 					__le16_to_cpu(bis_handle[i++]))) {
+ 			bt_dev_err(hdev,
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 2e88af51b8f3..83e59ba2a45b 100644
+index 83e59ba2a45b..01a691269f37 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -2320,8 +2320,13 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
- 	cp.handle = handle;
- 	cp.reason = reason;
+@@ -8998,8 +8998,15 @@ static int hci_le_create_big_v2_sync(struct hci_conn *conn,
+ 		cp.bis.hdt_rates = cpu_to_le16(qos->bcast.out.rates ? :
+ 					       hci_hdt_tx_rates(hdev));
  
--	return __hci_cmd_sync_status(hdev, HCI_OP_LE_TERM_BIG,
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG_V2,
 -				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+	/* Wait for HCI_LE_Terminate_BIG_Complete, so the periodic advertising
-+	 * of the BIG is not disabled while the BIG is still being terminated.
++	/* Wait for LE BIG Complete, so that the cleanup of BISes closed
++	 * meanwhile terminates the BIG before removing its advertising set.
++	 * An HDT capable controller reports it with LE Create BIG Complete v2,
++	 * which hci_le_set_event_mask_sync() unmasks for it.
 +	 */
-+	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_TERM_BIG,
++	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_BIG_V2,
 +					sizeof(cp), &cp,
-+					HCI_EVT_LE_TERM_BIG_COMPLETE,
-+					HCI_CMD_TIMEOUT, NULL);
++					HCI_EVT_LE_CREATE_BIG_COMPLETE_V2,
++					conn->conn_timeout, NULL);
  }
  
- int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
+@@ -9025,8 +9032,16 @@ int hci_le_create_big_sync(struct hci_conn *conn, struct bt_iso_qos_ext *qos,
+ 	cp.bis.encryption = qos->bcast.encryption;
+ 	memcpy(cp.bis.bcode, qos->bcast.bcode, sizeof(cp.bis.bcode));
+ 
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_BIG,
+-				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	/* Wait for LE BIG Complete, so that the cleanup of BISes closed
++	 * meanwhile terminates the BIG before removing its advertising set.
++	 * An HDT capable controller reports it with LE Create BIG Complete v2
++	 * even here, since that is the one unmasked.
++	 */
++	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_BIG,
++					sizeof(cp), &cp, hdt_capable(hdev) ?
++					HCI_EVT_LE_CREATE_BIG_COMPLETE_V2 :
++					HCI_EVT_LE_CREATE_BIG_COMPLETE,
++					conn->conn_timeout, NULL);
+ }
+ 
+ static void le_enable_encrypt_complete(struct hci_dev *hdev, void *data, int err)
 -- 
 2.43.0
 
