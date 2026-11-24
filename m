@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795522756;
-	b=iYj+BeLB8BhR215y8KUFTINobDhgNb98oQgAgeAzYDsTEKE5ZwSHzqcqKwS0CyeOtwE3
-	 yMs8RuB9yTJpQGykHOpFfV/+E0pj44ZSQ6e7VEgk8IVcnJAnWkiBnimaON+z/N8CkfP95
-	 9iuDzUbf2/4QOItIWUmf2uMEVgQdR+p1R0Wc9H8A9Ed4rDD+4NMs7sAlzB06bvtBtjCnX
-	 ijN2XnILf8mSJkyXlWbi1FbTbGvLhwP5dt37x0leCLW9f+y3IPa7sL0sgjsYxCB+fcNOd
-	 GQVWBZ0fFFZPgsc3/UVzsj0Q7hu+BCsmhGefCR/RUgDWi7IVrCLi+JvZP0lr4b+8tsg==
+	t=1795522757;
+	b=vAQnxqjldnH/Y3qJh24NJU3XMuIiLifXESyNLF6PFkPbVMwPdoiiJmYfleBk0pZ9gM+q
+	 L7XNmjEX0bsJzKhRf9qvHjXz07RJLCrdmmDbC3z4caJeEIuVfZLZtaIibEKngYqvK/yI2
+	 fUmBwpZYmrT783gGsrRFgQpbDxuz1ZpjRpaG3PugdiNmI6xSZ46Ku+N6H1Ch9H9B4dU4x
+	 T+4gASuuB+DekKL6fDatYfBBcItVDkCC1welfRTtxRJk1zHjPa7+9BR2jtGWpQM5/AC05
+	 WhcgbSPaO+rq7xgu574Nr8mBkv1gcGiZCjh2Xs0bmZ44mIyMZb7lx0pKzhc5NrlEsUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795522756;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795522757;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3BDS1UrwPf3P+i7a+X5Yrvl64vk9DSkAutA/WDEu8Jk=;
-	b=0Dj/0VDkbRzbqscT6yAnrl8z2zoSyXWTgpMn3HJCpA4YGQnqYqU1EDEpMWtxrM1xLy6a
-	 9fPIYXfVDBfraIKdYBG4JTFc1/HMm1uR9XsPZkWCB9dQQVEQ19lbetk0WMELiTw6q5qbR
-	 xEk+LKQka0SA4l1rXhXki99PdtA9UJyiPY2Gw6pCZtwq2CwTkoffzdnaPYBNVZwOsIeUe
-	 G34LsYfUykC41EMhh+g9NesOK2oL7PdKbxPCalM/vcW2FgD13qsEmI2FROPqM/Kwy8z7O
-	 YKgsM+B745H+7H+AlOfLGYFCEHfTPkuLOcIY6PWhAH3asMI/L/PCjBIFPWWRGEpFjPg==
+	bh=lpI5sdjNNELC66nEWFczL9aM7GGgky1ZCN22mO1d7jc=;
+	b=zaN/BtcOQX/cGmpxyUE0OhEYl13YQyz7YTEuZt7XTSoXDbnC9h6kpY0VM3bPQipXhSJ+
+	 A9uWcFq6CstiY1nmv1ySDNc1TK43qFR7vtOE56FVsnh9+3+hqmjJqFjjDvmCRNZaD3Rb0
+	 +4hev1srE8/YuKQFxWdzi9kinHj5ANJWXqgBtuWhVj6Nw2Kj+Y50Rq0gBzKnLP/UnufeQ
+	 ZJZJEzrHQdkhel2Nj/wWCCVfDyR5+K9bmZI3Nl79MxjuADtWOrcPCn2O9KydPjflrlc1l
+	 QyVJgotiJuJs+VZPuPbUQb39shDcH60Agz0mDTopaIClbux6+Yvf4/OlVbVg0vgxuYA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="kJ4/gtPm";
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=nb9K4h6E;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C5A606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1D5606A334
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:19:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70C5A606A331
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB1D5606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kJ4/gtPm
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4bb68c197c7so56416305e9.1
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=nb9K4h6E
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4bb702a7548so36935425e9.1
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 04:19:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795522755; x=1796127555; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=3BDS1UrwPf3P+i7a+X5Yrvl64vk9DSkAutA/WDEu8Jk=;
-        b=kJ4/gtPmqVJIeMguQdd0aCIJMsec6fxfWCOzfP9x4F3ccrhdslFTlgjqXbNywlgwyi
-         sbnvP+cotwCI08BMonZyk1IEnKpVTWTBmUQTIjmI9CrBTiwdpGUih4Hmw5d5QX7DdMw9
-         Ph2BguAwFMHtvTcdiBPTeIbXysX43Q+8Fiago=
+        bh=lpI5sdjNNELC66nEWFczL9aM7GGgky1ZCN22mO1d7jc=;
+        b=nb9K4h6EiLWwb25BCPRaEROLVBOZkfXW0lM98URe84cJkL7g5Zwzw8PiWMS4iAtfpL
+         IR92F+z8Xh8zM7Fmqoxptz0JeLXTCDiTQ2d/AeFU/tjgmDpz8FMrzb8N+cXIP9inentV
+         bv0iXy32RrgjWqh9JhL0JN/GZfygF3mi2nXJw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795522755; x=1796127555;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3BDS1UrwPf3P+i7a+X5Yrvl64vk9DSkAutA/WDEu8Jk=;
-        b=iW6/ok75vem/ze9K5+xRsCBHY6piD7Te2DoBVDwWzx2dNPj+h+AXvMAZKV8KPUlS00
-         Sv2eXz4Yd0csOUAL30GHGdpdgsSDYRc9pGRhYJhm/1Q7uhlwMCH/1opagAvtkzWe4Ma3
-         +h3iyWrf+86eTq78awzXsn89liLvueGJBrdGo+cexB+9Qs27cE46PGRLb0Wnt6MYe5rM
-         WnrWxAV3DS64evHfSEBZad2zkdpPUa1NsvSboJb7DbtZbRS6h0/jbv0S3EDWxIjmFOh8
-         3dAeq9BhPnY7z40p0zx2XqH5vmaCf+VZu/goQAX8bU3uzQfs+PXXYe1nNHMmNMQLqvqf
-         3emw==
-X-Gm-Message-State: APuU4Z8Hr4lfkW9WU6/5Ln/DkUbyGFeD6N8gJ2pGTrCOK8r8LTa0DhLd
-	75Y8701kwPEG1tqS4jNqo/CQGwfOz+zX7CnED9R65TFUgrROXW2mUJwlBlipHW9KRnaIwYa1Si5
-	NOazD
-X-Gm-Gg: AZFdTZdCgGqs6xveFMKBw2NYvNyLf/gJ5hiE/wgP6uvshFwaYboPRCKaNZnJ/dyhjHd
-	Q8xnNF95U+L9kIflPxho0Kq8XnDL4XUeF932Dmn1GCX8+BP0QfjUD5NK7SmH59Z3LqT2U1Iao+v
-	UgFpXikqyrfPoXdJUUGE9YBylXKKLoM//lUkZxhLnw0Lkg7z8k3EWweDe0Xj4AIQJgdPq0t66Uj
-	vjnHAzt8eHKv6ss/HGVnAM0vjNc/tF4Y/6AmiEpqkYKHwiB9nds/bSM+5SBO2GQWfDp0qRLwjZT
-	E4LkTTPtfhhHcjgWibwoKf+z7DyOHRrVwYtFab4pxO8tlezriS7ETiREv8rHpWTUY9SafCmGuhV
-	brrDFb6t0qrGAqsIM9/0UboBNuBhFsaugMPA6FjthNcVzx18rfCKMhmiYkcl/FDMSljtxmFFwA7
-	rpoLh1KUH1Oxn8yv+GAZPG/OCNefWdqdteXfSknGSGh2sluMQuKYGu0jq2Gy7HJZaYWtC8a/DVq
-	RNyruTWdGrIsAK9FzJl4eCov6ldMiG7Np36HqNkWKrhEYdVM3Ajod07OFjQ9LLKcHg2b0SuoyC/
-	CSfGbCMG59t12spnb2NvK79yPxx/ALpFesC+YgtuB5DDlnmc7Q==
-X-Received: by 2002:a05:600c:3547:b0:4a3:5991:718 with SMTP id 5b1f17b1804b1-4bb88809795mr302217005e9.16.1795522754798;
-        Tue, 24 Nov 2026 04:19:14 -0800 (PST)
+        bh=lpI5sdjNNELC66nEWFczL9aM7GGgky1ZCN22mO1d7jc=;
+        b=bEUXaGXruG1xoici7hTsuC2t6vqLzpEtbV8iUzQyVrmz2cMA0O97tH0Fv7VaQXG/dW
+         SzoWv5aPgtu5CuqtoytZgRXL4MZuixmdpihcFan9RMsxjZvIk3T4uXTEIK2DyChsNla/
+         Jh66aZbiV86Uc3DlBET4HKLRy7JQZ8jt5TfdmJRI4uGroQ2fOpGcAvsWfjbBYReXpb8W
+         Q+0YygPrkfEZmKPVPPZ9vDGR+oraODuQHv3xm92Oi6byQmYbq4EcSEBHcdFIz+xfPBT/
+         kqgAcy6ELMD4aPuUBFhRZ2W0BGnnvy3O8epg/w0q7TJKp+MWOD0xqyBxDLNkFE3b3ryB
+         YaWw==
+X-Gm-Message-State: APuU4Z+eopiAwBHhIrBRA1qSQ9nnivlqyT+PsgEIDF5amnfBss+Vfb4I
+	P0a989FEp25C2UZ9MqG1+IM7UImGXQsNnVMgOhkip6YNxxWqUnHQzkqVmYxguc8Kk/yxAPb3bbc
+	d29id
+X-Gm-Gg: AZFdTZeDVRQV3/rY7ivruRQI9kplbzob/5hV5q/oRXT0pWXeRHpJ00VInQcsGb8WTba
+	FITYEtLcHn4PiUbEbtakeoMr/mQRUap9t9FIfGgcxjd+kg/XZmqr09tBdQWgtanFQqRVsAeo/Xu
+	grrZMd9+Q+1yDjDMBweKcuFte3VRxmc9WD/CHE25XgUtH9Hf9FzoyEr652vcijh0DdkAAo4M07b
+	9fMAzKuKhOYwb+TPwsmiwPVNrWMuCDbXnJJpNCpCVb8wnHsb9FMdw2wNcw1c04U9+/5gwJGZLeb
+	bZlcE+1phulY7hMUeerYk7KM/NpvIdfS67qRJKZMHMhFaHWdTQdpWt4oGiF3CPNb1kPeSRLtMro
+	UH1pVa2J42Jwaqq+Q1upWqDsKIArChB4/YNt5OD66BJnRPz8HSgS3ENYRK8ZY0ggKezyLzBtpIS
+	rizJmOTNnTtzanUvOTMQuygavTA+M1ZMUCrnSy9uO+t4USE00jGZuhAQnmbWYcZLJgYjnsg/bAX
+	O1eDxdkz4eeN2Bpz24bIZIn4qr7gM5+MFjAxm/zxIQhpNho29838FcC/MynH7d+CJKQUMCv0oTX
+	B/FFdhzT7RPNFbUgIUHsyoUg6G6cumBPffiSgiryZdUML4+/8Q==
+X-Received: by 2002:a05:600c:4e0d:b0:4bb:5f07:10d7 with SMTP id 5b1f17b1804b1-4bb8882445cmr287219855e9.26.1795522755287;
+        Tue, 24 Nov 2026 04:19:15 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm391427775e9.8.2026.11.24.04.19.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 04:19:14 -0800 (PST)
+        Tue, 24 Nov 2026 04:19:15 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v4 09/10] unit/test-media-player: Add test for stale NumberOfItems reply
-Date: Tue, 24 Nov 2026 13:19:03 +0100
-Message-ID: <20261124121904.3267700-10-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v4 10/10] player: Fix Now Playing NumberOfItems when its content changes
+Date: Tue, 24 Nov 2026 13:19:04 +0100
+Message-ID: <20261124121904.3267700-11-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124121904.3267700-1-simon.mikuda@streamunlimited.com>
 References: <20261124121904.3267700-1-simon.mikuda@streamunlimited.com>
@@ -95,65 +95,66 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The number of items of a folder may be reported after the client has
-moved to another folder. Check that it does not replace the number of
-items of the current folder, while the current folder's own is still
-taken.
+When the target reports that Now Playing changed
+(NOW_PLAYING_CONTENT_CHANGED), bluetoothd drops the listed items but
+keeps the old NumberOfItems, and ListItems asks the target for only that
+many items. So if the list grows while the client stays in Now Playing,
+ListItems still returns only as many items as before.
 
+To reproduce, list the 2 items of Now Playing, let the target add 3
+items, and list Now Playing again:
+
+  btmon: EventID: 0x09 (EVENT_NOW_PLAYING_CONTENT_CHANGED)
+  avrcp_now_playing_changed() NowPlaying changed
+  bluetoothd: profiles/audio/player.c:get_items() 2
+  btmon: AVRCP: GetFolderItems: len 0x0022
+  btmon: Scope: 0x03 (Now Playing)
+  btmon: StartItem: 0x00000000 (0)
+  btmon: EndItem: 0x00000001 (1)
+  avrcp_list_items_rsp() start 0 end 1 items 2 total 2
+
+Only the 2 items listed before are listed again.
+
+When Now Playing changes, reset NumberOfItems to 0 (unknown), so that
+ListItems asks for all items until the target reports the new number,
+and request the number again if Now Playing is the current folder.
+
+Fixes: 671f370a8e34 ("audio/player: Clear playlist on Now Playing Changed AVRCP event")
 Assisted-by: Claude:claude-opus-5-5
 ---
- unit/test-media-player.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ profiles/audio/player.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/unit/test-media-player.c b/unit/test-media-player.c
-index ba10e5175..53dc6f69b 100644
---- a/unit/test-media-player.c
-+++ b/unit/test-media-player.c
-@@ -770,6 +770,33 @@ static void test_total_items_scope_change(const void *data)
- 	g_assert(context->total_items_calls == 1);
- }
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 9802e52bb..e1458dfb8 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -2065,9 +2065,25 @@ struct media_item *media_player_set_playlist_item(struct media_player *mp,
  
-+/*
-+ * The count of a folder that is no longer the scope must not replace the
-+ * count of the current one.
-+ */
-+static void test_total_items_stale(const void *data)
-+{
-+	context = create_context();
-+	if (context == NULL)
-+		return;
+ void media_player_clear_playlist(struct media_player *mp)
+ {
++	struct player_callback *cb = mp->cb;
 +
-+	g_assert(media_player_create_folder(context->mp, "/Filesystem",
-+					PLAYER_FOLDER_TYPE_MIXED, 0) != NULL);
-+	g_assert(media_player_create_folder(context->mp, "/Other",
-+					PLAYER_FOLDER_TYPE_MIXED, 0) != NULL);
+ 	if (mp->playlist) {
+ 		g_slist_free_full(mp->playlist->items, media_item_destroy);
+ 		mp->playlist->items = NULL;
 +
-+	media_player_set_folder(context->mp, "/Filesystem", 0);
-+	media_player_set_folder(context->mp, "/Other", 0);
-+	media_player_set_folder(context->mp, "/Filesystem", 0);
++		/* Unknown until the target reports it again */
++		mp->playlist->number_of_items = 0;
++	}
 +
-+	media_player_total_items_complete(context->mp, "/Filesystem",
-+								TOTAL_ITEMS);
-+	media_player_total_items_complete(context->mp, "/Other",
-+							TOTAL_ITEMS + 1);
++	if (mp->playlist && mp->scope == mp->playlist) {
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++						mp->path,
++						MEDIA_FOLDER_INTERFACE,
++						"NumberOfItems");
 +
-+	call_get_number_of_items(&context->pending, number_of_items_reply);
-+}
-+
- /*
-  * Search() shares the pending request slot with the other browsing
-  * requests, so a busy Search() must report EBUSY like they do.
-@@ -834,6 +861,10 @@ int main(int argc, char *argv[])
- 					test_total_items_scope_change,
- 					test_teardown);
++		if (cb->cbs->total_items)
++			cb->cbs->total_items(mp, mp->scope->item->name,
++							cb->user_data);
+ 	}
  
-+	tester_add("/media_player/total_items_stale", NULL, NULL,
-+					test_total_items_stale,
-+					test_teardown);
-+
- 	tester_add("/media_player/search_busy", NULL, NULL,
- 					test_search_busy, test_teardown);
- 
+ 	g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
 -- 
 2.43.0
 
