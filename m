@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795529438;
-	b=YTpfOF5qTH5A/3Xg/ZQHHo0nGPoHoFHon053K1UYtBdK/GmLnRdmfnZVUsYF1Dn40K45
-	 Sr7AOqKekGLFIpRSmXKzbDf+BgF251O41iWVqxGRCBfGFbcQKMqeQxmlnq+7r35WwpeC9
-	 py3FNNS2Iwa23A4sJzUNWQGVdml/HK0WDNDlDosHjWKRNNFy4uny4Orb2Z6ovevepla5c
-	 1Q+0cYg+KvgCL0G3rIbA/7/Zkr/QP+c52YshMOa882AR5xJHNWYrFXgWnlwBE0haXyXxm
-	 2KAI4MpgdcGfMvPt7WGYsbJFeCz1csbknH2z155LxQ1T0OV6sdhTTo7XHkkXvzZkVbA==
+	t=1795529447;
+	b=nmBj2td9Q9Os3t0bsMymUWUXnlR4ua1ntlmkxtf2vhjGcZKFGp1Fd4tYXchG8Ayv47Ic
+	 wKAAjCIEKIufPp7kfytV6zdBkPSOCzEmSR7teZz81Q9IS5ZtRgy0KbH5tY+OmJ4gxMC63
+	 4LRM+GKrplsU13gR1mpvhgptWOEld8/Sg/1AAzKDse8TLKimylrRNaxPPmlSlI6J1IueD
+	 BxBwfgL1KlhMshYJgyCmTAbTefCYJRSrgKEIwF3gKzpjzKhoi2YeNtAAzeEF7HG9Mss7/
+	 Bn5s/VRbxFc+lyXWjn1zIZ6sJheHuPttfZ6AEzVFVdQ8gGm8FPH38CYKfIkLh6v64TQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795529438;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795529447;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=usmzJFstSB4DaIIYnuydnpavcKscN4qLr3YgErVbc3U=;
-	b=yIrM4pr4D/Vy6xTIRkk3fYSxbROMgeFAkX+xo7c7umxCt3cftP8TraBFHLWBhud2rLd6
-	 13lVSQT5XAEXO78cfj3wcacPMdNYefiCB9FxCAREETEbamkE9X9P3+1rBQOc5u0/03Hrl
-	 AbsNB2fZNtN5idjUjlh6YfDViF4Eh1mQwXYkQPP3CItPv1InoWw0XNiqVXCDDBcqvizIs
-	 +UmSe/mp+wJ2tb7HaPiLmC7r8SaZOn6WjPQ7lAui3IdFsV4D9PNBWAagcd7klD/jaDbUa
-	 GxwLPsN7KV2O794x0g6BWH56djjJwwd10lReq67Yp7D4/OoZHcqXjuFCnF1nzaCZ41g==
+	bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
+	b=2MwIeKcxoPw/Xu0ibYnDrR2Cp8mH2cfA2EIKuwEquVjAWnTO/Oxch7ERD+Jkgojy7jpe
+	 CpjZ/I0KwN+vQiQGQuoHJoHoTarWajFAfy4bgEk7PiIjYcHDTsfxbGcmUSwXgW93k1HEW
+	 FL0ykZ25CXrnfBvg2Xjp7a2f2nbjIujMOv8jmd93V+Si99l1PJ29hNI7q8V2ioCAfglQc
+	 tjhlfFuKEfX6pARi9KN0P/6xpB8PyxQJkKyD5JEc5ldwVzbMq1/cuAOp4W/xaiZguDiam
+	 MMXCnJ8Q8UUtDMn4Z7UPrY+a+Fm3CL+vmfr/0xKLElhvZHbShVGCs/eUfCAaWPRIiVw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J9xxH0Dy;
-	arc=none smtp.remote-ip=209.85.222.52
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="rKjh+Un/";
+	arc=none smtp.remote-ip=209.85.221.180
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C123A606A695
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:10:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C123A606A695
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6432E606A692
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:10:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6432E606A692
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J9xxH0Dy
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-990fbae94f5so2391226241.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:10:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rKjh+Un/
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5eafb65e169so2654973e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:10:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795529437; x=1796134237; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795529445; x=1796134245; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=usmzJFstSB4DaIIYnuydnpavcKscN4qLr3YgErVbc3U=;
-        b=J9xxH0DyVAEP6rqizec2uRhXIk6WsXIIIydwKq9un+IGnZ/tNvdJ8AAH5iBjjvg0IN
-         2/+VamcKewv8Wr4uvNlCHEsY3jQIMV/MUZKA7eoNHgVN/Glqog7Ai5TbDMysKq4gGxPd
-         4/apyJp72vyLpTWnDjvzequRa2brK/kF3zEJa+avxORP09Z+zJ5RfsoCyeB1QQ18+EMJ
-         BWZblITOHAaLFcIFw3bcjo53LbP7JnUZo9FGrxJ1ghPha3VcxIaZ821dUBkQayWQC7+R
-         pbRW96CNMpyn+eLn+b6SkryUZYD1KEMjRQIvC0JqaWzufKmX/VF6NqgBO3jyaANJ+eMB
-         +e1Q==
+        bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
+        b=rKjh+Un/CNcE7k3fd7JY9nVSCz8T6Bo6KU6Qm6T3vrx+6SJfiPSjKWghWYp2uXDhUo
+         3kr6Q9jdUclD6RZoVflL/78OQ5p1jdt1lxMxwRLzpuyUehFJ38Vfmg4aTo6IjGtqJShb
+         nYfRrqAxGtqsHGzZiLYbBx63qIBfW6dJlGpXuxi5xpGTrKn46KU9r1rf+npSeCebGlr5
+         eyFSLxC4lM/8SmJPPguML7m4LNMH/AIE3I/qoKc9OucuAdFS9hwo4jV0PaGgoh1Rc7Hv
+         nAj8B+N1szk/xEk8tDyWqmAmkttvGHW2/US7cHCVmLUW5miZKppN6yLln3p+rVSNbHbu
+         +8ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795529437; x=1796134237;
+        d=1e100.net; s=20260707; t=1795529445; x=1796134245;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=usmzJFstSB4DaIIYnuydnpavcKscN4qLr3YgErVbc3U=;
-        b=RT5rQAlmFWjc+9VZBCJPzNh0DYtscmYpE4USj8qjrQ1AXSLl8TquqSQV4iOGnfZYkZ
-         6XHNo4TneYQLz1J/XxnujtvN5yMyG99/RXcPSF1YdCTAh9X56zcJRVwfMnIctU0SNcmi
-         TZ2A/Y26GxyjFKJoy2MOT/17JbYSv/L81veSYNcgSYN/A+zq06WBtyT++f+fjXmQpvbO
-         bYoI7xG1tBn0yRPIbiTyP+gr3x3mv45G/W2CvNdaFWxwt9KswaVFmi4hmGduiEarlZRR
-         6k2SwFs2xPEwHhW14XNJuet6ke3sxGzithvOAuXcc9lI2PEmqNI+F8QR70XDNdkINu05
-         JURg==
-X-Gm-Message-State: APuU4Z/inrCBkpe20BP4TaL2/0176n3GOdicQ+rS+MW4KHHkZY0MXvAn
-	OkQBuE8dHkOh+BpqnlUZjX1IeujVGEbNHEgDyrPfdZ20f7CtUHgcPuw8ZUlYbH47nPQ=
-X-Gm-Gg: AZFdTZccWNzU/qn62yvUibxZiIlv0ijH6PLW/8UfAoJS34onqVHH+tB2XrBKHS6evag
-	psX401AJy5aczj7Iwspc49/ogBDJpIaD7robDwTv16kuex3eQ/WcTy5fWlqeXWkWP3KR8TADyAC
-	yGmRY3CYb3+mjvNca3c3jRoOCi+CXHQYmJsWJZUxZ++572jjZh54KxwUGWB89WlzgxRJ/zJtUKL
-	PFJ94PDyEbnxeN1uUYbbRbje2SODUFJ3N30iIZjNukrO/pQrBxR7XtBiP8SA6jGjnJDqv5eAGDo
-	LgJydLYlqYm0GLfoVraCvl2rJTC8031BHxOQJ6ymEtg+s6DGYQW6qea8bot659Fi/Sunuzo2elS
-	Nb3GwwAin2DdcOyppSj6jE+Gu95c96EE6BANPdpKsMkgyP5YFnYeWt7+87Qs6Dfmx05ji+ULSAe
-	lgLxLYsoKlX7hOhOkBSELOTQ8bCKz89oYR0nOSqm/z6dPZrs/0bgN7oxHJiYtg1ecXs9rpo18T7
-	JYdHR32oG/4qsIZXrP8YwiepZCCqUOPDU7DAhexjGXWMtzrUd04/A9JCxKmGSY6j0GSrS50wxEr
-	fcIGwpO+cj46YU/QmQ==
-X-Received: by 2002:a05:6122:6162:b0:5c9:a60c:273d with SMTP id 71dfb90a1353d-5ee8af7629cmr8104492e0c.21.1795529436577;
-        Tue, 24 Nov 2026 06:10:36 -0800 (PST)
+        bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
+        b=JRQ53nXMsZx6031R97P9CAVEWDfB1/LecxmuHCQxaUTJoB+ScF4rIODtWqmobO/clX
+         sSVGkK63ZPx2eRTYlkQ1BgkomuzkYq4mqy2X4koXxlD1tlAhsQGw9i+rvPHjFhv1BwWb
+         exlsksiqKk2tRMfmpMd0GDJH3EiaQ8aW/hISNCC+eQicR6Ook3svHc/73qrHHXZlKysx
+         FwbVTUveBJ9AN5ES81GXLEcRmRKOHEDwLaxn2hUcVfr/pBajuJ09nJsSGX6bw+i7QKFl
+         uJ1tTo8JZPyEqPBZ+DHzHIUsY3czae/gmtJgGPFykD5BywUeipNA/5yWy54QaDPgeGxm
+         EaCw==
+X-Gm-Message-State: APuU4Z9W14Dj8JVH5U+orsliM4IZNDIo1sHa+RQ/SC0dyl/E2mWpgLQ0
+	fdjZzJqxhoXbQP4QjSRgThZd4pKvukXvbxmt5xLop7kOke/c/WrDOFoJ6qBguv4g6zk=
+X-Gm-Gg: AZFdTZckBzjDoUafxs5cLggC6TLjh3ZXoQ3vSF7cfwmNwRTFIbPIo7oSuHB7SPqmDZO
+	drpRLZhw+xWfXouTlFwa8QtorrYtLpVa6687q/H/3tnFeDydeFlReY6Mn3umTCVwpHcs6l1H4Ff
+	ROw7f10qfGSjBKc5AgEbXteiCXHPm4pGuC1oukiXQqAv+B+g5V28sBjCu581Gag1p47HPMb4u+h
+	t3OJoem+HnxXKUhkYzmqxPCUAzmMdFIGkZm9/jb47KFUzsb3ixgxGejE2eQrN1Lr36y+me5t35x
+	7/2LBUhP60BxsA6zSfKP21rbbNo1EFViNcd8UN6KSWS/xuCcSA4VcUBkAex7HsQpoKck+yG5OLa
+	NJAZX8q1b8Ms6Yty9BnG5ZvVg87tfIilx+6j0z0baw53yBoJQOifFBeVM219UjMZnZycD65V9/W
+	MTTSG7+f2JemU2KD8Dkxi4jCUYUcSzcv5ydVd6a6ha7tm8bktrsdb0zg2Z1XuLuZqWXVjrbUvzq
+	bn2va6ud7zRcVzDcqcB8Diuq7HFUiwUkNlfKlg/M2E8+b1mkl5SFGa5+ZOwj4OGm/rOLz4D6pXK
+	0IQV+L+VnHMYB4uG3zGgyLhU/eXIWE+f
+X-Received: by 2002:a05:6122:4698:b0:5ea:c98d:768 with SMTP id 71dfb90a1353d-5ee8ae8eb5cmr8365635e0c.6.1795529445171;
+        Tue, 24 Nov 2026 06:10:45 -0800 (PST)
 Received: from shine.local ([168.196.221.52])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b555137sm14056121e0c.3.2026.11.24.06.10.34
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b555137sm14056121e0c.3.2026.11.24.06.10.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 06:10:36 -0800 (PST)
+        Tue, 24 Nov 2026 06:10:44 -0800 (PST)
 From: "Andrei A. Bykov" <andreiab9019@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: hci_sync: keep unrelated replies away from event waiters
-Date: Tue, 24 Nov 2026 11:09:55 -0300
-Message-ID: <20261124140956.15296-2-andreiab9019@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: hci_core: preserve LE feature holds across encryption events
+Date: Tue, 24 Nov 2026 11:09:56 -0300
+Message-ID: <20261124140956.15296-3-andreiab9019@gmail.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124140956.15296-1-andreiab9019@gmail.com>
 References: <20261124140956.15296-1-andreiab9019@gmail.com>
@@ -99,122 +99,88 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-An asynchronous command can finish while a synchronous request waits for
-its terminal event. For example, an LE LTK Request Reply can complete
-before LE Read Remote Features Complete arrives. Completing the waiter
-with that reply releases the feature-discovery hold too early.
+LE feature discovery now owns its connection hold until its asynchronous
+completion callback. Encryption Change and Key Refresh Complete can run
+while that discovery is pending in BT_CONFIG. Neither path owns a second
+setup hold, so dropping one there consumes the upper-layer hold after
+feature discovery finishes and disconnects an active ATT connection.
 
-Keep valid unrelated Command Complete and Command Status replies away
-from event waiters after processing their command handlers and credits.
-Continue scheduling queued commands and preserve unmatched Reset recovery.
+Keep the BT_CONFIG drop for BR/EDR, whose configuration path still owns
+that hold. Route LE key refresh through the same confirmation helper.
 
-Do not identify the current waiter solely by HCI_CMD_PENDING: timeout
-and cancellation can leave it set with an old req_skb. Capture the actual
-synchronous command carrying HCI_REQ_SKB even when that flag is already
-set. Callback-less commands must not replace the waiter. Drop the stale
-socket reference when replacing the request, but preserve the same skb
-backing storage and socket reference when Reset recovery resends it.
-The request skb is still replaced on the ordered command/event workqueue.
+On LE setup failure, explicitly request disconnection instead of relying
+on a drop of the feature worker-owned hold. The abort request records
+abort_reason before queuing its work. Do not let a later encryption or
+feature-complete event announce such a connection as successful while
+that abort is pending. Apply the check to both LE feature event formats.
+The feature worker still releases its own hold and device reference.
 
-This also lets the next synchronous command complete normally after an
-event timeout, without waiting for the old terminal event to arrive.
-
-Fixes: 2615fd9a7c25 ("Bluetooth: hci_sync: Fix overwriting request callback")
+Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
 Signed-off-by: Andrei A. Bykov <andreiab9019@gmail.com>
 ---
- net/bluetooth/hci_core.c  | 16 +++++++++++++++-
- net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  9 ++++++++-
+ net/bluetooth/hci_event.c        | 10 +++-------
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 255005916..ae0773a81 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4284,11 +4284,25 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
- 		kfree_skb(skb);
- 	}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7cf63bc0f..469d4f077 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -2272,11 +2272,18 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ 	__u8 encrypt;
  
-+	/* A synchronous command starts a new waiter, even if an earlier
-+	 * event waiter timed out without clearing HCI_CMD_PENDING. Commands
-+	 * without a completion callback must not replace the waiter.
-+	 */
- 	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
--	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
-+	    (bt_cb(hdev->sent_cmd)->hci.req_flags & HCI_REQ_SKB)) {
-+		/* hci_resend_last() clones the same command during reset
-+		 * recovery. It does not own another socket reference.
-+		 */
-+		if (hdev->req_skb &&
-+		    hdev->req_skb->head == hdev->sent_cmd->head)
-+			return err;
+ 	if (conn->state == BT_CONFIG) {
++		if (conn->type == LE_LINK && conn->abort_reason)
++			return;
 +
- 		hci_dev_lock(hdev);
-+		if (hdev->req_skb && hci_skb_sk(hdev->req_skb))
-+			sock_put(hci_skb_sk(hdev->req_skb));
- 		kfree_skb(hdev->req_skb);
- 		hdev->req_skb = skb_get(hdev->sent_cmd);
-+		hci_dev_set_flag(hdev, HCI_CMD_PENDING);
- 		hci_dev_unlock(hdev);
- 	}
+ 		if (!status)
+ 			conn->state = BT_CONNECTED;
  
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 039bcea98..477b876fd 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4487,6 +4487,18 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
- 
-+	/* An unrelated command may complete while a request waits for its
-+	 * terminal event. Process the reply and command credits, but do not
-+	 * complete the pending request with that command's response.
-+	 * Unmatched replies must still reach hci_req_cmd_complete(), e.g.
-+	 * for the spontaneous Reset workaround during initialization.
-+	 */
-+	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
-+	    hdev->req_skb && hci_skb_event(hdev->req_skb) &&
-+	    hci_skb_opcode(hdev->req_skb) != *opcode &&
-+	    hci_sent_cmd_data(hdev, *opcode))
-+		goto queue_next;
-+
- 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
- 			     req_complete_skb);
- 
-@@ -4496,6 +4508,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
+ 		hci_connect_cfm(conn, status);
+-		hci_conn_drop(conn);
++		/* LE feature discovery releases its own hold asynchronously. */
++		if (conn->type != LE_LINK)
++			hci_conn_drop(conn);
++		else if (status)
++			hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
  		return;
  	}
  
-+queue_next:
- 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
- 		queue_work(hdev->workqueue, &hdev->cmd_work);
- }
-@@ -4606,6 +4619,18 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 477b876fd..b224d4d69 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5435,11 +5435,7 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
+ 	}
  
- 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+ 	if (conn->state == BT_CONFIG) {
+-		if (!ev->status)
+-			conn->state = BT_CONNECTED;
+-
+-		hci_connect_cfm(conn, ev->status);
+-		hci_conn_drop(conn);
++		hci_encrypt_cfm(conn, ev->status);
+ 	} else {
+ 		hci_auth_cfm(conn, ev->status);
  
-+	/* An unrelated command may complete while a request waits for its
-+	 * terminal event. Process the reply and command credits, but do not
-+	 * complete the pending request with that command's response.
-+	 * Unmatched replies must still reach hci_req_cmd_complete(), e.g.
-+	 * for the spontaneous Reset workaround during initialization.
-+	 */
-+	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
-+	    hdev->req_skb && hci_skb_event(hdev->req_skb) &&
-+	    hci_skb_opcode(hdev->req_skb) != *opcode &&
-+	    hci_sent_cmd_data(hdev, *opcode))
-+		goto queue_next;
-+
- 	/* Indicate request completion if the command failed. Also, if
- 	 * we're not waiting for a special event and we get a success
- 	 * command status we should try to flag the request as completed
-@@ -4622,6 +4647,7 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+@@ -6961,7 +6957,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
+ 			}
+ 		}
+ 
+-		if (conn->state == BT_CONFIG) {
++		if (conn->state == BT_CONFIG && !conn->abort_reason) {
+ 			__u8 status;
+ 
+ 			/* If the local controller supports peripheral-initiated
+@@ -7639,7 +7635,7 @@ static void hci_le_read_all_remote_features_evt(struct hci_dev *hdev,
  		}
  	}
  
-+queue_next:
- 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
- 		queue_work(hdev->workqueue, &hdev->cmd_work);
- }
+-	if (conn->state == BT_CONFIG) {
++	if (conn->state == BT_CONFIG && !conn->abort_reason) {
+ 		__u8 status;
+ 
+ 		/* If the local controller supports peripheral-initiated
 -- 
 2.56.1
 
