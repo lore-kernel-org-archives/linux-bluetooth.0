@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795527115;
-	b=QOX9kIecc4vz2k6XGu+N0rk1hbaZ3uohJ/O2UMt3hJVUXb9tV5LoRufS4fG6oBcZfOHo
-	 j/Rxi32DACFZMmM1JsdU4C7F33J2KivXgFc4pygTmk7BBC36YvYhsJoEHewaYuITdN/qv
-	 nkvuhog3+CvZKo7lSGUz1zA93nko2G6VqYkPG55NMQdTDAW6IPA23NhwCOyQU/EhBUTpV
-	 F6goUkfkhEg3VWS2UmlS4ws3GiNM0d8gzlnIbg6n/IQF3LumcOZTPXaDWEo01xJptu/E+
-	 KJSTM7dxnHdm7gmLxp1vlJHBjCRHiuXsl4I6cXl2vJZBDFLW5LwKM//oo9vXwSQcGBQ==
+	t=1795527600;
+	b=0u7jQ7qrUW8lT/C+7g74VXM8P6U30+JQAsOW09IPUhBR2TwzUCDUQwvXV9lRsaVJ3Opz
+	 95tt/8Dm1tSPNSgpoQjEyVn3cBGlpgKXZBIth7iOjZua7Tf2IQwHroigw6aogue+tFzKL
+	 Cbr6C9mIjyXHQiowIB4Q1JPvGLAiHeiqNtopUQqkB/UDFQx1gN1N/FLh5xXsU0OBSZgPz
+	 Y8kKRaf8W04WC0PO1IYe1F2rJLGbUSxuzmSsTdC6YgljWAo29hyQB7opySX0t0NuQ3CRU
+	 aPJmKUJk3LZCdEAFacbIzqjLiMhBaRaNJ6gMzuOJN06wjc/YJariTD2g8F3g+6//t2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795527115;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795527600;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=sRmFPcUPUdqrcbC1ZXCGrGKNgcf62X2sZJFNcGCiyZc=;
-	b=Td7XmGYG+mYVXR8CVX0aoIXb0VTzyIfd+E9GbnmIRMN+Bok21ruLxi6LH6nQ195IIvdM
-	 Cayylia0qNr3v8Sx3Wz84+F+EYhgSFheD0y18QOGc+vEHEAZCal4AOI/mmX0Lh0YdIjhY
-	 yqKUz51g1U4IOY7bDr56Z7aTa3yBVkdoVqp/OYMQyh2lWRio1EFTyPc0Tu61i3GyF2Cx/
-	 0O2KfROFgPnKR+q8toAgg1PbM+wdgYb7vr/CAJ9arqoGKBtezCqem/EnTF14ZDYi6Ey3o
-	 OI/So0gBq+KL/pG15Gd4BJ9yjDDBx7HCUpfFq2t9H6dWvaJS2xWKqsrKx150uoDdYEA==
+	bh=WIdYb8baR8Q7++ZwNpye3IyiN2nTzQx+MIJotU+BQTg=;
+	b=4l46n6widiO7d7FdrvkeboUVyA99Hw5YAvyMWlqqK74v5FOqMQ+sL+cZlj8hMsNOjM/t
+	 y0+NKJT2b5/s6FVL5VUmmUsMGM3z7e0nLuvsnSw0V3tDoxiH4B1OIfKN4efPlAlH2hEYE
+	 z6LrKAtVJutLabW/Xfyyunbv6qaQquG8vYUaRyg/dxaZqBWBs0HhZuY2qEwvSNgyzdReS
+	 05ApI7LI+A+kcGa7W4Myp5WHhmM2asXwyUCMi71rhoohg1oTuRDjnLlCKpUhaM4r0MoqO
+	 HPUauwJ6pDHPUvz7H8JZEwVh4Fiin3ywZKT6Hkac6GhaO08xwqybbWwOKnvyFpQQpkQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=1BKkU2V+;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kP0VkchE;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87B0606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 13:31:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D87B0606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB0F606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 13:40:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7DB0F606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=1BKkU2V+
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4ba013938d7so41239555e9.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:31:54 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kP0VkchE
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb5b8ef642so39685415e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:40:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795527113; x=1796131913; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795527599; x=1796132399; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=sRmFPcUPUdqrcbC1ZXCGrGKNgcf62X2sZJFNcGCiyZc=;
-        b=1BKkU2V+f82O4IRslyIKp16TPBeefkmE+f/SgAZeBWPYpQ1tCehgnn1cGiL0R6AUwg
-         96poU9sdk9wNX+dCkO7KFu3A+LYNL/oci5pMjzli9kkrLsNq7WRVygQ8qOMFnHDhN0so
-         0CxcFFcVJTIbPE0kzc6iFbn47nNJm7oCZSQd0=
+        bh=WIdYb8baR8Q7++ZwNpye3IyiN2nTzQx+MIJotU+BQTg=;
+        b=kP0VkchE6TcM2EzUj7nuxO+xPDndoi9humDjg3kZPYldHZjZ/Cw1Ju1Bo6JEScyUR6
+         g9RLBJ3TQ9b/8qp16oDNv363RAortqVEHobRNlYJoJAROBXiYGH3TE0U1EZ9XKv3l6M9
+         kMK5zt7FV9i1Jml5DQwtz9c6SbNN7iB2Y7Hjs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795527113; x=1796131913;
+        d=1e100.net; s=20260707; t=1795527599; x=1796132399;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=sRmFPcUPUdqrcbC1ZXCGrGKNgcf62X2sZJFNcGCiyZc=;
-        b=m1CMk6NN8U61gp8k3VG+kuKhhndLR1pimgxfIpD7TvTobMSzPse+TdEvZRFDEZhi5w
-         uzsb6zjg3b1nOvhwtn4guKDpUQe21Ev1bLiAbFgL/dj6HW/xq0a8UVcrpa5lI15J0p0g
-         WTMSlGUywHFDpIXx1E2HkNGZt2DqGfZNF5uIS/MoA8ubkiOHa5sJbBmI1oCh5m986xZ3
-         tGTO09+iR2bQrRpyVR+2PACox+bynM/GBY7vAALtjHGi0eSJRmYmyeyulJEbXZzchdkY
-         xf/91A5UGrK8J7Hf+YzCTwA3tme0H4LHLkuSHJiOgE2+ZSuCAD5bCz+u9q17FCn2WxYv
-         ujbA==
-X-Gm-Message-State: APuU4Z/iEmeuXh/o4et8Zyv8wTr8mX6dCHGQqibQtvdeoC52B5p+Vz51
-	Ednnq8xyovYRfdbPxz4yOLLlhsBMdoq3Mlj51Ravec+1Z2BQegbMnnIPN3uGPctCXTgD0TmdWJf
-	JgBDy
-X-Gm-Gg: AZFdTZcD/VPCF3H0elEltRbRHID4bxTP7sK9+oC8QS+cEw7JbN0+7GjNPWaiHh03o79
-	AlKb6mqY/vnbwbMGTzB75SlqYP/QrlNfreHBf2mOwuVO8gj+WYM+1pp8KlBxtXkX3yfVsVHhF4G
-	YXE3GieI2MJCGXCWbTY20LPnIXcihuudnp0GUJmrG/OC0Erzo1aBE7Ge/4H0ndGnJ4CopkqWjFb
-	qaQRXLHc64hKz2q2qm5RUvsztorRRi1xuttf3tHeCFegtvA4CyXAJFTWAXkWFBGg5t1aIVSQlaF
-	phiZGQISjJ0UwOsG8YkRZDfKL2rwkgi5hsucd0lsdHaMnM5hLIwEVvket6eV88eG7C+6SeIpimU
-	Y7dAweifOOfLUtnuRYQluaWH0Iw7a5UBTMJt5UwtlJrAYAkK0MVxJ2CKV+ougRT3sBPlwOVWd9R
-	qtAPsEcBAsSXBK6nT1ogclg9RApTBCFsQQ1tXQT3Frj99LKQdpmf0kEuuj/whC88kTOsTAqTXXX
-	/z76RMkdkOlzsXe48I5qMoyRv0qIy3YtZCLW+0ws9bRoCjE7Hc1xZf5+xVIMiFjTYjBkFox1m4z
-	gJBzHOE17r73i3Fp1Sqw/cz7gUFT7KjpOu9O7yzL0X1p4nfzEA==
-X-Received: by 2002:a05:600c:6290:b0:4bb:741d:eba with SMTP id 5b1f17b1804b1-4bb88824a5bmr299873055e9.13.1795527113179;
-        Tue, 24 Nov 2026 05:31:53 -0800 (PST)
+        bh=WIdYb8baR8Q7++ZwNpye3IyiN2nTzQx+MIJotU+BQTg=;
+        b=GM7Gh4ExJcBEZEe0aDGC8ecpgHkHsUxd78br5VXJROORhLg5JD2JazCSU5VZWTDSNi
+         MPshGqQPDOjgJ8DlWyF9MQ5EydB5WSPQPCwSWOgTBRvZ8GwCEFx95/J8At9fBuWG6MNm
+         +aHO5Zq2EbW27iqqbH6T0d3plkX0htolrYyQzWFTxlt5Tm0VsLrW6KiFS84ZOMWez0cV
+         p65Zv48J+RqrRNJNoAhqXf0IZGo2YYQ6IcjLGXBfOo1AZhDEVDAsBn5fHQCifzgQBKGv
+         1AHXKYyUQNYUfPfr2ZltbSliTNT9YARzeKUyAi/ZNhmP4c3GQWLzgsCChyit8QQsjNHs
+         eglQ==
+X-Gm-Message-State: APuU4Z/O1ZBD6zr/mareOs2QyhlDdXJJ0jT33nWMFfFHkmfZoE+RWqip
+	xe1URbMUCzCtMhYB5grTF+9jBdCVPy35XQEO4C23NBPs5U/jXzLkOzFN0i8S12w7dyj/9HcI/ge
+	K4Uxk
+X-Gm-Gg: AZFdTZfWnhydPl4hW4FZMZyNto65Au4Gd683YsefIC7M+OnTVIqC2OtiOrdmgf9lP/c
+	ZeOfqsjlRmyhIZ0dFfafTGjIhvDhMKKF3bgKx+v3VS65Lu5vJfUXAIX7Dh00vMM3eY0MJrXD9gf
+	SMWUQkI5+drHpVS5Jy+a5oL/oDMJu0s9WrlQJvRxozA4vjFUysF5EYEmsyx8vHQKU9oXKr740m4
+	q6Mb8ZRwr2joC7tQbyoUd2gz+U6RuE9v0eX4KHGBbwC/2tAS0Mo95Zesm83dQBlyGZAFqsBKceF
+	+agGErSgMG/6i9D756VBrY5O0ghWP/gZkjxPgmTmMKG+rc0mnd80g40+EijVdOaO7ZOXm//hOJz
+	IQjEJ7ThL1ggYlAkproLmDGiy0kih/fjbKhLDLHwBlOio9NzLmQHZrQlEDjHssa+SWCpRX77q4A
+	dm0Dd5i/eOc7Itm4dtiqjeDRLnkbCmO8Txzluhe/BKG+H/7AJuxdaOBRoskKGEjLUct9tA8bdSO
+	GRusEj5e1uysaJjHTBXEe/V3/nSccuXwy0hrvDv58tw70hYDBR+gJ0ee4br4uKwfE7JNjfD7oK3
+	L8dff/SY9bvu5bpWd+7qsEXnKq9SqOD28oDD7jfDr5zJ5vGfD1Mi1ob8ocHDyR6YNJHyyA0=
+X-Received: by 2002:a05:600c:500c:b0:4bb:82f7:549f with SMTP id 5b1f17b1804b1-4bb8881409bmr322483355e9.19.1795527598818;
+        Tue, 24 Nov 2026 05:39:58 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm224045315e9.0.2026.11.24.05.31.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8538b3a7sm491626385e9.3.2026.11.24.05.39.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 05:31:52 -0800 (PST)
+        Tue, 24 Nov 2026 05:39:58 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] advertising: Allow ServiceData with no data
-Date: Tue, 24 Nov 2026 14:31:48 +0100
-Message-ID: <20261124133148.3959415-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 1/2] avrcp: Defer init until service discovery completes
+Date: Tue, 24 Nov 2026 14:39:53 +0100
+Message-ID: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,45 +91,227 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A ServiceData entry with an empty value is rejected and the whole
-advertisement fails to register, as the byte type is checked on the
-first element of the array, which an empty array does not have. A
-Service Data AD with only the UUID is valid, and a Scan Delegator
-advertises the BASS UUID like that.
+When the remote connects AVCTP before SDP has found its AVRCP records,
+as iOS does on the first connection after pairing, neither controller
+nor target is initialized and the session stays without them. Wait for
+the service discovery with device_wait_for_svc_complete() instead.
 
-Check the element type of the array instead.
+The remote uses the session meanwhile: iOS asks for the supported
+events and registers for EVENT_VOLUME_CHANGED right away, and would
+not get absolute volume otherwise. Report every supported event from
+the start, the remote registers only those it uses, and create the
+target when the control channel connects so these registrations are
+kept; target_init() completes it from the SDP record. A volume
+registration with no volume set yet starts at max volume, which
+target_init() set only for 1.4 controllers with category 2.
 
-Steps to reproduce:
-
-  [bluetoothctl]> advertise.service 0x184f
-  [bluetoothctl]> advertise on
-  Failed to register advertisement: org.bluez.Error.Failed
-
-Fixes: 758dae03725e ("core/advertising: Fix not parsing data properly")
 Assisted-by: Claude:claude-opus-5-5
 ---
- src/advertising.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ profiles/audio/avrcp.c | 102 ++++++++++++++++++++++-------------------
+ 1 file changed, 55 insertions(+), 47 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index d07068c6c..3a1d9a6b7 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -489,11 +489,11 @@ static bool parse_service_data(DBusMessageIter *iter, struct bt_ad *ad)
- 		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
- 			goto fail;
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 2f214e982..f7c988ec0 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -252,6 +252,7 @@ struct avrcp {
+ 	bool pos_changed_supported;
+ 	uint8_t transaction;
+ 	struct pending_pdu *pending_pdu;
++	unsigned int svc_complete_id;
+ };
  
--		dbus_message_iter_recurse(&value, &array);
+ struct passthrough_handler {
+@@ -1614,12 +1615,6 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	if (!(session->supported_events & (1 << pdu->params[0])))
+ 		goto err;
+ 
+-	if (!session->target) {
+-		pdu->params_len = cpu_to_be16(1);
+-		pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+-		return AVC_CTYPE_REJECTED;
+-	}
 -
--		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_BYTE)
-+		if (dbus_message_iter_get_element_type(&value) !=
-+							DBUS_TYPE_BYTE)
- 			goto fail;
+ 	switch (pdu->params[0]) {
+ 	case AVRCP_EVENT_STATUS_CHANGED:
+ 		len = 2;
+@@ -1648,6 +1643,10 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 		len = 1;
+ 		break;
+ 	case AVRCP_EVENT_VOLUME_CHANGED:
++		/* Start at max volume if none has been set yet */
++		if (media_transport_get_a2dp_volume(dev) < 0)
++			media_transport_set_a2dp_volume(dev, 127);
++
+ 		volume = media_transport_get_a2dp_volume(dev);
+ 		if (volume < 0)
+ 			goto err;
+@@ -4263,16 +4262,15 @@ static void session_init_browsing(struct avrcp *session)
+ 							destroy_browsing);
+ }
  
-+		dbus_message_iter_recurse(&value, &array);
- 		dbus_message_iter_get_fixed_array(&array, &service_data, &len);
+-static struct avrcp_data *data_init(struct avrcp *session, const char *uuid)
++static struct avrcp_data *data_init(struct avrcp *session,
++					struct avrcp_data *data,
++					const char *uuid)
+ {
+-	struct avrcp_data *data;
+ 	const sdp_record_t *rec;
+ 	sdp_list_t *list, *protos;
+ 	sdp_profile_desc_t *desc;
+ 	int port = 0;
  
- 		DBG("Adding ServiceData for %s", uuid_str);
+-	data = g_new0(struct avrcp_data, 1);
+-
+ 	rec = btd_device_get_record(session->dev, uuid);
+ 	if (rec == NULL)
+ 		return data;
+@@ -4348,14 +4346,9 @@ static void avrcp_connect_browsing(struct avrcp *session)
+ 
+ static void target_init(struct avrcp *session)
+ {
+-	struct avrcp_server *server = session->server;
+ 	struct avrcp_data *target;
+-	struct avrcp_player *player;
+ 	struct btd_service *service;
+ 
+-	if (session->target != NULL)
+-		return;
+-
+ 	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
+ 
+ 	if (service == NULL) {
+@@ -4363,47 +4356,22 @@ static void target_init(struct avrcp *session)
+ 		return;
+ 	}
+ 
+-	target = data_init(session, AVRCP_REMOTE_UUID);
+-	session->target = target;
++	target = data_init(session, session->target, AVRCP_REMOTE_UUID);
+ 
+ 	DBG("%p version 0x%04x", target, target->version);
+ 
+ 	btd_service_connecting_complete(service, 0);
+ 
+-	player = g_slist_nth_data(server->players, 0);
+-	if (player != NULL) {
++	if (target->player != NULL) {
+ 		int8_t init_volume;
+-		target->player = player;
+-		player->sessions = g_slist_prepend(player->sessions, session);
+ 
+ 		init_volume = btd_device_get_volume(session->dev);
+ 		media_transport_set_a2dp_volume(session->dev, init_volume);
+ 	}
+ 
+-	session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+-				(1 << AVRCP_EVENT_TRACK_CHANGED) |
+-				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
+-				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
+-				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+-
+ 	if (target->version < 0x0104)
+ 		return;
+ 
+-	if (avrcp_volume_supported(target)) {
+-		session->supported_events |=
+-				(1 << AVRCP_EVENT_VOLUME_CHANGED);
+-		/* Check if transport volume hasn't been initialized then set it
+-		 * to max so it works properly if the controller attempts to
+-		 * subscribe to AVRCP_EVENT_VOLUME_CHANGED.
+-		 */
+-		if (media_transport_get_a2dp_volume(session->dev) < 0)
+-			media_transport_set_a2dp_volume(session->dev, 127);
+-	}
+-
+-	session->supported_events |=
+-				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+-				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
+-
+ 	/* Only check capabilities if controller is not supported */
+ 	if (session->controller == NULL)
+ 		avrcp_get_capabilities(session);
+@@ -4430,7 +4398,8 @@ static void controller_init(struct avrcp *session)
+ 		return;
+ 	}
+ 
+-	controller = data_init(session, AVRCP_TARGET_UUID);
++	controller = data_init(session, g_new0(struct avrcp_data, 1),
++							AVRCP_TARGET_UUID);
+ 	session->controller = controller;
+ 
+ 	DBG("%p version 0x%04x", controller, controller->version);
+@@ -4460,8 +4429,35 @@ static void controller_init(struct avrcp *session)
+ 	avrcp_connect_browsing(session);
+ }
+ 
++static void session_svc_complete(struct btd_device *dev, int err,
++							void *user_data)
++{
++	struct avrcp *session = user_data;
++
++	session->svc_complete_id = 0;
++
++	if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) != NULL)
++		controller_init(session);
++
++	if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) != NULL)
++		target_init(session);
++}
++
+ static void session_init_control(struct avrcp *session)
+ {
++	struct avrcp_player *player;
++
++	/* The remote may register for events before its records are known,
++	 * target_init() completes the target from them.
++	 */
++	session->target = g_new0(struct avrcp_data, 1);
++
++	player = g_slist_nth_data(session->server->players, 0);
++	if (player != NULL) {
++		session->target->player = player;
++		player->sessions = g_slist_prepend(player->sessions, session);
++	}
++
+ 	session->passthrough_id = avctp_register_passthrough_handler(
+ 							session->conn,
+ 							handle_passthrough,
+@@ -4473,11 +4469,19 @@ static void session_init_control(struct avrcp *session)
+ 							session);
+ 	session->control_handlers = control_handlers;
+ 
+-	if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) != NULL)
+-		controller_init(session);
++	/* Report every event supported: the remote registers those it uses */
++	session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
++				(1 << AVRCP_EVENT_TRACK_CHANGED) |
++				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
++				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
++				(1 << AVRCP_EVENT_SETTINGS_CHANGED) |
++				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
++				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
++				(1 << AVRCP_EVENT_VOLUME_CHANGED);
+ 
+-	if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) != NULL)
+-		target_init(session);
++	session->svc_complete_id = device_wait_for_svc_complete(session->dev,
++							session_svc_complete,
++							session);
+ }
+ 
+ static void controller_destroy(struct avrcp *session)
+@@ -4513,6 +4517,10 @@ static void session_destroy(struct avrcp *session, int err)
+ 
+ 	session_abort_pending_pdu(session);
+ 
++	if (session->svc_complete_id)
++		device_remove_svc_complete_callback(session->dev,
++						session->svc_complete_id);
++
+ 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+ 	if (service != NULL) {
+ 		if (session->control_id == 0)
 
 base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 -- 
