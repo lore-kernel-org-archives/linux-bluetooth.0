@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795513469;
-	b=32fjOuQMKp2RGzYzD5HgrItDu+pR4ZE8dq4zS9IEZzX7WzfYGPvG3HLTtJ885Qd3xg8s
-	 kb9T6v71AoW00/lj3SIwxGS3u/Rqz8qwsSmYmy1m7zltAdedaSgi+sGSvWA/P7QcomzvL
-	 2CNCXXN0AI+4aNlVfpooYsniHS32La3sAsDydP1e5lxRlp/OHN71QdWHwlOMmd5cbEMSr
-	 51LgcCpvJIxESHA4Jw4UYpzL8QXP/Cui1zdL1JYMLNo2SauGShXyLMGVumL+8BhAYz6HZ
-	 EGBMQpqN2JZb5hkQCgWlP7RoYx1O8mJdXnW6Lv1Dvm1+5Z5+r3bfdMMZPe7892DO8kQ==
+	t=1795513482;
+	b=Eq0WTtWIJub442i+N/Spj6RFcIPDtHjU1kDROLUf0dJe7h//EA9gNai64zqGFePFdsxI
+	 I8xDOuTug0ZSlzfLNRyykqeizo2B44EsNTiftHzRttNec/lXorGdZKfv8XEunw2jyIhhM
+	 Uo7tPBRzFw7bcuYJo8IL2lq+eVwh2y4euCtDp3FfJ2TmaBCk5oaUxFwq29skv6BdDnteI
+	 Q/HlY+NK74RLOe63MIdJWobJUtLjiOqmmIthzOXw3Xemge1bf+mv3KF/adfhiotpzSLVR
+	 o49mvnjaLhlB4i3mBxGmWRWN8QL+yFvyh+NotEBzHevSLGsdDMJPSEowIAGRb/sNo+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795513469;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795513482;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=p4sT5+vbEJgTPXn0ZxCwAz9v5MiOVyx+czs5SWxFdeU=;
-	b=AgXs1dYlIIhBpKwe/IlTT+jADF+iyuXmApNIgz1jeV0+jbH647gtfnB3TifKNIo9CVE8
-	 u5Arzap0Y/Wx/qZL2/yRrViZ9Nmsh99aEYVi4laMlG5g0nbyCV39ixdjHwcAL/QuXGEFA
-	 FMdPiqhKF+q4jIN7A91WB3OoWCZ7BAd56EHH8tLjKpTirSkp9fjC1aB5f6ZrUn9JGkkbe
-	 0f/XWDOZnI1holOKlS55jypj8VIv5frkT1i0NkCTf41HDKTi8NGDy0XBXPNriusK7xQIr
-	 vCCow5/JNLfiw03NkUEPbY/Jf898SMPhtN9DOanJd218b6r+GeCPZ8P0FFXFQA1wv9Q==
+	bh=Zo2nWdiL6YEo2G0GsZnQyRDF6TQweGSzc4WECw2Gtr8=;
+	b=aJC5hD2ICDR9CXem//7xVZWTYI9nwvLNrQp014DN0bHBbKjBuAEnr4PKilAReBOjLE8t
+	 GgLGduarkxBgf0ybZuoxWnLj86XLv1+07O4VVyf0vkLBweh4tJCzEDZmcR7iSoLU7zNZ5
+	 9wuuJp+kTkDnYF9Mq5qwLxTgeHz/qW/9sDC0aHX8kGVkL0Kifk/6rgVn7z0YU6WTVwzGR
+	 2goE05GkpkTPPT2tQbPHtGpyCyetjqRPqg9zSRMuUx+DOS4CdLbjmZFuqXrMm1X7nZrd4
+	 3k9Mt9xL+0/n1jZwz9mHHW7buC09InYTJx20YrI50vd2DPCo3acMlQ5F2b9L3MmICfA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nzlwURpe;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hCzzhuV8;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB2D606A6AD;
-	Tue, 24 Nov 2026 09:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F782606A6B3;
+	Tue, 24 Nov 2026 09:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nzlwURpe
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B75141F00A19;
-	Tue, 24 Nov 2026 09:44:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hCzzhuV8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCCC1F000D4;
+	Tue, 24 Nov 2026 09:44:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795513468;
-	bh=p4sT5+vbEJgTPXn0ZxCwAz9v5MiOVyx+czs5SWxFdeU=;
+	s=k20260515; t=1795513482;
+	bh=Zo2nWdiL6YEo2G0GsZnQyRDF6TQweGSzc4WECw2Gtr8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nzlwURpebWbSzflPGrSsOImZ2bkcmFOZTDs2gOO+FcErgqYeZBXNIV22z7Fa9f06s
-	 2FW5pMqNrqElmv+oP7h75F7VCBSUDVAWyq9fJCirEuAyNlt04+PjRTM3dyq5Wfvcml
-	 7/iP4sL5oxjGmcn61TSFaQJJjgSuZx1qO4ZvBWSnQsvZHjz0YoGjzHwMlwpz255otb
-	 LL3eUYPk4wmRwKgX8dm5Ypu9dQsFMaiaTWQO11Qt6do/sYRYSRylEC6P+xBi0q8oZP
-	 3o81xyc6QCTho1NzeSAbwVf1ccMLwrZ6jyDlJC7AvJxkjtiZSSoWeogROlrhlqSLYG
-	 pnYNy0FEwu4EA==
+	b=hCzzhuV8eWBG4AfXP+7+b2h+Hxq807kLdzMk4iPl7z7TE21BUD8yoiPpYSjrXTOAC
+	 sGzXXhj1ys/ACItFAeu7a/uiILFeXYN0RUHkj4ZyTG9FzU/dITl/joHNHslEvH22nJ
+	 SVtVvJyxBApNIyUQR/CNnt+rZx+T7FS+FdxJ+k2QVun+mR6NlOdh2Ll03aguesqeTw
+	 RTyetfOWSsHZ3ha2xOpiMZNhliZ4hBbuI1ogKcAiPe+3RkiPNR0c2Fo9Oqlp1/wRuB
+	 GZy/jE0AxdoSv++ew5gi69CpIlLxHIHvw+iKf6vmVzsU0R69v4m87HQqkQbr4pMPWo
+	 ODX9iGK/viB3Q==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -100,9 +100,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@suse.de>,
 	linux-sound@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v4 04/33] USB: serial: Register USB drivers with their owning module
-Date: Tue, 24 Nov 2026 11:43:35 +0200
-Message-ID: <20261124-device-trust-core-v4-4-037eb0d17b1f@nvidia.com>
+Subject: [PATCH v4 07/33] USB: Release interface claims according to binding state
+Date: Tue, 24 Nov 2026 11:43:38 +0200
+Message-ID: <20261124-device-trust-core-v4-7-037eb0d17b1f@nvidia.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
 References: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
@@ -121,68 +121,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-The USB-serial core allocates each USB driver on behalf of its serial
-module, which deregisters and frees it during module exit. Registering
-through usb_register() instead identifies the USB-serial core as its
-owner, so a module reference does not retain the driver's allocation.
+A driver such as CDC-ACM can claim a sibling interface before it is
+registered. Disabling USB bus autoprobing between the claim and
+registration leaves dev->driver set without adding the interface to the
+driver's bound-device list.
 
-Pass the serial module's owner and KBUILD_MODNAME to usb_register_driver().
-Keep the module name separate from the USB driver name so built-in drivers
-also link to the correct module.
+Releasing that interface through driver core then attempts to remove an
+unattached list node, causing a NULL pointer dereference.
 
-Fixes: 68e24113457e ("USB: serial: rework usb_serial_register/deregister_drivers()")
+Fixes: b8c5cec23d5c ("Driver core: udev triggered device-<>driver binding")
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/usb/serial/usb-serial.c | 4 +++-
- include/linux/usb/serial.h      | 4 +++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ drivers/usb/core/driver.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/usb/serial/usb-serial.c b/drivers/usb/serial/usb-serial.c
-index 4a19621f08ba2..ccbd0875339a3 100644
---- a/drivers/usb/serial/usb-serial.c
-+++ b/drivers/usb/serial/usb-serial.c
-@@ -1513,6 +1513,7 @@ static void usb_serial_deregister(struct usb_serial_driver *device)
-  * @serial_drivers: NULL-terminated array of pointers to drivers to be registered
-  * @owner: owning module
-  * @name: name of the usb_driver for this set of @serial_drivers
-+ * @mod_name: name of the module containing the serial drivers
-  * @id_table: list of all devices this @serial_drivers set binds to
-  *
-  * Registers all the drivers in the @serial_drivers array, and dynamically
-@@ -1520,6 +1521,7 @@ static void usb_serial_deregister(struct usb_serial_driver *device)
-  */
- int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers[],
- 				  struct module *owner, const char *name,
-+				  const char *mod_name,
- 				  const struct usb_device_id *id_table)
+diff --git a/drivers/usb/core/driver.c b/drivers/usb/core/driver.c
+index 735ae3310b45d..d902708416d06 100644
+--- a/drivers/usb/core/driver.c
++++ b/drivers/usb/core/driver.c
+@@ -612,6 +612,15 @@ int usb_driver_claim_interface(struct usb_driver *driver,
+ }
+ EXPORT_SYMBOL_GPL(usb_driver_claim_interface);
+ 
++static void usb_unbind_claim(struct usb_interface *iface)
++{
++	struct device *dev = &iface->dev;
++
++	usb_unbind_interface(dev);
++	dev_set_drvdata(dev, NULL);
++	dev->driver = NULL;
++}
++
+ /**
+  * usb_driver_release_interface - unbind a driver from an interface
+  * @driver: the driver to be unbound
+@@ -631,27 +640,25 @@ void usb_driver_release_interface(struct usb_driver *driver,
  {
- 	int rc;
-@@ -1559,7 +1561,7 @@ int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers
- 		}
+ 	struct device *dev = &iface->dev;
+ 
+-	/* this should never happen, don't release something that's not ours */
+-	if (!dev->driver || dev->driver != &driver->driver)
+-		return;
+-
+-	/* don't release from within disconnect() */
++	/* Avoid recursive locking from disconnect(). */
+ 	if (iface->condition != USB_INTERFACE_BOUND)
+ 		return;
++
++	device_lock(dev);
++	if (!dev->driver || dev->driver != &driver->driver ||
++	    iface->condition != USB_INTERFACE_BOUND)
++		goto unlock;
+ 	iface->condition = USB_INTERFACE_UNBINDING;
+ 
+-	/* Release via the driver core only if the interface
+-	 * has already been registered
+-	 */
+-	if (device_is_registered(dev)) {
+-		device_release_driver(dev);
+-	} else {
+-		device_lock(dev);
+-		usb_unbind_interface(dev);
+-		dev_set_drvdata(dev, NULL);
+-		dev->driver = NULL;
++	if (device_is_bound(dev)) {
+ 		device_unlock(dev);
++		device_release_driver(dev);
++		return;
  	}
++
++	usb_unbind_claim(iface);
++unlock:
++	device_unlock(dev);
+ }
+ EXPORT_SYMBOL_GPL(usb_driver_release_interface);
  
--	rc = usb_register(udriver);
-+	rc = usb_register_driver(udriver, owner, mod_name);
- 	if (rc)
- 		goto err_free_driver;
- 
-diff --git a/include/linux/usb/serial.h b/include/linux/usb/serial.h
-index 5866f19d3c7b8..fcfd0e26e0ffb 100644
---- a/include/linux/usb/serial.h
-+++ b/include/linux/usb/serial.h
-@@ -321,9 +321,11 @@ struct usb_serial_driver {
- 	container_of(d, struct usb_serial_driver, driver)
- 
- #define usb_serial_register_drivers(serial_drivers, name, id_table) \
--	__usb_serial_register_drivers(serial_drivers, THIS_MODULE, name, id_table)
-+	__usb_serial_register_drivers(serial_drivers, THIS_MODULE, name, \
-+				      KBUILD_MODNAME, id_table)
- int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers[],
- 				  struct module *owner, const char *name,
-+				  const char *mod_name,
- 				  const struct usb_device_id *id_table);
- void usb_serial_deregister_drivers(struct usb_serial_driver *const serial_drivers[]);
- void usb_serial_port_softint(struct usb_serial_port *port);
 
 -- 
 2.56.1
