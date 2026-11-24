@@ -1,60 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.100
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795540875;
-	b=nroe2KQ4lax0hCsYl9K2M1H5rO5Wxehz2mh8Wc02+CR2CksyzjyVig5FJaPElH1wN27Y
-	 fGHAiUKsAXZomwhlMS87IFJMlrO+vULXVb1W/Hu/Tyc8wK8PDzuqIwSD+fu6+YFmkBLbI
-	 vN+dXSXEOiLW4nJGp7GMl66aMJE1HWqL04/+/r6EUZW12e0MzrYaxcCC7DygnfaokKEMm
-	 cqOfx5XQUStgtETqVo1lRX+AIan5+geigsYbTu/eNG06dz31RthhNxPGY0pCU1HK7zVvr
-	 2ldNflNFvVU60F2jBDpW9eT59GHtD0oOvMWMRVgQdHMmT6pORGa+bscznEX1oBJUnDQ==
+	t=1795543908;
+	b=jf+ZUYkQqecR1LTwvBNlgMhD1pnwaNKiA4xKaYnQ/9QDP/0sQ0CAoJda1g4CiWCGO7uf
+	 m2AlSPTvc2ysqmE5KhZGxk5FVe76l3t1sP0W1eHYUbvtJOElHI1nir9OChQVjXJ5th5Eb
+	 LCOotNmwUyl+nfDtaOsXNH/FIju6O/wmDYpKJLqWxSzUU5JFltvbyac2XvZfumREMbmBv
+	 sffCzsxiblJeCeehGc30D4pLJLBhczRmqMEMJeo4CP9dw9blQUgYGe2QR/nx+kTqAj9Tt
+	 jlYh6yNPYiW7A65M88ynf44KwNqGv+4Tdxv5xxtefN+RFxqn77JyAejY4meZQHQsX0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795540875;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=2/6ySiDGwni9RpELdfQluGW4uegOP0fKwnNv2RVOXCI=;
-	b=ogPREsxkLb7A9Mv+F0Dcn/WDttAX9IUU0lbCtTNp2sOb6OnBeDPJKDG/O7sKjA24m5ve
-	 w00bqa8Dae7Jv3k0AltwGXUMHqZBqi9vjlZ4Sq4F2mKBTsjE0mGHq4bVAujpWPvmlbumP
-	 +DWCW7AVVYJ4NKUBd2oenkYAQua6JhGp8DWia4iKFxIhXlzdKYO/FIz4BNE+hAhgtJn8i
-	 kNYtzkSP6eMalWkN7Pdd3DslSx+R9yNAGWsb5E2U5h+7cC99gNcnMFiQe3zByJ7jC1Jie
-	 6Gc4lY5JikWELy96LsEEBFdsd3pyn+L86PODvlCb1nlzSnMfURlUDhnmb2tP/fL89eQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795543908;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=QQ/E4jNofpIAXMnqMmreWzyHR+WzX2sEKvuTf6pD3LM=;
+	b=wsaz/vGIGe9ORKyquji7Tk65Y4wUTyHSK2siTomzGbmgNrAUUa1nUKnLZyo1AaW3f/Fa
+	 WrrJdUe5j+bFxFAE5a9YpjWLRHiQOqjz6WSvyqOExX5ScUR1CDIoy8mLkEST2zIZz8lgV
+	 4zfUdY8/Awh+iExsb7gqXjkPsfhGIG5q9mYcXXrWH52iM5CCZWevr3Rh2ONUHe59Nn+l7
+	 mawy2bbk7vHnZ06+D5IY9s0rLpKMN925/zxmBU8YgvEN4rZocZvdGg14DbpmiKKWG7NxT
+	 3hsYDnLN7BD+UdBccE205UfKK3UxzjhI7D2bg5/J2V3jnciq7Qp0TGQDDAsNXc+r6Og==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=kRu5bUQG;
-	arc=none smtp.remote-ip=185.70.43.100
-Received: from mail-43100.protonmail.ch (mail-43100.protonmail.ch [185.70.43.100])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=yYChClEy;
+	arc=none smtp.remote-ip=209.85.128.54
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AA1606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 17:21:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37AA1606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5EB606A331
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 18:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA5EB606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=kRu5bUQG
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1795540871; x=1795800071;
-	bh=2/6ySiDGwni9RpELdfQluGW4uegOP0fKwnNv2RVOXCI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=kRu5bUQGzUp853vvlpjGnNuxxkmUQ6oLMOTs73X3X26kT/kJwiYmHDmeD+Y7/DzjU
-	 ZgeShInvWxupP6v1uC5Sq5iQ6GmeI+p4ZDOXsxIRCOzs3W9DOj8+AbLV6PvdSeKKeE
-	 NgRVk3yidbrwhq1G1dfws0Hsp6+gKf7m2IuTQZoLx73R34LwyVcixZHTDqWWahFHc4
-	 CKQQuY0xOgynYyRfjWBdHIQVvmw/n+z+Pqio0nAgnlFbGtynTMqrDGTbWS2gPA2+hm
-	 jsRC05sw9eimb/1oRf1kGRHyum7zHJiIIh/BYbGHpQDnbZl33uwfL2JMq3sAn1snRy
-	 dms1Uz/rlsIhA==
-Date: Tue, 24 Nov 2026 17:20:55 +0000
-To: Arun Raghavan <arun@arunraghavan.net>
-From: cochcoder <cochcoder@proton.me>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [RFC PATCH RESEND] asha: use robust streaming connection parameters
-Message-ID: <WUthOy_PV6V8FWqN--CeTaWpb0S2EcRN0wKqiNV3owQKOJuehZGp3kUNFsylWP3NEkpttAo7vxXG9tGgwbj2bmAlkglXRg7uxEqucs1MGLg=@proton.me>
-In-Reply-To: <182c2e78-8c98-4686-beee-9b45dfa02d34@app.fastmail.com>
-References: <20261028133204.262169-1-cochcoder@proton.me> <182c2e78-8c98-4686-beee-9b45dfa02d34@app.fastmail.com>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 83dcc321679735c849b2bcaf5895d7a714ce1fec
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=yYChClEy
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4b79502c27aso48167665e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 10:11:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1795543906; x=1796148706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QQ/E4jNofpIAXMnqMmreWzyHR+WzX2sEKvuTf6pD3LM=;
+        b=yYChClEyKdb6KO0oUkogWDwX8LOqzK5rya4lGUQerNsu+W6LbarKIeVRU5zz19+nTP
+         sCOpKh/vFV7PVpmonU7JCIUJpn6RhUmXbdk1IwvuRCJcmIsjlC4j5liz4XYZBsTWwlSa
+         IfpvTAuqrtuKF9Gm+1fQe36HfAkKXvUq+bDrQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795543906; x=1796148706;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QQ/E4jNofpIAXMnqMmreWzyHR+WzX2sEKvuTf6pD3LM=;
+        b=0XLSE1An1yMsDZdnGy44aaf4QnqN6P48KMrbFN/+iTd9UhcxXrhWuIShWiWm2GSgXu
+         wMEhx97wfTe43oIKGW817F4y7trZQRgSN/ceexl+CR/NDwnVQ6mweez+Q67JMBPYqN4K
+         loj/XMp7VDbT38Ex3SnZ/HleCEvs26S8js0KAwLavDpxIRYa7dM2ujFcEGA9NRLNK6Cd
+         eF+w34BZY4JlcH0Brzk4t9tX0MSEjKYJgoSQVC6zyX6PLjgAL2eHhml9xQ2Qb8hbEckR
+         42Tv4wvs/V+iwVMzR2zcqp3gon/bsyHJUzha5oCuKDz8tgO6wswLFoV9ZFZcx5v0Etdq
+         yBUg==
+X-Gm-Message-State: APuU4Z/lQXBP/7G+o7D/tDjR6WwhNn4UcxoQkhsZ/Rx0kM9w43uyGSfH
+	ewB2K2oX2u357T4IP0ZIs8Mo5KLC4KDWvfd+KHT2tCF6KNWzp4lfXk5QvpYuLfqJb5vTuISIcEw
+	KusT+
+X-Gm-Gg: AZFdTZeo30uXvuHzol3CgGNLHDRRcC1xaTtJCc7o70A2flV1ZF7bMWyhmAnvexfN683
+	WZGsfuihqX1T8Vt279CMHTvCAxCR+3nhnG7ZyyeAOmtnYUzbklsd+C7PBHeqPZpFl3bwyW3LIxi
+	rAUm+yiQPNU9ePmgwR3hjCqlGgXpGTUKI3sroAIgrtGr93UuVYEhlGA++RLnAzyYQxxNyRan3y5
+	+w9lZYJZN38VY3kfFps3eYH/8Xtb7rhEyLBavN8Ojh1TLpz74L3z7Uxu1B/5H6i7V7DOUH9ysOp
+	JftGnVZN12nsa7Gv/jHbi64YHWLp26E7nu2FQwrL+Qyx87hXnhNLKINLU54lO+eg+voZpvttc3I
+	4HRBzOUC8+gO3/FyQvzNnRNIOUD/941L1HIkDchhYMbb0Bqx9oWKYrNZAqB/JGk5rKwlsKiLvaX
+	LCdEfWdstisLyfPxtZS89cVASrhyCaozoKIPwgaTTuQqZACagt+DP5U5Ar++x2h/yZOnsrftJLQ
+	Cx9+zwjeNvB4diee03SCLySWeuARVMO+Wo2r+f1yjlqXWdJ49cJ9wl6Awupv3FbG3do3bVxuJwz
+	bFvXhx6n0jd7nGdsNrW3LRMfJkDH+ffVAF1sKSdP7RI4imCMuw==
+X-Received: by 2002:a05:600c:3b83:b0:4b7:6b96:e431 with SMTP id 5b1f17b1804b1-4bb88822242mr365788015e9.28.1795543906206;
+        Tue, 24 Nov 2026 10:11:46 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8526cbd0sm593980055e9.0.2026.11.24.10.11.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2026 10:11:45 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v2 1/2] device: Run reverse service discovery on the bonded bearer
+Date: Tue, 24 Nov 2026 19:11:32 +0100
+Message-ID: <20261124181134.481760-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,86 +89,320 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Arun,=20
-Since BlueZ already uses the
-10-event latency and 1-second timeout=20
-from Android, I am withdrawing
-this RFC for now. Thanks for pointing
-out that reference.=20
-Thanks,
-Kyle
+When a remote bonds with us, reverse service discovery is started after
+DISCOVERY_TIMER, but it browses SDP whenever the device supports
+BR/EDR, whichever bearer bonded. A dual-mode phone that connects and
+bonds over LE is then paged for SDP while only LE is connected. A
+browse on one bearer also makes a browse on the other fail with
+-EBUSY, as there is a single request per device.
 
+Keep the discovery timer and the browse request per bearer, and
+discover SDP on BR/EDR and GATT on LE.
 
+Assisted-by: Claude:claude-opus-5-5
+---
+Changes in v2:
+- change ReverseServiceDiscovery default back to 'true'
 
-On Sunday, November 15th, 2026 at 9:23 PM, Arun Raghavan <arun@arunraghavan=
-.net> wrote:
+ src/device.c | 122 +++++++++++++++++++++++++++------------------------
+ 1 file changed, 65 insertions(+), 57 deletions(-)
 
-> On Wed, 28 Oct 2026, at 6:32 AM, Kyle Pepper wrote:
-> > The tested renderer requests a six-second supervision timeout and
-> > latency of five events. Use these values instead of the one-second
-> > timeout and ten-event latency that accompanied link failures.
-> >
-> > Assisted-by: OpenCode:gpt-6.1-sol
-> > ---
-> > Resending unchanged after automated CI PR2667 expiry; no source changes=
-.
-> > Previous submission:
-> > https://lore.kernel.org/linux-bluetooth/20261013035111.522738-1-cochcod=
-er@proton.me/
-> > Earlier remote functional, lowercase checkpatch, Codacy Security Scan
-> > and
-> > outer-CI failures remain unresolved. Historical local passes do not
-> > establish remote success; no new hardware or functional test is claimed=
-.
-> >
-> > Submission review notes (not part of the commit message):
-> > Local validation is for base 7428ca2df9356363079db0f48412c20cbdb9471f.
-> > Compatibility with newer upstream tips has not been verified locally.
-> > October 9 N8/UB500 trials independently restore timeout 1 s and latency
-> > 10. Completed HCI values change as intended; the variants have five and
-> > four supervision timeouts respectively. Restoring latency 5 / timeout 6=
- s
-> > restores short streaming. These are device-tested values, not universal=
-ly
-> > optimal ASHA defaults. STATUS and the other downstream fixes stayed on.
-> >
-> >  profiles/audio/asha.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-> > index 8e625fdca3..409b4f20b5 100644
-> > --- a/profiles/audio/asha.c
-> > +++ b/profiles/audio/asha.c
-> > @@ -50,6 +50,9 @@
-> >  #define ASHA_MIN_MTU 163
-> >  /* The default of 672 does not work */
-> >  #define ASHA_CONNECTION_MTU 512
-> > +#define ASHA_CONN_INTERVAL 0x0010 /* 20 ms in 1.25 ms units */
-> > +#define ASHA_CONN_LATENCY 0x0005
-> > +#define ASHA_SUPERVISION_TIMEOUT 0x0258 /* 6 s in 10 ms units */
-> >
-> >  struct bt_asha_device {
-> >  =09struct bt_asha *asha;
-> > @@ -162,10 +165,8 @@ unsigned int bt_asha_device_start(struct
-> > bt_asha_device *asha_dev,
-> >  =09int ret;
-> >
-> >  =09btd_device_set_conn_param(asha_dev->device,
-> > -=09=09=090x0010 /* min interval =3D 1.25ms intervals =3D> 20ms */,
-> > -=09=09=090x0010 /* max interval =3D 1.25ms intervals =3D> 20ms */,
-> > -=09=09=090x000A /* 10 events' latency */,
-> > -=09=09=090x0064 /* 1s timeout */);
-> > +=09=09=09ASHA_CONN_INTERVAL, ASHA_CONN_INTERVAL,
-> > +=09=09=09ASHA_CONN_LATENCY, ASHA_SUPERVISION_TIMEOUT);
->=20
-> These values may not make sense globally as the notes above mention.
->=20
-> The 10 event / 1s come from here, fwiw: https://cs.android.com/android/pl=
-atform/superproject/+/android-latest-release:packages/modules/Bluetooth/sys=
-tem/bta/hearing_aid/hearing_aid.cc;l=3D453
->=20
-> -- Arun
-> 
+diff --git a/src/device.c b/src/device.c
+index 36a980d1e..40d17bae4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -157,6 +157,8 @@ struct bearer_state {
+ 	bool connectable;
+ 	time_t last_seen;
+ 	time_t last_used;
++	unsigned int discov_timer;	/* reverse service discovery timer */
++	struct browse_req *browse;	/* service discovery request */
+ };
+ 
+ struct ltk_info {
+@@ -246,9 +248,7 @@ struct btd_device {
+ 	bool		connectable;
+ 	bool		cable_pairing;
+ 	unsigned int	disconn_timer;
+-	unsigned int	discov_timer;
+ 	unsigned int	temporary_timer;	/* Temporary/disappear timer */
+-	struct browse_req *browse;		/* service discover request */
+ 	struct bonding_req *bonding;
+ 	struct authentication_req *authr;	/* authentication request */
+ 	uint8_t		bonding_status;
+@@ -787,8 +787,10 @@ static void browse_request_free(struct browse_req *req)
+ {
+ 	struct btd_device *device = req->device;
+ 
+-	if (device->browse == req)
+-		device->browse = NULL;
++	if (device->bredr_state.browse == req)
++		device->bredr_state.browse = NULL;
++	if (device->le_state.browse == req)
++		device->le_state.browse = NULL;
+ 
+ 	if (req->listener_id)
+ 		g_dbus_remove_watch(dbus_conn, req->listener_id);
+@@ -928,8 +930,10 @@ static void device_free(gpointer user_data)
+ 	if (device->disconn_timer)
+ 		timeout_remove(device->disconn_timer);
+ 
+-	if (device->discov_timer)
+-		timeout_remove(device->discov_timer);
++	if (device->bredr_state.discov_timer)
++		timeout_remove(device->bredr_state.discov_timer);
++	if (device->le_state.discov_timer)
++		timeout_remove(device->le_state.discov_timer);
+ 
+ 	if (device->temporary_timer)
+ 		timeout_remove(device->temporary_timer);
+@@ -2076,8 +2080,10 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 	if (device->bonding)
+ 		bonding_request_cancel(device->bonding);
+ 
+-	if (device->browse)
+-		browse_request_cancel(device->browse);
++	if (device->bredr_state.browse)
++		browse_request_cancel(device->bredr_state.browse);
++	if (device->le_state.browse)
++		browse_request_cancel(device->le_state.browse);
+ 
+ 	if (device->att_io) {
+ 		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+@@ -2660,7 +2666,7 @@ void btd_device_update_allowed_services(struct btd_device *dev)
+ 	/* If service discovery is ongoing, let the service discovery complete
+ 	 * callback call this function.
+ 	 */
+-	if (dev->browse) {
++	if (dev->bredr_state.browse || dev->le_state.browse) {
+ 		ba2str(&dev->bdaddr, addr);
+ 		DBG("service discovery of %s is ongoing. Skip updating allowed "
+ 							"services", addr);
+@@ -2801,7 +2807,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services)
+ 	GSList *l;
+ 	uint8_t bdaddr_type;
+ 
+-	if (dev->pending || dev->connect || dev->browse)
++	if (dev->pending || dev->connect || dev->bredr_state.browse)
+ 		return -EBUSY;
+ 
+ 	if (!btd_adapter_get_powered(dev->adapter))
+@@ -2852,7 +2858,7 @@ DBusMessage *device_connect_profiles(struct btd_device *dev,
+ 	DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
+ 						dbus_message_get_sender(msg));
+ 
+-	if (dev->pending || dev->connect || dev->browse)
++	if (dev->pending || dev->connect || dev->bredr_state.browse)
+ 		return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY);
+ 
+ 	if (!btd_adapter_get_powered(dev->adapter)) {
+@@ -3206,7 +3212,7 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
+ 
+ 	/* if successfully resolved services we need to free browsing request
+ 	 * before passing message back to connect functions, otherwise
+-	 * device->browse is set and "InProgress" error is returned instead
++	 * the bearer's browse is set and "InProgress" error is returned instead
+ 	 * of actually connecting services
+ 	 */
+ 	msg = dbus_message_ref(req->msg);
+@@ -3251,7 +3257,7 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+ 						uint8_t bdaddr_type, int err)
+ {
+ 	struct bearer_state *state = get_state(dev, bdaddr_type);
+-	struct browse_req *req = dev->browse;
++	struct browse_req *req = state->browse;
+ 
+ 	DBG("%s err %d", dev->path, err);
+ 
+@@ -5658,8 +5664,10 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ 		device_cancel_bonding(device, status);
+ 	}
+ 
+-	if (device->browse)
+-		browse_request_cancel(device->browse);
++	if (device->bredr_state.browse)
++		browse_request_cancel(device->bredr_state.browse);
++	if (device->le_state.browse)
++		browse_request_cancel(device->le_state.browse);
+ 
+ 	while (device->services != NULL) {
+ 		struct btd_service *service = device->services->data;
+@@ -6364,7 +6372,7 @@ static void att_disconnected_cb(int err, void *user_data)
+ 
+ 	DBG("");
+ 
+-	if (device->browse)
++	if (device->le_state.browse)
+ 		goto done;
+ 
+ 	DBG("%s (%d)", strerror(err), err);
+@@ -6392,7 +6400,7 @@ done:
+ 
+ static void register_gatt_services(struct btd_device *device)
+ {
+-	struct browse_req *req = device->browse;
++	struct browse_req *req = device->le_state.browse;
+ 	GSList *services = NULL;
+ 
+ 	if (!bt_gatt_client_is_ready(device->client))
+@@ -6797,8 +6805,8 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 			adapter_connect_list_add(device->adapter, device);
+ 		}
+ 
+-		if (device->browse)
+-			browse_request_complete(device->browse,
++		if (device->le_state.browse)
++			browse_request_complete(device->le_state.browse,
+ 						BROWSE_GATT,
+ 						device->bdaddr_type,
+ 						-ECONNABORTED);
+@@ -6924,15 +6932,17 @@ static struct browse_req *browse_request_new(struct btd_device *device,
+ 							DBusMessage *msg)
+ {
+ 	struct browse_req *req;
++	struct bearer_state *state = type == BROWSE_SDP ?
++				&device->bredr_state : &device->le_state;
+ 
+-	if (device->browse)
++	if (state->browse)
+ 		return NULL;
+ 
+ 	req = g_new0(struct browse_req, 1);
+ 	req->device = device;
+ 	req->type = type;
+ 
+-	device->browse = req;
++	state->browse = req;
+ 
+ 	if (!msg)
+ 		return req;
+@@ -7051,16 +7061,7 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
+ static gboolean device_is_browsing(struct btd_device *device,
+ 					uint8_t bdaddr_type)
+ {
+-	if (!device->browse)
+-		return FALSE;
+-
+-	if (bdaddr_type == BDADDR_BREDR && device->browse->type == BROWSE_SDP)
+-		return TRUE;
+-
+-	if (bdaddr_type != BDADDR_BREDR && device->browse->type == BROWSE_GATT)
+-		return TRUE;
+-
+-	return FALSE;
++	return get_state(device, bdaddr_type)->browse != NULL;
+ }
+ 
+ void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type)
+@@ -7078,12 +7079,13 @@ void device_cancel_browse(struct btd_device *device, uint8_t bdaddr_type)
+ 	else
+ 		attio_cleanup(device);
+ 
+-	browse_request_free(device->browse);
++	browse_request_free(get_state(device, bdaddr_type)->browse);
+ }
+ 
+ int device_discover_services(struct btd_device *device,
+ 				uint8_t bdaddr_type, DBusMessage *msg)
+ {
++	struct bearer_state *state = get_state(device, bdaddr_type);
+ 	int err;
+ 
+ 	if (bdaddr_type == BDADDR_BREDR)
+@@ -7091,9 +7093,9 @@ int device_discover_services(struct btd_device *device,
+ 	else
+ 		err = device_browse_gatt(device, msg);
+ 
+-	if (err == 0 && device->discov_timer) {
+-		timeout_remove(device->discov_timer);
+-		device->discov_timer = 0;
++	if (err == 0 && state->discov_timer) {
++		timeout_remove(state->discov_timer);
++		state->discov_timer = 0;
+ 	}
+ 
+ 	return err;
+@@ -7435,16 +7437,22 @@ bool device_is_connectable(struct btd_device *device)
+ 	return state->connectable;
+ }
+ 
+-static bool start_discovery_cb(gpointer user_data)
++static bool start_sdp_discovery_cb(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+ 
+-	if (device->bredr)
+-		device_browse_sdp(device, NULL);
+-	else
+-		device_browse_gatt(device, NULL);
++	device->bredr_state.discov_timer = 0;
++	device_browse_sdp(device, NULL);
++
++	return FALSE;
++}
++
++static bool start_gatt_discovery_cb(gpointer user_data)
++{
++	struct btd_device *device = user_data;
+ 
+-	device->discov_timer = 0;
++	device->le_state.discov_timer = 0;
++	device_browse_gatt(device, NULL);
+ 
+ 	return FALSE;
+ }
+@@ -7618,18 +7626,18 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 						DBUS_TYPE_INVALID);
+ 		}
+ 		bonding_request_free(bonding);
+-	} else if (!state->svc_resolved) {
+-		if (!device->browse && !device->discov_timer &&
+-				btd_opts.reverse_discovery) {
+-			/* If we are not initiators and there is no currently
+-			 * active discovery or discovery timer, set discovery
+-			 * timer */
+-			DBG("setting timer for reverse service discovery");
+-			device->discov_timer = timeout_add_seconds(
+-							DISCOVERY_TIMER,
+-							start_discovery_cb,
+-							device, NULL);
+-		}
++	} else if (!state->svc_resolved && !state->browse &&
++			!state->discov_timer && btd_opts.reverse_discovery) {
++		/* If we are not initiators and there is no currently
++		 * active discovery or discovery timer, set discovery
++		 * timer on the bearer that was bonded.
++		 */
++		DBG("setting timer for reverse service discovery");
++		state->discov_timer = timeout_add_seconds(DISCOVERY_TIMER,
++					bdaddr_type == BDADDR_BREDR ?
++					start_sdp_discovery_cb :
++					start_gatt_discovery_cb,
++					device, NULL);
+ 	}
+ }
+ 
+@@ -7667,12 +7675,12 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
+ 	if (state->svc_resolved || !btd_opts.reverse_discovery)
+ 		cb->idle_id = g_idle_add(svc_idle_cb, cb);
+ 	else {
+-		if (dev->discov_timer > 0)
+-			timeout_remove(dev->discov_timer);
++		if (dev->bredr_state.discov_timer > 0)
++			timeout_remove(dev->bredr_state.discov_timer);
+ 
+-		dev->discov_timer = timeout_add_seconds(
++		dev->bredr_state.discov_timer = timeout_add_seconds(
+ 						0,
+-						start_discovery_cb,
++						start_sdp_discovery_cb,
+ 						dev, NULL);
+ 	}
+ 
+
+base-commit: 1608f836188610aabeff5a3164169ebe0360e443
+-- 
+2.43.0
+
