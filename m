@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795522755;
-	b=zUdXAo2wryJAEitGncGyoVkdkDZ1/w8HKbw/prcTBSS9wsnI5Epd0Q6CMNwhe7jB2KgA
-	 jzCX15O72K3lVhdC29PrndkRJ4tlO7IwSHV6SgLwAPDtmIn3EQIQbyhpQTafSbzTcTnO5
-	 SnUEhT9l9uA2OsqIdqZkukTABFveHZywtUZkh6jmjMS0FaCVV3zeHcusq+EskegXx1QI+
-	 PUwcVcyDvC933g8mvIxG72M8hE/FB+A2pujtlMVYPMffJ4xKPSQPtqwnafkvFHbRTMmMQ
-	 PwOI/VYH6PK7m2pYVY91gHDs4b/cLD6A1Y5V+X9HNrOCKJgbe+xV3ahfH/BNhj+cUBQ==
+	b=Dhp3kE7qQMdF6IBy3XT07Ai9K21OzSXcgyj6w8fDeEDv/yvlQkCkhqUjXedXBflBUTcu
+	 ueR2rS5oURAN8NKlbmi0/jiBvy4RkMzO55+sYOGgufIfVtbEQSUUaRFh6zI+67+ZF6gBV
+	 OhTeGklJ8L/l1Et9BJ9WZIvORNtt0LTAW2yFBiOvdoylZEviTOJ843wP0CFEy1gx/piqJ
+	 0KTEUL+taxhCWKqBs/MJ+0afxnC7GuxT4B2tvkZfXejoKOxfh3Ey86d8WRdQ8VBiY4G3k
+	 673uM/VcNiwJf7c5WczYt/ITMvbcIUSgdjhF9NOhZfTL9fz7ZubkJmCFMBg/W1mUJSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795522755;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-	b=dxkyEId5KaFqMsUTvpN7gjHftmNwQ04Trz1+9JzbhUIL1FikRbhFIaInKgOdImaufcSp
-	 zaqeKmLXfOoXUoR2CwJ/t+PFWAicDyRyjhwV8JZczbOQDZL8H+cDvUFCatXc9YL3SwrAX
-	 UVoOW2yJeZYhneht3+DgmrN0Y5t2JcLIwv2u9HGjfnK1+3oHi9/CCswluk36OEo+d8sey
-	 IGwuJqtLM0exEkij0Qudcfyyz66vZLYElvYaFkztEeMkqt1Vvnf+v2t5CRUUJeCL4BChV
-	 A+ot8uQh7+WXP8XcGBXN2hih4Mqo/Lqu9p5d4WDTZ4WfOU4FfSOKKR8J03X8wEEW8Xw==
+	bh=D7nno6EUUypUkbRmfVbiDkPklRoxlIfwDjf3nWt/PH0=;
+	b=Q/myVD1GY7pz8hno/owG7OTHgdMWI6kO5hvRU9RyRuP6cqduArpM0bOzo9Ivh2M6M5Am
+	 pUiNqIW82QpDFZq1zvHmCcA75ZATlJwJ2UH3D5uMinJ+sDyfp3diU7jXviUJIzkookqXb
+	 J5Iranwi+Q97M/b5KglqOiHBd1CcjRW7iZlFnaSl7B8MQDBt+9DF763CzqqPssx456vGK
+	 dsbEhMNlq1wVNsyKHMG5UlCaYEFhsOByNMrM0/3hx2adM3XCtalvpq6KkKg6XovhXyaTZ
+	 8qfExWQyckZ5AEUd910145zdOYbSB4JbETJyqd2JK0qHCmF1/hudxYjB2i1luPs4IAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="Lxk2j/X5";
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b="kulD5/Dx";
+	arc=none smtp.remote-ip=209.85.128.45
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7DE606A331
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:19:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE7DE606A331
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5974F606A32C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:19:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5974F606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Lxk2j/X5
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a35d5d4a20so43466645e9.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 04:19:14 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=kulD5/Dx
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4bb61185057so28907095e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 04:19:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795522753; x=1796127553; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795522754; x=1796127554; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-        b=Lxk2j/X5Z1Ks/Q5X05Ktzck5inSbevjcWha4yTd7HA5ga7WAihVoNgVAkLw+ooeGrt
-         ZZiympnCYe1oLS8YmaX2Ajo9Rm7df9uoq5Y6TQrMMBMAaPH0c8Bdd27lmh/k25IUjCFR
-         FxSiZ+UFtjyHNj5aoo+uOBN29YkkwOFk9mgE0=
+        bh=D7nno6EUUypUkbRmfVbiDkPklRoxlIfwDjf3nWt/PH0=;
+        b=kulD5/Dx4QwsXQquqzy2koJARTiMgVH3et60WJl6TD9NfAIrZ0dPKXXYT8f2dLJ5c+
+         EX9AMTvX6NxT02VvCFGoiJF8vV7wUYLw1+6KI2R2RPv5UnL22nU6DN/CBkc+YkIZlCS/
+         /SwvDiKcjvdVfDvn85CaXlS4MuLWMHWKJxKi0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795522753; x=1796127553;
+        d=1e100.net; s=20260707; t=1795522754; x=1796127554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9I0Y/Fz00U/JfLIJYFe8trRkD9P+BbO9baVK1YGIO5k=;
-        b=o/r23bRPVx7RGZF1ieRUyfZEJ88lY7l5A27XaO8oiNO2SyO3T7sEa8UYn1YsqTc04m
-         8Cltk8WhzCbGMX35y75om34qumZn/+zsk/xD+Duu1IAhJP+pV+dOB+NsbKzLQ1iCWGpB
-         8ldcVi9GyRw/wd/sQgITPUu5dqoQ46cYW0zVyoooChtY2RrMBdYRVElawhNNEVHv8EN+
-         tPIkqhz6NVwrQ3oy6WCg+5peH1p18kDaOUQ0VJaWk93ghOhXw83Kry4KegopARYUqP4B
-         Rf83ATaII+OA7aeG50qhSZemJNQ5k2wkhl5VqBtwoFzy6kWogsAWvtSD8IsdOSuiO67S
-         xUAw==
-X-Gm-Message-State: APuU4Z+LPkv8X2LvX/49aHkhTfqjm1Q7JidtXcURyUTzAwNOA2XoFLNF
-	c6Ut+hqyyuoeuEc6CQJfm7mS00zkRcNqBjYQnBF5GruYxUfZnqRsds73zyb4ulTE0AqfXNTp9c8
-	1dkoR
-X-Gm-Gg: AZFdTZcWZ6ZsQVAKE5856obTjDQq8R5yWm38eiMsGupNS3JF8o03bqNMSSwsqK8zEuu
-	Q/YQxgtclL+icHHPjotQWndSDbyJE7+cYxae5R01Ia7WzIqtMovOF8DN9ZlF8ndiTi1FvZw2hJR
-	KI+on8Qss+SrG7aWcAHvMJnBlDr/cYp2Dm85Q88Bkv6NxZLH7gnk+OmtseH7nWfUHJyUPzmdO49
-	zK1E6qYCE19Mh/qnoNELEBP3gzMyMLDzNx3K3QQ6fToHJW6IXhSns5R25TTaI4fyxOJmnu2Ouh7
-	Ut7QlCgsGHGoBSbCy67R+zj8iB5DMG+PyhqVxOo5gFzKCzAFyr9mdFVNB9V5L+mx4ovds6a66tm
-	Ugw+zmEdABxT5oirFlNbwi2eL3RX+8vu4tCIuF2inSPvfLYiGyFlD1N+ntYmidWoMmZkpJMlAvp
-	eFa1k0ZCOQwgP25+n5LpugboLc3Rpum+F/IY7o0Tv4jHer/OCSoa6Vs/af4fZ21ScUri1/E7rHJ
-	kQI2qtyVuqnGeGN2rzh1YGRzk9Gjjc1y3ixjexRc4k+70BpYmvsXwfN4cRuLe0R2lSYfxMyapvF
-	R8uGKsLfSJ8eYnz8fGo2M73HP338B8EPRB+VHiwN3gZEtxG6nA==
-X-Received: by 2002:a05:600c:3555:b0:4a1:f377:5c68 with SMTP id 5b1f17b1804b1-4bb8881da76mr292346465e9.34.1795522753210;
+        bh=D7nno6EUUypUkbRmfVbiDkPklRoxlIfwDjf3nWt/PH0=;
+        b=tV8dk9YnYVBHDLEnnoTLnZ7DhnHPttdYF6c5am3VuHiScE33Y4SoAyWYL/48eMR1XN
+         M7YZVXvwMgHocbC5vxJ+U7uKH8qUxNC533KPWl++yA5VGHz0ljW16+wgj0Je0hOqRDXu
+         yp54XVEMPhu8IobpzIpIwqGEOAp8dSqC9u9fuslgg0U6VMsUt/bYPoGW07JYf08610pA
+         HH0Kgxq1DYrzVRKvtvVsP1xQS/ZIiqYApR46VykBC2wFgfu//NSOBamCP84N4b5DSadc
+         bLg+aTrXkME9nWlyZHO15fYIyT7UKqdNPhtmXcro3hqm41iu4nDOOCW5gg4KsIckpXUh
+         8vgQ==
+X-Gm-Message-State: APuU4Z9HrHlCRoIBdEs2GxzErcv+SMbWoj9Gy5TjQM2dOo5dH00FbzMi
+	EUJFeDyoUG6shm3VSSHmUNjrs89g2qrwvFwnsOYg7H5wN6G1v0pptG1v3cRFcGHEVTiXO5mvhgU
+	kBkS/
+X-Gm-Gg: AZFdTZdHC98UBf0cCGb5S24b+pf16dXLapzVyrisQKk2+sv/keDGck34Q/DYiqA62n2
+	tcTw54KBv/islgBizTXJlCVZQBDqmRP3G4H1HFwTkzofcZ/7p07ug5/NcH1VIXjI1wyoR9+9wvI
+	6UimsXr8w8xteKReqAekkhW7UW3MndMkz0lT5BHFEnQ/9enF9sq1GgkOg5cvXRutcRN/WrLACzo
+	SZ26XRsfqkVdGUOy9CqtmghBmEPmBDT2NbK76zBemIN/KNkYyparD2uUyjvj952DBFvjZ8mednu
+	w/xS25FAejgR7bvLWk7SVkrfIMToNfETuQqSVIRdAKSrGayg1ycbTfxzptXXscexLDSvzlJX1yH
+	mmUXh2b601njC4jyJ7A3i7R5OghbEJ7QohGAPuDxqTwh5vRKqp6zpS4otFM+2FHfcUZMjein9if
+	ZMj5ZQFXeZMXbA/7R7BMBeVTySyVNVvM0wBzjuY4TR6ofkQqMTlIR7VA9mRJX30NYgG8QppZuI4
+	k0SYHLlIYZ7tYA/aZ5Tso54e4WH9D8Qo/k3gShergsn0mhfBFg3IWxHADhB2EzeUaHi+yP5R9wn
+	AQlTAq3W31FsdHUHR2aSMzjdOCHnCL/OP8uz0C3PmD3wABbN0AAgldHr9xcrKc1dgeIx1AE=
+X-Received: by 2002:a05:600c:3511:b0:4ba:73f:ef5 with SMTP id 5b1f17b1804b1-4bb88828304mr299460895e9.34.1795522753696;
         Tue, 24 Nov 2026 04:19:13 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm391427775e9.8.2026.11.24.04.19.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm391427775e9.8.2026.11.24.04.19.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 04:19:12 -0800 (PST)
+        Tue, 24 Nov 2026 04:19:13 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v4 06/10] player: Fix crash on Search in a folder whose name has a space
-Date: Tue, 24 Nov 2026 13:19:00 +0100
-Message-ID: <20261124121904.3267700-7-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v4 07/10] player: Fix missing Name of listed Now Playing items
+Date: Tue, 24 Nov 2026 13:19:01 +0100
+Message-ID: <20261124121904.3267700-8-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124121904.3267700-1-simon.mikuda@streamunlimited.com>
 References: <20261124121904.3267700-1-simon.mikuda@streamunlimited.com>
@@ -95,81 +95,81 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The search folder object path is made from the name of the folder
-searched, e.g. /Filesystem/My Music/search. A name with characters an
-object path cannot have, such as a space, fails to register, and
-media_player_search_complete() dereferences the NULL item.
+A track change creates the Now Playing item of the new track by its UID
+alone, without a name. When the folder is listed afterwards,
+media_folder_create_item() finds that item by its UID and returns it as
+it is, so the current track, and any track played before, are listed
+without a Name.
 
-To reproduce, browse a target with a folder named "My Music", change to
-it and call Search:
+To reproduce, browse a target with a Now Playing list, change the track
+to one of its items, and list Now Playing:
 
-  media_player_create_subfolder() /Filesystem/My Music/search
-  media_folder_create_item() D-Bus failed to register
-      org.bluez.MediaItem1 on
-      /org/bluez/hci0/dev_00_AA_01_01_00_42/avrcp/player0/Filesystem/My
-      Music/search path
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  dbus_message_iter_append_basic () from libdbus-1.so.3
-  #1  dbus_message_append_args_valist () from libdbus-1.so.3
-  #2  g_dbus_create_reply_valist (...) at gdbus/object.c:1572
-  #3  g_dbus_create_reply (...) at gdbus/object.c:1587
-  #4  media_player_search_complete (mp=..., ret=2) at
-      profiles/audio/player.c:741
-  #5  avrcp_search_rsp (...) at profiles/audio/avrcp.c:4460
-  #6  browsing_response (...) at profiles/audio/avctp.c:964
+  btmon: AVRCP: GetItemAttributes: len 0x000c
+  btmon: Scope: 0x03 (Now Playing)
+  btmon: UID: 0x0000000000000002 (2)
+  bluetoothd: profiles/audio/player.c:media_player_set_playlist_item() 2
+  media_folder_create_item() (null) type audio uid 2
+  ...
+  btmon: AVRCP: GetFolderItems: len 0x00e5
+  btmon: Name: Blue Morning
+  btmon: Name: Green Afternoon
+  media_folder_create_item() Blue Morning type audio uid 1
+  avrcp_list_items_rsp() start 0 end 1 items 2 total 2
 
-Replace those characters with '_' in the object path of a folder named
-by its path, as the search folder and the folders of the browsed player
-are, and fail the search if the folder still cannot be created.
+Item 2, "Green Afternoon", the current track, is listed without a Name.
 
-Fixes: 0a232a434d4b ("audio/player: Add implementation of MediaFolder.Search")
+Set the name of an existing item when it is listed, and report its
+Metadata as changed too when it has none, since the name is then its
+Title.
+
+Fixes: b18723a18e8f ("audio/player: Create item on media_player_set_playlist_item")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/player.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ profiles/audio/player.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 4c94dcab4..bfc51ac4b 100644
+index bfc51ac4b..07f4d4f78 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -730,8 +730,17 @@ void media_player_search_complete(struct media_player *mp, int ret)
- 	}
+@@ -1876,6 +1876,24 @@ void media_item_set_playable(struct media_item *item, bool value)
+ 					MEDIA_ITEM_INTERFACE, "Playable");
+ }
  
- 	if (search == NULL) {
-+		struct media_item *item;
++static void media_item_set_name(struct media_item *item, const char *name)
++{
++	if (name == NULL || g_strcmp0(item->name, name) == 0)
++		return;
 +
-+		item = media_player_create_subfolder(mp, "search", 0);
-+		if (item == NULL) {
-+			reply = btd_error_failed(mp->msg,
-+					"Unable to create search folder");
-+			goto done;
-+		}
++	g_free(item->name);
++	item->name = g_strdup(name);
 +
- 		search = g_new0(struct media_folder, 1);
--		search->item = media_player_create_subfolder(mp, "search", 0);
-+		search->item = item;
- 		mp->search = search;
- 		mp->folders = g_slist_prepend(mp->folders, search);
- 	}
-@@ -1890,11 +1899,16 @@ static struct media_item *media_folder_create_item(struct media_player *mp,
- 	item->player = mp;
- 	item->uid = uid;
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), item->path,
++					MEDIA_ITEM_INTERFACE, "Name");
++
++	/* Without metadata, get_metadata() reports the name as Title */
++	if (item->metadata && g_hash_table_size(item->metadata) == 0)
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					item->path, MEDIA_ITEM_INTERFACE,
++					"Metadata");
++}
++
+ static struct media_item *media_folder_create_item(struct media_player *mp,
+ 						struct media_folder *folder,
+ 						const char *name,
+@@ -1886,8 +1904,11 @@ static struct media_item *media_folder_create_item(struct media_player *mp,
+ 	const char *strtype;
  
--	if (!uid && name[0] == '/')
-+	if (!uid && name[0] == '/') {
- 		item->path = g_strdup_printf("%s%s", mp->path, name);
--	else
-+
-+		/* Replace what a D-Bus object path cannot have with '_' */
-+		g_strcanon(item->path + strlen(mp->path), G_CSET_A_2_Z
-+					G_CSET_a_2_z G_CSET_DIGITS "_/", '_');
-+	} else {
- 		item->path = g_strdup_printf("%s/item%" PRIu64 "",
- 						folder->item->path, uid);
+ 	item = media_folder_find_item(folder, uid);
+-	if (item != NULL)
++	if (item != NULL) {
++		/* media_player_set_playlist_item() creates it unnamed */
++		media_item_set_name(item, name);
+ 		return item;
 +	}
  
- 	item->name = g_strdup(name);
- 	item->type = type;
+ 	strtype = type_to_string(type);
+ 	if (strtype == NULL)
 -- 
 2.43.0
 
