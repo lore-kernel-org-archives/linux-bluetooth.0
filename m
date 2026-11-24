@@ -1,63 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795532227;
-	b=oXdiidKV92zYrM0V5tZOfPDZs1e1mb12aMAc48b1GgpL9r6byM9E0jQD1VmI89VAKz2J
-	 p7pVoKEJSdsLia0/QvEGWUTO/ok/irn/TriragIILIXCpLnOSVDKtOIQFmLC9I8giAm0v
-	 Vex0naeQHpWQtUmXT97kc8gvhlrNIR8GaNOzRe5SBPAPE3S9gx0JEi68kwm2gShh9eWsa
-	 wgZM6C0HW5+UshsJvDUJs57597fBKvhTa9V9q8o9aDDX5/VOOyeBTKpdwAQ4KOa0FTW01
-	 /HqVpq+JBQDj6F96MfmsgN9IxrYCaDfx//WsG7N2pwX3kdWizKzKGkYx8Jf5vcV6lGQ==
+	t=1795532852;
+	b=AwlTPsWe13yDmHi/QIKxgQlVPxK84Q8fckv8h2X9xhwcNuP31FoFwtWvnD5R/OeD/+/6
+	 ziTgX4l08znEf3+17+nMV4xYCumrgFlcbS1WgOIPmKW1r3PWtNpz7Nsm/R2q1NzSZIIjp
+	 9ysBhVxTQVaY7OtY4daEKLl/ejcHhwznbqLj+KejTiES8d6LqKZ9/Eycf2+mODtdw/Lel
+	 qd8T5G23YbU6gIGX9cEnzIXo5VGLDVzICN5sGvl1JoE8jTHtiT3G0uwuipow3Nn90LICI
+	 AHs3pFCIL6UutkYbPC9NQu3guStDvA4NtlvsObQpg4F982vDpzdt+mWcwRReWWzlMNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795532227;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=uFD5kOkJS5jicp6BGOfPAWYZCmXmAm7sxy1k3bO1qX0=;
-	b=WxcKlontL1wNlncaUSADQMJ/+EYNaLafxyqvSmNNZTd6WvigiFZKvPpkT/16bpINFpu2
-	 j5Cky2utTS8jGbm01UYGgPOLGTW5eO+ZMuXqMaTL1LMgD1iIh7ZiOB5oTxPhHLO1yhPQj
-	 WvYKtlys2SZ9+ONCUnYPakCzoVnsJ2iClwXteUKmbdtW9lwhgI6bWsnwrh3Pk18rsi1Wm
-	 F9nlpfw1Xqp3r9sY4EpN1i4eCBcoCm0s63lM2Y13mGbX90ApBm/y+anduFvS4kD9DmNrQ
-	 OpNJI2V6Lb1YzBWoFqfdichXkVt24V5U6MAVR6BGSg5c0sekX2ZwW/1F5MxECGIeBfw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795532852;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=QWQLkDLFKoSp0VrlEJJsDgRmhEMyfHQqSz5LUKuP/dc=;
+	b=PiADHg1Y7037JbPqmMwdVkyykP4neTYoV3Fvl3OaQxyfq8BlyKuj/ELh0dX8pwGfzUU+
+	 tDFXALVMkVs5UsT4gidddpHn1oxjXs4tCIv9/GY1HwttM5H+lpaEBqsoJ1d59gTgI/Nnp
+	 XTG2UPMfvJyI7VJe28hkUDiG2Y0to0+10MPf0FQnu3DwXh1+2w94V+S1nmdnEkeBZ5HdC
+	 1w42bjHHdka5VC/iRDUg5YvN1VUl0b/nBkOGUGU20gGsbtgfRv6qh76/RHuZ6T3maIiH5
+	 kbfTYSAbPshTrSe6HAF5ePPOOvsKaVNFx8EErAg/3zFzeUb1iMSli07w0j4p1MsaoCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=collabora.com;
-	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=k9i6VlDx;
-	arc=none smtp.remote-ip=148.251.105.195
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=XWMYmjy4;
+	arc=none smtp.remote-ip=209.85.128.53
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618D9606A33C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 618D9606A33C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1970C606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:07:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1970C606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=k9i6VlDx
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1795532224;
-	bh=8FzNN7WIH1eovhabdqmbiN1IhPVNsvLDMebltbUKiUA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=k9i6VlDx729y2dEgpDzoyIIx8/C8NpXx/PnKKD+l7eu1LLeJR/8KyK7OPqdTKzcOJ
-	 CI6Nw1va+lDTbGy6nvXLVaSWysq/ekTypOywcBjw6F90Qsgs2upSIcmsta1WQuVyzV
-	 1LZSHtu/mpcuIcra5XzjyYbPxL7qyNLqhSRaVz3bmXGUajltOUFFLsJgxdass9qqi+
-	 yiAWUunMmGSiH2Sc7rsYN5gRHmlGSYkqrnw0Euj4p44TA2SqTeiW15KGFqcgfkVvYp
-	 UYnKnWWBidBHcMlGnxy/fWNsPiisSirvcmH1Fjpw5mT8KIYPmobV8jyfhqrxuN8V1i
-	 rAFGjjoVU07SA==
-Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id CE7E417E0FD4
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:57:04 +0100 (CET)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=XWMYmjy4
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4ac95761c85so36224775e9.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:07:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1795532850; x=1796137650; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QWQLkDLFKoSp0VrlEJJsDgRmhEMyfHQqSz5LUKuP/dc=;
+        b=XWMYmjy4kbSsyLoHjOuFd4zD129/8EDp4U1Z4KSod+AB9zcdXegQMLK1IGzT1N/zsG
+         emUxgWFMIx4mivLfJ0ULX/mS+WBKQoshCNEUlXAe0x+ijBDbiYS1tBDzC3jRgyzmb/yd
+         D23yeRHYCrspiGW+SH4NVYThM/EjsUmI/9yVY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795532850; x=1796137650;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QWQLkDLFKoSp0VrlEJJsDgRmhEMyfHQqSz5LUKuP/dc=;
+        b=FtziecWc8rPqvDB55IAPVtN2QlOw5Z+qWbSHNVpvG4c7sSLyW0TjsIDICDox404Sgt
+         x5Go80HmBnMr/DenXZKkNVcFYsKGEr22zXjse2dASyVixBcghFeiCw08cK4iBvgNLd/O
+         VKMSYtYgjVcEWGXASxsGedEvSlveOUhMRS5un0lOgI+LOnvr8hXHmnDQy0DfTfNPpNcx
+         /DuzplkkUPEVQVkiQHr30cW5E+ijOKNyowJfUTNcfg9OLat0lIqzQobfla0cct7WoWPh
+         Qtnh+4EJbHxqrEwdCe7x4UTMrWm8JcK8StQueDtampWkqSqHEar0GzQMr/fhsBtBevMF
+         HPwA==
+X-Gm-Message-State: APuU4Z8qqj3gqyxRS9PTkelPv56AKDon5lGSASW7blHqxm2nwp2InnEt
+	fUs8nBKDuFjSJ9D1+9cKdYI4CIuGEc40NjPAsXfY8Sd4bwYoGNfHJeZU6zXtBn4qYXC5WhLez7m
+	axOpO
+X-Gm-Gg: AZFdTZd6NjTSSGBgEjrRuvnAHM3TnGOLym9YJBpePUogXhG5CYa0mekC3jX/qDLbp5x
+	4ME95YqEfnVAoFLMrBxC+yMsZMHKyaB25hq5QiDWuO4kj3HAqwYXYqmSVbBg9QRVxzRp6/qvizX
+	mIl93KwKCMABNG6DHZ+3iK3sGckkiTCzUKoP5oDJ27DqpNzGS3D5EC1FpMoa+JNaWQqJZdxmX5c
+	U2Va/BHpqaAdtNHLh/KqoWt0RnsXzxR/LTWx6qcj1sSEFfcqXpNlmwiul1bhtjinKi7sixpoeSD
+	Iq8KMn3krYBKE2wj4RsLrAnyj9w1WOflwaUcKvibqegxelRNP5MU+poXGiyERYcZfVaPIe90hlH
+	PNVUaRA+fabPgTc9HACtlJNauV7fkYHL4zdb1/dA8KpTjUt9KjsXf5dDfiXpkmuJo/6GXzmVDBP
+	hboL9e/bcLMS++dcxqID7Mb4LdxLYfHiXqECAjhQ1TQJ4cYuv7s7W2qUhAj7KhinV3inOI5yoVf
+	jzUy3Mrn01J8LUqRNKQG6wEhIkEHHkyqoeg3EDmgprrzZLKRVNaymZIRnCdc0nhGrlZofxqnKW+
+	yVTtIHSOccBJOxGrChOcHyfBmqzjkwlhoVbcMJr02Sqmw5CDAw==
+X-Received: by 2002:a05:600c:5303:b0:4a2:1a:a11d with SMTP id 5b1f17b1804b1-4bb88785d24mr291951645e9.0.1795532850448;
+        Tue, 24 Nov 2026 07:07:30 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b110c3csm27844341f8f.36.2026.11.24.07.07.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2026 07:07:30 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 6/6] monitor: Reassemble OBEX PDUs split across RFCOMM UIH frames
-Date: Tue, 24 Nov 2026 15:56:52 +0100
-Message-ID: <20261124145653.336273-7-frederic.danis@collabora.com>
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: hci_event: Don't keep the handle of a failed PA sync
+Date: Tue, 24 Nov 2026 16:07:28 +0100
+Message-ID: <20261124150728.332222-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261124145653.336273-1-frederic.danis@collabora.com>
-References: <20261124145653.336273-1-frederic.danis@collabora.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,264 +91,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The RFCOMM MTU is typically much smaller than the maximum OBEX PDU
-length, so a single OBEX PDU can be split across several UIH frames.
-uih_frame() decoded each UIH frame's payload independently, so any
-OBEX PDU spanning more than one frame failed to parse ('frame too
-short').
+A failed LE Periodic Advertising Sync Established still stores its invalid
+handle, and the controller gives the same value to the next sync. The
+lookup by handle finds the failed connection first, so the PA reports of
+the next broadcaster go to it and bluetoothd never lists that broadcaster
+(btmon, shortened, on a 6.18.2 based vendor kernel):
 
-Buffer UIH information bytes per index/handle/channel/direction
-(obex_frag_list[]/obex_frag_get()) until a complete PDU (3-byte
-opcode+length header plus body) is available, then decode it and
-keep any leftover bytes for the next frame. Drop the buffer for a
-channel when it is torn down (rfcomm_remove_channel(), called
-alongside obex_remove_channel() on DISC/DM) so a later renegotiation
-of the same channel number doesn't resume from stale fragments.
+    PA Sync Established: Connection Failed to be Established (0x3e)
+        Sync handle: 0, Advertiser address: 50:1E:2D:00:42:2D
+    PA Sync Established: Success
+        Sync handle: 0, Advertiser address: 50:1E:2D:A1:5F:1C
+    MGMT Device Connected: 50:1E:2D:00:42:2D
 
-Assisted-by: Claude:claude-sonnet-5
+Store the handle only for an established sync.
+
+Fixes: d356c924e7a3 ("Bluetooth: ISO: Handle PA sync when no BIGInfo reports are generated")
+Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
-v2->v3: New in v3.
-v3->v4:
-  - Add rfcomm_remove_handle(), called from the HCI disconnect
-    complete handler, to free every fragment buffer still tracked for
-    an ACL handle that goes away without an RFCOMM DISC/DM on each of
-    its channels.
-  - Widen the reassembly buffer's length/position tracking from
-    uint16_t to uint32_t, and clamp the amount handed to obex_packet()
-    on a malformed declared length to l2cap_frame.size's uint16_t
-    range, keeping any excess buffered for the next call instead of
-    reporting an incorrect remaining size.
+ net/bluetooth/hci_event.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
- monitor/l2cap.h  |   2 +
- monitor/packet.c |   1 +
- monitor/rfcomm.c | 167 ++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 167 insertions(+), 3 deletions(-)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 610207e25fa4..35fc46dcfad0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6842,7 +6842,8 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
+ 
+ 	clear_bit(HCI_CONN_CREATE_PA_SYNC, conn->flags);
+ 
+-	conn->sync_handle = le16_to_cpu(ev->handle);
++	if (!ev->status)
++		conn->sync_handle = le16_to_cpu(ev->handle);
+ 	conn->sid = HCI_SID_INVALID;
+ 
+ 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, PA_LINK,
+@@ -6862,7 +6863,8 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	if (IS_ERR(pa_sync))
+ 		goto unlock;
+ 
+-	pa_sync->sync_handle = le16_to_cpu(ev->handle);
++	if (!ev->status)
++		pa_sync->sync_handle = le16_to_cpu(ev->handle);
+ 
+ 	if (ev->status) {
+ 		set_bit(HCI_CONN_PA_SYNC_FAILED, pa_sync->flags);
 
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 1c1f7e609..6cfc25f8c 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -364,4 +364,6 @@ void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 
- void rfcomm_packet(const struct l2cap_frame *frame);
- 
-+void rfcomm_remove_handle(uint16_t index, uint16_t handle);
-+
- void l2cap_dequeue_frame(struct timeval *delta, struct packet_conn_data *conn);
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 7414910c7..ca68c54ae 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -12315,6 +12315,7 @@ static void disconnect_complete_evt(struct timeval *tv, uint16_t index,
- 	if (evt->status == 0x00) {
- 		release_handle(le16_to_cpu(evt->handle));
- 		obex_disconnect_handle(index, le16_to_cpu(evt->handle));
-+		rfcomm_remove_handle(index, le16_to_cpu(evt->handle));
- 	}
- }
- 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index 8a44a2199..a17d7acfa 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -386,12 +386,112 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	return true;
- }
- 
-+/* An OBEX PDU may be split across several RFCOMM UIH frames since the
-+ * RFCOMM MTU is typically much smaller than the maximum OBEX PDU
-+ * length. Information bytes are buffered per index/handle/channel and
-+ * direction until a complete PDU (3-byte opcode+length header plus
-+ * body) is available; complete PDUs are then decoded and any leftover
-+ * bytes are kept for the next frame.
-+ */
-+#define MAX_OBEX_FRAG 64
-+
-+struct obex_frag_data {
-+	uint16_t index;
-+	uint16_t handle;
-+	uint8_t channel;
-+	bool in;
-+	uint8_t *buf;
-+	uint32_t len;
-+};
-+
-+static struct obex_frag_data obex_frag_list[MAX_OBEX_FRAG];
-+
-+static struct obex_frag_data *obex_frag_get(uint16_t index, uint16_t handle,
-+						uint8_t channel, bool in)
-+{
-+	int i, n = -1;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (!obex_frag_list[i].channel) {
-+			if (n < 0)
-+				n = i;
-+			continue;
-+		}
-+
-+		if (obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle &&
-+				obex_frag_list[i].channel == channel &&
-+				obex_frag_list[i].in == in)
-+			return &obex_frag_list[i];
-+	}
-+
-+	if (n < 0)
-+		return NULL;
-+
-+	obex_frag_list[n].index = index;
-+	obex_frag_list[n].handle = handle;
-+	obex_frag_list[n].channel = channel;
-+	obex_frag_list[n].in = in;
-+	obex_frag_list[n].buf = NULL;
-+	obex_frag_list[n].len = 0;
-+
-+	return &obex_frag_list[n];
-+}
-+
-+static void obex_frag_reset(struct obex_frag_data *frag)
-+{
-+	free(frag->buf);
-+	frag->buf = NULL;
-+	frag->len = 0;
-+}
-+
-+static void rfcomm_remove_channel(uint16_t index, uint16_t handle,
-+							uint8_t channel)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (obex_frag_list[i].channel == channel &&
-+				obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle) {
-+			obex_frag_reset(&obex_frag_list[i]);
-+			memset(&obex_frag_list[i], 0,
-+					sizeof(obex_frag_list[i]));
-+		}
-+	}
-+}
-+
-+/* An ACL handle may be disconnected without an RFCOMM DISC/DM on each
-+ * of its channels (e.g. the link is simply dropped), which would
-+ * otherwise leave both directions' reassembly buffers and their slots
-+ * allocated. Free every fragment buffer still tracked for this handle.
-+ */
-+void rfcomm_remove_handle(uint16_t index, uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (!obex_frag_list[i].channel)
-+			continue;
-+
-+		if (obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle) {
-+			obex_frag_reset(&obex_frag_list[i]);
-+			memset(&obex_frag_list[i], 0,
-+					sizeof(obex_frag_list[i]));
-+		}
-+	}
-+}
-+
- static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- {
- 	uint8_t credits;
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
- 	struct rfcomm_lhdr *hdr = &rfcomm_frame->hdr;
- 	uint8_t channel = RFCOMM_GET_CHANNEL(hdr->address);
-+	struct obex_frag_data *frag;
-+	uint8_t *buf;
-+	uint32_t pos;
- 
- 	if (!channel)
- 		return mcc_frame(rfcomm_frame, indent);
-@@ -410,10 +510,69 @@ static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	if (!frame->size)
- 		return true;
- 
--	if (obex_channel(frame->index, frame->handle, channel, NULL))
--		obex_packet(frame, channel, frame->size);
--	else
-+	if (!obex_channel(frame->index, frame->handle, channel, NULL)) {
- 		packet_hexdump(frame->data, frame->size);
-+		return true;
-+	}
-+
-+	frag = obex_frag_get(frame->index, frame->handle, channel, frame->in);
-+	if (!frag) {
-+		obex_packet(frame, channel, frame->size);
-+		return true;
-+	}
-+
-+	buf = realloc(frag->buf, frag->len + frame->size);
-+	if (!buf) {
-+		obex_frag_reset(frag);
-+		obex_packet(frame, channel, frame->size);
-+		return true;
-+	}
-+
-+	memcpy(buf + frag->len, frame->data, frame->size);
-+	frag->buf = buf;
-+	frag->len += frame->size;
-+
-+	pos = 0;
-+
-+	while (frag->len - pos >= 3) {
-+		struct l2cap_frame pdu_frame = *frame;
-+		uint16_t pdu_len = get_be16(frag->buf + pos + 1);
-+
-+		if (pdu_len < 3) {
-+			/* Malformed declared length: hand over as much of
-+			 * the rest of the buffer as fits in l2cap_frame.size
-+			 * (uint16_t) and let obex_packet() report the error,
-+			 * rather than buffering indefinitely. Any excess
-+			 * stays buffered and is retried on the next call.
-+			 */
-+			uint32_t remaining = frag->len - pos;
-+
-+			if (remaining > UINT16_MAX)
-+				remaining = UINT16_MAX;
-+
-+			pdu_frame.data = frag->buf + pos;
-+			pdu_frame.size = remaining;
-+			obex_packet(&pdu_frame, channel, pdu_frame.size);
-+			pos += remaining;
-+			break;
-+		}
-+
-+		if (frag->len - pos < pdu_len)
-+			break;
-+
-+		pdu_frame.data = frag->buf + pos;
-+		pdu_frame.size = pdu_len;
-+		obex_packet(&pdu_frame, channel, pdu_len);
-+
-+		pos += pdu_len;
-+	}
-+
-+	if (pos == frag->len) {
-+		obex_frag_reset(frag);
-+	} else if (pos) {
-+		memmove(frag->buf, frag->buf + pos, frag->len - pos);
-+		frag->len -= pos;
-+	}
- 
- 	return true;
- }
-@@ -523,6 +682,8 @@ void rfcomm_packet(const struct l2cap_frame *frame)
- 		 */
- 		obex_remove_channel(frame->index, frame->handle,
- 					RFCOMM_GET_CHANNEL(hdr.address));
-+		rfcomm_remove_channel(frame->index, frame->handle,
-+					RFCOMM_GET_CHANNEL(hdr.address));
- 	}
- 
- 	return;
+base-commit: 62fd917f6d2df1a399a453138c2b7cbd563f8f95
 -- 
 2.43.0
 
