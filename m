@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795513525;
-	b=KXJlizjgRXIeQV3G1lUl8VKiTOpJ/8r9dmEhrc2gTf77TQJuWjX2nyC2gIlY+gwNb3bp
-	 ZCBLCy0Kq0st5/DTmNda9W6d6nWrjY2MB/E7EHbzwsFVjp9v1SY9zWtbx4v1KMTv62q9V
-	 5CQ/QQV2SXjznaHv5cQytbNxQXViQv/HluKu8+O7Qj+Hb3e3zL9lQBLXBW2YkHcb7ATqY
-	 jTi00orW3uvmSAzqlCDNYDEc8xIRwTHJN1V964/KagaXbYelCFlwnX9LifjQyXksQ/d0r
-	 Ig1459/gVEiCCHfKbEJ4sGd5DPAMMYQU1/P2EvMHr3PYNxQZuAOg9xN5tzL6HMZWKIA==
+	t=1795513533;
+	b=sneVlvtDlSI5lGg/sgvIBUsdR7kpVLBjslyw6wwTou6zUat7yU1iGHIkNpVuAXDMWLpH
+	 hQM0JMt9QPcYxRTU4JzbyBE94TKxqYmS/7qsy3c2+35RPMjBbC5rvfR2pHzuRI29KpJiO
+	 6Ryn+6M/parTWuWzuaeuqWFIuoAl7/PtmNvvA8w9IvCUrsxg6B07xF4fR+3trmqF5d4+9
+	 gfc07WcK5nrqNT7+w9ip3pQXh0PAVBxb1Nftud2BNawJvumYP0WbLxnMLue1E1VoQTe86
+	 jdOhru3orD415fsa/ZNYo3mCEYzBnYVONlGpctqeFhPtYRcaK2d3vva/FeCk79OeTNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795513525;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795513533;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=LHYj5RNi7XvfXBnbm1SbTiMtiCmXpIiLuGJrR2GJWwc=;
-	b=hD/R9Ku13hFZoI/uM0OQsZglUhZjhs/5zJcQ+3U4ZqO5rNv1s8NF7g/eSRbR4fHkUCRN
-	 l9xH9l5YRLlGUMRFDilJLGOgicY+MPjF++6zK9G0txor0wy6tjsINgj/9QoARvAMIeosY
-	 V3U2ZI3qDAadNc7NlSDuJKfmmkJZVdA7xke7af05ukRu/R7x6PiNc17O+IjiDQFm6NEND
-	 Os2OAM1XZ23T3Kb26uGBdu4vdVX8vJkZvHESfpCflbu8pA20i+/1WozKNi4dqYcKshKs5
-	 cDFFiBrcE4EWXejWh9DukEivVUrt5GI1c0MRLud/KfcVNMa8rPlzRC3codQTlY5pQSg==
+	bh=ePO1HaQy6BuunjZvvPsV5K/2vWM8debo/YiENR3jWNU=;
+	b=z2mPQGRImZhTVsQXboflvRjJPGAVUCWtYlJX78SMego8+BMA9aLm2oF6F9h0SMEYomoy
+	 aoB7LFqNbYCjfWEWnRD+IJRz/g1tGNLy+mjBXogxGkJhOyKtYMRKezsGbAqQ+VBQZ+PFz
+	 lv2QyUtSlE8wWRoVRbUC79sLqnb+gISXV9udte4stzlo+9ex5zpWLva1BCqHriVj35Y4E
+	 1XmV6Z4xLAKiHkeIC9jkARWwoHbZJt1W8+KSS/iowOGC+bdh74zrjUkJTxeC03Lnk3f/B
+	 0IZVXMi310JlZuQYFinYcwsrOQ+fwkJnaEY3CwxsJT8s15Kt5cL98/WrXmecyVGkuqg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Vmtr/gCV";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IJNHHCiG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCA4606B004;
-	Tue, 24 Nov 2026 09:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A52606B009;
+	Tue, 24 Nov 2026 09:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Vmtr/gCV
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB31F1F000EC;
-	Tue, 24 Nov 2026 09:45:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IJNHHCiG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C3EE1F000F4;
+	Tue, 24 Nov 2026 09:45:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795513524;
-	bh=LHYj5RNi7XvfXBnbm1SbTiMtiCmXpIiLuGJrR2GJWwc=;
+	s=k20260515; t=1795513533;
+	bh=ePO1HaQy6BuunjZvvPsV5K/2vWM8debo/YiENR3jWNU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Vmtr/gCV5mFlhmL5fYdy1BFDkTDFgZXY8A7Ivtap3aBB1FbJnoWDo49qa8zu+i6hg
-	 /qAn4VJVc4NqkdwryMEo+/clY8adVODQ2Nop7ro6aB8lcBjunuNQf7tigwompyOcdw
-	 iZLTxGX/z4ngkEwCrqAGDcGX5yEISXNYXbaCtYMxGxOER/UKG+sCabqa5XDOekqJjG
-	 8ZlN/0kvYu+6bhk8CQcGSG601QgimZ33XvwX8e8no/H3viXDixCxCFSXWVXK+DsoDk
-	 bUwi4RI2kwAk8ZwX7nsbqFCgg8Jr3wZhfCYakMjGRAlAT3g90aPMPMd6AE3hhFsjzy
-	 0464XxhU8qPJQ==
+	b=IJNHHCiGzv0WWwdpPr1FMAlFOt8wwBxS5sXv8kmA4ekRytwPIv8fStFQiwgccPJrP
+	 FJcDzCZEXAOXDaG+hW7vVoSHtCvFqsNVshNhdnEkJL8jKIzWWigshXntueRO2pXPqX
+	 2D64PCUgFN2FwBt+1y7HOY4T4SFRY1TX0S+un8UcYb4OFVFHLcDWQBcn17adMbhsmy
+	 /b/g/D8+J1SwD5uUGpy2mMmy0mXkKgT4/6xbQSaTcXsAgfybEHx+HIwbeRtuvdUMym
+	 kTGklVtTRxr9d3w/5mJUYPzDg0/hXfrKvbszu6tItwb8wygBsOuwj8maD4SuAGbryo
+	 ECFVMc6pEGaPg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -100,9 +100,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@suse.de>,
 	linux-sound@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v4 17/33] Input: gameport - use the compatibility driver attachment API
-Date: Tue, 24 Nov 2026 11:43:48 +0200
-Message-ID: <20261124-device-trust-core-v4-17-037eb0d17b1f@nvidia.com>
+Subject: [PATCH v4 18/33] Input: serio - use the compatibility driver attachment API
+Date: Tue, 24 Nov 2026 11:43:49 +0200
+Message-ID: <20261124-device-trust-core-v4-18-037eb0d17b1f@nvidia.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
 References: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
@@ -121,57 +121,72 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Manual gameport binding calls the driver's connect callback without the
-device lock, allowing it to race with generic sysfs probing. Normal
-probing would run CONFIG_DEBUG_TEST_DRIVER_REMOVE under gameport_mutex;
-a disconnect callback that unregisters a child port would then deadlock
-trying to acquire the same mutex.
+Manual serio binding holds serio_mutex, but generic sysfs probing does
+not take that mutex. The two paths can race while updating driver state
+or cleaning up a failed probe.
 
-Use device_driver_attach_unrestricted() to centralize binding and failure
-cleanup without the debug removal cycle. Take the device lock with
-device_trylock() to serialize attachment with generic probing. Return
--EBUSY on contention because waiting while holding gameport_mutex could
-deadlock with probe cleanup that needs it.
+Use device_driver_attach_unrestricted() after the port ID check to
+centralize binding and cleanup. Acquire the device lock with
+device_trylock() to exclude generic probing, returning -EBUSY instead of
+waiting while holding serio_mutex. Map legacy -1 connect failures to
+-ENODEV in the probe callback so they are not reported as -EPERM, while
+preserving errors returned by the attachment helper.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/input/gameport/gameport.c | 22 +++++-----------------
- 1 file changed, 5 insertions(+), 17 deletions(-)
+ drivers/input/serio/serio.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/input/gameport/gameport.c b/drivers/input/gameport/gameport.c
-index 9707b155bc947..88b1a3464bf3e 100644
---- a/drivers/input/gameport/gameport.c
-+++ b/drivers/input/gameport/gameport.c
-@@ -216,24 +216,12 @@ static int gameport_bind_driver(struct gameport *gameport, struct gameport_drive
+diff --git a/drivers/input/serio/serio.c b/drivers/input/serio/serio.c
+index 54dd26249b027..f239217d7de45 100644
+--- a/drivers/input/serio/serio.c
++++ b/drivers/input/serio/serio.c
+@@ -83,26 +83,15 @@ static int serio_bind_driver(struct serio *serio, struct serio_driver *drv)
  {
  	int error;
  
--	gameport->dev.driver = &drv->driver;
--	if (drv->connect(gameport, drv)) {
--		gameport->dev.driver = NULL;
--		return -ENODEV;
--	}
-+	if (!device_trylock(&gameport->dev))
+-	if (serio_match_port(drv->id_table, serio)) {
++	if (!serio_match_port(drv->id_table, serio))
++		return 0;
+ 
+-		serio->dev.driver = &drv->driver;
+-		if (serio_connect_driver(serio, drv)) {
+-			serio->dev.driver = NULL;
+-			return -ENODEV;
+-		}
++	if (!device_trylock(&serio->dev))
 +		return -EBUSY;
  
--	error = device_bind_driver(&gameport->dev);
--	if (error) {
--		dev_warn(&gameport->dev,
--			 "device_bind_driver() failed for %s (%s) and %s, error: %d\n",
--			gameport->phys, gameport->name,
--			drv->description, error);
--		drv->disconnect(gameport);
--		gameport->dev.driver = NULL;
--		return error;
+-		error = device_bind_driver(&serio->dev);
+-		if (error) {
+-			dev_warn(&serio->dev,
+-				 "device_bind_driver() failed for %s (%s) and %s, error: %d\n",
+-				 serio->phys, serio->name,
+-				 drv->description, error);
+-			serio_disconnect_driver(serio);
+-			serio->dev.driver = NULL;
+-			return error;
+-		}
 -	}
--
 -	return 0;
-+	error = device_driver_attach_unrestricted(&drv->driver, &gameport->dev);
-+	device_unlock(&gameport->dev);
++	error = device_driver_attach_unrestricted(&drv->driver, &serio->dev);
++	device_unlock(&serio->dev);
 +	return error;
  }
  
- static void gameport_find_driver(struct gameport *gameport)
+ static void serio_find_driver(struct serio *serio)
+@@ -744,8 +733,10 @@ static int serio_driver_probe(struct device *dev)
+ {
+ 	struct serio *serio = to_serio_port(dev);
+ 	struct serio_driver *drv = to_serio_driver(dev->driver);
++	int error;
+ 
+-	return serio_connect_driver(serio, drv);
++	error = serio_connect_driver(serio, drv);
++	return error == -1 ? -ENODEV : error;
+ }
+ 
+ static void serio_driver_remove(struct device *dev)
 
 -- 
 2.56.1
