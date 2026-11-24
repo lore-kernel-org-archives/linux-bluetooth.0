@@ -1,61 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795532225;
-	b=ZtGi6v31yRmnVy7uTIqAFrKRTtPRIGHm3C+6LZk8pnF9gp0bdHSwS8kW5qq8EQmeDsuS
-	 uHpyuA7Hj+nyhqP20Z3U1TqpxCqPInmcDFQQ1Gr7g8i6TVbkfgZjaO6+Igoast1Lhh0q5
-	 wiqSkgfCIHO0WA3IBCok8r/kRSkqLMMqtL85w3I4BRGdTuM54kqXKmDbNj5Q5IVaD6zYT
-	 x/q3od1Swhn2gjykJM7qJ+xnYeBIaDF2IrTPH0aahwqZ8NsCNtlUttiAZcFxjUH4YROAh
-	 6ioSwE1S+5oFTOMBPeN1wZMXIyi2vJe/I60WuE292+/ynT6B6k8TzaOC/ok8PLgn6sg==
+	t=1795532226;
+	b=1IMWZIzWzIAlK5krstA7E9Hy5c9eBxtCMAlyrWtcy1eZhqIbF3xNc5vOq5YibRAmgNen
+	 8QUSeUtNBzSoYzNvtaht16oEXLR6HIVmWLl3C63IgJHIeXGUGIca3J4hnOs+CIpEnCQja
+	 6m5hh3b3tA9Sy6oOvVXWWn4gPpJPYWbkSNpvzuRqxc142CayJU4r6CCmlHetj2DjMw0K2
+	 eY4TjG6PNFjLq6Tv4aB3BvmkrkPtoJT8a8ClMu21+oS9FK2FlyMot334/Qx2wtk6UZ/Up
+	 lGNTEjJ9yRktVKO3f7fYnrYZfxnmNnXPEjFdPqcDDCfL9M3b9g1azFW1vtZFEUQRqJQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795532225;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795532226;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Type:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=CW3jqQcxDq+hgRzEPN4XIdltBMPz25ze4ju/xSwcbmQ=;
-	b=Ow6GPY+w6XZxhmQZaKRWa0rav5ozuoPeQ1P5uSMzX+Q7cwMdHAxAHkAB9epcCqR92ql0
-	 7wWLvXn3aWNzGIchzroRkl1geusnlyGIaEQQyE1+YliuBNiDNJ3AAyQWIy9XNvYccXDVu
-	 PwYejMlV9e3bbJs2YlVptjSAu/LP9bhsEDyv0v1URX4TrrSJIIB5mPmMewfhlgOgOTJ6W
-	 GPuOutTgW2HnUqCy4A0vlAtE8+/T4QfBfLIvUZabt3xtN7GO0ba7BkQhlYVOSgsR0ytzo
-	 16KaqCn2CwuR+sJoJtjUb6AKEjxFcx0VPdMY+aDupVOgmPTP5B6SqkEFeA+ftArPgaQ==
+	bh=rI2NdPHwj+rbbSNN8XipxukML9FpNZsd/md7ScWlb9s=;
+	b=2lqAxqCeWtgrTfxurUwLIZu9niXtM6nSTQlSdWY1OGa5TvAJJY/FOmanrgvYTOK1O07g
+	 2q2p3Qd/EaXcTHqQMslIBSDUPnSQCskyRwxoguE29f5ZexkPxecGicja63QliF+SaDt50
+	 pmUC2xWpQZJ7YjAPmm4njp7aH7KO4y4NrVLTN0lfX9lZva9tBW7lahtvxrIyOHjTx3vB/
+	 UEqBjR3aB2/8qK87i5st9sy55T8DMl76LpDP3aW2mAHoYRdveQq8Rvcr/iYjwbtKP2Ng4
+	 LxD1pnnCbLUx/a1gX0lXuXX3BfvJ9FqrEqh+6s1gjVcFvJmoXQu7LlT8av/E8y0LBBw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=VCeG4Bpy;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=FbPiwSPm;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259E0606A329
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:57:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 259E0606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2584F606A327
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:57:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2584F606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=VCeG4Bpy
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=FbPiwSPm
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1795532223;
-	bh=AGv/AJH9QZXtT6tyGnDJ36Eon6v383d//BdT9Ua+eB8=;
-	h=From:To:Subject:Date:From;
-	b=VCeG4Bpyc+ergrlH2r7uthfbFiRSzV+/BgczA/64jNBjRVZnm6TlgMtSht1VgVwDf
-	 AWZU5LLXNWTdLu+a5QBlV+k43KAFaczNKSanw+EHxkSywBG3ufP2WQDgW2aDEdwb4g
-	 nx2lKHEEl+LQvatKFVsS8gmJaXul90Q+tNVjyG/wq6QrfOTnHRc9pDD3iHfFCPrbn2
-	 xF0A8CEIzV9/WPi8FZObncQ3qJZHyJz6/2RIMgx1/1xvxFHzMxjFUEnnx1sxsdThLk
-	 uEL+NAW0+EMXiZyWlT0IiKES4uEVK5cHu5EwqE/71tjtG+D9dTMxWHWUey11QjlRAl
-	 pZTmDplMKTEfw==
+	bh=wLsDPgZf+yUmv6T2hqX8ptzNXHS1Xeo4lzF/Sg/aHRI=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=FbPiwSPmtt0ffr1wDKtY9Ngj7kcqgtenK/hBIUXIfdnYp5r3UnCXnv+RGcqWgQZV2
+	 0DdZOK7OI8jUV/awUA+fLrLuXcceDQVgwPPDuVhDZcr5siDzHqgAhQi1Zh6B8QORyp
+	 AVmQUv4zTlDGJkRljWs1kihCZyKTBjvXVQGKDOiXoJc2Ol32LzfhVmiXfca1Wos/Mj
+	 wl+zud6YJNmapeAq5/KdNLi7FaPlAjEvP5vAVc5MtYcb7NqcGFms3+gzpdUQJWTL7D
+	 NPRY+DjaqhiB1dqaIu8prgZ+fcBNKnZ7nVKpR0Sub1LgNkXXDhGPkSWV+jQgELYMTP
+	 bLfw5+/iZ5q/g==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5AA1217E00E8
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9409E17E047C
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:57:03 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 0/6] monitor: Add an OBEX protocol decoder to btmon
-Date: Tue, 24 Nov 2026 15:56:46 +0100
-Message-ID: <20261124145653.336273-1-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v4 1/6] monitor: Strip trailing L2CAP FCS before upper layer dissectors
+Date: Tue, 24 Nov 2026 15:56:47 +0100
+Message-ID: <20261124145653.336273-2-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261124145653.336273-1-frederic.danis@collabora.com>
+References: <20261124145653.336273-1-frederic.danis@collabora.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -65,118 +67,209 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-btmon currently hexdumps all OBEX traffic (RFCOMM and L2CAP GOEP), making
-PBAP/MAP/BIP/OPP sessions hard to follow in a trace. This series adds a
-dedicated OBEX dissector (monitor/obex.c) and wires it into the RFCOMM,
-L2CAP and SDP monitors.
+From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-Patch 1 adds the core decoder: opcodes, response codes, CONNECT/SETPATH
-fixed fields, all generic header IDs, BIP's IMG-Handle/IMG-Descriptor
-extension headers, and Target/Who UUID recognition for the well known
-OBEX profiles.
-It tracks sessions on both RFCOMM (learned from SDP
-ProtocolDescriptorList) and L2CAP (a dynamically negotiated PSM
-learned from the GoepL2capPsm SDP attribute), keyed
-direction-independently so CONNECT requests and responses are correctly
-matched to the same session.
+ERTM/Streaming mode I-frames append a 2-byte FCS after the payload,
+which was never stripped before handing the frame to protocol
+dissectors (OBEX, RFCOMM, SDP, ...). OBEX's own PDU length enforcement
+was masking this as spurious "Trailing data" on every ERTM frame, two
+bytes that are actually the L2CAP checksum, not protocol payload.
 
-Patch 2 adds per-profile Application Parameters (Tag/Len/Value) decoding
-for PBAP, MAP and BIP, replacing the generic 'Tag 0xNN len N' hexdump with
-named, typed values, using the profile learned from each session's
-Target/Who header.
+Track the negotiated FCS option per channel (defaulting to the 16-bit
+FCS enabled by the Core Spec unless a peer explicitly negotiates "No
+FCS"), and trim the trailing 2 bytes off ERTM/Streaming mode frames
+before dispatching to the PSM-specific dissector.
 
-Patch 3 adds SDU reassembly for L2CAP ERTM/Streaming mode, since OBEX PDUs
-routinely span multiple SAR fragments; without it, any segmented PDU
-failed to parse ('frame too short'). Reassembled PDUs are decoded once, on
-the End fragment, while raw per-fragment hexdumps are kept for
-Start/Continuation fragments so no bytes are lost from the trace.
+Verified against a real btsnoop capture: the spurious 2-byte "Trailing
+data" hexdump after every OBEX PDU on an ERTM channel is gone, while
+decode output is otherwise unchanged (109 OBEX PDUs decoded before and
+after).
 
-Sample decode, a PBAP CONNECT followed by a GET with Application
-Parameters:
+Assisted-by: Claude:claude-sonnet-5
+---
+v3->v4:
+  - Track the FCS value requested by a Config Request and apply it on
+    a successful Config Response that doesn't repeat it (a successful
+    response need not repeat accepted options), instead of only
+    reading the FCS option when the response itself carries it.
 
-OBEX: Connect (0x00) final 1 len 35
-   Version: 1.0
-   Flags: 0x00
-   Max Packet Length: 8087
-   Target: Phonebook Access (PBAP)
-   Application Parameters: [len 6]
-     Supported Features: 1023 (0x000003ff)
-...
-OBEX: Get (0x03) final 1 len 87
-   Connection ID: 1 (0x00000001)
-   Single Response Mode: 1 (0x01)
-   Name: telecom/fav.vcf
-   Type: x-bt/phonebook
-   Application Parameters: [len 21]
-     Format: 1 (0x01)
-     Max List Count: 65535 (0xffff)
-     Filter: 0x0000000018b111af
-     List Start Offset: 0 (0x0000)
+ monitor/l2cap.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 121 insertions(+), 2 deletions(-)
 
-v1->v2: Fix commit title issue
-v2->v3: Address review feedback:
-  - Patch 2 (OBEX protocol decoder): fix a possible uint32_t overflow in
-    the SDP element-length parsing, fix obex_de_uuid16() extracting the
-    short value from the wrong half of a 32-bit UUID, and stop treating
-    L2CAP PSM 0x1001 as always running OBEX.
-  - Patch 3 (PBAP/MAP/BIP Application Parameters): clear the learned
-    profile classification on session/channel/handle teardown and on a
-    new CONNECT, so a later session can't inherit a stale profile.
-  - Patch 4 (L2CAP SDU reassembly, retitled): track the expected TxSeq
-    per direction to discard retransmitted/duplicate fragments and stop
-    reassembling past a lost fragment, and fix l2cap_sdu_reassemble()
-    reporting success on an End fragment with no buffered Start, which
-    could free a borrowed packet buffer.
-  - New patch 5: trim the trailing RFCOMM FCS byte from the payload
-    handed to upper layer dissectors, and skip credit-only UIH frames.
-  - New patch 6: reassemble OBEX PDUs split across several RFCOMM UIH
-    frames, since the RFCOMM MTU is typically smaller than the maximum
-    OBEX PDU length.
-v3->v4: Address review feedback:
-  - Patch 1 (L2CAP FCS): apply an FCS value requested by a Config
-    Request on a successful, option-free Config Response too.
-  - Patch 2 (OBEX protocol decoder): fix the disconnect handler's
-    swapped SCID/DCID session resolution, stop obex_remove_channel()
-    from dropping the SDP-learned channel mapping so a reconnect on
-    the same ACL link doesn't need SDP repeated, validate 128-bit
-    UUIDs against the Bluetooth Base UUID before treating them as
-    16-bit assigned numbers, recognize OBEX running directly over a
-    dedicated L2CAP PSM (e.g. BIP's AVRCP Cover Art), only trust a
-    GOEP L2CAP PSM attribute once the record is confirmed to speak
-    OBEX, and decode UTF-16 surrogate pairs correctly.
-  - Patch 3 (PBAP/MAP/BIP Application Parameters): document why
-    obex_remove_channel() keeps the channel mapping, and use a
-    channel-zero check consistently to detect free profile slots.
-  - Patch 6 (OBEX PDU reassembly over RFCOMM): free a handle's
-    reassembly buffers when the ACL link itself is disconnected
-    without a per-channel RFCOMM DISC/DM, and widen the reassembly
-    length/position tracking to avoid truncating a malformed
-    declared length's remaining byte count.
-
-Frédéric Danis (6):
-  monitor: Strip trailing L2CAP FCS before upper layer dissectors
-  monitor: Add OBEX protocol decoder
-  monitor: Decode PBAP/MAP/BIP Application Parameters tags
-  monitor: Reassemble L2CAP ERTM/Streaming SDUs
-  monitor: Fix RFCOMM UIH frame length and credit-only handling
-  monitor: Reassemble OBEX PDUs split across RFCOMM UIH frames
-
- Makefile.tools   |    1 +
- monitor/l2cap.c  |  389 +++++++++++-
- monitor/l2cap.h  |    2 +
- monitor/obex.c   | 1512 ++++++++++++++++++++++++++++++++++++++++++++++
- monitor/obex.h   |  119 ++++
- monitor/packet.c |    6 +-
- monitor/rfcomm.c |  194 +++++-
- monitor/sdp.c    |   12 +-
- 8 files changed, 2203 insertions(+), 32 deletions(-)
- create mode 100644 monitor/obex.c
- create mode 100644 monitor/obex.h
-
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index ddc2388d5..3fc876f5a 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -100,6 +100,8 @@ struct chan_data {
+ 	uint8_t  ext_ctrl;
+ 	uint8_t  seq_num;
+ 	uint16_t sdu;
++	uint8_t  fcs;
++	int8_t   req_fcs;
+ 	struct packet_latency tx_l;
+ };
+ 
+@@ -158,6 +160,13 @@ static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
+ 	chan_list[n].ctrlid = ctrlid;
+ 	chan_list[n].mode = mode;
+ 
++	/* 16-bit FCS is the default for ERTM/Streaming mode unless the
++	 * peer explicitly negotiates "No FCS" via the FCS configuration
++	 * option (see assign_fcs()).
++	 */
++	chan_list[n].fcs = 1;
++	chan_list[n].req_fcs = -1;
++
+ 	chan_list[n].seq_num = seq_num;
+ }
+ 
+@@ -255,6 +264,98 @@ static void assign_mode(const struct l2cap_frame *frame,
+ 	}
+ }
+ 
++/* Record whether the peer negotiated "No FCS" (0x00) or "16-bit FCS"
++ * (0x01) via the FCS configuration option, so the trailing 2-byte FCS
++ * on ERTM/Streaming mode frames can be stripped before handing the
++ * payload to upper layer dissectors.
++ */
++static void assign_fcs(const struct l2cap_frame *frame,
++					uint8_t fcs, uint16_t dcid)
++{
++	int i;
++
++	for (i = 0; i < MAX_CHAN; i++) {
++		if (chan_list[i].index != frame->index)
++			continue;
++
++		if (chan_list[i].handle != frame->handle)
++			continue;
++
++		if (frame->in) {
++			if (chan_list[i].scid == dcid) {
++				chan_list[i].fcs = fcs;
++				break;
++			}
++		} else {
++			if (chan_list[i].dcid == dcid) {
++				chan_list[i].fcs = fcs;
++				break;
++			}
++		}
++	}
++}
++
++/* Record the FCS value requested by a Config Request, so it can be
++ * applied on a successful Config Response even if that response omits
++ * the FCS option (a successful response need not repeat accepted
++ * options).
++ */
++static void assign_req_fcs(const struct l2cap_frame *frame,
++					uint8_t fcs, uint16_t dcid)
++{
++	int i;
++
++	for (i = 0; i < MAX_CHAN; i++) {
++		if (chan_list[i].index != frame->index)
++			continue;
++
++		if (chan_list[i].handle != frame->handle)
++			continue;
++
++		if (frame->in) {
++			if (chan_list[i].scid == dcid) {
++				chan_list[i].req_fcs = fcs;
++				break;
++			}
++		} else {
++			if (chan_list[i].dcid == dcid) {
++				chan_list[i].req_fcs = fcs;
++				break;
++			}
++		}
++	}
++}
++
++/* Apply a previously requested FCS value on a successful Config
++ * Response, in case the response is option-free.
++ */
++static void apply_req_fcs(const struct l2cap_frame *frame, uint16_t scid)
++{
++	int i;
++
++	for (i = 0; i < MAX_CHAN; i++) {
++		if (chan_list[i].index != frame->index)
++			continue;
++
++		if (chan_list[i].handle != frame->handle)
++			continue;
++
++		if (frame->in) {
++			if (chan_list[i].scid == scid) {
++				if (chan_list[i].req_fcs >= 0)
++					chan_list[i].fcs = chan_list[i].req_fcs;
++				break;
++			}
++		} else {
++			if (chan_list[i].dcid == scid) {
++				if (chan_list[i].req_fcs >= 0)
++					chan_list[i].fcs = chan_list[i].req_fcs;
++				break;
++			}
++		}
++	}
++}
++
+ static int get_chan_data_index(const struct l2cap_frame *frame)
+ {
+ 	int i;
+@@ -882,6 +983,11 @@ static void print_config_options(const struct l2cap_frame *frame,
+ 					get_le16(data + consumed + 9));
+ 			break;
+ 		case 0x05:
++			if (response)
++				assign_fcs(frame, data[consumed + 2], cid);
++			else
++				assign_req_fcs(frame, data[consumed + 2], cid);
++
+ 			switch (data[consumed + 2]) {
+ 			case 0x00:
+ 				str = "No FCS";
+@@ -1188,10 +1294,13 @@ static void sig_config_rsp(const struct l2cap_frame *frame)
+ 	print_cid("Source", pdu->scid);
+ 	print_config_flags(pdu->flags);
+ 	print_config_result(pdu->result);
+-	if (pdu->result == 0x0003)
++	if (pdu->result == 0x0003) {
+ 		print_unknown_options(frame, 6);
+-	else
++	} else {
++		if (pdu->result == 0x0000)
++			apply_req_fcs(frame, le16_to_cpu(pdu->scid));
+ 		print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
++	}
+ }
+ 
+ static void sig_disconn_req(const struct l2cap_frame *frame)
+@@ -2740,6 +2849,16 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 			}
+ 
+ 			display_printf("\n");
++
++			/* ERTM/Streaming mode frames carry a trailing 2-byte
++			 * FCS (unless explicitly negotiated off via the FCS
++			 * configuration option) that is not part of the
++			 * upper layer payload.
++			 */
++			chan = get_chan(&frame);
++			if (chan && chan->fcs && frame.size >= 2)
++				frame.size -= 2;
++
+ 			break;
+ 		}
+ 
 -- 
 2.43.0
 
