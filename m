@@ -1,93 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795529447;
-	b=nmBj2td9Q9Os3t0bsMymUWUXnlR4ua1ntlmkxtf2vhjGcZKFGp1Fd4tYXchG8Ayv47Ic
-	 wKAAjCIEKIufPp7kfytV6zdBkPSOCzEmSR7teZz81Q9IS5ZtRgy0KbH5tY+OmJ4gxMC63
-	 4LRM+GKrplsU13gR1mpvhgptWOEld8/Sg/1AAzKDse8TLKimylrRNaxPPmlSlI6J1IueD
-	 BxBwfgL1KlhMshYJgyCmTAbTefCYJRSrgKEIwF3gKzpjzKhoi2YeNtAAzeEF7HG9Mss7/
-	 Bn5s/VRbxFc+lyXWjn1zIZ6sJheHuPttfZ6AEzVFVdQ8gGm8FPH38CYKfIkLh6v64TQ==
+	t=1795530971;
+	b=hLtqrOCA2oObJAb3Dfg60uP7HME9sldcpCJuLOLJ7757ACbgt6pnf2APtB+NP+SBcVE7
+	 g+vx2pS6iuZp2Yh9MjnDXRrweI8t2dQZmVn0Evzmob4wv4a/Dohq3H7ZqlOR8eE8jhEuv
+	 hMxQRLziHF9bESPvWDU+pvcGtgi+71Pj/bYlClz0NPt9WaMjO5/B5aNgrRPvSkgnDesdK
+	 /UQfOMzbpNVrXHvPx/8lJ8retOFNkA2FEdDR4mgLXOL3W0JITo6MF7/DqyBuEqtQNQIJU
+	 aPI1YbbeNjyzilBLMFsnoslZy+uxdZOMcauFTEIeY2ohUpMtM3/atSLJF4HxEVReVxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795529447;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795530971;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
-	b=2MwIeKcxoPw/Xu0ibYnDrR2Cp8mH2cfA2EIKuwEquVjAWnTO/Oxch7ERD+Jkgojy7jpe
-	 CpjZ/I0KwN+vQiQGQuoHJoHoTarWajFAfy4bgEk7PiIjYcHDTsfxbGcmUSwXgW93k1HEW
-	 FL0ykZ25CXrnfBvg2Xjp7a2f2nbjIujMOv8jmd93V+Si99l1PJ29hNI7q8V2ioCAfglQc
-	 tjhlfFuKEfX6pARi9KN0P/6xpB8PyxQJkKyD5JEc5ldwVzbMq1/cuAOp4W/xaiZguDiam
-	 MMXCnJ8Q8UUtDMn4Z7UPrY+a+Fm3CL+vmfr/0xKLElhvZHbShVGCs/eUfCAaWPRIiVw==
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=URzeZgeOfG4XSpkC4U3RADPq0CdA4uG4IJ6mQI+mVOU=;
+	b=DPerKNbgbiUe8rn98td8XazJkFaSb+dpsRfK1UbgLIv7W7V4uRgD/n+MCw0Ue9SrM3J6
+	 ehL9gHIoMcbZ1cK+XtW1pS7pXPMfc1C98RUnYjl6g4m7XqDLK6y5rqdeH29PUKz1V4/0R
+	 aFZ9wxJhi5yJAYJKhEI4PXi7eA9OF7jbQcOCXCVIcDhgtaRB2UqdZLXKu1L54eLzB/Jc8
+	 BZbyw6yQ6hlxmWM+97LvX8EVLf2KgrUqYsi/+BRP/fJlx+e3P2RbujWLgae3JAomDTLWY
+	 c8H5d4ltpH9iYtQRFU8WwgnmqvNkH86OfTnz9HumySj4dstTymD3Jf7ci4LKeydXzxA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="rKjh+Un/";
-	arc=none smtp.remote-ip=209.85.221.180
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=xM5JD4Kv;
+	arc=none smtp.remote-ip=209.85.221.49
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6432E606A692
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:10:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6432E606A692
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32FC606A321
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:36:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F32FC606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rKjh+Un/
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5eafb65e169so2654973e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:10:46 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=xM5JD4Kv
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4a42b34e930so4030799f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:36:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795529445; x=1796134245; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
-        b=rKjh+Un/CNcE7k3fd7JY9nVSCz8T6Bo6KU6Qm6T3vrx+6SJfiPSjKWghWYp2uXDhUo
-         3kr6Q9jdUclD6RZoVflL/78OQ5p1jdt1lxMxwRLzpuyUehFJ38Vfmg4aTo6IjGtqJShb
-         nYfRrqAxGtqsHGzZiLYbBx63qIBfW6dJlGpXuxi5xpGTrKn46KU9r1rf+npSeCebGlr5
-         eyFSLxC4lM/8SmJPPguML7m4LNMH/AIE3I/qoKc9OucuAdFS9hwo4jV0PaGgoh1Rc7Hv
-         nAj8B+N1szk/xEk8tDyWqmAmkttvGHW2/US7cHCVmLUW5miZKppN6yLln3p+rVSNbHbu
-         +8ww==
+        d=streamunlimited.com; s=google; t=1795530968; x=1796135768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=URzeZgeOfG4XSpkC4U3RADPq0CdA4uG4IJ6mQI+mVOU=;
+        b=xM5JD4KvW/JTpJUGk7b1643GPYDAL6WTQgJfIFWv/aKqu0k0R1pPkjnp7OloliZBUZ
+         v2c2Z6sFedoWqA/T+eotmshJoog8fGsl9wEs6/a9TLQfbxpT4yY1O20q0LhJh0Iad3g+
+         Glcv1i7z+ITKdW8UJCsOGWi8+cwPGjuYQviLo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795529445; x=1796134245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=XShi4tcBiiUeex/UpD4VJCvI1c9XNejU2j6InR/Tko4=;
-        b=JRQ53nXMsZx6031R97P9CAVEWDfB1/LecxmuHCQxaUTJoB+ScF4rIODtWqmobO/clX
-         sSVGkK63ZPx2eRTYlkQ1BgkomuzkYq4mqy2X4koXxlD1tlAhsQGw9i+rvPHjFhv1BwWb
-         exlsksiqKk2tRMfmpMd0GDJH3EiaQ8aW/hISNCC+eQicR6Ook3svHc/73qrHHXZlKysx
-         FwbVTUveBJ9AN5ES81GXLEcRmRKOHEDwLaxn2hUcVfr/pBajuJ09nJsSGX6bw+i7QKFl
-         uJ1tTo8JZPyEqPBZ+DHzHIUsY3czae/gmtJgGPFykD5BywUeipNA/5yWy54QaDPgeGxm
-         EaCw==
-X-Gm-Message-State: APuU4Z9W14Dj8JVH5U+orsliM4IZNDIo1sHa+RQ/SC0dyl/E2mWpgLQ0
-	fdjZzJqxhoXbQP4QjSRgThZd4pKvukXvbxmt5xLop7kOke/c/WrDOFoJ6qBguv4g6zk=
-X-Gm-Gg: AZFdTZckBzjDoUafxs5cLggC6TLjh3ZXoQ3vSF7cfwmNwRTFIbPIo7oSuHB7SPqmDZO
-	drpRLZhw+xWfXouTlFwa8QtorrYtLpVa6687q/H/3tnFeDydeFlReY6Mn3umTCVwpHcs6l1H4Ff
-	ROw7f10qfGSjBKc5AgEbXteiCXHPm4pGuC1oukiXQqAv+B+g5V28sBjCu581Gag1p47HPMb4u+h
-	t3OJoem+HnxXKUhkYzmqxPCUAzmMdFIGkZm9/jb47KFUzsb3ixgxGejE2eQrN1Lr36y+me5t35x
-	7/2LBUhP60BxsA6zSfKP21rbbNo1EFViNcd8UN6KSWS/xuCcSA4VcUBkAex7HsQpoKck+yG5OLa
-	NJAZX8q1b8Ms6Yty9BnG5ZvVg87tfIilx+6j0z0baw53yBoJQOifFBeVM219UjMZnZycD65V9/W
-	MTTSG7+f2JemU2KD8Dkxi4jCUYUcSzcv5ydVd6a6ha7tm8bktrsdb0zg2Z1XuLuZqWXVjrbUvzq
-	bn2va6ud7zRcVzDcqcB8Diuq7HFUiwUkNlfKlg/M2E8+b1mkl5SFGa5+ZOwj4OGm/rOLz4D6pXK
-	0IQV+L+VnHMYB4uG3zGgyLhU/eXIWE+f
-X-Received: by 2002:a05:6122:4698:b0:5ea:c98d:768 with SMTP id 71dfb90a1353d-5ee8ae8eb5cmr8365635e0c.6.1795529445171;
-        Tue, 24 Nov 2026 06:10:45 -0800 (PST)
-Received: from shine.local ([168.196.221.52])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b555137sm14056121e0c.3.2026.11.24.06.10.43
+        d=1e100.net; s=20260707; t=1795530968; x=1796135768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=URzeZgeOfG4XSpkC4U3RADPq0CdA4uG4IJ6mQI+mVOU=;
+        b=Oj/8zl42k2vWnqJpzberdXvYQOHdKi32ccflMvr+1pLvRJlY9sfjYZkUBXFtpCe5+Y
+         Cl7Y5R2+tZJeW2QodThMwvFW6EbjDNiyfD1eAJua6k7yEGPE2nRhKXLGLhMXbdKRcxXT
+         8yt+YHmJWD3CKbSvfkOVeupgvjcdYDWgl7GkiWITLITnUiDw5hwZyJBqh0frCt8infLV
+         Yaf4/y2xLduR6Yu7t891XsOIV7IXq1+L8kF+Bnz+C/u62Btx7SFHNLH18KLFisKdLA0x
+         4OlFO680T4BMtV5TTHq4HE/ueaDdyyFVJKKtXqPcIsPLVmtOo1BivoLg+Ce3amU0iJJA
+         JcmA==
+X-Gm-Message-State: APuU4Z//gIwwop2K28mXT4ye7kAh6+udYKDsw3OeslSGQb5Mvg64TY9/
+	A0AnYcFafaTDmTIFzoaGdCQF2VWiQZ11ncAdYpTdA8ioLdWgwu9anYUvxeYTCxHGVoispNdNv53
+	9j5aE
+X-Gm-Gg: AZFdTZeakq5f6SfElsWKgbGNRpyH7dI1gZfMgnFTHTbkKd/TxvIJi6I07a4J8rREtEA
+	TNVSbbFay4YKtL2buxiSJjKVillte+fBR5C/fe/+UC84l9MysTrLa+VrqKQXqd68lZyHZsdYhwZ
+	lPvpsgOB6amp694VN/cv+5IBQR/GPLBQu3XIJGpOpBzGVg6742Lx5Ulh/WdkqkPi29Um1z+H/5M
+	pg+7MIwjqk/UFTjhs8YHHK0sMueAqmV1n1644wbH+iQtz9kQYTOGJCnV3b9UB42GRX8lnDv8uhw
+	oL5gYAorkpaTDBY9K6FVmT3JrXWZ7TyhBzW6vN0Q5PzDmBzQyNAKM4890Pl8McpQN+uiRFtK6Zq
+	R3noB8uMga45uSejm14M7YfsaZCaFOvGuxocDV7TSEo9PRzXdUXZEO95TYskOdAvQj6TXGAJMux
+	z2MmtKHCudmq8cZ7OdjLz0FNl8P04VttxzOAG3zmmIdureu+6qVuKB3vI+HTbCVXktGkjbcWSJu
+	YZQpexFjIkCj9JE1xkjReHutbZYL/RQIUokVjg+djoLGK+ClS5RZMl7JHwsVtc+WO5q9HWAKr5i
+	idaIMgAdbEcE0GDhd5M8lIBGB0rUh9ok2v71ZvJVDaex9jT3ZQ==
+X-Received: by 2002:a5d:5f85:0:b0:4a7:1613:7206 with SMTP id ffacd0b85a97d-4abb57f7b6fmr29554086f8f.47.1795530968067;
+        Tue, 24 Nov 2026 06:36:08 -0800 (PST)
+Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4b33a596f9csm9019187f8f.12.2026.11.24.06.36.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 06:10:44 -0800 (PST)
-From: "Andrei A. Bykov" <andreiab9019@gmail.com>
+        Tue, 24 Nov 2026 06:36:07 -0800 (PST)
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: hci_core: preserve LE feature holds across encryption events
-Date: Tue, 24 Nov 2026 11:09:56 -0300
-Message-ID: <20261124140956.15296-3-andreiab9019@gmail.com>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261124140956.15296-1-andreiab9019@gmail.com>
-References: <20261124140956.15296-1-andreiab9019@gmail.com>
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 1/3] shared/vcp: Notify Volume State on Mute
+Date: Tue, 24 Nov 2026 15:35:59 +0100
+Message-ID: <20261124143601.245340-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,88 +91,34 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-LE feature discovery now owns its connection hold until its asynchronous
-completion callback. Encryption Change and Key Refresh Complete can run
-while that discovery is pending in BT_CONFIG. Neither path owns a second
-setup hold, so dropping one there consumes the upper-layer hold after
-feature discovery finishes and disconnects an active ATT connection.
+A Mute operation on the Volume Control Point sets Mute and increments
+Change_Counter, but unlike every other operation it does not notify
+Volume State. A client that keeps Change_Counter from the notifications
+then writes its next operation with a stale value and gets Invalid
+Change Counter.
 
-Keep the BT_CONFIG drop for BR/EDR, whose configuration path still owns
-that hold. Route LE key refresh through the same confirmation helper.
-
-On LE setup failure, explicitly request disconnection instead of relying
-on a drop of the feature worker-owned hold. The abort request records
-abort_reason before queuing its work. Do not let a later encryption or
-feature-complete event announce such a connection as successful while
-that abort is pending. Apply the check to both LE feature event formats.
-The feature worker still releases its own hold and device reference.
-
-Fixes: a106e50be74b ("Bluetooth: HCI: Add support for LL Extended Feature Set")
-Signed-off-by: Andrei A. Bykov <andreiab9019@gmail.com>
+Fixes: b8a113ecbabc ("shared/vcp: Add initial code for handling VCP")
+Assisted-by: Claude:claude-opus-5-5
 ---
- include/net/bluetooth/hci_core.h |  9 ++++++++-
- net/bluetooth/hci_event.c        | 10 +++-------
- 2 files changed, 11 insertions(+), 8 deletions(-)
+ src/shared/vcp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7cf63bc0f..469d4f077 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2272,11 +2272,18 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
- 	__u8 encrypt;
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index c7f74956e..d19bd9210 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -861,6 +861,9 @@ static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->mute = 0x01;
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
  
- 	if (conn->state == BT_CONFIG) {
-+		if (conn->type == LE_LINK && conn->abort_reason)
-+			return;
-+
- 		if (!status)
- 			conn->state = BT_CONNECTED;
++	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
++				 sizeof(struct vol_state),
++				 bt_vcp_get_att(vcp));
+ 	return 0;
+ }
  
- 		hci_connect_cfm(conn, status);
--		hci_conn_drop(conn);
-+		/* LE feature discovery releases its own hold asynchronously. */
-+		if (conn->type != LE_LINK)
-+			hci_conn_drop(conn);
-+		else if (status)
-+			hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
- 		return;
- 	}
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 477b876fd..b224d4d69 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5435,11 +5435,7 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev, void *data,
- 	}
- 
- 	if (conn->state == BT_CONFIG) {
--		if (!ev->status)
--			conn->state = BT_CONNECTED;
--
--		hci_connect_cfm(conn, ev->status);
--		hci_conn_drop(conn);
-+		hci_encrypt_cfm(conn, ev->status);
- 	} else {
- 		hci_auth_cfm(conn, ev->status);
- 
-@@ -6961,7 +6957,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
- 			}
- 		}
- 
--		if (conn->state == BT_CONFIG) {
-+		if (conn->state == BT_CONFIG && !conn->abort_reason) {
- 			__u8 status;
- 
- 			/* If the local controller supports peripheral-initiated
-@@ -7639,7 +7635,7 @@ static void hci_le_read_all_remote_features_evt(struct hci_dev *hdev,
- 		}
- 	}
- 
--	if (conn->state == BT_CONFIG) {
-+	if (conn->state == BT_CONFIG && !conn->abort_reason) {
- 		__u8 status;
- 
- 		/* If the local controller supports peripheral-initiated
+
+base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 -- 
-2.56.1
+2.43.0
 
