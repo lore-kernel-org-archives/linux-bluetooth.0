@@ -1,111 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795489048;
-	b=pKo8NinxmDnJFUl7MwUf5WWRPL44QVHgqdsJlLaImS5gnWonIObfkb/w7x+Id4SGcRPA
-	 yNZq9XDt+J+YVluGaU1fthJoUrBLMesH+lwuGVcgL+ca7PmOOt4wh9+tbsJTX+3i9JUP0
-	 HbgThxAD4iWJeTpE6Prh3l+83bhotnlinAOqEfqcrCk+PBPN5dt6jEpOIJ2qZQ7V9p98V
-	 A9ofdO5ARh19DgOUQtrtHopHBJpKkZ4nX1xeY4BSarHEdZyqRru7Mo7p95wDkRO9dHdnP
-	 m4Ccu1DAFasMDP5O4Palwp5QAm4Nz3LtMw5anF9NS2Zg+L1WYMLApGRsr07ix/Nz1rw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795489048;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
-	 X-Received:X-Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
-	b=O4+hCqIwo+ObjRJORa9cKisONpk+MVj/9OAGeMfwsGAb3GgjSF9nJAF950J3zZkYg03E
-	 tKJo+IHtKO3AGTCJ05K++81I/O8Un75dnSICBc2JEZ1SpWQ1+LW3aal03N+6eiaGJ0RjK
-	 bMZCw5fRTJOEKrWzMLELRcydwTGQ/KF0VCIwwyfcreSRuXVPQDrvYn/VTz4iBtSJ/NReZ
-	 uR2Hbhgj8K5nAKZjepl9Vuc4SC8HKcZWtln+4TxpYd0gpqpTDGQezFbxwDP53gah5cngl
-	 wIGa6G3H96pyVW/oZKE3ClRdcW1pvbK9WT1I757VzXgEriE9gyCCmGuJMmmRYt9ZPaA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BcRaiItI;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b="cs/Xyd/X";
-	arc=none smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795490474;
+	b=Fk5yA8P4J22skTQOl5kCZjxYSUQLGauD1kjYdsyPfIO1RCcxt6RQ7jXaqmT461+x/2Oc
+	 vHcwVMUuJDKrH08vNDUFO7bF/hhV5+uC2YbtbkR8F2g6ajrG6hEHy+ppZL5opNBAw9rl1
+	 y3psmMhlQsIyZaX/WdLj74U0H4y+wrddkIhHKZCdRMphMx7gtSxRgOUGK4IWIM6ikLylA
+	 5QmSO9KbaoW/shsDfgOqP+FwKtbOvUBiDwOaq/puTgAYPVqLWQeMGabHpi6EndiptxSUK
+	 eN9M1u4yL5QcIsXZJM42aZcp8yxRmP9rFKXYnLcQRDr9/g9ewFBPPE3mR1pAGF9DzbA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795490474;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:MIME-Version:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=5K8gBQmbANshQMGjOwGW+ZIQJvSSKhEt8Jf+UhdYaoE=;
+	b=z8bbtPnqLyIHOm2D1G9vVdeC7uqhF6hfQ5DfARawiM1seCNW4/JFegPkt6uinnSnPF7Q
+	 eCG4pJOfmR4WiZ0nUKOau5XcOr7CsAyXpkwJh7keb4ZmH/kX/g7R3OdA/G0dkKZaSKOFG
+	 6iv0kYBo7MaCQVRNp9NVkHFIYGh9g7qDVlGufEHawpDaEmInluv1gAmSJrQ9duvtVyA8V
+	 dh7oaUwFEh+uE0ZqQk+F4dRVee7dBptz0ChaJsSNahcWQoHPW25pD2IwqToDR4L3CWvgh
+	 u8dClSF89nKs630XgdMCqPr0skepEDJQPtgD71OaXbInjRyNO8reBwzGaTTYgNn58iQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZkuUHEVi;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.49
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B125E606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B125E606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5EF606A322
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:21:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE5EF606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BcRaiItI;
-	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=cs/Xyd/X
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AO2k1fE3701099
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=; b=BcRaiItI0yZRC4oi
-	T2KXQ9lC5+m+M92JiEDTaOx0KAZXCJjs6tnSYuizq0275WZfU4FK8X5xCX+k7MWW
-	qk9beO4vunUKq0uWu9/DmoLJ7TZ1ANV1v4dHxQxk68D85t4oBkUKvD0AmMoSywky
-	BORpZyLxrWPbAaakTsKFq7Mfw0h5jQG0jRb+HtNtCZDwia5i/1fsAYk4J+B16+fT
-	xkR/U4AdzVFwWwoHJwFf++/Asu+GqzEgKoWXzWIS79VuW57KEBUYMeznPeU52GyL
-	8xpf77OlPCyXsUoG5NgUfHC1GxoMsevU+bBKVW2jbA39W59tc18VDgOwgPcZrked
-	bJj3XA==
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j50ky0apk-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:26 +0000 (GMT)
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2f021f3a9ebso8177355ad.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 18:57:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZkuUHEVi
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-67c6a0abc2eso4228292d50.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 19:21:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795490473; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ccZvvWUxns5zfZFRbOX0abysG0HItd8sYVWOWhWF42+s76rbsROI/iTBULclzqfwga
+         k1WpqDe5cd4OMYCsTdfaMbLrrYFHlwE1N1Wamb9WBXpuDYzEPDPML7Nhjqh18MMm7DpA
+         XNkNDnegtDlD3VgncE0TiW3shK0KqhgIfCtlCWsItW7lib5LGJA/Dam6RfF6bDs1Z10G
+         72OoeUnZzZ7k5dGQVB7KO2BPmJsgK8bSmn319L42ByLSTHdXpGk7LYwJdzx7aHLe9sjr
+         ZJuRdYVPEg1xJFDAVLjelhoC95lXzzIgufBKkuElbPesB/zBn/4SV/V/52N+hwJ8HBgy
+         5e6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
+        bh=5K8gBQmbANshQMGjOwGW+ZIQJvSSKhEt8Jf+UhdYaoE=;
+        fh=RowRCfnne+38Ef5u+0puxiBl6gtKxRauRStUxD+/MRM=;
+        b=Lw/7UrducXzPplcpNcZHjNj5Wt+AfLVX1DzwNmzKZ0BfV9fbYBgpaLRgUiwnFRn3jD
+         zXC48bNWdnUxY+XbzML5mB6/R2eprzYI3JpcW+8RZaghg+OQDJAcO+WVIMPG2E2F2Ohw
+         TEU9eSH7leGaWzo5/td02RvofbLWGuvMGgI0qdo50dR7sPLP/d4ij3UGGGypXcP+mLxL
+         J7XqMLPK8vi1+AwIbHusYA9jEcgECvDpE62+vQajsTtwRA5LTBqz/JrJUM5cvX68aI7Y
+         DiXjZWBNlcpTUr5Hc/4NIToX45xB9Gium1inIeIbIiXHU+yi4MdSCt9lN/HDe7y6W2W1
+         Rleg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795489046; x=1796093846; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
-        b=cs/Xyd/Xz83/srYM0qk2XczY+NQwDqCymddH+LhkNn4lOfzUZIH+WE375mZZB1bMr8
-         +uV+hRsyFh6xEmjB0J5lrXskfJsDDsedIdPy6shlTabFadVmrDlpYqDRJSE5hg3VWbat
-         Ytvm7lXzwIXKRpBtTylDN5nwiVIFZx5Y9XcISmgEi0/Kd43aFwfYJjiqdLBnOJeNgyPA
-         7FTk3u2UYffMLqk/Rth0GCwvMzyHt4xfdvL3NaZOXnXSdXyTz7MwBNp+vLe7hj9KxYwe
-         VF6lIh8UDvhO8p5lCK2yPjwFw11oikDPCaKInD0WlQBuU2wu8BEe47qg68Sh54reaC4M
-         tciw==
+        d=gmail.com; s=20260707; t=1795490473; x=1796095273; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:mime-version:from:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5K8gBQmbANshQMGjOwGW+ZIQJvSSKhEt8Jf+UhdYaoE=;
+        b=ZkuUHEViLF0pji5IU7BXrSvoloyyZEeETIdKNd4ZWD1ZyG7U5sbtIYi0S+wGrUfgkI
+         FXgUFGzNtTIB9xDXYbSkP+UaigjJ3hFUg0aT6tLoguIlsg/u4rgypoHKnTNGPnTjzlxJ
+         HH0eLCImBj6KVXfMsW06U1PtCdCo6rhlTd9aDkMIOw1CMFLrijQliDVZpHGSzCbyKEfn
+         x0nxHaM1qDfC/i6KDKhMdYvffup5Gs3P+EbKKR9xcax+0pE5vCMlZVyeGxHl9uFmtc0t
+         1MaHc48tWz/mw0W2LQTrky0Ue/HSCWipdor6ebDeXirXaJUjksIce4I8fucwAMu1vlab
+         qtOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795489046; x=1796093846;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
-        b=PN+Lgs8itY2b3wfO7raO0dkaPTpJw+fTQGOjatDpUlrNoFdsZ7n4/QfzRx8OLyA4dt
-         ja3N1vLNT0Owa6dOXDrYopwHtZafHJkxoMg7KGs/WrzT0WpI/z7XPEPHV0uprVl5U8xg
-         /oRRezbFnNC9BKEdeERX5l0OcoZxWPmID93Wnw1WvrSKzuU0sVgHYXWaBah1ZkzOHgBZ
-         nAagXjMISZDyWypIkAhM6TkM1SKEaGA7u7ry6ls1knOCKeswly0jeYrS5DPiY7FkCd3a
-         snFhVn6FT0z785DKx1VHau6DooM7FqNQgVfvBR48QP+EEetvBk57sdrChfpoxnek9ixm
-         KZ3A==
-X-Gm-Message-State: APuU4Z/0fq3+GhcKcnJ4SoUi4p+ERrgG9hHyegaRduyMmaYFzDjG86G3
-	Uf+ukYT1b7toV4e39Zwk23/vs9IjebdgXySs11iWP9VixkY8HO6hLT3Ms1kFXsG5mQP4Wvqf/vN
-	q/XsSpoRVQ//cCu2PKUwu1BWaRJ8eldhQrN6tSIAj3mDZ0XLNxYZFhVf5l5cFcRnHRTI697DV1J
-	ijDn4=
-X-Gm-Gg: AZFdTZfO917VQ2lm1FKMjXES8IEsNVMTuLaqjC+4vdZaSdzM6JqFO18Hy6YbqcPH9xM
-	9TJ5pIVbpZPAznf+YA+MYgbEwqqn0PAw31qeoLktBV+86r2PneGG92YJH2FAaX2xV37fTKDSPDY
-	aukgS9f50bKQoZkkgmWR7g+3oldp3AtjfaKuderqm9eOayVjay0Rxtf8caW0fltHn2yO5SVDNRP
-	48WYP9nHUba0gsP2GPQXyq3vrx5kAjWNLYjRj3CAjy7C2VnQho5jNhj2WBuBqfLOsUg0AU4t+xE
-	n2zsDYEfNLBFO6XiF0RC8CM64o0A9k1ePb9WhOq6POe6cz0gHIiM7zMwNvjp0mCtp7n2DqexASy
-	R3564IXPGFVzxSB69b4c12H41NMYuTc7Fftfb+unPTKt7pahGcBIimXemlgArXCQPHGG6EbAvXf
-	PthI48GLgb3V2WfsT5A+P6G20q81PNj/MgTjN8hE4=
-X-Received: by 2002:a17:902:d547:b0:2f0:33d8:f88d with SMTP id d9443c01a7336-2f03ee6fa4fmr213866905ad.0.1795489046040;
-        Mon, 23 Nov 2026 18:57:26 -0800 (PST)
-X-Received: by 2002:a17:902:d547:b0:2f0:33d8:f88d with SMTP id d9443c01a7336-2f03ee6fa4fmr213866605ad.0.1795489045545;
-        Mon, 23 Nov 2026 18:57:25 -0800 (PST)
-Received: from [10.249.21.191] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f1276c5sm65412885ad.67.2026.11.23.18.57.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Nov 2026 18:57:24 -0800 (PST)
-Message-ID: <eb42aa05-3065-446e-b257-b08477e04c6f@oss.qualcomm.com>
-Date: Tue, 24 Nov 2026 10:57:22 +0800
+        d=1e100.net; s=20260707; t=1795490473; x=1796095273;
+        h=content-type:cc:to:subject:message-id:date:mime-version:from
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=5K8gBQmbANshQMGjOwGW+ZIQJvSSKhEt8Jf+UhdYaoE=;
+        b=GVqpJsT8emwvwgzesAg75sS1REBk5vrbPwueFb2hHGBouw/+GVG0zYTkz/djKGX484
+         w/1OmYU9SPAp9NCOQoPUnHMj4sewam76EdaEekBptvolT7LQ+k6Ja1YGDuI0mf1ZV6v4
+         BkYwudLXJobNPPu0CeU2DUL5nL7Gam1qcPrweOq5f3hBRpaJZ6A41ffZZjg5N1aJVrRb
+         4q4PJ7xiw90sBgFU43zErql2ZCZD53RutSMnnhVQWE2pSJbz4bDWQ+GvAPRfyspZXsAU
+         C36B0sv4jUoYEnJXvekPWIpCPqJls6h43gH5qhvez9U+Cr5OEaMF/1OnlduhMLf5layP
+         N4Cw==
+X-Gm-Message-State: APuU4Z8bIkyCssZn5waSmkhQ2qJ50llbkxPXPHb5TYaUDdtJNYSMous0
+	M9iD05ZcuJmGSykC1WCXnKqnhX4MZP2dtty3KY5GWBw+gEvG9b9BwkIVf5LLg/dooNVvc7XZk82
+	kOnOvA6B/H+QY+RBtXnEvd0GqlKzCZlo=
+X-Gm-Gg: AZFdTZeEhH7rr5vCGo/GRJ7nLlWvOyebaFSoC98/IMbR7r4w88jaskwY9bEWJ/gcVwg
+	5d/8TunYlcrbjLkgSQFLEYK5iceN2jcAem15wUe3EDZr6PqhfXQAQhdcaxakEvcQEDQY+ubc4Ce
+	gOR1V+IJzMPIFCme4pdwuYvpq48MfeUySWIra78jIv0geeade0JDvfYtcA0vOWTtm/KdBV4b9p9
+	T+vB7Bq+gzKQJuHKjdCQDVHFFmB2Ksk93KmkAvjPwNNznNB4VB9lt852UrjXWuAbXHjWDyx4sxV
+	GWdo5ZdtJZcT8HY03ZuwDdt/71OQleO7y0uvKavYnc/A+3fzu0USwCIAD5YmrETklSoNGJCGmOf
+	C9/AH/fC4BggG9lGnJWtuAHSM2LI02rkjz44k
+X-Received: by 2002:a05:690e:1c08:b0:67e:5ce:90ce with SMTP id
+ 956f58d0204a3-67e05ce91cfmr3267820d50.44.1795490472582; Mon, 23 Nov 2026
+ 19:21:12 -0800 (PST)
+Received: from 723974502065 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 23 Nov 2026 19:21:12 -0800
+From: Qican Ma <goonsomeway@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -115,85 +102,141 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bluez 2/3] tools/test-runner: Support running on arm64
- hosts
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
-References: <20261122-tr_arm64-v1-0-4eccf35daeca@oss.qualcomm.com>
- <20261122-tr_arm64-v1-2-4eccf35daeca@oss.qualcomm.com>
- <edb6288e11cf9eab058cada5151c0c071587eb3e.camel@iki.fi>
- <249d8212-f68a-4eee-b92c-efb339dd9de4@oss.qualcomm.com>
- <CABBYNZ+-8kb2wA4fd5oYq=_hi9BSfFwie-RSpsZdVbCM57qCUQ@mail.gmail.com>
-Content-Language: en-US
-From: Zijun Hu <zijun.hu@oss.qualcomm.com>
-In-Reply-To: <CABBYNZ+-8kb2wA4fd5oYq=_hi9BSfFwie-RSpsZdVbCM57qCUQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=Y+ptIReN c=1 sm=1 tr=0 ts=6b04fd16 cx=c_pps
- a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=J5rNfPaM_tw-T4xYV3oA:9 a=QEXdDO2ut3YA:10 a=GvdueXVYPmCkWapjIL-Q:22
-X-Proofpoint-GUID: a6cY7S1YcWcpismh8A1l-kXq1H2XNu1h
-X-Proofpoint-ORIG-GUID: a6cY7S1YcWcpismh8A1l-kXq1H2XNu1h
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI0MDAxMSBTYWx0ZWRfX5Av4BQN+wExS
- poEUW8ughkZfqyx9QuDib+zsC/oaWW2pvutfLxZQeJI8KKQweDtsxP3ZbJTeTGdFyoF4iBv/Fo3
- rbI1o75qUUNK/kMU3DjdmQXLx1aVVrk=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI0MDAxMSBTYWx0ZWRfXzj55cjaGxnmZ
- 4ve+SKFG5V5pkk1r9ox9HTjRXvrwboDpB7kqblynaWhGtdJDWsIX5GzQrNh5qRFco6uyc05sXkp
- 15ZXTZsYePMoOkikWINQlsk3PwxGuUvzh3HnEEqEpKduH6Uvzh5qm8AfMLk3cTHbemnpQbI7Feb
- 2p07T+89Q2D/wn3vGLLzx5qb+99AgLJLEQfTWOjfThbLOKfov42oic0CSpLDKWI9xZVWkaSrhJJ
- T+duqq6LwmefXd7iHA+ij7j3aHtXCmTe7QHlSHAlTWqjdzxEYqjaaIlj1mTTMt7oRg45HxQbGB9
- ZsIa9DmjFfTvkN78D5qasxOPC/5Vg/amJ/pGWdaKNHPHn3AF8izFMKNaTCKlLCKuAxU3rRz6M3s
- O750dFrdsWmen2+EIBOJLDvoN4xVjEax1Yv7b721M1ZstpYcz0tqZSDRbfD+/IwnX8xancWtLXc
- 3LSO3ToqFlWg/Wle8vQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-24_01,2026-11-23_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 clxscore=1015 malwarescore=0 adultscore=0 spamscore=0
- lowpriorityscore=0 bulkscore=0 suspectscore=0 impostorscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611240011
+Date: Mon, 23 Nov 2026 19:21:12 -0800
+X-Gm-Features: Aa3M54pdCqnY3E60UONaT_y3uCUMeDrztdQuqt2t4mZW7K25hPa6BOLUhPo-sOk
+Message-ID: <CA+OT+OO6R-qQc0L9YE1ktBtzWCpFcQ2MbSG63sH4--gk3E5LjA@mail.gmail.com>
+Subject: [PATCH] Bluetooth: RFCOMM: serialize RFCOMM_CONNINFO dlc->session dereference
+To: marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/23/2026 10:45 PM, Luiz Augusto von Dentz wrote:
->>> Should it actually determine whether to run qemu x86 vs aarch based on
->>> what the kernel image is, and not the host system this is compiled for?
->> I don't think so. Choosing at build time is correct and simpler than
->> at runtime:
->>
->> 1) The guest shares the host rootfs and runs the host binaries, with
->>  test-runner itself as init, so guest arch == host arch == the arch
->>  test-runner is built for, namely, the build arch decides both the
->>  host and guest arch.
->>
->> 2) Kernel images come in many formats (bzImage, vmlinux, Image,
->>  Image.gz, ...), so detecting the arch at runtime would add more
->>  logic than it is worth, while QEMU for a given arch already parses
->>  its formats with -kernel.
-> I guess that is a fair point: the tools binaries would have to be
-> built for the same arch of the kernel image. However, that doesn't
-> rule out running test-runner on an x86 host while mounting the rootfs
-> with a cross compiled tools. I guess we shouldn't recommend that setup
+rfcomm_sock_getsockopt_old() checks rfcomm_pi(sk)->dlc->session and then
+dereferences dlc->session->sock->sk while holding only lock_sock(sk).
+rfcomm_dlc_unlink() clears d->session and rfcomm_session_del() frees the
+session under rfcomm_mutex without taking the socket lock, leaving a
+check-then-dereference race against concurrent session teardown.
 
-That doesn't work, e.g. on an x86 host:
-test-runner(x86) -q qemu-system-aarch64 -k arch/arm64/boot/Image -- /bin/bash(arm64)
-since test-runner(x86) can't run in the arm64 guest as the init
+Commit 46f8ffd0a1f1 ("Bluetooth: RFCOMM: fix NULL dereference of
+dlc->session in RFCOMM_CONNINFO") added the NULL check for the
+post-disconnect case on deferred-setup sockets, but did not serialize
+the dereference against concurrent unlink and kfree().
 
-> since it's counterproductive and considerably slower to compile and
+Add rfcomm_dlc_get_conninfo() to read the underlying L2CAP connection
+fields under rfcomm_lock(). Hold a reference on the DLC and drop the
+socket lock around the helper call to preserve the established
+rfcomm_mutex -> lock_sock(sk) lock ordering used by krfcommd.
 
-Agreed. Actually, test-runner requires:
-arch test-runner is built for == host arch == guest kernel arch
-and failing when this rule is violated is expected.
- 
-> run. That said we could perhaps print an error if the user attempts to
-> pass a kernel image of a different arch; test-runner should probably
-> fail with a clear message stating that this is not supported.
+Found with an LLM-assisted code review tool and verified by inspection on
+v7.4-rc4 (b6a9fa34ce4). Build-tested only; no runtime reproducer was
+constructed for the narrow disconnect race window.
 
-So, is it acceptable to illustrate this rule in the ARCHITECTURE
-section of doc/test-runner.rst instead of parsing the various guest
-kernel image formats to detect the arch and print an error?
+Fixes: bb23c0ab8246 ("Bluetooth: Add support for deferring RFCOMM
+connection setup")
+Fixes: 46f8ffd0a1f1 ("Bluetooth: RFCOMM: fix NULL dereference of
+dlc->session in RFCOMM_CONNINFO")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qican Ma <goonsomeway@gmail.com>
+---
+ include/net/bluetooth/rfcomm.h |  2 ++
+ net/bluetooth/rfcomm/core.c    | 23 +++++++++++++++++++++++
+ net/bluetooth/rfcomm/sock.c    | 24 ++++++++++++------------
+ 3 files changed, 37 insertions(+), 12 deletions(-)
 
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 9dc5fd4cb8c..2e2cd873dd3 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -290,6 +290,8 @@ struct rfcomm_conninfo {
+ 	__u8  dev_class[3];
+ };
 
++int rfcomm_dlc_get_conninfo(struct rfcomm_dlc *d, struct rfcomm_conninfo *ci);
++
+ #define RFCOMM_LM	0x03
+ #define RFCOMM_LM_MASTER	0x0001
+ #define RFCOMM_LM_AUTH		0x0002
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 8a4205347c4..e6af6f5f591 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1427,6 +1427,29 @@ void rfcomm_dlc_accept(struct rfcomm_dlc *d)
+ 	rfcomm_unlock();
+ }
 
++int rfcomm_dlc_get_conninfo(struct rfcomm_dlc *d, struct rfcomm_conninfo *ci)
++{
++	struct l2cap_conn *conn;
++	struct sock *l2cap_sk;
++	int err = 0;
++
++	rfcomm_lock();
++
++	if (!d->session) {
++		err = -ENOTCONN;
++	} else {
++		l2cap_sk = d->session->sock->sk;
++		conn = l2cap_pi(l2cap_sk)->chan->conn;
++
++		memset(ci, 0, sizeof(*ci));
++		ci->hci_handle = conn->hcon->handle;
++		memcpy(ci->dev_class, conn->hcon->dev_class, 3);
++	}
++
++	rfcomm_unlock();
++	return err;
++}
++
+ static void rfcomm_check_accept(struct rfcomm_dlc *d)
+ {
+ 	if (rfcomm_check_security(d)) {
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 3fb8b547494..e91a129a67b 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -741,9 +741,8 @@ static int rfcomm_sock_getsockopt_old(struct
+socket *sock, int optname,
+ 				      sockopt_t *sopt)
+ {
+ 	struct sock *sk = sock->sk;
+-	struct sock *l2cap_sk;
+-	struct l2cap_conn *conn;
+ 	struct rfcomm_conninfo cinfo;
++	struct rfcomm_dlc *d;
+ 	int err = 0;
+ 	size_t len;
+ 	u32 opt;
+@@ -786,20 +785,21 @@ static int rfcomm_sock_getsockopt_old(struct
+socket *sock, int optname,
+ 		break;
+
+ 	case RFCOMM_CONNINFO:
+-		if ((sk->sk_state != BT_CONNECTED &&
+-		     !(sk->sk_state == BT_CONNECT2 &&
+-		       rfcomm_pi(sk)->dlc->defer_setup)) ||
+-		    !rfcomm_pi(sk)->dlc->session) {
++		if (sk->sk_state != BT_CONNECTED &&
++		    !(sk->sk_state == BT_CONNECT2 &&
++		      rfcomm_pi(sk)->dlc->defer_setup)) {
+ 			err = -ENOTCONN;
+ 			break;
+ 		}
+
+-		l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+-		conn = l2cap_pi(l2cap_sk)->chan->conn;
+-
+-		memset(&cinfo, 0, sizeof(cinfo));
+-		cinfo.hci_handle = conn->hcon->handle;
+-		memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
++		d = rfcomm_pi(sk)->dlc;
++		rfcomm_dlc_hold(d);
++		release_sock(sk);
++		err = rfcomm_dlc_get_conninfo(d, &cinfo);
++		rfcomm_dlc_put(d);
++		lock_sock(sk);
++		if (err)
++			break;
+
+ 		len = min(len, sizeof(cinfo));
+ 		if (copy_to_iter(&cinfo, len, &sopt->iter_out) != len)
+-- 
+2.50.1 (Apple Git-155)
