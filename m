@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.70.183.196
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795535618;
-	b=5Ot6L8AxAsfjrmgPomRooMWVXNBg+IxLT5WfDp4yqDA7xIQzAXvV0CyGu6ZHI7b1E3GO
-	 wl4lrspX0RLW68JcWUKEfoIiv9GMnLK+b9ADU9vTDEWanNk0MwYkTetmdJsu/wqjYaik5
-	 PdpbNAI+yQRkSlDZbYV8g1suYBLJVgX9vY6a1a4wAwQAr1F5/1dKMqEdM3jcVmtHxALv4
-	 uPTZ7g8xL9doF01jNnbsaU1yfXfKfa9wm2bXRLq50qgtlsUn12xSjgwoQKafqGuvpXdqG
-	 GFQzwzp+XGuWY8/P79RrfzHFWy7TPpyoQFBj3gVvH2UwPfg5WtwJkQdlCLem18TZtJQ==
+	b=V27MIpFo4Jpo4YOfkcv22xPFoTeg9FQPccyXuKXNPeHR4v1bLXYb5P1NdpboPzePAfJY
+	 zq2A7Xkp2fypwRqas0Cisp23KXenDWTFYY86qUJs+OV8UeuzM1S+Vh4SblZhwDvHqI8vh
+	 w6sFVBcnRxcZbDKOa2Ky7+MrX3RGbrsfQcUyCwg2UTvGxKde1n6m9QKL3YHGFt47Dr6QB
+	 y9nJdaiVcngHjjrFgp2D8glLc8j9IDLhHnXs2Y9mFFFlZkYryHtIV6SbjBtYC9xjvFTJT
+	 E5PGjwge+TrIq6O/quAoSrWp7Kqn5NkXBo/unPFI2gcu/ePQJlPHRBM6H8jK8vMQgNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795535618;
 	h=DMARC-Filter:Received:From:To:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
 	 X-GND-Sasl:X-GND-Score:X-GND-Cause:X-GND-State;
-	bh=JwjH8jPXZLQWqy1Q97PDf8fY7CnZHSI9wRezoExhAng=;
-	b=jvuRwBL5hEURuNvGDQ7NiPDiBuB/qabqolsEPf99ppWE00x8CWiESYp+HR+nwuMx0OMg
-	 xw9zM+JoDEKcvSVeWa8Lm5tWajWYFy68bluF57wuJjlkV6md/NYeGFuLtD5COgTCXILZ2
-	 Rd2WMAU4RLNrQErt9fRC8HcmxnicP4NgrrOw53uY8eol/+S5JfqokIdUVJ0VwM53HlG8n
-	 JHDwPK4BUFOm+1kLvH1fOaagU/EcLp1RphQBXZK5b1U0hoLKcJdqC7cLOjxOeHTtV9AS+
-	 CGpMK5EUpyKrwFnTMtMBa1UZouneWk6oev50ORb/9/MqWQTfGXdPoFBFs1Diwb6dFGQ==
+	bh=dKGmhE3EGMWo2/OnOcb+JkK9VU3oqaMygTogl84oBsw=;
+	b=AR+nu2Fv39v4u92UqyLeLfF+cwbAbwM7Zs1CaCnWQUQtWIIaOESEosmXLKHbJxvm47tQ
+	 WeimJSxbCRRjTSVxQoqpb5FfI3Qy3AS6JWJj0HjP0R70t+FT+8/OV9KqxMv6pxwTR9vdz
+	 qPoxdfzd6SHS2lJ16+Kb/fSM/KVBwZhcQSCUG5yAGIk0zUKPCUw7UBQNN6FXQSlIcUKU5
+	 zCJjf0L3ZcETr1NS/nPbbqlP/9OO45JKtErBy5nMBG3sW9DI1ElfiCXIGkreo+qq9wb0v
+	 7dBP0QQV//cagEdygiogYZmlPDjvn/KgGBHxzOYIFBPrCLYOg9NK03cTG2YmnSsfDJg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=hadess.net;
 	spf=pass smtp.mailfrom=hadess.net;
@@ -25,18 +25,18 @@ Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196]
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F77606A68E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A83C606A691
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:53:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83F77606A68E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9A83C606A691
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C7B493F5BB
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:53:30 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E23BA3F5B1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:53:29 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v11 13/14] github: Add docs deployment
-Date: Tue, 24 Nov 2026 16:50:44 +0100
-Message-ID: <20261124155319.1752879-14-hadess@hadess.net>
+Subject: [BlueZ v11 10/14] build: Only build gdbus library if there is a user
+Date: Tue, 24 Nov 2026 16:50:41 +0100
+Message-ID: <20261124155319.1752879-11-hadess@hadess.net>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261124155319.1752879-1-hadess@hadess.net>
 References: <20261124155319.1752879-1-hadess@hadess.net>
@@ -52,74 +52,28 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 X-GND-Score: 0
-X-GND-Cause: dmFkZTEl1HvpEMdP/OkapW9gaMSRNrF7roNtKXbwKpGs6hhiGaPpXZYLJohkYQyFzbqDEYzcZ4fO8HjOoRHUMpoMAi3jrSkPTh4wA00NcG9j4sxgNL+JbIa4KvtNS6hr//jTv3sOEnQcnSGUjhhZAvG03Pbav7BVidOFGZV0W8su5GQUJBAfOA1X3C+a+eJP1dV7opwlPwtdbzp2zbdrasVBoCsDR5GVX6rgCEkc7d9ecfXzDL5rb9i8xLVCKE/Jc0ox3/5kVkjbWzJcI6/8MwndlOh6T2KF6ttQbCgeDxahX2E9KtaBiVgaZEsDDgAa7w5DM4f5npwoNbxi4OKLlBy5UmFpJIzfYzNVQzmsqZCpX7eWYkXLfITVEq7XfLwJdboBbtd6l/xBNO51BdA1DtPloOfgVfT4NuQoNiyoxet4skuko75Qmtq2r0983BEmmcjtxSpJ9i9DIX5HaufX5cx7CET8WiMzV8tHmtSe/pNPOdMG51Xh6BfvLZvvnjg3EZNZY6z8wt+Gok0SoawqT7j5gXibVvOnHuGcwIy6ZFFX2T23cHOUDLgoB2Z2L6r4XKKXW83dpROR74X9/u3aVXtu9Fw6qmFYaBzyEg6mm9rAikA/YWF7wxyCvW6kt2QTUDIauZrc3/NxrkxPWDesIDA5j7gM2w4WbPx/L4JPM+OEXpZWzQ
+X-GND-Cause: dmFkZTGkBQPJBgyPp3EQcm81e1o6okEqvhg68CbVpV7cswzi9J34puYBUcRJblDMvhLWDqHk0B4IQEOuTrP0jemR+UlnuQBF6s+RQBIrWF2me6rXh4X0IfiZxsBBo+5ja+bxgJ1w3dPYvN60ahlXEBHvwwxXhfROQqxR8oh7NaBuAdTnR99qN9ElNArhTI5/fEBObzxTBYDDRV90DTrZYWVQrlqYQtDFdCVW5Q86cZ8Z7EYd8vUecONBX0RUZTpzr+cvizy+EUgnBDezhvgi7gaTx+eiUjngG2Cw9BthUGRuc7RRbx74AqH5NLJBGm64XpJK6j+rQiyyg19+JNOPFsqhIjMFtQXrr5Yr8kONCtzlZ2CkmjAgiuwGz18ih5goHUvS+/AumhE2QJb+Hf/QaFnFHn6RaRy/HIvjpu8xw0mACOLCZNbpveomAZ2313CcLoSzW4ku3M/EHBiY09OufZiHQ6YV/1uU+Ve6yj1et1MqMIjA0ByYCYtHIkR6EMWOo6aKNRzSfdOdj364p3c6SA2oGD8cg1ya30GjZ86Je8QSf9lTUN6IN11nak6RcnFDYcHlZW6QuMmMwpUgRF7gR+gXiaLAAWbo2daAlyQdwy7eReAFJc8rB4vhvTiaRQ3B++Pczbu9TKyjEESt7R0w7Ft7YSFervrb35xv6go8xKxQMQ1QSg
 X-GND-State: clean
 
 ---
- .github/workflows/docs.yml | 54 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
- create mode 100644 .github/workflows/docs.yml
+ meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/.github/workflows/docs.yml b/.github/workflows/docs.yml
-new file mode 100644
-index 000000000000..e21504a4edf3
---- /dev/null
-+++ b/.github/workflows/docs.yml
-@@ -0,0 +1,54 @@
-+name: Deploy Docs
-+
-+on:
-+  push:
-+    branches:
-+      - master
-+  workflow_dispatch:
-+
-+permissions:
-+  contents: read
-+  pages: write
-+  id-token: write
-+
-+concurrency:
-+  group: pages
-+  cancel-in-progress: true
-+
-+jobs:
-+  build:
-+    runs-on: ubuntu-latest
-+    steps:
-+      - name: Checkout
-+        uses: actions/checkout@v4
-+
-+      - name: Set up Python
-+        uses: actions/setup-python@v5
-+        with:
-+          python-version: "3.12"
-+
-+      - name: Install deps
-+        run: |
-+          sudo apt-get update
-+          sudo apt install -y libglib2.0-dev libdbus-1-dev meson python3-docutils furo python3-sphinx python3-sphinx-copybutton python3-sphinxext-opengraph
-+
-+      - name: Build site
-+        run: |
-+          meson setup --prefix /tmp/bluez-install --libdir lib -Dudev=disabled -Dauto_features=disabled -Dtools=disabled -Dclient=disabled -Ddaemon=disabled -Dsystemd=disabled -Dmonitor=disabled -Ddeprecated=disabled -Dexperimental=disabled -Ddocumentation=enabled -Dlocalstatedir=/var _build
-+          meson compile -C _build
-+
-+      - name: Upload Pages artifact
-+        uses: actions/upload-pages-artifact@v3
-+        with:
-+          path: _build/doc/html/
-+
-+  deploy:
-+    runs-on: ubuntu-latest
-+    needs: build
-+    environment:
-+      name: github-pages
-+      url: ${{ steps.deployment.outputs.page_url }}
-+    steps:
-+      - name: Deploy to GitHub Pages
-+        id: deployment
-+        uses: actions/deploy-pages@v4
+diff --git a/meson.build b/meson.build
+index d3cd76c1032b..01582a0b5969 100644
+--- a/meson.build
++++ b/meson.build
+@@ -270,7 +270,9 @@ configure_file(
+ )
+ 
+ subdir('lib')
+-subdir('gdbus')
++if not get_option('tools').disabled() or get_option('client').enabled() or get_option('obex').enabled() or not get_option('tests').disabled() or not get_option('daemon').disabled()
++  subdir('gdbus')
++endif
+ subdir('btio')
+ subdir('plugins')
+ if get_option('daemon').enabled()
 -- 
 2.56.0
 
