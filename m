@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795513478;
-	b=IEXFV/kxqxqNz0OcS92MBrCjXKMy7bW7uNXYmbnP9OAJph5n/fA0RBYwGvSbTPEqzLoi
-	 BoNK4jv4eZIt0GTaytjvWVTw3i3nlvHhMxmlsi+2y3NRaCXxN9hZcYZ2Wcfg2BXOX2GIY
-	 j/rD/7wxB69ndedND9rrkzvZJTiKFXpTWNIn5OocgWC66RMCJFKWrDmwC59J9Vifgpecs
-	 oTaX8j94TE3n4wSp5vVEbdmhdU1x5nFmN60yKf3nQH2t0ZVPZSAqqI7vyBcCM0E7gf01J
-	 RahC0e4hs4xoitdFwzjpuWxuKtpJdqC3xlGj74Cv/XKWdoHjzRpHSuUXu86vptPYajg==
+	t=1795513469;
+	b=32fjOuQMKp2RGzYzD5HgrItDu+pR4ZE8dq4zS9IEZzX7WzfYGPvG3HLTtJ885Qd3xg8s
+	 kb9T6v71AoW00/lj3SIwxGS3u/Rqz8qwsSmYmy1m7zltAdedaSgi+sGSvWA/P7QcomzvL
+	 2CNCXXN0AI+4aNlVfpooYsniHS32La3sAsDydP1e5lxRlp/OHN71QdWHwlOMmd5cbEMSr
+	 51LgcCpvJIxESHA4Jw4UYpzL8QXP/Cui1zdL1JYMLNo2SauGShXyLMGVumL+8BhAYz6HZ
+	 EGBMQpqN2JZb5hkQCgWlP7RoYx1O8mJdXnW6Lv1Dvm1+5Z5+r3bfdMMZPe7892DO8kQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795513478;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795513469;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 Content-Transfer-Encoding;
-	bh=U1U4cqLXy2TPKYTc2nCd+GXlXsu96XA9ImgVgtVC+CM=;
-	b=uImIfrB/I7jqpo3Rqhepoa6AcFvo+5eJPnrtUsxOLIiavmTrskzoYkcumFUt/tEIuWa4
-	 ZkZ+rUb4OdlqzX9WIfxJc2wlodUK3OWjIGLt3CBS5OEtcnBEJ2Qiajq6PQcLGJfTteOBJ
-	 ji+67keWATKCsu5thApNcsfoD9mS7+TCEdpusXzJOutj4UlivT92yUWc+78Zq0a0eaayl
-	 l4dB73Y6gyx7vRbw6+hRiuBzKaWfxtusa9XwUySFAoq2RA9sz9UfIAOh+fmt79XfP8Bk+
-	 MjgWdMHS+2DZTKkMQilAWgY3RjWszVB1d0cz8PxTVQ/S8jtSwd4aejK+H09O3HCTrkg==
+	bh=p4sT5+vbEJgTPXn0ZxCwAz9v5MiOVyx+czs5SWxFdeU=;
+	b=AgXs1dYlIIhBpKwe/IlTT+jADF+iyuXmApNIgz1jeV0+jbH647gtfnB3TifKNIo9CVE8
+	 u5Arzap0Y/Wx/qZL2/yRrViZ9Nmsh99aEYVi4laMlG5g0nbyCV39ixdjHwcAL/QuXGEFA
+	 FMdPiqhKF+q4jIN7A91WB3OoWCZ7BAd56EHH8tLjKpTirSkp9fjC1aB5f6ZrUn9JGkkbe
+	 0f/XWDOZnI1holOKlS55jypj8VIv5frkT1i0NkCTf41HDKTi8NGDy0XBXPNriusK7xQIr
+	 vCCow5/JNLfiw03NkUEPbY/Jf898SMPhtN9DOanJd218b6r+GeCPZ8P0FFXFQA1wv9Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AOOAh7Hu;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nzlwURpe;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7507606A68C;
-	Tue, 24 Nov 2026 09:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB2D606A6AD;
+	Tue, 24 Nov 2026 09:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AOOAh7Hu
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9573F1F000E0;
-	Tue, 24 Nov 2026 09:44:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nzlwURpe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B75141F00A19;
+	Tue, 24 Nov 2026 09:44:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795513478;
-	bh=U1U4cqLXy2TPKYTc2nCd+GXlXsu96XA9ImgVgtVC+CM=;
+	s=k20260515; t=1795513468;
+	bh=p4sT5+vbEJgTPXn0ZxCwAz9v5MiOVyx+czs5SWxFdeU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AOOAh7HuGjeBfXfb5eWeJV+oHc8wfCUEHmHQ+DBb/OCZdkyZmUA1e7PTZhrRXkfIS
-	 O5yANy1DoQl3UPJyfh69s1JvEp1jj5q5lDfylrtJUZRXIYs0S0B/vi/nrJlDYAQMAM
-	 3rgavDyekraF5uuVXjYQ27JfnDmrk/WS4mf6EA2kugPAUyvwhChfKkAiAE+jOvBDPB
-	 MUwaHNWrq2Xrv2W8MdSmSYsXscFbXTzNHfaEYpjsjm8/H0lG0B0bXaVo0Ih5qWuKaJ
-	 3GSN7DOEC3fb91rBY3o0x8jvSgSVdg5EpWFk8V7GsKsctQ0RDH5mu1oBx/yT0zl2GQ
-	 NFOO9/bcoFfOA==
+	b=nzlwURpebWbSzflPGrSsOImZ2bkcmFOZTDs2gOO+FcErgqYeZBXNIV22z7Fa9f06s
+	 2FW5pMqNrqElmv+oP7h75F7VCBSUDVAWyq9fJCirEuAyNlt04+PjRTM3dyq5Wfvcml
+	 7/iP4sL5oxjGmcn61TSFaQJJjgSuZx1qO4ZvBWSnQsvZHjz0YoGjzHwMlwpz255otb
+	 LL3eUYPk4wmRwKgX8dm5Ypu9dQsFMaiaTWQO11Qt6do/sYRYSRylEC6P+xBi0q8oZP
+	 3o81xyc6QCTho1NzeSAbwVf1ccMLwrZ6jyDlJC7AvJxkjtiZSSoWeogROlrhlqSLYG
+	 pnYNy0FEwu4EA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
@@ -100,9 +100,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@suse.de>,
 	linux-sound@vger.kernel.org,
 	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: [PATCH v4 06/33] USB: Reject usbfs connect requests for unregistered interfaces
-Date: Tue, 24 Nov 2026 11:43:37 +0200
-Message-ID: <20261124-device-trust-core-v4-6-037eb0d17b1f@nvidia.com>
+Subject: [PATCH v4 04/33] USB: serial: Register USB drivers with their owning module
+Date: Tue, 24 Nov 2026 11:43:35 +0200
+Message-ID: <20261124-device-trust-core-v4-4-037eb0d17b1f@nvidia.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
 References: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
@@ -121,46 +121,68 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-USB core does not register DT-disabled interfaces, and an interface whose
-registration failed stays in the active configuration. USBDEVFS_CONNECT
-still asks driver core to attach a driver to such an interface:
+The USB-serial core allocates each USB driver on behalf of its serial
+module, which deregisters and frees it during module exit. Registering
+through usb_register() instead identifies the USB-serial core as its
+owner, so a module reference does not retain the driver's allocation.
 
-proc_ioctl()
-  device_attach()
-    __device_attach()
+Pass the serial module's owner and KBUILD_MODNAME to usb_register_driver().
+Keep the module name separate from the USB driver name so built-in drivers
+also link to the correct module.
 
-The interface has no driver-core private data, so the request
-dereferences a NULL pointer.
-
-Return -ENODEV for an unregistered interface. An interface claimed by a
-sibling driver keeps reporting -EBUSY.
-
-Fixes: ef0ff68351be ("driver core: Probe devices asynchronously instead of the driver")
+Fixes: 68e24113457e ("USB: serial: rework usb_serial_register/deregister_drivers()")
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/usb/core/devio.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/usb/serial/usb-serial.c | 4 +++-
+ include/linux/usb/serial.h      | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/usb/core/devio.c b/drivers/usb/core/devio.c
-index 101cb94254809..1491ba015bcd8 100644
---- a/drivers/usb/core/devio.c
-+++ b/drivers/usb/core/devio.c
-@@ -2366,10 +2366,12 @@ static int proc_ioctl(struct usb_dev_state *ps, struct usbdevfs_ioctl *ctl)
+diff --git a/drivers/usb/serial/usb-serial.c b/drivers/usb/serial/usb-serial.c
+index 4a19621f08ba2..ccbd0875339a3 100644
+--- a/drivers/usb/serial/usb-serial.c
++++ b/drivers/usb/serial/usb-serial.c
+@@ -1513,6 +1513,7 @@ static void usb_serial_deregister(struct usb_serial_driver *device)
+  * @serial_drivers: NULL-terminated array of pointers to drivers to be registered
+  * @owner: owning module
+  * @name: name of the usb_driver for this set of @serial_drivers
++ * @mod_name: name of the module containing the serial drivers
+  * @id_table: list of all devices this @serial_drivers set binds to
+  *
+  * Registers all the drivers in the @serial_drivers array, and dynamically
+@@ -1520,6 +1521,7 @@ static void usb_serial_deregister(struct usb_serial_driver *device)
+  */
+ int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers[],
+ 				  struct module *owner, const char *name,
++				  const char *mod_name,
+ 				  const struct usb_device_id *id_table)
+ {
+ 	int rc;
+@@ -1559,7 +1561,7 @@ int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers
+ 		}
+ 	}
  
- 	/* let kernel drivers try to (re)bind to the interface */
- 	case USBDEVFS_CONNECT:
--		if (!intf->dev.driver)
--			retval = device_attach(&intf->dev);
--		else
-+		if (intf->dev.driver)
- 			retval = -EBUSY;
-+		else if (!device_is_registered(&intf->dev))
-+			retval = -ENODEV;
-+		else
-+			retval = device_attach(&intf->dev);
- 		break;
+-	rc = usb_register(udriver);
++	rc = usb_register_driver(udriver, owner, mod_name);
+ 	if (rc)
+ 		goto err_free_driver;
  
- 	/* talk directly to the interface's driver */
+diff --git a/include/linux/usb/serial.h b/include/linux/usb/serial.h
+index 5866f19d3c7b8..fcfd0e26e0ffb 100644
+--- a/include/linux/usb/serial.h
++++ b/include/linux/usb/serial.h
+@@ -321,9 +321,11 @@ struct usb_serial_driver {
+ 	container_of(d, struct usb_serial_driver, driver)
+ 
+ #define usb_serial_register_drivers(serial_drivers, name, id_table) \
+-	__usb_serial_register_drivers(serial_drivers, THIS_MODULE, name, id_table)
++	__usb_serial_register_drivers(serial_drivers, THIS_MODULE, name, \
++				      KBUILD_MODNAME, id_table)
+ int __usb_serial_register_drivers(struct usb_serial_driver *const serial_drivers[],
+ 				  struct module *owner, const char *name,
++				  const char *mod_name,
+ 				  const struct usb_device_id *id_table);
+ void usb_serial_deregister_drivers(struct usb_serial_driver *const serial_drivers[]);
+ void usb_serial_port_softint(struct usb_serial_port *port);
 
 -- 
 2.56.1
