@@ -1,84 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795553469;
-	b=XosaGTVrlPxJREHrA6D8yuQLmhld6sjwJbT247ret43u8xd5xcBxB+WwmGJP9IMgJ3y/
-	 s/xLkiN6TNVLXngrgwTEy6tB2pYMffT7mdMExCYN/+sCOTmGVTaBng3pJEICo3OxhOh8E
-	 2avYxjprgxiX6HgqRp2uSyYhH3zXUheynE/Lz4LAUdYKNx4DL3qiXO5OHjkgLBzejYf9D
-	 6977ZTJCZdiurPtCPGX8SnwAyki94Y0Q8AHgQLKZbjUH5kbrRosrBvdi0yxN7qjQ7ui+x
-	 B05ISS2DAJtWjvbatYuWUlRwXBBs1XACbiZD/zTWsOwnN5Wne1I1E7T6LGj2Lb4FXrw==
+	t=1795553470;
+	b=tLwpC8+2CX5Qn9h/5e797C4FNhlxzmirSw0t6l6tRVXmpJ2oNo5ne0MzVvPSX10NpmX4
+	 6H5BxdpkGZqUQg11yQGphmUmaSzC2OjnWjy6jN/Q9AiRnucwfQ7nr1Jne6dCjJ6sVupLE
+	 l8ugNrwm39BjwN0Qd+snQJPt22z6SEfYO//H3+zdR3KLsA0/on6c/hn/Vg6xFgqJ8qVCX
+	 rfo3r5yo7oPxbZaPg2VRrMU5yT3l+yvEsi/EKOI7dPvilUM84Zu3xZZUcpB0T/4BYCjlI
+	 +f2yehMiYCQomo3rMimGwvuebPO6jJebOmqatYfuBQzSQpLQAisiUi8Q0+3hR0DMQew==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795553469;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795553470;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=b4JtSFrK5CFLKh/ihwZCAK0byiOAYliMy9JU9m1WCGk=;
-	b=noHSJrKv1uU5QwXUkcvFngMHa1kChFYG/mukdfcqvAFOH+fgDLK1AvuNB5F2+yeVMSxC
-	 NA+1rKKSTUVv5rp+Uqz2RwlX7ZNe+0ehTkttYeYooGn1C39rtvNwhwreuLgnD12Hgkl4S
-	 1LCUA4180eXMxN/YocluyNZnrxzk5XK+kfp4R0zbRV/dQYihWVNgd27BvcyFm8IB8ww3q
-	 MRBku985xv2Ocz1a0WFWSFC5CTlou9p++k9bcbtik7yveQ5qLr+hWyg7CFAcjSMQCNF7C
-	 m3/lDqj1T2l4AdB0FsGyvarp7d4BRJ9OgprhTlCFEijJqshh1j2XUdNoiQTN3H0b09g==
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+	b=Kv08jmOThzQaF+HkVZ2fgzVynxnG8K0fJ5a5T9c8xQZyEit7eqK5YjhWaaXMg/VJXbod
+	 H7/7gqI8CZ5cARbUGq+CzaeVPZA9pJDk1j1b6b48paKtsda+gux6ziGN0uUAW7/ppIRcd
+	 UFpcSlD+1mHUIqiDQmRsm8oDhNnLUaaPhJvyrO/erYLVX+el4seXN1yDEw01o5bJtQHV6
+	 p1+HkFJOEqCFpbIMljKRHNWsNkyWqb3lnSIUZooWZX0E1hf08bEo4ZkP0Xs/sjtzNGgoO
+	 WjEEgY/BgDy8Wk9XRDn20/VWrC6HI3rY9W+4l4QA8Qzg3p4augvV1EpyU9ECe4VTEhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WnM72nXS;
-	arc=none smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wIX0aD5N;
+	arc=none smtp.remote-ip=209.85.221.174
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66D8606A32C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 20:51:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E66D8606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF00A606A327
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 20:51:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF00A606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WnM72nXS
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-3866a784546so6594147eec.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:51:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wIX0aD5N
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5ec6f271883so3038596e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:51:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795553468; x=1796158268; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=b4JtSFrK5CFLKh/ihwZCAK0byiOAYliMy9JU9m1WCGk=;
-        b=WnM72nXSlBFFlxjkjY/2mKjc0r0RoOQHCkwXKwKEy/tUzpEKQB5wozmI0dhmJx0DiH
-         smuBL3ake4WYbPYCqfoQnicz6bDXsYZEJjYyTrFd2mPQ8BzE/XyCgkPsFhUwKjBTdjbK
-         i2TP8YQ6lT8OU9zbOkcbodkVAXDVjTbewUJzipo4Q/0MgrpzrTAoDnFitskSJCZhmzA3
-         xeVXk/PQDhv6MXj7jaLcEPHpCCN66w/dI6i6kWIOOiHF5/9OIJ2SxDjVfwS3OV7vHvkF
-         ZUGUlrD8g8NpWNZc1I4OOIGqcc08AZ1MUGtns66qQyp5cqllLLhuMCCk7AzmMVt6HwHR
-         mNfQ==
+        bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+        b=wIX0aD5NrlXf70HgJ913eWRn93ZqKF1Q7/Ki/mJJAshco9k9h+7oMEoY8hAbHxyyJn
+         bVUFYuAomJKwwJ1GBiQOnsdRAbudp25GSNAjvxnmCKS1L81lhmRESDQ/sv1pxmgKdCbW
+         qsa06b8NSo44LElMdVndZnlBP0wlcgOVLHzlGL12I40Q+GvF3FSmMXezi9uL4srmt9K3
+         QaJ5ais/GDBtDQyebZHEGRHrMAW3qoptwvdJhKuUjNtBtC5J7fg2NbBEgZXzqbNCjF5r
+         GRGEhUb8X0oF+eKWTeuWObtyB/cn0uMpwK8uMyaCncS0GihvU+s8BVij9QWtF46toe1X
+         zCRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795553468; x=1796158268;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=b4JtSFrK5CFLKh/ihwZCAK0byiOAYliMy9JU9m1WCGk=;
-        b=s6KSyF09BY3EIOnhcb42BpFenZJeJJCWbe3pSaFf5vgWRgZTZbJVHk7X+Oegy+y97U
-         GkZr8JxshNZvXOlMMeEHYhSPN6MMyuwBFSCGQ+fRUDKoe6pYinf5ulf/h2Bp4lv4B08E
-         Sk1mbulJxTGWR6gmCBkMe+HwbND1mbQhkumy1IlymkDd0VuiGM8hXPFPV7MHWDe4xDVE
-         wHFE2u5PVFAkvfvwwPcUeAxi76HUzzLJW9xGecLG8kqHvnisy7thOE0qAwIwSG7AH6AZ
-         hRE6X/cV4EXHSOZ6u/33nGWCha3E5gH99tGrEy8zfodyYsrIdmfQSaEADH5sKBlFGTp2
-         QajA==
-X-Gm-Message-State: APuU4Z+NNXIP4rcH3RyJXkWLZJ6DHc1I9ycjBjs/PaeHWKVd1VaB56p5
-	GwpC/Wx3DGIv2UNojdVJUKCS6Ol/RrgeMziayn7W1UY6x8lJNANtZ68RsEpLYA==
-X-Gm-Gg: AZFdTZdscOYvWnAv7ruO3H13ZVbsyEHBMljLV1uPgDUYorbr5eNyDF7O76A2/G1G4sy
-	eOCnfAZkTzxccwqdTiqEUFs4w9y+m2tsUQP83jSBZ965EJ8brMVVq8XB4RC1qTZzmNK4zxRKOgq
-	fbKAv9t8+s2Ya8yR6rwqlv54mYp6nAuY+pHa2MzA+wsJLfBTk8TLlpDhBtK9IoadIXqMTJRzLSw
-	hh0l+B/ZUvOQZ/SMP/WbozjoeZkg/Tcczm+OA9ZMm4w6oQiWu5lxmfilJ92tcLIzDG6SG3pGeJA
-	T6pQZ+mifmMVotx4fo9VkVuoXzk9NXMUIbAIWs4fWZmSF3zrF5oBx3fVxUu1RH3cOxTGh7wQXTi
-	DKtgUniniZvUWV0YsrPHLDH2yAijlJkhxvmbKhwW/ADMMNPwiVej2oQ+eq6dh021gKl3gPJLfo1
-	+WpGL54W5NyHMFvhQ/ylQnRxJ3+w6DYAJBecgucXq/fLk9MIzvEZq1F6rlH3GhJ6QE9PCwUQHyN
-	hBLWpzabSJx+g9F0Xv9lxyu9ZazwWq98IRtKdhGY0e6270gJqhzcBGhAEDUXP1V
-X-Received: by 2002:a05:7301:700d:b0:383:600a:4577 with SMTP id 5a478bee46e88-385702565damr17532644eec.23.1795553467592;
-        Tue, 24 Nov 2026 12:51:07 -0800 (PST)
-Received: from [172.17.0.2] ([172.182.244.225])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385672c6f31sm46125732eec.15.2026.11.24.12.51.06
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=7XYzZSlM3O2BoehNjFHmoO37Rm46xkBI5D5iJuD3yRU=;
+        b=NTeyO4bTwURv5HlDb5CG58rMez4+DSETKmAsZ7XnbOTNjfExtK9aC2u6FvSMl6F0jY
+         equ4nhx3aSIJd1h6wQLNrMFEVgFbeGrxlydybd+g8t63MqAGYBV3DNWhliwhGTAiHbkd
+         0LLj5DjHxY7jHhsMpUfKM2IbebVB8qaPybbv5a9aYuJoM89K1NpMe5MlSBjZChBRDTMl
+         XIYhEXYL0au2Ue8rLwq3ajl/ifDkeXJ9CLfCh34vMPFDGe4kbWWFi8Tll1Rb7vAPybb9
+         q85VPtKWxK+C+4384Z0YQONfdJghBKWFOHqUiq7TUAEsU/YodwgO+H4vSacEPVxj3zCK
+         vGXQ==
+X-Gm-Message-State: APuU4Z+JlDvF9yKUKmwx6ubq9+scpTmg8V1PgCzryeB8mms+tJ7OHeZ5
+	nw+n/rTy4dB50VOUK8DSKTwusYBM4XZpnoRSyFy7xXi2I4Hos0BTlrBtiB1jRA==
+X-Gm-Gg: AZFdTZeftHt39Z8X94ydCdLL+Le72xiPhir7oZRtPNt7T7MEprncqkMwhyI6qXIbJRZ
+	UUG4LzEwUJvr2Q3764hINP3GU2AiYG/KhZQGhtD3QWqd+hvLNo9ocC538qNYCq/rxKaihjWr1tn
+	tn0InVmaO455Hs3DbVBhYdhJ7/cmfwYVhxji6Vbz65Lvm54DtxQ6x3WWeBfHS3plletX6oWEiwr
+	ILQhoD6P4xcwn+CmCKN0hx3btyz/Zb72u2RdKxTwm1bxmeZAIkgHFAlY6ePqv9HSpNIUNbP6PAd
+	7hsUXZgFsEE+7HQyJERylEVA8iU/vvU4hLpErUseifwuYSArq0rtmwdFxtxn6Mv0Cbh0p9Ig2BX
+	FyX88EmB61gHW0e3Kf92sq+1/mz/HO5QoC3HXKNPSdvpuw+rZ3CvivwX65fJc9L3UgslGeMogTf
+	6TipZhmSnNF9We/t6eekQWKz05KELImNHHHti6bQhiXdM3A0JyOVBEhxINBjphRRegYK4ukxZ5u
+	kfOfiaCuyZhzrHiQF8SpvZxG5fRmyk3x8w23QJ1ju4phUv0VfwDG1jS4UtFP8qJGVgJXRHKWRb2
+	2RiwEfauBfRXEWUT1LEZfqcRm2UCZhwrvtBsC+/C5M2ySFdCLtIO0bQzr5qWr0j4nF+CdtGWNx9
+	nztacGJTSVtKsvQogI58knXBt6iogPejcTrgdJEVQv0gir+jsatoj+SzlFPvEgv4Rdp40PW5zcu
+	BbA0w=
+X-Received: by 2002:a05:6122:3d10:b0:5c9:c60e:5cf5 with SMTP id 71dfb90a1353d-5ee8af2e0dcmr10118607e0c.19.1795553468470;
+        Tue, 24 Nov 2026 12:51:08 -0800 (PST)
+Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee91a4e0cfsm13929876e0c.13.2026.11.24.12.51.07
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 12:51:07 -0800 (PST)
-Message-ID: <6b05f8bb.f7c117cf.2c69b5.d490@mx.google.com>
-Date: Tue, 24 Nov 2026 12:51:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0842537902083498200=="
+        Tue, 24 Nov 2026 12:51:08 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 2/5] emulator/btdev: Add btdev_set_link_key_type
+Date: Tue, 24 Nov 2026 15:50:59 -0500
+Message-ID: <20261124205102.737384-3-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261124205102.737384-1-luiz.dentz@gmail.com>
+References: <20261124205102.737384-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,49 +97,75 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: client/btpclient: Security Level reporting
-In-Reply-To: <20261124121719.280039-2-frederic.danis@collabora.com>
-References: <20261124121719.280039-2-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============0842537902083498200==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Add btdev_set_link_key_type() to set the key type reported in Link Key
+Notification no matter the type of the key pairing results in, so
+testers can emulate pairing completing with a key that doesn't meet
+the security level required.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1220796/
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.09 seconds
-GitLint                       PASS      0.71 seconds
-BuildEll                      PASS      17.96 seconds
-BluezMake                     PASS      263.12 seconds
-MakeCheck                     PASS      13.34 seconds
-MakeDistcheck                 PASS      131.97 seconds
-CheckValgrind                 PASS      321.22 seconds
-CheckSmatch                   PASS      241.37 seconds
-bluezmakeextell               PASS      88.65 seconds
-TestFunctional                PASS      1105.51 seconds
-IncrementalBuild              PASS      258.88 seconds
-ScanBuild                     PASS      880.57 seconds
-
-
-
-https://github.com/bluez/bluez/pull/2898
-
+Assisted-by: OpenCode:claude-fable-5.2
 ---
-Regards,
-Linux Bluetooth
+ emulator/btdev.c | 13 ++++++++++++-
+ emulator/btdev.h |  5 +++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 1140acd90e7d..7c630718013d 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -214,6 +214,8 @@ struct btdev {
+ 	uint8_t pin_len;
+ 	uint8_t io_cap;
+ 	uint8_t auth_req;
++	bool link_key_type_set;
++	uint8_t link_key_type;
+ 	bool ssp_auth_complete;
+ 	uint8_t ssp_status;
+ 
+@@ -1906,7 +1908,10 @@ static void link_key_notify(struct btdev *btdev, const uint8_t *bdaddr,
+ 
+ 	memcpy(ev.bdaddr, bdaddr, 6);
+ 	memcpy(ev.link_key, key, 16);
+-	ev.key_type = get_link_key_type(btdev, bdaddr);
++	if (btdev->link_key_type_set)
++		ev.key_type = btdev->link_key_type;
++	else
++		ev.key_type = get_link_key_type(btdev, bdaddr);
+ 
+ 	send_event(btdev, BT_HCI_EVT_LINK_KEY_NOTIFY, &ev, sizeof(ev));
+ }
+@@ -9458,6 +9463,12 @@ void btdev_get_mtu(struct btdev *btdev, uint16_t *acl, uint16_t *sco,
+ 		*iso = btdev->iso_mtu;
+ }
+ 
++void btdev_set_link_key_type(struct btdev *btdev, uint8_t type)
++{
++	btdev->link_key_type_set = true;
++	btdev->link_key_type = type;
++}
++
+ void btdev_set_le_states(struct btdev *btdev, const uint8_t *le_states)
+ {
+ 	memcpy(btdev->le_states, le_states, sizeof(btdev->le_states));
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 097021c01cc5..517c65a19cf0 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -90,6 +90,11 @@ const uint8_t *btdev_get_adv_addr(struct btdev *btdev, uint8_t handle);
+ void btdev_get_mtu(struct btdev *btdev, uint16_t *acl, uint16_t *sco,
+ 								uint16_t *iso);
+ 
++/* Report the given type in Link Key Notification, whichever is the type of
++ * the key that pairing results in.
++ */
++void btdev_set_link_key_type(struct btdev *btdev, uint8_t type);
++
+ void btdev_set_le_states(struct btdev *btdev, const uint8_t *le_states);
+ 
+ void btdev_set_al_len(struct btdev *btdev, uint8_t len);
+-- 
+2.56.0
 
---===============0842537902083498200==--
