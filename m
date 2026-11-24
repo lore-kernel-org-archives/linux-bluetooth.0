@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795546134;
-	b=IBSiFU7B7AedO99bk4QtoajN1WFSC6CZKYq6BXkJ0xAafAB9nqHhDc9TdnHsMH0LgtOq
-	 8F7qrN6cYhgbD+w0wZSWfQZODCcmOjaewps42NDysemZOGptx52uTQlZUqFu/77LX0o7v
-	 PJNFdoILE5ib4lIPKSFnU+rSU2RRrsSHrvz2MmS3zhbJKWmdDFvBLyFKPB19AyYM6Aj4d
-	 FhhO5NuIL/GQX4B3OQts4Z8ije7Hfha93RoiSRprJjdQC2SmW+mx0hFNRTIo6cEVOW+3q
-	 rM1x6rVBetSnz1nKdg1xEcyW/PnOsSLR9ne9G0zrwXCtGtUCOaJ9UVj1qKHX4SVcbdw==
+	t=1795546138;
+	b=M7T5C0BnqsnWTRV7MVTIICmZz3SpIc7c9s30iomlv7URN794iV+ZQhKeXCbByhOCxrag
+	 SOcDUwYw7fAWa/xSsZDEG1rWhdxl4kVEFqGkAnnIjjfqUxTq+IzkY9D5BZ9jl5VIOIaGJ
+	 1A6dlCG2hMIs3DfW/cNzenSrLMp6H+MSZPOTeX724/J6T7OFnk3N7xEerab3NVa3gQplz
+	 X7s0OOJ9fKtf9NrSggHDkjIURNUu04VwZR8UiUd//WHI/RzsG8vvYj5oMZOYzjqTr2vmW
+	 YHo1Wz679IiFE6AtPdJG7DqCtChF4ERJFrTWda18wdQKQwrgkWzGbfz4Mvs/j8+Iivg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795546134;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795546138;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=tyHlTFz9S9R5P1qwSVnwYH5LkfRkuXeGRKQxh6Q5F1Y=;
-	b=Aw+Zr5LHCdnfCif8c6XVemZxj7LqMHLuCe6i8qUPINmRL7059ZpR7grntY3Hj1G+B0Cm
-	 SjIqg4y7LiflbKldwuU4oG1dl+mquQ1g+bFpG2muQLr+Toz3QqDTrr1cZggfmisacNVvg
-	 LjUppHoTBvI385Pd+5M3RpPXbXqYC22sxHrL+Uv4bLCQp1tKXLtYo2SXQCoUC+L9p85Z+
-	 80cGp/EQYIHhvGLMnPQgJFmWiTpOpOKEZHIX5z4/gNl+RajOK2uwss+iyRj50GNMJaO6n
-	 EEi2q3IH0RroSRBH1cK+DgTI9nNUUy8wec7/e+spgQktjJndrfiZ+uh3vDb3UAGbHRw==
+	bh=YszUu/3Vwrbhnhmb5vQH/tdGX/KFhwe/h8nCzsSOWaE=;
+	b=Sw8B+TpBVhFyNzcVSCC1EfiPm4PU7aePsstH3u75Ncnz1EILMMlOmsQacdvnm6HVQq8b
+	 7onOn+w/PAyoL0859eiKwiZpD+ChJfKF7y2Fg7S+BndNwMUs7zu6L4oCh+zKtFyM/6ec8
+	 p4ZPecEe5ssO/FpgMyHiEAsTXUaj3Y0cf1i4JnQ2XXXpttA8vP08Fo/pxcywGCLRYE8Xd
+	 FwdTTsM/ApqL5TXmXj6/kJRlt54bvKT1TTixRuiSm0Z9RY0sCIeJJ8u/XNwAi2cMsmujR
+	 H/6N6SnjqUabtuu8MrNkirsEdEp9f2le40+y4S2qLVr5ajYTZw+WNg5i/3u8WZWi9GQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=b6en03Zq;
-	arc=none smtp.remote-ip=209.85.167.173
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gRMR2ObK;
+	arc=none smtp.remote-ip=209.85.210.182
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C12606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 18:48:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96C12606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BDC606A321
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 18:48:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4BDC606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=b6en03Zq
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-4d7034a99a9so2898243b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 10:48:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gRMR2ObK
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8c70c2ab5a2so1905874b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 10:48:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795546132; x=1796150932; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795546137; x=1796150937; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=tyHlTFz9S9R5P1qwSVnwYH5LkfRkuXeGRKQxh6Q5F1Y=;
-        b=b6en03ZqdKdV7yZa1VfeDsuzXwcPpkUv9OlaHYBdhIxkA6/hCs/75J71J54u7FK9Kv
-         o/Tw9M6qWhhBPo2oUnYWfUbDuE8ahoURXoVbtpK7+3yf9FYksSGopkUQkUlI3Pgfk9Zj
-         0z1yd5r7K/H2No8Bqfk91Q5yDO6djEz58paR9F1IXHP2hvX1e6FWHTgLYw2+g0WV7PSm
-         r1Cpduge+1An5BLOL80P3Uuh21Yt1USR5j10UwO/H8feHbajME084t+F0SwUHEohDZBC
-         iicV/qXFsvySLPMVjYG4Y/j0lK74JyJoutbT4S3gX7JLt+muvVffouDqJ18EL29JjD2Z
-         wzZA==
+        bh=YszUu/3Vwrbhnhmb5vQH/tdGX/KFhwe/h8nCzsSOWaE=;
+        b=gRMR2ObK6Vr/2vJNHiN0ycLibUWXL7kKCF1qkofGhYT8jCaM2UGUZYJk5e5f/8mebI
+         Y4S/4iiplnS3yQ7gVeUnxFD8cLI0oPwB2wZ8bxr+RogGayKfwkcfmtlW99WRDuVJoeCq
+         xRtwV86r8hkmArMZSxz1QdhAxVA+FWtSY2l0dMhRRS+xSQ/eZ2gUmNXLOJCvEYVCVUFJ
+         cW3QCdON32lPzAE51ib1HOZlr2zFnANohE7J2qPbASbXosx+kb+IN5Y7LTy2Pkrf5Y8A
+         2bsVCiQ6NQhtSnA35Vy8IGYKM/vKZDEXpmkcmLKrmvWsBsgDwVwTkDC3N1n25wJJrcvT
+         1tbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795546132; x=1796150932;
+        d=1e100.net; s=20260707; t=1795546137; x=1796150937;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=tyHlTFz9S9R5P1qwSVnwYH5LkfRkuXeGRKQxh6Q5F1Y=;
-        b=fz7xTxl7KUPrhU2QOHltiMETkn3pQkPDHwyxbbjF+iOCo2gAs10ggFCBGsgOtsZWSd
-         KrW8FYRGYUX4HJvnTx3A8d7XNceBAMo41oGeho3qKjDUPMUvj4rswVttyvNAPefwVGbo
-         M8GRWtrPL66mCQ5KgX3jFjh2wyoLX0SzIu59Ua/N6Bwyunc5CCIOYxfW9HVbTNYA4lwx
-         gGBiSwH9w43xcKyef2ULfs4WMuNChXS3vGiOS0+9z4eHj8VVMKdv1WMwD3rtY/Rrq7WR
-         kHEMC7fvfB4+Y5dGE7u1xdUYETv4VDq9L+VuetFfRvUiqEzSlGkAJg49eTLm5ox3zPWs
-         XPkA==
-X-Gm-Message-State: APuU4Z/WF59NA4JC0RYtPOwks/A4gWbgRfPW5X4yOnxg/733BZMwrxfn
-	irxLzUYROlm89rnn9BOAnBYInnzZRlo4RICD5h9rYUl0pIKzMT2kS0TDrq5YJw==
-X-Gm-Gg: AZFdTZca8heWn0paDQXnqmkx4W8uAwsq/ErlryHwRdOPO83w1frpHROGvcrA5pFUhIC
-	UXxPLbkPBQAYUH3rKk7SbHAly0WAx5QB1F/JltKbl56EpNM60KCogb/bfemeaGbv58ooM69nHT/
-	9EXoIioDLnIaFRSL7uBhk/OXyL1/Vd+voeY7c8mfopMAZULT/9WqIDUm53RyDWwuocie+SiD6XU
-	NnsGOfaktpHgfd4FUJGrCaar97SH5Hch7Vv6nc6phLbKONjWfgaU6bI5N6ENQ3/vzjijsxajN6c
-	QF5p8JiMJZEfMLeyQrbLit4v6cvps8iB79Dv87C+ZBDPniGyVmeSXX0ol1F4HgFyD33RW0snRrQ
-	h+tYEAG/qDY2891ZdKKTA+nBxkcifxYA3btIYMkQ5ovjdis+msbhYF5frTvUbL/SHgLTe6LAc1F
-	xhE257HR60/oOKLHFynImyC/tMsNTvX7QS3V28seCSp8wLFJARTgor8IysZbGsAlwlqkZW7hUUq
-	9yy5EEMLHkGUrbkjozX6Xi4uryFTmfm21n9tmQBX37i3JWHcK2lvGNMpxJkMNA3CGIDXzf4HzNz
-	m8qqvA6Crm0=
-X-Received: by 2002:a05:6808:50ac:b0:53b:f634:83b2 with SMTP id 5614622812f47-57a025f405emr16763592b6e.0.1795546132533;
-        Tue, 24 Nov 2026 10:48:52 -0800 (PST)
-Received: from [172.17.0.2] ([130.131.205.179])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-57a34252251sm12599563b6e.6.2026.11.24.10.48.52
+        bh=YszUu/3Vwrbhnhmb5vQH/tdGX/KFhwe/h8nCzsSOWaE=;
+        b=tgx+wp5vlfJSj8ov8z3iTzJiWt6InVxcUiyScSk1HIbLrvfWqZQEsKLFcE1A1SOiWN
+         yR6H6ZbJ4Rld6zgS7iZodiGCNmO1Kyl8QTWeCnf1nnssjU+2OE4Qgk5f/fmAfeyb/ESP
+         s3AXvXgyu0hxSFraOuf/FDP/cywTC0xRRoVpX0o6rNdZUUWtYk9zUC1N/nVShfwz9M1T
+         ojqMV9bGe2zMRgkao83hattk0k0ebQQPdBA9ur6oOdnr8usBy+SOuTnUdJkHNeILOea5
+         Xg5t/gYMPdJHa1OteUAIoNbyUGZ/RmfL2o0UlsCdUrq8MpX8CNg+4jbT038/ncgfqcFv
+         /FVw==
+X-Gm-Message-State: APuU4Z8WqbM7VFEMdPSM/Kox/QNI9R7U+kz0Tm4FHZOTR7M/1TA39Shf
+	V6cCsjX5zO/rc9WTyswxQtMZcWR3q2xW3dG0oePYd3xmbWH0s0DqKJ6uCTaPDg==
+X-Gm-Gg: AZFdTZf2kcZrj1xTt6YGrX/GH8sWLiyjXhEfpHw9+TgEROXlX4eel0W2oaXSXpX8Yfa
+	FQgGyl7c5GGj3Mau8jCeITWO9mx+VLXTIxSZDK24CXRTdFe4cdbFexVJfQjPos9OuHc3LAU62zw
+	f7XAhSHvqhP9Sqto3DVm4ZYPmX5OIFeWDD03nkOVPYLqgWUTkU7icQR6SYCQIbp+gvB3rAVLZUK
+	0vHmJ5ljlE1uL9rdFKKXmd1Wt8TUR3TRy5ImIWSNj7yEtIwLyElUPyIqRGFPyp+1HobuP4f5bej
+	pkXIkOKkejcad65+BnT32x8RIZOiQJdbJNFC7gGffSJ/J7bNcA3sG5yAVCTRm/vSWAX2h4ahH1m
+	LcuVhPbQubJZkltwCDzaXZSePIOuymYIMeJw/3a6pErlYmVsKNWJhADbT+6F1t7uxGncmPzeElA
+	4S+9cPgJu0JYQof5tggCdAcBAbt4/viq950rWOUrdfZz9C0Xf1cpA5+ULqxTGbG4OtHqQ0iE2Gg
+	tHLkClN2E8OE49y/vLmYNJk4wAPcD6eR6adsVyFmsykNHmF/Tb0dkWNoUttV7AounJdENI8tgV0
+	bEsxy/oWVORntr2IVRGKvpf5ns/Tr9kYA2hfakEg
+X-Received: by 2002:a05:6a00:21c8:b0:89d:f19f:5dd1 with SMTP id d2e1a72fcca58-8c87c862aadmr13910444b3a.33.1795546136806;
+        Tue, 24 Nov 2026 10:48:56 -0800 (PST)
+Received: from [172.17.0.2] (ec2-3-42-157-141.us-west-2.compute.amazonaws.com. [3.42.157.141])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c873f11da2sm7326637b3a.55.2026.11.24.10.48.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 10:48:52 -0800 (PST)
-Message-ID: <6b05dc14.a8342903.a6b10.8976@mx.google.com>
-Date: Tue, 24 Nov 2026 10:48:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5898277908821522874=="
+        Tue, 24 Nov 2026 10:48:56 -0800 (PST)
+Message-ID: <6b05dc18.6514f89f.8731f.221e@mx.google.com>
+Date: Tue, 24 Nov 2026 10:48:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2020998224769195361=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,13 +90,13 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [v13,1/2] Bluetooth: L2CAP: Restrict LE credits to connected CoCs
-In-Reply-To: <9d9d37680044266dbd1d6919b08564026afcd87d.1795528595.git.github.filter194@slmail.me>
-References: <9d9d37680044266dbd1d6919b08564026afcd87d.1795528595.git.github.filter194@slmail.me>
+To: linux-bluetooth@vger.kernel.org, radek@podgorny.cz
+Subject: RE: Bluetooth: find an RPA peer's connection parameters by its identity
+In-Reply-To: <20261124-for-upstream-le-conn-params-rpa-v4-1-f2dd5eb41f45@podgorny.cz>
+References: <20261124-for-upstream-le-conn-params-rpa-v4-1-f2dd5eb41f45@podgorny.cz>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============5898277908821522874==
+--===============2020998224769195361==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,45 +107,55 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1220931/
+PW Link:https://patchwork.kernel.org/series/1220594/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      0.59 seconds
-VerifyFixes                   PASS      0.09 seconds
-VerifySignedoff               PASS      0.10 seconds
-GitLint                       PASS      0.27 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      24.49 seconds
-CheckAllWarning               PASS      27.91 seconds
-CheckSparse                   PASS      29.82 seconds
-BuildKernel32                 PASS      25.18 seconds
-CheckKernelLLVM               PASS      24.71 seconds
-TestRunnerSetup               PASS      572.47 seconds
-TestRunner_l2cap-tester       PASS      15.27 seconds
-IncrementalBuild              PASS      23.86 seconds
+CheckPatch                    FAIL      2.22 seconds
+VerifyFixes                   PASS      0.04 seconds
+VerifySignedoff               PASS      0.04 seconds
+GitLint                       PASS      0.59 seconds
+SubjectPrefix                 PASS      0.16 seconds
+BuildKernel                   PASS      20.13 seconds
+CheckAllWarning               PASS      22.73 seconds
+CheckSparse                   WARNING   24.24 seconds
+BuildKernel32                 PASS      20.04 seconds
+CheckKernelLLVM               PASS      21.69 seconds
+TestRunnerSetup               PASS      480.48 seconds
+TestRunner_l2cap-tester       PASS      13.51 seconds
+TestRunner_iso-tester         PASS      11.72 seconds
+TestRunner_bnep-tester        PASS      3.12 seconds
+TestRunner_mgmt-tester        PASS      84.73 seconds
+TestRunner_rfcomm-tester      PASS      4.34 seconds
+TestRunner_sco-tester         PASS      5.39 seconds
+TestRunner_ioctl-tester       PASS      4.47 seconds
+TestRunner_mesh-tester        PASS      4.38 seconds
+TestRunner_smp-tester         PASS      4.29 seconds
+TestRunner_userchan-tester    PASS      3.17 seconds
+TestRunner_6lowpan-tester     PASS      4.33 seconds
+IncrementalBuild              PASS      35.62 seconds
 
 Details
 ##############################
 Test: CheckPatch - FAIL
 Desc: Run checkpatch.pl script
 Output:
-[v13,1/2] Bluetooth: L2CAP: Restrict LE credits to connected CoCs
+[v4,1/4] Bluetooth: copy the peer's RPA out of its IRK under RCU
 WARNING: Non-standard signature: Assisted-by:
-#92: 
-Assisted-by: LLM
+#104: 
+Assisted-by: Claude:claude-opus-5-5
 
-ERROR: Unrecognized email address: 'LLM'
-#92: 
-Assisted-by: LLM
+ERROR: Unrecognized email address: 'Claude:claude-opus-5-5'
+#104: 
+Assisted-by: Claude:claude-opus-5-5
 
-total: 1 errors, 1 warnings, 0 checks, 11 lines checked
+total: 1 errors, 1 warnings, 0 checks, 22 lines checked
 
 NOTE: For some of the reported defects, checkpatch may be able to
       mechanically convert to the typical style using --fix or --fix-inplace.
 
-/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15017328.patch has style problems, please review.
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15015926.patch has style problems, please review.
 
 NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
@@ -153,13 +163,84 @@ NOTE: If any of the errors are false positives, please report
       them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
+[v4,2/4] Bluetooth: connect to an RPA as to the identity behind it
+WARNING: Non-standard signature: Assisted-by:
+#118: 
+Assisted-by: Claude:claude-opus-5-5
+
+ERROR: Unrecognized email address: 'Claude:claude-opus-5-5'
+#118: 
+Assisted-by: Claude:claude-opus-5-5
+
+total: 1 errors, 1 warnings, 0 checks, 115 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15015925.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-https://github.com/bluez/bluetooth-next/pull/1217
+[v4,3/4] Bluetooth: refuse to dial a peer whose connection is under its RPA
+WARNING: Non-standard signature: Assisted-by:
+#113: 
+Assisted-by: Claude:claude-opus-5-5
+
+ERROR: Unrecognized email address: 'Claude:claude-opus-5-5'
+#113: 
+Assisted-by: Claude:claude-opus-5-5
+
+total: 1 errors, 1 warnings, 0 checks, 15 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15015927.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v4,4/4] Bluetooth: find an RPA peer's connection parameters by its identity
+WARNING: Non-standard signature: Assisted-by:
+#137: 
+Assisted-by: Claude:claude-opus-5-5
+
+ERROR: Unrecognized email address: 'Claude:claude-opus-5-5'
+#137: 
+Assisted-by: Claude:claude-opus-5-5
+
+total: 1 errors, 1 warnings, 0 checks, 84 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/home/runner/work/bluetooth-next/bluetooth-next/src/patch/15015928.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
+https://github.com/bluez/bluetooth-next/pull/1213
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============5898277908821522874==--
+--===============2020998224769195361==--
