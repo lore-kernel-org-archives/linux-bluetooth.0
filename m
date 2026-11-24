@@ -1,60 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.16
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795529066;
-	b=OGQcKMeYnqYByoHARezkCxBhuQf6u/OYi8wSEvmWz7fK2rSDsyaiL6vZSaqzrDKJk3dl
-	 g1VGG8eTFFiDh4+c5zpSuoXV6c6efC7so1ATHWiO9ULZIEkvS2jIq+4O2Js0X8sWZFN2l
-	 +pQdXBFAqp2RAsPFdQaDt3n9XY+dz2SGqOfc+Q+QPuLlCcEZwH4sSDhfR6Pd5gYdLe+WF
-	 VHcCLHcK4S6nby3yNhJIVuvKEapcTYGk9LWufRqRVgTkeB+KN9FZCMmQC5tGGjCNcLPAo
-	 S0Wtj7gwuYBqZPvKZ9vurmEkoG1nT/bKKIbehnqF3q6t1li82n7QP877iGbpaSPgwXw==
+	t=1795529432;
+	b=4EWpibnxeSqRHDOLWM5Am3ikBvuijrJLnjyGgZeKlMIbxG3yK7JTMU3J0mlqfQnCND9f
+	 ke5QuwNl7CiIR5wJYEb1/xuy4i53n9LSDbfEzOdv0v7HU+RGa9eXun0h7LDaiIDsNAQIP
+	 b0ZJ29BjEBavA4TpMntRXE6Gx6Tpm+tPpBnFYc/npiug1ySCNkDanGbOCdqtW0SMbJTea
+	 6h4f9+ZTD1Q3XopZaxRd6RDQ6mG6yEbA/GUbdCUDst1ATsibCvXiAq/IQxkBnDjNMK5LZ
+	 LSHswAAb6f5h0k3owE3ukuj08I6xl1WbyGhVEVS0t/ij1AXGvlABLELm/B5qOUlt7yw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795529066;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=mwBkpTejtwA7SbGjHD1SEdHo9VtyCbvGU94r1kmt2bU=;
-	b=lc2Zo6dySPXsMVWOyzo3pE9T2v61dN1bNPT+jX7ccbrBtJUyELzUzFr/M5k3xbS8oeN/
-	 wBZOEZHnzOoNuhP9ApCBNOtAaqT2tFn/uws/ITomK3BZY+C5x+/EJGE9WhRQtjE7E5T79
-	 xgb2agpJ4hezPy062AVH/S/IbwFK9i8lXc94M4taWL3gHOrKk0O54ivXL0jp878rsh2Y1
-	 DATEgCqmAjYYWoIq9HYT6+cy93sy9UvqhdJb2ES277CGVzOMB8wMvutb1EjQ0SNIa38Ib
-	 E5/+eBwu+82bsem328pxBnHLP8dlM2+t6GeAcWOOb8Hx4nfU6NZ6ARYw/IWNVmTXQIg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795529432;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=jXiPVtfN2wZl1+H6KM7aKPWRvFLxQP41vzviKryy7aM=;
+	b=YCJIMSi5BhCEUvaMTNM8Xiw+x2uyGIC5gWfc4DEaSEWSkZWklzviMuwZoP36+AZXHnH7
+	 kiUI8RTAva6wmJYEQFsbvpZByc99rLPifqO5kA2DF/FMvuG/01X2zPlLlPr9iR809xvFJ
+	 GDHpGalLSDZxI5fqDFBStY0+sHW7QEYg9Np16tCxCxE24a/Q5TjHs3xtanBrtSkIReHb4
+	 Hzmwu6CUvzzRtJiGBORS/gMloLVIKha/pNRR7CooMzaht22OJQsmpOwXb7vJxOkXIEUQD
+	 15Mz6odBZabxPRuVAwzthU3OQk+e46XXC/WFHiwcStaTzbDO+jHbJvGN7V39D5g3kiA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=aajk5wjz3zbl5pnadgvqvseqqu.protonmail2 header.b=DUfzQ+0D;
-	arc=none smtp.remote-ip=109.224.244.16
-Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B9cOdsCf;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7EC606A6AD
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:04:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C7EC606A6AD
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E0D606B031
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 14:10:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B7E0D606B031
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=aajk5wjz3zbl5pnadgvqvseqqu.protonmail2 header.b=DUfzQ+0D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=aajk5wjz3zbl5pnadgvqvseqqu.protonmail2; t=1795529064;
-	x=1795788264; bh=mwBkpTejtwA7SbGjHD1SEdHo9VtyCbvGU94r1kmt2bU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=DUfzQ+0D4cwaZsiMUesHcYjw/1wcwwAwzyhUv7XeyKA+Nd2qiaKD78XKUFbqcCKM7
-	 moVuJ5hKC1EuBwcx7N70cT+6Jgfo8qD6J46Zm2C1isWZgI1rp+gYwJZlFA0b/k9Gv6
-	 x3Zu9hAnOGtZ7taM1QKUdwP/bPEEDk/i/Uaqx5JczPaYo8VWULwLZ22rP0vvz5BqKi
-	 pBnhM5Hk0TzlJ+BOA+jeh0Ux6aPp1xrkcnhmWd1K4ttpDMvT5UwlAarr56Ky3IWoNG
-	 /GOrdY3s/h7NRYGoLg6/Nyz+QGy0C/zmkChJSFooyRNj/IRoyLcJ6TzHUdYort6iQX
-	 uatmF1nSEFpcA==
-Date: Tue, 24 Nov 2026 14:04:18 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B9cOdsCf
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-99e145569c6so978219241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:10:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795529431; x=1796134231; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jXiPVtfN2wZl1+H6KM7aKPWRvFLxQP41vzviKryy7aM=;
+        b=B9cOdsCfRSm/kHBVHQzvDZZF/z2RrcH2FFKfpsj/vjD+Terp7WV3aMU4fYavvSdty2
+         +DfuMEiqNsVK3QErFBhvOWY6gPu0rMGwMdpc+OBca16yQnDzoF3rtADwW64d2+HTDYbn
+         9lcAu1EEZ/4BhGNFidq36l/XsWiVYGWDUxI6nXvdI0pBLWsovczeWdW5yu/3ybCpre3q
+         XdYPXaixauQ9TCHlVQ3CvEnE2FHYNH50FqFh2T9wq85/vgt/WMnDnW/ZyUhM+aBH//wb
+         bOJjrA7aedUkkWYf3xaF5yiJ94ZkfqLf+nkzQ2Tn9i2mSKL8VuoiKXOmjihuQS5Jo8y8
+         fSyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795529431; x=1796134231;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=jXiPVtfN2wZl1+H6KM7aKPWRvFLxQP41vzviKryy7aM=;
+        b=TVavu7qCKypg9zEpDQeh7ZHMukF6JGNbgznKwtoSP06ErCdrDWSqEm7Ur7/pfIEHYs
+         kt3VsZDcYGE0BtY/vcNVUx6+B08QbQWQScD+e5rFCZ1G6OPwsX24l+yybHutDIJsdjby
+         Y6G9Y+V0XNYG8SVj633fUV/1d0QZq5YD0SWKihvllulgVP8PqvAAq3bSvNbadv1IO0CW
+         pk7+vLblkobmVrKV8tDDINyWeKvHcVSXDeMDqJYGXVNsjGIry1X/XXEG9YtGTgIO0RYs
+         TxUIfXgbqlB5FCmGD8eGkVlS3GUBmKfS5l1k0Mk3Vzo35lI+HjoXlhbWlcHR1k2ieZ9K
+         Os8Q==
+X-Gm-Message-State: APuU4Z/mHvocaKE1ladmr5idIL04OdEV6pcpuK3aGhR9c+Md5RlwBdJ9
+	Cc+NtAcXh9cVHjMkRQwRlI4OLf3vJMIfpRewU+FHWo7eihJYlQREFuNmul5EDc5jj08=
+X-Gm-Gg: AZFdTZf2vjrGHbZ9DF7HkCVRwAoZdHqosuq4eaQ5+j25dG2dUSU8H/k17HEBnpqFoXV
+	H6VBsRfOnY3MDAAtEQQfr4VuZGhik/9wvhzwSRGWMnr9YR03EUX57rtueMWMPuj3uPjeLP+mm6j
+	R+mdtLBGOqK/9VgYwTFUxfQJHdZ1NKDeInDVRsmzvGXIHlWG7PU+FKqXZuK5p9Zny5GC2bQtmX2
+	9DDOHqW4ktfEChPyYCnenkgm8DppbzuzYCc/Q5nb21UqL9/HpacsExG2u2NBqCIqJah5mmX89tj
+	HiOmKzA35wNzZ52QxjTP38n41MkkJZntEEjEBXtEzBiwquWdMWEtXaS9VjriecW72itGtLlwpxY
+	Z3JdLSDiBwVf7B8pRWqaVJlkTVQuTKSKfaZTeBCkyo2PXUpu8M1ZfGnutNfnx22x+3PwYDSYvID
+	3XBisW2+ff3ZpysusKz3kuEhRJkbIlXv038DQRpZZNUac1DBeDl9qFhXntFKBucYIT9S7mwbHKK
+	R7NN5KFXaQ2OkclaybZhOc7F+BOhgHHkWdVkqrnTsXQHgfkvRHXHbCTM74p+Y+Lv3umX9EbtfTV
+	jz06uAZVUetl2YNSTX0tzxln5AiqlXap
+X-Received: by 2002:a05:6122:628b:b0:5ec:e6b8:eb94 with SMTP id 71dfb90a1353d-5ee8aefcf60mr8116807e0c.12.1795529430568;
+        Tue, 24 Nov 2026 06:10:30 -0800 (PST)
+Received: from shine.local ([168.196.221.52])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b555137sm14056121e0c.3.2026.11.24.06.10.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2026 06:10:30 -0800 (PST)
+From: "Andrei A. Bykov" <andreiab9019@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Cc: luiz.dentz@gmail.com
-Subject: [RFC PATCH v5] Bluetooth: l2cap: prefer compatible local LE intervals
-Message-ID: <20261124140405.3096828-1-cochcoder@proton.me>
-In-Reply-To: <b6847b841127362e423b49f9e48118f97985865d.1795497229.git.cochcoder@proton.me>
-References: <20261013033118.501182-1-cochcoder@proton.me> <20261015043336.47734-1-cochcoder@proton.me> <20261015181041.42873-1-cochcoder@proton.me> <b6847b841127362e423b49f9e48118f97985865d.1795497229.git.cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 22b59a37cb488bebb7ef5b2893af76e3b2e9b230
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] Bluetooth: fix bonded LE peripheral reconnect completion and holds
+Date: Tue, 24 Nov 2026 11:09:54 -0300
+Message-ID: <20261124140956.15296-1-andreiab9019@gmail.com>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -64,52 +93,72 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Prefer the intersection of a valid peer interval range and local
-preferences when they overlap. Otherwise retain the peer request
-instead of treating an initial preference as a hard supported bound.
+This series fixes two interactions seen when reconnecting a bonded Windows
+central to an LE HID peripheral on an Intel AX210 with BlueZ 5.88.
 
-Validate the original request before narrowing its interval range.
-Leave latency, timeout and disjoint-range acceptance unchanged.
+The first patch preserves a synchronous terminal-event waiter across an
+unrelated command reply and refreshes that waiter for the next synchronous
+command after timeout or cancellation. The second keeps LE discovery hold
+ownership in its completion callback and handles both encryption and key
+refresh setup paths, including failed setup followed by a late event.
 
-OpenCode and Codex assisted with source review, tests and wording.
+Changes since v1, following the public Sashiko report:
+- Refresh the saved request from a callback-bearing synchronous command,
+  including after timeout or cancellation; retain Reset resend ownership.
+- Handle the BT_CONFIG key-refresh path through hci_encrypt_cfm().
+- Explicitly abort failed LE setup and prevent later feature events from
+  announcing that aborting connection as successfully connected.
+- Rebase onto the official Bluetooth master at 4fe38719e673, rather than
+  the GitHub workflow branch used for v1.
 
-Signed-off-by: Kyle Pepper <cochcoder@proton.me>
----
-Changes in this revision: disclose AI assistance in the changelog.
-No source changes.
-Previous version: https://lore.kernel.org/r/b6847b841127362e423b49f9e48118f=
-97985865d.1795497229.git.cochcoder@proton.me/
+Local extracted-function tests pass 152 dispatch and 62 lifetime checks
+with GCC, Clang and ASan/UBSan. Both the unpatched tree and v1 fail the
+new regression cases. These checks model kernel services and do not
+exercise concurrent workqueues or a physical controller.
 
-GCC/Clang W=3D1 builds and source-extracted sanitizer tests passed.
-Fresh native interval/VM/controller tests were unavailable.
-Policy acceptance and interoperability remain open.
+A full kernel and modules build of this revision on the official base
+completed successfully; that upstream build was not boot-tested.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 943effc86..4f4625b97 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5089,6 +5089,17 @@ static inline int l2cap_conn_param_update_req(struct=
- l2cap_conn *conn,
- =09memset(&rsp, 0, sizeof(rsp));
-=20
- =09err =3D hci_check_conn_params(min, max, latency, to_multiplier);
-+=09if (!err) {
-+=09=09u16 pref_min =3D max_t(u16, min, hcon->le_conn_min_interval);
-+=09=09u16 pref_max =3D min_t(u16, max, hcon->le_conn_max_interval);
-+
-+=09=09/* Local preferences must not reject a valid peer request. */
-+=09=09if (pref_min <=3D pref_max) {
-+=09=09=09min =3D pref_min;
-+=09=09=09max =3D pref_max;
-+=09=09}
-+=09}
-+
- =09if (err)
- =09=09rsp.result =3D cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
- =09else
+I also tested a backport to Linux 7.3.5 with the same configuration used
+for v1 and upstream prerequisite f3183d7ad101 (Bluetooth: hci_sync: Drop
+the command's sk reference), already present in the series base. Repeated
+bonded reconnects, approximately seven hours without observed connection
+loss, and disabling/re-enabling Bluetooth on Windows passed.
 
-base-commit: ffb95458a0f70dcab620eee0ecf5ef7750971b2f
+A hardware trace confirms encryption can complete before remote features
+without prematurely completing the feature waiter. The short HID test
+sent 48 reports. In a teardown run with 20 seconds of post-exit recording,
+Disconnection Complete arrived 137 ms after Disconnect, with no observed
+command or connection timeout. One earlier teardown wait of about two
+seconds was not reproduced; its cause and relation to this series remain
+unconfirmed.
+
+Windows suspend/resume remains a limitation: in two attempts BlueZ
+reported a connection while the test HID application continued waiting
+for the notification subscription. I have not localized this to the peer,
+BlueZ, the application or the kernel; this series does not claim to
+resolve that scenario.
+
+OpenAI Codex assisted with the analysis, patch preparation and tests.
+Sashiko supplied the review findings addressed by this revision.
+
+v1: https://lore.kernel.org/r/20261121033104.441146-1-andreiab9019@gmail.com
+Review: https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261121033104.441146-1-andreiab9019%40gmail.com
+
+Andrei A. Bykov (2):
+  Bluetooth: hci_sync: keep unrelated replies away from event waiters
+  Bluetooth: hci_core: preserve LE feature holds across encryption
+    events
+
+ include/net/bluetooth/hci_core.h |  9 +++++++-
+ net/bluetooth/hci_core.c         | 16 +++++++++++++-
+ net/bluetooth/hci_event.c        | 36 +++++++++++++++++++++++++-------
+ 3 files changed, 52 insertions(+), 9 deletions(-)
+
+
+base-commit: 4fe38719e6738feaa90486e36b0790dd5d960a96
+-- 
+2.56.1
 
