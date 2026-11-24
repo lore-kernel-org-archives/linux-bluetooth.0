@@ -1,59 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795491580;
-	b=jrV0Ib+EIUHsSeGxpUCQDItbrbUV5Iu/jxtc9eZH6eLZjlb6rHaqdj3gHVt+M/b1MtT0
-	 eSBjKvnpx0q84D78Nd20VfD2Ikqe6y1OLqSBW62YDchMY7ILiHWZPEn22gUBZhQjNrzEb
-	 sY22Bmj+8fv3qP7kRUTeYVH757bRmsjsGcvkCaUXjrjMN1M1V/6YBDwz21nlo+CazhGVO
-	 v/HbTqcfeK3CpRNH0zjnBMOqPOe1iqKLlJeHnTuIsLODo+ZQLe2JAgPMbsJmFDgyGoJuu
-	 IB0Wlr6xpIjWgbYxVNjGCl8qfo4V/fgj7wjj2sNvfi2zlQJoNex+XKzdDRwluanodow==
+	t=1795494962;
+	b=gnKiVKQ78IKkdqUjawSczcPAcawcuq8yPnSeEkY0aVWlEYoHhUmk7P3b1PJ0gkjtL2zp
+	 UxI2iExyCpMoaVS7YiAS6SKMdWTsRxMekjpHfFIBpfUSn3fJwVxB0ysl+n6FpI3rMpnQR
+	 lFWBHMmWtBqZcfgC4iNBAvnmlMkC7q6gjDwzPXiz8Jrzg/V/DxhUO62n3/8r9GwZ+ZV3K
+	 Ux0TACGBbx+b5Rn+aEj19Jmt8G7uAtUjhh5I0dGvEzIZjyA4gtjMKunCTZnE3G1O6aQpv
+	 B9Z+jAJV4Sx9hFBQu0FLkK7tRejkLN4DbExyEhdOasQp8HE5yz+i++St96rJ2mMeauQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795491580;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=Qs5VovkTw5LDUFQOrf/GzXjRIBICrpK20op6MqRjtwk=;
-	b=TaJq/I+uP8SSodAu/4fDX6d2bUxHtMMeWCzS0zBHt6SPm+NyxM9luA8bAq0k5O2netYL
-	 qQPiAnvgt6E4KUruzQ61FgezpiM7K3kD4Bd5YcNwkg8jjK1tXubbWTSvSh5rODGin+j4b
-	 CsD+eebFljIkuRFc10KFK8rz5g42DDvBRWswQu4ePgt4qXkFgwKa9Px/wEmLHFJLhFcWC
-	 w4qByuwBmCz/4v2HGJPeJEQRDRp90AS7koP1CcPGNhsfB8U/h+x4for47iaK9k3zR22un
-	 eL0eZgghfnLEA5gzt5B4kCKOmaMFvkn1cmDvhfIBhw8FUPOjkiLy2RtC2ttNbY+esOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795494962;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=a6JmNtwsC479LW7C3URFMM1XNY4U2kPYHWSp05ZWEes=;
+	b=D+ZG6rl/4nLamb57px6hoVAO/NECQXfzjJTo2feX4FqDKOUJZ3AzyAcpdfd5GCWedNOC
+	 eIK/UgOfoF6iMG7zaocCRAywKsNyC6oBSE/BgLBVeuBMtWqgM5IG0+eFjCgX7UChuOBnp
+	 gyBobcQ4l4znKYaibyx3cKQooKInFfD5GitPvQkYZD2ojF7y4V8IJAVLBRe93S4os+amL
+	 XaD3fEvF5pHUMoQo8PJ+H5lePhKlXzQwymqXIygN6Wpf1kCUIC3AOr+/MSVEljCy1LFg+
+	 Zx/9CnZ6NXBbPb9jH4AZZVjYCcLDwUgbRV6BSKxIT7YojLqgHNs9v5g0KZIkTAbq40A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=IhQNIE6l;
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K9RNBq4G;
+	arc=none smtp.remote-ip=209.85.167.173
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6984D606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:39:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6984D606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C25606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 04:36:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 56C25606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=IhQNIE6l
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1795491576; x=1795750776;
-	bh=Qs5VovkTw5LDUFQOrf/GzXjRIBICrpK20op6MqRjtwk=;
-	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=IhQNIE6lMbOGBs2HTLM+vlykzK1jf6cpK67L6Rd4RTUVhPI0yqh33ABJBcDOI3Jvq
-	 KOTXzLnk1ZOwD5Cv1VKJdYdIwusxD4ohuTJXtwIcSOPoEi5erHkTv6nynKIKiVn9FK
-	 uDHwNOjlV98i/+hy/blWN/SEq8L6WDgklQnch6vpOU+ycNvhNkIgFe4LyHOO+BcBNm
-	 1AmnscECUcvMeUcDI9eM96kg8wfW+8gojepr/Pwd978zN1hjbYgp+2yLCQhKZ8KHoK
-	 DIuU4gRIwe0vma814y13YR1Zk5ZXqctGvVmS/9rvP1lZlje8kL1auPgeMeRiBboSsG
-	 5iTFhIhybTn+A==
-Date: Tue, 24 Nov 2026 03:39:33 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Kyle Pepper <cochcoder@proton.me>
-Subject: [RFC PATCH BlueZ v4 4/4] unit: Test ASHA connection interval notifications
-Message-ID: <89a18b67576047b65894d25be99882013d49f451.1795489294.git.cochcoder@proton.me>
-In-Reply-To: <cover.1795489294.git.cochcoder@proton.me>
-References: <20261029002158.1036153-1-cochcoder@proton.me> <20261106235122.719665-1-cochcoder@proton.me> <cover.1795489294.git.cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: b1cb3ef15929f2a4741c4a97b12a165461ad065e
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=K9RNBq4G
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-57297a3f099so93525b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 20:36:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795494961; x=1796099761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=a6JmNtwsC479LW7C3URFMM1XNY4U2kPYHWSp05ZWEes=;
+        b=K9RNBq4GetSyBglQLs1ncYuWN39r31mTJx5/E4FjI0pKMviLXbV6l4oXypq/YLlMHo
+         lGRb3Lgp8cpPEi/Ah/LZpx/a3qF2Rpf/eyvRrlaAeWoFdv6XWROurE5n0pxs5IUftn2a
+         rThhraGLnghSxeA0F+zYYbteGWljU93wa/UkuIgog1ZGcXihi86mhpgskLoSYI3G5UMq
+         amqJVA/8LiZLNNy7xC1zqK2TXzX8pExPWCrpDvLXKLsbjYBzjcUoO3ySTpyme5xJH5n3
+         blWl3JjG9wjjdd4poO8n8VxTs9RsPsaChl9YOEvLuZp+1gOgcEYObof2PxTZk5N/vEkH
+         DiTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795494961; x=1796099761;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=a6JmNtwsC479LW7C3URFMM1XNY4U2kPYHWSp05ZWEes=;
+        b=0kvgRcM/81BmSrdzmvjvTc9q6Yns5lXzt0doralCD8sRNeh+JytJL6wQxoXGinbfVH
+         +HeSGzE5EjMnIGUJEurqHbkNbCAYT3lhDxlanyw9XJYVYjXaAH+wjl9szj0ss9KOCca1
+         OadBsjpn3aeurc2o7nTRTrBpA4hKIvY07V41Y/b0RugmzcM6naodQC1Pq5GlK7m/Qs5j
+         k1CC728GDZW3AqhtEzRvbn+WdPwlNCOAqwnmumJssRF7iVXRtvO9hFwmUqwbmMRxvEJO
+         /YWYUWUbA3rNwJvUF4lIJsXvCJu2u4E9eFcg2iK/N41UwxdQqZ5KFTBc+HGNkMHSLlnc
+         jThQ==
+X-Forwarded-Encrypted: i=1; AL+hErEcT5CrJOXP1ZAknyNNHYz3MpTjIiya+8hx9gGqOL9tc6kAJqUzQlKZw+ycxSFCZBYom+70+moYPnl+nLN+JlM=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8NECILFWv7Nd/+aHrp4LMMmGPODpNUCDH2ud+qIetJ/dKUxhEK
+	Sp9mEllBBxSjzftC5Jtom3hMjW2CLm9Lll5lnli2pQykhWY8RXuTKAxA
+X-Gm-Gg: AZFdTZd3rWzDjceO6bCJNMrJIpyBOiXWVcPNOt78Mlzs/a6XvkXAeqg/MdvckFUbx3p
+	4yEgEVRE/vyWPTUj3gH5pIBjwf1STZMY1OMbwjSh1Y7MlygVcvLUbKj9/w3qFFYDOUaoQ5a9DYM
+	TsAhzzaDTzjlv/MgPdXH2dlug5LE689mv6J21AC9H09n8pYTYzveGmHYB5nZedSH2AOctrLZZqp
+	DNW//lComBhEFUA7t32vthWW4HMnvvI91NJTGPE9y3trV7tcy2OWDxAEPrIfQJW2pD0E/7s0IWX
+	pSlQpZ+/Zkj5zGlBW5HWNfRo9OVWQ7DrRowADxyuK+9nr0IsCR5/OI9hESTVnNWeavomU/RWtrh
+	ZLGV5miW2x3mhTmSKwBh7KV1h7uUXc+pq7r1+/ofsq9W0T2eIjXK2gCAMuapYfVdyHPu9bfnrQA
+	WK2YBqbQ2mBHDMsF43PYQ31UqC6l9bVn7+PuFHfUKoHsSnC09HSAyu+2EZ5ntyDQmlk4wQCjymh
+	QQ3SghC13Ole2cZTgUO/W4KmQ4y95V5CqWY+CUMXZIJuDqDI4LX0CI0EgmBwiNZGqPVG5+WUA1m
+	2+ULw64a3208UAMO60d+MnIgyfLkK5HD9kKg39gRr5R6edsSQcnbyf16pGiHmFOratXvma85Cky
+	wTMWJ34rcqw==
+X-Received: by 2002:a05:6808:c123:b0:53a:5069:cdef with SMTP id 5614622812f47-57a09b0c52emr21890400b6e.4.1795494960966;
+        Mon, 23 Nov 2026 20:36:00 -0800 (PST)
+Received: from localhost.localdomain ([37.19.221.69])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4bc5ebdc0acsm14193466fac.3.2026.11.23.20.35.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 20:36:00 -0800 (PST)
+From: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Tibor Harcsa <silurust@gmail.com>
+Subject: Re: [REPORT] btusb: QCA9377 13d3:3503 on ROM firmware: HCI hang during mSBC SCO
+Date: Tue, 24 Nov 2026 05:33:39 +0100
+Message-ID: <20261124043440.1206949-1-yaroslav.voytovych@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <bf27c4e0-31ac-4ee6-b7ba-afc6744e5c0a@oss.qualcomm.com>
+References: <20261029013350.360574-1-yaroslav.voytovych@gmail.com> <bf27c4e0-31ac-4ee6-b7ba-afc6744e5c0a@oss.qualcomm.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -63,936 +102,60 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Cover the STATUS helper and the profile observer with mocked GATT and
-HCI inputs, and cover the lifetime of set members: an object that is
-reset, freed, or replaced must not stay reachable from the peer's
-notification path.
+On Thu, 29 Oct 2026 at 18:42 +0800, Zijun Hu wrote:
+> QCA9377 is not ROME(QCA6174A), btusb driver does not support it,
+> linux-firmware repo also does not have firmware it.
+>
+> See table @qca_devices_table for supported controllers from ROME.
 
-Assisted-by: OpenCode:gpt-6.1-sol
-Assisted-by: Codex:gpt-6
----
- .gitignore                |   2 +
- Makefile.am               |  17 ++
- unit/test-asha-conn.c     | 578 ++++++++++++++++++++++++++++++++++++++
- unit/test-asha-conn.h     |  11 +
- unit/test-asha-interval.c | 237 ++++++++++++++++
- 5 files changed, 845 insertions(+)
- create mode 100644 unit/test-asha-conn.c
- create mode 100644 unit/test-asha-conn.h
- create mode 100644 unit/test-asha-interval.c
+Thank you. I take the point that QCA9377 is a different product from
+QCA6174A. Please let me explain what I am asking and why.
 
-diff --git a/.gitignore b/.gitignore
-index 06b2473..21b3bbe 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -99,6 +99,8 @@ unit/test-tester
- unit/test-mainloop
- unit/test-ringbuf
- unit/test-queue
-+unit/test-asha-conn
-+unit/test-asha-interval
- unit/test-util
- unit/test-eir
- unit/test-uuid
-diff --git a/Makefile.am b/Makefile.am
-index 37302ed..b92105f 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -712,6 +712,23 @@ unit_tests +=3D unit/test-hfp
- unit_test_hfp_SOURCES =3D unit/test-hfp.c
- unit_test_hfp_LDADD =3D src/libshared-glib.la $(GLIB_LIBS)
-=20
-+unit_tests +=3D unit/test-asha-interval
-+
-+unit_test_asha_interval_SOURCES =3D unit/test-asha-interval.c
-+unit_test_asha_interval_LDADD =3D src/libshared-glib.la \
-+=09lib/libbluetooth-internal.la $(GLIB_LIBS)
-+
-+unit_tests +=3D unit/test-asha-conn
-+
-+unit_test_asha_conn_SOURCES =3D unit/test-asha-conn.c unit/test-asha-conn.=
-h
-+unit_test_asha_conn_CFLAGS =3D $(AM_CFLAGS) -DBLUETOOTH_PLUGIN_BUILTIN \
-+=09-ffunction-sections -fdata-sections
-+unit_test_asha_conn_LDADD =3D src/libshared-glib.la \
-+=09lib/libbluetooth-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
-+unit_test_asha_conn_LDFLAGS =3D -Wl,--gc-sections \
-+=09-Wl,--wrap=3Dsocket -Wl,--wrap=3Dbind -Wl,--wrap=3Dsetsockopt \
-+=09-Wl,--wrap=3Dgetsockopt
-+
- unit_tests +=3D unit/test-gdbus-client
-=20
- unit_test_gdbus_client_SOURCES =3D unit/test-gdbus-client.c
-diff --git a/unit/test-asha-conn.c b/unit/test-asha-conn.c
-new file mode 100644
-index 0000000..7db7d9a
---- /dev/null
-+++ b/unit/test-asha-conn.c
-@@ -0,0 +1,578 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+#include <assert.h>
-+#include <fcntl.h>
-+#include <stdarg.h>
-+#include "test-asha-conn.h"
-+
-+/* Internal calls can be resolved before GNU ld --wrap when LTO is enabled=
-. */
-+#define bt_gatt_client_get_att test_get_att
-+#define bt_att_get_fd test_att_fd
-+#define bt_asha_set_connection_interval test_set_interval
-+#define bt_asha_start test_start
-+#define bt_io_get test_io_get
-+#include "profiles/audio/asha.c"
-+#undef bt_gatt_client_get_att
-+#undef bt_att_get_fd
-+#undef bt_asha_set_connection_interval
-+#undef bt_asha_start
-+#undef bt_io_get
-+#include "bluetooth/hci.h"
-+#include "src/shared/tester.h"
-+
-+/* Sanitizers retain the plugin's globals, including unused daemon callbac=
-ks. */
-+int btd_profile_register(struct btd_profile *profile)
-+{
-+=09assert(false);
-+}
-+
-+void btd_profile_unregister(struct btd_profile *profile)
-+{
-+=09assert(false);
-+}
-+
-+const char *device_get_path(const struct btd_device *device)
-+{
-+=09assert(false);
-+}
-+
-+const bdaddr_t *device_get_address(struct btd_device *device)
-+{
-+=09assert(false);
-+}
-+
-+const bdaddr_t *btd_adapter_get_address(struct btd_adapter *adapter)
-+{
-+=09assert(false);
-+}
-+
-+void btd_device_set_conn_param(struct btd_device *device,
-+=09=09=09=09uint16_t min_interval, uint16_t max_interval,
-+=09=09=09=09=09uint16_t latency, uint16_t timeout)
-+{
-+=09assert(false);
-+}
-+
-+struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
-+{
-+=09assert(false);
-+}
-+
-+struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *devic=
-e)
-+{
-+=09assert(false);
-+}
-+
-+struct btd_device *btd_service_get_device(const struct btd_service *servic=
-e)
-+{
-+=09assert(false);
-+}
-+
-+void *btd_service_get_user_data(const struct btd_service *service)
-+{
-+=09assert(false);
-+}
-+
-+void btd_service_set_user_data(struct btd_service *service, void *user_dat=
-a)
-+{
-+=09assert(false);
-+}
-+
-+void btd_service_connecting_complete(struct btd_service *service, int err)
-+{
-+=09assert(false);
-+}
-+
-+void btd_service_disconnecting_complete(struct btd_service *service, int e=
-rr)
-+{
-+=09assert(false);
-+}
-+
-+DBusConnection *btd_get_dbus_connection(void)
-+{
-+=09assert(false);
-+}
-+
-+gboolean g_dbus_register_interface(DBusConnection *connection,
-+=09=09=09=09const char *path, const char *name,
-+=09=09=09=09const GDBusMethodTable *methods,
-+=09=09=09=09const GDBusSignalTable *signals,
-+=09=09=09=09const GDBusPropertyTable *properties,
-+=09=09=09=09void *user_data, GDBusDestroyFunction destroy)
-+{
-+=09assert(false);
-+}
-+
-+gboolean g_dbus_unregister_interface(DBusConnection *connection,
-+=09=09=09=09=09const char *path, const char *name)
-+{
-+=09assert(false);
-+}
-+
-+const struct media_endpoint *media_endpoint_get_asha(void)
-+{
-+=09assert(false);
-+}
-+
-+struct media_transport *media_transport_create(struct btd_device *device,
-+=09=09=09=09const char *remote_endpoint,
-+=09=09=09=09uint8_t *configuration, size_t size,
-+=09=09=09=09void *data, void *stream)
-+{
-+=09assert(false);
-+}
-+
-+void media_transport_destroy(struct media_transport *transport)
-+{
-+=09assert(false);
-+}
-+
-+const char *media_transport_get_path(struct media_transport *transport)
-+{
-+=09assert(false);
-+}
-+
-+GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
-+=09=09=09=09GDestroyNotify destroy, GError **gerr,
-+=09=09=09=09=09=09=09BtIOOption opt1, ...)
-+{
-+=09assert(false);
-+}
-+
-+static int peer_fd[2];
-+static int observer_fd[2];
-+static int pending_peer;
-+static unsigned int writes;
-+static uint16_t last_interval;
-+static struct bt_asha *last_asha;
-+static bool socket_ready =3D true;
-+static bool fail_socket;
-+static int att_fd =3D 100;
-+static unsigned int handle_reads;
-+static socklen_t conninfo_length =3D sizeof(struct l2cap_conninfo);
-+static uint16_t att_handle =3D 16;
-+
-+int __wrap_socket(int domain, int type, int protocol)
-+{
-+=09int fds[2];
-+
-+=09assert(domain =3D=3D PF_BLUETOOTH);
-+=09assert(protocol =3D=3D BTPROTO_HCI);
-+
-+=09if (fail_socket)
-+=09=09return -1;
-+
-+=09assert(!socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK, 0, fds));
-+=09pending_peer =3D fds[1];
-+=09return fds[0];
-+}
-+
-+int __wrap_bind(int fd, const struct sockaddr *addr, socklen_t length)
-+{
-+=09const struct sockaddr_hci *hci =3D (void *) addr;
-+
-+=09/* Ignore tester's optional logging channel. */
-+=09if (hci->hci_dev =3D=3D HCI_DEV_NONE) {
-+=09=09close(pending_peer);
-+=09=09return -1;
-+=09}
-+
-+=09assert(hci->hci_dev < 2);
-+=09peer_fd[hci->hci_dev] =3D pending_peer;
-+=09observer_fd[hci->hci_dev] =3D fd;
-+=09return 0;
-+}
-+
-+int __wrap_setsockopt(int fd, int level, int opt, const void *value,
-+=09=09=09=09=09=09=09socklen_t length)
-+{
-+=09if (level =3D=3D SOL_HCI)
-+=09=09return 0;
-+
-+=09return __real_setsockopt(fd, level, opt, value, length);
-+}
-+
-+int __wrap_getsockopt(int fd, int level, int opt, void *value,
-+=09=09=09=09=09=09=09socklen_t *length)
-+{
-+=09struct l2cap_conninfo *info =3D value;
-+
-+=09assert(level =3D=3D SOL_L2CAP && opt =3D=3D L2CAP_CONNINFO);
-+=09handle_reads++;
-+
-+=09if (!socket_ready)
-+=09=09return -1;
-+
-+=09assert(*length =3D=3D sizeof(*info));
-+=09info->hci_handle =3D att_handle;
-+=09*length =3D conninfo_length;
-+=09return 0;
-+}
-+
-+struct bt_att *test_get_att(struct bt_gatt_client *client)
-+{
-+=09return (void *) client;
-+}
-+
-+int test_att_fd(struct bt_att *att)
-+{
-+=09return att_fd;
-+}
-+
-+struct btd_adapter *device_get_adapter(struct btd_device *device)
-+{
-+=09return (void *) device;
-+}
-+
-+uint16_t btd_adapter_get_index(struct btd_adapter *adapter)
-+{
-+=09return PTR_TO_UINT(adapter) - 1;
-+}
-+
-+void btd_debug(uint16_t index, const char *format, ...)
-+{
-+}
-+
-+void btd_error(uint16_t index, const char *format, ...)
-+{
-+}
-+
-+bool test_set_interval(struct bt_asha *asha,
-+=09=09=09=09=09=09=09uint16_t interval)
-+{
-+=09writes++;
-+=09last_asha =3D asha;
-+=09last_interval =3D interval;
-+=09return true;
-+}
-+
-+unsigned int test_start(struct bt_asha *asha, bt_asha_cb_t cb,
-+=09=09=09=09=09=09=09void *user_data)
-+{
-+=09assert(writes =3D=3D 1 && last_asha =3D=3D asha && last_interval =3D=3D=
- 24);
-+=09asha->state =3D ASHA_STARTING;
-+=09return 0;
-+}
-+
-+gboolean test_io_get(GIOChannel *io, GError **err, BtIOOption opt1, ...)
-+{
-+=09return TRUE;
-+}
-+
-+static void event(unsigned int adapter, uint8_t subevent, const void *valu=
-e,
-+=09=09=09=09=09=09=09uint8_t length)
-+{
-+=09uint8_t packet[260] =3D { BT_H4_EVT_PKT, BT_HCI_EVT_LE_META_EVENT,
-+=09=09=09=09=09=09length + 1, subevent };
-+
-+=09memcpy(packet + 4, value, length);
-+=09assert(write(peer_fd[adapter], packet, length + 4) =3D=3D length + 4);
-+
-+=09while (g_main_context_iteration(NULL, FALSE))
-+=09=09;
-+}
-+
-+static void test_connection(const void *user_data)
-+{
-+=09struct bt_asha asha =3D { .acp_handle =3D 0x79 };
-+=09struct bt_asha other =3D { .acp_handle =3D 0x79 };
-+=09struct bt_asha_device dev =3D { .asha =3D &asha, .device =3D (void *) 1=
- };
-+=09struct bt_asha_device dev2 =3D { .asha =3D &other, .device =3D (void *)=
- 2 };
-+=09struct connect_data conn =3D { .asha_dev =3D &dev };
-+=09GIOChannel *io;
-+=09int io_fds[2];
-+=09struct asha_adapter *adapter;
-+=09unsigned int before;
-+=09struct bt_hci_evt_le_conn_complete complete =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(24),
-+=09};
-+=09struct bt_hci_evt_le_enhanced_conn_complete enhanced =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(32),
-+=09};
-+=09struct bt_hci_evt_le_conn_update_complete update =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(40),
-+=09};
-+=09struct bt_hci_evt_disconnect_complete disconnect =3D {
-+=09=09.handle =3D cpu_to_le16(16),
-+=09};
-+=09uint8_t packet[7] =3D { BT_H4_EVT_PKT, BT_HCI_EVT_DISCONNECT_COMPLETE,
-+=09=09=09=09=09=09=09sizeof(disconnect) };
-+
-+=09assert(!pipe(io_fds));
-+=09io =3D g_io_channel_unix_new(io_fds[0]);
-+=09assert(!asha_adapter_probe(NULL, (void *) 1));
-+=09assert(!asha_adapter_probe(NULL, (void *) 2));
-+=09asha_streams =3D queue_new();
-+=09queue_push_tail(asha_streams, &dev);
-+=09queue_push_tail(asha_streams, &dev2);
-+=09writes =3D 0;
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 0);
-+
-+=09/* Cache the initial event before GATT discovery/CoC. */
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete));
-+=09assert(writes =3D=3D 0);
-+=09asha.client =3D (void *) 1;
-+=09connect_cb(io, NULL, &conn);
-+=09assert(writes =3D=3D 1 && last_interval =3D=3D 24);
-+
-+=09/* Identical handles on different controllers are separate links. */
-+=09event(1, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &enhanced,
-+=09=09=09=09=09=09=09sizeof(enhanced));
-+=09before =3D handle_reads;
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09assert(handle_reads =3D=3D before + 1);
-+=09assert(writes =3D=3D 2 && last_asha =3D=3D &asha && last_interval =3D=
-=3D 40);
-+=09other.state =3D ASHA_STOPPED;
-+=09other.client =3D (void *) 2;
-+=09event(1, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09assert(writes =3D=3D 3 && last_asha =3D=3D &other);
-+
-+=09/* Failed/malformed updates leave the last successful value intact. */
-+=09update.status =3D 1;
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09update.status =3D 0;
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update,
-+=09=09=09=09=09=09=09sizeof(update) - 1);
-+=09update.handle =3D cpu_to_le16(ASHA_NUM_HANDLES);
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09assert(writes =3D=3D 3);
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 4 && last_interval =3D=3D 40);
-+
-+=09/* Closed ATT sockets cannot be associated with a cached handle. */
-+=09socket_ready =3D false;
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 4);
-+=09socket_ready =3D true;
-+
-+=09memcpy(packet + 3, &disconnect, sizeof(disconnect));
-+=09assert(write(peer_fd[0], packet, sizeof(packet)) =3D=3D sizeof(packet))=
-;
-+
-+=09while (g_main_context_iteration(NULL, FALSE))
-+=09=09;
-+
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 4);
-+=09asha_send_interval(&dev2);
-+=09assert(writes =3D=3D 5 && last_interval =3D=3D 40);
-+
-+=09/* Reused handle gets the new connection's value, never the old one. */
-+=09complete.interval =3D cpu_to_le16(16);
-+=09asha.client =3D NULL;
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete));
-+=09asha.client =3D (void *) 1;
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 6 && last_interval =3D=3D 16);
-+
-+=09adapter =3D queue_find(asha_adapters, match_adapter, (void *) 1);
-+=09assert(adapter->intervals[16] =3D=3D 16);
-+=09queue_remove(asha_streams, &dev);
-+=09update.handle =3D cpu_to_le16(16);
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09assert(writes =3D=3D 6);
-+=09asha_adapter_remove(NULL, (void *) 1);
-+=09asha_adapter_remove(NULL, (void *) 2);
-+=09assert(!asha_adapters);
-+=09queue_destroy(asha_streams, NULL);
-+=09asha_streams =3D NULL;
-+=09close(peer_fd[0]);
-+=09close(peer_fd[1]);
-+=09g_io_channel_unref(io);
-+=09close(io_fds[0]);
-+=09close(io_fds[1]);
-+=09dev.io =3D NULL;
-+
-+=09fail_socket =3D true;
-+=09assert(asha_adapter_probe(NULL, (void *) 1) =3D=3D -EIO);
-+=09assert(!asha_adapters);
-+=09fail_socket =3D false;
-+=09tester_test_passed();
-+}
-+
-+static void test_handle_bounds(const void *user_data)
-+{
-+=09const uint16_t handles[] =3D { 0, ASHA_NUM_HANDLES - 1,
-+=09=09=09=09=09ASHA_NUM_HANDLES, UINT16_MAX };
-+=09struct bt_asha asha =3D { .client =3D (void *) 1, .acp_handle =3D 0x79 =
-};
-+=09struct bt_asha_device dev =3D { .asha =3D &asha, .device =3D (void *) 1=
- };
-+=09struct bt_hci_evt_le_conn_complete complete =3D {
-+=09=09.interval =3D cpu_to_le16(24),
-+=09};
-+=09struct bt_hci_evt_le_enhanced_conn_complete enhanced =3D {
-+=09=09.interval =3D cpu_to_le16(32),
-+=09};
-+=09struct bt_hci_evt_disconnect_complete disconnect =3D { 0 };
-+=09unsigned int i;
-+
-+=09assert(!asha_adapter_probe(NULL, (void *) 1));
-+=09asha_streams =3D queue_new();
-+=09queue_push_tail(asha_streams, &dev);
-+
-+=09for (i =3D 0; i < ARRAY_SIZE(handles); i++) {
-+=09=09att_handle =3D handles[i];
-+=09=09complete.handle =3D cpu_to_le16(att_handle);
-+=09=09enhanced.handle =3D complete.handle;
-+=09=09disconnect.handle =3D complete.handle;
-+=09=09writes =3D 0;
-+=09=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete,
-+=09=09=09=09=09=09=09sizeof(complete));
-+=09=09event(0, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &enhanced,
-+=09=09=09=09=09=09=09sizeof(enhanced));
-+
-+=09=09if (att_handle >=3D ASHA_NUM_HANDLES) {
-+=09=09=09asha_send_interval(&dev);
-+=09=09=09assert(writes =3D=3D 0);
-+=09=09=09continue;
-+=09=09}
-+
-+=09=09assert(writes =3D=3D 2 && last_interval =3D=3D 32);
-+=09=09complete.status =3D 1;
-+=09=09enhanced.status =3D 1;
-+=09=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete,
-+=09=09=09=09=09=09=09sizeof(complete));
-+=09=09event(0, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &enhanced,
-+=09=09=09=09=09=09=09sizeof(enhanced));
-+=09=09complete.status =3D 0;
-+=09=09enhanced.status =3D 0;
-+=09=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete,
-+=09=09=09=09=09=09=09sizeof(complete) - 1);
-+=09=09event(0, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &enhanced,
-+=09=09=09=09=09=09=09sizeof(enhanced) - 1);
-+=09=09asha_send_interval(&dev);
-+=09=09assert(writes =3D=3D 3 && last_interval =3D=3D 32);
-+=09=09disconnect.status =3D 1;
-+=09=09asha_disconn_complete(&disconnect, sizeof(disconnect),
-+=09=09=09queue_find(asha_adapters, match_adapter, (void *) 1));
-+=09=09asha_send_interval(&dev);
-+=09=09assert(writes =3D=3D 4 && last_interval =3D=3D 32);
-+=09}
-+
-+=09att_handle =3D 16;
-+=09queue_destroy(asha_streams, NULL);
-+=09asha_streams =3D NULL;
-+=09asha_adapter_remove(NULL, (void *) 1);
-+=09close(peer_fd[0]);
-+=09tester_test_passed();
-+}
-+
-+static void test_late_connection(const void *user_data)
-+{
-+=09struct bt_asha asha =3D { .client =3D (void *) 1, .acp_handle =3D 0x79,
-+=09=09=09=09=09=09=09.state =3D ASHA_STARTED };
-+=09struct bt_asha_device dev =3D { .asha =3D &asha, .device =3D (void *) 1=
- };
-+=09struct bt_hci_evt_le_conn_complete complete =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(24),
-+=09};
-+=09struct bt_hci_evt_le_enhanced_conn_complete enhanced =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(32),
-+=09};
-+
-+=09writes =3D 0;
-+=09assert(!asha_adapter_probe(NULL, (void *) 1));
-+=09asha_streams =3D queue_new();
-+=09queue_push_tail(asha_streams, &dev);
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 0);
-+
-+=09/* The raw socket can dispatch the initial event after GATT/START. */
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete));
-+=09assert(writes =3D=3D 1 && last_interval =3D=3D 24);
-+=09event(0, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &enhanced,
-+=09=09=09=09=09=09=09sizeof(enhanced));
-+=09assert(writes =3D=3D 2 && last_interval =3D=3D 32);
-+
-+=09queue_destroy(asha_streams, NULL);
-+=09asha_streams =3D NULL;
-+=09asha_adapter_remove(NULL, (void *) 1);
-+=09close(peer_fd[0]);
-+=09tester_test_passed();
-+}
-+
-+static void test_observer_lifecycle(const void *user_data)
-+{
-+=09struct bt_asha asha =3D { .acp_handle =3D 0x79 };
-+=09struct bt_asha_device dev =3D { .asha =3D &asha, .device =3D (void *) 1=
- };
-+=09struct bt_hci_evt_le_conn_complete complete =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(24),
-+=09};
-+=09struct bt_hci_evt_le_conn_update_complete update =3D {
-+=09=09.handle =3D cpu_to_le16(16), .interval =3D cpu_to_le16(32),
-+=09};
-+=09uint8_t pending[] =3D { BT_H4_EVT_PKT, BT_HCI_EVT_LE_META_EVENT,
-+=09=09=09=09sizeof(update) + 1,
-+=09=09=09=09BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE };
-+=09uint8_t packet[sizeof(pending) + sizeof(update)];
-+=09uint8_t byte;
-+
-+=09writes =3D 0;
-+=09assert(!asha_adapter_probe(NULL, (void *) 1));
-+=09asha_streams =3D queue_new();
-+=09queue_push_tail(asha_streams, &dev);
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete));
-+=09asha.client =3D (void *) 1;
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 1 && last_interval =3D=3D 24);
-+
-+=09/* Failed/truncated events cannot replace a successful interval. */
-+=09complete.status =3D 1;
-+=09complete.interval =3D cpu_to_le16(40);
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete));
-+=09complete.status =3D 0;
-+=09event(0, BT_HCI_EVT_LE_CONN_COMPLETE, &complete, sizeof(complete) - 1);
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 2 && last_interval =3D=3D 24);
-+
-+=09conninfo_length--;
-+=09asha_send_interval(&dev);
-+=09conninfo_length +=3D 2;
-+=09asha_send_interval(&dev);
-+=09conninfo_length--;
-+=09att_fd =3D -1;
-+=09asha_send_interval(&dev);
-+=09att_fd =3D 100;
-+=09assert(writes =3D=3D 2);
-+
-+=09/* The passive observer must never transmit controller commands. */
-+=09assert(read(peer_fd[0], &byte, 1) =3D=3D -1);
-+=09assert(errno =3D=3D EAGAIN);
-+=09asha_adapter_remove(NULL, (void *) 1);
-+=09assert(fcntl(observer_fd[0], F_GETFD) =3D=3D -1 && errno =3D=3D EBADF);
-+=09close(peer_fd[0]);
-+=09assert(!asha_adapter_probe(NULL, (void *) 1));
-+
-+=09/* After restart, existing links stay unknown until a new update. */
-+=09asha_send_interval(&dev);
-+=09assert(writes =3D=3D 2);
-+=09event(0, BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE, &update, sizeof(update));
-+=09assert(writes =3D=3D 3 && last_interval =3D=3D 32);
-+
-+=09/* Drop queued callbacks when their adapter and device are removed. */
-+=09memcpy(packet, pending, sizeof(pending));
-+=09memcpy(packet + sizeof(pending), &update, sizeof(update));
-+=09assert(write(peer_fd[0], packet, sizeof(packet)) =3D=3D sizeof(packet))=
-;
-+=09queue_remove(asha_streams, &dev);
-+=09asha_adapter_remove(NULL, (void *) 1);
-+
-+=09while (g_main_context_iteration(NULL, FALSE))
-+=09=09;
-+
-+=09assert(writes =3D=3D 3 && !asha_adapters);
-+=09assert(fcntl(observer_fd[0], F_GETFD) =3D=3D -1 && errno =3D=3D EBADF);
-+=09close(peer_fd[0]);
-+=09queue_destroy(asha_streams, NULL);
-+=09asha_streams =3D NULL;
-+=09tester_test_passed();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+=09tester_init(&argc, &argv);
-+=09tester_add("ASHA/interval/HCI", NULL, NULL, test_connection, NULL);
-+=09tester_add("ASHA/interval/handle-bounds", NULL, NULL,
-+=09=09=09=09=09=09test_handle_bounds, NULL);
-+=09tester_add("ASHA/interval/late-connection", NULL, NULL,
-+=09=09=09=09=09=09test_late_connection, NULL);
-+=09tester_add("ASHA/interval/observer-lifecycle", NULL, NULL,
-+=09=09=09=09=09=09test_observer_lifecycle, NULL);
-+=09return tester_run();
-+}
-diff --git a/unit/test-asha-conn.h b/unit/test-asha-conn.h
-new file mode 100644
-index 0000000..5e88aed
---- /dev/null
-+++ b/unit/test-asha-conn.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#include <sys/socket.h>
-+
-+int __wrap_socket(int domain, int type, int protocol);
-+int __wrap_bind(int fd, const struct sockaddr *addr, socklen_t length);
-+int __wrap_setsockopt(int fd, int level, int opt, const void *value,
-+=09=09=09=09=09=09=09socklen_t length);
-+int __wrap_getsockopt(int fd, int level, int opt, void *value,
-+=09=09=09=09=09=09=09socklen_t *length);
-+int __real_setsockopt(int fd, int level, int opt, const void *value,
-+=09=09=09=09=09=09=09socklen_t length);
-diff --git a/unit/test-asha-interval.c b/unit/test-asha-interval.c
-new file mode 100644
-index 0000000..f32c7aa
---- /dev/null
-+++ b/unit/test-asha-interval.c
-@@ -0,0 +1,237 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+#include <assert.h>
-+
-+/* Redirect source-level calls so LTO cannot bypass the GATT mock. */
-+#define bt_gatt_client_write_without_response test_gatt_write
-+#include "src/shared/asha.c"
-+#undef bt_gatt_client_write_without_response
-+#include "src/shared/tester.h"
-+
-+static unsigned int writes;
-+static struct bt_gatt_client *failed_client;
-+static uint8_t expected_interval;
-+
-+void btd_error(uint16_t index, const char *format, ...)
-+{
-+}
-+
-+void btd_debug(uint16_t index, const char *format, ...)
-+{
-+}
-+
-+unsigned int test_gatt_write(
-+=09struct bt_gatt_client *client, uint16_t handle, bool signed_write,
-+=09=09=09=09const uint8_t *value, uint16_t length)
-+{
-+=09assert(client);
-+=09assert(handle =3D=3D 0x79);
-+=09assert(!signed_write);
-+=09assert(length =3D=3D 3);
-+=09assert(value[0] =3D=3D 0x03 && value[1] =3D=3D 0x02);
-+=09assert(value[2] =3D=3D expected_interval);
-+=09writes++;
-+=09return client !=3D failed_client;
-+}
-+
-+static void test_interval(const void *user_data)
-+{
-+=09struct bt_asha left =3D {
-+=09=09.client =3D (void *) 1, .acp_handle =3D 0x79, .hisyncid =3D { 1 },
-+=09};
-+=09struct bt_asha right =3D {
-+=09=09.client =3D (void *) 2, .acp_handle =3D 0x79, .hisyncid =3D { 1 },
-+=09=09.right_side =3D true,
-+=09};
-+=09struct bt_asha unrelated =3D {
-+=09=09.client =3D (void *) 3, .acp_handle =3D 0x79, .hisyncid =3D { 2 },
-+=09};
-+
-+=09asha_devices =3D queue_new();
-+=09update_asha_set(&left, true);
-+=09update_asha_set(&right, true);
-+=09update_asha_set(&unrelated, true);
-+=09writes =3D 0;
-+=09expected_interval =3D 16;
-+
-+=09/* Both attached sides, including a stopped peer, receive the update. *=
-/
-+=09assert(bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 2);
-+=09assert(bt_asha_set_connection_interval(&right, expected_interval));
-+=09assert(writes =3D=3D 4);
-+=09assert(bt_asha_set_connection_interval(&unrelated, expected_interval));
-+=09assert(writes =3D=3D 5);
-+
-+=09assert(!bt_asha_set_connection_interval(&left, 5));
-+=09assert(!bt_asha_set_connection_interval(&left, 0));
-+=09assert(!bt_asha_set_connection_interval(&left, 256));
-+=09assert(!bt_asha_set_connection_interval(&left, UINT16_MAX));
-+=09assert(!bt_asha_set_connection_interval(NULL, 16));
-+=09assert(writes =3D=3D 5);
-+
-+=09expected_interval =3D 6;
-+=09assert(bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 7);
-+=09expected_interval =3D 255;
-+=09assert(bt_asha_set_connection_interval(&right, expected_interval));
-+=09assert(writes =3D=3D 9);
-+
-+=09/* Failure on either side does not suppress the other side's attempt. *=
-/
-+=09failed_client =3D left.client;
-+=09assert(!bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 11);
-+=09assert(!bt_asha_set_connection_interval(&right, expected_interval));
-+=09assert(writes =3D=3D 13);
-+=09failed_client =3D NULL;
-+
-+=09right.client =3D NULL;
-+=09assert(bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 14);
-+=09assert(!bt_asha_set_connection_interval(&right, expected_interval));
-+=09assert(writes =3D=3D 14);
-+=09right.client =3D (void *) 2;
-+=09right.acp_handle =3D 0;
-+=09assert(bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 15);
-+=09assert(!bt_asha_set_connection_interval(&right, expected_interval));
-+=09assert(writes =3D=3D 15);
-+
-+=09update_asha_set(&right, false);
-+=09assert(bt_asha_set_connection_interval(&left, expected_interval));
-+=09assert(writes =3D=3D 16);
-+=09update_asha_set(&left, false);
-+=09update_asha_set(&unrelated, false);
-+=09assert(!asha_devices);
-+=09tester_test_passed();
-+}
-+
-+/* How the object that leaves a pair is torn down, as the device code does=
-. */
-+#define TEST_RIGHT=090x01=09/* The leaving object is the right side */
-+#define TEST_RESET=090x02=09/* Disconnect: reset, then reset again */
-+#define TEST_FREE=090x04=09/* Device removal: free, after any reset */
-+
-+static void test_leave(const void *user_data)
-+{
-+=09unsigned int flags =3D PTR_TO_UINT(user_data);
-+=09bool right =3D flags & TEST_RIGHT;
-+=09struct bt_asha *leaving =3D bt_asha_new();
-+=09struct bt_asha remaining =3D {
-+=09=09.client =3D (void *) 1, .acp_handle =3D 0x79, .hisyncid =3D { 1 },
-+=09=09.right_side =3D !right,
-+=09};
-+=09struct bt_asha_set *set;
-+
-+=09leaving->hisyncid[0] =3D 1;
-+=09leaving->right_side =3D right;
-+=09asha_devices =3D queue_new();
-+=09update_asha_set(leaving, true);
-+=09update_asha_set(&remaining, true);
-+
-+=09if (flags & TEST_RESET) {
-+=09=09bt_asha_reset(leaving);
-+=09=09bt_asha_reset(leaving);
-+=09}
-+
-+=09if (flags & TEST_FREE) {
-+=09=09bt_asha_free(leaving);
-+=09=09leaving =3D NULL;
-+=09}
-+
-+=09/* No slot may keep the object, so a freed one is never reached. */
-+=09set =3D find_asha_set(&remaining);
-+=09assert(set);
-+=09assert(right ? !set->right : !set->left);
-+=09assert(right ? set->left =3D=3D &remaining : set->right =3D=3D &remaini=
-ng);
-+
-+=09writes =3D 0;
-+=09expected_interval =3D 16;
-+=09assert(bt_asha_set_connection_interval(&remaining, 16));
-+=09assert(writes =3D=3D 1);
-+
-+=09/* Releasing an object that is no longer in a set stays harmless. */
-+=09if (leaving)
-+=09=09bt_asha_free(leaving);
-+
-+=09update_asha_set(&remaining, false);
-+=09assert(!asha_devices);
-+=09tester_test_passed();
-+}
-+
-+/* A newer object for the same side must survive the older one's release. =
-*/
-+static void test_replace(const void *user_data)
-+{
-+=09unsigned int flags =3D PTR_TO_UINT(user_data);
-+=09bool right =3D flags & TEST_RIGHT;
-+=09struct bt_asha *old =3D bt_asha_new();
-+=09struct bt_asha *cur =3D bt_asha_new();
-+=09struct bt_asha remaining =3D {
-+=09=09.client =3D (void *) 1, .acp_handle =3D 0x79, .hisyncid =3D { 1 },
-+=09=09.right_side =3D !right,
-+=09};
-+=09struct bt_asha_set *set;
-+
-+=09old->hisyncid[0] =3D cur->hisyncid[0] =3D 1;
-+=09old->right_side =3D cur->right_side =3D right;
-+=09cur->client =3D (void *) 2;
-+=09cur->acp_handle =3D 0x79;
-+=09asha_devices =3D queue_new();
-+=09update_asha_set(old, true);
-+=09update_asha_set(&remaining, true);
-+=09update_asha_set(cur, true);
-+
-+=09if (flags & TEST_RESET)
-+=09=09bt_asha_reset(old);
-+=09else
-+=09=09bt_asha_free(old);
-+
-+=09set =3D find_asha_set(&remaining);
-+=09assert(set);
-+=09assert(right ? set->right =3D=3D cur : set->left =3D=3D cur);
-+
-+=09writes =3D 0;
-+=09expected_interval =3D 16;
-+=09assert(bt_asha_set_connection_interval(&remaining, 16));
-+=09assert(writes =3D=3D 2);
-+
-+=09if (flags & TEST_RESET)
-+=09=09bt_asha_free(old);
-+
-+=09cur->client =3D NULL;
-+=09bt_asha_free(cur);
-+=09update_asha_set(&remaining, false);
-+=09assert(!asha_devices);
-+=09tester_test_passed();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+=09tester_init(&argc, &argv);
-+=09tester_add("ASHA/interval/pair", NULL, NULL, test_interval, NULL);
-+
-+=09tester_add("ASHA/leave/reset/left", UINT_TO_PTR(TEST_RESET), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+=09tester_add("ASHA/leave/reset/right",
-+=09=09=09UINT_TO_PTR(TEST_RESET | TEST_RIGHT), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+=09tester_add("ASHA/leave/free/left", UINT_TO_PTR(TEST_FREE), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+=09tester_add("ASHA/leave/free/right",
-+=09=09=09UINT_TO_PTR(TEST_FREE | TEST_RIGHT), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+=09tester_add("ASHA/leave/reset-free/left",
-+=09=09=09UINT_TO_PTR(TEST_RESET | TEST_FREE), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+=09tester_add("ASHA/leave/reset-free/right",
-+=09=09UINT_TO_PTR(TEST_RESET | TEST_FREE | TEST_RIGHT), NULL,
-+=09=09=09=09=09=09=09test_leave, NULL);
-+
-+=09tester_add("ASHA/replace/free/left", UINT_TO_PTR(0), NULL,
-+=09=09=09=09=09=09=09test_replace, NULL);
-+=09tester_add("ASHA/replace/free/right", UINT_TO_PTR(TEST_RIGHT), NULL,
-+=09=09=09=09=09=09=09test_replace, NULL);
-+=09tester_add("ASHA/replace/reset/left", UINT_TO_PTR(TEST_RESET), NULL,
-+=09=09=09=09=09=09=09test_replace, NULL);
-+=09tester_add("ASHA/replace/reset/right",
-+=09=09=09UINT_TO_PTR(TEST_RESET | TEST_RIGHT), NULL,
-+=09=09=09=09=09=09=09test_replace, NULL);
-+=09return tester_run();
-+}
---=20
-2.56.1
+The problem: my laptop's QCA9377 module (USB 13d3:3503) had no entry
+in btusb's quirks table, so its controller ran the ROM firmware. In
+twelve recorded failures, the first HCI command after an mSBC (HFP
+wideband) link came up got no reply. Removing power recovered the
+controller; a warm reboot did not always.
 
+dc16388d45ec adds this ID with BTUSB_QCA_ROME | BTUSB_WIDEBAND_SPEECH.
+On this controller QCA_GET_TARGET_VERSION returns rom_version
+0x00000302, which qca_devices_table, the table you pointed to, lists
+as "Rome 3.2". btusb therefore loads qca/rampatch_usb_00000302.bin
+and qca/nvm_usb_00000302.bin, and the kernel logs:
 
+  QCA: patch rome 0x302 build 0x3e8, firmware rome 0x302 build 0x111
+
+Both downloads return 0, and a later version request reports patch
+build 0x3e8. Across 74 SCO links, 50 of them mSBC, there was then no
+HCI command timeout: 58 on a diagnostic build with BTUSB_QCA_ROME
+only, 16 on the exact upstream entry.
+
+linux-firmware lists these two files for QCA61x4 USB chips. Whether
+they are the intended files for this module is what only Qualcomm
+can tell.
+
+Three questions, and what each answer would change:
+
+1. Are the Rome 3.2 rampatch and NVM the intended files for the
+   Bluetooth controller of a QCA9377 module that reports ROM 0x302?
+   btusb has BTUSB_QCA_ROME for three IDs whose commits name QCA9377:
+   04ca:3015 (0a03f98b98c2), 0cf3:e500 (0324d19cb998) and 13d3:3503;
+   I have measured only the last. If yes, that would support using
+   the same setup for other matching IDs. If no, what should
+   13d3:3503 load instead?
+
+2. Is there a list of the USB IDs that need this setup, or a reliable
+   way to recognise them? This year, 13d3:3503, 0b05:1868 and
+   0b05:1825 were each added after a user reported BLE-scan errors.
+   A list would help add missing entries before users hit failures.
+
+3. Is this loss of HCI responses after mSBC link-up a known issue of
+   ROM 0x302 build 0x111? If so, is there an erratum, an affected ROM
+   range, or a rampatch or NVM revision known to address it? That
+   would help determine whether other modules with this ROM need the
+   same firmware.
+
+Thanks,
+Iaroslav Voitovych
