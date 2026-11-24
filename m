@@ -1,89 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.78.89
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795512532;
-	b=ifkRgMaJEavLQa3EB0gxf35F8n5YqaA0YxQ4XnDtBxAk2s7x3aZO/Y9jY2i3hKjz1wd0
-	 elhhlkgGnn6f61ELj/P8NdlUTcC8pK7uwupIzX68NsAUj14vw6inoq5kfF09Zwe5c879D
-	 Y0QPHP3P7kEiZ4LL3k/BtecUHJaNsv8nwSgeb3T1Ue7THzx6rllIA5ekEw95XUYt/bbqI
-	 ZPoHMHn7CmHmTze/LDbeMycDy9DO1G0ccJQ6pooqZe9faCbykXiGlJTXwISsWLIVlA9du
-	 BCQAvqTop1iv/BJVBnhbSHFQQ0ovqaftLP2NSktLbpH7/OeMw3JLVFRSM6L3H7Utr0A==
+	t=1795512675;
+	b=f3NQksMEdec+IOdKw3SsWqIii/AWzmE5XM559xrEPP5vS7nel3yKWHj3Q/gL7rA3uLBq
+	 rTlN+RbNSu3KmnI35XcCfBvD7mpHxHQR07YgKuZEIbVtNhrvcanrJ8jAcI50788rdze8O
+	 kMj13vx/Ob9JRunIfHaPLrSd+pd/sXIRbI6knMzu9v97wNKohdIT0AE5/UwZ62cyNhE4/
+	 fJ8IoPqxZbrsbst92sdq4ujKsHDBrjT9S/nRR663tmd2sXt08C+KF77hrBuHjM7UDp05y
+	 SWCEhy0eiUesbyBh9aZ7z8gMEchAKFd6izhfL52fb+7tuVa9T4eMkauTR7MxnNlNpUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795512532;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=g7+1Hz8H6Dxc9el5Vh0+kGzx45RhyLUMF157DeLaodo=;
-	b=F2XN4afB5ZWhiFNOmG61PZj1lb+vHCJVpN4nhaLFPpL16cC72gM45rHLhtTK9ez+fDVk
-	 coYLrbTXZO41x3jKeyuDKQPDMbrlRkbE/KPWCmpttxTWkJq/DUO/X0dERMI+THCjZAHN0
-	 eDD7ejSrcRT6BDnbwCx3qJ41hveKX3pliUnwD8MS62ibD8pBdsI37FhdjhQM0eE3f0bsA
-	 NEWWFKnOFBW9Tcm2InCuQut1k66aEYf0e6rsd5cdGF3kvzWcEDV1waEIqhRSGRPfulUQd
-	 4TQzeQ7pHngHMPHw0yQFVFOlPK5ydqWJz3XN+18exPnhf+xrf3stxT9DLDUI7o0mTWA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795512675;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Subject:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
+	 References:In-Reply-To:To:Cc:X-Mailer;
+	bh=jm0pg8mi4c+vKOs4I3fCVMNCqq2U0x5wOZd4jvsZzpo=;
+	b=5cPHxgt8Vy0MblMF6+wHq6koSzo7+RTAmQgXS9gk2JCjzRYafn2jQgvuBWzoSAo886AG
+	 kG/67MZeSFI9v6NCfTRVo4CEiWeGx3mnB6Kr9XAbvEJjRYC/H3tqyhPfonp8j84l94xUK
+	 nl8tdXNQVEKEsM1gLtjveYQmhZTainpngS5xjkRVegKlEryCrOwlIRM5axCC9EfTKzVmC
+	 HMM8OKVcpNPBHtFSSheENjrV1S0n5N6rayffO7KwxuQtamftcG6rW7cBsGPrXAM+Floge
+	 j9KlaJGtVmuLIT21gAFw8inwfjmSgh/3aQmRTl4g8GhQ2IlTtXxencIky1YwYgIcoBw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=streamunlimited.com;
-	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=EQ4nzYYO;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=podgorny.cz;
+	spf=pass smtp.mailfrom=podgorny.cz;
+	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=W+je61bn;
+	arc=none smtp.remote-ip=77.75.78.89
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.78.89])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09106606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 09:28:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09106606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B5606A32D;
+	Tue, 24 Nov 2026 09:31:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AA4B5606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=EQ4nzYYO
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4bb72b44a97so36234625e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 01:28:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795512530; x=1796117330; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=g7+1Hz8H6Dxc9el5Vh0+kGzx45RhyLUMF157DeLaodo=;
-        b=EQ4nzYYOPL+KG41/SC1RHtWsYCTfdJX3B1LoLkSi+NV2i32l568Kd+/9BubXfLQnvR
-         Sc6E+3nGSZcNejFemDoq4qkqdRBCLroiv064U3gkvN8lTuyowtHhM7FavX4sxIDPaWNu
-         /rSIl/JabrAHYR7EONA0t8fIX9awXgBtRYImY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795512530; x=1796117330;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=g7+1Hz8H6Dxc9el5Vh0+kGzx45RhyLUMF157DeLaodo=;
-        b=IX3RKDKvLSBRZ2qWKhexbnnsoqPs3rB+Tev89VfrVxMs6Lw88pNyFNHWWU64eclLWC
-         Ks4Y0X+l0eY34iqKIxcQjRDXJIf+pRypsZ1SxDgoHdbNbJYECmwiouyhHCmMregTmu86
-         06LZxcR/kFP6lbiqkJC5VBT7dhlRSXhn2V3Fp3nK0V2UdcLYq8q53LnbMQIZadX2ErnH
-         fVZUtMnBorgfjrcH6Kh9Idda784+FAWplj1tDcZXSsssBlRixWjIpy8r7e6n5WfOX8Ok
-         UsHhju47MzEDIc0Te7ic2aLSeOjh4xTLpbZDkvq6wXhbm2Jv5Y46kV7KtAnNQ2TxbJ0n
-         t+eQ==
-X-Gm-Message-State: APuU4Z+0iy9gua9rcN555dIsiqEZ1eWOQFu8EJB1C/U37x9z4QiPO8Ih
-	yj7+t/0j8sWDBTQeAw3Y1onU3430uUoYmRrXayhrUbCcdsM3Zhb76i8C+TP7AmoDFEOn02+UIK1
-	07039
-X-Gm-Gg: AZFdTZf8uHCxCHF1FvAE2t+nTje90FEmjsBd9QmAkn4QGCCxxITv7bXFdLeHz93Xqhl
-	dlJgnuvOGtPWi2z+vKZAtBtBxVR04b31hNDlQ1ha6qQar/uvkTBgUHc8aV5lf/lfGz/wSYo+vPi
-	hMPNavMeGThBxJT64v5GJoIzmR891oyoGRxjwvs0gRaZaDm4soWnLbqzfXyGNy0ITkUwRpjNU4s
-	DeKpiltStzH51pQkeVPhtmwHRCcbboc3VstItXTkLYRfiCyZ+7KHNtb+DaPc1vyKty7ZN1J24WY
-	EH1n8/oLKOI1rIk4w7GICQZ6JXa8HCeF4YvTbMGZU3a0UX5NeGs233IoGuP0lhd3hJKpMCXfbjC
-	SYTqo2mFvJwms8cuqholD+miLnbPM0l6scMwfIRH9rsqXXDfcRes1cwKE5i8Uwu+gEymbIRIm2E
-	/CxqqCINy8XZFIDRgRuElhQ74+BGmfR0OcQkVGVV6hKb0kdPbkYey+yJAeT2IyweApPL5x2HBgw
-	eLsa2E5sMv55+rbmvqdvBM+Yg+ii//1dkjSOlFTzKy6yPI3+bvvZlA3NDroqpLw5HyM47OzmJ40
-	ZJdc+qwtXM88C/EtLnwfoJrtisJGgTXKzSRND/ZmSTWKn3/elA==
-X-Received: by 2002:a05:600c:1389:b0:4af:83ad:8f70 with SMTP id 5b1f17b1804b1-4bb88924f66mr282676195e9.35.1795512524976;
-        Tue, 24 Nov 2026 01:28:44 -0800 (PST)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c61e53asm27870362f8f.59.2026.11.24.01.28.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 01:28:44 -0800 (PST)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v3 08/10] avrcp: Fix NumberOfItems set from a reply for another folder
-Date: Tue, 24 Nov 2026 10:28:31 +0100
-Message-ID: <20261124092833.1191053-8-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261124092833.1191053-1-simon.mikuda@streamunlimited.com>
-References: <20261124092833.1191053-1-simon.mikuda@streamunlimited.com>
+	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=W+je61bn
+Received: from email.seznam.cz
+	by smtpc-mxb-5bd84c9575-nc5th
+	(smtpc-mxb-5bd84c9575-nc5th [2a02:598:64:8a00::1000:947])
+	id 083ec157be046c4e0db1db1f;
+	Tue, 24 Nov 2026 10:31:02 +0100 (CET)
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
+	t=1795512662; bh=jm0pg8mi4c+vKOs4I3fCVMNCqq2U0x5wOZd4jvsZzpo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:To:Cc;
+	b=W+je61bnNwlWPSDdsDV2KnQBJTHPT5jRfmtHJ9HrDpqqretK199cNpK2oJWDHc7Jb
+	 WakhYRLcKGSfNj1MoTlisAJruvzbEjQs3rwBISOhUhdwyeIjJm/HiYC43Suy/YEx5m
+	 r4zveCQNjUuVeUo+C8+MBj9BlektwkzV/xwWnjlINMZN45WibyS7mav1Z6R58BmZc6
+	 3RhTGUHkSsgUXsGBGq+QfagtPhd1Nrs7S9f3j5Hs8oPLm2uP1ZZpUyaBgfykK6CN+f
+	 xO4f8lJRnhyjnbZPEbLnPRCla1BCZWtTt71VI1c6CZIz1lwk2CC7KP6ZEJoYQ4p+8S
+	 deP9MVJPpGmxQ==
+Received: from [192.168.31.57] ([2a01:9422:904:1ee:e65e:37ff:feee:e29c])
+	by smtpd-relay-584bc557d7-pqx9t (szn-email-smtpd/2.0.97) with ESMTPA
+	id c5c0371c-fdd6-47ba-8132-755a04ca86f3;
+	Tue, 24 Nov 2026 10:31:01 +0100
+From: Radek Podgorny <radek@podgorny.cz>
+Date: Tue, 24 Nov 2026 10:30:58 +0100
+Subject: [PATCH v4 2/4] Bluetooth: connect to an RPA as to the identity
+ behind it
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,234 +65,184 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261124-for-upstream-le-conn-params-rpa-v4-2-f2dd5eb41f45@podgorny.cz>
+References: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
+In-Reply-To: <20261124-for-upstream-le-conn-params-rpa-v4-0-f2dd5eb41f45@podgorny.cz>
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ Johan Hedberg <johan.hedberg@intel.com>, 
+ Jakub Pawlowski <jpawlowski@google.com>, linux-bluetooth@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Radek Podgorny <radek@podgorny.cz>
+X-Mailer: b4 0.15.2
 
-The GetTotalNumberOfItems reply does not say which folder it counts, and
-the client may change folder or player before it arrives. The reply then
-sets NumberOfItems of whichever folder is current by then.
+A connect made to a peer's RPA through hci_connect_le_scan(), from Pair
+Device, an L2CAP socket or a CIS, looks for an existing connection by
+that RPA only. A bonded peer's established connection is kept under its
+identity, so the lookup misses it and a second hci_conn is created
+under the RPA, which waits until the connect times out. An L2CAP
+connect to the RPA of a connected peer does exactly that on v7.3.5.
+The connect also marks params under the RPA for itself, while the
+peer's advertising reports are resolved to its identity before
+check_pending_le_conn() looks params up, so it is never started either.
 
-To reproduce, change folder to /Filesystem, to another folder and back
-to /Filesystem before the replies arrive: the reply for the other folder
-sets NumberOfItems of /Filesystem.
+Resolve an RPA to the identity first, through a new
+hci_rpa_to_identity(), so the connect proceeds as one made to the
+identity: it finds the peer's connection and marks the identity's
+params. hci_connect_le() still puts the RPA on air when the controller
+cannot resolve it. SMP can free the IRK without hdev->lock, so the
+identity is copied out under rcu_read_lock().
 
-Keep the player and directory path each request was sent for, and drop
-the reply when that directory is no longer the player's current folder.
+A connection hci_connect_le() is already creating for the peer is kept
+under the RPA it dials, which the lookup by the identity now misses.
+Fall back to finding the peer's connection by its IRK, which also finds
+it after the peer has moved to a new RPA.
 
-Fixes: f17d3a2c3b0d ("audio/avrcp: Add support for GetTotalNumberOfItems")
+Fixes: f75113a26008 ("Bluetooth: add hci_connect_le_scan")
 Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Radek Podgorny <radek@podgorny.cz>
 ---
- profiles/audio/avrcp.c   | 65 +++++++++++++++++++++++++++++++---------
- profiles/audio/player.c  |  6 ++--
- profiles/audio/player.h  |  1 +
- unit/test-media-player.c |  9 ++++--
- 4 files changed, 62 insertions(+), 19 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_conn.c         | 57 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_core.c         | 20 ++++++++++++++
+ 3 files changed, 79 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index f65d394e8..796ab917e 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -252,6 +252,13 @@ struct avrcp {
- 	bool pos_changed_supported;
- 	uint8_t transaction;
- 	struct pending_pdu *pending_pdu;
-+	GSList *total_items_reqs;
-+};
-+
-+struct total_items_req {
-+	struct avrcp *session;
-+	struct avrcp_player *player;
-+	char *dir_path;
- };
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4aa0b49ae104..28eb79dd51f0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1927,6 +1927,8 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 				 u8 type);
+ void hci_bdaddr_list_clear(struct list_head *list);
  
- struct passthrough_handler {
-@@ -3554,50 +3561,66 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
++void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
++			 u8 *addr_type, bdaddr_t *id_addr);
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type);
+ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8638b7f8dee3..c1583cb6c28a 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1520,6 +1520,54 @@ u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
  	return 0;
  }
  
-+static void total_items_req_free(void *data)
++/* A connection to a peer the controller cannot resolve is kept under the
++ * peer's RPA until it completes, and the peer may have moved to a new RPA
++ * since. Match it by the peer's IRK instead of by address.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++static struct hci_conn *le_conn_by_irk(struct hci_dev *hdev,
++				       const u8 irk_val[16])
 +{
-+	struct total_items_req *req = data;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn *c;
 +
-+	g_free(req->dir_path);
-+	g_free(req);
++	rcu_read_lock();
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->type != LE_LINK ||
++		    !hci_bdaddr_is_rpa(&c->dst, c->dst_type))
++			continue;
++
++		if (smp_irk_matches(hdev, irk_val, &c->dst)) {
++			rcu_read_unlock();
++			return c;
++		}
++	}
++	rcu_read_unlock();
++
++	return NULL;
 +}
 +
- static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
- 	struct iovec iov = { operands, operand_count };
--	struct avrcp *session = user_data;
--	struct avrcp_player *player = session->controller->player;
--	struct media_player *mp = player->user_data;
-+	struct total_items_req *req = user_data;
-+	struct avrcp *session = req->session;
-+	struct avrcp_player *player = req->player;
- 	uint32_t num_of_items = 0;
- 	uint16_t uid_counter;
- 	uint8_t status;
- 
--	if (operands == NULL)
--		return FALSE;
-+	session->total_items_reqs = g_slist_remove(session->total_items_reqs,
-+									req);
++/* Find the LE connection of the peer at addr by the peer's IRK, for when it
++ * is kept under one of the peer's RPAs instead of addr.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++static struct hci_conn *le_conn_lookup_irk(struct hci_dev *hdev,
++					   bdaddr_t *addr, u8 addr_type)
++{
++	struct hci_conn *conn = NULL;
++	struct smp_irk *irk;
 +
-+	if (!operands || !g_slist_find(session->controller->players, player))
-+		goto free;
++	rcu_read_lock();
++	irk = hci_find_irk_by_addr(hdev, addr, addr_type);
++	if (irk)
++		conn = le_conn_by_irk(hdev, irk->val);
++	rcu_read_unlock();
++
++	return conn;
++}
++
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, bool dst_resolved, u8 sec_level,
+ 				u16 conn_timeout, u8 role, u8 phy, u8 sec_phy)
+@@ -1787,6 +1835,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     enum conn_reasons conn_reason)
+ {
+ 	struct hci_conn *conn;
++	bdaddr_t id_addr;
  
- 	if (!avrcp_pull_browsing_header(&iov) ||
- 			!util_iov_pull_u8(&iov, &status))
--		return FALSE;
-+		goto free;
+ 	/* Let's make sure that le is enabled.*/
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+@@ -1796,6 +1845,12 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return ERR_PTR(-EOPNOTSUPP);
+ 	}
  
- 	if (status == AVRCP_STATUS_OUT_OF_BOUNDS)
- 		goto done;
- 
- 	if (status != AVRCP_STATUS_SUCCESS)
--		return FALSE;
-+		goto free;
- 
- 	if (!util_iov_pull_be16(&iov, &uid_counter) ||
- 			!util_iov_pull_be32(&iov, &num_of_items))
--		return FALSE;
-+		goto free;
- 
- 	player->uid_counter = uid_counter;
- 
- 	if (!num_of_items)
--		return FALSE;
-+		goto free;
- 
- done:
--	media_player_total_items_complete(mp, num_of_items);
-+	media_player_total_items_complete(player->user_data, req->dir_path,
-+							num_of_items);
-+free:
-+	total_items_req_free(req);
- 	return FALSE;
++	/* Connect to the peer as if by its identity, under which its
++	 * connection and parameters are kept. hci_connect_le() puts its RPA
++	 * on air when the controller cannot resolve it.
++	 */
++	hci_rpa_to_identity(hdev, &dst, &dst_type, &id_addr);
++
+ 	/* Some devices send ATT messages as soon as the physical link is
+ 	 * established. To be able to handle these ATT messages, the user-
+ 	 * space first establishes the connection and then starts the pairing
+@@ -1806,6 +1861,8 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 	 * and return the object found.
+ 	 */
+ 	conn = hci_conn_hash_lookup_le(hdev, dst, dst_type);
++	if (!conn)
++		conn = le_conn_lookup_irk(hdev, dst, dst_type);
+ 	if (conn) {
+ 		if (conn->pending_sec_level < sec_level)
+ 			conn->pending_sec_level = sec_level;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 024960e9af66..a87c92dccd4f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2359,6 +2359,26 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
  }
  
--static void avrcp_get_total_numberofitems(struct avrcp *session)
-+static void avrcp_get_total_numberofitems(struct avrcp *session,
-+							const char *dir_path)
- {
- 	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 1];
- 	struct avrcp_player *player = session->controller->player;
- 	struct avrcp_browsing_header *pdu = (void *) buf;
-+	struct total_items_req *req;
- 
- 	memset(buf, 0, sizeof(buf));
- 
-@@ -3606,8 +3629,20 @@ static void avrcp_get_total_numberofitems(struct avrcp *session)
- 
- 	pdu->params[0] = player->scope;
- 
--	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
--				avrcp_get_total_numberofitems_rsp, session);
-+	/* The player and its folder may change before the reply */
-+	req = g_new0(struct total_items_req, 1);
-+	req->session = session;
-+	req->player = player;
-+	req->dir_path = g_strdup(dir_path);
++/* A peer we hold the IRK of is tracked under its identity address, so
++ * point *addr and *addr_type at the identity behind an RPA we can resolve.
++ * SMP can free the IRK without hdev->lock, so the identity is copied to
++ * @id_addr before leaving the RCU read-side section.
++ */
++void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
++			 u8 *addr_type, bdaddr_t *id_addr)
++{
++	struct smp_irk *irk;
 +
-+	if (avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+				avrcp_get_total_numberofitems_rsp, req) < 0) {
-+		total_items_req_free(req);
-+		return;
++	rcu_read_lock();
++	irk = hci_get_irk(hdev, *addr, *addr_type);
++	if (irk) {
++		bacpy(id_addr, &irk->bdaddr);
++		*addr = id_addr;
++		*addr_type = irk->addr_type;
 +	}
++	rcu_read_unlock();
++}
 +
-+	session->total_items_reqs = g_slist_prepend(session->total_items_reqs,
-+									req);
- }
- 
- static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
-@@ -3631,7 +3666,7 @@ static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
- 	else
- 		player->scope = 0x01;
- 
--	avrcp_get_total_numberofitems(session);
-+	avrcp_get_total_numberofitems(session, name);
- 
- 	return 0;
- }
-@@ -4552,6 +4587,8 @@ static void session_destroy(struct avrcp *session, int err)
- 	if (session->position_timer > 0)
- 		timeout_remove(session->position_timer);
- 
-+	g_slist_free_full(session->total_items_reqs, total_items_req_free);
-+
- 	if (session->controller != NULL)
- 		controller_destroy(session);
- 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 07f4d4f78..9802e52bb 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -758,11 +758,13 @@ done:
- }
- 
- void media_player_total_items_complete(struct media_player *mp,
--							uint32_t num_of_items)
-+						const char *dir_path,
-+						uint32_t num_of_items)
- {
- 	struct media_folder *folder = mp->scope;
- 
--	if (folder == NULL)
-+	/* The scope may have changed while the request was in flight */
-+	if (folder == NULL || g_strcmp0(folder->item->name, dir_path) != 0)
- 		return;
- 
- 	if (folder->number_of_items != num_of_items) {
-diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index dcd7df286..ee8c40a67 100644
---- a/profiles/audio/player.h
-+++ b/profiles/audio/player.h
-@@ -108,6 +108,7 @@ void media_player_change_folder_complete(struct media_player *player,
- 						int ret);
- void media_player_search_complete(struct media_player *mp, int ret);
- void media_player_total_items_complete(struct media_player *mp,
-+						const char *dir_path,
- 						uint32_t num_of_items);
- 
- void media_player_set_callbacks(struct media_player *mp,
-diff --git a/unit/test-media-player.c b/unit/test-media-player.c
-index ef2d5dff3..ba10e5175 100644
---- a/unit/test-media-player.c
-+++ b/unit/test-media-player.c
-@@ -142,10 +142,12 @@ static void number_of_items_reply(DBusPendingCall *call, void *user_data);
- 
- static gboolean complete_total_items(gpointer user_data)
- {
-+	const char *dir_path = user_data;
-+
- 	if (context == NULL)
- 		return FALSE;
- 
--	media_player_total_items_complete(context->mp, TOTAL_ITEMS);
-+	media_player_total_items_complete(context->mp, dir_path, TOTAL_ITEMS);
- 
- 	call_get_number_of_items(&context->pending2, number_of_items_reply);
- 
-@@ -158,7 +160,7 @@ static int test_search(struct media_player *mp, const char *string,
- 	return 0;
- }
- 
--static int test_total_items(struct media_player *mp, const char *name,
-+static int test_total_items(struct media_player *mp, const char *dir_path,
- 							void *user_data)
- {
- 	struct context *ctx = user_data;
-@@ -166,7 +168,8 @@ static int test_total_items(struct media_player *mp, const char *name,
- 	ctx->total_items_calls++;
- 
- 	if (ctx->check_total_items)
--		g_idle_add(complete_total_items, NULL);
-+		g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, complete_total_items,
-+						g_strdup(dir_path), g_free);
- 
- 	return 0;
- }
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type)
+
 -- 
-2.43.0
+2.56.1
 
