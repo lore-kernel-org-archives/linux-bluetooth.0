@@ -1,54 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.12
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.46
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795534855;
-	b=CE+qcAf7uaRcadv2iooGmrbjJGsaWb1xz69NWhu458kaD3w2El3pyIeaDWx4zNx2H4Ok
-	 nc09WwKgzRiteYKrIeqqLQhloCPgv+DhAnMlie0Yzr4xfAVPrvn21n/TJVDLxtGYPj9wT
-	 vudntUVhOXZi2L+71s6EpS60CAvuLbUayJesFkiey+8HaroxLHtx/f26irJdJWhErr4at
-	 WzUVZ1WkksCJzaB+a0gusFKG98TxshtnLRYW0K9ZE92+WDmz8UwVm9ZI5KuulF82K3xqf
-	 Ob2tSNlZhiacjK8aPGpKgH8HeHgavGYGvMl+XwfOYRFGJ4JGsdvPRIvNHqDvWs+HftQ==
+	t=1795535512;
+	b=RLoLiDBVq34VfghrRgQI1tURzQMOWg0Y8c2ayU8OJHhnoDBgCclOsnchlAecyCm6sClt
+	 DKuN8rQsqEQUYzeOKJtaglz6A+YSXTX2pxiQycnkHdHQQewJDASctFeDNO3B632TGQKJi
+	 TFCJ4IoewuvJEceY4rARceRPd8JeDel8YdhSWCvxW+4LIJzFh3oHntHPJ7jl2qaq/SG7t
+	 AtSTcNtdx/rW22JcE/PMo0TMpxkjM1vwMUYmRSMhXDimvNZkQgjXY/HI47LMiBVwDhtm+
+	 nVnuxxulUHqOsWI8WfKPLWdcI7rQeA4OimWvgJiRBhGD/7VSvb2UhQ746msroImLjsA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795534855;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-ZohoMailClient;
-	bh=68mthMIvUfI7bxI4fE5iQ8kHnRupALWyjA7PGWOoGPI=;
-	b=zikUHzHmIX3d4bYWiqJTluQIdG35nFNBIA8io6foUQyzfKJmh5R/BlsUrEWiAq7I8C4T
-	 7I6l95v2XRs3UOuQ/u0d4nhFxexNZyopPS/rii0BFLhhlHr1+jaG03aiOhy6LCe4vNBg+
-	 g+ouoUN2bEO/uTXAf4IH1iu17QSevgH8UDJKVYsAlwwm5IpcYUIyyegbpLGIFbQ7FTkIC
-	 9NAICPJWUNVzwe2Pw5citaaWmImuIvvyG0fMmavZT9gMqmVsM5T9ORUBQHmJ89Xn7t7xb
-	 1Uqq05U4uTOOW7PawPSWV4zX4EBGreORAwNwE9mvFpjhGnnHIxanAygkhmyw4OYGZGA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795535512;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=cy/KtHTBG+PUZnxC+4g8mwKSUvHHz6JH3vdHAtn/qOI=;
+	b=W4VjETxy/vHGD/eOQfsNvkecnSPK4aoSJ7roMwngGPvZ9wm8GYs2SRgnb+TOAtLJqrmd
+	 lMQiBM51cZ5H+6T+uos0iGM/dYR90i9DUboPvGJ0bDq2qza+zhbRJnYX8oFcHu8zppFs8
+	 J3xhjJjtrpG79mUQAC5cpxT75JZHmD28yy6lbaXQu3PDk6JyJFSRJsvMUxTvQG3FKMswF
+	 oKHjn82/qClpdqn7JG983FQw7DqxpSoZDZftVZgGVCfjuhnAib2Vxw/dq8cYnD8urRIr6
+	 nJ4uwQDj3o8RNkxwNhU/F9EWqs75NZ1iy8MUK4fTbI6Hc7zEtUVtmFMt0Qy2Kpm0rWw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=collabora.com;
-	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=zohomail header.b=Hq3yRElD;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.12
-Received: from sender5-op-o12.zoho.com (sender5-op-o12.zoho.com [165.173.182.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=e88acMWQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.46
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB544606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:40:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB544606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11069606A6B7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:51:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11069606A6B7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=zohomail header.b=Hq3yRElD
-ARC-Seal: i=1; a=rsa-sha256; t=1795534851; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Xvwu8Kn5qBWk5qalk+1Q73HxRvErCkJ9HPwRz5BhBWc1kKjesipUJraixWSdwzk3Ttj7jhwJ0jAM8jzzyf5cD7T1yUjYGUyniUYO/rs22SzN6STGUtdste16yhn3XcvqYXrtARR9iD44oG08+RDeIcBCQQnu6rVLcKCUBLixEbU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1795534851; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
-	bh=68mthMIvUfI7bxI4fE5iQ8kHnRupALWyjA7PGWOoGPI=; 
-	b=fhHsPSDU+8TUMe8cEh+fupgjjVUjWFgPRufhKl+vKI6XnsmbjsqPDT/Pu9s5dtPKr7LsrP0AKJ1ACh+Z43ZAsKYStoeIk67sQq9u1WfTa3DEh5lkBVELweZTFwSAwk6Ouog00J3/0G69IIKOqWfpbPEz1RmsFBiKDqBJFGwFF/g=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
-	dmarc=pass header.from=<frederic.danis@collabora.com>
-DKIM-Signature: a=rsa-sha256; b=Hq3yRElDhEkZZHODZkd9gc8Zc3fEEhdHf7YT/wn/JydwXN/cG5ljLXpKZWrO5VEJuQQEdfJn6TovAEdKvzKJTd8B9hFlSTrwy1dbcQ+n5u1ZWUN5ea7jza3BykIW5j7NlhQCRPnWTcjuCWC53vMESxJGrlzdV1zYU/9Mcihioro=; c=relaxed/relaxed; s=zohomail; d=collabora.com; v=1; bh=68mthMIvUfI7bxI4fE5iQ8kHnRupALWyjA7PGWOoGPI=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1795534848991627.7874587789807;
-	Tue, 24 Nov 2026 07:40:48 -0800 (PST)
-Message-ID: <066a8c1e-7461-4a00-b65e-ff097e2ed41d@collabora.com>
-Date: Tue, 24 Nov 2026 16:40:46 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=e88acMWQ
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-67bee1f693bso3706591d50.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:51:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795535511; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QmH4U1Gat377cMwjDnpzZDHP5dVxtjntjqeothEL/d43DRjEqb8DEC+dv++xjCoeXH
+         DQJohEFYWFZLIPGcPVEVdNSwUD5jeHd2dLPOqJ4yinHpRhHpSpgg5EtpA5WxVwwLNcOz
+         +CYYBgb73M59eO1+BwC54kImc83O/LUQf6OGAFjjtyCBRwogPePdAUpyhfDJZLUVXAZy
+         223m79XMa9KNO5SzusmrHBFa0m5yopIMoQHHmA6zJ3VV12HhWpcZIAIx7SEKFEEqGPNu
+         rU760zhWhcO6OY3Ufw1KpmoyGslN+j9UxGSKNW8XqdOdKSFaoZK+WX+7qB2gjrTMmypj
+         zWCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cy/KtHTBG+PUZnxC+4g8mwKSUvHHz6JH3vdHAtn/qOI=;
+        fh=UA/cNErwqknDfefZj80dwpXzGaUZl6eKpR9TO5+4Joc=;
+        b=KfL0fNJptqlKgVhTuskRtS4ULGLnB687FT55GXP5okRNn/QoX9h9DN69GEXoDN1LHN
+         5/hXlYNo3bCgaqgaEGFSjDaS5E6ByzhiNlgoizXzFJCiXec7H/KT0+Pu7PGjUyTcYmGj
+         +LePostGvTFtCXGrPhmzl3Fj5juSnxjcJOsx8OrY1BZAUoawz2aXNcIsk/Ip9a6zVPpv
+         S0B6lrMGRnOMGeCDBRiMrqd3s/Tb0cQ7EAuOVC/lcSgb2Jyn4ZpBxCUI41ZcY7qhz7FQ
+         E84Ajca3vW0EZCl48vPj2p/4R7tqGIyun2/ynZYEvYHRiEdrj3QooWteosVEK5Wo1pBP
+         OEMQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795535511; x=1796140311; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cy/KtHTBG+PUZnxC+4g8mwKSUvHHz6JH3vdHAtn/qOI=;
+        b=e88acMWQ0Wr8ufS6u+x5O+ZHbHZQSpqZ4qDgTvrYJLjrIq/uc915H1Zte5wg4u6EgP
+         aWM89g8bjcA/K0B3smVlukmCGphtoX8MI7hRSbv9ZurU7hcziIe27zZrgHHSp1SPYotw
+         erdP4c69GMlXCqeb71wWFzkKaILuLOVixAsySroqVhxoEiNqRJfoZ/b6VC0aAIiT1lCp
+         sG72uBvdxBPCtuzSpY98uKepm51HnK8rhdpPB/LzsoIqbSnbyRVvYPjQKoqWNFSb9Zmx
+         oHW/PVBOOQpJoDB9hMZJeafNUnF9/h9osyXZ0BEe5BGGF8LW7K299/uOpcIDIdu1XLWh
+         /QUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795535511; x=1796140311;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cy/KtHTBG+PUZnxC+4g8mwKSUvHHz6JH3vdHAtn/qOI=;
+        b=E1gUzY+qR18BnN2a+MQXXxR79uXa4BWQh43pbLUAbBORAy1XRFwnpmtfyCtJjThWMh
+         /ajuRZ1jjvfJ7AJqY/HmG8FMvJvnolO0882dKAV2B3K+xlH/PGCIMm9iaUe6cgH4OV0g
+         nEH1qSdC03+Ur1cfpfv+sPv31r3IAgT3WPX++f82oIGBLRKKifJgpPMYaUSM7//Qeb25
+         K9d1yVy/1iS8QbVVpQYy2fHL40wfoXACXbY6yoa1IH56p7OTq/mwdEBrJny0+DqW89Fr
+         Mw2mCxb0AAI5Oc6rj0jX0TUSwH12CqJIkuYXZ4nBYRj0F6TySgXTJd0zoBXoavqkLAR0
+         B56g==
+X-Gm-Message-State: APuU4Z/0IAtY4o2DNSIMe/pjl0+qlepYLYJD2Tguayhq2MoMR84a4+4Z
+	Go0uYNidtyCbEpJHsatbO/B7EE0ZYCL+s59qUlF1p9R9bUubupXB7HJZERU118nCytN7W8CGGgh
+	2fPWQgvCf8dpanYqw/2nD6j+qJQ29iihZE/Xb
+X-Gm-Gg: AZFdTZeNCy2H0+QrlIuMUVabyB9QurhVfVNwDhDUWgWGJ1Dm46zQgUDKdv6xWnnt7Hx
+	3Bo1TlCtj3izgzJ/icZZRthweyiUA/E/HkONwt9e7rQjr90WbFt4yK+bf8kECw8cgFlBPSn2I6B
+	gX2UbnafLv+4wN7Vlfj7LmS0BG0GTftT3o4JaufNXhJaMIvIpOa9uX+S0OTyOW2WjgxcwxulDvm
+	/qDIULC2worX9bADzYlR236V8IKyaEEkLas0GjeuWf+RCzrxmrQDTSemg0+tSLb2Al3DNpAN0au
+	Hyv1kNI37GQo1kocvfe+7kwz17vmrKlfrJCpCzyeHGmvR5eF6N1+lOIiuViSchRlD2oJpBG7flD
+	NwizPS8Ok8w9PASP7xD7w40NURbv/+CxnP28SJAo4y1SXs5dgabqagqr3L28IzUe+v2op2YzO8p
+	LnLpHQcy21Ri0Ey4k1j+FEahjeixvSGGtkK3uXfKJY4p8Tud3miYn0GsWA
+X-Received: by 2002:a05:690e:479f:10b0:676:7f47:5e19 with SMTP id
+ 956f58d0204a3-67df4498232mr4841604d50.93.1795535511044; Tue, 24 Nov 2026
+ 07:51:51 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,69 +104,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: client/btpclient: Security Level reporting
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
-References: <20261124100035.245953-2-frederic.danis@collabora.com>
- <6b05756c.018c0331.11d296.c08e@mx.google.com>
- <CABBYNZJRrv81NNbbD9cJ9Q2r+FGMxmxjWiVPzde+1YuCMga4aQ@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
-In-Reply-To: <CABBYNZJRrv81NNbbD9cJ9Q2r+FGMxmxjWiVPzde+1YuCMga4aQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+References: <20261122201519.2859075-1-simon.mikuda@streamunlimited.com> <20261124115545.1890095-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20261124115545.1890095-1-simon.mikuda@streamunlimited.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 24 Nov 2026 10:51:38 -0500
+X-Gm-Features: Aa3M54pZbEjP9mS713LU1Y5bBws-d2NmIavsZtN_KWcCalimXV5Bd4UBdtDqZD8
+Message-ID: <CABBYNZJides4vqWtDC3fJBaN8xDZ79+hHT+X8UdtRq3uuPm4Yw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Don't report a cancelled PA sync as failed
+To: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
+Hi Simon,
 
-On 24/11/2026 16:37, Luiz Augusto von Dentz wrote:
-> Hi Frederic,
+On Tue, Nov 24, 2026 at 6:55=E2=80=AFAM Simon Mikuda
+<simon.mikuda@streamunlimited.com> wrote:
 >
-> On Tue, Nov 24, 2026 at 6:31 AM <bluez.test.bot@gmail.com> wrote:
->> This is automated email and please do not reply to this email!
->>
->> Dear submitter,
->>
->> Thank you for submitting the patches to the linux bluetooth mailing list.
->> This is a CI test results with your patch series:
->> PW Link:https://patchwork.kernel.org/series/1220644/
->>
->> ---Test result---
->>
->> Test Summary:
->> CheckPatch                    PASS      0.99 seconds
->> GitLint                       PASS      0.69 seconds
->> BuildEll                      PASS      15.91 seconds
->> BluezMake                     PASS      229.50 seconds
->> MakeCheck                     PASS      13.53 seconds
->> MakeDistcheck                 PASS      117.21 seconds
->> CheckValgrind                 PASS      280.36 seconds
->> CheckSmatch                   PASS      234.25 seconds
->> bluezmakeextell               PASS      75.46 seconds
->> TestFunctional                PASS      1003.52 seconds
->> IncrementalBuild              PASS      235.64 seconds
->> ScanBuild                     PASS      844.91 seconds
->>
->>
->>
->> https://github.com/bluez/bluez/pull/2896
-> Copilot flagged a problem:
+> Please disregard this patch.
 >
-> https://github.com/bluez/bluez/pull/2896#pullrequestreview-6038693469
+> I tested it only on a 6.18 based kernel with one controller (Synaptics).
+> On bluetooth-next the patch is not right, and with other controllers it
+> can misbehave, e.g. a listener may get no report of the timeout at all.
 >
-This has been fixed in version 3.
+> Sorry for the noise.
 
-Regards,
+Too late, it has already been applied. so we might need to revert it
+if it doe make other controller misbehave, that said it is not common
+to have controllers sending HCI_ERROR_CANCELLED_BY_HOST.
 
-Fred
-
--- 
-Frédéric Danis
-Senior Software Engineer
-
-Collabora Ltd.
-Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
-Registered in England & Wales, no. 5513718
-
-
+--=20
+Luiz Augusto von Dentz
