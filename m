@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.50
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795533645;
-	b=ye2LvrYAlPHcWCvDa6LlPNQON+4A+mh01AJ2uK7tuBCBs5j/8rGsZg0VqnB4gpmQRvxN
-	 sF0wz5udcNEeopJ058pp4J7oQcQSjfkHoesGl2NimgAEfr5pnJ+Yn5i4vATs8T2xZZtWt
-	 l0Jl4xYIF0YHaZB5Iw7XhMFvsOaN5VRM1gI7I38pM92LSSxQN85UJcO1bkBKTor5JJ1oX
-	 4RNWn8BNNdHoM1cRziQCkm2M267vI7Cdb1QuGgDuoeyQ8Lxj4F2xkali2fWMB0+qMIea5
-	 Sdl+vvsqXSLTuOpOzuuZCU0uz+t8dEDhJetlTEKG0/DiuAu5+V6U6iaOxCLsiW640hA==
+	t=1795534649;
+	b=G5rGzMeh0RgmEuOMBAlzng3NLMa9mQ6vmb4qeU/1ikdmi6fK0DJlqqfNimn/Jtc7mY9k
+	 5kykwbwqtai7+Ch8SJa0ABjpoSEi//E1/0Shm2JlO4HWX/zLbXSJ6CUoUHr0tyypDlkb5
+	 SpXArxfrz7UbiwuGntIfy2l8EwGTa0k2ZFh8tNbb5V0w4UUkkWxSdVYUJ0XwIXriB99D5
+	 MgnVRlKgl2UrnnpU6W1BrXO0H0Fmm0GRbjtgTaYFvFO9UcR3mSmrimu4d3X3tGCMflzOe
+	 KxRH1jRpZl7xUvPspAbc5bM5uCIKsGRMfrouk3iR1QsrII3qkLcJtENEO3uVPUh8K8w==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795533645;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795534649;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
 	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=9o5z9ynSh62lZy+tzi0Ll5SycpVaykB/mbkJ1yNVL30=;
-	b=jCR+0wTNOuDCzJAqas7EZloJcfeOLylGuvxx+zlC19VmgUAm3nw5z+oujLhOPIbAB3fw
-	 kFpsIUfdCZEFM/5Si6dzdT2a5DP7gcneaK/FvvWgQbdE2DdRSLoSCQj2OMsITk4lY+ntv
-	 FOmSethsrJT+xm9r5+hsP891y31/uj0wyXcANDNBohI5A1R5if7XHYEF7j6xvVxskKX1T
-	 k0Mc4Yi1Aau0Pv1CyqHR9iJoCQLI68Zhb+ucEXV9E5fh2fuLac2YS0yxPa5NJIbFQi9Mm
-	 mXIHeB+VtM49A2H3wd8w8hbl8UIB0hWxZ2tI8UZ+8vw1CrHNL/cWitSjPRYfKA84D4A==
+	bh=+vemHTFllke4mRHjKFMkhveBuZAKrkf8PQBjoS+U/I0=;
+	b=ROxZb14v91sFZnKAlRMODbHQga/AMaQGbk8UEHqORs5XsrO2BSY8xGxbgwJz2cb+n0EL
+	 1rq9vUChvLVDTRyNRe8UyLeC2hipBimh8/NDSH1/kGCWjastK4hauLSHDBbS0eiYkdMt7
+	 fncLDNJddl9jeOTcL3Svk/aJvwh759PuLxTieOxu+13To8Y9ExVwiYtq9fZ+cWXt/UmW3
+	 dUFOaoGogfLV/TCTM5yKcnfb33Cjwx7eKWp3uF7KHUEKFYrlBP9ZY8TjBR6jFZKOFHm/J
+	 09QkaUFNH8xZHmFvtEfhTlom+W6Ml539+YmorJkSlzkvUt32/xtF6HHRYuhrzOM545g==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p9bI8dGU;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.51
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IcGidxiZ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.50
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D0A606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:20:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9D0A606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9BE606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:37:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF9BE606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p9bI8dGU
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-67990a45e02so4724410d50.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:20:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795533644; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IcGidxiZ
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-67db23d8892so5083000d50.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:37:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795534648; cv=none;
         d=google.com; s=arc-20260327;
-        b=ZOKPt9PgvST8Ds09pVZvj/R3pdwml+N8ShdM8wknCp8JME9eTvKCHZs/E1brZ9NONO
-         l/V0qo1CbmEOM1Vu2fZyCdOsK4ukfwagFIPDqIj2teAlW8hoQfEP5tKucRpgcIQ5jB0q
-         PJ4569/EjBRtjxC9QCBFPrX0LIihoPEvNIV7sBEQ0Bs2Hge0j2QdeOlMifToYyXhduC/
-         cQCItgDB+cgtTQnoNExWHt/rVu+p2pdhRp3ewa10cOQhzvncyYf9H8ufmP/ch0fiUhNA
-         P/rQH7MvCICzdSYLNkhGimvYhdH5ah12aaOFl4Pw810FVlbP9uivQfTeXIqZ8BpvE/2m
-         CZzw==
+        b=UUEs5diSX1hJi/Iioo7Z1K1c2D9NEZRwyjIxt8DUSGhbYCI4jwpo+5yBbaNdSKhOMD
+         uRdXeAzHVVgjmaKGJR+Ve+tkCTn2+zl/mTmXMaSlB6FnH1L/xO6l9x88WJCoIMRMIxf7
+         +32iwRWgLI8C4ylE/tK4FOAqOaiLcal4Q1MHSOnao6Fmit1FxgRqLoT5i5NsVDb0zXJ+
+         pOA/qQ3SwKL2O8j6sdMDZCcbin56WfQSOeVqEkCmh6xfOrV34y5XDBEfpnv8nOeYtpaw
+         74uqxso7Ieeso6M5oc4EW4ABogmKhfHuwXhTUIoxdPE7BpEpYCF35RYuXAx09/igK5CG
+         dbYQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=9o5z9ynSh62lZy+tzi0Ll5SycpVaykB/mbkJ1yNVL30=;
-        fh=dTzD+sIqnwBkIcVZ80uGkoLsiNeeBlhM/8JkiCbQjww=;
-        b=KJMPuJi+bqzucG1ke8rchbeMwVJzN8VqJCeWARhnt8AhIGvaUVNfqoXcQorXPFjCOP
-         tn0JfGESr8dB/jlrVv3XE4JNTMmEQxg6BtfWQynZl7GrrLtwhRF4YL5G5W0hP1jD92+S
-         tmtnzcuUMVpsOuOahNrboad50v2Eml7b1JtE+SpOaIY96NBX4hWsFI+wtGPNoAQ6ou0z
-         g1pCSKf6sVhzIh0lZ1ONnHpuL2Ow3AdfnUfmrscXEPfyG6uZ4cyF9oycLqmgpZYsrBNo
-         TnxlWf86MNXCuHaGoUNWTSY9wfk7rnSl/BW3H5K136RzxJ5r/sRNTMu2Vmefd0s7/3xr
-         TCmg==;
+        bh=+vemHTFllke4mRHjKFMkhveBuZAKrkf8PQBjoS+U/I0=;
+        fh=6Ejz2qDC1kzAz/SGTrdN+HkwL3203PQPsV+Bv5fThMU=;
+        b=dGY5fRutS4bpTZQ1msmj0upfWfpksBZvHD+D4FBwmLIZfaF8G2bvT0G1Qa25wwxpSp
+         ObuEx0LnVT2DiZq+GqlJH/CBwwdBOGedGUY0YA2j2l2/uc2wCko342WP/NYqVAGuT/We
+         L461Hrc1ww7leYK2wThFsD/2ogn5hvitvHWZz7hx4nocULBOP42AatyCe5BNyMxQVfvr
+         0tnrLNacOwAkmRW0WptVzIqb8nDSLtjdDfN4rC4nQIHU/jcApIOa/QAtxCV9w/6q1PB1
+         5rO0JiLUZHn1TPw/1ERzBIs4Y0QUYYqzH78YWovr48R5c1cbM8ohF1AI5wOqqU52x0Iw
+         f1BA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795533644; x=1796138444; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795534648; x=1796139448; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=9o5z9ynSh62lZy+tzi0Ll5SycpVaykB/mbkJ1yNVL30=;
-        b=p9bI8dGUlqa1TR0QaCz5qk7oCpsEtHRA+LIBwV4SgcMVr6SRpnWXoaHt2m5IIy00St
-         Xrx2a+x+SG6masNNqhy/6klnGjVQk5r8DvQMDl3iRA3n6WItS4QpDFThV4DXEXKohISJ
-         GHcxob/s0c0AZmMpCGQOtslSHLEd7QvIJY4TPPZPPSTH7tKBNnIDJSKzuif04S0OlHaQ
-         M4ENIaEHGUlaCcvEBkcTO12RVM8qL67rfM/q76ZoYuTZxtzWmFdBoXWOxAtajhwyxi5O
-         dWnNa7+T75Il3/kTKEbLJB2xyM2w8VsgeAZrWz6AafsFA/iKG2Ut3MhlBZBBAn1tcldi
-         C11Q==
+        bh=+vemHTFllke4mRHjKFMkhveBuZAKrkf8PQBjoS+U/I0=;
+        b=IcGidxiZl/mNFvtW1ggMs9Bz0d+NANdIb/o751/Du1QO8oOf1AlXAan1eFmpHTFfRg
+         9Ro1IvkjBU5bjnYTb/HWgwyaCUmfvGCJniXzWP1Cbk0ZfurYYJ8Lc3pBbcUqD8+bt/4P
+         ESjuG3IYqGphSZ/0ihw+XTfbHRl8pzfj2VatLycrR4wrqWKpzBu065HZgaMrgMmNJspw
+         RMveyxHFi0U93idASdj9bv1bsx4SFmie6jot/L+HWDr/h6joOewvZ5psNfH3kqL0P1Bv
+         VkWm5e5bCpCy/Fq2PJ5yzB0xx6t3QgpFxjtFYbE51n00XkJKSHQODXSf3+JjTRLhZKTy
+         sZVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795533644; x=1796138444;
+        d=1e100.net; s=20260707; t=1795534648; x=1796139448;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9o5z9ynSh62lZy+tzi0Ll5SycpVaykB/mbkJ1yNVL30=;
-        b=c6KVirvfQKp3odrGcf/MVBGiAlBEvHHnUvbN8W3ntTX8R6+C2dZt6KAfsw1UipbkS5
-         opGG7FkVvW9r61ejTbX1nJLeluKK8QdHUBYgqb3bpSUlIolmZwiiKNmKVv244swFs/QI
-         P8CXztjA1T8oxWJ0yi0SOSTsnxbgSOHOSq8JEJZv1HINWnwwYfzJWMb3henD9L6S2Wyy
-         4iNy+ZxPCgDavZVVBOu3KQmgYMIyPW4ppgkkvqnYJmSPBH3eB7Y338S/18RspV5BF9+Q
-         KLcKhGjPxIyAvbHjGX/sZzer/jQxCyJxqkexGxulGWgV1T05FmP0c4F339lG+TAWfb6L
-         6JpA==
-X-Gm-Message-State: APuU4Z83vPu93R5oh/mt8zSGRRAHFV0P17jywLhBtZLd6mgBtEjGyLH4
-	OKD+lCPzsDshtP1TGKcw1QKlfSrzqwcFf5NIygDF9aB9G4eJ/I1joE1SNo8KmplX4bED56Moj51
-	LDuHSY+HoizU68d1g5b2Dm4vzNoE7VRk=
-X-Gm-Gg: AZFdTZd1WTN2+HW1VLgN4GsFXGZY7DMeCg+y9+QFd8FIWY+gglnZU6NhGgSkTupbn7u
-	+m8q6nWJUnk+Oehf/UxzzxZShz6OS1BtO/SlTctqjEw7iJGXv6/S7Xqcd1bwRwr6fAnohATX7cj
-	37sM3XKrBHt5ngu1Pm8AdEVKDn72AhGSH+wiK/ZJy9nEGL6lgRG/FvIKE0JuWopsFcRM32nhITT
-	Dwq5Ud+W/9q0RGui9qnqAESW/EfBl9wPfD36tVgiviSIj1+OB9NKfim8oicromp1HKUbfOOxyCy
-	CNEFLyszb4DpdP9x0ad2/IEzQK3yAoyGeOVrMm25N4L3UnH1eL6j60doKzRtOh6r3YQKmE0FgJX
-	psoDxNVH4Z+lZsXS5NBpNXW3KNveu/2YxwjToOX+FSNiZu6L1QBp+24GVReN2JemhP2EloI35no
-	mL30NYSLUsirN/VbdgVCMyO+LjNVchCJ+cnrbj0t5OwuDFc6yyH6sRWoYJ
-X-Received: by 2002:a05:690e:4790:10b0:67d:a6fc:6bb5 with SMTP id
- 956f58d0204a3-67df44405bfmr4581791d50.57.1795533643649; Tue, 24 Nov 2026
- 07:20:43 -0800 (PST)
+        bh=+vemHTFllke4mRHjKFMkhveBuZAKrkf8PQBjoS+U/I0=;
+        b=PAKby3kz9UeDl+/rF4XqLfzrvLBVLlLtCaq/PuTYZhSOSrkKZGyyyaVdgS/V+J+B8N
+         fQT12YnFW89gRebHTDXLP4Dj3o17TXM3+utz4AQVBb/CDEueVb96xyRdYyL9xfghdugw
+         JJEWsdFBLh/lvB/VQ7ZSaU9vp8Jh+AgwuGEvuLyAYvR3J86lxjiomqmLJVb/L0jQuX03
+         lHeVfbT8Fp5Af2C/HnBrtpnhFq+cusu5KoekDohtzhf+8t4j8siBRJyEfOmArWWCb6kE
+         uw9y0uRUZKTHNVFkdBJf4PvKA6LM9WOFqFWqFBpvnm3QglHR+JkZ4/AfZ658U9N2Nz65
+         +cAQ==
+X-Gm-Message-State: APuU4Z8DcNfb52i42yudZ9EYGtI1zCWQHJvWidCB1DugK8eUUxJpz4hV
+	MwB1nq14wMT0ksIBBHV3/lK6dfLPScVjKUd7wRFPNW+G3+HJ6dhWIEmgpwdVm/m+fTZWuuroeab
+	tm2FRzXCN3fY8hTLPpZLxsJBI9gg+eKasCXH/
+X-Gm-Gg: AZFdTZdc0j1bbFQwkvY7FqVPcLfF30+/5WkS8krRJAlNMn+xIb20mBVs2iLBVnnPHwN
+	8fI3XWXWC/np3UJyrkqg0YYELxoKdyS9J0ZyZUFDRlHChoJc7Mjswd+xu9SQHAKJCPanLQVas1G
+	2tgMub8oKvjUrimhmjuIaxHOg4fWqEYS+LxbV2gATlGv8nb992x5yjLfMPBgEwz5QjMDT27xfwy
+	1FFwLq92NgYx1SfqtV/w8f/FyTNOOC1/UNG5Mcgql7/gIosvl2c/QXl76tGWCxnGBQUyRsmSZOW
+	2Fg/KUklGtvujrzlKqbIKpFgHnpAs/kdodWa+JyEDGdY1XFWXOnWXyWS/x1+iQZ52u3tQ/FqMw7
+	dA4MGxKBU6I5NhSWZuucBTAiYxu8TLsWFRFokN4CV1JI9Iq9vWdcdpIDuYAudmCoMEhp+hD2S73
+	BfnJhb7F1jPDmBlRZ7Y85pVK8SWIZ7eI7m1MmEcdPOwP4pWPzzHEKwDbDw
+X-Received: by 2002:a05:690e:80a:10b0:67d:99fc:2e48 with SMTP id
+ 956f58d0204a3-67df441fbccmr4804347d50.47.1795534647574; Tue, 24 Nov 2026
+ 07:37:27 -0800 (PST)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -104,71 +104,53 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261122-tr_arm64-v1-0-4eccf35daeca@oss.qualcomm.com>
- <20261122-tr_arm64-v1-2-4eccf35daeca@oss.qualcomm.com> <edb6288e11cf9eab058cada5151c0c071587eb3e.camel@iki.fi>
- <249d8212-f68a-4eee-b92c-efb339dd9de4@oss.qualcomm.com> <CABBYNZ+-8kb2wA4fd5oYq=_hi9BSfFwie-RSpsZdVbCM57qCUQ@mail.gmail.com>
- <eb42aa05-3065-446e-b257-b08477e04c6f@oss.qualcomm.com>
-In-Reply-To: <eb42aa05-3065-446e-b257-b08477e04c6f@oss.qualcomm.com>
+References: <20261124100035.245953-2-frederic.danis@collabora.com> <6b05756c.018c0331.11d296.c08e@mx.google.com>
+In-Reply-To: <6b05756c.018c0331.11d296.c08e@mx.google.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 24 Nov 2026 10:20:32 -0500
-X-Gm-Features: Aa3M54qA0J0XoJryHHTVXfTjl4FFiFRAPoS3H1MgHgfnpPUyTjb1kXejGRWEJcw
-Message-ID: <CABBYNZJbEbXWVocnyvr2_Yb46xC9_1vJv2tULuZ4sFWu4SRjiw@mail.gmail.com>
-Subject: Re: [PATCH bluez 2/3] tools/test-runner: Support running on arm64 hosts
-To: Zijun Hu <zijun.hu@oss.qualcomm.com>
-Cc: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
+Date: Tue, 24 Nov 2026 10:37:16 -0500
+X-Gm-Features: Aa3M54pQtscHfhodgxqg2tbL-Ippvl08nQWlwSy_R05Db-Kell3PxlDfgnULr1w
+Message-ID: <CABBYNZJRrv81NNbbD9cJ9Q2r+FGMxmxjWiVPzde+1YuCMga4aQ@mail.gmail.com>
+Subject: Re: client/btpclient: Security Level reporting
+To: linux-bluetooth@vger.kernel.org
+Cc: frederic.danis@collabora.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Zijun,
+Hi Frederic,
 
-On Mon, Nov 23, 2026 at 9:57=E2=80=AFPM Zijun Hu <zijun.hu@oss.qualcomm.com=
-> wrote:
+On Tue, Nov 24, 2026 at 6:31=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
 >
-> On 11/23/2026 10:45 PM, Luiz Augusto von Dentz wrote:
-> >>> Should it actually determine whether to run qemu x86 vs aarch based o=
-n
-> >>> what the kernel image is, and not the host system this is compiled fo=
-r?
-> >> I don't think so. Choosing at build time is correct and simpler than
-> >> at runtime:
-> >>
-> >> 1) The guest shares the host rootfs and runs the host binaries, with
-> >>  test-runner itself as init, so guest arch =3D=3D host arch =3D=3D the=
- arch
-> >>  test-runner is built for, namely, the build arch decides both the
-> >>  host and guest arch.
-> >>
-> >> 2) Kernel images come in many formats (bzImage, vmlinux, Image,
-> >>  Image.gz, ...), so detecting the arch at runtime would add more
-> >>  logic than it is worth, while QEMU for a given arch already parses
-> >>  its formats with -kernel.
-> > I guess that is a fair point: the tools binaries would have to be
-> > built for the same arch of the kernel image. However, that doesn't
-> > rule out running test-runner on an x86 host while mounting the rootfs
-> > with a cross compiled tools. I guess we shouldn't recommend that setup
+> This is automated email and please do not reply to this email!
 >
-> That doesn't work, e.g. on an x86 host:
-> test-runner(x86) -q qemu-system-aarch64 -k arch/arm64/boot/Image -- /bin/=
-bash(arm64)
-> since test-runner(x86) can't run in the arm64 guest as the init
+> Dear submitter,
 >
-> > since it's counterproductive and considerably slower to compile and
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/series/1220644/
 >
-> Agreed. Actually, test-runner requires:
-> arch test-runner is built for =3D=3D host arch =3D=3D guest kernel arch
-> and failing when this rule is violated is expected.
+> ---Test result---
 >
-> > run. That said we could perhaps print an error if the user attempts to
-> > pass a kernel image of a different arch; test-runner should probably
-> > fail with a clear message stating that this is not supported.
+> Test Summary:
+> CheckPatch                    PASS      0.99 seconds
+> GitLint                       PASS      0.69 seconds
+> BuildEll                      PASS      15.91 seconds
+> BluezMake                     PASS      229.50 seconds
+> MakeCheck                     PASS      13.53 seconds
+> MakeDistcheck                 PASS      117.21 seconds
+> CheckValgrind                 PASS      280.36 seconds
+> CheckSmatch                   PASS      234.25 seconds
+> bluezmakeextell               PASS      75.46 seconds
+> TestFunctional                PASS      1003.52 seconds
+> IncrementalBuild              PASS      235.64 seconds
+> ScanBuild                     PASS      844.91 seconds
 >
-> So, is it acceptable to illustrate this rule in the ARCHITECTURE
-> section of doc/test-runner.rst instead of parsing the various guest
-> kernel image formats to detect the arch and print an error?
+>
+>
+> https://github.com/bluez/bluez/pull/2896
 
-Well, I'd think it probably trivial to parse the header to check if
-the kernel image matches test-runners arch, or you have a problem
-doing that?
+Copilot flagged a problem:
+
+https://github.com/bluez/bluez/pull/2896#pullrequestreview-6038693469
 
 --=20
 Luiz Augusto von Dentz
