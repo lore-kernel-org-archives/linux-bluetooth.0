@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795520387;
-	b=4L5jc2O5fwY3cAvxP/vnFhJgcI2H6/6yoovcB48e4z4M1YUZrl/J2LNlqkauF6NT7CGs
-	 9qivB5LA4ut+4qd7TegBfc3s4aChYezl0BM1x+kh1EzCT5ik8QEinZdNYP5OD//t4SUNP
-	 bV9fuXJE/GdoA4DanFrYB3OZH5O9FqAmQeFlctXAo7zCbVrJiQQXo0SGDrewtApIQTT4t
-	 5b0bimDaiKkmvBQV9s9S0HxjUzMr5lMxqOTv78DRoH8Hbw9m/zmfzDKFrxHEi6JdnB1Z3
-	 o2xG/SQP/nQESUh2S8lTc8OzSP15XnIH0JqBRs9L7zd5Ctp3lHZEhavQmrCX8zweWCw==
+	t=1795520415;
+	b=aJFDL650zXmeSTrPmaOyzVOObhpWcUC/b73xmrS1RYSmuhK/m90D4xstvda/woMdLJZH
+	 RMB+jTJQsf1jAv51NtOiokBrOEkfxzCLfGLZX7ftylG5XJMDfrg6OX5dTCRa55wde0L0g
+	 +WoB36lUyn+eedpqqwsYwhB8y5MHoEomjSlBv+uooenQ+HQmlZSamy+DdIIPPHGasjIfm
+	 EvI3vn71BtU8ZbglhNV6rCca79YDedjivOcByiD7aycrX/F9NhKEvqtCpK9Qu5UiNabK6
+	 PIjVs8Pty6FmSE5p3G7leO1LYN591oxiUHO1LVrJamhR2WauVhY6MTE2chO4S6dskrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795520387;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795520415;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=JqGqtOvly3sZRihfxsc94FyRjgbsolpXsfWFSPg896I=;
-	b=aQFnVgWClcFgBQ7ddhEUATROibcBmC8X6pDzV5IzaqLB2YrgmS1pEk6I2hUT5rJDGf/6
-	 KTbgyfK71HmcwaLkY1hnWcAatkrKvC2SqjsBDxOrk2P4A7b6LRraYRl/CQ2eIKXL8J+/L
-	 r/R6f6mk9XXb04ZCBxmY5xm/Sz+Ma0o93J+REvYekn/vPW43TVLFaUVe7p7yDF3qf6d4/
-	 nkdPpf946Wq4gjXJj6/Um3bJCwZkljmWCP/fJJfpchdnblWZmSCv/4tZ5PSmBK82nHVNc
-	 fpHsWdMb1CjCAYKdCDvXdJ7ThKedlaf/TWbh1dB/uZbHqRWn57Abc5rWm/idd20Uy0Q==
+	bh=0Zp3jHOV31NIj94DCngdzooB8/E9Q/YUvZ02W/fimHk=;
+	b=dVeCwkjtapvS6W5a0qxIyoEDsy1ZS9kqC0EpdW8LvSRo793cYr3fp+RyzCuSFDRfx03M
+	 4khDbBcDuiXIMjQueG6qC2V/19Ch+NUWCkDtG784KLOeJFav/vIpFDg8aZDqIMhGWmm5i
+	 G2kG4RYl+t9sYCVujYqbWSgGcE8h5Uk89OldieTQV+liDpDriL050nCgRKwcJPoQQ7G3z
+	 i5K72grIdlI77ZsBbSZahM8WJRP2UAVUnni6VAPOiJhsOv0D+LHy/pqU+wjBXRv9cqQ2A
+	 +IEKJgHmmwKQxJ0q8ACD9jqXTG4pn14ijr0S+Pze+09g5pccH9ikIAe1d2AbxypCG6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Jdm6ptVP;
-	arc=none smtp.remote-ip=209.85.128.48
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=y6oAjVkD;
+	arc=none smtp.remote-ip=209.85.128.47
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E91606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 11:39:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67E91606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA8A606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 11:40:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1DA8A606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Jdm6ptVP
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a5177d78c7so42322155e9.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:39:45 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=y6oAjVkD
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4bb68c197c7so55899945e9.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 03:40:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795520384; x=1796125184; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795520413; x=1796125213; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JqGqtOvly3sZRihfxsc94FyRjgbsolpXsfWFSPg896I=;
-        b=Jdm6ptVPBcL++SjZoiiKUVTNtxI+3hhcIusYu+ZkNVm7ANRPloJuXH9sW5efjoO+Vf
-         7OO98ZaA9adDPJlJqCej9aDGD2ll+S2DbnWzgV8YcLo8M1fBh96y+zo6phoNXnpeHAOd
-         F3n3eHwxxEgHdKVqHcn5pvbbuC5BZzy5EeQ8M=
+        bh=0Zp3jHOV31NIj94DCngdzooB8/E9Q/YUvZ02W/fimHk=;
+        b=y6oAjVkDqjoL2gMYSO9fUlAyBXyqLOMJEXRcJtKtjnfBWq29VafsbtBOr9fNEQvn1R
+         tz8AP+f1fV3o4VvNUpUYPefpJACPcB7kexppBKvmH3oLMVjxgmfoeYyvJDIwZoIoCe4e
+         pbtncVeOsXwV5fCKTrJ1C99Ap7ArDSbg4Vwx4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795520384; x=1796125184;
+        d=1e100.net; s=20260707; t=1795520413; x=1796125213;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=JqGqtOvly3sZRihfxsc94FyRjgbsolpXsfWFSPg896I=;
-        b=amAJG4DoDRcWuownnt3Iux5l3fH/ezbO3BTap+VFO1wpJaZYgy2H9cWqg57vVznArz
-         /A7Gpu2h0wis6V8QETQfV8n2RQWhJTcLTb7BBCFE1bS8PmpimASHqpwUOH0L6JoJwstM
-         /5TnL+L+2dTPNJehXZkN8FEUy/6s0FJfAJ2BiF5alZH1BbwTa6GmPVpOQ99LhrRG3/eP
-         0WNwv7/sgNcK0s2js+7+x7WOEMsM2DyahK7XFhDyTFzW0atXq2bYTzyWjBA67x7f2N20
-         MTkQ2JDde3lHIrnT6iq7gwzdFYNO87wYnQCv+tUg/eKbA2M0me/ub7zipXvWiUQamcbz
-         E9cg==
-X-Gm-Message-State: APuU4Z/QvWwToSqLw/gc5iZnWbs3eXbQ/Ai3WAq/uv3WX+n9hmhplQQ0
-	k9yZ3m45fujzGfKP4kf81uYYXFNDUao13utIdr75f83sixSksS+5F2vnjEeaps7fhPYkTX5jG02
-	dkQWQ
-X-Gm-Gg: AZFdTZfp/QOoblFG2odl0KpRnkNphKrK0Z51etYeAddBmAea8IXdNGjKPM/SKAE8V3d
-	YacPCvBrZgr47TZ1LONUjW5O2j71NquHqDXjp0yOVLQg4R+4ZN9D5R7Q6oHtAL6xnN6IYl/mIP/
-	atlMTi25CEI/lkvaxwob/EfAV3CdWUrAi+h4RbVo+AwwD3qI5eZBt+ucBFS2C9T3D90e0UJA9VZ
-	lPV/2YfROdJ1Vt3xd27viQCtVz+kMdfNXCvq6VTKiGNVSC9848qPPFs5UCuqsYUmMhkidG0UpMe
-	zTWROaJHCNoTEQN46Q8KNacxFN7bkVKonhUZVfKnHyOG8DOL6kLjSt0LZd7ooafK7a2n1MeBJ2y
-	TxbftH+eB+/9KLMlTHt9kMkBuC/y8XbmG3BQ6qg9tvH9iagf1b3UO6sg10XJtxuw3+5k4RxtSeC
-	7EwkcnLFpAbp0S4Qa4Pt8hp9nwYuEwaUYrxLYik9gQW3Ujnj7wDP8p5YFYC9fAR1DWEK/AzwemF
-	DvEIr4YuZJIVOu5E6xP2o/3Hr1zNKOgHweuioneNpVBVrmkLOCBbNDy1Q0al/aMTAPYubsO3AwY
-	J9cS4ayFnISZqzKbYdnCwAoI66BcYTIf4k0WegYP2Y3n0lsMfo8=
-X-Received: by 2002:a05:600c:46d3:b0:4a3:12fb:1ee7 with SMTP id 5b1f17b1804b1-4bb88812c9dmr297512725e9.25.1795520384483;
-        Tue, 24 Nov 2026 03:39:44 -0800 (PST)
+        bh=0Zp3jHOV31NIj94DCngdzooB8/E9Q/YUvZ02W/fimHk=;
+        b=Nz9/m9eAluZG6t/FGDuhmP7+cOHXvNWbRaP0kNbBJHtDOaTv1uKIdvg18RqAZc1MHX
+         NahEBdIOLpHhZST6CHb2jjsVFRKBLbQ877TEG7v7u8dt3Qw4JWCluoh8vOM18LC+UAUA
+         kTMxDum0A1A3Jpbsm/wgXxu7i/v28nl2N8sjM7LTdTHWngaCNRJEuXW8RSQYT4XX/A27
+         Mb9AByE/iXzwXrkkrhNpjW387KqyrCfrDVkg+ZKWEiPASjsmPMMZ5pzPDF0S8Y6T2mJX
+         T5N0auUJ0jmm9RJtV6Qz0UvXuLV1NFit1YQA/1WWxzjkv07UI9sNxkFNUDmTYX9LsKlK
+         XbOA==
+X-Gm-Message-State: APuU4Z+SVo1143YEv1KW5F5w0QNlRKG8/cBmnawJ0dfYiRih9phV8s3w
+	YAm9zx5MKG25RXQ029HQjMZrW2kN8ZgbYSRbDt3bmlX01o2U2w9SHcHBBDOaUUhlzcmEZ5+AU2b
+	ueGNX
+X-Gm-Gg: AZFdTZemKuO0zdO+GwxNWRKirW862l7ZDdBGc4hnpPer77CZTNDURzdOBVWvgAF6mIp
+	9OQTLKUwEarIjQb5q3hFXtFEur/t7ZlpzB0pcSRZ2uH1aKloPIH3IjrYj7ZCYEC0csnTTOUcggT
+	+dSfE+zcKh/dwjcro6rP6AFKS6Rd3A+b1PbNptOuSxWHiRrJNgSWQ3/V8xaKVswmQKqbO5OMtgf
+	FjceKbVpySvd3SWbr5EPGyQc1dHRw9NgT3p+WrZTJHbEWAZPnhP6Huluw/662w6d4t3oFYpzcB2
+	sk7pae03lvC5pmg0Cu7HmpClpXTMDC1NICU9dtYz78HvFOdZIcouwhAar/a5GxkKCmwOfH2PbyQ
+	8XG/NLY4PTDsqCK4tvv1OwrhpI8x1/PVmOkcRY5JSERakPENyRGj4LzFFeF5Nzp3S0WW3gDlvwz
+	XQ8XHCarb3DD2LbqRAeJfF4avwCktpmoWNU1y8R1Qy/2Fa+UZ1kEW/tB3ksmLooggMIrgFzn9+s
+	R3xAD/ZqGaM1r9Tn4KRPJ3j0damSg5r4C7lpdBKxD5iKgAzH3txU2O4tKxdoVRvLNablAovvaf2
+	Y5/8yWI8Ed+NxZ8KBCfWrN1arM5qMPbqCWLW0IpEngaGI0AukEosPDbAnJDmfoWeFYaj90o=
+X-Received: by 2002:a05:600c:1548:b0:4a1:e00b:a10b with SMTP id 5b1f17b1804b1-4bb88800020mr318006455e9.7.1795520413393;
+        Tue, 24 Nov 2026 03:40:13 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb9067846esm264905335e9.4.2026.11.24.03.39.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853a9846sm506581225e9.11.2026.11.24.03.40.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 03:39:44 -0800 (PST)
+        Tue, 24 Nov 2026 03:40:13 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v2] Bluetooth: hci_sync: Don't announce a broadcast from an NRPA
-Date: Tue, 24 Nov 2026 12:39:37 +0100
-Message-ID: <20261124113937.1695751-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH v2 1/3] Bluetooth: hci_conn: Fix BIG cleanup while BISes are still bound
+Date: Tue, 24 Nov 2026 12:40:08 +0100
+Message-ID: <20261124114010.1696510-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -93,144 +93,116 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MGMT Add Extended Advertising Parameters sets an advertising set up
-before its data is known, and the set becomes periodic only in
-hci_start_per_adv_sync(), when a broadcast ISO socket is connected on
-it. Until then a set without the connectable flag, on an adapter that is
-not connectable and has privacy off, gets a non-resolvable private
-address. If its data carries a Broadcast Audio Announcement, the
-broadcast is announced from that address, and the set is moved to the
-identity address when its periodic advertising starts:
+When a broadcast source BIS is closed, bis_cleanup() calls
+hci_le_terminate_big() unless another BIS of that BIG is in
+BT_CONNECTED, BT_CONNECT or BT_OPEN. Until LE BIG Complete the BISes of
+a BIG are in BT_BOUND, so one that is closed in that time does not see
+the others, and the teardown is queued while they still wait to be
+connected. The BIG is not marked as created yet, so it is not
+terminated: terminate_big_sync() only disables the periodic advertising
+and removes the advertising set the BIG is being created on.
+hci_le_create_big_complete() then connects the BISes that are still
+bound, in a BIG that has lost its advertising.
 
-< HCI Command: LE Set Extended Advertising Parameters        3.162678
-        Handle: 0x02
-        Properties: 0x0000
-        Own address type: Random (0x01)
-< HCI Command: LE Set Advertising Set Random Address         3.164952
-        Advertising random address: 21:3E:30:B7:DE:A4 (Non-Resolvable)
-< HCI Command: LE Set Extended Advertising Data              4.161538
-        Service Data: Broadcast Audio Announcement (0x1852)
-        Broadcast ID: 11645491 (0xb1b233)
-< HCI Command: LE Set Extended Advertising Enable            4.164125
-        Extended advertising: Enabled (0x01)
-< HCI Command: LE Set Extended Advertising Enable           11.280146
-        Extended advertising: Disabled (0x00)
-< HCI Command: LE Set Extended Advertising Parameters       11.282026
-        Own address type: Public (0x00)
-< HCI Command: LE Set Extended Advertising Enable           11.284922
-        Extended advertising: Enabled (0x01)
-< HCI Command: LE Set Periodic Advertising Enable           11.291942
-        Periodic advertising: Enabled (0x01)
+Steps to reproduce, with btmon running:
 
-The address the broadcast is first announced from never carries the
-periodic advertising. A scanner listed Broadcast ID 0xb1b233 under
-21:3E:30:B7:DE:A4 before the socket was connected, and under the
-controller's public address in a scan started after it.
+1. Open two ISO sockets for one BIG as BlueZ does: BT_ISO_QOS and
+   BT_ISO_BASE on both, BT_DEFER_SETUP on the first, then connect()
+   both, the second one non-blocking. That connect() sends LE Create
+   BIG.
+2. close() the second socket right after its connect().
+3. Keep the first socket open for 12 s and scan for broadcast sources
+   with another device in that time.
 
-The commit in Fixes stopped giving a periodic set a non-resolvable
-address, but it looks only at adv->periodic. Treat a set whose data
-carries a Broadcast Audio Announcement as a broadcast set too, and set
-it up again in Add Extended Advertising Data, because its parameters
-were sent before the data was known. With this change LE Set Extended
-Advertising Parameters is sent a second time, with Own address type
-Public, before the set is first enabled, and the scanner lists the
-Broadcast ID only under the public address.
+With the Zephyr controller (on an nRF54L15) and a 7.3-rc2 based kernel:
 
-The address of other sets does not change: an NRPA is only asked for
-when neither the set's flag nor the adapter's setting makes it
-connectable, and a set that uses a resolvable private address gets that
-first.
+  < HCI Command: LE Create Broadcast Isochronous Group (0x08|0x0068)
+  > HCI Event: Command Status (0x0f) plen 4
+          Status: Success (0x00)
+  < HCI Command: LE Set Periodic Advertising Enable (0x08|0x0040)
+          Periodic advertising: Disabled (0x00)
+  > HCI Event: Command Complete (0x0e) plen 4
+          Status: Success (0x00)
+  < HCI Command: LE Set Extended Advertising Enable (0x08|0x0039)
+          Extended advertising: Disabled (0x00)
+  > HCI Event: Command Complete (0x0e) plen 4
+          Status: Success (0x00)
+  < HCI Command: LE Remove Advertising Set (0x08|0x003c)
+  > HCI Event: Command Complete (0x0e) plen 4
+          Status: Command Disallowed (0x0c)
+  > HCI Event: LE Meta Event (0x3e) plen 23
+        LE Broadcast Isochronous Group Complete (0x1b)
+          Status: Success (0x00)
+          Connection Handle #0: 16
+          Connection Handle #1: 17
+  < HCI Command: LE Setup Isochronous Data Path (0x08|0x006e)
+          Handle: 16
+  > HCI Event: Command Complete (0x0e) plen 6
+          Status: Success (0x00)
 
-Steps to reproduce, on an nRF54L15 with Zephyr 4.5.0's open link layer
-as hci1 (public address F4:26:7C:31:12:69) and BlueZ 5.87, with privacy
-off and the adapter not connectable ("btmgmt info" lists neither):
+  Bluetooth: hci1: Opcode 0x203c failed: -16
 
- 1. btmon -i hci1 -w FILE
- 2. In one "btmgmt --index 1" session, a second apart:
-      add-ext-adv-params -r 0xa0 -x 0xf0 -P 2M 2
-      add-ext-adv-data -d 0616521833b2b1 2
- 3. About 7 s later, a broadcast ISO socket on advertising set 2:
-      isotest -i hci1 -q -s 00:00:00:00:00:00 -B 16_2_1 -G 0 -T 2
+The first socket becomes writable, and LE Terminate BIG is sent only
+when it is closed, 11.8 s later. The scanning device did not find the
+broadcast in 5 of 5 runs.
 
-A Realtek RTL8763EFL next to it scanned for broadcast sources, 10 s from
-before step 2 and again from 2 s after step 3.
+A Synaptics SYN43756 controller, with a 6.18.2 based vendor kernel,
+answers LE Remove Advertising Set with Success. In 3 of 5 runs the BIS
+was connected as above, and when its socket was closed the controller
+answered LE Terminate BIG with a Command Status, then sent 2690 vendor
+events instead of LE Terminate BIG Complete and answered no command
+after that:
 
-Fixes: 03ddb4ac2514 ("Bluetooth: hci_sync: Fix using random address for BIG/PA advertisements")
+  < HCI Command: LE Terminate Broadcast Isochronous Group (0x08|0x006a)
+          BIG Handle: 0x01
+  > HCI Event: Command Status (0x0f) plen 4
+          Status: Success (0x00)
+  > HCI Event: Vendor (0xff) plen 244
+
+In the other 2 runs the set was removed before LE BIG Complete, which
+then never came, and the first socket was neither connected nor given
+an error.
+
+hci_le_create_big_complete() connects every BIS in BT_BOUND, so count
+them as users of the BIG too. They were counted until the lookup of any
+BIS of the BIG was replaced with lookups by state. With that, neither
+controller gets an advertising command before the last BIS is closed,
+and the scanning device found the broadcast in 5 of 5 runs with each.
+
+Fixes: d36349ea73d8 ("Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn->type PA_LINK")
 Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
 ---
 Changes in v2:
-- no code change
-- reworded git description
-- steps to reproduce added
+- 1/3: controller named correctly: Synaptics, not Broadcom/Infineon
+- 1/3: message corrected: the early cleanup does not terminate the BIG
+- all: traces are hardware captures now, with steps to reproduce
+- 2/3: vendor statement and event-handler paragraph dropped
+- 2/3: unused struct hci_evt_le_term_big_complete dropped
+- 3/3: Realtek claim removed, it was not reproduced
 
- net/bluetooth/hci_sync.c | 12 ++++++++++--
- net/bluetooth/mgmt.c     | 14 ++++++++++++++
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_conn.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 25ab26c2fbf8..de6b479a7cd4 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1487,7 +1487,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
- {
- 	struct hci_cp_le_set_ext_adv_params cp;
- 	struct hci_rp_le_set_ext_adv_params rp;
--	bool connectable, require_privacy;
-+	bool connectable, periodic, require_privacy;
- 	u32 flags;
- 	bdaddr_t random_addr;
- 	u8 own_addr_type;
-@@ -1522,6 +1522,14 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 0b76df1bc5fd..9fa8dab2520e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -939,6 +939,13 @@ static void bis_cleanup(struct hci_conn *conn)
+ 		if (bis)
+ 			return;
  
- 	flags = hci_adv_instance_flags(hdev, instance);
- 
-+	/* A set with a Broadcast Audio Announcement is a broadcast source even
-+	 * before its PA starts.
-+	 */
-+	periodic = adv && (adv->periodic ||
-+			   eir_get_service_data(adv->adv_data,
-+						adv->adv_data_len, 0x1852,
-+						NULL));
++		bis = hci_conn_hash_lookup_big_state(hdev,
++						     conn->iso_qos.bcast.big,
++						     BT_BOUND,
++						     HCI_ROLE_MASTER);
++		if (bis)
++			return;
 +
- 	/* If the "connectable" instance flag was not set, then choose between
- 	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting,
- 	 * unless the instance carries periodic advertising, which can only be
-@@ -1540,7 +1548,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
- 	 * advertising is used and it is not periodic.
- 	 * In that case it is fine to use a non-resolvable private address.
- 	 */
--	require_privacy = !connectable && !(adv && adv->periodic);
-+	require_privacy = !connectable && !periodic;
- 
- 	err = hci_get_random_address(hdev, require_privacy,
- 				     adv_use_rpa(hdev, flags), adv,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f5f32860782d..edfbdf2942f7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9646,6 +9646,20 @@ static int add_ext_adv_data_sync(struct hci_dev *hdev, void *data)
- 	int err;
- 
- 	if (ext_adv_capable(hdev)) {
-+		struct adv_info *adv;
-+		bool bcast;
-+
-+		/* The parameters were set before the data was known */
-+		hci_dev_lock(hdev);
-+		adv = hci_find_adv_instance(hdev, cp->instance);
-+		bcast = adv && !adv->periodic &&
-+			eir_get_service_data(adv->adv_data, adv->adv_data_len,
-+					     0x1852, NULL);
-+		hci_dev_unlock(hdev);
-+
-+		if (bcast)
-+			return hci_start_ext_adv_sync(hdev, cp->instance);
-+
- 		err = hci_update_adv_data_sync(hdev, cp->instance);
- 		if (err)
- 			return err;
+ 		hci_le_terminate_big(hdev, conn);
+ 	} else {
+ 		hci_le_big_terminate(hdev, conn);
 
-base-commit: 62fd917f6d2df1a399a453138c2b7cbd563f8f95
+base-commit: ffb95458a0f70dcab620eee0ecf5ef7750971b2f
 -- 
 2.43.0
 
