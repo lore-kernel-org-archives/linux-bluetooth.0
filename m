@@ -1,93 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795553430;
-	b=X2DbUnyPNUkZKVrsrx8PNPq1M75L7D79ZEI/AqrV1AgWoMxeixQWwhdlVorTZ//8ALo9
-	 QkwgtYnpErI4x4fl2SXHvRK8IlGu2Uegv6oXU/X5Lf5oypIXe3w83GVM+d5UqsfQ5fX4s
-	 XhXn3qwYjIxa9BXjS0DRgN2h0U1HjXYPIwqtdO+ioPpw4RKDu3JWkXG273Vxt0jsOpwEe
-	 3JLdc9fWZ/kPd4UtLu2TVMVgeipw7J7eUXZjyGgZ785Awp/yvngBKvVA+9b4PefujSYLo
-	 WFFiTtGie3QtYaGrvmTQX+ivqbeRQuw3EU9PBwVw7a0a5WP2y/Qj5d4x6aIds0J43vA==
+	t=1795553468;
+	b=J0k5VIqULa5SzuOrx/PNj4QmLYlXuloXmbcCUdcYayrTNxK7fhsvCc2zFw+XLsEmgZoS
+	 8JHT0Zz3oUQ8IvtHX65IAxQfs6R9CNkCzi0TwDjH85JOEF6PFnpwb8Ji74F1qlDEwxPwz
+	 4TcAOEXL/hMckaZrnBVjiYkpytayqW+Ab9yU3Tiv6E+APJcnKNpPncElJVecKgPR7h2xC
+	 sZMwTLTfIaEbhTbxHtADlg56+7+PzTfJWtEqW/eRHSyjJeNSY1+3xi7AOMLdGDIIYcBbT
+	 wgJ/gZ3Wp6wH2yWzSAnq0dg6RcceXZoGeRckyyDpGLJuqcwZSsPPYwLCZ6P4X67fQDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795553430;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795553468;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=Xh0NYCmg7UZkXOyH2mnhTkKOlvnecQbCf1jrDQ1tDDQ=;
-	b=P67KpeZ3uLRlFYP50IMBg85XtWtz/BeJk1RuIgpEnUSLD8P4WDPL6TE+9NoQiKl2muF+
-	 T/BtkhcS4yTajAYkx03R3c7kK9z7JovYTnD6l9GX7vsheztJ+xb4UyJY5Lj3l8a0uo0uP
-	 CgtYBxLgtVSJhKN3oQIWqUP8vnjTWCtB1sarBKCgmFhkEjcPOmi4Hur43ePU283oghm3I
-	 JhqzL88YSjQW+hih5BbQ00QgH0xV9EI3OOw4HNuDYnKMgIjayzDy7bvfh/IX0mP4V6x0f
-	 Hd0DHAzVrNuK40N6smvIggkjNR1N8FRDVGE+WNihGWn1Fyjw7EAbpFxnZcDkbIxcNBw==
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=WG9zvJmE3ikUgj3CSNiDooo/BBN2EHvJ4E3E6UC9i5k=;
+	b=s1OOU4M9gcsqar2kDeSL3ZPjFttmUksBQJmSRPpizLuzv4v7/sO1lx9SvMoIzOLWoY/y
+	 dosY3RKuA/g+WP0QQRrGWOzJ+/kHKRpE2s15gh6vWYoUxku4KiSKElbDz+AA0RM0TOXZm
+	 J+B0x5GYlkhrOmSY1Bo9unm9bttf3mgLfZ5qVtKhRpskoJO6sisT+9/hLGn3cgGwJvsDo
+	 MzqU2DHbod9JYdMyP8chQQ1+z8YOAEeqwwC9O3UizYyzgJcygSCmOcVVZ/g4ei0+jXfkq
+	 M2iFHuWu68lNSNVo2O0Snu55zk+vq3ORgJQ60w5auMHO2HNLEmle143Pj/dFmxCu4jQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AnMRjLNR;
-	arc=none smtp.remote-ip=209.85.222.47
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o0MO9FKi;
+	arc=none smtp.remote-ip=209.85.221.176
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32097606A326
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 20:50:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32097606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFA7606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 20:51:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DCFA7606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AnMRjLNR
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-97ca72f2cd9so2722305241.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:50:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=o0MO9FKi
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-5ecde8e8e5bso1542738e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 12:51:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795553429; x=1796158229; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=Xh0NYCmg7UZkXOyH2mnhTkKOlvnecQbCf1jrDQ1tDDQ=;
-        b=AnMRjLNRxBx5YTkJaI6Bn0Zi++6Eb4/pmAOp8ojFPZj6m08clycXyg8xzcmhMHnzio
-         r8rRWD2CxXqILJTU+4J9g1SyYf3+srDOCMf2lu02ok7ABk/B/7yrK6CjufSOwFCeO9+P
-         /lH6zJjb/ARuhCUA/qYoB4AP3glgsuLN2+mdxgAUDn7CCoc5qo84NbRhfdD5zP+YZOEN
-         9KCFQk0EMKqAxWCqxxwrNx8OFLftOhzs7kK79EGZm/BA2yhcHGLsJNwyFbB//HezX14y
-         6SE7/qesQfmWhqQ1e68JCsq+OaWUpfFeTOSHjV+bzTjzSjX12n/6mjunBFsazlXSooyp
-         gsVQ==
+        d=gmail.com; s=20260707; t=1795553467; x=1796158267; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WG9zvJmE3ikUgj3CSNiDooo/BBN2EHvJ4E3E6UC9i5k=;
+        b=o0MO9FKiVgAsgCvHtizdXYz+5ybdv5CokUcuG1dWXrgL6uOG8+JyCw0IyCROeXRAyB
+         eWDp5IXmPOH1rkh4JVv5wrDENolNcutMEeYP1G97k6gmbhrpaDGBPGKQWT3KnanHVTYW
+         2eguqANyozkR6rDQnhHIFTDWYVncnS7A+Km6SW0VrcfSSol+f1JkU6mcE5b/RaJqmFhT
+         arcgJcjFK89tcQh8Vk/ZMRa/1qQy/TQSTBCVtSS4aC4AzKfiF7ETygG9tUAAVAOfO0AP
+         zuwOwudwmkcpsgG2xT/xqLgiu8swpvRnpGNLDYXVjYoFyKoNfaWvw+k9cKBHbNxTrFYo
+         4RvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795553429; x=1796158229;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=Xh0NYCmg7UZkXOyH2mnhTkKOlvnecQbCf1jrDQ1tDDQ=;
-        b=qIa755sZmDr/4aIiBOkpaWBda9E78vLpJpodmJsl1NSkNa3voMSvg79s12djCXCYsE
-         wCC9baX57cSE0JODj6Fcc/Bc54yBdXSHiVdrw5379peWcb2Wr4TBY3qp3lh6I4IsMccy
-         D2l/LBBmPM4tARBSOlGd5+JVBGhZtzowVuv+KT/CSamHmLeSgE28Xa7zFZ251BB+onot
-         fUJ4CRY1vXlXwOetZBwLKIR9oA4eXnB4ljWURN+Zc8nwksaQX1o3kHK2zW4rig1BMIbY
-         IHgF+Pcd/Frie100mF+6tRA/2YrEVLCBsXX3JlUVTY88RS26SKEO/yecyxNBCVgZA8Mf
-         sF9A==
-X-Gm-Message-State: APuU4Z8xGta4+a+40Sf30yLoE9BNFvzuE4J1xJAgIvFQaCv5CB1anymI
-	9yDTFv+KcKiHowHMzOyydiSk9P4oOCnqSzrX+Clcu20dELnQOhQR3HgTAGYZ9A==
-X-Gm-Gg: AZFdTZcMW30632mj6IpKPKkkTO9G4PROdDoN7sNjTV653Hn50Ig+88g62IM1L/h11yk
-	ThvnrwYJH9Fh5oA2TkVGNeYbOd/wlFb5ow7Fz7cyi2YxG9dA9E0Lj3rvpe4Cw85Xc5ky7OjgRXU
-	oyGwSo60qFvEgsd1bG5Yce2lpJOqBnfkv9c2+Fl/Ri93tnHzgWNaIDawdiwLpBvp2b7cAEXYhSw
-	pKoKFALIt8J2ZXaRGOq5PQN9RKpl/342DmYcyhK2G1F1W9ZEUsM8LT41HxT/i8YmwbRIQYKFZXO
-	ePUy/QXHNqfNJW7YNXmWBUu24CTk5w+I0zqKaSMKiLxo/Qc84z8QlXKOfIaj5RI5B+xOl1uGLae
-	kZj2HuJTo5kGZ4SPoT0Hd1yqoDV3xN5pTq5Syq2S0stfU1v4vIldrbJPLWb0Eg1d7zKM1SyWAhB
-	U+TL9LSGm6+SfNLhBRiHlD5Sx4BNSgJ5rnzeykgZp58v8zrDYh7fE+pUp9hxTA+Gfdh87rxDPY2
-	STHCl9DbkO3xjjw2h/4Pv/tdsyPoxaoflrV8tEgw3z4jT5IE854QvSOyRXDoQPoAzWkFNbXDD+p
-	c+0TY46Jqs3ctDiVLN3CVeFpNBbl5BUWpEwj+Fesz/R64OGgmBQf2VTe9W/LOwnH4lMB8rldQz+
-	6q2dYiceXvCEvJrWH3TRAJYGoPjxdLydwy1Cr4i4eQLs//pwUZ4emrwEGBI+9sPEp2K/JBOdpq/
-	vodlM=
-X-Received: by 2002:a05:6102:1627:b0:7d2:8529:6892 with SMTP id ada2fe7eead31-7d739390113mr8670740137.11.1795553429146;
-        Tue, 24 Nov 2026 12:50:29 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795553467; x=1796158267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=WG9zvJmE3ikUgj3CSNiDooo/BBN2EHvJ4E3E6UC9i5k=;
+        b=CK3RWCLpbRqcoBEw0ekR+QBegJUWYAltSOvifnxndn5Sn8Zr5mMrW5adTnpTC0xTeo
+         CTjBQuGBq5Nz+oR70QNBJ6g8TzbPMcYRnKbLnHgpMhhFeOVU6YWcTU6k6x/hJZDUMXAG
+         gXjEcaURC3KW4BWh8rYAzKGJ2bPnSNr/jeiUYuuXkrjpsRQyHqQSkL5EuCczPtXODJsc
+         QInQdrc9iRhJSOlm/PYVzLMN47hjmQz7sp64E1S+P8aufsTmW9gn5O67LK+fnTwuTDOD
+         c7EGbfxBnMMpG1BpYPeulaXaz3yHaCvHnittHFTOywPTyJsJ99TMMFbdZdjYUtfBkGYi
+         jJ2g==
+X-Gm-Message-State: APuU4Z9nO0q683kEPbrX35pghNhamYImKNOxq1ZesmTBU/iEYi8Ez1w0
+	eF9alIBQiBICFpaSitEQA1QcKqFV4dnzCaUtF7i27OUAiVpxfXVaDLidc8F7uA==
+X-Gm-Gg: AZFdTZchhd1ujxyQibBHwqTPRrtMVWvaJ+bd4RIhC0OoljyHsYpZJ41EoQYSifgZHiv
+	Izw02pmssm5wZg5bospuihjGxzYeGa676ddClLLUA8ct9rR8OLQpwg4JSftbv1ueHe2xn1uLDqa
+	MYAzJO4zBugpyR9nILpt/5P42znPXfhBwRIsmuRoEgpgX+OOTB6N3WHwwVhzsANClyLygovUxkD
+	yfumecZ1sUWR94uaMD67OS06EN26nH9jqDSYOgj2n5CNoFFXsLsehFOaWWz7mdHxvyd5Inhx8qT
+	kvGunJ1W3OkLKAzU1dM6t1zpLjisKPs4x/hZSXvXTLK/QQE0HIp5EVQfBKzwKKJ+c8WpVDbO18z
+	YMTyhwk3MjEtKrHBs1uXFP66iYjn7AjwAOArqdPCkDZvtkR/86alu6uVpqdRwbE2zB3np5ytyxe
+	GFvqTrG6s2NymTjWus7IJYboPJ21dsIqAqexBqBZ3Fg78tMMSlIN53t26AP0db0aXAlGLRrH4nc
+	501S9OejdRrV5oYyq4b8FPgmEuaIT8+VdmkCr278Kx2V0i2j/GgmoBe3oe6b8zpqXvx2e3RYiBr
+	rWmgIkV/dMAJWzPu8Ntfcefh9wXa47IaVxiz20XAYGlyfUso+CFD9i3PJTjDpiQPtPAxUT00WPc
+	RmybUklVf0VTKLbqxHpuOWNY3eRqUipRSqoyhl/tFieEs6W2nm6jGkKTjVeyzJUZ+5/p6QG9m5Z
+	+N4Mw=
+X-Received: by 2002:a05:6122:2904:b0:5ea:c330:77c9 with SMTP id 71dfb90a1353d-5ee8adf3fc8mr8846559e0c.1.1795553466544;
+        Tue, 24 Nov 2026 12:51:06 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-7d6e80cb440sm16308884137.7.2026.11.24.12.50.28
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee91a4e0cfsm13929876e0c.13.2026.11.24.12.51.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 12:50:28 -0800 (PST)
+        Tue, 24 Nov 2026 12:51:06 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/2] Bluetooth: L2CAP: Don't offer deferred channels before security is met
-Date: Tue, 24 Nov 2026 15:50:25 -0500
-Message-ID: <20261124205025.736808-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 0/5] Add tests for security of deferred setup
+Date: Tue, 24 Nov 2026 15:50:57 -0500
+Message-ID: <20261124205102.737384-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261124205025.736808-1-luiz.dentz@gmail.com>
-References: <20261124205025.736808-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,84 +97,59 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-A BR/EDR channel is moved to BT_CONNECT2 as soon as the connection
-request is answered as pending, no matter if it is waiting for the
-information exchange, for the link security or for userspace to
-authorize it, and the socket state follows the channel state.
+This adds tests for listeners using BT_DEFER_SETUP when the security
+of the link changes, or is still pending, while a connection waits to be
+authorized, along with the emulator helpers they need.
 
-bt_accept_poll() assumes that a child in BT_CONNECT2 of a listener
-using BT_DEFER_SETUP is waiting to be authorized, and
-bt_accept_dequeue() returns any child of such a listener, so although
-the listener is only notified once the security is met, a listener
-that doesn't wait for it can accept() the child and then authorize it
-with recvmsg() while authentication is still pending.
-l2cap_sock_defer() then moves the channel to BT_CONFIG and responds
-with L2CAP_CR_SUCCESS, and if authentication fails afterwards the
-channel is left open since l2cap_security_cfm() doesn't close channels
-in BT_CONFIG.
+The following tests depend on the kernel series starting with
+"[PATCH v3 1/2] Bluetooth: L2CAP: Fix accepting channels with
+insufficient security" and fail without it:
 
-Fix this by only moving the socket to BT_CONNECT2 when the channel is
-offered to the listener with l2cap_sock_defer_cb(), which is only
-called once the security is met, and by only letting accept() return a
-child of a listener using BT_DEFER_SETUP once it is in BT_CONNECT2, as
-bt_accept_poll() does. The child stays in the accept queue so the
-backlog limit and the cleanup done when the listener is closed are not
-affected.
+L2CAP BR/EDR Server - Security Block Downgrade
+L2CAP BR/EDR Server - Defer Encryption Off
+L2CAP BR/EDR Server - Defer Early Accept
 
-Fixes: f66dc81f44d9 ("Bluetooth: Add support for deferring L2CAP connection setup")
-Assisted-by: OpenCode:claude-fable-5.2
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/af_bluetooth.c |  6 +++++-
- net/bluetooth/l2cap_sock.c   | 10 +++++++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
+The remaining tests pass with and without the kernel changes, they
+cover paths that had no tests: deferred setup with BR/EDR, LE and
+RFCOMM, and a connection being blocked when pairing fails after the
+request has been responded as pending.
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 7758e9ea3848..103d61d13fbf 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -330,8 +330,12 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
- 			continue;
- 		}
- 
-+		/* With deferred setup only a child in BT_CONNECT2 has been
-+		 * offered to the listener, see bt_accept_poll().
-+		 */
- 		if (sk->sk_state == BT_CONNECTED || !newsock ||
--		    test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags)) {
-+		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
-+		     sk->sk_state == BT_CONNECT2)) {
- 			bt_accept_unlink(sk);
- 			if (newsock)
- 				sock_graft(sk, newsock);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index d5663a4642a9..57ada00f76eb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1812,7 +1812,13 @@ static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
- 
- 	lock_sock(sk);
- 
--	sk->sk_state = state;
-+	/* BT_CONNECT2 also covers a channel still waiting for the information
-+	 * exchange or link security. Only l2cap_sock_defer_cb() moves the
-+	 * socket to BT_CONNECT2, once the channel can be offered to the
-+	 * listener.
-+	 */
-+	if (state != BT_CONNECT2)
-+		sk->sk_state = state;
- 
- 	if (err)
- 		sk->sk_err = err;
-@@ -1880,6 +1886,8 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- 
- 	lock_sock(sk);
- 
-+	sk->sk_state = BT_CONNECT2;
-+
- 	parent = bt_sk(sk)->parent;
- 	if (parent)
- 		parent->sk_data_ready(parent);
+With the kernel series a channel is refused if encryption completes
+below its security level, so L2CAP BR/EDR Client SSP - Success 2, which
+requires BT_SECURITY_HIGH, now sets an IO capability that makes pairing
+result in an authenticated key.
+
+v3:
+ - L2CAP BR/EDR Server - Defer Early Accept and Defer Encryption Off
+   fail if the final Security Block response is received before the
+   connection was accepted or encryption was disabled, instead of
+   passing with it.
+v2:
+ - Add L2CAP BR/EDR Server - Security Block Downgrade and
+   btdev_set_link_key_type() which it uses.
+ - L2CAP BR/EDR Server - Defer Success no longer expects a response,
+   so it only passes once the socket is connected instead of passing
+   with the first, pending, response.
+ - bthost: A request kept while its response is pending is only called
+   with Connection Responses, other requests may use the same
+   identifier.
+ - Set the IO capability in L2CAP BR/EDR Client SSP - Success 2.
+
+Luiz Augusto von Dentz (5):
+  emulator/bthost: Add helpers to test security of deferred setup
+  emulator/btdev: Add btdev_set_link_key_type
+  l2cap-tester: Add tests for security of deferred setup
+  rfcomm-tester: Add tests for deferred setup
+  l2cap-tester: Set IO capability in Client SSP - Success 2
+
+ emulator/btdev.c      |  13 +-
+ emulator/btdev.h      |   5 +
+ emulator/bthost.c     |  86 ++++++++++++
+ emulator/bthost.h     |   6 +
+ tools/l2cap-tester.c  | 301 ++++++++++++++++++++++++++++++++++++++++++
+ tools/rfcomm-tester.c | 146 ++++++++++++++++++++
+ 6 files changed, 556 insertions(+), 1 deletion(-)
+
 -- 
 2.56.0
 
