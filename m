@@ -1,74 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795499868;
-	b=Wfy0xGvJuWCRABwdmjp/0ow09kNCLdgIaZEecHFdIa6T391VnjjUtVORvA3yNb0iwGVy
-	 3vn2Z+bUN5c5kumGgCl5bJCbOohBXYG+GG3892QP7s4CgRv+SK4dcy5ZPNOSL/a+AwtLD
-	 rD4PQLZsDQxQIS18EYzYle95wVnJx0x1GZeRh3gYZ7mGp46w6IG89Wirg7akOxgUeZUxy
-	 +fgyX7nJ3UveIxeVGEcLRd3Fj6KKWlG9JyEo6xNwcRvcLvD44VCLmg/yvMm+ZSJ+bLesS
-	 us93VvZXPaQhini9HFzhEKTriFMnabWsdDLvwKdksz2OKntJoU0sQjjWdYI2SoxJq3A==
+	t=1795502267;
+	b=UkTKgdxcRbigs3gt0zaQ9qjS/BFfwbKdNBwQNUAV0dJyPVp7LuYnUdz9XXp7P7kOegWs
+	 +Hs6cYZfJQaEevCj4TXvwTFij/EyBpgGLv0c9/NLZGzFEXtxGciMaucdH30huOHvLwIVg
+	 dpG2xIT0GmlnDeAbK2P1YmFhOKL54GLqOI2yKljQr0RuUN5D0LvkcUGMXHFZLeBDorFYk
+	 nuO0q3vASvhUn/tpqQjgWFyBlwn1mKmf0MoNXwpnjDZ0L6iOOB64w5/5mUMBAWhYrdUvL
+	 dg1UcMLuJ7b6GqwRGH3uWdzR7TKpxChQKev1DwK4BVEDzVthn8v9v6lwWVpPegTtxIA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795499868;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=YK+OudAIft/FOt4qO0o3cz28TC62bidm40aBh9hU5DU=;
-	b=0HD5lpGTqEG+a1lK5BXw0xUJKu9rgObXWFYDj5T1KTn3R5BCpTBjEyury9/FbyPZksTN
-	 4sSSY2AoGFE2lj+eGHgCFg1dclDZKtJ6gm3qNHWHyn0H+4zZhvlfEY/sEsjn62AUKKIP4
-	 s2nUTD3BguM2ys2V8nl2tbJJW0Yz4sjpzUuM9VeVngvRq7ddrJuMSXGtbj0XjXX5aOKCH
-	 RGVWwhR6bOv6lLxrTkWQJ6qSxuP06k5TvmuVKbrSrS2rOm+BsWGoQtZW6PZDQsGYeLLBm
-	 K9fyBkZnKI3QNm2MkwmVJaZehYKfnW62/SfwosOnm/HtZ9Ovh7WE/s6zsM5lL2FfwDw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795502267;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=2Id++rAHtGP/+D5y3s4+T35ImfaWbACKTTN2CHguGPA=;
+	b=QoMT4b41NNL8lMvHA5xKSwPxwwWl8KoOhmhu7ufo9Yct4WBjYNVyGT7xbBQKdRt518al
+	 Mufpc/WmSW0gVWP+HFBgO//E9NaumdZKZZH8fXNEzN2qishfK6ZNaj1xGx0KJcR7lp3aq
+	 9y1abfBsxlqquiVe2dStYSJdQaoQLnkAEwfMW1MNNYgoi7kG+tMrnqaynEq20PntBx7+T
+	 gJA7E2aB8ZnBqmjAVT+7P1bRLggyCz1O3gtPRFiH6Wd0ZPGKmGNYXKYq4Ce3Vf7HCV6tP
+	 nObw0UXkaAjSTQSYTYt4uIsGejE1rS9aSK1GHtpXOjSccXdvFFgbUP3ywEIb97eiUag==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=oHkEt1EW;
-	arc=none smtp.remote-ip=192.198.163.7
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0w0Reyj9;
+	arc=none smtp.remote-ip=209.85.214.177
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B38D606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:57:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0B38D606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829DD606A33B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 06:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 829DD606A33B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=oHkEt1EW
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795499867; x=1827035867;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xxG1TCxRdnfJrozI6friiGNZOXJpYq8rBZaq3ToVqus=;
-  b=oHkEt1EWluFtl30GkNwU0OuAf/E8JfzafwWe5ABDL1aIO1kNmSpRy669
-   KrlOy20muCbPHr3MVU1chl26snkIlKFe03rb0ao9Zkx+n8XFc+7Lu/ii2
-   LZir2O+fqQS0btY9K527ZJQ2/KTyIDVo6deNO9EtIYkcdyX+dPfZt5Up6
-   Pg0crWlmdvq60zYBIPn0n1Nitm/IWEHBp+r6CLl02FEbYa3Cmn+J69DZ5
-   2TUQHF/5w/Zc6ADoIYyn/X9JLITiw474etM7LZTk5Su09PayPQ8fT1DA9
-   1Wy+4YxH8hlXRmo88bz5XOixB+EWP2K1LzkTGP59mJe5daonx9bWNzM8m
-   g==;
-X-CSE-ConnectionGUID: gYuQR5QkQD+hd1rDwIDAPg==
-X-CSE-MsgGUID: 7k9GxXgWTHq7HHjVMaz2DA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="4168225"
-X-IronPort-AV: E=Sophos;i="6.27,230,1787036400"; 
-   d="scan'208";a="4168225"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2026 21:57:45 -0800
-X-CSE-ConnectionGUID: rjCq74mMSeWE+kmDIztSCg==
-X-CSE-MsgGUID: eC0NZDkrRO++pMCRcwZhBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,230,1787036400"; 
-   d="scan'208";a="11857331"
-Received: from unknown (HELO WEBAPTLH152.iind.intel.com) ([10.66.226.239])
-  by fmviesa009.fm.intel.com with ESMTP; 23 Nov 2026 21:57:43 -0800
-From: Catherine L <catherine.l@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: kiran.k@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Catherine L <catherine.l@intel.com>
-Subject: [PATCH v4] Bluetooth: btintel: Add UEFI BPMO support for PeP
-Date: Tue, 24 Nov 2026 11:26:27 +0530
-Message-ID: <20261124055627.250718-1-catherine.l@intel.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0w0Reyj9
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2f02ee04378so32742855ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 22:37:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795502267; x=1796107067; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=2Id++rAHtGP/+D5y3s4+T35ImfaWbACKTTN2CHguGPA=;
+        b=0w0Reyj9JXgx47Qh+DBeLCybzgRElieZ9NA3MrKTZSXQ6e5rHIW1jS/gVd7bM5AmNM
+         D+xwG7hbMs3671n3bPXfOKuI7rep+IVgzbchj6DiHiZxLZMwIx92HIfIoYGUq8hfhyn5
+         Ww2ExyXEH6yh1a+5AAsPZPUE2OTX28CkLRTBc7LwJYZEdBSHA9BQ5JBiv9Wbr14Askpu
+         3gyfKghJMp5SJDDPV4Lg7mec0iK2W2nlnhKXfv+mbnM+qQZpm4iqP5Ls0f/eKTJ4DF+N
+         2NbocVuZjoxtB5kfFapeYSwvfo1h2vP+Js6SJ0I1dJWWfhZ1JBRh5R2k/KRo8V0Mh/Bx
+         r5Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795502267; x=1796107067;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=2Id++rAHtGP/+D5y3s4+T35ImfaWbACKTTN2CHguGPA=;
+        b=aunMqnx0EyeXWjYZbVpcd9K/Gtnv+ouwhnXoKzEk9py/oWhn+fYnCiTVTA/D8pOAUd
+         6pCwCTEr1tbsXmcZiZm4/VsTThF1SwgCr34WE2XQ9uywqxOrMFkOCQzXHVp8pZJQ5yYp
+         opHJZAyzoXGZdCH2exXUw/+S8nhvzb4isSoQm88q1B/4jICCy5c5McyoufrMmNLX5vwE
+         oI6n02NU+P4mxpj3PCnSu72QNQHDCCyu3ajI8ZVnj1mMkPywdgw9FI1+j3/4rL+67yFS
+         kPPbDiXmw/Sxb+GQK9vO2fmpla0YEAxmkrSCqjPY5ApFfeZrEu5H7fciQMpQrChDtlJR
+         bniA==
+X-Gm-Message-State: APuU4Z9ux83kTpFM37VHkrRE+CmXwXzeoPfOG6rhm8EDK/fvYLO7iS9Q
+	aiNDpgJOIkOGRZPcUvHiS1CnvophVdn741+w6uTpBLI44lLG3VlkI80vZ4w/dA==
+X-Gm-Gg: AZFdTZfnTFP1ivmLGKh1/BB7WRwPLlREbKNYfsGFJIloTWta2gpJymV1Y+L37H4SU/s
+	Ex9OxXIiH/BnJWAs/+nz5WxwtqYot4K/VSvyhJVN3NuWStB1SkTqpF/ZFEhRfBs1ZNLm9iOWx3b
+	Jv5hQz/MVbug/YM+s/GDtc8d9NOOprKV8Xwmcl4/S+VROWNIFdJLULQmDzU/dVGnxq7w1nv+810
+	+t43vpKd1OVjJo2IhN5+5eO5itmE6rWjgmI+il5x6PL0v2VMwB2UukOR8KRQ4DoM/sUkJ0RImPV
+	kNkd6eivLI0WOGDY+P5S03h84fQDrwjuQS88DSynca8ZaW3dkPT2DZyMyyoLb/K9TzyretOIlUe
+	V2w2xM5qAwtP1FfE9MYpAAt9WEAgoBfxxiLXyUjmUhiNZw8yjJUQmooIOEy7clYYTwOGybG7+0z
+	tmvkNx2uMe70sVRHaHmBPNf5LVKP8Nyu4/nRi2f05j+O1snnV1h6wXUJh3aAv2qNxKNMEL88YgF
+	lzuzIKVbokaUzQGdVYS3IKKS68vMUA1Wjzev4+iYazZ5bbr6TlziaMM6oqzF4w4DSgsP/JzHFzx
+	hrmhIt0Wn4oJP9A1JUbS3m8ImaGI6E8k419eZ8a2
+X-Received: by 2002:a17:902:cecb:b0:2f0:45a7:5d10 with SMTP id d9443c01a7336-2f045a76530mr132059665ad.8.1795502266727;
+        Mon, 23 Nov 2026 22:37:46 -0800 (PST)
+Received: from [172.17.0.2] (ec2-3-42-157-192.us-west-2.compute.amazonaws.com. [3.42.157.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f147a9esm63375545ad.72.2026.11.23.22.37.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Nov 2026 22:37:45 -0800 (PST)
+Message-ID: <6b0530b9.8aebd4a1.31c350.3ea5@mx.google.com>
+Date: Mon, 23 Nov 2026 22:37:45 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5272588276961988603=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -78,181 +89,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, goonsomeway@gmail.com
+Subject: RE: Bluetooth: RFCOMM: serialize RFCOMM_CONNINFO dlc->session dereference
+In-Reply-To: <CA+OT+OO6R-qQc0L9YE1ktBtzWCpFcQ2MbSG63sH4--gk3E5LjA@mail.gmail.com>
+References: <CA+OT+OO6R-qQc0L9YE1ktBtzWCpFcQ2MbSG63sH4--gk3E5LjA@mail.gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-PeP and later CNVr platforms allow the BIOS to supply a per-modulation
-SAR offset table (BPMO) through the UefiCnvBtBPMO UEFI variable. The
-firmware subtracts these per-chain, per-modulation offsets from the
-BRDS limit, giving finer SAR granularity than a single limit per band.
+--===============5272588276961988603==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Read UefiCnvBtBPMO in the UEFI SAR path after the BRDS and BSSS
-handling. When the CNVr is PeP or later, UEFI BRDS revision 2 is
-enabled, the SAR tables are locked, and the BPMO revision 0 variable
-is enabled, write the BPMO enable flag (DDC 0x0359) followed by the
-chain A (DDC 0x035A) and chain B (DDC 0x035B) offset tables.
+This is an automated email and please do not reply to this email.
 
-The values are passed to the firmware unchanged. The existing SAR
-initialization complete command (0xfe25) is still sent once, after all
-SAR DDC writes. A missing, disabled or unsupported BPMO variable is not
-treated as an error, and the firmware keeps its default of no offset.
+Dear Submitter,
 
-The existing ACPI and UEFI BRDS/BSSS flows are unchanged.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Signed-off-by: Catherine L <catherine.l@intel.com>
+----- Output -----
+
+error: patch fragment without header at line 8: @@ -786,20 +785,21 @@ static int rfcomm_sock_getsockopt_old(struct
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-Changes in v4:
-- addressed sashiko comments
+Regards,
+Linux Bluetooth
 
-Changes in v3:
-- Added Fixes tag
 
-Changes in v2:
-- addressed sashiko comments
-- rebased patch
----
- drivers/bluetooth/btintel.c | 75 ++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h |  7 ++++
- 2 files changed, 80 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 15c00d833f27..37fd2e31fd79 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -30,6 +30,7 @@
- 
- #define BTINTEL_EFI_DSBR	L"UefiCnvCommonDSBR"
- #define BTINTEL_EFI_BRDS	L"UefiCnvBtBRDS"
-+#define BTINTEL_EFI_BPMO	L"UefiCnvBtBPMO"
- #define BTINTEL_EFI_BSSS	L"UefiCnvBtBSSS"
- #define BTINTEL_EFI_GLUI	L"UefiCnvCommonGLUI"
- 
-@@ -62,6 +63,13 @@ struct btintel_uefi_sar {
- 	u8 chain_b[5];
- } __packed;
- 
-+struct btintel_bpmo {
-+	u8	header;
-+	__le32	mode;
-+	u8	chain_a[BTINTEL_BPMO_NUM_MODULATIONS];
-+	u8	chain_b[BTINTEL_BPMO_NUM_MODULATIONS];
-+} __packed;
-+
- enum {
- 	DSM_SET_WDISABLE2_DELAY = 1,
- 	DSM_SET_RESET_METHOD = 3,
-@@ -3739,7 +3747,64 @@ static int btintel_uefi_read_sar(struct hci_dev *hdev, efi_char16_t *name,
- 	return 0;
- }
- 
--static int btintel_set_uefi_sar(struct hci_dev *hdev)
-+static int btintel_uefi_set_bpmo(struct hci_dev *hdev, u8 lock_status)
-+{
-+	u8 buffer[sizeof(struct btintel_cp_ddc_write) +
-+		  BTINTEL_BPMO_NUM_MODULATIONS];
-+	struct btintel_cp_ddc_write *cmd = (void *)buffer;
-+	unsigned long size = sizeof(struct btintel_bpmo);
-+	struct btintel_bpmo bpmo;
-+	efi_status_t status;
-+	int ret;
-+
-+	if (lock_status != BTINTEL_UEFI_LOCK_LOCKED &&
-+	    lock_status != BTINTEL_UEFI_LOCK_TEST_MODE)
-+		return -EOPNOTSUPP;
-+
-+	if (!IS_ENABLED(CONFIG_EFI) ||
-+	    !efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
-+		return -EOPNOTSUPP;
-+
-+	status = efi.get_variable(BTINTEL_EFI_BPMO, &btintel_efi_sar_guid, NULL,
-+				  &size, &bpmo);
-+	if (status == EFI_NOT_FOUND)
-+		return -ENOENT;
-+	if (status != EFI_SUCCESS) {
-+		bt_dev_dbg(hdev, "Failed to read UEFI BPMO variable: 0x%lx",
-+			   status);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (size != sizeof(bpmo) || bpmo.header != 0) {
-+		bt_dev_dbg(hdev, "Unsupported UEFI BPMO variable");
-+		return -EOPNOTSUPP;
-+	}
-+	if (!(le32_to_cpu(bpmo.mode) & BIT(0))) {
-+		bt_dev_dbg(hdev, "UEFI BPMO is disabled");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	cmd->len = 3;
-+	cmd->id = cpu_to_le16(BTINTEL_DDC_ID_SAR_BPMO_ENABLE);
-+	cmd->data[0] = 0x01;
-+	ret = btintel_send_sar_ddc(hdev, cmd, sizeof(*cmd) + 1);
-+	if (ret)
-+		return ret;
-+
-+	cmd->len = 2 + BTINTEL_BPMO_NUM_MODULATIONS;
-+	cmd->id = cpu_to_le16(BTINTEL_DDC_ID_SAR_BPMO_CHAIN_A);
-+	memcpy(cmd->data, bpmo.chain_a, BTINTEL_BPMO_NUM_MODULATIONS);
-+	ret = btintel_send_sar_ddc(hdev, cmd, sizeof(buffer));
-+	if (ret)
-+		return ret;
-+
-+	cmd->id = cpu_to_le16(BTINTEL_DDC_ID_SAR_BPMO_CHAIN_B);
-+	memcpy(cmd->data, bpmo.chain_b, BTINTEL_BPMO_NUM_MODULATIONS);
-+	return btintel_send_sar_ddc(hdev, cmd, sizeof(buffer));
-+}
-+
-+static int btintel_set_uefi_sar(struct hci_dev *hdev,
-+				struct intel_version_tlv *ver)
- {
- 	/* 5G8 and 5G9 share a limit but have separate DDC identifiers. */
- 	static const struct {
-@@ -3826,6 +3891,12 @@ static int btintel_set_uefi_sar(struct hci_dev *hdev)
- 		ret = 0;
- 	}
- 
-+	if (INTEL_CNVX_TOP_TYPE(ver->cnvr_top) >= BTINTEL_CNVR_PEP) {
-+		ret = btintel_uefi_set_bpmo(hdev, lock_status);
-+		if (ret == -ENOENT || ret == -EOPNOTSUPP)
-+			ret = 0;
-+	}
-+
- complete:
- 	skb = __hci_cmd_sync(hdev, 0xfe25, sizeof(enable), &enable,
- 			     HCI_CMD_TIMEOUT);
-@@ -3853,7 +3924,7 @@ static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
- 	/* Supported SCP2+ platforms use this UEFI DDC map regardless of CNVr. */
- 	if (hw_variant >= BTINTEL_HWID_SCP2 &&
- 	    hw_variant != BTINTEL_HWID_BZRIW)
--		btintel_set_uefi_sar(hdev);
-+		btintel_set_uefi_sar(hdev, ver);
- 
- 	/*
- 	 * Platforms with UEFI BSSS do not provide ACPI BRDS. If UEFI BRDS is
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 372c6d7d8cbe..766cd69503f6 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -71,6 +71,7 @@ struct intel_tlv {
- /* CNVR */
- #define BTINTEL_CNVR_FMP2		0x910
- #define BTINTEL_CNVR_WHP2		0xA10	/* Whale Peak2 - Panther Lake */
-+#define BTINTEL_CNVR_PEP		0xA30   /* Pelican Peak2 / Pelican Peak STC */
- 
- #define BTINTEL_IMG_BOOTLOADER		0x01	/* Bootloader image */
- #define BTINTEL_IMG_IML			0x02	/* Intermediate image */
-@@ -87,6 +88,12 @@ struct intel_tlv {
- #define BTINTEL_HWID_SCP2F	0x21	/* Scorpius Peak2-F - Nova Lake */
- #define BTINTEL_HWID_BZRIW	0x22	/* BlazarIW - Wildcat Lake */
- 
-+#define BTINTEL_BPMO_NUM_MODULATIONS	16
-+
-+#define BTINTEL_DDC_ID_SAR_BPMO_ENABLE		0x0359
-+#define BTINTEL_DDC_ID_SAR_BPMO_CHAIN_A		0x035A
-+#define BTINTEL_DDC_ID_SAR_BPMO_CHAIN_B		0x035B
-+
- extern const guid_t btintel_guid_dsm;
- 
- struct intel_version_tlv {
--- 
-2.43.0
-
+--===============5272588276961988603==--
