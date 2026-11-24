@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795534755;
-	b=e5ElJM8F834ebBiV2IVkjISfRpSTjIZ2fXaNVT+D2TY/A1MK9QEbvgvo1RhxDcnYpEQk
-	 qaoF2xx/KCcuE7LyZcoAr5mqeqCnEkt8Rqx3L6r0eppbGse0iHMngqPAPk2N2uVbZm1PT
-	 RQ+3D7VxtmH1lXzUGhojV8BpTs4K93s3BK0EoenU/t70UV0bmvzu96wOa+h94Tcym2C6r
-	 1d1rTKyReqcCyRHchZZ7Lz9wImMExcVWlcOrIgBAviLMELy356VuAd5pQOhwsY1zKliPh
-	 1kP9mfvqk2OX/pZ3sA5QnCYxKGGZPaihmVyr+KskcGJeWYR9chbkNpPMkl3fLN4ROkw==
+	t=1795534756;
+	b=YcE8G2yv5ahRoFlQtKFRIIKwXFJukYA4rwoXGGvaLZipVxbAGtn2lxLCknBELZIz1cLv
+	 E9iB5570YP8C/bP9r4bNWPs9w9fZol1UAAsyY9PaGDRU78wgOH+GQMWc89Ee+rznqWbOX
+	 ogxa0lQhhYtjYsEsWArfZY2SJ8T3VpbsdLrWwrgg3RBoKGats4i+3zbaGWejZ3RxCPGp3
+	 JQl3oS49YlsH/xaZvo+JD5MFMO0N51mU0o4lh7+7BRdSgHryLsRzyxk1oE9BtF3Mifqmj
+	 bE8Lg7YPblK6c5CWFNAtaYa7Vufc83q31yQWSZin4Qxs6IISwg5wCyK+ziiQO1QVA/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795534755;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795534756;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-	b=Wxofl6rN3RN9Z0cf1e7aEd1ANUQ/fNR/gWgFv99Y1x1RAiTlEI0vKbz+8LOT4MMcxuqw
-	 tHo42ySgN9go5EQmnA7RRehomLlWIFw6RmZ+Mv8wnSO/McXE60mRR7XTyGUiCHquItfSJ
-	 PjqAKm/EpTS9Veo7DTU772AA5tHJtrc8dofU+xjuySiFzlODgNKQ8OeTmMjUJkTFkRgtv
-	 o8KCIhAkgASyBCkkMq/+IGazFGLHz8O4LAuaJMOtNX8/RAjAcJAdTX3puE3pQdw+T2yVm
-	 N5anLUT3hrwQgTqtXo3Rgjrj1LdzETsFB1yfugA3yu9+y8aTxSRRZbrfjmEd/wI6Bcg==
+	bh=Kfl/Tnr/Uk5fxS/oQCHEqAcUD7xHq0sIA+symXG51Tk=;
+	b=JarVAM+NsPVgKgnE0v77FSJjrAVpYWh0dLB2/0M2tcks7VHulvldvolntvSO1rjbph1m
+	 Jm+PpayKGGvVOH8zPLq4vUDhqzE4828r6vFUFnMFQH14DQxt7Zt5ka4w/bltn1OxO42Am
+	 w4vCD/NoZCrXkmWANg8sOzVfQ2+O3BOKNwJj4TPJ7TfzTvjqMWVw8n+6NknWXHE11Me4j
+	 7AOplLu7LqWla/tbjRP+EGFCQK2pDF92p9h+tiCz0HvRcs6fL2eT48u2LK19FPyqVDjk1
+	 L6klTtDgEX1M1VqB9Bs/hfuch4ulFLQqfZpjGCxiNCXYj+pDgeMgBNHUZ0+FU99YpHA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=iaeXOdzN;
-	arc=none smtp.remote-ip=209.85.221.171
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cJmjOcT1;
+	arc=none smtp.remote-ip=209.85.222.47
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ED5606A32C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:39:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F3ED5606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2F7606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:39:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC2F7606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=iaeXOdzN
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5ec6f271883so2841128e0c.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:39:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cJmjOcT1
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-99071945aa7so2613664241.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:39:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795534754; x=1796139554; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795534755; x=1796139555; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-        b=iaeXOdzNTX0Uktmf7Q3gYuAuxAPaF/B4i8cnSKkQI8v4Es+tSqQSeSWfa+vwMbAqOF
-         FhsRkmXh4eO0nBaAgpn2nwjiPuiMxB5Ny1W5TEqzlb5ucX2iiUnlueJ30jcw8JRytPSC
-         WfQqOawyX00JX9FSmzgEh/90OBXEXvgEvOJgWGX8OIatpboZnAAD1mxKq49mKmI+XHGH
-         q/FN/9FkjJLNofuElccLVAP+uVL/gbeDDStNhrfd4kRDIWQlR1vKhQGaZKnk6whEyo9r
-         28wVgrMpSyXyXjfU2u8B3WHIOUBBCcv1Y+XvAzNCxI56gCCifEwhkPq8bjBjTiYrZkEE
-         fxyQ==
+        bh=Kfl/Tnr/Uk5fxS/oQCHEqAcUD7xHq0sIA+symXG51Tk=;
+        b=cJmjOcT1g/jRZj2NGTN10f8jtMoJortEjfwNmG0rR3dsxSVx9YCdvFA10cxupGpbq/
+         D8IzNqZVGLcq2ne6WophWSQVlWxPmywDm2OK9/YN7tZ7Yu7MAY55hhJI201rM2Rvbn0m
+         qz9tbMDXi/DsoDHs8glD6RhVd4XlGSCI4HM+gyGs4zbnujo92lEG2cDZYnydcO3h3tvv
+         tu5fAAzqaA/0Bsq+SthXR0ddufEKZzrlnWHXkzkbDBbY8jue8SVOpHovgVa53kVxkTOU
+         yLpLHI+lz+3/PxdWg8Hlh5lpgkAl+AeYQLabYJMyOvIIGHm5E+O/41Xgdk9+DlT5HRRk
+         MdRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795534754; x=1796139554;
+        d=1e100.net; s=20260707; t=1795534755; x=1796139555;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=3wiPbdugB1ArzJIouetPDfuhoOHHCe64/hIyko5cCF8=;
-        b=ZpJyVTS96SBhjPVaPp38apFKCACc6ztGf48v40RpPq9IyGo2DPW1b/8xplWjzeJyK3
-         lgannLHSAaq1JhX1c32UN/Pf2lDMt6vVVZMfixA8AN+bNUaVZrnDxJQ+sqlaukip5Gyh
-         Cg3TXLJ0pEA7NXMU5OMdv5c9S2D7jns+PmyqCc9S04UCWhxvHD3DgthQ61LyR/PhOm38
-         lNV6FGJGUXTE4OhcuielyP99ZohCqEHs+3cT43ysfGp/MTotQifRRwGMDgbXW8pIUqQJ
-         eHaqcIaVKqyschPWlghvQTwXH8C7RaPoPBca2WkrhDpZ7ud87RXBRNBF5jCNBzTZ1P/j
-         kFkw==
-X-Gm-Message-State: APuU4Z98lBXgJKPVl1rBu1s6MMhlS/zDr+ABnB9jO89QUk2wpc+zF5oQ
-	Kl9hSKSQfkdJyEkpB0nuTeC6g9OAZfO20cUyAkmueSjTYzrAtAyBDtX4S4JtBg==
-X-Gm-Gg: AZFdTZdP4S8dOE7wa9VSeI8ArAltxqlteOO8Nx3sqVv62jWPJHv/rW7ps1Hwwl93LuO
-	OzGzIIjHkc/7OdAAU4/fJO4eFdCthgBq35nLW/OphjMi3TJ33PYJgY9E8lNDyAKW3+MPV5V9j/y
-	46iC6ogDUaxwCj7qpX7Sw5q2crnIO7VS0L7N+GXhqmwmlwv8nLH1VF8yRO0YRRhXcrqqKjB6ZFJ
-	rVpe2mTOR4TsKOIe2TFUkeI/BlgL7ecsfRAiJ0EbYy2GDH/SVv0Y7oAyOqYWCD9LzV4fpoT1JbJ
-	8Nn3vOAzanPS/BFUT/QcZh/GaeFQ6BbVowwEPV4Evpz+H/KRQTGvvPoMvl88iCU4MEwwMqyTaj2
-	tSuFdiitZWvrd7h8w7r0Qsy3DVZc5+/J/lP171NKz69h7fSfPeI4MEcoQTDBNlDryBVXxtRTqTR
-	7nnsvwoXLwNoUu/XRvvPpto1T8ddW3i8HsqSva0PV6KwxiU2uElHeLswB9zHKpa0jkjMKokpNtm
-	/0WjIqOHD+F/gqKSe4zzYLUeeHp/Yth6ch4TsEfThsclZDv5Fnm/c7BzrdL/4JYCSuYo8gyTgwi
-	3FnZslkL01kc1I78D3tPYIUjWXPQePKb31HyWs3rUBt6oAr/SoP8SN7E55D5UlT9vtGKn/+St2k
-	Yt7nftlqAgXyOgn/PFm7oIL+inSCYR5ETFxy5LXMxpt0BgUijLCDPGsgyA2C7so0HEL1/9+plfP
-	lutYE=
-X-Received: by 2002:a05:6122:7cc:b0:5ea:b712:8281 with SMTP id 71dfb90a1353d-5ee8af2df64mr9269163e0c.18.1795534753510;
-        Tue, 24 Nov 2026 07:39:13 -0800 (PST)
+        bh=Kfl/Tnr/Uk5fxS/oQCHEqAcUD7xHq0sIA+symXG51Tk=;
+        b=HyCUhPhRRi4B+rg3Lnu/fv8pXv8emBDn52KbiSodzZTcMBYeuFzj41HIGvRBJ8Aifq
+         NnAqMiE9IQgDkSZAbE51Jl40FQ8KG7g+2RCgH2xNCy80l2ga0feEERN04CFpitYDx02F
+         g8+jGywDjqY6rSPGtmimVla5oZUDIPA1vtyP/OGXyJsZbTZiu2qCl8PqlLLQEX62Lh2c
+         C21zTHGxTAF47eLaWl6qvnxJKXlETGt2r8k1kVC4NLsEcOJ/gvLpw328XduVQE9V694M
+         qy8G7ITbFfwxl3+guwbWPr3X5CQC4Abqo/H2Svqm/bsmwLlrdj+HIcOmcYmbfpG39O60
+         cC6g==
+X-Gm-Message-State: APuU4Z8Y29B8NdldfihyZeGjdOjSBtWfli1OhbHglD9KaY0BSjG2bk3L
+	iRhPv5rifwuLievnHsLUnqs7IlbaES9HuMYJaTZvzlKPC1aNhwS0xhg2ukf63Q==
+X-Gm-Gg: AZFdTZexJV4YyW6tLnGylT1fLhA24iaUzuEZ7UxdfLJm7GAxYE43LjkGnsDuA+A4xqn
+	qFUnOL1Ur3qvj3UEhIg8ROD+2w/IF3caqTT8cVIb0+Shu673BeKOENG917SOkkIf+FS+mupl+i5
+	v2Rv33+sRSs/30o53sDAaAbp1Qsk2Zpm/xqB/lB56385oKA7G+j2wg8NY904FyCuIWa9/+8fXX0
+	TaD/VpQAl7gNzUyxZ3sp/XtXVZE06mPADX/sE7JburaL/9ffW/HYJnfT94mxa2SYtBwlkyk0d5x
+	b6CbzqMYToIFejzE3xDdLWm8sj6JfA/TGaqKVdg6AkndkizilXxJ69auTKl53HyghdoMo3xMfyh
+	QjnupF/mzizgdtkf9TYI3lByZoiCNGmivkOmLqdGUCIBtwtrHB2yfzNP6Ska0f4sS+b0l5YN0hk
+	1saOH+NGvY153ZlfnP9lG6/2yJe1AVf+E90iw3NNRbPAfvtsbwmri0i21T/wnRcNhC28byCkrOX
+	xP+fpVxCnUFPUncpK+FZ4Ovo8JfSyNC3nU5mgzj+qExGTq5jOwFL9WteEySI+S/czB11XlXzbr6
+	Wnau39/5YlKlHiaXJlgLC9EpUAp4JY9kxsBvywsgUTjv89jHq2MlyvC9KCIDF6GIns6cdWbcpi4
+	5vgnVlwDDN4SpGBNndNPxDWv17r6MvxIXB3XePL+nlSfJzW9oF6TInQoXJUkDp6c+5ldcS5cbYJ
+	mrPOE=
+X-Received: by 2002:a05:6122:e1aa:b0:5ea:e052:2ef0 with SMTP id 71dfb90a1353d-5ee8af38c92mr7985193e0c.9.1795534754477;
+        Tue, 24 Nov 2026 07:39:14 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5564a9sm14343463e0c.5.2026.11.24.07.39.12
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5564a9sm14343463e0c.5.2026.11.24.07.39.13
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 24 Nov 2026 07:39:13 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v6 17/18] unit/test-rap: Add tests for Ranging Data subscription and counters
-Date: Tue, 24 Nov 2026 10:38:54 -0500
-Message-ID: <20261124153856.216054-18-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v6 18/18] shared/rap: Defer Ranging Data mode selection until Features is read
+Date: Tue, 24 Nov 2026 10:38:55 -0500
+Message-ID: <20261124153856.216054-19-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261124153856.216054-1-luiz.dentz@gmail.com>
 References: <20261124153856.216054-1-luiz.dentz@gmail.com>
@@ -101,578 +101,513 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add Requester tests for the Ranging Data subscriptions: nothing is
-written when RAS Features is read, Real-time and On-demand CCCD values
-for both transports, subscribing on start, and the 5 s Real-time timeout
-running from CS Procedure Enable Complete rather than from the CCCD write.
-
-Add a two-connection test that the Ranging Data Ready and Overwritten
-counters are per connection.
+- Wait for the RAS Features read before choosing a mode in
+  bt_rap_ensure_ranging_data(), since a zero value also means the read
+  has not completed.
+- Keep an explicit SetRangingDataMode(Disabled) instead of subscribing
+  again on the next start, and subscribe a selected mode again with its
+  transport when its subscription ended with the last measurement. A
+  selection is only remembered once it took effect.
+- Make only the On-demand registrations that are missing, so a repeated
+  subscription retries the failed ones without registering the others
+  twice.
+- Forget a notification registration the peer rejected and drop its
+  handler, so that a later start retries it.
+- Arm the first Real-time data timeout when Real-time is enabled while a
+  procedure is already running.
 
 Assisted-by: Claude:claude-sonnet-5-5
 ---
- unit/test-rap.c | 507 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 464 insertions(+), 43 deletions(-)
+ src/shared/rap.c | 177 +++++++++++++++++++++++++++++++++++++++--------
+ unit/test-rap.c  | 169 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 317 insertions(+), 29 deletions(-)
 
+diff --git a/src/shared/rap.c b/src/shared/rap.c
+index d4ce1751f052..c0466e5cd827 100644
+--- a/src/shared/rap.c
++++ b/src/shared/rap.c
+@@ -480,6 +480,11 @@ struct bt_rap {
+ 	unsigned int ready_notify_id;
+ 	unsigned int overwritten_notify_id;
+ 	uint32_t ras_features;
++	bool features_read;	/* RAS Features read completed */
++	bool ensure_pending;	/* ensure_ranging_data() waits for it */
++	bool mode_selected;	/* SetRangingDataMode() called, even Disabled */
++	enum bt_rap_ranging_data_mode selected_mode;
++	bool proc_enabled;	/* a CS procedure is running */
+ 
+ 	/* Responder role: Ranging Counters read back through Ranging Data
+ 	 * Ready and Overwritten, scoped to this connection (RAS v1.0, 3.4
+@@ -999,6 +1004,10 @@ void bt_rap_detach(struct bt_rap *rap)
+ 	rap->cp_notify_id = 0;
+ 	rap->ready_notify_id = 0;
+ 	rap->overwritten_notify_id = 0;
++	rap->features_read = false;
++	rap->ensure_pending = false;
++	rap->mode_selected = false;
++	rap->proc_enabled = false;
+ 
+ 	bt_att_unregister_disconnect(rap->att, rap->disconn_id);
+ 	rap->att = NULL;
+@@ -3357,7 +3366,9 @@ void bt_rap_hci_cs_procedure_enable_complete_callback(uint16_t length,
+ 	/* RAP v1.0 4.4.1.1: the first Real-time Ranging Data is due within
+ 	 * 5 seconds after the CS procedure starts.
+ 	 */
+-	if (data->state == 0x01 && rap->realtime_notify_id)
++	rap->proc_enabled = data->state == 0x01;
++
++	if (rap->proc_enabled && rap->realtime_notify_id)
+ 		ras_realtime_arm_timeout(rap,
+ 					RAS_REALTIME_FIRST_SEGMENT_TIMEOUT);
+ }
+@@ -3530,14 +3541,68 @@ static void rap_read_value(struct bt_rap *rap, uint16_t value_handle,
+ 	queue_push_tail(rap->pending, pending);
+ }
+ 
++static void rap_forget_notify(struct bt_rap *rap, unsigned int id)
++{
++	if (rap->realtime_notify_id == id)
++		rap->realtime_notify_id = 0;
++	if (rap->ondemand_notify_id == id)
++		rap->ondemand_notify_id = 0;
++	if (rap->cp_notify_id == id)
++		rap->cp_notify_id = 0;
++	if (rap->ready_notify_id == id)
++		rap->ready_notify_id = 0;
++	if (rap->overwritten_notify_id == id)
++		rap->overwritten_notify_id = 0;
++}
++
++struct rap_failed_notify {
++	struct bt_rap *rap;
++	unsigned int id;
++};
++
++static bool rap_failed_notify_cb(void *user_data)
++{
++	struct rap_failed_notify *failed = user_data;
++
++	if (failed->rap->client)
++		bt_gatt_client_unregister_notify(failed->rap->client,
++							failed->id);
++
++	return false;
++}
++
++static void rap_failed_notify_free(void *user_data)
++{
++	struct rap_failed_notify *failed = user_data;
++
++	bt_rap_unref(failed->rap);
++	free(failed);
++}
++
+ static void ras_register(uint16_t att_ecode, void *user_data)
+ {
+ 	struct bt_rap_notify *notify = user_data;
++	struct rap_failed_notify *failed;
+ 
+-	if (att_ecode)
+-		DBG(notify->rap, "RAS register failed 0x%04x", att_ecode);
++	if (!att_ecode)
++		return;
++
++	DBG(notify->rap, "RAS register failed 0x%04x", att_ecode);
++
++	/* The ID only says the CCC write was queued. Forget it so a later
++	 * subscription retries, and drop the handler the client still holds;
++	 * that is done from the mainloop as the client is iterating its
++	 * registrations right now.
++	 */
++	rap_forget_notify(notify->rap, notify->id);
++
++	failed = new0(struct rap_failed_notify, 1);
++	failed->rap = bt_rap_ref(notify->rap);
++	failed->id = notify->id;
+ 
+-	(void)notify;
++	if (!timeout_add(0, rap_failed_notify_cb, failed,
++					rap_failed_notify_free))
++		rap_failed_notify_free(failed);
+ }
+ 
+ static void rap_notify(uint16_t value_handle, const uint8_t *value,
+@@ -4651,11 +4716,20 @@ static bool rap_subscribe_ranging_data(struct bt_rap *rap,
+ 		rap->realtime_notify_id = bt_rap_register_notify(rap,
+ 				value_handle, rap->realtime_ccc_value,
+ 				ras_segment_notify_cb, "real-time");
++
++		/* Enabled while a procedure is already running: its start,
++		 * which arms the first data timeout, has been missed.
++		 */
++		if (rap->realtime_notify_id && rap->proc_enabled)
++			ras_realtime_arm_timeout(rap,
++					RAS_REALTIME_FIRST_SEGMENT_TIMEOUT);
++
+ 		return rap->realtime_notify_id != 0;
+ 	}
+ 
+ 	if (mode == BT_RAP_RANGING_DATA_ONDEMAND) {
+ 		uint16_t value_handle;
++		bool ready_new = false;
+ 
+ 		/* Only the data characteristic follows the requested
+ 		 * transport (RAS v1.0 Table 3.1). The RAS Control Point can
+@@ -4663,22 +4737,33 @@ static bool rap_subscribe_ranging_data(struct bt_rap *rap,
+ 		 * Overwritten are indicated whenever the server supports it,
+ 		 * since a server may send them only as indications.
+ 		 */
+-		rap_subscribe_ondemand_chrc(rap, ras->ondemand_chrc,
+-			rap->ondemand_ccc_value, ras_segment_notify_cb,
+-			"on-demand", &rap->ondemand_notify_id);
+-		rap_subscribe_ondemand_chrc(rap, ras->cp_chrc,
+-			BT_RAP_RANGING_INDICATE, ras_cp_response_notify_cb,
+-			"RAS Control Point", &rap->cp_notify_id);
+-		rap_subscribe_ondemand_chrc(rap, ras->ready_chrc,
+-			rap_status_ccc(ras->ready_chrc),
+-			ras_data_ready_notify_cb,
+-			"Ranging Data Ready", &rap->ready_notify_id);
+-		rap_subscribe_ondemand_chrc(rap, ras->overwritten_chrc,
+-			rap_status_ccc(ras->overwritten_chrc),
+-			ras_data_overwritten_notify_cb,
+-			"Ranging Data Overwritten",
+-			&rap->overwritten_notify_id);
+-		if (ras->ready_chrc &&
++		/* Only the registrations still missing are made, so this can
++		 * be repeated to retry the ones that failed or were rejected
++		 * without registering the others twice.
++		 */
++		if (!rap->ondemand_notify_id)
++			rap_subscribe_ondemand_chrc(rap, ras->ondemand_chrc,
++				rap->ondemand_ccc_value, ras_segment_notify_cb,
++				"on-demand", &rap->ondemand_notify_id);
++		if (!rap->cp_notify_id)
++			rap_subscribe_ondemand_chrc(rap, ras->cp_chrc,
++				BT_RAP_RANGING_INDICATE,
++				ras_cp_response_notify_cb,
++				"RAS Control Point", &rap->cp_notify_id);
++		if (!rap->ready_notify_id) {
++			ready_new = true;
++			rap_subscribe_ondemand_chrc(rap, ras->ready_chrc,
++				rap_status_ccc(ras->ready_chrc),
++				ras_data_ready_notify_cb,
++				"Ranging Data Ready", &rap->ready_notify_id);
++		}
++		if (!rap->overwritten_notify_id)
++			rap_subscribe_ondemand_chrc(rap, ras->overwritten_chrc,
++				rap_status_ccc(ras->overwritten_chrc),
++				ras_data_overwritten_notify_cb,
++				"Ranging Data Overwritten",
++				&rap->overwritten_notify_id);
++		if (ready_new && ras->ready_chrc &&
+ 			gatt_db_attribute_get_char_data(ras->ready_chrc, NULL,
+ 						&value_handle, NULL, NULL,
+ 						NULL))
+@@ -4695,7 +4780,7 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
+ 			enum bt_rap_ranging_data_mode mode,
+ 			enum bt_rap_ranging_transport transport)
+ {
+-	if (!rap || !rap->client || !rap->ras_features)
++	if (!rap || !rap->client || !rap->features_read)
+ 		return false;
+ 
+ 	if (mode == BT_RAP_RANGING_DATA_REALTIME &&
+@@ -4714,7 +4799,14 @@ bool bt_rap_set_ranging_data_mode(struct bt_rap *rap,
+ 	rap->realtime_ccc_value = transport;
+ 	rap->ondemand_ccc_value = transport;
+ 
+-	return rap_subscribe_ranging_data(rap, mode);
++	/* Only a selection that took effect is kept for later starts */
++	if (!rap_subscribe_ranging_data(rap, mode))
++		return false;
++
++	rap->mode_selected = true;
++	rap->selected_mode = mode;
++
++	return true;
+ }
+ 
+ bool bt_rap_ensure_ranging_data(struct bt_rap *rap)
+@@ -4724,17 +4816,37 @@ bool bt_rap_ensure_ranging_data(struct bt_rap *rap)
+ 	if (!rap || !rap->client)
+ 		return false;
+ 
+-	if (rap->realtime_notify_id || rap->ondemand_notify_id)
++	/* An explicit selection stands, Disabled included. */
++	if (rap->mode_selected &&
++			rap->selected_mode == BT_RAP_RANGING_DATA_DISABLED)
+ 		return true;
+ 
+-	/* The RREQ has to enable one of the two (RAP v1.0 4.4). Real-time
+-	 * Ranging Data is optional for the RRSP, so fall back to On-demand
+-	 * when it is not supported (RAP v1.0 4.4.2).
+-	 */
+-	if (rap->ondemand_mode || !(rap->ras_features & 0x01))
++	/* Which mode the peer supports is only known once Features is read */
++	if (!rap->features_read) {
++		rap->ensure_pending = true;
++		return true;
++	}
++
++	if (rap->mode_selected) {
++		mode = rap->selected_mode;
++	} else if (rap->realtime_notify_id) {
++		return true;
++	} else if (rap->ondemand_mode || !(rap->ras_features & 0x01)) {
++		/* The RREQ has to enable one of the two (RAP v1.0 4.4).
++		 * Real-time Ranging Data is optional for the RRSP, so fall
++		 * back to On-demand when it is not supported (RAP v1.0 4.4.2).
++		 */
+ 		mode = BT_RAP_RANGING_DATA_ONDEMAND;
+-	else
++	} else {
+ 		mode = BT_RAP_RANGING_DATA_REALTIME;
++	}
++
++	/* A mode whose subscription ended with the last measurement (stop or
++	 * timeout) or was rejected is subscribed again with its transport;
++	 * the On-demand subscription only makes the registrations missing.
++	 */
++	if (mode == BT_RAP_RANGING_DATA_REALTIME && rap->realtime_notify_id)
++		return true;
+ 
+ 	return rap_subscribe_ranging_data(rap, mode);
+ }
+@@ -4785,6 +4897,7 @@ static void read_ras_features(struct bt_rap *rap, bool success,
+ 	if (ras)
+ 		ras->client.abort_operation = abort_operation;
+ 	rap->ras_features = features;
++	rap->features_read = true;
+ 
+ 	DBG(rap, "RAS Features - Real-time: %s, Retrieve Lost: %s, Abort: %s",
+ 	    supports_realtime ? "Yes" : "No",
+@@ -4802,6 +4915,12 @@ static void read_ras_features(struct bt_rap *rap, bool success,
+ 			!rap_subscribe_ranging_data(rap,
+ 					BT_RAP_RANGING_DATA_ONDEMAND))
+ 		DBG(rap, "Failed to subscribe to requested Ranging Data mode");
++
++	/* StartMeasurement() arrived before the peer's features were known */
++	if (rap->ensure_pending) {
++		rap->ensure_pending = false;
++		bt_rap_ensure_ranging_data(rap);
++	}
+ }
+ 
+ static void foreach_rap_char(struct gatt_db_attribute *attr, void *user_data)
 diff --git a/unit/test-rap.c b/unit/test-rap.c
-index 338f0babf2a4..a1655640d41c 100644
+index a1655640d41c..a14536a665ea 100644
 --- a/unit/test-rap.c
 +++ b/unit/test-rap.c
-@@ -49,6 +49,10 @@ struct test_data_ras {
+@@ -49,6 +49,8 @@ struct test_data_ras {
  struct test_config_rap {
  	const struct iovec *setup_data;
  	const size_t setup_data_len;
-+	/* Run once the Requester is ready; when NULL the test passes there */
-+	void (*action)(struct bt_rap *rap);
-+	/* Called when the ATT script is exhausted; NULL leaves it to action */
-+	void (*complete)(const void *user_data);
- };
++	/* Run right after attaching, before RAS Features is read */
++	void (*early)(struct bt_rap *rap);
+ 	/* Run once the Requester is ready; when NULL the test passes there */
+ 	void (*action)(struct bt_rap *rap);
+ 	/* Called when the ATT script is exhausted; NULL leaves it to action */
+@@ -467,6 +469,9 @@ static void test_client_rap(const void *user_data)
+ 	bt_rap_ready_register(data->rap, rap_client_ready_cb, data, NULL);
  
- struct test_data_rap {
-@@ -180,6 +184,57 @@ static void gatt_notify_cb(struct gatt_db_attribute *attrib,
- 		printf("%s: Failed to send notification\n", __func__);
+ 	bt_rap_attach(data->rap, data->client);
++
++	if (data->cfg->early)
++		data->cfg->early(data->rap);
  }
  
-+static void inject_proc_enable(struct bt_rap *rap)
-+{
-+	struct rap_ev_cs_proc_enable_cmplt ev;
-+
-+	memset(&ev, 0, sizeof(ev));
-+	ev.conn_hdl = 0x0001;
-+	ev.config_id = 0x01;
-+	ev.state = 0x01;
-+
-+	bt_rap_hci_cs_procedure_enable_complete_callback(sizeof(ev), &ev, rap);
-+}
-+
-+static void inject_cs_result(struct bt_rap *rap, uint16_t proc_counter)
-+{
-+	size_t event_size = sizeof(struct rap_ev_cs_subevent_result) +
-+			    sizeof(struct cs_step_data);
-+	struct rap_ev_cs_subevent_result *fake_event;
-+	struct cs_mode_zero_data *mode_zero;
-+
-+	if (tester_use_debug())
-+		tester_debug("Injecting fake CS data...");
-+
-+	fake_event = g_malloc0(event_size);
-+
-+	fake_event->conn_hdl = 0x0001;
-+	fake_event->config_id = 0x01;
-+	fake_event->start_acl_conn_evt_counter = 0x0000;
-+	fake_event->proc_counter = proc_counter;
-+	fake_event->freq_comp = 0x0000;
-+	fake_event->ref_pwr_lvl = 0x00;
-+	fake_event->proc_done_status = 0x00;
-+	fake_event->subevt_done_status = 0x00;
-+	fake_event->abort_reason = 0x00;
-+	fake_event->num_ant_paths = 0x01;
-+	fake_event->num_steps_reported = 0x01;
-+
-+	fake_event->step_data[0].step_mode = CS_MODE_ZERO;
-+	fake_event->step_data[0].step_chnl = 0x00;
-+	/* Mode 0: 1+1+1+4 bytes */
-+	fake_event->step_data[0].step_data_length = 4;
-+	mode_zero = &fake_event->step_data[0].step_mode_data.mode_zero_data;
-+	mode_zero->packet_quality = 0x01;
-+	mode_zero->packet_rssi_dbm = 0x02;
-+	mode_zero->packet_ant = 0x03;
-+	mode_zero->init_measured_freq_offset = 0x04;
-+
-+	bt_rap_hci_cs_subevent_result_callback(event_size, fake_event, rap);
-+
-+	g_free(fake_event);
-+}
-+
- static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 					unsigned int id, uint16_t offset,
- 					const uint8_t *value, size_t len,
-@@ -220,48 +275,8 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 	/* If notifications/indications enabled on Real-time Ranging Data CCCD,
- 	 * inject fake HCI CS subevent data to trigger notifications
- 	 */
--	if (handle == 0x0006 && ccc_value != 0x0000 && data->rap) {
--		size_t event_size = sizeof(struct rap_ev_cs_subevent_result) +
--				    sizeof(struct cs_step_data);
--		struct rap_ev_cs_subevent_result *fake_event;
--		struct cs_mode_zero_data *mode_zero;
--
--		if (tester_use_debug())
--			tester_debug("Injecting fake CS data...");
--
--		fake_event = g_malloc0(event_size);
--		if (!fake_event)
--			return;  /* Already sent write response */
--
--		/* Fill in the header fields */
--		fake_event->conn_hdl = 0x0001;
--		fake_event->config_id = 0x01;
--		fake_event->start_acl_conn_evt_counter = 0x0000;
--		fake_event->proc_counter = 0x0001;
--		fake_event->freq_comp = 0x0000;
--		fake_event->ref_pwr_lvl = 0x00;
--		fake_event->proc_done_status = 0x00;
--		fake_event->subevt_done_status = 0x00;
--		fake_event->abort_reason = 0x00;
--		fake_event->num_ant_paths = 0x01;
--		fake_event->num_steps_reported = 0x01;
--
--		fake_event->step_data[0].step_mode = CS_MODE_ZERO;
--		fake_event->step_data[0].step_chnl = 0x00;
--		/* Mode 0: 1+1+1+4 bytes */
--		fake_event->step_data[0].step_data_length = 4;
--mode_zero = &fake_event->step_data[0].step_mode_data.mode_zero_data;
--		mode_zero->packet_quality = 0x01;
--		mode_zero->packet_rssi_dbm = 0x02;
--		mode_zero->packet_ant = 0x03;
--		mode_zero->init_measured_freq_offset = 0x04;
--
--		/* Inject the fake event to trigger notification */
--		bt_rap_hci_cs_subevent_result_callback(event_size, fake_event,
--						       data->rap);
--
--		g_free(fake_event);
--	}
-+	if (handle == 0x0006 && ccc_value != 0x0000 && data->rap)
-+		inject_cs_result(data->rap, 0x0001);
- 	return;
+ /*
+@@ -1121,12 +1126,118 @@ static void action_ondemand_indicate(struct bt_rap *rap)
+ 	WRITE_CCCD(0x0f, 0x02), \
+ 	WRITE_CCCD(0x12, 0x02)
  
- done:
-@@ -413,6 +428,13 @@ static void test_setup_rap(const void *user_data)
- 
- static void rap_client_ready_cb(struct bt_rap *rap, void *user_data)
- {
-+	struct test_data_rap *data = user_data;
-+
-+	if (data->cfg->action) {
-+		data->cfg->action(rap);
-+		return;
-+	}
-+
- 	tester_test_passed();
- }
- 
-@@ -432,7 +454,7 @@ static void test_client_rap(const void *user_data)
- 	io = tester_setup_io(data->iov, data->iovcnt);
- 	g_assert(io);
- 
--	tester_io_set_complete_func(NULL);
-+	tester_io_set_complete_func(data->cfg->complete);
- 
- 	data->db = gatt_db_new();
- 	g_assert(data->db);
-@@ -1001,6 +1023,372 @@ const struct test_config_rap cfg_cggit_discovery = {
- 	IOV_DATA(0x0a, 0x09, 0x00), \
- 	IOV_DATA(0x0b, 0x01, 0x00)
- 
-+/*
-+ * Requester subscription behavior (RAP v1.0 4.4)
-+ *
-+ * Remote handles: Real-time CCCD 0x0006, On-demand CCCD 0x0009, RAS Control
-+ * Point CCCD 0x000c, Ranging Data Ready CCCD 0x000f, Ranging Data Overwritten
-+ * CCCD 0x0012.
++/* StartMeasurement() before RAS Features was read waits for it, so the mode
++ * follows what the peer supports (Real-time here).
 + */
-+#define ATTACH_FEATURES_REALTIME \
-+	IOV_DATA(0x0a, 0x03, 0x00), \
-+	IOV_DATA(0x0b, 0x01, 0x00, 0x00, 0x00)
-+
-+/* Abort supported, Real-time not */
-+#define ATTACH_FEATURES_ONDEMAND \
-+	IOV_DATA(0x0a, 0x03, 0x00), \
-+	IOV_DATA(0x0b, 0x04, 0x00, 0x00, 0x00)
-+
-+#define WRITE_CCCD(handle, value) \
-+	IOV_DATA(0x12, handle, 0x00, value, 0x00), \
-+	IOV_DATA(0x13)
-+
-+static gboolean idle_pass_cb(gpointer user_data)
-+{
-+	tester_test_passed();
-+	return FALSE;
-+}
-+
-+static gboolean realtime_disable_cb(gpointer user_data)
-+{
-+	bt_rap_disable_realtime_ranging(user_data);
-+	return FALSE;
-+}
-+
-+/* Reading RAS Features must not subscribe by itself: nothing is written
-+ * until the Upper Tester asks for Ranging Data (RAP/REQ/RRD/BV-01-C).
-+ */
-+static void action_idle(struct bt_rap *rap)
-+{
-+	g_timeout_add(300, idle_pass_cb, NULL);
-+}
-+
-+static void action_realtime_notify(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_REALTIME,
-+				BT_RAP_RANGING_NOTIFY));
-+	g_timeout_add(200, realtime_disable_cb, rap);
-+}
-+
-+static void action_realtime_indicate(struct bt_rap *rap)
-+{
-+	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_REALTIME,
-+				BT_RAP_RANGING_INDICATE));
-+	g_timeout_add(200, realtime_disable_cb, rap);
-+}
-+
-+/* StartMeasurement() with the peer supporting Real-time subscribes to it */
-+static void action_ensure(struct bt_rap *rap)
++static void early_ensure(struct bt_rap *rap)
 +{
 +	g_assert(bt_rap_ensure_ranging_data(rap));
 +}
 +
-+static void action_ondemand_notify(struct bt_rap *rap)
++/* An explicit Disabled selection is not overridden by StartMeasurement() */
++static void action_disabled_then_ensure(struct bt_rap *rap)
 +{
 +	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_ONDEMAND,
++				BT_RAP_RANGING_DATA_DISABLED,
 +				BT_RAP_RANGING_NOTIFY));
++	g_assert(bt_rap_ensure_ranging_data(rap));
++	g_timeout_add(300, idle_pass_cb, NULL);
 +}
 +
-+static void action_ondemand_indicate(struct bt_rap *rap)
++static gboolean retry_ensure_cb(gpointer user_data);
++
++/* A selection that could not be made is not remembered: Real-time is not
++ * supported here, so the next start falls back to On-demand.
++ */
++static void action_failed_selection(struct bt_rap *rap)
++{
++	g_assert(!bt_rap_set_ranging_data_mode(rap,
++				BT_RAP_RANGING_DATA_REALTIME,
++				BT_RAP_RANGING_NOTIFY));
++	g_assert(bt_rap_ensure_ranging_data(rap));
++}
++
++/* One of the On-demand registrations is rejected: the next start retries
++ * that one only, without registering the others again.
++ */
++static void action_ondemand_retry(struct bt_rap *rap)
++{
++	g_assert(bt_rap_ensure_ranging_data(rap));
++	g_timeout_add(300, retry_ensure_cb, rap);
++}
++
++/* A selected mode whose subscription ended with the last measurement is
++ * subscribed again, with the selected transport, by the next start.
++ */
++static void action_selected_resubscribe(struct bt_rap *rap)
 +{
 +	g_assert(bt_rap_set_ranging_data_mode(rap,
-+				BT_RAP_RANGING_DATA_ONDEMAND,
++				BT_RAP_RANGING_DATA_REALTIME,
 +				BT_RAP_RANGING_INDICATE));
++	g_timeout_add(200, realtime_disable_cb, rap);
++	g_timeout_add(400, retry_ensure_cb, rap);
 +}
 +
-+#define RAP_REQ_RRD_NO_SUBSCRIBE \
-+	ATTACH_FEATURES_REALTIME
-+
-+#define RAP_REQ_RRD_ROUND(value) \
-+	ATTACH_FEATURES_REALTIME, \
-+	WRITE_CCCD(0x06, value), \
-+	WRITE_CCCD(0x06, 0x00)
-+
-+#define RAP_REQ_RRD_ENSURE \
-+	ATTACH_FEATURES_REALTIME, \
-+	WRITE_CCCD(0x06, 0x01)
-+
-+/* On-demand: the data characteristic follows the requested transport, the
-+ * Control Point, Ranging Data Ready and Overwritten are indicated.
-+ */
-+#define RAP_REQ_ORD_ROUND(value) \
-+	ATTACH_FEATURES_ONDEMAND, \
-+	WRITE_CCCD(0x09, value), \
-+	WRITE_CCCD(0x0c, 0x02), \
-+	WRITE_CCCD(0x0f, 0x02), \
-+	WRITE_CCCD(0x12, 0x02)
-+
-+const struct test_config_rap cfg_rap_idle = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_idle,
-+};
-+
-+const struct test_config_rap cfg_rap_rt_notify = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_notify,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_rt_indicate = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_indicate,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_ensure = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ensure,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_od_notify = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ondemand_notify,
-+	.complete = test_complete_cb,
-+};
-+
-+const struct test_config_rap cfg_rap_od_indicate = {
-+	.setup_data = cggit_setup_data,
-+	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_ondemand_indicate,
-+	.complete = test_complete_cb,
-+};
-+
-+/*
-+ * The 5 s wait for the first Real-time Ranging Data starts with the CS
-+ * procedure (RAP v1.0 4.4.1.1), not with the CCCD write: the CCCD is disabled
-+ * 5 s after Procedure Enable Complete, which is injected after the write.
-+ */
-+
-+static gint64 proc_enable_time;
-+
-+static gboolean inject_proc_enable_cb(gpointer user_data)
++static gboolean retry_ensure_cb(gpointer user_data)
 +{
-+	proc_enable_time = g_get_monotonic_time();
-+	inject_proc_enable(user_data);
++	g_assert(bt_rap_ensure_ranging_data(user_data));
 +	return FALSE;
 +}
 +
-+static void action_realtime_timeout(struct bt_rap *rap)
++/* The peer rejects the CCCD write: the next start has to retry it */
++static void action_ensure_retry(struct bt_rap *rap)
 +{
-+	proc_enable_time = 0;
++	g_assert(bt_rap_ensure_ranging_data(rap));
++	g_timeout_add(300, retry_ensure_cb, rap);
++}
++
+ const struct test_config_rap cfg_rap_idle = {
+ 	.setup_data = cggit_setup_data,
+ 	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
+ 	.action = action_idle,
+ };
+ 
++const struct test_config_rap cfg_rap_early_ensure = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.early = early_ensure,
++	.action = action_idle,
++};
++
++const struct test_config_rap cfg_rap_disabled = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.action = action_disabled_then_ensure,
++};
++
++const struct test_config_rap cfg_rap_resubscribe = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.action = action_selected_resubscribe,
++	.complete = test_complete_cb,
++};
++
++const struct test_config_rap cfg_rap_failed_sel = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.action = action_failed_selection,
++	.complete = test_complete_cb,
++};
++
++const struct test_config_rap cfg_rap_od_retry = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.action = action_ondemand_retry,
++	.complete = test_complete_cb,
++};
++
++const struct test_config_rap cfg_rap_retry = {
++	.setup_data = cggit_setup_data,
++	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
++	.action = action_ensure_retry,
++	.complete = test_complete_cb,
++};
++
+ const struct test_config_rap cfg_rap_rt_notify = {
+ 	.setup_data = cggit_setup_data,
+ 	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
+@@ -1204,6 +1315,27 @@ const struct test_config_rap cfg_rap_rt_timeout = {
+ 	.complete = realtime_timeout_complete,
+ };
+ 
++/*
++ * Real-time Ranging Data enabled while a procedure is already running arms
++ * the first data timeout as well.
++ */
++static void action_realtime_midproc(struct bt_rap *rap)
++{
++	proc_enable_time = g_get_monotonic_time();
++	inject_proc_enable(rap);
 +
 +	g_assert(bt_rap_set_ranging_data_mode(rap,
 +				BT_RAP_RANGING_DATA_REALTIME,
 +				BT_RAP_RANGING_NOTIFY));
-+	g_timeout_add(300, inject_proc_enable_cb, rap);
 +}
 +
-+static void realtime_timeout_complete(const void *user_data)
-+{
-+	/* Disabled no earlier than 5 s after Procedure Enable Complete */
-+	if (!proc_enable_time ||
-+	    g_get_monotonic_time() - proc_enable_time < 4900 * 1000)
-+		tester_test_failed();
-+	else
-+		tester_test_passed();
-+}
-+
-+const struct test_config_rap cfg_rap_rt_timeout = {
++const struct test_config_rap cfg_rap_rt_midproc = {
 +	.setup_data = cggit_setup_data,
 +	.setup_data_len = ARRAY_SIZE(cggit_setup_data),
-+	.action = action_realtime_timeout,
++	.action = action_realtime_midproc,
 +	.complete = realtime_timeout_complete,
 +};
 +
-+/*
-+ * RAS Ranging Data Ready/Overwritten reads report the counters of the
-+ * connection they are read on (RAS v1.0, 3.4 and 3.5).
-+ */
-+#define RAS_CONNS	2
-+
-+struct cnt_op {
-+	int conn;
-+	enum { CNT_READ, CNT_WRITE, CNT_INJECT } type;
-+	uint16_t handle;
-+	uint16_t value;
-+};
-+
-+struct test_data_cnt {
-+	struct test_data_ras ras;
-+	struct bt_att *satt[RAS_CONNS];
-+	struct bt_att *catt[RAS_CONNS];
-+	struct bt_gatt_server *server[RAS_CONNS];
-+	struct bt_gatt_client *client[RAS_CONNS];
-+	struct gatt_db *cdb[RAS_CONNS];
-+	unsigned int ready;
-+	unsigned int step;
-+};
-+
-+static struct test_data_cnt cnt_data;
-+
-+static const struct cnt_op cnt_ops[] = {
-+	/* Fresh connections report no counter */
-+	{ 0, CNT_READ, 0x000e, 0 },
-+	{ 1, CNT_READ, 0x000e, 0 },
-+	{ 0, CNT_READ, 0x0011, 0 },
-+	{ 1, CNT_READ, 0x0011, 0 },
-+	/* Connection 0 selects On-demand and two procedures complete on it,
-+	 * the second one overwriting the first.
-+	 */
-+	{ 0, CNT_WRITE, 0x0009, 0x0001 },
-+	{ 0, CNT_INJECT },
-+	/* Only connection 0 sees the counters */
-+	{ 0, CNT_READ, 0x000e, 2 },
-+	{ 1, CNT_READ, 0x000e, 0 },
-+	{ 0, CNT_READ, 0x0011, 1 },
-+	{ 1, CNT_READ, 0x0011, 0 },
-+};
-+
-+static void cnt_teardown(const void *user_data)
-+{
-+	struct test_data_cnt *data = (void *)user_data;
-+	int i;
-+
-+	for (i = 0; i < RAS_CONNS; i++) {
-+		bt_gatt_client_unref(data->client[i]);
-+		bt_gatt_server_unref(data->server[i]);
-+		bt_att_unref(data->satt[i]);
-+		bt_att_unref(data->catt[i]);
-+		gatt_db_unref(data->cdb[i]);
-+	}
-+
-+	gatt_db_unref(data->ras.db);
-+	bt_rap_unregister(data->ras.ras_id);
-+	queue_destroy(data->ras.ccc_states, free);
-+
-+	tester_teardown_complete();
-+}
-+
-+static void cnt_next(struct test_data_cnt *data);
-+
-+static void cnt_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+	const struct cnt_op *op = &cnt_ops[data->step];
-+
-+	g_assert(success);
-+	g_assert_cmpuint(length, ==, 2);
-+	g_assert_cmpuint(get_le16(value), ==, op->value);
-+
-+	data->step++;
-+	cnt_next(data);
-+}
-+
-+static void cnt_write_cb(bool success, uint8_t att_ecode, void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+
-+	g_assert(success);
-+
-+	data->step++;
-+	cnt_next(data);
-+}
-+
-+static void cnt_next(struct test_data_cnt *data)
-+{
-+	const struct cnt_op *op;
-+	uint8_t value[2];
-+	struct bt_rap *rap;
-+
-+	if (data->step == ARRAY_SIZE(cnt_ops)) {
-+		tester_test_passed();
-+		return;
-+	}
-+
-+	op = &cnt_ops[data->step];
-+
-+	switch (op->type) {
-+	case CNT_READ:
-+		g_assert(bt_gatt_client_read_value(data->client[op->conn],
-+					op->handle, cnt_read_cb, data, NULL));
-+		break;
-+	case CNT_WRITE:
-+		put_le16(op->value, value);
-+		g_assert(bt_gatt_client_write_value(data->client[op->conn],
-+					op->handle, value, sizeof(value),
-+					cnt_write_cb, data, NULL));
-+		break;
-+	case CNT_INJECT:
-+		rap = bt_rap_get_session(data->satt[op->conn], data->ras.db);
-+		g_assert(rap);
-+		inject_proc_enable(rap);
-+		inject_cs_result(rap, 0x0001);
-+		inject_cs_result(rap, 0x0002);
-+		data->step++;
-+		cnt_next(data);
-+		break;
-+	}
-+}
-+
-+static void cnt_client_ready_cb(bool success, uint8_t att_ecode,
-+							void *user_data)
-+{
-+	struct test_data_cnt *data = user_data;
-+
-+	g_assert(success);
-+
-+	if (++data->ready == RAS_CONNS)
-+		cnt_next(data);
-+}
-+
-+static void test_counters(const void *user_data)
-+{
-+	struct test_data_cnt *data = (void *)user_data;
-+	int i;
-+
-+	data->ras.db = gatt_db_new();
-+	g_assert(data->ras.db);
-+
-+	gatt_db_ccc_register(data->ras.db, gatt_ccc_read_cb, gatt_ccc_write_cb,
-+					gatt_notify_cb, &data->ras);
-+
-+	bt_rap_add_db(data->ras.db);
-+
-+	data->ras.ras_id = bt_rap_register(ras_attached, ras_detached,
-+								&data->ras);
-+	data->ras.ccc_states = queue_new();
-+
-+	for (i = 0; i < RAS_CONNS; i++) {
-+		int sv[2];
-+
-+		g_assert(socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0,
-+								sv) == 0);
-+
-+		data->satt[i] = bt_att_new(sv[0], false);
-+		data->catt[i] = bt_att_new(sv[1], false);
-+		g_assert(data->satt[i] && data->catt[i]);
-+
-+		bt_att_set_close_on_unref(data->satt[i], true);
-+		bt_att_set_close_on_unref(data->catt[i], true);
-+		bt_att_set_security(data->satt[i], BT_ATT_SECURITY_MEDIUM);
-+
-+		data->server[i] = bt_gatt_server_new(data->ras.db,
-+						data->satt[i], 64, 0);
-+		g_assert(data->server[i]);
-+
-+		data->cdb[i] = gatt_db_new();
-+		data->client[i] = bt_gatt_client_new(data->cdb[i],
-+						data->catt[i], 64, 0);
-+		g_assert(data->client[i]);
-+
-+		bt_gatt_client_ready_register(data->client[i],
-+				cnt_client_ready_cb, data, NULL);
-+	}
-+
-+	/* Notifications go out through the first connection */
-+	data->ras.server = data->server[0];
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -1080,5 +1468,38 @@ int main(int argc, char *argv[])
- 			test_setup_rap, test_client_rap,
- 			&cfg_cggit_discovery, RAP_CL_CGGIT_CHA_BV_06_C);
+ /*
+  * RAS Ranging Data Ready/Overwritten reads report the counters of the
+  * connection they are read on (RAS v1.0, 3.4 and 3.5).
+@@ -1497,6 +1629,43 @@ int main(int argc, char *argv[])
+ 			test_setup_rap, test_client_rap, &cfg_rap_ensure,
+ 			RAP_REQ_ORD_ROUND(0x01));
  
-+	/* RAP Requester Ranging Data subscriptions */
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [No subscription at attach]",
-+			test_setup_rap, test_client_rap, &cfg_rap_idle,
-+			RAP_REQ_RRD_NO_SUBSCRIBE);
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time Notification]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_notify,
-+			RAP_REQ_RRD_ROUND(0x01));
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time Indication]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_indicate,
-+			RAP_REQ_RRD_ROUND(0x02));
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Subscribe on start]",
-+			test_setup_rap, test_client_rap, &cfg_rap_ensure,
-+			RAP_REQ_RRD_ENSURE);
-+	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time timeout from "
-+				"Procedure Enable]",
-+			test_setup_rap, test_client_rap, &cfg_rap_rt_timeout,
++	define_test_rap("RAP/REQ/RRD/BV-01-C [Subscribe on start before "
++				"Features read]",
++			test_setup_rap, test_client_rap, &cfg_rap_early_ensure,
++			ATTACH_FEATURES_REALTIME, WRITE_CCCD(0x06, 0x01));
++	define_test_rap("RAP/REQ/RRD/BV-01-C [Disabled mode kept on start]",
++			test_setup_rap, test_client_rap, &cfg_rap_disabled,
++			ATTACH_FEATURES_REALTIME);
++	define_test_rap("RAP/REQ/RRD/BV-01-C [Selected mode resubscribed]",
++			test_setup_rap, test_client_rap, &cfg_rap_resubscribe,
++			ATTACH_FEATURES_REALTIME, WRITE_CCCD(0x06, 0x02),
++			WRITE_CCCD(0x06, 0x00), WRITE_CCCD(0x06, 0x02));
++	define_test_rap("RAP/REQ/ORD/BV-01-C [Failed selection not kept]",
++			test_setup_rap, test_client_rap, &cfg_rap_failed_sel,
++			RAP_REQ_ORD_ROUND(0x01));
++	define_test_rap("RAP/REQ/ORD/BV-01-C [Retry rejected registration]",
++			test_setup_rap, test_client_rap, &cfg_rap_od_retry,
++			ATTACH_FEATURES_ONDEMAND,
++			WRITE_CCCD(0x09, 0x01),
++			IOV_DATA(0x12, 0x0c, 0x00, 0x02, 0x00),
++			IOV_DATA(0x01, 0x12, 0x0c, 0x00, 0x03),
++			WRITE_CCCD(0x0f, 0x02), WRITE_CCCD(0x12, 0x02),
++			IOV_DATA(0x0a, 0x0e, 0x00),
++			IOV_DATA(0x0b, 0x00, 0x00),
++			WRITE_CCCD(0x0c, 0x00), WRITE_CCCD(0x0c, 0x02));
++	define_test_rap("RAP/REQ/RRD/BV-01-C [Retry after rejected CCCD]",
++			test_setup_rap, test_client_rap, &cfg_rap_retry,
++			ATTACH_FEATURES_REALTIME,
++			IOV_DATA(0x12, 0x06, 0x00, 0x01, 0x00),
++			IOV_DATA(0x01, 0x12, 0x06, 0x00, 0x03),
++			WRITE_CCCD(0x06, 0x00),
++			WRITE_CCCD(0x06, 0x01));
++	define_test_rap("RAP/REQ/RRD/BV-01-C [Real-time timeout when enabled "
++				"mid-procedure]",
++			test_setup_rap, test_client_rap, &cfg_rap_rt_midproc,
 +			ATTACH_FEATURES_REALTIME, WRITE_CCCD(0x06, 0x01),
 +			WRITE_CCCD(0x06, 0x00));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [On-demand Notification]",
-+			test_setup_rap, test_client_rap, &cfg_rap_od_notify,
-+			RAP_REQ_ORD_ROUND(0x01));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [On-demand Indication]",
-+			test_setup_rap, test_client_rap, &cfg_rap_od_indicate,
-+			RAP_REQ_ORD_ROUND(0x02));
-+	define_test_rap("RAP/REQ/ORD/BV-01-C [Subscribe on start without "
-+				"Real-time support]",
-+			test_setup_rap, test_client_rap, &cfg_rap_ensure,
-+			RAP_REQ_ORD_ROUND(0x01));
 +
-+	/* RAS Ranging Counters are per connection */
-+	tester_add("RAS/SR/RCO/Ranging Counters per connection", &cnt_data,
-+			NULL, test_counters, cnt_teardown);
-+
- 	return tester_run();
- }
+ 	/* RAS Ranging Counters are per connection */
+ 	tester_add("RAS/SR/RCO/Ranging Counters per connection", &cnt_data,
+ 			NULL, test_counters, cnt_teardown);
 -- 
 2.56.0
 
