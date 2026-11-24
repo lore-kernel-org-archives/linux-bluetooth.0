@@ -1,89 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795527601;
-	b=kN4nfm0nvv/6OOg4vTHgn8jvwfCzlwBgSRgorlCqUVNx8EMDs/5hD3MiRAq5dk+ilNwM
-	 PRcU10qnqlu/i47ZCcISImLvYcc9IoTaXwE5OQL7ndT/z47y4tJLRgvnfb9ipofHaWpv+
-	 RHpVZzhzjtchh56rMapjFVAmmdQ2VpSDjHXW2A9TOD7FgfWioZbBemkjS3mqFc0hCrIgu
-	 iYuZvvTjxNKfiGlk9GHPt3yUK3+A/sf43gQHnYlSHI3d1y1fJ1Qo1dZdBEfgYo2jmpvtg
-	 6U1kfDtt0EFAP3Uu5py6Bo7h8VSUJCD0DZZ04hHfRyBmeBCwE9gEFvxWnYz9PWwSr4g==
+	t=1795528290;
+	b=Fj9yvC9NLM9lnwB2Ga5JdU6La3El+93CHuHcDaDAsqR5NNRf76fFu6DgGWQ9Os62UPQZ
+	 WzIOwSXLakYWZufnf4kzZTcqpYxTpDsbVArTFnQHai0Ur3x81UuMXUP6NSpDHiFYeQKmt
+	 GF+7w9dbw0W5R2efBAI/syLUUKyvfz/cJRYGjK8r0f7ocm1o8xC5sg5LUV0C1iFhP5xLf
+	 HA1DRqkq09QW7JZXmpBt4jh7gdLbr4FMx9ai3mT8jnwDKfg4wRHZZM1OiUnberTyiSil9
+	 Y4dS43j4V/279TzfLhLuhhGY617ddseycqE0KwZqMc/BCL6TZ5ffJOPaF+KGNacozJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795527601;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=EHuEUm5lurPlRo3c0vApVwcfsxVlYCchTM9Uw/PvieE=;
-	b=3F2nn79D6KlM1FLVcfilnyDs27gzBkGHQQ3bVbqHjSrs3AmhAcoSroqnkXfoh9Y1JVmf
-	 Of8e2hDe/XevbRF1j3oLS/tuhIUvR1zKzFSnIN3b9J+2vzcGFOIrzxy4Sn4oEko6LgQDI
-	 ZKt3/cj61dG3nZ9YcGoB/rGwE4iJFKy2eKYlx61VhuEHIjNmJqoIvs+y05WYGcOTA+EBa
-	 +wXYFq/o8vzY1/ijf/TXoCHAFF7YFKOgCBypkGJBNPerMiVTbNI2RtVkg/7bKRp2C4KeV
-	 RWhdL6SwLbYJdNAffQnsfO1WOoOBc+7Trfo0VP2Im5AFG7TLAQ3FKz4qU8KrWks1Xqw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795528290;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=C7mOKh6VwWM4fsC15U6YlO7+ABqxy4naltAuOZ9urGY=;
+	b=QEXN7/84ODCYc77vLldsy2o6Jtc63ZvEuk6sz2F86C4FuzqK0Tggbv90kImO0nmxVVwU
+	 QVcLUaAmDfx9PIGpTFIvXbuZqqJTLdDtlIKVjnvSIRwiDc1XajM5QSi2v1qA8lkFjCum2
+	 pBCZetF65FPA3lvFBlsO1aVytxOhSpf3v67O5a+wzgg/TMnSFPWQcaw75C7fJPgmOOOqC
+	 8s+23GHSagtV3ocPlILCqCMcRHmMcFLg1Z7jLaq/2hYM1ikqroiFz/7iH2zCqtdZ0bAr1
+	 MFFQMs0tnGkj9lc5QGcTm5LrnOApXiJTLIBmt9ijB+uCNeH8qqQ6OMOBCl65z62rj6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=streamunlimited.com;
-	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=KYyEUthe;
-	arc=none smtp.remote-ip=209.85.128.44
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=proton.me;
+	spf=pass smtp.mailfrom=proton.me;
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=q2FdlheG;
+	arc=none smtp.remote-ip=185.70.43.22
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA399606A321
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 13:40:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CA399606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22E5606A321
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 13:51:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A22E5606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=KYyEUthe
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb9d8e8e90so16470915e9.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795527599; x=1796132399; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EHuEUm5lurPlRo3c0vApVwcfsxVlYCchTM9Uw/PvieE=;
-        b=KYyEUthebZO8OBTr9K7LyeFcIVEz4S3pVwW/sT4zCwznE8UZJ0AcoHi+Qriw3bj2Ex
-         0nRkFKLTRIAgidI6FDFlLEz/ZlCZorMvBKir4Xf9SmbCeWPp00jLeLxWOXuetgCxPCpW
-         Ss9SkIdQsDCHMpErmqXoS+Ojj3OCTILomtgI4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795527599; x=1796132399;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EHuEUm5lurPlRo3c0vApVwcfsxVlYCchTM9Uw/PvieE=;
-        b=vOltoqrYQqxsd37mAYXJ2PsOj7aW9jgud1ixBQNH5+d4mHbOwbDaFG6/s1FV5+PrmD
-         7QY2VoIYTm45IwP84GTydswOu4bqDpgiG0S3syrxgnktUYQhITM0G2uMbqywicvxy2aQ
-         nIK48UKzjb0+8/SmssCoRjPhGjho/qHouwxsTkTbsGPZIIVC8hBACh6TpfczENBeVfyn
-         dlEezR5+UcuY1K3BSzxcGrKbXGse8TxSA1K4PPwLrltVNL36yPvJf0u3AKHih+/5EGVM
-         WiwVxgoTZ3C2jplKCKImWRPLRWGELy+OZ4gAos5DCKmxG2lAhjTS9EeU3GCuDUY50hPm
-         vflg==
-X-Gm-Message-State: APuU4Z9Ot9EJEsCC6lbxORUfak55+9pjQBvxDuh1hj8sRcPkXzXnnE1B
-	sTrKMiRixFipq9RBXCSLgWaNnhC1H4ia9cQ0QviV+9jFZU8EpWlSEtce8AC/eSJluxgJfXYfpAW
-	isDHq
-X-Gm-Gg: AZFdTZekHbRN+3655EPd1bApV1G9YQaDX02LNzPFAAyB1KMt854pxGtC8FhwLU84C2i
-	/CY41zMaqNL9CBA7vV8qKoZlQ65Oscc9dmijC6DruU6JFV84hydAGjH4k8srE99iGrp8+bjVXOJ
-	rFfs4eFmVa/E7OmNylALcrCL2xUGe2E9UO8HqruUEmRkS3ha5yjQgY0uiWke9YR8BeNGcWojo9k
-	t0wP5OCZkpmY4tCI0fD8+Y8r9PTMSw4c2MCXT4oJRL1tayxuNIS7Hl5prqmho9bKPi27DTVMO9W
-	K2qBE6cxyh2xGCNB6TWgwqGUcSSX0wcf9qT5QRKP26dicLOej03baEZChUlusp2I07T2VDNF4Eo
-	WMnwh5cx8WikTCVkviDxFXEcfcnps9KyL2riXcPV+XTDXEjXzaxtzr2xG1f92I9atpvLF9h4CNn
-	QUujzFBcZof3ljZ2Xb0t20b1IzSZVeTiWRXO8dm1t5J+DPnmIIN/+wzr3D/kWbmRN9iMcX74tUZ
-	oeuR/W/pZWZINDsOL4rcL/56R+KSvCVE7bPxo87c+nXQY1ETh5hMPEdZWseS+mqj5A3atF/EiQV
-	fXA5cDl2KVSTcZKNVgEVn+oRLnltSnElmf+h9AFdoUhzS+MULJk=
-X-Received: by 2002:a05:600c:4584:b0:4bb:5de1:e90f with SMTP id 5b1f17b1804b1-4bb88819bcdmr293324535e9.31.1795527599235;
-        Tue, 24 Nov 2026 05:39:59 -0800 (PST)
-Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8538b3a7sm491626385e9.3.2026.11.24.05.39.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 05:39:59 -0800 (PST)
-From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=q2FdlheG
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1795528286; x=1795787486;
+	bh=C7mOKh6VwWM4fsC15U6YlO7+ABqxy4naltAuOZ9urGY=;
+	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=q2FdlheGMwoXXRPiW/nI6/MY50hEToN7lJgthqWb0atWD7npB8o/9I+y0VHK72ZTG
+	 T3cHqkc5aety7rKkWkVpKyHGw9vRA8KGJYRpsEeIpky43yw4lI/FAusV/77IM6ICNd
+	 ODdnbiChFXjDiIhQP6vy5FGl5/nellVPaY8Fs5EM9unYWvpWpPAsEWOklsLA7cpHyW
+	 TixYjN6Ad7lnWxnKV26AFEvFb/3fRgkHas69KFMKSUPyHVUBIGg6myR/7Ik7KymneV
+	 4oDZa+WkghI/fe5QgFnHNW2cm2tUzpA7SK7yijDkpJ+hQuq+1yKAnTvVbnZzdNZCbb
+	 PA50u6TewtTWw==
+Date: Tue, 24 Nov 2026 13:51:22 +0000
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 2/2] avrcp: Check what the remote uses instead of its AVRCP version
-Date: Tue, 24 Nov 2026 14:39:54 +0100
-Message-ID: <20261124133954.4009535-2-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
-References: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
+From: Kyle Pepper <cochcoder@proton.me>
+Subject: [RFC PATCH BlueZ v4] l2cap-tester: Check compatible interval preferences
+Message-ID: <e9181806a0382a9ed0312caaf39048c222476fc3.1795528108.git.cochcoder@proton.me>
+In-Reply-To: <ee66ad17c264d1db6b42eb97d359f134817c6750.1795497229.git.cochcoder@proton.me>
+References: <20261031181244.123461-1-cochcoder@proton.me> <20261031193734.189558-1-cochcoder@proton.me> <ee66ad17c264d1db6b42eb97d359f134817c6750.1795497229.git.cochcoder@proton.me>
+Feedback-ID: 97716137:user:proton
+X-Pm-Message-ID: b239382b770b0d38a2fbf752ec1359d4f2512eae
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -93,114 +63,286 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The version in the remote's SDP record does not tell which commands
-it uses. Android phones such as the Nexus 6P show AVRCP 1.3 in their
-controller record but set the absolute volume and register for
-EVENT_VOLUME_CHANGED, and the Huawei Nova 7 registers for it without
-a controller record that passes avrcp_volume_supported(). Both lose
-absolute volume control.
+Load local connection preferences and check the peer's L2CAP response
+and the resulting HCI Connection Update parameters. Cover overlapping
+and disjoint ranges, containment, a shared endpoint, and preservation
+of peer latency and timeout.
 
-Accept SetAbsoluteVolume and notify EVENT_VOLUME_CHANGED whenever the
-remote uses them: the registration already tells whether to notify.
-Ask any remote for its capabilities and register the events it
-reports, connect browsing on the feature bit alone, and drop the
-version checks before SetAddressedPlayer and player settings, which
-exist only for players and settings the remote reported. Sending
-SetAbsoluteVolume still requires category 2 when VolumeCategory is set.
-
-Assisted-by: Claude:claude-opus-5-5
+Assisted-by: OpenCode:gpt-6.1-sol
+Assisted-by: Codex:GPT-6
 ---
- profiles/audio/avrcp.c | 28 ++++------------------------
- 1 file changed, 4 insertions(+), 24 deletions(-)
+Previous version: https://lore.kernel.org/r/ee66ad17c264d1db6b42eb97d359f13=
+4817c6750.1795497229.git.cochcoder@proton.me
+CI report: https://github.com/bluez/bluez/pull/2892
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index f7c988ec0..b550c3b2a 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1740,10 +1740,10 @@ err:
- 	return AVC_CTYPE_REJECTED;
+Changes since v3:
+- Wrap three lines to satisfy the 80-column CI check. No behavior change.
+
+Overlap cases require the companion Linux preference policy:
+https://lore.kernel.org/r/b6847b841127362e423b49f9e48118f97985865d.17954972=
+29.git.cochcoder@proton.me
+
+Validation: whitespace-only comparison against v3 and source checkpatch
+with --max-line-length=3D80. V3 remote CI passed all eight other jobs.
+Fresh native interval/controller execution remains unavailable locally.
+
+ tools/l2cap-tester.c | 214 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 214 insertions(+)
+
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 4d2c5cd..a17c67d 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -59,6 +59,7 @@ struct test_data {
+ =09int step;
+ =09struct queue *io_channels;
+ =09struct tx_tstamp_data tx_ts;
++=09unsigned int interval_events;
+ };
+=20
+ struct l2cap_conn_subrate {
+@@ -154,6 +155,7 @@ struct l2cap_data {
+=20
+ =09/* Change security level to this after connecting */
+ =09int change_sec_level;
++=09const struct interval_test *interval;
+ };
+=20
+ static void print_debug(const char *str, void *user_data)
+@@ -4428,6 +4430,194 @@ done:
+ =09close(sk);
  }
- 
--/* SetAbsoluteVolume requires at least version 1.4 and a category-2 */
-+/* SetAbsoluteVolume requires a category-2 */
- static bool avrcp_volume_supported(struct avrcp_data *data)
+=20
++enum interval_event {
++=09INTERVAL_EVENT_UPDATE =3D 0x01,
++=09INTERVAL_EVENT_RESPONSE =3D 0x02,
++};
++
++struct interval_test {
++=09uint16_t local_min;
++=09uint16_t local_max;
++=09uint16_t peer_min;
++=09uint16_t peer_max;
++=09uint16_t expect_min;
++=09uint16_t expect_max;
++=09uint16_t peer_latency;
++=09uint16_t peer_timeout;
++};
++
++/* Local, peer and selected ranges (1.25 ms), peer latency, timeout (10 ms=
+). */
++static const struct interval_test interval_cases[] =3D {
++=09{ 16, 16, 16, 24, 16, 16, 0, 600 },
++=09{ 24, 40, 6, 6, 6, 6, 0, 600 },
++=09{ 16, 24, 80, 160, 80, 160, 0, 600 },
++=09{ 16, 16, 16, 16, 16, 16, 0, 600 },
++=09{ 16, 32, 8, 24, 16, 24, 0, 600 },
++=09{ 8, 24, 16, 32, 16, 24, 0, 600 },
++=09{ 16, 24, 8, 32, 16, 24, 0, 600 },
++=09{ 8, 32, 16, 24, 16, 24, 0, 600 },
++=09{ 16, 24, 24, 32, 24, 24, 0, 600 },
++=09{ 16, 16, 16, 24, 16, 16, 4, 200 },
++};
++
++static const struct l2cap_data interval_data[] =3D {
++=09{ .interval =3D &interval_cases[0] },
++=09{ .interval =3D &interval_cases[1] },
++=09{ .interval =3D &interval_cases[2] },
++=09{ .interval =3D &interval_cases[3] },
++=09{ .interval =3D &interval_cases[4] },
++=09{ .interval =3D &interval_cases[5] },
++=09{ .interval =3D &interval_cases[6] },
++=09{ .interval =3D &interval_cases[7] },
++=09{ .interval =3D &interval_cases[8] },
++=09{ .interval =3D &interval_cases[9] },
++};
++
++static void interval_complete(struct test_data *data, enum interval_event =
+event)
++{
++=09data->interval_events |=3D event;
++
++=09if (data->interval_events =3D=3D (INTERVAL_EVENT_UPDATE |
++=09=09=09=09=09=09INTERVAL_EVENT_RESPONSE))
++=09=09tester_test_passed();
++}
++
++static void interval_command(uint16_t opcode, const void *param, uint8_t l=
+en,
++=09=09=09=09=09=09=09void *user_data)
++{
++=09struct test_data *data =3D user_data;
++=09const struct l2cap_data *l2data =3D data->test_data;
++=09const struct interval_test *test =3D l2data->interval;
++=09const struct bt_hci_cmd_le_conn_update *cp =3D param;
++
++=09if (opcode !=3D BT_HCI_CMD_LE_CONN_UPDATE)
++=09=09return;
++
++=09if (len !=3D sizeof(*cp)) {
++=09=09tester_warn("Invalid LE Connection Update length %u", len);
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09tester_print("LE update: interval %u-%u, latency %u, timeout %u",
++=09=09=09get_le16(&cp->min_interval),
++=09=09=09get_le16(&cp->max_interval),
++=09=09=09get_le16(&cp->latency), get_le16(&cp->supv_timeout));
++
++=09if (get_le16(&cp->min_interval) !=3D test->expect_min ||
++=09=09=09get_le16(&cp->max_interval) !=3D test->expect_max ||
++=09=09=09get_le16(&cp->latency) !=3D test->peer_latency ||
++=09=09=09get_le16(&cp->supv_timeout) !=3D test->peer_timeout) {
++=09=09tester_warn("Expected interval %u-%u, latency %u, timeout %u",
++=09=09=09=09test->expect_min, test->expect_max,
++=09=09=09=09test->peer_latency, test->peer_timeout);
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09interval_complete(data, INTERVAL_EVENT_UPDATE);
++}
++
++static void interval_response(uint8_t code, const void *param, uint16_t le=
+n,
++=09=09=09=09=09=09=09void *user_data)
++{
++=09struct test_data *data =3D user_data;
++=09const struct bt_l2cap_pdu_conn_param_rsp *rsp =3D param;
++
++=09if (code !=3D BT_L2CAP_PDU_CONN_PARAM_RSP || len !=3D sizeof(*rsp) ||
++=09=09=09=09=09=09get_le16(&rsp->result)) {
++=09=09tester_warn("Connection Parameter Update was not accepted");
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09interval_complete(data, INTERVAL_EVENT_RESPONSE);
++}
++
++static void interval_connected(uint16_t handle, void *user_data)
++{
++=09struct test_data *data =3D user_data;
++=09const struct l2cap_data *l2data =3D data->test_data;
++=09const struct interval_test *test =3D l2data->interval;
++=09struct bthost *host =3D hciemu_client_get_host(data->hciemu);
++=09struct bt_l2cap_pdu_conn_param_req req =3D {
++=09=09.min_interval =3D cpu_to_le16(test->peer_min),
++=09=09.max_interval =3D cpu_to_le16(test->peer_max),
++=09=09.latency =3D cpu_to_le16(test->peer_latency),
++=09=09.timeout =3D cpu_to_le16(test->peer_timeout),
++=09};
++
++=09if (!bthost_l2cap_req(host, handle, BT_L2CAP_PDU_CONN_PARAM_REQ,
++=09=09=09=09&req, sizeof(req), interval_response, data))
++=09=09tester_test_failed();
++}
++
++static void interval_loaded(uint8_t status, uint16_t len, const void *para=
+m,
++=09=09=09=09=09=09=09void *user_data)
++{
++=09struct test_data *data =3D user_data;
++=09struct bthost *host =3D hciemu_client_get_host(data->hciemu);
++=09struct tester_io *io;
++=09int sk;
++
++=09if (status) {
++=09=09tester_warn("Could not load connection preferences");
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09bthost_set_connect_cb(host, interval_connected, data);
++=09bthost_add_l2cap_server(host, 0x0080, NULL, NULL, NULL);
++
++=09if (!hciemu_add_central_post_command_hook(data->hciemu,
++=09=09=09=09=09=09interval_command, data)) {
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09sk =3D create_l2cap_sock(data, 0, 0, 0, BT_MODE_LE_FLOWCTL);
++
++=09if (sk < 0) {
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09if (connect_l2cap_sock(data, sk, 0x0080, 0) < 0) {
++=09=09close(sk);
++=09=09tester_test_failed();
++=09=09return;
++=09}
++
++=09io =3D tester_io_new(sk);
++=09tester_io_set_close_on_unref(io, true);
++=09data->io_channels =3D queue_new();
++=09queue_push_tail(data->io_channels, io);
++}
++
++static void test_interval_preferences(const void *test_data)
++{
++=09struct test_data *data =3D tester_get_data();
++=09const struct l2cap_data *l2data =3D data->test_data;
++=09const struct interval_test *test =3D l2data->interval;
++=09uint8_t buf[sizeof(struct mgmt_cp_load_conn_param) +
++=09=09=09=09=09=09sizeof(struct mgmt_conn_param)];
++=09struct mgmt_cp_load_conn_param *cp =3D (void *) buf;
++=09struct mgmt_conn_param *param =3D cp->params;
++
++=09memset(buf, 0, sizeof(buf));
++=09cp->param_count =3D cpu_to_le16(1);
++=09memcpy(&param->addr.bdaddr, hciemu_get_client_bdaddr(data->hciemu),
++=09=09=09=09=09=09sizeof(param->addr.bdaddr));
++=09param->addr.type =3D BDADDR_LE_PUBLIC;
++=09param->min_interval =3D cpu_to_le16(test->local_min);
++=09param->max_interval =3D cpu_to_le16(test->local_max);
++=09param->timeout =3D cpu_to_le16(600);
++
++=09if (!mgmt_send(data->mgmt, MGMT_OP_LOAD_CONN_PARAM, data->mgmt_index,
++=09=09=09=09sizeof(buf), buf, interval_loaded, data, NULL))
++=09=09tester_test_failed();
++}
++
+ static void test_l2cap_ethtool_get_ts_info(const void *test_data)
  {
--	if (!data || data->version < 0x0104)
-+	if (!data)
- 		return false;
- 
- 	if (btd_opts.avrcp.volume_category &&
-@@ -1763,11 +1763,6 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
- 	if (len != 1)
- 		goto err;
- 
--	if (!avrcp_volume_supported(session->target)) {
--		error("SetAbsoluteVolume not supported");
--		goto err;
--	}
--
- 	volume = pdu->params[0] = pdu->params[0] & 0x7F;
- 
- 	media_transport_set_a2dp_volume(session->dev, volume);
-@@ -3084,8 +3079,7 @@ static void avrcp_set_addressed_player(struct avrcp *session,
- static void set_addressed_player(struct avrcp *session,
- 					struct avrcp_player *player)
+ =09struct test_data *data =3D tester_get_data();
+@@ -4439,6 +4629,30 @@ int main(int argc, char *argv[])
  {
--	if (!player || !player->id || player->addressed ||
--				session->controller->version < 0x0104)
-+	if (!player || !player->id || player->addressed)
- 		return;
- 
- 	/* Set player as addressed */
-@@ -3137,9 +3131,6 @@ static bool ct_set_setting(struct media_player *mp, const char *key,
- 	if (session == NULL)
- 		return false;
- 
--	if (session->controller->version < 0x0103)
--		return false;
--
- 	set_ct_player(session, player);
- 
- 	attr = attr_to_val(key);
-@@ -4369,9 +4360,6 @@ static void target_init(struct avrcp *session)
- 		media_transport_set_a2dp_volume(session->dev, init_volume);
- 	}
- 
--	if (target->version < 0x0104)
--		return;
--
- 	/* Only check capabilities if controller is not supported */
- 	if (session->controller == NULL)
- 		avrcp_get_capabilities(session);
-@@ -4415,14 +4403,8 @@ static void controller_init(struct avrcp *session)
- 			return;
- 	}
- 
--	if (controller->version < 0x0103)
--		return;
--
- 	avrcp_get_capabilities(session);
- 
--	if (controller->version < 0x0104)
--		return;
--
- 	if (!(controller->features & AVRCP_FEATURE_BROWSING))
- 		return;
- 
-@@ -4837,10 +4819,8 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
- 		return -ENOTCONN;
- 
- 	if (notify) {
--		if (!avrcp_volume_supported(session->target)) {
--			error("EVENT_VOLUME_CHANGED not supported");
-+		if (!session->target)
- 			return -ENOTSUP;
--		}
- 		return avrcp_event(session, AVRCP_EVENT_VOLUME_CHANGED,
- 								&volume);
- 	}
--- 
-2.43.0
+ =09tester_init(&argc, &argv);
+=20
++=09test_l2cap_le("L2CAP Interval - Prefer overlap", &interval_data[0],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Fast HID fallback", &interval_data[1],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Slow idle fallback", &interval_data[2],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Exact match", &interval_data[3],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Lower overlap", &interval_data[4],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Upper overlap", &interval_data[5],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Local range contained",
++=09=09=09&interval_data[6], setup_powered_client,
++=09=09=09test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Peer range contained",
++=09=09=09&interval_data[7], setup_powered_client,
++=09=09=09test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Shared endpoint", &interval_data[8],
++=09=09=09setup_powered_client, test_interval_preferences);
++=09test_l2cap_le("L2CAP Interval - Preserve latency and timeout",
++=09=09=09&interval_data[9], setup_powered_client,
++=09=09=09test_interval_preferences);
++
+ =09test_l2cap_bredr("Basic L2CAP Socket - Success", NULL,
+ =09=09=09=09=09setup_powered_client, test_basic);
+ =09test_l2cap_bredr("Non-connected getpeername - Failure", NULL,
+
+base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 
