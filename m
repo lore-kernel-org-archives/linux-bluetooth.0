@@ -1,82 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795487015;
-	b=LOs6dRaHiESaA+fRox3zb3lnpyGZmfvzt0k5TzneSSidLbJ32CdtGBHZixO80ldNyy+c
-	 yAlmAzQNs1zR4EXS0rhhn5DplTEX+Qno+ltUhG8mKGd8+sRRKpkKlikLTfw+hSOfmqL8S
-	 xt7xrLdEeKGLK+eBEnSqIxu6MyayIiBtErhFe6X2WQCWoh+kKTEFDYNxlnoL8CiIEYBnt
-	 WnrOX9nX/ElKuXZm1e7JKy8QUKFyf8LOg0iZzJhnQ4JizKf44AyQkxzsolpd/WaUct+n/
-	 5ad7FvH8ks/ywb+4S6cj9B0dZW0cHUjDU3DlAU224cly5h3iNvYBQe6rrn0uhZFuJ4Q==
+	t=1795489048;
+	b=pKo8NinxmDnJFUl7MwUf5WWRPL44QVHgqdsJlLaImS5gnWonIObfkb/w7x+Id4SGcRPA
+	 yNZq9XDt+J+YVluGaU1fthJoUrBLMesH+lwuGVcgL+ca7PmOOt4wh9+tbsJTX+3i9JUP0
+	 HbgThxAD4iWJeTpE6Prh3l+83bhotnlinAOqEfqcrCk+PBPN5dt6jEpOIJ2qZQ7V9p98V
+	 A9ofdO5ARh19DgOUQtrtHopHBJpKkZ4nX1xeY4BSarHEdZyqRru7Mo7p95wDkRO9dHdnP
+	 m4Ccu1DAFasMDP5O4Palwp5QAm4Nz3LtMw5anF9NS2Zg+L1WYMLApGRsr07ix/Nz1rw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795487015;
-	h=DMARC-Filter:X-UUID:DKIM-Signature:X-CID-P-RULE:X-CID-O-INFO:
-	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:Received:
-	 Received:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
-	 Content-Type;
-	bh=P0xXakZdv0vwsCXEeKqDEArbRa7wMVxfx0H1jm89ElQ=;
-	b=uvVtNttF5oqsVqKv6MuojA1THWQJiIdfnosvpUFIIiG9l0RqdNq1mOqJimpyWvZaEMwh
-	 tvJygQi8GWZvDOqNwPdFxHaPHjYwpKpLHQpp8Fk6QpsVQ8zrtep/WfM+dfJ2soQUoXSAi
-	 RZL6Lbj7dmQvzFMcs0Y/V/nYyNBHRA1VodqmxWIC/8idJ0LmCdzO0JMAToSyUASUayPXV
-	 rL8hUBVcrv9yMUy/A+CWIIZuDzf1LsU/gzEnU4/WaEyhASCTiMQy/L4KGHBbcZ2xkTjWt
-	 LjRKRNz7vtvyHXKEwRUr3wbO9xDLGRl798SlFF+tPv1N4NgGsEIpmxvp+uDuj1lmKiw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795489048;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:
+	 X-Received:X-Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
+	b=O4+hCqIwo+ObjRJORa9cKisONpk+MVj/9OAGeMfwsGAb3GgjSF9nJAF950J3zZkYg03E
+	 tKJo+IHtKO3AGTCJ05K++81I/O8Un75dnSICBc2JEZ1SpWQ1+LW3aal03N+6eiaGJ0RjK
+	 bMZCw5fRTJOEKrWzMLELRcydwTGQ/KF0VCIwwyfcreSRuXVPQDrvYn/VTz4iBtSJ/NReZ
+	 uR2Hbhgj8K5nAKZjepl9Vuc4SC8HKcZWtln+4TxpYd0gpqpTDGQezFbxwDP53gah5cngl
+	 wIGa6G3H96pyVW/oZKE3ClRdcW1pvbK9WT1I757VzXgEriE9gyCCmGuJMmmRYt9ZPaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=mediatek.com;
-	spf=pass smtp.mailfrom=mediatek.com;
-	dkim=pass header.d=mediatek.com header.i=@mediatek.com header.a=rsa-sha256 header.s=dk header.b=Nya9iYFg;
-	arc=none smtp.remote-ip=60.244.123.138
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BcRaiItI;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b="cs/Xyd/X";
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80A4606A321;
-	Tue, 24 Nov 2026 02:23:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B80A4606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B125E606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B125E606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.a=rsa-sha256 header.s=dk header.b=Nya9iYFg
-X-UUID: 05516a92e7ae11f1b1788b6acf885367-20261124
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=P0xXakZdv0vwsCXEeKqDEArbRa7wMVxfx0H1jm89ElQ=;
-	b=Nya9iYFgjGqPP5bRvKamH4giYGWR9BFuhmSwlVIberVDNi2Lsl05Ekcg9C/h2jE+RYj+VwQsyUcR4Wq2vW+4JN0LN2s5pfdbuUvtJ5vaL+zV+vBHZSBRW8pGHXcogKI+iAv2fZcYePsiEy4Cm/T2QMUMMic1lNAEDDyymGeVro0=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.21,REQID:aeaf9b20-f37a-4379-ba20-e1de1ca6ebcd,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:b0318ac,CLOUDID:bedbacac-906b-4a61-9d37-76e40377bd21,B
-	ulkID:nil,BulkQuantity:0,SF:81|82|102|836|865|888|898,TC:-5,Content:0|15|5
-	0|99,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0
-	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 05516a92e7ae11f1b1788b6acf885367-20261124
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1241682080; Tue, 24 Nov 2026 10:23:22 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Tue, 24 Nov 2026 10:23:21 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.56 via Frontend Transport; Tue, 24 Nov 2026 10:23:21 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Hao Qin <hao.qin@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Will
- Lee <will-cy.Lee@mediatek.com>, SS Wu <ss.wu@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH] Bluetooth: btusb: Do not set BROKEN_ENHANCED_SETUP_SYNC_CONN for newer MediaTek chips
-Date: Tue, 24 Nov 2026 10:23:18 +0800
-Message-ID: <20261124022318.663787-2-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20261124022318.663787-1-chris.lu@mediatek.com>
-References: <20261124022318.663787-1-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BcRaiItI;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=cs/Xyd/X
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AO2k1fE3701099
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=; b=BcRaiItI0yZRC4oi
+	T2KXQ9lC5+m+M92JiEDTaOx0KAZXCJjs6tnSYuizq0275WZfU4FK8X5xCX+k7MWW
+	qk9beO4vunUKq0uWu9/DmoLJ7TZ1ANV1v4dHxQxk68D85t4oBkUKvD0AmMoSywky
+	BORpZyLxrWPbAaakTsKFq7Mfw0h5jQG0jRb+HtNtCZDwia5i/1fsAYk4J+B16+fT
+	xkR/U4AdzVFwWwoHJwFf++/Asu+GqzEgKoWXzWIS79VuW57KEBUYMeznPeU52GyL
+	8xpf77OlPCyXsUoG5NgUfHC1GxoMsevU+bBKVW2jbA39W59tc18VDgOwgPcZrked
+	bJj3XA==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j50ky0apk-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 02:57:26 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2f021f3a9ebso8177355ad.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Nov 2026 18:57:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795489046; x=1796093846; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
+        b=cs/Xyd/Xz83/srYM0qk2XczY+NQwDqCymddH+LhkNn4lOfzUZIH+WE375mZZB1bMr8
+         +uV+hRsyFh6xEmjB0J5lrXskfJsDDsedIdPy6shlTabFadVmrDlpYqDRJSE5hg3VWbat
+         Ytvm7lXzwIXKRpBtTylDN5nwiVIFZx5Y9XcISmgEi0/Kd43aFwfYJjiqdLBnOJeNgyPA
+         7FTk3u2UYffMLqk/Rth0GCwvMzyHt4xfdvL3NaZOXnXSdXyTz7MwBNp+vLe7hj9KxYwe
+         VF6lIh8UDvhO8p5lCK2yPjwFw11oikDPCaKInD0WlQBuU2wu8BEe47qg68Sh54reaC4M
+         tciw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795489046; x=1796093846;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Z2346qPlbqE+w6NK/kbd+5STGHT/xmU/Nmfs8PzX6I4=;
+        b=PN+Lgs8itY2b3wfO7raO0dkaPTpJw+fTQGOjatDpUlrNoFdsZ7n4/QfzRx8OLyA4dt
+         ja3N1vLNT0Owa6dOXDrYopwHtZafHJkxoMg7KGs/WrzT0WpI/z7XPEPHV0uprVl5U8xg
+         /oRRezbFnNC9BKEdeERX5l0OcoZxWPmID93Wnw1WvrSKzuU0sVgHYXWaBah1ZkzOHgBZ
+         nAagXjMISZDyWypIkAhM6TkM1SKEaGA7u7ry6ls1knOCKeswly0jeYrS5DPiY7FkCd3a
+         snFhVn6FT0z785DKx1VHau6DooM7FqNQgVfvBR48QP+EEetvBk57sdrChfpoxnek9ixm
+         KZ3A==
+X-Gm-Message-State: APuU4Z/0fq3+GhcKcnJ4SoUi4p+ERrgG9hHyegaRduyMmaYFzDjG86G3
+	Uf+ukYT1b7toV4e39Zwk23/vs9IjebdgXySs11iWP9VixkY8HO6hLT3Ms1kFXsG5mQP4Wvqf/vN
+	q/XsSpoRVQ//cCu2PKUwu1BWaRJ8eldhQrN6tSIAj3mDZ0XLNxYZFhVf5l5cFcRnHRTI697DV1J
+	ijDn4=
+X-Gm-Gg: AZFdTZfO917VQ2lm1FKMjXES8IEsNVMTuLaqjC+4vdZaSdzM6JqFO18Hy6YbqcPH9xM
+	9TJ5pIVbpZPAznf+YA+MYgbEwqqn0PAw31qeoLktBV+86r2PneGG92YJH2FAaX2xV37fTKDSPDY
+	aukgS9f50bKQoZkkgmWR7g+3oldp3AtjfaKuderqm9eOayVjay0Rxtf8caW0fltHn2yO5SVDNRP
+	48WYP9nHUba0gsP2GPQXyq3vrx5kAjWNLYjRj3CAjy7C2VnQho5jNhj2WBuBqfLOsUg0AU4t+xE
+	n2zsDYEfNLBFO6XiF0RC8CM64o0A9k1ePb9WhOq6POe6cz0gHIiM7zMwNvjp0mCtp7n2DqexASy
+	R3564IXPGFVzxSB69b4c12H41NMYuTc7Fftfb+unPTKt7pahGcBIimXemlgArXCQPHGG6EbAvXf
+	PthI48GLgb3V2WfsT5A+P6G20q81PNj/MgTjN8hE4=
+X-Received: by 2002:a17:902:d547:b0:2f0:33d8:f88d with SMTP id d9443c01a7336-2f03ee6fa4fmr213866905ad.0.1795489046040;
+        Mon, 23 Nov 2026 18:57:26 -0800 (PST)
+X-Received: by 2002:a17:902:d547:b0:2f0:33d8:f88d with SMTP id d9443c01a7336-2f03ee6fa4fmr213866605ad.0.1795489045545;
+        Mon, 23 Nov 2026 18:57:25 -0800 (PST)
+Received: from [10.249.21.191] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f1276c5sm65412885ad.67.2026.11.23.18.57.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Nov 2026 18:57:24 -0800 (PST)
+Message-ID: <eb42aa05-3065-446e-b257-b08477e04c6f@oss.qualcomm.com>
+Date: Tue, 24 Nov 2026 10:57:22 +0800
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -86,56 +115,85 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bluez 2/3] tools/test-runner: Support running on arm64
+ hosts
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Pauli Virtanen <pav@iki.fi>
+References: <20261122-tr_arm64-v1-0-4eccf35daeca@oss.qualcomm.com>
+ <20261122-tr_arm64-v1-2-4eccf35daeca@oss.qualcomm.com>
+ <edb6288e11cf9eab058cada5151c0c071587eb3e.camel@iki.fi>
+ <249d8212-f68a-4eee-b92c-efb339dd9de4@oss.qualcomm.com>
+ <CABBYNZ+-8kb2wA4fd5oYq=_hi9BSfFwie-RSpsZdVbCM57qCUQ@mail.gmail.com>
+Content-Language: en-US
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+In-Reply-To: <CABBYNZ+-8kb2wA4fd5oYq=_hi9BSfFwie-RSpsZdVbCM57qCUQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=Y+ptIReN c=1 sm=1 tr=0 ts=6b04fd16 cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
+ a=J5rNfPaM_tw-T4xYV3oA:9 a=QEXdDO2ut3YA:10 a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-GUID: a6cY7S1YcWcpismh8A1l-kXq1H2XNu1h
+X-Proofpoint-ORIG-GUID: a6cY7S1YcWcpismh8A1l-kXq1H2XNu1h
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI0MDAxMSBTYWx0ZWRfX5Av4BQN+wExS
+ poEUW8ughkZfqyx9QuDib+zsC/oaWW2pvutfLxZQeJI8KKQweDtsxP3ZbJTeTGdFyoF4iBv/Fo3
+ rbI1o75qUUNK/kMU3DjdmQXLx1aVVrk=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI0MDAxMSBTYWx0ZWRfXzj55cjaGxnmZ
+ 4ve+SKFG5V5pkk1r9ox9HTjRXvrwboDpB7kqblynaWhGtdJDWsIX5GzQrNh5qRFco6uyc05sXkp
+ 15ZXTZsYePMoOkikWINQlsk3PwxGuUvzh3HnEEqEpKduH6Uvzh5qm8AfMLk3cTHbemnpQbI7Feb
+ 2p07T+89Q2D/wn3vGLLzx5qb+99AgLJLEQfTWOjfThbLOKfov42oic0CSpLDKWI9xZVWkaSrhJJ
+ T+duqq6LwmefXd7iHA+ij7j3aHtXCmTe7QHlSHAlTWqjdzxEYqjaaIlj1mTTMt7oRg45HxQbGB9
+ ZsIa9DmjFfTvkN78D5qasxOPC/5Vg/amJ/pGWdaKNHPHn3AF8izFMKNaTCKlLCKuAxU3rRz6M3s
+ O750dFrdsWmen2+EIBOJLDvoN4xVjEax1Yv7b721M1ZstpYcz0tqZSDRbfD+/IwnX8xancWtLXc
+ 3LSO3ToqFlWg/Wle8vQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-24_01,2026-11-23_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 clxscore=1015 malwarescore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 impostorscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611240011
 
-HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN was set for every MediaTek
-controller, which makes the host fall back to HCI_OP_SETUP_SYNC_CONN
-for SCO connections. MT7921/MT7920 and the older MT7663/MT7668 need
-this fallback, but the chips released after MT7921 are expected to
-handle HCI_OP_ENHANCED_SETUP_SYNC_CONN properly. Note that the chip
-model number does not follow the release order.
+On 11/23/2026 10:45 PM, Luiz Augusto von Dentz wrote:
+>>> Should it actually determine whether to run qemu x86 vs aarch based on
+>>> what the kernel image is, and not the host system this is compiled for?
+>> I don't think so. Choosing at build time is correct and simpler than
+>> at runtime:
+>>
+>> 1) The guest shares the host rootfs and runs the host binaries, with
+>>  test-runner itself as init, so guest arch == host arch == the arch
+>>  test-runner is built for, namely, the build arch decides both the
+>>  host and guest arch.
+>>
+>> 2) Kernel images come in many formats (bzImage, vmlinux, Image,
+>>  Image.gz, ...), so detecting the arch at runtime would add more
+>>  logic than it is worth, while QEMU for a given arch already parses
+>>  its formats with -kernel.
+> I guess that is a fair point: the tools binaries would have to be
+> built for the same arch of the kernel image. However, that doesn't
+> rule out running test-runner on an x86 host while mounting the rootfs
+> with a cross compiled tools. I guess we shouldn't recommend that setup
 
-Set the quirk in btusb_mtk_setup() only when the chip ID read from the
-controller is 0x7663, 0x7668 or 0x7961, so the behavior of these chips
-is unchanged. MT7920 reports the same chip ID (0x7961) as MT7921, so it
-keeps the quirk as well.
+That doesn't work, e.g. on an x86 host:
+test-runner(x86) -q qemu-system-aarch64 -k arch/arm64/boot/Image -- /bin/bash(arm64)
+since test-runner(x86) can't run in the arm64 guest as the init
 
-For MT7922 and MT7925, verified that with the quirk removed the host
-uses HCI_OP_ENHANCED_SETUP_SYNC_CONN to set up SCO connections and no
-problem was observed. The chips released after them are not expected to
-need the quirk either.
+> since it's counterproductive and considerably slower to compile and
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
----
- drivers/bluetooth/btusb_main.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btusb_main.c b/drivers/bluetooth/btusb_main.c
-index 95398e2ca098..f0ced6e3192f 100644
---- a/drivers/bluetooth/btusb_main.c
-+++ b/drivers/bluetooth/btusb_main.c
-@@ -3205,6 +3205,12 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 		if (platform_is_ryzen() && is_direct_child_of_root_hub(data->udev))
- 			set_bit(BTUSB_WAKEUP_BROKEN, &data->flags);
- 		break;
-+	case 0x7663:
-+	case 0x7668:
-+	case 0x7961:
-+		/* SCO does not work with HCI_OP_ENHANCED_SETUP_SYNC_CONN */
-+		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
-+		break;
- 	}
+Agreed. Actually, test-runner requires:
+arch test-runner is built for == host arch == guest kernel arch
+and failing when this rule is violated is expected.
  
- 	return 0;
-@@ -4621,7 +4627,6 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->reset = btmtk_reset_sync;
- 		hdev->set_bdaddr = btmtk_set_bdaddr;
- 		hdev->send = btusb_send_frame_mtk;
--		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
- 		hci_set_quirk(hdev, HCI_QUIRK_NON_PERSISTENT_SETUP);
- 		data->recv_acl = btmtk_usb_recv_acl;
- 		data->recv_event = btmtk_recv_event;
--- 
-2.45.2
+> run. That said we could perhaps print an error if the user attempts to
+> pass a kernel image of a different arch; test-runner should probably
+> fail with a clear message stating that this is not supported.
+
+So, is it acceptable to illustrate this rule in the ARCHITECTURE
+section of doc/test-runner.rst instead of parsing the various guest
+kernel image formats to detect the arch and print an error?
+
+
 
