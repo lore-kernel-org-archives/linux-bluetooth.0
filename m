@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795540809;
-	b=SkN69vMfJGQ6imgWK7RGc/i2BqoZIxOQaAgmeSnAY/sH4CMNl0hcRF6qIqAZBI1lyGGc
-	 z43cfxjoSq2N/O9+7BoiYHwiT70gQ90jSAZZzCHuvgY0MnWIZClZmuZMR/4Mu39RQvQzz
-	 rzhHLeuVCoctVGPC4JF8RhENtYO4XV0xCPtYsq8v4ftbhxQNN8oySWwPTRsd/sUWcG7TP
-	 NSGYsPO2nr2aOuHDh5C3W9//EOeYOMs65CS3+yIYYCAA1YL2HXqc2P0AqnDyFHozTchM5
-	 aMf1d2TA+5FWXtiOAPk/CT1qcJGApKn+uQjW+ju+tha9IzDWHIA2E42VE6F9Kr1PJmg==
+	t=1795540811;
+	b=jtM9SJOLiU36gXkMxTkNQ+gIqGrNI+z6KCLwSs6IIp8whlZpWRp/Ua5hB8pMQWSBYhQ1
+	 yV1jHOEqudraF79jobHh0UXOsUS/AgrBltmNoFwvUcBr7BpTrJuhHM9vi9wWO+k4nB6y3
+	 jdFChRYAfGlBJj8t2FfRq/ArzRGdHEr0sCuxQRYqtCemSDwZ+i17HEbZrTdwB+p84h+eV
+	 GwTLxWTPZpbwla7s7H3TeWCTeftCWq0m6lrFUxuwJPKlIkR8j3Yb1feLyfkGLVwQosMIY
+	 gO7rzEjBDTeXGEMNsmItAX5dqjJI1jbYs5M3lRT9w7NtJEv8WT0ZtAfoGNUMdLqKdNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795540809;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795540811;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
 	 In-Reply-To:To:Cc;
-	bh=piyMwJR6rBW30kFd2H6lW70gdy5i6sNbjvYZVDM3H2s=;
-	b=Z9cnqlI+C0d3YFC0i7ygQm8Iwdf7ShjfGIV6o4TskLIq8DKJCKXmBSYMzKogMT3WbZMC
-	 PYu+auRd1V3Lz70QGun/ohitNZuPQ4Qt69aLYAVlwNJykx7txbVcG2geiqTwhOx0tvR01
-	 MbBnicpdprwMY8Y9mLSEJKx+p3dtBABTbZffiXDFSVrGdPzqfp3air8tSjpbVkQVepFd7
-	 rqHnWZgAliZmMqR0sBnzzYpNKEPQYZNAdvtkr+uJeOufp1j3i88TmU3986l2kIUzVgtAa
-	 1id5H+B8/N3uF671Fe51Ub/X7Z6sPqD3v0dUcXhANItVM4k6P10/JjL2pmv0PDJWiHA==
+	bh=71QyIFrv30XeX0Q1nPuS/OAonwDswRKIl5VAYgZCAtU=;
+	b=IX1PXUS17gLnIcfeAj/QH2bGHq5b2NvuOqIDs3Nw8SrV9WeswiQelF64d91W8us93UsL
+	 bgyLbPzE51MqeptOr0XHENAxh+loPvnCcJ3APjWYXEz9fmkswdP1OW2qAjm+OXK6viGqL
+	 iExC3PArO8r5dVNdcx3UAmlu8wm1/lFrKiZIpZoQiC+t5OZHl0lLbq3pW0xaihv6SXZRi
+	 qb15FTtD4cg9Dpc0ml7hg7p1yjhBt29Nhk3e2JoyWe+cilKcHPYiTx4YlMIOssTiyW9IG
+	 B9g3iCRLK16WUlqon2Yia38zjoiARvMH0NDnbpLPBu/L49VVGVuN8X0avCinAfe54eA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eaS5OaXU;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WJARhgTj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C552A606A327
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 17:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511F2606A321
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 17:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eaS5OaXU
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E0C1F000CA;
-	Tue, 24 Nov 2026 17:20:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WJARhgTj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C891F000C6;
+	Tue, 24 Nov 2026 17:20:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795540809;
-	bh=piyMwJR6rBW30kFd2H6lW70gdy5i6sNbjvYZVDM3H2s=;
+	s=k20260515; t=1795540810;
+	bh=71QyIFrv30XeX0Q1nPuS/OAonwDswRKIl5VAYgZCAtU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=eaS5OaXUsJY9iVZzntfaPTfuuGsoQPs/CGky+/du+6W9LJC/xNtizXczlotwSp62Y
-	 R+4L4nkwkScAkn67Lln3FmBpx98O0Yc50rKooccC0fZJSWbyU5Z5zk+xhQnE63xLjr
-	 eHQIL4Fm2Uvb0wl5ycrviMbI2G3uVk9r3ydHOLZTUDC3LwSEwVRKZ4q8slzkdp5mqp
-	 5mOxOwelrVDk/c+3wDOwQTXo7gEknBnHIqHqjC4cnW21euqBrIo95EPicm7RuXYCRO
-	 jQB9ADttODTkxoktQKawhg50O6pIWOpqghMB2yqTR+5NXRPc+SWF47frzade5PfxyO
-	 9nqvX/nwz3w5g==
+	b=WJARhgTj4EWRKx5w32zNSlZCURHGKI1czasix2cT/Ez9A4bSuJDaSU6injXTKlPhB
+	 GyAq2U4NAPR49n0Vd5O+/3xqDRKStM5SdFoO70mIMrwP6lDh/MhKih/e/YcXGTM6oL
+	 evESKpCOuxIFwm+Xwk+zlwFo3tO5bVzuIOwRtLp3zD1iL4C9qY2LgHJCia22x4TWaP
+	 Xgj3BpH2XdwVpKUvXbt5+owx5ui7e/pbuXlAJQ56lZuj9zX8I+S4ATIhMLagQZc8XC
+	 EoqF+mV+mTKNrh3ShP9MjCZIv4vhKt8eRPNYsw49Xp/302Pik0aq17aYoNGSYcj/fn
+	 VoYMIPtjxcovg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F163D3938FA7;
-	Tue, 24 Nov 2026 17:20:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7739E3938FA7;
+	Tue, 24 Nov 2026 17:20:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -54,40 +54,41 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: RFCOMM: serialize RFCOMM_CONNINFO
- dlc->session
- dereference
+Subject: Re: [PATCH] Bluetooth: hci_event: Don't keep the handle of a failed
+ PA
+ sync
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <179554080777.3669449.2938682800558673060.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Nov 2026 17:20:07 +0000
-References: <179550683515.38654.13328780695859519079@gmail.com>
-In-Reply-To: <179550683515.38654.13328780695859519079@gmail.com>
-To: Qican Ma <goonsomeway@gmail.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+ <179554080901.3669449.3906824046778217245.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Nov 2026 17:20:09 +0000
+References: <20261124150728.332222-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20261124150728.332222-1-simon.mikuda@streamunlimited.com>
+To: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, luiz.dentz@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 24 Nov 2026 15:53:55 +0800 you wrote:
-> rfcomm_sock_getsockopt_old() checks rfcomm_pi(sk)->dlc->session and then
-> dereferences dlc->session->sock->sk while holding only lock_sock(sk).
-> rfcomm_dlc_unlink() clears d->session and rfcomm_session_del() frees the
-> session under rfcomm_mutex without taking the socket lock, leaving a
-> check-then-dereference race against concurrent session teardown.
+On Tue, 24 Nov 2026 16:07:28 +0100 you wrote:
+> A failed LE Periodic Advertising Sync Established still stores its invalid
+> handle, and the controller gives the same value to the next sync. The
+> lookup by handle finds the failed connection first, so the PA reports of
+> the next broadcaster go to it and bluetoothd never lists that broadcaster
+> (btmon, shortened, on a 6.18.2 based vendor kernel):
 > 
-> Commit 46f8ffd0a1f1 ("Bluetooth: RFCOMM: fix NULL dereference of
-> dlc->session in RFCOMM_CONNINFO") added the NULL check for the
-> post-disconnect case on deferred-setup sockets, but did not serialize
-> the dereference against concurrent unlink and kfree().
+>     PA Sync Established: Connection Failed to be Established (0x3e)
+>         Sync handle: 0, Advertiser address: 50:1E:2D:00:42:2D
+>     PA Sync Established: Success
+>         Sync handle: 0, Advertiser address: 50:1E:2D:A1:5F:1C
+>     MGMT Device Connected: 50:1E:2D:00:42:2D
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: RFCOMM: serialize RFCOMM_CONNINFO dlc->session dereference
-    https://git.kernel.org/bluetooth/bluetooth-next/c/77bc0f253ff9
+  - Bluetooth: hci_event: Don't keep the handle of a failed PA sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3bd17f726f20
 
 You are awesome, thank you!
 -- 
