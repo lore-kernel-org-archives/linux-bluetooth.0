@@ -1,73 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.7
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795498769;
-	b=vO9At7W/qgaooGdPRAM8lp3E8tFfcT6lliQDYGAD84n4TxxQpz6IADgldVFp8L68kV7U
-	 TjaVvGGk6eu3LZ7omrTPRN6jwVMqFmwzjAPZuiGSHp1mMtDZzkoi49TCOzA29g4Cxk3nl
-	 4TolddNw7L7AX5d2RWDrB92l5+tq7vEkKYe7Y7unwWDmonOcQw3IZCKDy19sCn8esXiUY
-	 tOGqzrqYooNb9OnsVN4Z9EyXpK4Sh5zOGkwFpvgoXevuNNREbtMCBylLgfDpmeJC6dz0l
-	 zRvcPPbSnVhkQmJCgxlMEFSLLYjjUVtief2Px/BFt5M0FFsZWrF7e0DPPbvklDznQAA==
+	t=1795499868;
+	b=Wfy0xGvJuWCRABwdmjp/0ow09kNCLdgIaZEecHFdIa6T391VnjjUtVORvA3yNb0iwGVy
+	 3vn2Z+bUN5c5kumGgCl5bJCbOohBXYG+GG3892QP7s4CgRv+SK4dcy5ZPNOSL/a+AwtLD
+	 rD4PQLZsDQxQIS18EYzYle95wVnJx0x1GZeRh3gYZ7mGp46w6IG89Wirg7akOxgUeZUxy
+	 +fgyX7nJ3UveIxeVGEcLRd3Fj6KKWlG9JyEo6xNwcRvcLvD44VCLmg/yvMm+ZSJ+bLesS
+	 us93VvZXPaQhini9HFzhEKTriFMnabWsdDLvwKdksz2OKntJoU0sQjjWdYI2SoxJq3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795498769;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795499868;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=MPScnmKqU/n5MKA/g3TH54dB/wxLtTjScn4VpvD87cI=;
-	b=L5omQqeDu7iexeNyAV5pa5tmUgd9E1jm7/Z1QFb/HGiLbrlMqdjzpNb/okbntoMoR0q2
-	 jeawr3UB11aLUTjKlYSQ36Uk4Tf+KT574c8ImNP7Sb6GefC1rYWsBdPnXi7m2fmeDh5qQ
-	 LTal3pX019lu5OdlcddOESwcpwLnyvCxPTk87/L/eIPkKlr6pxoN3aHGi/9cXLWO7tOKf
-	 MaGEexF4JnHoN6k646y3S5Z3WXQuH1iRGj2UMSkTH5jKEGUTsXbBSHaaY3MWw3BMCkSjm
-	 TBzI07MCZOKWVb5LdyQOj09bQyioGu70JlArESrMvCpj8ZmTKDxD9YWY3v59+ozdYsA==
+	bh=YK+OudAIft/FOt4qO0o3cz28TC62bidm40aBh9hU5DU=;
+	b=0HD5lpGTqEG+a1lK5BXw0xUJKu9rgObXWFYDj5T1KTn3R5BCpTBjEyury9/FbyPZksTN
+	 4sSSY2AoGFE2lj+eGHgCFg1dclDZKtJ6gm3qNHWHyn0H+4zZhvlfEY/sEsjn62AUKKIP4
+	 s2nUTD3BguM2ys2V8nl2tbJJW0Yz4sjpzUuM9VeVngvRq7ddrJuMSXGtbj0XjXX5aOKCH
+	 RGVWwhR6bOv6lLxrTkWQJ6qSxuP06k5TvmuVKbrSrS2rOm+BsWGoQtZW6PZDQsGYeLLBm
+	 K9fyBkZnKI3QNm2MkwmVJaZehYKfnW62/SfwosOnm/HtZ9Ovh7WE/s6zsM5lL2FfwDw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=GU+nPnAk;
-	arc=none smtp.remote-ip=192.198.163.15
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=oHkEt1EW;
+	arc=none smtp.remote-ip=192.198.163.7
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D40606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:39:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3D40606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B38D606A321
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 05:57:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0B38D606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=GU+nPnAk
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=oHkEt1EW
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795498769; x=1827034769;
+  t=1795499867; x=1827035867;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=VaUa+4l2HnLU6DkFt5aQk9AAJbIQZ57em0yDM3SBj4s=;
-  b=GU+nPnAkWLDSmzuvjKY1/KAJCLKpQp5lj3K7SCqfBGGFBZRz+fKf4K9S
-   SXjNqDk7hrcfeNuDwIdAO+LBhlqOwQEeu1tLZfYqxgoeEJ6hmE4hpq1pu
-   dodNNBWFZnb3C9V/OZx5brrJHSs1MKk1Wd7wuWNKePmOqUCJglJuQkMB5
-   I1s1rpsnkp+WSNZh+9KB8wAse7ORNZwdi99HDl46nngbFjAdZvmSoAZj9
-   0nx2Lye/LzVHz8zuEuNC8u4ZR6jPPX8eIKJrPZDfBZqopSdeq45su17Zt
-   NcEqHXsIgrodQkp5aDNSuSl6BAmy3OCOAPAcmfJYk3e5NIBFXpYqPcy4T
-   w==;
-X-CSE-ConnectionGUID: d11REu3XQVWPWkI9OvqhFg==
-X-CSE-MsgGUID: KZfvpJVwT4aPlRNW5+IHmQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="4304258"
+  bh=xxG1TCxRdnfJrozI6friiGNZOXJpYq8rBZaq3ToVqus=;
+  b=oHkEt1EWluFtl30GkNwU0OuAf/E8JfzafwWe5ABDL1aIO1kNmSpRy669
+   KrlOy20muCbPHr3MVU1chl26snkIlKFe03rb0ao9Zkx+n8XFc+7Lu/ii2
+   LZir2O+fqQS0btY9K527ZJQ2/KTyIDVo6deNO9EtIYkcdyX+dPfZt5Up6
+   Pg0crWlmdvq60zYBIPn0n1Nitm/IWEHBp+r6CLl02FEbYa3Cmn+J69DZ5
+   2TUQHF/5w/Zc6ADoIYyn/X9JLITiw474etM7LZTk5Su09PayPQ8fT1DA9
+   1Wy+4YxH8hlXRmo88bz5XOixB+EWP2K1LzkTGP59mJe5daonx9bWNzM8m
+   g==;
+X-CSE-ConnectionGUID: gYuQR5QkQD+hd1rDwIDAPg==
+X-CSE-MsgGUID: 7k9GxXgWTHq7HHjVMaz2DA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11975"; a="4168225"
 X-IronPort-AV: E=Sophos;i="6.27,230,1787036400"; 
-   d="scan'208";a="4304258"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2026 21:39:28 -0800
-X-CSE-ConnectionGUID: lnFOM3nPSg+LAzWU3FGdHQ==
-X-CSE-MsgGUID: D2vvDaCRQ4SSKEuzdyyhsg==
+   d="scan'208";a="4168225"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2026 21:57:45 -0800
+X-CSE-ConnectionGUID: rjCq74mMSeWE+kmDIztSCg==
+X-CSE-MsgGUID: eC0NZDkrRO++pMCRcwZhBw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,230,1787036400"; 
-   d="scan'208";a="11683835"
+   d="scan'208";a="11857331"
 Received: from unknown (HELO WEBAPTLH152.iind.intel.com) ([10.66.226.239])
-  by fmviesa002.fm.intel.com with ESMTP; 23 Nov 2026 21:39:26 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 23 Nov 2026 21:57:43 -0800
 From: Catherine L <catherine.l@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: kiran.k@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	Catherine L <catherine.l@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel: Add UEFI BPMO support for PeP
-Date: Tue, 24 Nov 2026 11:08:12 +0530
-Message-ID: <20261124053812.249973-1-catherine.l@intel.com>
+Subject: [PATCH v4] Bluetooth: btintel: Add UEFI BPMO support for PeP
+Date: Tue, 24 Nov 2026 11:26:27 +0530
+Message-ID: <20261124055627.250718-1-catherine.l@intel.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -98,9 +98,11 @@ treated as an error, and the firmware keeps its default of no offset.
 
 The existing ACPI and UEFI BRDS/BSSS flows are unchanged.
 
-Fixes: 4bc12982b9b6 ("Bluetooth: btintel: Add UEFI standalone static SAR support")
 Signed-off-by: Catherine L <catherine.l@intel.com>
 ---
+Changes in v4:
+- addressed sashiko comments
+
 Changes in v3:
 - Added Fixes tag
 
