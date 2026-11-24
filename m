@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795532967;
-	b=Z7W6emiM8/0MYVJqvDwlbckoHM77EIWjwPq/ulsSVmgEI36b8IkZSm4ySFv06pKAsI3s
-	 P9TsxL3XqstT+k4uxUI7pLZrhi4B2RDorYZ8DJN8cagyjVXu3HBZUuU5PzMLkyfp0bpWR
-	 OjRHqEzueUzI88cFZBiA0qtCOA9W7dy92wwQQ4QhrHnU+gAT2yLfl1mHidsOyaLzQh41J
-	 YyDJ9znCxIZ7iKSaY/jsOmqBsnoosu8ZP0P0Q8Xj/kkDqUzJEpHO+THfBriJD75KxDZMb
-	 Qktyv9uCQcjK7hi7l6BbtNgfP5TKbRVuTAesxbfLNDnKm67ZWXfNzukQP46AAAH4Dgg==
+	t=1795532968;
+	b=rvmC6HRLeFiDmwDr395upf7ZArQzgkSR0JE7q4x3MwGHWwoT5zqpC/7uMi9Lw2X1hv8E
+	 52xobhFtrThMcCaNhXpeBIiKRSOTAM7s4OoOdOqz8KrJcFLCtXMVRTbgLs0P0z2ZmnlwQ
+	 fNt51yDnGCIhiWQRViwkcYh0W+8gfdma8GNrKuGUmI0e8K4eng0n0kT6+2vk9p6gOMdeh
+	 g7n5eP2uCQMXryfChi8URmLQst8KvDbbK8UpjIPx17zSC+fvfoNyaD3wPxJ0EC7NQvZge
+	 ONXL3+L3Cde6+ihsLp2CA3ESplbQSZPJ4PbK4h4MSXAPifzDkLjth83zQx0gpYzOiWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795532967;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795532968;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Vz553u+CfN2PXIaiELBJwtaaXkJfPTrQARCazJ6ffLI=;
-	b=xPi58xFNzfwdH06r7G5IkwImc90SQo3HqptKG4ygTT0KBje6Xqci8e69TC/+5FOlP/NF
-	 95YjLwWMCgg6Bph68Xt7S0/arjAEeVSYjI8f1zDV6cHmjJ9qir6d094b9SH+jA1jMd/Xn
-	 kFB52YkwDB7ZRM7DqmGvSeE3xuzRfqWjJjGgyBCeCIH8tuY8X5J6K3VFhs6KFaaO531MF
-	 LgTsqdS/MryYf1g8TNeqaHJEvoYvCTnRhnQbo/cnFscevtVIKR9Scn5BYj1mw6WcM1tcO
-	 lj7ZYREkVUqoL9nTafNKulavAQylOthjUnBQR5cflkIMuJcgSIPZQG2Sh/mySRV2+Lg==
+	bh=lw7EwILrYM4gyPtbdBjKrm298UEcX0uSOl8gJaShjQw=;
+	b=Sp6XQwfxuj65By8YTFEm2IMwpQo8UOeBWP89JfDF1Trz+ookadRwFHhG46VKwEPMsquG
+	 m2qGmpT6PwlXKnjwVuuX0SIPADfdaBhAJiAHNOEzS8sF9LTdyvm68pR/47k3ZHYVB0pUc
+	 sVbrUn9ShoJGgrKAzo/E7SChQiblfQsWDlOCgsM4ozIiGTW1HIPlvfkrahvX1rnC9X4n1
+	 tg4rSTULHo4zznEAtpV131ESlLqO/G/YfB164dDX3SnK5ZBTnpHlmt2MB/YyU+N/VJAX1
+	 XQe3iu5QXPwQGUWDFMJgVw54J89n9JzyiK1C3jnkBpm3MT5TIXAuR/jZCEyNXjdQ9gA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Kl1Rf3Vc;
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=qz3LVCVy;
+	arc=none smtp.remote-ip=209.85.128.51
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87126606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EF6606A333
 	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 87126606A32D
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F3EF6606A333
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Kl1Rf3Vc
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49d05d51553so33788685e9.2
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=qz3LVCVy
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4ba013938d7so42582955e9.2
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:09:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=streamunlimited.com; s=google; t=1795532966; x=1796137766; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Vz553u+CfN2PXIaiELBJwtaaXkJfPTrQARCazJ6ffLI=;
-        b=Kl1Rf3VcDmDIa6cK2NoS+M+4zdLV/JtmhtQMoLtHc58Xb72FKWyH8urJYRb+YwVKWX
-         GnLSNQbZikxHy45Wu8U1BfOimQhc5KrtNy74qXo0BPjQGO7fG3NjRGHZxeRKgNN2d5Ox
-         Gmjl9qNCCzQme707W86mDhEbIc8W8D5aK8CZw=
+        bh=lw7EwILrYM4gyPtbdBjKrm298UEcX0uSOl8gJaShjQw=;
+        b=qz3LVCVynxnia2M8k7A/R9nRyiOGtjFy9kuevdsvY9C/1UqlSJ+Xk25hzAhNw80kTi
+         xU1+djMWVhLafwyeMsqQ69FWw9bxN1gKptkZlX6gIq5eOSd84kVOp7tUPwizoY93BCpf
+         6IvPm+LMV+F+UcAIJDm3+aKS8g2KjwMm4ymdU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795532966; x=1796137766;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vz553u+CfN2PXIaiELBJwtaaXkJfPTrQARCazJ6ffLI=;
-        b=b8/5faCTnikQoF8z5jm/BMpXuyv1je2DIcEJ7vEWOTDg/aAfyIGj9hAekpCDSy/swW
-         EW5GZvxE8+C5bhFxgCImiuEVPRGbGRN/fR+pL+KYslmZzN7w3U+GTRqOxOe5DJv/iKCe
-         o0nC45oPi6mZJGRacc975Zk5Rk9D62C1nxaHKen88nw7r3QSduMer2jVUdc38NMQKUk6
-         dQ+ByzUNhnwXlZ6Lx16XORdpQioB6cGW3WHV33FOU+/Tcx0dQ7IzqD2Os0VJSkWWmu8o
-         Lvd+56JdkI9KSZZBOAUdfCeKD0Wh52m4czUYF8ESd+4j8g81+Nb3O/alrkmA8EkPIKNT
-         ruRQ==
-X-Gm-Message-State: APuU4Z80f68eU0NCmQtD6h6xTyVgHVB3JYejNnID2tipg+VsCiwp73X9
-	AQSReCFdCBwIjv3TYzW9b5j3QurWA/obXxtR1FAhU4xgH/ekmgLdfKUUIebSyntEzBLEf9oH0pP
-	630I6
-X-Gm-Gg: AZFdTZcu1wL978OZ3vtML5UC8ym7iz1WDmFH3RTmpeL9YRc9JJkq9wpCWZ2Q9P3qJU8
-	BdYRK4GKQB85sbMVHVI9S0uCdTdOA83lFOBxLxV1oqsu+DV9U4yZgGKcH22hpHVhT+SOG4PUrrp
-	jZ+ax3/NUZATkhb8CSX4n4HWbqHSxdhnqpRzcmAQivSbJWJzJpxCvH6+NSDXZDcJaRHX7gmO0i5
-	iZ++w1RgnWjZ4mCsfMP+JxWngGWyE+sQ10ctrcFz90iT1VOinZWMd3d2ZO012aazU8S85ef0KoD
-	Js7jSgzWCeYP93gtxcngNLtZRINQn4mvbrs5kWN1aDMHm38hwg7FlzayYoLrgNDquJ12CPYg6AA
-	DPHhuhXnDcli81+GaSJJrV/gMLxVPd4v83ZDlbhgaLqp4O+ZiXzR2ltaa+xjTv/qiLtA7Uk95SR
-	yKapQUUlkIONlgVH/Emfnso2HofLDNC46vo5FN/MXN8JZTJ2clni0OKrlR0KpvYZoHq/Bd6zto4
-	Om5YmbIf2zowIG2W2sZFgTmnCnd+Iiv7IHNxl7p6+gmnjkSEUjgwl3ZsDDNDbJJ3a0ioWcZOyKu
-	XR28NcswflrXk9srsUmZnF8KyKEHl0ALGNdLfqJKcn3166pL8A==
-X-Received: by 2002:a05:600c:4f84:b0:4bb:5f3b:25a9 with SMTP id 5b1f17b1804b1-4bb88820f39mr287526565e9.30.1795532965895;
-        Tue, 24 Nov 2026 07:09:25 -0800 (PST)
+        bh=lw7EwILrYM4gyPtbdBjKrm298UEcX0uSOl8gJaShjQw=;
+        b=Nqj8X+oFYf3QwOESSp/R4dy+l+ywC1ZvMguDHqeyJP1VMBDLB2/bFgZYEgYDOQJLVw
+         CY4i1+NxLHwexq5O7LLFDmGVTGAefWAnzr5SZxEbj1jcHlwF3ylLguxydEpMLvgH2IEA
+         A1JmaKu8zNR+zFodbcYRxxbABCZvrfOPKSPcH0XvcWHelbGr20fSjwK+M+XrjD4PBcsI
+         G6Hte1wVWjZejCPm5uNmuqRtk3UjrsIJNMHVQi0c0/OGZ1GpAsi6TNBlw0Z/1cyAaSrs
+         BdXYf6GhgNjgoa7Tfq98yT7Da3qxyrvROvewFvcU2DKXWkqg2tmVWWgokDaSJB66vTcS
+         zM0w==
+X-Gm-Message-State: APuU4Z/9NGwFk46nFNmNZ1sBG4jpVQ50FF4o1Gg7oh2xtuHEpXDrbEAm
+	VEaJuR7oQO8Xs216gJXi2PR5FNhHYaYmXe/cH/M2li6Ztzhd1BELBm9TQ9fCaU2qFyCXU5Rr5Qq
+	trIDU
+X-Gm-Gg: AZFdTZcx58NYG1XtPy1w90ALlDFk/nqamMS7AnQrh6umfiLY+vP5yQecg2yvgWV5p1A
+	XKxhMn8tmY4BCq4EO+Dp1ks7FNvC/7cugEMux2a9BT758uMtHbaDPte05y+XlgmHQF5VqwLnuRp
+	P5HJKOtp7kWSqVAWFHFLHOmtbL26ShziT2F9XSNURdzZ8EVMphNosjMZUdmE9Ugw1VWUCwSKkwU
+	LaPbJg8Z8lL9xJ46aLE1GDZkZpbyDPSaTBavomQjZoOuFf1xtoh5Bn8Fl44MFt9NbEO9ELCOXxP
+	IQd+BpVEmQ1xAbGx9lWzl4p/TVZrHNiaTvjYjMaQ3DDVXrZJVDPowDRc1zDQ9qOeo87kKzCz358
+	MtMeIFhR8gktKE31L25X+7lXlaFE7nZWZbJ7jZfToI11hrcGlVaikn8t8QYeCnsdTrF6SxTwt81
+	VFupsBnm8l+JO0iz82wNvSh5mCeThNNMODFduDzKKnedRaEHCJfRt3yVnqFG1NLKZcVI1kywBr3
+	rFcQfgB16N6qrtfXsTFpH7v5ZHYgM7PmtpJOO61TTT7ZwZGyCKuvfwc97VbmrAt9PwE9NMj5sz2
+	Ooww0ZPjClt+rpVnB7yjiaDYM36+RXkBjWmRUl6jwAWxn7rZYA==
+X-Received: by 2002:a05:600c:638f:b0:4bb:7581:2bb9 with SMTP id 5b1f17b1804b1-4bb8892692dmr267158845e9.22.1795532966350;
+        Tue, 24 Nov 2026 07:09:26 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm402731955e9.8.2026.11.24.07.09.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 07:09:25 -0800 (PST)
+        Tue, 24 Nov 2026 07:09:26 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@gmail.com>
-Subject: [PATCH BlueZ v3 3/4] bap: Don't leak the io of a PA sync that failed
-Date: Tue, 24 Nov 2026 16:09:21 +0100
-Message-ID: <20261124150922.341655-3-simon.mikuda@streamunlimited.com>
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v3 4/4] bap: Close a pending PA or BIG sync when a sink session ends
+Date: Tue, 24 Nov 2026 16:09:22 +0100
+Message-ID: <20261124150922.341655-4-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124150922.341655-1-simon.mikuda@streamunlimited.com>
 References: <20261124150922.341655-1-simon.mikuda@streamunlimited.com>
@@ -95,41 +95,65 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Simon Mikuda <simon.mikuda@gmail.com>
+bap_bcast_disconnect() frees the broadcast sink setups, but listen_io
+stays open with a callback on one of them, and so does the watch of a
+PA sync waiting for BIGInfo, which is on the accepted channel rather
+than on listen_io. A PA or BIG sync that completes after the session
+ended crashes bluetoothd:
 
-The kernel reports a PA sync that times out twice.
-iso_pa_sync_confirm_cb() replaced data->io_id for the second io, so the
-watch of the first one stayed, holding the last reference of its io and
-keeping the failed sync in the kernel. Where PA syncs are BIS
-connections on BIG 0, a broadcast source on BIG 0 then fails to bind
-with EADDRINUSE until bluetoothd restarts.
+    #4  iso_do_big_sync (io=0xaaaad1ab3a30, user_data=0xaaaad1a87110)
+        at profiles/audio/bap.c:3689
+    #5  server_cb (io=0xaaaad1aabd30, cond=<optimized out>,
+        user_data=0xaaaad1ad1310) at btio/btio.c:285
 
-Remove the previous watch, which also closes its io.
+Remove the watch and close listen_io before freeing the setups, and
+release a PA sync kept for a stream to be enabled. iso_do_big_sync()
+now clears io_id, so later cleanup does not remove an expired source.
 
-Fixes: 2748c60a2c6b ("bap: Wait for BIG Info report event before creating streams")
+Fixes: feb4ee9dcd4b ("bap: Fix use-after-free in broadcast sink cleanup")
 Assisted-by: Claude:claude-opus-5-5
 ---
- profiles/audio/bap.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ profiles/audio/bap.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 98ef26997..9a456f45b 100644
+index 9a456f45b..eff621762 100644
 --- a/profiles/audio/bap.c
 +++ b/profiles/audio/bap.c
-@@ -1912,6 +1912,13 @@ static void iso_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
- 	 * encryption flag is also available.
- 	 */
- 	DBG("PA Sync done");
+@@ -3957,6 +3957,8 @@ static gboolean iso_do_big_sync(GIOChannel *io, GIOCondition cond,
+ 	struct bt_iso_qos qos;
+ 	struct queue *links = bt_bap_stream_io_get_links(setup->stream);
+ 
++	data->io_id = 0;
 +
-+	/* A failed PA sync is reported twice. Dropping the previous watch also
-+	 * closes its io, as the watch holds the last reference.
+ 	DBG("BIG info received, do BIG sync");
+ 
+ 	if (data->listen_io != io) {
+@@ -4294,6 +4296,24 @@ static int bap_bcast_disconnect(struct btd_service *service)
+ 		error("BAP service not handled by profile");
+ 		return -EINVAL;
+ 	}
++
++	/* A pending PA or BIG sync calls back with one of the setups freed
++	 * below, and a PA sync kept for them is of no use any more: close
++	 * both.
 +	 */
-+	if (data->io_id)
++	if (data->io_id) {
 +		g_source_remove(data->io_id);
++		data->io_id = 0;
++	}
 +
- 	data->io_id = g_io_add_watch(io, G_IO_OUT, big_info_report_cb,
- 								user_data);
- }
++	pa_sync_release(data);
++
++	if (data->listen_io) {
++		g_io_channel_shutdown(data->listen_io, TRUE, NULL);
++		g_io_channel_unref(data->listen_io);
++		data->listen_io = NULL;
++	}
++
+ 	/* Clean up broadcast sinks before detach (like unicast does) */
+ 	if (data->bcast_snks) {
+ 		bcast_snks = data->bcast_snks;
 -- 
 2.43.0
 
