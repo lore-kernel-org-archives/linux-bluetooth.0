@@ -1,86 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795532937;
-	b=3CC8gE9T5UgxJQuaQYfBZdtNCmJpCxgRChC1bS8IV3nFTpUBXql2Ycut4ODGcvUJn5b+
-	 219zPJrVzLeBk1ew3rcRc2Mw6vNGfnKvPShQYutZ0pAJyNO9g7eUP4osCltJ2YTslH9QG
-	 g17k3jx84mCiRpTfHaSDFODY62otDxjXPS5PRahcJa+SGN8tOkvdHZ1tOuUIJjqU4n8F+
-	 TdQPHChvpPvzWoZUYB2EUWi8UOczIL0W+4T/X9ulvZnRkvV1h/L2tad9bGTFwzr0p5I5s
-	 EQ2eRu8LbB0EeOkggZPi4vnH88SltbBNjTr0anxtnh+754i+Y591EVH7uzYvc15s4uA==
+	t=1795532966;
+	b=ycAtR9ImjzbMl1z49mRws6B+zQeBt28Y9ahnVvyhxVvLtKMxPqWjjjPGolutsd9bHyr2
+	 Rrw+uSgvUuTJpa5L9E1RQkFiTaDim4oNju8qNprfDe1flWzEWMY5MSO7fcoaaVQrnSk3Z
+	 /qBdtGzIBAXlHFcEZFp+YsYAFDmgONkIBuH5RU3ISmVx41+3nV/NxC40FifhznGWAu1ye
+	 wjY6kK3hg26O6SFRErOLgqqi7hUa+K3wrelI73gL+JuYs5mKCW4OVL+Sx/9gJnQFJ7eP2
+	 du5NpButmOHoh0NtV7wfdd+FOX2lHG8X57ZGXEMBsaCLFADJ343G7OR8yypjLwJxVKw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795532937;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795532966;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=UTQUNopQNxN73KX7HgdMNqkd8EzRM0ZOijqDqz0SQ3s=;
-	b=xzM9gGJnAEzF6iXkCZHyvQlxwb1H10sZhEc/dq8lzZS9JzSjuoWEt1qdfFttRK0MHCYd
-	 4TtSU7micA4U53zk06kbt3JnKUMvr+g96Y9R3R9UglMh0IZlxqdT1JdBROlvXg04YAOEv
-	 bUhNOYxeeRAMMPEy/CaGHWayyKn89o77d1Jq9bVNjNOgXUIsAOFztXmdYyc03gbgCdsfc
-	 hD4kmHFvQA68ngfPCxu2V5qY3ozJJOvyJgu8KTvwQEsDVMO1M+oG40RkBVgGxwo4Ii1A1
-	 xmGpVv0uDlzehwkmDylyF/opeIF/2xdqa8Ll/RlWA00PDgPILAibwOjOanGfevrWopg==
+	bh=zxUFzzFYFZNvnxi4DXRKgik+mg3Yx60AHtJYW4ezN1Q=;
+	b=vJmiE9b+GSlKH7w18f3C0BeT+m9sTkLr59eorR1qxPfUX9kD7gnl9AhUbdJdlrbcFU54
+	 zgFNJuJeWfKM2jXrEfv+X8h6/Z8sBfMXp+wRw6q/atbUqN1eA1ffY6iENUhpxibfKk4gz
+	 ik36fdZiX/R7N6P8/1/qAT9A692Nu6HySbP4yxJMtQajqlRb5dVi6v+2HixlfqUrwQ15m
+	 bG8boJOnKePlTgenAaR8FB795uWpXNJB+gkp6bN6TxjrtpLS7HIxbS8Uy8CP5fEMccppi
+	 Tl3ksDmFU0CtrcY1ZRcvKR+pO126XSPsEp4fHW1b9AKVpG1ImfYte6HNPQoIVQaKm7g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=g2vH9RoN;
-	arc=none smtp.remote-ip=209.85.128.45
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Fsaz4d4B;
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48700606A31E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:08:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48700606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F290606A31E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 15:09:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F290606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=g2vH9RoN
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4a2153c8525so37224205e9.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:08:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=Fsaz4d4B
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4bb69f5b161so30014135e9.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 07:09:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795532935; x=1796137735; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795532965; x=1796137765; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UTQUNopQNxN73KX7HgdMNqkd8EzRM0ZOijqDqz0SQ3s=;
-        b=g2vH9RoN3P+jsH5tDJZL30TEWJzmquT0KKzBa/wn6341BNfF6wVhZAikul04/10EhW
-         b4oRVbYISHa78Fnvs0Mum1MYJUUIn2SRaA2uN1xgoSzROP7Ye8B09jGV/MY74qFqy5xo
-         IxT7WEMaJ/11HVhohUlxlQwejUt3XCxzsKvG4=
+        bh=zxUFzzFYFZNvnxi4DXRKgik+mg3Yx60AHtJYW4ezN1Q=;
+        b=Fsaz4d4BAwQX751ztbwYRb+XCGZXZbKXgOxKAh6HfnEZsA0kyx+47n2P8VbCcCXY88
+         /YVnv8f/zjQYuloNzIMe0M3FIdcSYXzLGDo6jq4IhH9ZwpeIEYaXVCGuhWvhYycaGvLv
+         Rxt7BiCTKxs5daRxsINJyHE+rdyTTpcRkG0Xw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795532936; x=1796137736;
+        d=1e100.net; s=20260707; t=1795532965; x=1796137765;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=UTQUNopQNxN73KX7HgdMNqkd8EzRM0ZOijqDqz0SQ3s=;
-        b=LaqQ6BSvsuZJtfpFnnxbRyB0qWxeVPa23+/ceuNOBJYw8vlg7VawrTx4oVfKBpU+2V
-         jsfTuSzD28T/h16NGcRmhIVzW5m8u7KhR7sP+tu7Tv4IIElx7qxkgGFgVQH/Kd/vD3Ei
-         5eeKM62tVQShbiJEkKEyd9mrxSnoUvC3Ys3k9JoxymjmXZN5rmQZR2BMLHxNhK6KSfm8
-         9MWDXx8Z2QTcvYEvrCaA69RGq/2ilLYf9NctOF9j88OERFIVDxHKsc5TSne12abJzZMC
-         v/f9iUCi3aETySe/xeKFQuyM3gcaU/vkfoRfjSVEyKz8AIlZmXkubfgqVdLv1+Q3Ds7V
-         pbhQ==
-X-Gm-Message-State: APuU4Z/C/OwIjoCgrrJ4EUmW7RFu4QH0q1zvK1lshzt4apLdYnR1FNzW
-	q4n3Vc3qIx6e6zxzimAYCcdJE0+w+L8Y8H+ioCHFHPnyAwNOH04gfL03/PrOp2ktb6e+9WcXNtg
-	k7hD8
-X-Gm-Gg: AZFdTZfDoyxrl5GeisqJjW+YWcsRIGokeTME4skiZkgjQhHs7SeD7DcI7UZwOeS1G6Q
-	pDTg5nPDEA/np1bk2XH37Z0oj5k/iPpmECimCiM+CoMMWDzx6lWC9kun8M5+nVO+3Y34HOeqfWh
-	LZSaHQI8+WCpzDEQQoXUSGn04jWARYR9INp4WNZFuKdnN+HC3c4CrdgXw+KhvJthY7Zo9RaEI8n
-	GkesQASchVOMzfa+I0O1Yomp59IIYYAjjZpvmgqS9/8lTYwnX9ajeRYNFcAlL3t5sOMxMVJwTY5
-	TUw8dQLUx5aFuJM38lwTo3L87SaYFQkTxt/Uwhx4MhMgOv0c+H1cQkM6r8+slVdsioZOjXxFsz0
-	GbuXyNPg0qhOMjECpDPrxry9EB0pVtXuQhFZW7aUqwCgo7f49C1qvUkaHMjD1EvDp9nKqI87UrP
-	IQ6e209SrTTpLEHYkxBEGrkUjGUOy0MChaqvT/GE27F+0bQEJKrrC1atI9Bu0sWqRWaIJ291QSA
-	MlyRRcyRQ8lVGwWGag7LKH2C11/gXwbrjzSIKv988jBqnIONUWliO1yQuWAaKuKrGqs9ssPeMok
-	Sr5T11Jj6j8D0Gm/9I3bxwQh6xFuWF6vyUK9lpUkBBCbWxK5Ww==
-X-Received: by 2002:a05:600c:820d:b0:4bb:5de1:e923 with SMTP id 5b1f17b1804b1-4bb887c33f7mr297897235e9.4.1795532935639;
-        Tue, 24 Nov 2026 07:08:55 -0800 (PST)
+        bh=zxUFzzFYFZNvnxi4DXRKgik+mg3Yx60AHtJYW4ezN1Q=;
+        b=MioZlrkHISVNagLUfkuU9DBX5wDLdNPzUPr2kvh8akpmTV77WgzonNU59DrANqC99d
+         m0YSPLhDG/f2af4VvhIymbYi0tltuV0Z4cX7aG1suu66kw3Y5uqhm5kvj/fCF+XfUUIF
+         Szuvg+Jvchc1ut49z3keqLqAC9iMR7WnUKR1RgU3MdbB+REQRK8ElnP26r7lcDBxbysa
+         lqIT+pcT8H5i6JEnORqC0Y4nIt2QNhDM+iwjdfPSadF53GQg5QN22f9g15E4YbJMdTa9
+         5aViZD36dCpBbT1C5WbNtu4awaRtGG+SvHi4HCr8EHuEH+bRRlbDl4OGi9MkkBI6AZAm
+         tDHA==
+X-Gm-Message-State: APuU4Z/lLc2u266ASDMWZWOixfXLp+ye9vL3LxwbAQMCqV1f26FODAan
+	LI7cPIAC36T0iu3MPtVJtMIk4Ku16RE551/nsfkHYXE5j2mtnCP5EzTokZkBbUQ8nIU0L1F/cRP
+	nJmSe
+X-Gm-Gg: AZFdTZeM7/Nnxsf79stoTA8f1TtjSjmwj7jBNjA1pdJ8Kt3QdivuliNjuXZMvfV84Ar
+	7orFFJ/i8DWKP4ZQtVjYwcfGtydJemPLYzjihc4F5qY6sq9fXUPCjuyhLGY9bMAm31q2rW9YYSf
+	FAATcEEYvG8l2iFjbtMpwjk+pbDNzvU4tAIAjXpQrXxx1643acUtJpZ68HwfoSm2nMEvJCnWh4i
+	x5r1McU67AAUbCJxVA0qcTXQgj2GNZKuKcxV9eNCuOnSsF+ATFNsyt1doT4GcvYq/5iCJlSGHMJ
+	s+AXo7hafA1rJQUKlfJQApjCqm/dsXIxW8OePzW2ouIe7ZD9yTBpJBP4Dj/w1sGFa3qMpk4nHW2
+	s+el4VOzZHRj4Hf9YhUPLQiFtB5LCbsZJSAJVRpgDdbaq7OBG7uStChOPG+Bvcz9mdWK2IrsC++
+	PCR378eFvtNhgGniFgN1k3d9xrciTpwQ4yF2kOrNE7t5oMT4Ez5ByCPwUql5ozwjNBtUecHgFUb
+	Rvwve8Mhw7tu+br8kwQLKFhJPeqISM2c+N+iOiQhmCtGyE8YxGJ68r5W/jh1boxuM4w9yO7Afgk
+	sgioJcmay9EHWLLkilPBwS3gKPKHA7DjiiBIJz+JU+3jWDlxQA==
+X-Received: by 2002:a05:600c:46c4:b0:4bb:6a5a:7834 with SMTP id 5b1f17b1804b1-4bb888106damr312359755e9.20.1795532964992;
+        Tue, 24 Nov 2026 07:09:24 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:d476:8432:c5c5:dd98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884b7515sm606401275e9.13.2026.11.24.07.08.55
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8849e598sm402731955e9.8.2026.11.24.07.09.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 07:08:55 -0800 (PST)
+        Tue, 24 Nov 2026 07:09:24 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: hci_event: Terminate a PA sync nobody accepts
-Date: Tue, 24 Nov 2026 16:08:51 +0100
-Message-ID: <20261124150851.338673-1-simon.mikuda@streamunlimited.com>
+Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v3 1/4] shared/bap: Remove broadcast sink PACs in bt_bap_remove_pac()
+Date: Tue, 24 Nov 2026 16:09:19 +0100
+Message-ID: <20261124150922.341655-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -93,59 +91,43 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The accept mask of hci_le_pa_sync_established_evt() starts from
-hdev->link_mode, which has HCI_LM_ACCEPT set by default, so a PA sync no
-ISO socket accepted is never terminated. This happens when the listening
-socket closes while the sync is pending. Every later sync to that source
-then fails until it stops advertising:
+bt_bap_remove_pac() looked for the PAC in the sink, source and broadcast
+source lists only, so a broadcast sink PAC stayed in broadcast_sinks
+after its endpoint was freed. When the endpoint owner goes away, like
+WirePlumber restarting, the next BIGInfo matches the stale PAC and
+bluetoothd crashes:
 
-    < LE Periodic Advertising Create Sync  50:1E:2D:A1:5F:1C
-      (listening socket closed)
-    > LE Periodic Advertising Sync Established  Status: Success
-      (no LE Periodic Advertising Terminate Sync)
-    < LE Periodic Advertising Create Sync  50:1E:2D:A1:5F:1C
-    > Command Status  ACL Connection Already Exists (0x0b)
+  pac_bcast_config (endpoint=<freed>) at profiles/audio/media.c
+  pac_config () at profiles/audio/media.c
+  bap_bcast_config () at src/shared/bap.c
+  bt_bap_stream_config () at src/shared/bap.c
+  create_stream_for_bis () at profiles/audio/bap.c
+  bis_handler () at profiles/audio/bap.c
+  bt_bap_parse_base () at src/shared/bap.c
+  big_info_report_cb () at profiles/audio/bap.c
 
-Only ISO can accept a PA sync, so start from 0 and let
-hci_proto_connect_ind() decide. Terminate only an established sync. A
-failed sync has no handle, so the handle in its event means nothing and
-can be the handle of another sync. The NXP IW612 Bluetooth chip, for
-example, reports a cancelled create with handle 0.
-
-Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
+Fixes: d49ea14f70da ("shared/bap: Add support for BAP broadcast sink")
+Assisted-by: Claude:claude-opus-5-5
 ---
- net/bluetooth/hci_event.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ src/shared/bap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 610207e25fa4..2da77ebee12d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6814,7 +6814,7 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
- 					   struct sk_buff *skb)
- {
- 	struct hci_ev_le_pa_sync_established *ev = data;
--	int mask = hdev->link_mode;
-+	int mask = 0;
- 	__u8 flags = 0;
- 	struct hci_conn *pa_sync, *conn;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8fc28de52..9404bddba 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -4864,6 +4864,9 @@ bool bt_bap_remove_pac(struct bt_bap_pac *pac)
+ 	if (queue_remove_if(pac->bdb->broadcast_sources, NULL, pac))
+ 		goto found;
  
-@@ -6848,7 +6848,11 @@ static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
- 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, PA_LINK,
- 				      &flags);
- 	if (!(mask & HCI_LM_ACCEPT)) {
--		hci_le_pa_term_sync(hdev, ev->handle);
-+		/* A failed sync has no handle, the one in the event may be
-+		 * another sync's.
-+		 */
-+		if (!ev->status)
-+			hci_le_pa_term_sync(hdev, ev->handle);
- 		goto unlock;
- 	}
++	if (queue_remove_if(pac->bdb->broadcast_sinks, NULL, pac))
++		goto found;
++
+ 	return false;
  
+ found:
 
-base-commit: 62fd917f6d2df1a399a453138c2b7cbd563f8f95
+base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 -- 
 2.43.0
 
