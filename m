@@ -1,80 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795620148;
-	b=I202T+IeJ3zXNaxQN1Ks0WMPN8ia76U26hU3+3fGH5dGSaFGank6Oal1+gYDU8b/2ulG
-	 3AfwWQ0vIFrAPokvnnyZHKE0DlTTtvCBnNK1Y2N9dG3WX2/FCwOSUezDMKbpOF3syKnjg
-	 YxdJSdvjpK0HTpQaGnicZiVlRzqrAaLwWL4cQy+c1HfWKorvS76R7auQU2+5bbTwqmbQB
-	 ZmwwNZ89Z+XUwdqKF5ApF1UhSE56ryvjY0WPNT1t4c3D4o7XPzcjPOf03sd9DpcI22DaS
-	 Iee8r/5JRMgLtZ4zQvMaX9MdBF/kxBFnlYCKiE9G3ysGkWo5k9cMT31RlZ0us7rRhRA==
+	t=1795620155;
+	b=GBOBnqcorLTXCvdFlMx4dyNRE9+yqPouVjrAiAjpUKtvDGLzMO3E1VzkI0UJnmdBFJD4
+	 HqbpS0/m+jfgwZZF5opP5ynhy1qcVjdtApKtSQQ0nvTbYDuXOpncDAIofsY0FwnIwVUAI
+	 GQDFWPgNrCDslJyKECvmsve0qWn6a3pmSiMHaLhiTlUkpKQsY1ttueA2IGVQ/M/22Go9m
+	 76I0NLV/oUigrjdgfKWZsV1nDxVLv4tjkKHoXRKmbGhfK2iE65xk+x2rRRiGMIzjYdV0O
+	 QeEddTeb6Tgn0B3ELgxBIJs2ty1Rn0rvPz9fUbCb7dnvQQW3InfNtmVDJI/OFXrEvbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795620148;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795620155;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=ZOVH7GPrhhsO60hstl6R1o81Xncu0EyH/gOszIASMlQ=;
-	b=RDvtQfk877hYruiZuLNYKTE5DOMgn8TrbUfvBau2DxRPPDsUahzbqausvKuiu3nBO5zR
-	 kTkYU8kOWsmMqhb2qojz7bbHC7h3N8lW6Ev4pCIaW++gOOLn+szBWXVKZ1hlox7WWWoIR
-	 DRw1h1Rqo+qqbVjGzEB5VSLNAs1VpCO03Nz1CAYsImYZL6jYWW88W6pmlb+Y8G7UJiEeI
-	 7HCPpYT7fRJf/qjpCJl7Acf5yjEzq9Rk2b8R/Y7uVVIqd09AWI/BTd9yoL2UGQSqIQyZh
-	 SOmbalJYyeEuFTcuGnMj0vY8tDNNwvtCBKHovmsKuNlyCBbeMZnIuwLacdZ/8AGiBqw==
+	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=m/P+s8e9LEiFl0Qu09s+H0T52nV18YVsV7Iu8lShA6E=;
+	b=XK+6fulYVBulcDCCaQZh7c5m2fCIkhUgESO6I9ZqWOhGX0SXcftIFLrLzSeOq9yWMZ3J
+	 Ry0xSfIT2sVXPEKXHIZ/+SHlI/WunY63eEsJk0Ia4Q8LZHVHdv668VwSIc8GmKskVSUk8
+	 oYQu5zSOo2VeXiFsvD3IIAt9CRcQm401vl/vye0q9AuLi4sieZkfYa6tkCELTcUVLRPfZ
+	 x7LbzQO8xSS+GYGuGdOCzFsNcapWqOykYz8RYIsYci7gFCAey1Tm1ryyvHP2fqZnwKz6T
+	 CTRbR2hA5myx79KnQ22OrQKFSAzCzx5IR/85D8InQRqWE0Zqq4vyNykejq01u/LWYHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jPmkv8Pe;
-	arc=none smtp.remote-ip=209.85.210.174
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="oK11i/6G";
+	arc=none smtp.remote-ip=209.85.210.172
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BE0606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 15:22:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8BE0606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18328606A321
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 15:22:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18328606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jPmkv8Pe
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8b3577deeb0so2678121b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 07:22:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oK11i/6G
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-8cf79c02fb8so570066b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 07:22:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795620147; x=1796224947; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ZOVH7GPrhhsO60hstl6R1o81Xncu0EyH/gOszIASMlQ=;
-        b=jPmkv8PesLa4C6zoxhIKZOfN+riZ7aay+ijRUaAeWqiffleQuxgF/xyzsGymgLXQ2K
-         c2EIOTlZARL2nWO4NDlS5KFLUVw+8/R7GZ/99j8y/7nkSm3U6D60u3omHxRTyvqLImXg
-         JPQJjTY71Ss1hSVM7QAe9o7JPiDdmK3mXaGjuyAfvk3Quvf5oAarmN/IvIovCNY728Jw
-         f6dvv27kIOTWl/E293jgTa6mkda13TdnSLRd1mG97MZYZDzpox0CNTCoTcCW6aSG95kt
-         yAyQ5Tg/CfVRuTFBT5wrGq5LQgvLFvaqQmpgr8lcIK1Rp0r4Pz06lluw6RYeoV9ApWO7
-         q6pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795620147; x=1796224947;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1795620154; x=1796224954; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ZOVH7GPrhhsO60hstl6R1o81Xncu0EyH/gOszIASMlQ=;
-        b=yFb6SlWsH90R+OiH1uFqnjN4nf9uFrx8XKSCMRjN7rGGTVoBLBd89M/YO87pQHVRr5
-         VaG5vNUPlNRtBsZtHU995WfTqHflIa0mnWc0+uT0h4+zH3PVVKYNF/WBqto0/PtFPhIZ
-         pkZFCqsAJGE4Ig2nfldMH41sBvTLga/qTyYwzgRrd6v8ZcGHxm3TgzZHS7ZGaMquUjB/
-         p5ja+AxMzYzF8ZxdiSZ3/bNuXTP4x93xAOqxg3BsDQvlvRnSrQrkz3BomEdDUeamyCk6
-         E8ODlJo1pdflHnNSyoALISPDjCDVypC9vIU1IjDJvs7MEcB5/njmin7JY7zP+AAegmCK
-         vYWw==
-X-Gm-Message-State: APuU4Z/xstJpPyERXwABV35m0LSqY5HHiAX6pR3JQ2s7DjtTSHF3tTDw
-	mnApu0Sl5EMv6RXpqwjJ3b3sggbgmdG0+xxGoH/HGzxV9riKH9AtB9qv
-X-Gm-Gg: AZFdTZfL5d8wkYQU6ZEZJJB9mM/MF8LWjS6cxU5cd/OzaeON7TjxPQ6WnmkEFssE3d/
-	do4wzMbAQgUSgwmFfxwvUbD59rFTNz/6Z2lEYtji10PW64HL9oAGEkpo7iRbYBjErXhdwpnVF6L
-	r6WNAq6VvsJZRLh9hYpMpQAG1YVCedja56IZMVf4MnWTL0BZMBAVosfd4f5zf+S4u9+4olRwoZs
-	JhiAMFWvDI1Lr2F5KbAtL8NNjlG4a+qTt4VEPVZ/OjHNsAjEY4fgJFXKwoiX+xUJ1CcvbPFP1xw
-	C8lefzfyP4tEXxOvwWMY4cjDLBEeriSbMNHqZxxNDh35rLpCy6Fw4CxO8kG0mewQOU9dYVwMbz/
-	VLK86xSWRE9Su+H4F6o8ICFvaW4CK/FF1pvQCNr0on9Px1Ih07A9NV5bzi48sI0KemTTigT3T6c
-	YjP066b3NrzWy3EagcZfp5b0vxiTHVg4wRtRLSPnq3s8zEu3Aybw9NRI8PQ1Ukg+dElEyFVwhX1
-	HryW3/+H5m9/c/EfKAtX7S0wfRrTmmttWzxafYjhzOIFnIBCr9+Z2YoLjub1ifpu1vfT6XDI0nJ
-	BUWcUOJFpu4gkXY6qP5GyWes
-X-Received: by 2002:a05:6a00:348f:b0:88d:3f61:20e9 with SMTP id d2e1a72fcca58-8c87d124ee2mr13760222b3a.48.1795620146973;
-        Wed, 25 Nov 2026 07:22:26 -0800 (PST)
+        bh=m/P+s8e9LEiFl0Qu09s+H0T52nV18YVsV7Iu8lShA6E=;
+        b=oK11i/6GApnRKdA/Ui/DZGKRVTnYi1Zt4xvqNPvWKzZs/8Ee2w8INiN14d7atKsL0c
+         xzDu4pv2ZJInhd9mE0DuA90UhSHXmP/329jlbZs8ywz87+6Tpej015n99C6altAA9Brc
+         kLshRsz+OZROLRaH7pfDc7nILS9aTAuFknbRoHlm2XQytevlcZZoErtyhDd6kWfZQww6
+         74ZDvFHW0zpgZtZTeF4l7nD4NDMZb0VLfEYxSWh3LM4u2lzAd7t4P07gL2oS4qfbI2kl
+         1vqJbtzuLQ5YEFRd7zQbHzlvOCFvIUsu1JvFyr9P9ay1yiLEgyo0c4i01vtQQb3AXOMg
+         oSyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795620154; x=1796224954;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=m/P+s8e9LEiFl0Qu09s+H0T52nV18YVsV7Iu8lShA6E=;
+        b=DzMbhJ0aGEvt79IIqM6HqPfGmtu1VCGe4pfyIRTTorwRXP9Puzk+LhBRhooBUToLuD
+         r4/iwNwe5eqesgLn9VGkQFSeoy00jx9LKOvPgibC7RkfKSN2sjscVyJte5XeOcF/0zKe
+         1jxmt3zy0EDEIJypCmqKhJMYf9o5K9HVU5bUe7KK0RDvzqaA7ucmizxhU46OnhiU3Gps
+         MiuCK43kFsrdMMlFCXdz4YJAdv+8VL7kiapmbp2ZEdoUkDj4D+gxXuNKJxT6A5qt9qQq
+         rYmDxtqX9DVhiSoBSmbNsSIIJN0JRU9frnj9RVhcCMLoGo5/GiHsej/3JRBoU63fjzim
+         39pQ==
+X-Gm-Message-State: APuU4Z+2035p5zSJu1RiYgZrMVHKYbpPK0n+SjgMgQ5Z+nfBf9kPWjoc
+	my1DlPM5s3GYVBNRoakZEwR6G51tM4Od4c/enMJUaGGVNtO8VVQz/ulk
+X-Gm-Gg: AZFdTZeQSMNt0yPB3XDf5SPDWSNRQMl9SXPWVgr7hzw88utL0L21lqJdpeLUhlLeeQr
+	+GOXvs9qs6dK9Sw7bZwk7wNwbSO+W1bDRxgjMRG6c0nYCtLcr/crZ1odv6ZZKX9C5lGG0yxGcCL
+	jhwDBAP/c1pQdkkqgxLCzwno7KHdavZH7YgCRxKBRODYJpP/74qJAFZ3icRIguBSJZdXDtxlzp+
+	Klv23FT01XmOV81tcb7KgtSWRCfd/AvsSvGEZ/AKuYPLgPVhAtVZV+y0Rohwqdb79USbagZCVpe
+	xmkGJ11fzk/RuI69ea5/G+mu36ZhVJfbjdLahjgsp5Lsms3mj7dU49q7arV8VRmPk+RdiU1FQd4
+	NTVQUl3YSiZVphPOcVQHBfdde3AbxiOfpCynonQbE96dUsr0m+8AWJ7wV8CzLkSAF2GKFI/bcGF
+	Nwtl3Ommq94tPa9ahxPZl3gP23H+h8dMBAmPg2QOp8mArMb+63rg/5q5luFJOrc8hYL3Tps1fge
+	jwJl0/P1IkjDHcalBMEwZAItv0DkGvE/VmlK/pglQnZ1ztqbhTlV5TSmzHeDS7LcMO8+UH75Ksn
+	bI0HN2jUNdfUD53yYcmqbxeK
+X-Received: by 2002:a05:6a00:a01:b0:893:4980:630e with SMTP id d2e1a72fcca58-8c87c38b5d7mr14799436b3a.31.1795620153916;
+        Wed, 25 Nov 2026 07:22:33 -0800 (PST)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c87077a058sm9221775b3a.8.2026.11.25.07.22.23
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c87077a058sm9221775b3a.8.2026.11.25.07.22.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 07:22:26 -0800 (PST)
+        Wed, 25 Nov 2026 07:22:33 -0800 (PST)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -84,10 +86,12 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH 0/2] Bluetooth: RFCOMM: Fix listener shutdown and TTY setup
-Date: Wed, 25 Nov 2026 23:22:16 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0218-followup-v2-88edfec8c72ed860e626-0@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: RFCOMM: Reject listen after socket shutdown
+Date: Wed, 25 Nov 2026 23:22:17 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0218-followup-v2-88edfec8c72ed860e626-1@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <pm-bluetooth-objects-candidate-0218-followup-v2-88edfec8c72ed860e626-0@gmail.com>
+References: <pm-bluetooth-objects-candidate-0218-followup-v2-88edfec8c72ed860e626-0@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -99,25 +103,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sashiko found that an RFCOMM socket can still start listening after
-shutdown, allowing release to skip accept queue cleanup. Reject
-listen after shutdown.
+RFCOMM drains a listener's accept queue on its first shutdown. A bound
+socket can retain BT_BOUND after shutdown, however, and the listen
+state check can admit it as a listener. Release then skips the accept
+queue cleanup because sk_shutdown is already set. Queued children can
+retain a pointer to the listener after it is freed.
 
-The review also found that failed TTY registration can leave a
-transferred DLC open. Close the DLC before dropping the port
-references and purge pending input when the port is destroyed. Use
-the existing RFCOMM_CONNINFO locking to avoid waiting for the socket
-lock while holding global locks during handoff.
+Check sk_shutdown before entering BT_LISTEN. The socket lock serializes
+this check with rfcomm_sock_shutdown() setting the flag.
 
-Cen Zhang (2):
-  Bluetooth: RFCOMM: Reject listen after socket shutdown
-  Bluetooth: RFCOMM: Close DLC on TTY registration failure
-
- net/bluetooth/rfcomm/sock.c |  2 +-
- net/bluetooth/rfcomm/tty.c  | 11 +++++------
- 2 files changed, 6 insertions(+), 7 deletions(-)
-
-
-base-commit: f57f78086ab54f3b3122fbaeba2c842ba7bb6d00
-
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Link: https://lkml.iu.edu/hypermail/linux/kernel/2611.2/24606.html
+Cc: stable@vger.kernel.org
+Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
+This patch was written with assistance from Codex (OpenAI).
+
+ net/bluetooth/rfcomm/sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 889e45dd5d04e..86a43dc0ab5e3 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -448,7 +448,7 @@ static int rfcomm_sock_listen(struct socket *sock, int backlog)
+ 
+ 	lock_sock(sk);
+ 
+-	if (sk->sk_state != BT_BOUND) {
++	if (sk->sk_state != BT_BOUND || sk->sk_shutdown) {
+ 		err = -EBADFD;
+ 		goto done;
+ 	}
+
