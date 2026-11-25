@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795624113;
-	b=Y8uFfHR/xdBJ+jQMjR0hvNNOnJGtWQuw+FqT/2UvGBQYGDIEVEfNbVGNBjL37EmLn64p
-	 njolQW+qn0ntjspsa1LH9Uo+/+8M+IOurAwZGeqzl0Z1hNutYb+H5GfGvhfNOmtDNBsrh
-	 yTX7Sw/dZiZ5Sea8A/VsZJALU7/6oBt6D1/hDPXIk+eL5ChcBdyRrgghf6rT1q9ALtjhW
-	 4YeyAMADO5vi00uCUMPuv1ijgqOnEKckcRkFb7RQ3Fb870jJOqd/I8MIzq+f1IVTknDn0
-	 QwK2eE1wLfzVuDagVwo3eaSr7z4WA/PvHUfZkAxR851dgDvlIDACNhJculVridMaEDQ==
+	b=Vm1+NkWwwBMGGPhE5qhdhW397E2mnwhx0W10zRoEOv7/Ws5ZvPMvCxfACFnbFBOp4dq4
+	 Gf66ou/RPSPqBt8i74zK4EL5nicmzRD1s24Xp2y9/0+wLAG9wUPB6knhGJtPPM5fn3bQE
+	 Pn49Z8NH5RzS3hNSGbwbxNRirT6MmiATbGiJlIPkolbbR5FNPH407BKSNF/5bbXXtnzrx
+	 2YPOp3wEnzUWXaN3rNv1n8BrC0G11aghH29UR63Kl38Aqir8jeYhNiEzAAB3ac+0P3E3z
+	 nwNOFGqV3hJZDTQ0nGXHKYrn0iJP6zqSIeAnQq+N8upVhre4V3RxUaqgLKVJel77a8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795624113;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=EaHeLM+0iePGwyjSDaIFO+amMcydBAJP+FK1ary6qd8=;
-	b=24apWYEk1isdiRbykKZYK4lold70LpJOKMR095Cq1gvNf7HLPGrYAn7OhJ0FQogfdbUd
-	 1K1No9eTuiXO9VohPCo6hXWDkTa7QkTmrWfV8PDGzwTWRHCSsPhdlKWCJ8Apr2xO4wAWo
-	 Yv5pesApi4cVi3LTGdjVqWOAHjjGzWhbKd4/X0SkcKihQGyQ4QSWXR8g45L314XuNCpQ5
-	 4r0TAUOG8ml6Citb+USZmzxSbY0TnGTQCT520hglcDcRUsHpWnsP7VE8nNUiJLqqWW0XI
-	 NFFP19EwcDsVBGfpnEX1cNncRfFD8lW0vGTMc7SBA0m2aji9X9X6wMY/hogw4uAkIUA==
+	bh=kflqQNTv3+xGoqAAJVnuszPCwPVqlPQ0HZLpG8SpaGo=;
+	b=tGDwe4O2vH6KNe2Hh2ExkGqOiWFvfba5Q9QJwcLBT+Ylv+mdSbri6EubSA5SqDW6uJcF
+	 lrfmRnY5ounq8mncRXi/jYYd/5ZiTGeiRRVY3xBGsOiykHdL6BOjghsiNSLjO5//nkjgs
+	 JWHfEpmi9y5dJesHVEATZQODISKKlr1bmuWvPW07kddSu0lSVVroUkWtLZa8WAVzpJxlz
+	 81lLmQmDJOKD4vaRPN4enep3w+yQs1HnlwZFRe46H2Bwe1X/fDCe/InaSu+RG6lebwxj/
+	 TSWUoQfALAPjuYTeJta8s/IffeSQxmLy1FklfymVhcrWzUVn6EcHtD4P+FiHB4fx4rg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DlG6wvwN;
-	arc=none smtp.remote-ip=209.85.221.182
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XdqYSMUl;
+	arc=none smtp.remote-ip=209.85.221.174
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98754606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1034A606A326
 	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 16:28:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98754606A323
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1034A606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=DlG6wvwN
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5ec690faf85so2098342e0c.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XdqYSMUl
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5eaf34452a9so4122731e0c.0
         for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 08:28:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795624111; x=1796228911; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795624112; x=1796228912; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=EaHeLM+0iePGwyjSDaIFO+amMcydBAJP+FK1ary6qd8=;
-        b=DlG6wvwNxy4/Bkf50R56bWhKzKF8pqluqucCU6u1FdcVisbRlZXG3qO8+OFip2a6Vz
-         SR8vyHy0dKlOe8PFmy78eLpzq6EnFQbIB9kqMRzbSczyTcEhh+MwLO+LqpN9vrtNIB43
-         d8KLSgZTBGZoP2B/fqHSlkOjW1J+EggYch/I+/06oPYBNXNJOaPS2iCuqzw2uoJVanUp
-         mKLxumKHdEDqKfdGN3u/sSCIYX0ccbvelo06vXz8UQIOTlq5QdzcSgdlQyBMqX6CBx3O
-         ZPxKbWtTx8dC8l7TvtGdCWAzlDbR79fBhR/yFF6Oh0DxsbMV/7KyxxSw/P16O/huTHbB
-         X14g==
+        bh=kflqQNTv3+xGoqAAJVnuszPCwPVqlPQ0HZLpG8SpaGo=;
+        b=XdqYSMUlpRW6h1JAaHYZn5DmZj9HA2TblNVKW49KxnQqCROcq9XaBxcq9cFP0WeKx/
+         jfX7QiQb2kTtc0p1CxT+2RLD4lrsBBTiW4r8SmfAq/3WQZZGT5hUVo8r8wz0T3SO89jO
+         i6XeisQyIDgtnWvAG5VN0evDgGleebJ/mQ3s5aKhqjS1/rOYBLNbfB76Cql2e52M9Qcp
+         ozZxqCJfTK61awy/FzJs+xjUzQrGuYAYfbJ68CixryvCLKpeR1FSYlq0qZD6YSY2afQP
+         kL+qAkPKQ3Nsp8cemlGieogJ5k/6ZRQZKUzI//EjKEqH1Wo25WrRxTw1jcWPqfOusmmr
+         DpZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795624111; x=1796228911;
+        d=1e100.net; s=20260707; t=1795624112; x=1796228912;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=EaHeLM+0iePGwyjSDaIFO+amMcydBAJP+FK1ary6qd8=;
-        b=sljuuea5HwQ6iK3Eos3573nMsUTlfI+0PGGiR29Vxhmcei/NeBfuKEYeZn2vZ+xgTC
-         0I0uKY8YqRKF4OPEIkB3YbsW3DbVX4I8m29oWtLMf+SLxqMPzWawg7ayXJzzwwhNhCmI
-         9euDcq6VR3p8iF/iIk9WQoFBaZirWPlHvDSNwZzPtGPfBqz+Tv1Byjv45isz4QqAxXwy
-         H3jixeghCg0dNnuugavDHxz6g3nTzHQZGRMW6xppJFjUxPIeYrRwV0eZXZvK+zbBmvej
-         r0trDF2vsj+lxdj0kd87z0qtyi+WmFkwpD/EaeFBk9e12HDAiVdxqDMJ93R/a2Tnx4v5
-         yjmw==
-X-Gm-Message-State: APuU4Z/UI/arSo+7zwhXqW8EcQj823fc7mwz7eLCR6gSBybOGsryaliQ
-	g7UAar9kydEpGUkai+UpiH9y8eFTp/a91c5MO5pKID1T3D44GWAuu+8V1QKopg==
-X-Gm-Gg: AZFdTZek2tJJ48JuWtA8DJCFODgnnQa6xu9kloQkgdJqJYPXyTT63EkKouAokJaOo/t
-	qid+hw98erUOTngFHxAoTHoXqyB1SEiDjJJ0g+rBpO3X7skQSVmVlyY88u1RZhBUv9zvU5McA/q
-	JBfmoeaDwUBgF1hxDtfrZR9CeZUrmC7GzD5C4EQl6WcDP/3XZYLfm+3uAi1sSmZhI6XuzSfqtNy
-	vasj2rz071k1WbcUiiMDqtuH+DIq6Jg4K4AIeIebr+pT2ILBHqWnIZcDwLYusNe2pfU5tsHKpSX
-	hHrvX3pZhpW5A6fzxSa+wO1f+lkxs+A0PjQ3iOzAxooRlDF9enrWNTTxmlmh5uXcjMBsI6zKV3M
-	xCF0oqtjuif5PGSbZTUug7rwZvLRT4PyKekYE+qnht2dj1UCdHN1f44Z28VfVklIdSGBWrIpWFN
-	tArX8QEcyolx4Sj+0NE07kW8jDEuNmnNX9sPtG83pa+AaV5n1DGZwXMlEy8oxtCAAmyNbJZtHuq
-	Uo/zTCgPaHZkoZxjWm5f8qzHyyXbUbuFqCfTauYDocpOqPKXV3zOs54+KchmxiFxefbjAonPJhX
-	7nIg+TZwOK+EO9Z8ntQMTPcR59r4WG6wiyRMObVBhUmoQ+Uh5ti0+NiY4li3e3UvFLvTDXznYUl
-	1sXsIZ7SZDJokILa4ZvSbGq5Fz0wJn+suqdWyLzlKJeU9tjPc59YwBLAAsIB17JO4Sl1BNWRGf1
-	WF2d8=
-X-Received: by 2002:a05:6122:218e:b0:5ec:d5e1:ee27 with SMTP id 71dfb90a1353d-5ee8af60a30mr10452444e0c.20.1795624111019;
+        bh=kflqQNTv3+xGoqAAJVnuszPCwPVqlPQ0HZLpG8SpaGo=;
+        b=Sry6S7bgNHmrJu+lIArouEQ3xbhtLseOGEciNzmpKWhUHJy5QvSumt2t2v02A94E1R
+         nyDjLFnB1sL9nWk9j9/8/RTs2/r+t/YTyd08SFEGE5hPJD6/6rVfpjZrfMG4euWTx3EF
+         uy8z3vJwzpAdnZbfUpg54A7Fh0GW7fvxxnuIjymB4z2bt4ERMPkZsmbGYoghxi2bY18d
+         vGfhS9AfxVqT0ShrmSkaW+1weZPnrF6ZKhTw3GgwiEyhjpJijEpfJ3/NcazfQ0keWwKT
+         MLZEw29hDGSmwWwXCFjU7+kKsVTl5szEjeDHLvq/9BYvJcCbHSnOqevUljRZU8iq3jqN
+         vKdg==
+X-Gm-Message-State: APuU4Z8ML5+gRfhqcoSomnpPrk01Cq5BeM+rbu0C8zKi6fmB+JE9+IFx
+	JgBb70iTyEjL/NC2OR9p1N1OYVBuJppenSe/0Z+XuKZ3y/aN2+h1r7tbgh2U9Q==
+X-Gm-Gg: AZFdTZeVOoj/62mNrSTqL6bJJ1IX4/6TGcXbIPJdhey6BMGnFadojmmT70sXsrYoac4
+	PZ9tC5MZ4eEhVFObJEAhGHpnep21fyNHdVwf20G3ninKgvrBQvIVyNWWE7gHnNwNNNv00SiXfMn
+	Y/53LS3Uvb8HudedObpe+07s46HFWhFovhaflWqwC0NDUMjXCo6djwU/ooPnx1aFdM9vVChEz/W
+	7zK36YiFsE4+T2oOT4Y83BOZ5swZ+X50QyFSJXwfBvhq4tUbrraXDSynkEfzWc0dFK6Tc3MYb0/
+	Mytu55bwajOinivibL+mh2VUMXjnfz1mdqry5iwW5O3iMhd+/A2b0uidIxol7vxdbFHMv+p5Cri
+	G55nqbSCnjLQBnQ0fVfDQqIbU68crH6LnUhKMVR6q098iANijnEnK9xbWoxngKgCiD4PKKWfn5C
+	0h/lax5WAF0j2t2CfnCbxOi5X8xNfzRSftbNN1HwkaO8xp+PNg8ux/X1cZu3HzfnI/YYVC0tgqQ
+	LlZESnFiOP1bzPxeBWnMVHpfYcdNdRWCyi1mS7o9PbrdbtBSbADRgA2nn7BSMRlzqICg72Y6Trk
+	aYqzyAfnXCBfmZxm65DTOuwU2reZjrJTTnG/eFrlRrUlXbP0ZkhcuFXQasu5J4uRN0/wVCXpvNG
+	IP9W8oLfL1nA34EQhOJuSe9SRXJZ8K8z9LzCnGdJ2AaXiEWHOPJT1ciAJaZ0kCrc6gdlK/A83J5
+	IguwI=
+X-Received: by 2002:a05:6123:110:b0:5ea:aedd:6077 with SMTP id 71dfb90a1353d-5ee8aee227bmr7411195e0c.5.1795624111920;
         Wed, 25 Nov 2026 08:28:31 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5cd7c8sm17985305e0c.11.2026.11.25.08.28.29
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b5cd7c8sm17985305e0c.11.2026.11.25.08.28.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 08:28:30 -0800 (PST)
+        Wed, 25 Nov 2026 08:28:31 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 3/5] l2cap-tester: Add tests for security of deferred setup
-Date: Wed, 25 Nov 2026 11:28:23 -0500
-Message-ID: <20261125162825.1409753-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 4/5] rfcomm-tester: Add tests for deferred setup
+Date: Wed, 25 Nov 2026 11:28:24 -0500
+Message-ID: <20261125162825.1409753-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261125162825.1409753-1-luiz.dentz@gmail.com>
 References: <20261125162825.1409753-1-luiz.dentz@gmail.com>
@@ -103,246 +103,54 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Add the following tests:
 
-L2CAP BR/EDR Server - Security Block Pairing Failed
-L2CAP BR/EDR Server - Security Block Downgrade
-L2CAP BR/EDR Server - Defer Success
-L2CAP BR/EDR Server - Defer Encryption Off
-L2CAP BR/EDR Server - Defer Early Accept
-L2CAP LE Server - Defer Success
+Basic RFCOMM Socket Server - Defer Success
+Basic RFCOMM Socket Server - Defer Early Accept
 
-Defer Encryption Off has the peer disabling encryption while the
-connection waits for the listener to authorize it, and Defer Early
-Accept has the listener accepting and authorizing the connection while
-authentication, which then fails, is still pending. Both expect the
-connection to be blocked instead of being established.
-
-Security Block Pairing Failed covers the connection being blocked once
-pairing fails after the request has been responded as pending, since
-L2CAP BR/EDR Server - Security Block is rejected before that, and
-Security Block Downgrade covers pairing succeeding with a key that
-doesn't meet the security level required.
+Defer Early Accept has the listener accepting and authorizing the
+connection while authentication, which then fails, is still pending and
+expects the connection to be refused.
 
 Assisted-by: OpenCode:claude-fable-5.2
 ---
- tools/l2cap-tester.c | 305 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 305 insertions(+)
+ tools/rfcomm-tester.c | 167 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 167 insertions(+)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 4d2c5cd15c64..6ad8a7aae717 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -26,6 +26,8 @@
- 
- #include "monitor/bt.h"
- #include "emulator/bthost.h"
-+#include "emulator/btdev.h"
-+#include "emulator/vhci.h"
- #include "emulator/hciemu.h"
- 
- #include "src/shared/tester.h"
-@@ -54,9 +56,15 @@ struct test_data {
- 	int sk2;
- 	int reencrypt_sk;
- 	int opp_sk;
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 998d698c1bb2..083872728371 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -43,6 +43,11 @@ struct test_data {
+ 	struct tester_io *io;
+ 	unsigned int io_id;
+ 	uint16_t conn_handle;
 +	int listen_sk;
-+	struct tester_io *defer_io;
- 	bool opp_encrypted;
- 	bool host_disconnected;
- 	int step;
-+	/* Result of accepting while security is pending: 1 if there was nothing
-+	 * to accept, 2 if a connection was accepted and authorized
++	/* Result of accepting while authentication is pending: 1 if there was
++	 * nothing to accept, 2 if a connection was accepted and authorized
 +	 */
 +	int early_accept;
- 	struct queue *io_channels;
- 	struct tx_tstamp_data tx_ts;
+ 	uint16_t send_len;
+ 	uint16_t recv_len;
  };
-@@ -129,6 +137,12 @@ struct l2cap_data {
- 	bool direct_advertising;
- 	bool close_1;
- 	bool defer;
-+	bool hold_auth;
-+	bool encrypt_off;
-+	/* Follow a pending connection response until the final one */
-+	bool pending_rsp;
-+	/* Link key type the controller reports instead of the actual one */
-+	uint8_t link_key_type;
- 
- 	bool shut_sock_wr;
- 
-@@ -355,6 +369,8 @@ static void test_data_free(void *test_data)
- 	test_l2cap(name, HCIEMU_TYPE_BREDRLE70, data, setup, func)
- 
- static uint8_t pair_device_pin[] = { 0x30, 0x30, 0x30, 0x30 }; /* "0000" */
-+/* "1111" */
-+static uint8_t pair_device_wrong_pin[] = { 0x31, 0x31, 0x31, 0x31 };
- 
- static const struct l2cap_data client_connect_success_test = {
- 	.client_psm = 0x1001,
-@@ -614,6 +630,111 @@ static const struct l2cap_data l2cap_server_sec_block_test = {
- 	.enable_ssp = true,
- };
- 
-+static const uint8_t l2cap_defer_sec_block_rsp[] = {
-+						0x40, 0x00,	/* dcid */
-+						0x41, 0x00,	/* scid */
-+						0x03, 0x00,	/* Sec Block */
-+						0x00, 0x00	/* status */
-+};
-+
-+/* No response is expected so the test only passes once the socket is
-+ * connected, after the connection has been authorized.
-+ */
-+static const struct l2cap_data l2cap_server_defer_success_test = {
-+	.server_psm = 0x1001,
-+	.defer = true,
-+	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
-+	.send_cmd = l2cap_connect_req,
-+	.send_cmd_len = sizeof(l2cap_connect_req),
-+};
-+
-+/* Pairing fails after the connection request has been answered as pending,
-+ * unlike l2cap_server_sec_block_test which is rejected right away.
-+ */
-+static const struct l2cap_data l2cap_server_sec_block_pairing_test = {
-+	.server_psm = 0x1001,
-+	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
-+	.send_cmd = l2cap_connect_req,
-+	.send_cmd_len = sizeof(l2cap_connect_req),
-+	.expect_cmd_code = BT_L2CAP_PDU_CONN_RSP,
-+	.expect_cmd = l2cap_defer_sec_block_rsp,
-+	.expect_cmd_len = sizeof(l2cap_defer_sec_block_rsp),
-+	.sec_level = BT_SECURITY_MEDIUM,
-+	.pin = pair_device_pin,
-+	.pin_len = sizeof(pair_device_pin),
-+	.client_pin = pair_device_wrong_pin,
-+	.client_pin_len = sizeof(pair_device_wrong_pin),
-+	.pending_rsp = true,
-+};
-+
-+/* "0000000000000000" */
-+static uint8_t pair_device_pin16[] = { 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+					0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-+					0x30, 0x30, 0x30, 0x30 };
-+
-+/* Pairing succeeds but the controller reports an unauthenticated key, so
-+ * encryption completes with a security level below the one required.
-+ */
-+static const struct l2cap_data l2cap_server_sec_block_downgrade_test = {
-+	.server_psm = 0x1001,
-+	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
-+	.send_cmd = l2cap_connect_req,
-+	.send_cmd_len = sizeof(l2cap_connect_req),
-+	.expect_cmd_code = BT_L2CAP_PDU_CONN_RSP,
-+	.expect_cmd = l2cap_defer_sec_block_rsp,
-+	.expect_cmd_len = sizeof(l2cap_defer_sec_block_rsp),
-+	.sec_level = BT_SECURITY_HIGH,
-+	.pin = pair_device_pin16,
-+	.pin_len = sizeof(pair_device_pin16),
-+	.client_pin = pair_device_pin16,
-+	.client_pin_len = sizeof(pair_device_pin16),
-+	.link_key_type = 0x04,
-+	.pending_rsp = true,
-+};
-+
-+/* The peer disables encryption while the connection waits for userspace to
-+ * authorize it, the link no longer meets the security level so the connection
-+ * shall be blocked instead of being offered again.
-+ */
-+static const struct l2cap_data l2cap_server_defer_encrypt_off_test = {
-+	.server_psm = 0x1001,
-+	.defer = true,
-+	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
-+	.send_cmd = l2cap_connect_req,
-+	.send_cmd_len = sizeof(l2cap_connect_req),
-+	.expect_cmd_code = BT_L2CAP_PDU_CONN_RSP,
-+	.expect_cmd = l2cap_defer_sec_block_rsp,
-+	.expect_cmd_len = sizeof(l2cap_defer_sec_block_rsp),
-+	.sec_level = BT_SECURITY_MEDIUM,
-+	.pin = pair_device_pin,
-+	.pin_len = sizeof(pair_device_pin),
-+	.client_pin = pair_device_pin,
-+	.client_pin_len = sizeof(pair_device_pin),
-+	.client_encrypt = true,
-+	.encrypt_off = true,
-+};
-+
-+/* The listener accepts and authorizes the connection while authentication is
-+ * still pending and then authentication fails, the connection shall be
-+ * blocked.
-+ */
-+static const struct l2cap_data l2cap_server_defer_early_accept_test = {
-+	.server_psm = 0x1001,
-+	.defer = true,
-+	.send_cmd_code = BT_L2CAP_PDU_CONN_REQ,
-+	.send_cmd = l2cap_connect_req,
-+	.send_cmd_len = sizeof(l2cap_connect_req),
-+	.expect_cmd_code = BT_L2CAP_PDU_CONN_RSP,
-+	.expect_cmd = l2cap_defer_sec_block_rsp,
-+	.expect_cmd_len = sizeof(l2cap_defer_sec_block_rsp),
-+	.sec_level = BT_SECURITY_MEDIUM,
-+	.pin = pair_device_pin,
-+	.pin_len = sizeof(pair_device_pin),
-+	.client_pin = pair_device_wrong_pin,
-+	.client_pin_len = sizeof(pair_device_wrong_pin),
-+	.hold_auth = true,
-+};
-+
- static const uint8_t l2cap_nval_psm_rsp[] = {	0x00, 0x00,	/* dcid */
- 						0x41, 0x00,	/* scid */
- 						0x02, 0x00,	/* nval PSM */
-@@ -1120,6 +1241,14 @@ static const struct l2cap_data le_server_success_test = {
- 	.expect_cmd_len = sizeof(le_connect_rsp),
- };
- 
-+static const struct l2cap_data le_server_defer_success_test = {
-+	.server_psm = 0x0080,
-+	.defer = true,
-+	.send_cmd_code = BT_L2CAP_PDU_LE_CONN_REQ,
-+	.send_cmd = le_connect_req,
-+	.send_cmd_len = sizeof(le_connect_req),
-+};
-+
- static const uint8_t nval_le_connect_req[] = {	0x80, 0x00, /* PSM */
- 						0x01, 0x00, /* SCID */
- 						0x20, 0x00, /* MTU */
-@@ -2223,6 +2352,20 @@ static void setup_powered_common(void)
- 	if (test && test->reject_ssp)
- 		bthost_set_reject_user_confirm(bthost, true);
- 
-+	if (test && test->hold_auth)
-+		bthost_hold_auth_request(bthost, true);
-+
-+	if (test && test->link_key_type) {
-+		struct vhci *vhci = hciemu_get_vhci(data->hciemu);
-+
-+		btdev_set_link_key_type(vhci_get_btdev(vhci),
-+							test->link_key_type);
-+	}
-+
-+	if (test && (test->hold_auth || test->encrypt_off ||
-+							test->pending_rsp))
-+		bthost_set_l2cap_rsp_pending(bthost, true);
-+
- 	if (data->hciemu_type >= HCIEMU_TYPE_LE)
- 		mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 				sizeof(param), param, NULL, NULL, NULL);
-@@ -3938,6 +4081,128 @@ static bool defer_accept(struct test_data *data, struct tester_io *io,
- 	return true;
+@@ -61,6 +66,12 @@ struct rfcomm_server_data {
+ 	uint8_t server_channel;
+ 	uint8_t client_channel;
+ 	bool expected_status;
++	bool defer;
++	int sec_level;
++	const uint8_t *pin;
++	uint8_t pin_len;
++	const uint8_t *client_pin;
++	uint8_t client_pin_len;
+ 	const uint8_t *send_data;
+ 	const uint8_t *read_data;
+ 	uint16_t data_len;
+@@ -286,13 +297,89 @@ static void setup_powered_server_callback(uint8_t status, uint16_t length,
+ 	tester_setup_complete();
  }
  
-+/* Keep an accepted socket open until the test ends */
-+static void defer_keep(struct test_data *data, struct tester_io *io)
++/* Authorize a deferred connection, the socket is kept open in data->io */
++static void defer_authorize(struct test_data *data, int sk)
 +{
-+	if (!data->io_channels)
-+		data->io_channels = queue_new();
-+
-+	queue_push_tail(data->io_channels, io);
-+}
-+
-+/* Authorize a deferred connection without closing its socket */
-+static void defer_authorize(struct test_data *data, struct tester_io *io)
-+{
-+	int sk = tester_io_get_fd(io);
 +	ssize_t ret;
 +	char c;
 +
@@ -350,186 +158,197 @@ index 4d2c5cd15c64..6ad8a7aae717 100644
 +
 +	tester_print("Authorize deferred setup sk = %d: %zd (%s)", sk, ret,
 +					ret < 0 ? strerror(errno) : "ok");
++
++	if (data->io)
++		tester_io_unref(data->io);
++
++	data->io = tester_io_new(sk);
++	tester_io_set_close_on_unref(data->io, true);
 +}
 +
-+/* Behave like a listener that does not wait to be notified: accept and
-+ * authorize whatever connection is queued.
-+ */
-+static bool early_accept(struct test_data *data)
++static void pin_code_request_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct tester_io *io;
-+	int new_sk;
++	const struct mgmt_ev_pin_code_request *ev = param;
++	struct test_data *data = user_data;
++	const struct rfcomm_server_data *srv = data->test_data;
++	struct mgmt_cp_pin_code_reply cp;
 +
-+	new_sk = accept(data->listen_sk, NULL, NULL);
-+	if (new_sk < 0) {
-+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-+			tester_warn("accept failed: %s (%d)", strerror(errno),
-+									errno);
-+			tester_test_failed();
-+			return false;
-+		}
-+
-+		tester_print("Nothing to accept while security is pending");
-+		data->early_accept = 1;
-+		return true;
-+	}
-+
-+	tester_print("Accepted sk = %d while security is pending", new_sk);
-+	data->early_accept = 2;
-+
-+	io = tester_io_new(new_sk);
-+	tester_io_set_close_on_unref(io, true);
-+
-+	defer_keep(data, io);
-+	defer_authorize(data, io);
-+
-+	return true;
-+}
-+
-+/* Handle the responses of the tests that follow a pending connection until
-+ * its final response. Returns true if there is nothing else to check.
-+ */
-+static bool server_security_rsp(struct test_data *data,
-+				const struct bt_l2cap_pdu_conn_rsp *rsp)
-+{
-+	const struct l2cap_data *l2data = data->test_data;
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	uint16_t result = le16_to_cpu(rsp->result);
-+	uint16_t status = le16_to_cpu(rsp->status);
-+
-+	tester_print("Connection response result 0x%04x status 0x%04x",
-+							result, status);
-+
-+	if (!result) {
-+		tester_warn("Connection accepted without required security");
-+		tester_test_failed();
-+		return true;
-+	}
-+
-+	/* Not pending, check the final response, which only counts if the
-+	 * action the test is about was done before it.
++	/* Behave like a listener that does not wait to be notified: accept
++	 * and authorize whatever is queued while authentication is pending.
 +	 */
-+	if (result != 0x0001) {
-+		if (l2data->hold_auth && !data->early_accept) {
-+			tester_warn("Connection refused before accepting it");
-+			tester_test_failed();
-+			return true;
-+		}
++	if (srv->defer) {
++		int new_sk;
 +
-+		if (l2data->encrypt_off && !data->step) {
-+			tester_warn("Connection refused before disabling "
-+								"encryption");
-+			tester_test_failed();
-+			return true;
-+		}
++		new_sk = accept(data->listen_sk, NULL, NULL);
++		if (new_sk < 0) {
++			if (errno != EAGAIN && errno != EWOULDBLOCK) {
++				tester_warn("accept failed: %s (%d)",
++						strerror(errno), errno);
++				tester_test_failed();
++				return;
++			}
 +
++			tester_print("Nothing to accept while authentication "
++					"is pending");
++			data->early_accept = 1;
++		} else {
++			tester_print("Accepted sk = %d while authentication "
++					"is pending", new_sk);
++			data->early_accept = 2;
++			defer_authorize(data, new_sk);
++		}
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.addr, &ev->addr, sizeof(cp.addr));
++	cp.pin_len = srv->pin_len;
++	memcpy(cp.pin_code, srv->pin, srv->pin_len);
++
++	mgmt_reply(data->mgmt, MGMT_OP_PIN_CODE_REPLY, data->mgmt_index,
++					sizeof(cp), &cp, NULL, NULL, NULL);
++}
++
+ static void setup_powered_server(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	const struct rfcomm_server_data *srv = test_data;
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Powering on controller");
+ 
++	if (srv && srv->pin) {
++		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++		mgmt_register(data->mgmt, MGMT_EV_PIN_CODE_REQUEST,
++				data->mgmt_index, pin_code_request_callback,
++				data, NULL);
++
++		bthost_set_pin_code(bthost, srv->client_pin,
++							srv->client_pin_len);
++
++		mgmt_send(data->mgmt, MGMT_OP_SET_BONDABLE, data->mgmt_index,
++				sizeof(param), param, NULL, NULL, NULL);
++	}
++
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_CONNECTABLE, data->mgmt_index,
+ 				sizeof(param), param,
+ 				NULL, NULL, NULL);
+@@ -374,6 +461,33 @@ const struct rfcomm_server_data listen_read_success = {
+ 	.read_data = data
+ };
+ 
++const struct rfcomm_server_data listen_defer_success = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0c,
++	.expected_status = true,
++	.defer = true,
++};
++
++static const uint8_t pair_pin[] = { 0x30, 0x30, 0x30, 0x30 }; /* "0000" */
++/* "1111" */
++static const uint8_t pair_wrong_pin[] = { 0x31, 0x31, 0x31, 0x31 };
++
++/* The listener accepts and authorizes the connection while authentication is
++ * still pending and then authentication fails, the connection shall be
++ * refused.
++ */
++const struct rfcomm_server_data listen_defer_early_accept = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0c,
++	.expected_status = false,
++	.defer = true,
++	.sec_level = BT_SECURITY_MEDIUM,
++	.pin = pair_pin,
++	.pin_len = sizeof(pair_pin),
++	.client_pin = pair_wrong_pin,
++	.client_pin_len = sizeof(pair_wrong_pin),
++};
++
+ const struct rfcomm_server_data listen_nval = {
+ 	.server_channel = 0x0c,
+ 	.client_channel = 0x0e,
+@@ -721,6 +835,13 @@ static bool rfcomm_listen_cb(struct tester_io *io, uint32_t cond,
+ 		return false;
+ 	}
+ 
++	/* The result is checked once the client connection completes */
++	if (srv->defer) {
++		tester_print("Accept deferred setup sk = %d", new_sk);
++		defer_authorize(data, new_sk);
 +		return false;
 +	}
 +
-+	/* Authentication pending */
-+	if (l2data->hold_auth && status == 0x0001 && !data->step) {
-+		data->step = 1;
-+		if (early_accept(data))
-+			bthost_release_auth_request(bthost);
-+		return true;
+ 	if (srv->send_data) {
+ 		ssize_t ret;
+ 
+@@ -767,6 +888,15 @@ static void connection_cb(uint16_t handle, uint16_t cid, void *user_data,
+ 		return;
+ 	}
+ 
++	/* The result only counts if the listener tried to accept while the
++	 * authentication was pending.
++	 */
++	if (srv->defer && srv->pin && !data->early_accept) {
++		tester_warn("Connection result before accepting it");
++		tester_test_failed();
++		return;
 +	}
 +
-+	/* Authorization pending */
-+	if (l2data->encrypt_off && status == 0x0002) {
-+		if (!data->step) {
-+			data->step = 1;
-+			tester_print("Disabling encryption");
-+			bthost_set_conn_encrypt(bthost, data->handle, 0x00);
-+			return true;
-+		}
-+
-+		/* Offered again after encryption was disabled, authorize it */
-+		data->step = 2;
-+		if (data->defer_io)
-+			defer_authorize(data, data->defer_io);
-+	}
-+
-+	return true;
-+}
-+
- static bool l2cap_listen_cb(struct tester_io *io, uint32_t cond,
- 							void *user_data)
- {
-@@ -3967,6 +4232,15 @@ static bool l2cap_listen_cb(struct tester_io *io, uint32_t cond,
- 			return false;
- 		}
+ 	if (srv->expected_status == status)
+ 		tester_test_passed();
+ 	else
+@@ -803,6 +933,37 @@ static void test_server(const void *test_data)
+ 		return;
+ 	}
  
-+		/* Authorize only after the peer has disabled encryption */
-+		if (l2data->encrypt_off) {
-+			data->defer_io = io;
-+			defer_keep(data, io);
-+			if (data->step > 1)
-+				defer_authorize(data, io);
-+			return false;
-+		}
++	if (srv->sec_level) {
++		struct bt_security sec;
 +
- 		if (!defer_accept(data, io, l2cap_accept_cb)) {
- 			tester_warn("Unable to accept deferred setup");
- 			tester_test_failed();
-@@ -3994,6 +4268,12 @@ static void client_l2cap_rsp(uint8_t code, const void *data, uint16_t len,
- 	if (code == BT_L2CAP_PDU_CONN_RSP) {
- 
- 		const struct bt_l2cap_pdu_conn_rsp *rsp = data;
++		memset(&sec, 0, sizeof(sec));
++		sec.level = srv->sec_level;
 +
-+		if ((l2data->hold_auth || l2data->encrypt_off ||
-+				l2data->pending_rsp) && len >= sizeof(*rsp) &&
-+				server_security_rsp(test_data, rsp))
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_SECURITY, &sec,
++							sizeof(sec)) < 0) {
++			tester_warn("Can't set security level: %s (%d)",
++						strerror(errno), errno);
++			tester_test_failed();
++			close(sk);
 +			return;
++		}
++	}
 +
- 		if (len == sizeof(rsp) && !rsp->result && !rsp->status)
- 			return;
- 
-@@ -4196,6 +4476,8 @@ static void start_test_server(const void *test_data, bthost_new_conn_cb conn_cb,
- 			return;
- 		}
- 
-+		data->listen_sk = sk;
++	if (srv->defer) {
++		int opt = 1;
 +
- 		io = tester_io_new(sk);
- 		tester_io_set_close_on_unref(io, true);
- 
-@@ -4557,6 +4839,26 @@ int main(int argc, char *argv[])
- 					&l2cap_server_sec_block_test,
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &opt,
++							sizeof(opt)) < 0) {
++			tester_warn("Can't enable deferred setup: %s (%d)",
++						strerror(errno), errno);
++			tester_test_failed();
++			close(sk);
++			return;
++		}
++	}
++
++	data->listen_sk = sk;
++
+ 	if (listen(sk, 5) < 0) {
+ 		tester_warn("listening on socket failed: %s (%u)",
+ 				strerror(errno), errno);
+@@ -868,6 +1029,12 @@ int main(int argc, char *argv[])
+ 	test_rfcomm("Basic RFCOMM Socket Server - Read Success",
+ 				&listen_read_success, setup_powered_server,
+ 				test_server);
++	test_rfcomm("Basic RFCOMM Socket Server - Defer Success",
++				&listen_defer_success, setup_powered_server,
++				test_server);
++	test_rfcomm("Basic RFCOMM Socket Server - Defer Early Accept",
++				&listen_defer_early_accept,
++				setup_powered_server, test_server);
+ 	test_rfcomm("Basic RFCOMM Socket Server - Conn Refused", &listen_nval,
  					setup_powered_server, test_server);
  
-+	test_l2cap_bredr("L2CAP BR/EDR Server - Security Block Pairing Failed",
-+					&l2cap_server_sec_block_pairing_test,
-+					setup_powered_server, test_server);
-+
-+	test_l2cap_bredr("L2CAP BR/EDR Server - Security Block Downgrade",
-+					&l2cap_server_sec_block_downgrade_test,
-+					setup_powered_server, test_server);
-+
-+	test_l2cap_bredr("L2CAP BR/EDR Server - Defer Success",
-+					&l2cap_server_defer_success_test,
-+					setup_powered_server, test_server);
-+
-+	test_l2cap_bredr("L2CAP BR/EDR Server - Defer Encryption Off",
-+					&l2cap_server_defer_encrypt_off_test,
-+					setup_powered_server, test_server);
-+
-+	test_l2cap_bredr("L2CAP BR/EDR Server - Defer Early Accept",
-+					&l2cap_server_defer_early_accept_test,
-+					setup_powered_server, test_server);
-+
- 	test_l2cap_bredr("L2CAP BR/EDR Server - Invalid PSM",
- 					&l2cap_server_nval_psm_test,
- 					setup_powered_server, test_server);
-@@ -4722,6 +5024,9 @@ int main(int argc, char *argv[])
- 					setup_powered_client, test_connect);
- 	test_l2cap_le("L2CAP LE Server - Success", &le_server_success_test,
- 					setup_powered_server, test_server);
-+	test_l2cap_le("L2CAP LE Server - Defer Success",
-+					&le_server_defer_success_test,
-+					setup_powered_server, test_server);
- 	test_l2cap_le("L2CAP LE Server - Nval SCID", &le_server_nval_scid_test,
- 					setup_powered_server, test_server);
- 	test_l2cap_le("L2CAP LE Server - PHY", &le_server_phy_test,
 -- 
 2.56.0
 
