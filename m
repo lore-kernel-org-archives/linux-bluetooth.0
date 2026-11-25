@@ -1,63 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795593437;
-	b=MejWzvV5KN62sqrXGeVaX1L8kFH5ZMF38SWygCCXgBwzfoivfOjzjqalmSsOaKahMEMV
-	 q0qDfOxMz8Nzv92o2zw1phTvcWW5c5JjdiANP3vGg8MSjUmfphV53fa3ZHeBou6UuM5FO
-	 QiCwkUCfIuxIFKQ+kjIdSBk7ATllZwzdLEjpZsThrIc9GA5mzbBjDloWiWjup+KLvwvhU
-	 fXhOz1a8nL3oSY0tZ3hjgo53wnXK47AVxiSbiiw3k/AJrACxdmlz1mPWg+2QYG/rntKPx
-	 CpkDLdUSKep7ust2UlPRDmqZWH4oVzTp0A/yAmXQ/brtxGXSG9WEh+Z4ToWJv/Qh5lA==
+	t=1795593436;
+	b=DFaUU70+GjjCW1g+aQEQienywiCz8FGOL8rmXuM+mlVKdtEWZ4Hh+bKP79k1uZYIE9Or
+	 OCJgwN1Nue10PTQ20EwDc80etcL5+mgPQWpu/ypuZkkarppzutbWb5pTGExRKAY0YNdZd
+	 JhD/KAmpQsUwbfkTbwESI+Kyof5Q/X26+gTB/mYL5CUqhEyYRJcXtrjSjogm/6tjZvSro
+	 2UjVHx3tPeoZvpBVZjImJROiez3mS3ByaCaFmJyp3JJr37lYL8hBSpUbSaygdmpMgRtAf
+	 W1eeq8N50JBoXGBBy4dcMVIrU2d48SuHwR++Uedh5JELcDavFq3t5jboSCIe0xa0yFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795593437;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795593436;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 X-Mailer:MIME-Version:Content-Type:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=TYBjK0sSpWbQr05ODTmrbKp0N9Z7DSsx3bpbHUeWwJc=;
-	b=BENIiBtw6UZYO7vR5oGoI3nvfl9Lm8G1hEwrOIma1SYwPs943DQqe5e51sV490HX5uV/
-	 WJSM3mKzHhTzdn4wbhuOEENM9KhcFPLYaR9ZyyjKa5Cogk9Rv5nCcxFMZ9QOhhMpR93zM
-	 7JuoxUIru+hGrzLY8ENOxzfRC/LftRwSyVobMdes+kp1iD9leGRCJhIeTQ4ru+VqnxRCI
-	 YHAtKakFMfJefygBU9CIU015M3Jp4zWi0xvAizI+IfgjEXycYxlKZd+35dro1seSikBzv
-	 +CSohP8JJXCRDt0Xqc7h+I5Af2+GnGCyaenlEXbCSZ7847Sjmzo5fPYWUgDrJ4CR9/g==
+	bh=GYNbbugO/NZ6w6cd+8ISkdbwHoQ/wRI4QCWh7H+kQts=;
+	b=Fu40MTx+ftxnEvOILHURIaA5XCldMoMacbKoLaSUMErnrGp5X83uLQphMr8aYzuB/O27
+	 2rESZ+P3SPtOOFy7ir8fwnKop5Bmx0i1qKgcPAm4L13vEWFkKWaojnayp89Cv1ETDGspJ
+	 OVsvGru/j7yY4g1yQTYe0vZ5orig2xsLWmPvsvgBhjOUasRrmGpHHROEznIJzZavL2ZQv
+	 w0OSVPsyvSg/YRifvj5j0XHchFYd/k+xj3QhAWRdf6K04zIhZdtKeMf6EWHO43pCiNH02
+	 jO/Fkz6fv8cUTcOHCw46AlObDgLElEyqk41mf6lEn9YrpDiqRCPeixp6lGFILt00kLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=GbAAYqad;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=RBaCbnrd;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF172606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF18E606A327
 	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 07:57:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF172606A326
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF18E606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=GbAAYqad
+	dkim=pass (2048-bit key, unprotected) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=RBaCbnrd
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1795593434;
-	bh=EPF6f6alhgQr/AI1kNC14tYR9zul7jcOqdNxhdYAw0k=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=GbAAYqadviDWTOlkekBAAl1Iilq5oZ0EiIraY5geYudEAgnR3RCc+GzRHvn2VyRsI
-	 yIFgLzJkg/hLpt+GjZfrD1Q6lSrnzD/6nHrIsDSSQDdQLgHAWJPtbMReyPXf8dgynt
-	 tse5NMf8A/0ukvZRM505dBRQ3vcmof6fHdhrLPDfeRxsMpDJS85xJz/NbgoOe8kL04
-	 HCBrOwnizNWBVrrc62G8lAv9CZ4yuGD1ajtZnTK0HiaGjfo7YJKcj7+JTU9WBhJa5r
-	 HWc6rKVKuxZDukES2NUP1yfTvxSh1K2nvgjZDktmbD5gN4Fnr9FHniiFNyyA3WHCky
-	 RWH4j29UdsbFg==
+	bh=l4da9cLDskRYCgqJuD2wnlA4gHc3xgjx0661iO/PVno=;
+	h=From:To:Subject:Date:From;
+	b=RBaCbnrdblcfo2i9PzAiTGZriONoz0n9ADSaOwYvfCJDIymFbt8CYlVceopNHHQBp
+	 04mqcjIKyiPQqAOw1Av+o8sUmMSu8Ib20d3dPF2LaW7m4ijuF87ZsWuMsYg89BYnhv
+	 BBE5UdZEMJyJda81U5nzl+l11v/PBlnmyV8kTKC3xzBIfo5+wwvQXDCedy+cLHefgh
+	 FTeZME7YYLn2qb7WkqAOj2A4oddwf9ui8UjiwAgHIAkrbGnbmfoYLqwE3H96gBOH+c
+	 WUMCU2so9NDv7zfNDfb1fDNtO71zAwysrtwnvJkgEeBq9aEMDmIeJyUbsP5DDQdBx+
+	 C9Qy9QGUS0iAg==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 34B3717E0BCD
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 08:57:14 +0100 (CET)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id EB70E17E04F7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 08:57:13 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 1/3] device: Provide Security Level props when kernel supports them
-Date: Wed, 25 Nov 2026 08:57:07 +0100
-Message-ID: <20261125075709.459719-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v4 0/3] client/btpclient: Security Level reporting
+Date: Wed, 25 Nov 2026 08:57:06 +0100
+Message-ID: <20261125075709.459719-1-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261125075709.459719-1-frederic.danis@collabora.com>
-References: <20261125075709.459719-1-frederic.danis@collabora.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,83 +65,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The SecurityLevel and EncryptionType properties should be available in
-org.bluez.Device only when kernel supports MGMT_EV_SECURITY_LEVEL_CHANGED
-events.
-This allows applications to check those properties when they are
-meaningful.
----
-v1->v2: Retitled from "device: Provide Security Level related props when
-  supported by kernel" (subject line was exceeding the mailing list's
-  80-character limit with the series prefix).
+Set org.bluez.Device SecurityLevel and EncryptionType properties to
+optional so application can access them only when they are meaningful.
 
- src/adapter.c |  4 ++++
- src/adapter.h |  1 +
- src/device.c  | 13 +++++++++++--
- 3 files changed, 16 insertions(+), 2 deletions(-)
+Send BTP_EV_GAP_SEC_LEVEL_CHANGED event from SecurityLevel property
+changes once the device's services are resolved, matching the BTP levels
+expected by auto-pts.
+This reduces connection time for the BAP tests.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 112312651..12d7e8246 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -11409,6 +11409,10 @@ static void read_commands_complete(uint8_t status, uint16_t length,
- 			DBG("kernel supports suspend/resume events");
- 			kernel_features |= KERNEL_HAS_RESUME_EVT;
- 			break;
-+		case MGMT_EV_SECURITY_LEVEL_CHANGED:
-+			DBG("kernel supports security level events");
-+			kernel_features |= KERNEL_HAS_SECURITY_LEVEL_EVT;
-+			break;
- 		}
- 	}
- }
-diff --git a/src/adapter.h b/src/adapter.h
-index 63016c8e1..74e866108 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -294,6 +294,7 @@ enum kernel_features {
- 	KERNEL_HAS_RESUME_EVT		= 1 << 4,
- 	KERNEL_HAS_EXT_ADV_ADD_CMDS	= 1 << 5,
- 	KERNEL_HAS_CONTROLLER_CAP_CMD	= 1 << 6,
-+	KERNEL_HAS_SECURITY_LEVEL_EVT	= 1 << 7,
- };
- 
- bool btd_has_kernel_features(uint32_t feature);
-diff --git a/src/device.c b/src/device.c
-index 36a980d1e..a21819419 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3785,6 +3785,13 @@ static gboolean dev_get_encryption_type(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean
-+dev_security_level_exists(const GDBusPropertyTable *property,
-+						void *data)
-+{
-+	return btd_has_kernel_features(KERNEL_HAS_SECURITY_LEVEL_EVT);
-+}
-+
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
- 	{ "AddressType", "s", property_get_address_type },
-@@ -3830,9 +3837,11 @@ static const GDBusPropertyTable device_properties[] = {
- 				dev_property_set_prefer_bearer,
- 				dev_property_prefer_bearer_exists,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "SecurityLevel", "y", dev_get_security_level, NULL, NULL,
-+	{ "SecurityLevel", "y", dev_get_security_level, NULL,
-+				dev_security_level_exists,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "EncryptionType", "y", dev_get_encryption_type, NULL, NULL,
-+	{ "EncryptionType", "y", dev_get_encryption_type, NULL,
-+				dev_security_level_exists,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
+v1->v2: Retitled patch 1 from "device: Provide Security Level related
+  props when supported by kernel" (subject line was exceeding the
+  mailing list's 80-character limit with the series prefix).
+v2->v3: Patch 3 (BTP_EV_GAP_SEC_LEVEL_CHANGED support): only read and
+  report SecurityLevel when ServicesResolved becomes true, so a stale
+  cached level isn't reported as a security-level-changed event when an
+  encrypted peer disconnects.
+v3->v4: Patch 3 (BTP_EV_GAP_SEC_LEVEL_CHANGED support): fetch the
+  device's Address/AddressType D-Bus properties instead of reading the
+  btp_device struct fields directly, consistent with the other event
+  builders in gap.c.
+
+Frédéric Danis (3):
+  device: Provide Security Level props when kernel supports them
+  org.bluez.Device: Make Security Level props optional
+  client/btpclient: Add BTP_EV_GAP_SEC_LEVEL_CHANGED support
+
+ client/btpclient/gap.c   | 65 +++++++++++++++++++++++++++++++++++++++-
+ doc/org.bluez.Device.rst |  8 ++---
+ src/adapter.c            |  4 +++
+ src/adapter.h            |  1 +
+ src/device.c             | 13 ++++++--
+ src/shared/btp.h         | 11 +++++++
+ 6 files changed, 95 insertions(+), 7 deletions(-)
+
 -- 
 2.43.0
 
