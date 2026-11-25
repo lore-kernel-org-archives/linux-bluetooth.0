@@ -1,97 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.70.183.194
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795596559;
-	b=2KtqMyO4Iourzk2hYttn5GFPPoCKv6EmG04Z/i/GAKvjqgxT3goXnSgX9KnNTD5uRkFO
-	 My//Vf/oqyd4Wls/f5wpNa3BFWhlwAfhtmHwvVSn1qmiCAqLPxeXRjPxvwAgO57LTwaok
-	 N7ubEMqW+A4mpoCkGQ43IJD1U03rQ80p4MqKITTSbhb4+1/bHX7V3GZY+T09Er25zd8nL
-	 NAchWsVSp/pTkcB0G30HHqZFZTWe+i+5yd5gOvUV7WNvKsSlKllMesBUueYK1udpOYBcM
-	 2RfOIEFgO7tAS+gljD/+l3C/paHWuCgmlWfrTuSx0EboVo4Mo9EpjCr38YycBfv3djw==
+	t=1795597175;
+	b=KjUb/khki+Ewf4LsuqszkIJtFeZ/3eCkLnWiWWPAO26slbNNcrrjwq5SZRpAd6HlF67i
+	 hQu6mu+KfXknnpum/ZkN1wZLfuYtMdKo60XPrvB9OlahTo+m9xBgB1QTIZQsrsDzExEPi
+	 4m9KHeQYUSD0LLTlGTtlvuzzK6fCbOMaGOcZGMzCSphvDWFwpTVv3E9ItGo8IX0UF2WCM
+	 ZeA07aAMoy5W4tcNVx9vN8LJkI7OlNtXAFdeQZiwmdfuMh3gcEqqksgxJBzmkzIMPVdhS
+	 TPmQOknW7JYH1ye8m+8bmKaTw/0AHAHN/y6qviHjS6doxb8eLICxRvLi9BzTZ1dRlrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795596559;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=TlND/jXIyTOutFCDB5DXoV3ddiKsYWv3HLDMVOOuvUk=;
-	b=LQE0vBSdlPqY7FItSS5Dr/dXeU+XAOTqmx3rdyr7nSCtCBSzyk+CVGhkxIp30kXbnVin
-	 XrupdkSZSCnG5UsKMEq9dDGfzH8XfCSzJGj395bQT9RH8KAQVeB2Plennd22/fmN5wamK
-	 fgztazqQ+NMWDzbq7DqS5QDQ9kEYjq1Cjb7y1ilXLolDSENXAZqF4vHKA4JJGOpbjR/Ga
-	 C39LFiRAWs1dO7X7u/FZbRC2jQtYwlvwJ0GcKUjrPjA0MW8gN8tmdVZJukSr2ZhqY358L
-	 ydb0FZvg20BMPXJIb1mwNGictZEYP2s2E3o3yE3KOdfBvHKEYjuwDJhCqypagD1+ruQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795597175;
+	h=DMARC-Filter:Received:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
+	 References:Content-Type:Content-Transfer-Encoding:User-Agent:
+	 MIME-Version:X-GND-Sasl:X-GND-State:X-GND-Score:X-GND-Cause;
+	bh=gN4CUQUTI4A3aQzoXeKsqYPNwgKYiOurkvLSM0Ikrms=;
+	b=cexaJ+CJPMI3wW6qFFlNyfqcZZKqVNsdNYgVx1VF37aDgABf82XB2GFRdYLn5lWwYJYu
+	 TI4podqAcl6nPMOSdbL/2beeAjKqVufLw4MkJPgaF7DRAWhLgsr60VGPob4kqxg0s4jlk
+	 PbJv6voDKKwtivzrDirxA8KdaPy+8Mt9VWGYKhNzolROQENQPrOT7MLNuIKJlpSbA0QAA
+	 O2oqZKvLL3Aa+4Yf3oHg2u1TZZic92m/MShbw+td6FvvJJ0h/tzMchzLowDN5VlXZWDs0
+	 UWN1lYwe3D8FMJf3J8oULTUpBzqshUKMuPcoRrpSQcW0e07eBkwV4ci1hi9IzrmRJxQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CbvI696z;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=hadess.net;
+	spf=pass smtp.mailfrom=hadess.net;
+	arc=none smtp.remote-ip=217.70.183.194
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0287606A68D;
-	Wed, 25 Nov 2026 08:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CbvI696z
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FDEF1F00A00;
-	Wed, 25 Nov 2026 08:49:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795596559;
-	bh=TlND/jXIyTOutFCDB5DXoV3ddiKsYWv3HLDMVOOuvUk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=CbvI696zR6OtVXAPCG7g/iPy03A2oTw21RBe6JaPhJHFPRXi+H17lOBRzJrgNARtn
-	 r+fRoufm0OiktxQGgsxLm9zCVTMRoj9kPsTPBWqqSY5vGYQEAuqD+14yaCOmlKMYgF
-	 j1qfbL6ZNKLE7MMyEMUkcV3l/4FT2ZkmMgDykuG0RcIRla9mWdpv0NQJXIM+9jb3cF
-	 VJt8oZcFXReeREr1uqelf/3atuLgWEoBVmlLglOje+t6FyydCXpPAQKHBjUs9j0ERg
-	 xnHTGpj/TffLtZ2xQ+zgZOe75RLjcDXEPhX2RuZKUdYZKO2pec6w3jDkKOOwtf+v8j
-	 Gmrfe0Cs12QCA==
-Date: Wed, 25 Nov 2026 10:49:05 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	"Joerg Roedel (AMD)" <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Nikhil Agarwal <nikhil.agarwal@amd.com>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	Chris Lu <chris.lu@mediatek.com>, Mans Rullgard <mans@mansr.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Cornelia Huck <cornelia.huck@de.ibm.com>,
-	Andrew Morton <akpm@osdl.org>, Jeff Garzik <jeff@garzik.org>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-	Dan Williams <djbw@kernel.org>, linux-kernel@vger.kernel.org,
-	driver-core@lists.linux.dev, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-acpi@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-pci@vger.kernel.org, iommu@lists.linux.dev,
-	linux-coco@lists.linux.dev, Alexey Kardashevskiy <aik@amd.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Greg Kroah-Hartman <gregkh@suse.de>, linux-sound@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v4 02/33] Bluetooth: btusb: Fix MediaTek ISO claim locking
-Message-ID: <20261125084905.GX14811@unreal>
-References: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
- <20261124-device-trust-core-v4-2-037eb0d17b1f@nvidia.com>
- <65749362-927a-492d-8bff-573c277fe456@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7122C606A31E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 08:59:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7122C606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A9BA42997;
+	Wed, 25 Nov 2026 08:59:26 +0000 (UTC)
+Message-ID: <1277316d1d687050b546a2bc006c14a1a9569b5b.camel@hadess.net>
+Subject: Re: [PATCH bluez 1/3] doc/test-runner:
+ s/CONFIG_BT_HCIBTINTEL_PCIE/CONFIG_BT_INTEL_PCIE/
+From: Bastien Nocera <hadess@hadess.net>
+To: Zijun Hu <zijun.hu@oss.qualcomm.com>, Linux Bluetooth
+	 <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	 <luiz.dentz@gmail.com>, Zijun Hu <zijun_hu@icloud.com>
+Date: Wed, 25 Nov 2026 09:59:26 +0100
+In-Reply-To: <20261122-tr_arm64-v1-1-4eccf35daeca@oss.qualcomm.com>
+References: <20261122-tr_arm64-v1-0-4eccf35daeca@oss.qualcomm.com>
+	 <20261122-tr_arm64-v1-1-4eccf35daeca@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-3.fc44) 
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,41 +56,75 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65749362-927a-492d-8bff-573c277fe456@suse.com>
+X-GND-Sasl: hadess@hadess.net
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: dmFkZTGnony62tuoZ8NSvh1Xjvdg6ZXz/4un/s0WSMOQPfOiBn0SqFh4/6HVMjZ/Mvztyf0QKjLu/tucy0e7MkEwvkfjoi3ynTsBKDp9G88yJ9miV3TS+BVSVMakH9ugoRNYlK6X6U76sKhszKfwrbtWQbs+dVXqQzQkkGjqreLXVQPWnYqA014ws5eblbXxtwQMgJb0NptPWQfo9W1EjAC6uRMjYHT1QriO3YXUUslyYgKUlHpvLzRM540RS4qYXx+LwcbDcRSRTT01RschtUVNI3Q0pG4mnEBW/atqXKgeQUjzj2ZicmsncMZEF3lOcq9ZfFPyHBT6XyZz7U7GM9PZSukuXQYhZ79P2jheVftspP+MgJ3UnV1b3/AWUtpyaVOdnhB0EHFI470gO4owy9iK+DMMQxQGAPl7/1znWrz4US3rwgxekpleigvI+NLeCIe7KEgwSg/oCFDNXm03SHwdXv+WTbiexkGhyOWpstKLx38Nj3SQ/wfS5o3M0Y4OVdhl6hPgaOp9BJ+1lO9qbQ2swAek2Hf0qvlF/V2mKGTT0Rc2pu4DHv6mmtRfnt9TjvQ9IgWfr1J63uo4HaOXuKvrOfmfPZPvRWehoUcvwMz7MADNSxlKDkJHcHR33WMLas1amf62Wy9ksAmKpSyuTjK+tXolM/8q7E5hYKWEhggNp4Xa2w
 
-On Tue, Nov 24, 2026 at 11:39:40AM +0100, Oliver Neukum wrote:
-> 
-> 
-> On 24.11.26 10:43, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > MediaTek ISO claims are performed from HCI setup work outside USB probe.
-> > Locking only the interface does not protect the claim against teardown
-> > of the parent device. Unconditionally waiting for the parent lock can
-> > deadlock with disconnect while it drains the setup work.
-> Hi,
-> 
-> your patch raises a question. Can usb_claim_interface() ever be
-> used safely outside probe() without this kind of locking?
+Hey,
 
-No, it cannot. This is why need_parent_lock is set for every caller of
-usb_driver_claim_interface() running from .probe().
+On Sun, 2026-11-22 at 02:34 -0800, Zijun Hu wrote:
+> The btintel_pcie driver is enabled by CONFIG_BT_INTEL_PCIE, not
+> CONFIG_BT_HCIBTINTEL_PCIE, which does not exist.
+>=20
+> Also split CONFIG_SERIAL_8250_PCI=3DyCONFIG_DEBUG_KERNEL=3Dy into two
+> lines.
 
-> If the answer to that is negative, should the locking be integrated into
-> usbcore?
+If you need to write "also" in a commit message, that usually means
+that you need to create a separate commit fixing that separate problem.
 
-Not in the current upstream code. Currently, only two callers of
-usb_driver_claim_interface() do not run through .probe: MediaTek and usbfs.
-usbfs already holds the lock, leaving only MediaTek, which does not.
+This is the case here.
 
-Therefore, the caller should take the lock, and MediaTek is the only caller
-that needs to be fixed.
-
-Thanks
-
-> 
-> 	Regards
-> 		Oliver
-> 
+>=20
+> Assisted-by: Claude:claude-opus-5-5
+> ---
+> =C2=A0doc/test-runner.rst | 5 +++--
+> =C2=A01 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/doc/test-runner.rst b/doc/test-runner.rst
+> index 220a2cec1c55..b5876e4f5108 100644
+> --- a/doc/test-runner.rst
+> +++ b/doc/test-runner.rst
+> @@ -190,17 +190,18 @@ option (like the Bluetooth subsystem) can be
+> enabled on top of this.
+> =C2=A0	CONFIG_NET_9P=3Dy
+> =C2=A0	CONFIG_NET_9P_VIRTIO=3Dy
+> =C2=A0
+> =C2=A0	CONFIG_9P_FS=3Dy
+> =C2=A0	CONFIG_9P_FS_POSIX_ACL=3Dy
+> =C2=A0
+> =C2=A0	CONFIG_SERIAL_8250=3Dy
+> =C2=A0	CONFIG_SERIAL_8250_CONSOLE=3Dy
+> -	CONFIG_SERIAL_8250_PCI=3DyCONFIG_DEBUG_KERNEL=3Dy
+> +	CONFIG_SERIAL_8250_PCI=3Dy
+> +	CONFIG_DEBUG_KERNEL=3Dy
+> =C2=A0	CONFIG_SERIAL_8250_NR_UARTS=3D4
+> =C2=A0
+> =C2=A0	CONFIG_TMPFS=3Dy
+> =C2=A0	CONFIG_TMPFS_POSIX_ACL=3Dy
+> =C2=A0	CONFIG_TMPFS_XATTR=3Dy
+> =C2=A0
+> =C2=A0	CONFIG_DEVTMPFS=3Dy
+> =C2=A0	CONFIG_DEBUG_FS=3Dy
+> @@ -381,17 +382,17 @@ Running shell with host controller PCIe-
+> passthrough
+> =C2=A0
+> =C2=A0In addition the above kernel config option the following is
+> required:
+> =C2=A0
+> =C2=A0.. code-block::
+> =C2=A0
+> =C2=A0	CONFIG_PCI=3Dy
+> =C2=A0	CONFIG_PCI_MSI=3Dy
+> =C2=A0	CONFIG_ACPI=3Dy
+> -	CONFIG_BT_HCIBTINTEL_PCIE=3Dy
+> +	CONFIG_BT_INTEL_PCIE=3Dy
+> =C2=A0
+> =C2=A0IOMMU and interrupt remapping, without which vfio-pci fails to
+> allocate
+> =C2=A0MSI-X vectors (-ENOSPC):
+> =C2=A0
+> =C2=A0.. code-block::
+> =C2=A0
+> =C2=A0	CONFIG_INTEL_IOMMU=3Dy
+> =C2=A0	CONFIG_INTEL_IOMMU_DEFAULT_ON=3Dy
