@@ -1,61 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.78.89
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=77.75.76.89
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795649838;
-	b=ZI/7BwYMpOy3brRl/UbpkthJQGUve05DlO7CNlD5sgpQrelkgsdfN9J1gXjqdNOdjdTp
-	 ZtfDKIkxZhKsVET1ffuO51vyJEOlkHnZElHh2X5FJpdECfnZH2P0EXKUenS7XFidjOERe
-	 l3phtPUPTMyySqSsZEEYhqaD4vtvL0rZW2Wcuz7Uh8qwJ9Qy6YxK6rwseMquuVqjagmNG
-	 Gr246I/gnXNlpFTpw/9aD5K318TaiSRpdwQkGgltBWoXFknl56NiJyV8kktbSWfY6IGL1
-	 UuKdurbdVLRvq3hjDjMwwZyv1db+Qd/5nEYHKtH5ySSBX5VINurPbg5tXG4ozh224/g==
+	t=1795649842;
+	b=Wa4r5jeAo7wduPo1D8TNMSNFVvAXiHgAvcuejWUpGZCghS6DWJkoHvkj28H8IN8ZvjRW
+	 nlVYdA8XhiIkj7RXIceIpxHHSSeTKcv7bJuI5slLXgJ2s9MrfhIcPgRVW5DTqES24TZbA
+	 ysmr1GNKpe8tUkTp+Cev3WTIepHntuH7IEB0yBGjHx1TNFTwHDVftqELoQ3bdizLBs8Ok
+	 YZLmURhl2iAqe4WUMbJW9/gT8zNX546P5ZCCY0gQw+bOh4BPa6UfnzjTk5VXBW4FLJFAH
+	 BotKBwcBeEWVI5Uoqg+HBo00NO8vg/II5sRRYOdFYMU46C8f7SVSRxqMCLPOirn1Qhw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795649838;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795649842;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:From:Date:Subject:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
 	 References:In-Reply-To:To:Cc:X-Mailer;
-	bh=az3pf6ZKU0+YdyqUH/rVdd5Mz08oZMkFsFpzAKyDL2M=;
-	b=KHNwrR9NnOqTnYA6+MQopy0XCrIkgzLR9VB6ezh3cZaRZiXcc2XQ3XcTev1TNyqqJy3E
-	 4Uvnhd3gvfelwDax2dqWH81zz+/ULO7lD8TLsQpJByrEtnlXPd1nHas1PkazKzFOYWTRp
-	 FIB/zo87pTM6DmRdsexm/aUvbZnnCk0Sz/3QJhVo0xfasPNBwlxAnC4erBcRxOlCEFNFm
-	 fSSSl9wwknJN8NZLUh1Z125Y0WSBXpO7DxV7Z9ET/zpXVzQ+fyu8uXPJm79FZU2gnp2J/
-	 FwmjDQ/Aw/q9dmOQTKV6wAi9djb7Rb21vOPzjf9mKlt9zj8cVMpyJ+g7NtGjEyFQlCw==
+	bh=oW1EaG0nC61uki89tRmeCaktZjU+KZagC4yR8cfFS5Q=;
+	b=fVirhYrBdKBh7WgeoEvTCKGgKTtDP03xNV21lFc1dlRm25MoFpsPhtVFJoyFwRehU6NG
+	 2cGbzhq45TMGqYg9suZQ6hJ9mmxhXok5AmwB/8MWQGlybBZDmn/5KgJdybC0VngOxKVqp
+	 XsLNiRt1mHP6gvO8uYTkSyy2+xENcJAUFzY9s2zhEQ6HacP77Vf8CRznWBrFGA5a9Un2g
+	 8TD9PNp4NQGO8KkCF9fcgUIBF5LuFrFjQ40ea4Hb/rWKL8XKB6ENHHWyUk1VYSV5uIs4M
+	 xkZJIk1usBJ9KVJyzAxLlqfyJ8amjqWJTjvsp5T9uqnPsi1dGXi89nqsBgVnf0o7IpQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=podgorny.cz;
 	spf=pass smtp.mailfrom=podgorny.cz;
-	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=pJsvVhWx;
-	arc=none smtp.remote-ip=77.75.78.89
-Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.78.89])
+	dkim=pass header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=bEfLkdtr;
+	arc=none smtp.remote-ip=77.75.76.89
+Received: from mxb.seznam.cz (mxb.seznam.cz [77.75.76.89])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0F1606A329;
-	Wed, 25 Nov 2026 23:37:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B0F1606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5687606A329;
+	Wed, 25 Nov 2026 23:37:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A5687606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=podgorny.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=pJsvVhWx
+	dkim=pass (2048-bit key, unprotected) header.d=podgorny.cz header.i=@podgorny.cz header.a=rsa-sha256 header.s=szn1 header.b=bEfLkdtr
 Received: from email.seznam.cz
-	by smtpc-mxb-5bd84c9575-nc5th
-	(smtpc-mxb-5bd84c9575-nc5th [2a02:598:64:8a00::1000:947])
-	id 53e6bc5be5dc11425669a613;
-	Thu, 26 Nov 2026 00:37:06 +0100 (CET)
+	by smtpc-mxb-67bf8c997c-nxznx
+	(smtpc-mxb-67bf8c997c-nxznx [2a02:598:128:8a00::1000:93f])
+	id 46c1d321f0fb7e38434ec969;
+	Thu, 26 Nov 2026 00:37:14 +0100 (CET)
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed; d=podgorny.cz; s=szn1;
-	t=1795649826; bh=az3pf6ZKU0+YdyqUH/rVdd5Mz08oZMkFsFpzAKyDL2M=;
+	t=1795649834; bh=oW1EaG0nC61uki89tRmeCaktZjU+KZagC4yR8cfFS5Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:To:Cc;
-	b=pJsvVhWxIdS2q3nu61uq1TR+nimbNNRphLZ6ITsYbQTWFohQpYnR8aD5xgztCFFQM
-	 tS6jHz+D5kwlY7MXl3xxpBKW5PS8f150zoEN0pqXbhlqAucNYhG4JRegc2bP4uMM7V
-	 X8uHRq0wQ3kBQ+3u2HkPOHovVSvEl81T+9iuqURWLjPbzKTltDwEeoVoQNWjg6ZBp6
-	 NG5SFVKXneN77XUS15OL1BLhS5QmTXc16G4kOWlJvRoqfahM6oVW4EVj/ByeZYlRm1
-	 1I8Zw/ws1wOFUUsKqPysnOFhMAqklo+Hd2gLGAQdAuHkY4CWvUgu0+pKlYV4/0nAPN
-	 gqC+WS9BotalQ==
+	b=bEfLkdtrov5G543709csWw8pYWJ0OPZki5Z62EUHY+xAUjAA19RqVlBggdW8iZO8J
+	 rGAvnplvPFNM+8SGlsorVExPnKThMNs+ZzU01NWhlU++Iy5e9iFiVF1y+N1RHrehTu
+	 trzPg5lnCsV42mCxk4QE5LxNuV3a1AdWwi3/xwXZv7ldjp2ygEuUYWxFx7d0zQhH+y
+	 34U5SimzNopsEaVpYzbSyC5wbk2P+2pEtO9HaR2HZXeFf9RLNtDFVd38t+jmnIUgEt
+	 q3Gc01djuqhvNSP3GbjQ/KjDzLX88E5OPVJ6Z2UgmZH0K3QLNb6i4TobOTdrocipkP
+	 oniZO8PTRhtsw==
 Received: from [192.168.31.57] ([2a01:9422:904:1ee:e65e:37ff:feee:e29c])
 	by smtpd-relay-86b589c786-pdzw7 (szn-email-smtpd/2.0.97) with ESMTPA
-	id 9aee33ef-4dd5-4215-807d-e33641008801;
+	id c4433140-c7eb-4bf5-9953-d4d328ffc188;
 	Thu, 26 Nov 2026 00:36:53 +0100
 From: Radek Podgorny <radek@podgorny.cz>
-Date: Thu, 26 Nov 2026 00:36:50 +0100
-Subject: [PATCH v5 3/4] Bluetooth: connect to an RPA as to the identity
- behind it
+Date: Thu, 26 Nov 2026 00:36:51 +0100
+Subject: [PATCH v5 4/4] Bluetooth: find an RPA peer's connection parameters
+ by its identity
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -67,7 +67,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261126-for-upstream-le-conn-params-rpa-v5-3-b7f015a35023@podgorny.cz>
+Message-Id: <20261126-for-upstream-le-conn-params-rpa-v5-4-b7f015a35023@podgorny.cz>
 References: <20261126-for-upstream-le-conn-params-rpa-v5-0-b7f015a35023@podgorny.cz>
 In-Reply-To: <20261126-for-upstream-le-conn-params-rpa-v5-0-b7f015a35023@podgorny.cz>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -78,110 +78,382 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  linux-kernel@vger.kernel.org, Radek Podgorny <radek@podgorny.cz>
 X-Mailer: b4 0.15.2
 
-A connect made to a peer's RPA through hci_connect_le_scan(), from Pair
-Device, an L2CAP socket or a CIS, looks for an existing connection by
-that RPA only. A bonded peer's established connection is kept under its
-identity, so the lookup misses it and a second hci_conn is created under
-the RPA. An L2CAP connect to the RPA of a connected peer does exactly
-that on v7.3.5. The connect also marks params under the RPA for itself,
-while the peer's advertising reports are resolved to its identity before
-check_pending_le_conn() looks params up, so it is never started and
-waits until it is cancelled.
+A bonded peer's connection parameters are stored under its identity
+address, but hci_conn_params_lookup() matches only the exact address it
+is given. hci_le_create_conn_sync() is given the peer's RPA, since
+hci_connect_le() dials the cached RPA when the controller cannot
+resolve it, so it misses the entry and creates the connection with the
+controller-wide defaults instead of the peer's own parameters.
 
-Resolve an RPA to the identity first, through a new
-hci_rpa_to_identity(), so the connect proceeds as one made to the
-identity: it finds the peer's connection, also one hci_connect_le() is
-still creating under an RPA, through the fallback by IRK the previous
-patch adds to hci_conn_hash_lookup_le(), and marks the identity's
-params.
-hci_connect_le() still puts the RPA on air when the controller cannot
-resolve it. SMP can free the IRK without hdev->lock, so the identity is
-copied out under rcu_read_lock().
+Resolve an RPA to its identity in hci_conn_params_lookup() and in
+hci_conn_params_add(), which uses the result both to search and as the
+key of a new entry, so every caller finds the same entry whichever of
+the peer's addresses it holds. The identity is looked up instead of the
+RPA, not after it: Pair Device leaves an entry under the RPA the peer
+had before bonding, which matching first would hand out for as long as
+the peer keeps that RPA. Such an entry is cleared with the other
+disabled ones the next time all connection parameters are loaded.
 
-An L2CAP channel keeps the address it was connected to, here the RPA,
-also when its connection is under the identity, as it already does when
-le_conn_complete_evt() moves a new connection to the identity.
+The entry found can then be under another address type than the one
+given; load_conn_subrate() looks the connection up with the entry's.
 
-Fixes: f75113a26008 ("Bluetooth: add hci_connect_le_scan")
+SMP adds an IRK without hdev->lock, so a caller that resolves twice, in
+a lookup and then in an add, can see the two disagree. Such callers
+resolve once and use __hci_conn_params_lookup() and a new
+__hci_conn_params_add(), which do not resolve again:
+hci_explicit_conn_params_set(), given an address hci_connect_le_scan()
+has resolved, and Load Connection Parameters. Set Device Flags uses a
+single add. hci_conn_params_del() and Unpair Device keep matching
+exactly.
+
+What userspace sees, given an RPA:
+- Set and Get Device Flags act on the identity's entry, where Set used
+  to create a separate one under the RPA and Get failed. The reply
+  still carries the address given; Device Flags Changed names the
+  identity.
+- Load Connection Parameters and Load Connection Subrate store the
+  parameters under the identity.
+- New Connection Parameter, sent when a connection still under an RPA
+  gets new parameters, names the identity whose entry was updated. It
+  only carries identity addresses, so it used to be dropped there.
+
+Fixes: 4914c4998961 ("Bluetooth: put the peer's on-air address on air when we cannot resolve")
 Assisted-by: Claude:claude-opus-5-5
 Signed-off-by: Radek Podgorny <radek@podgorny.cz>
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_conn.c         |  7 +++++++
- net/bluetooth/hci_core.c         | 22 ++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
+ include/net/bluetooth/hci_core.h |  4 +++
+ net/bluetooth/hci_conn.c         | 20 ++++++++++++---
+ net/bluetooth/hci_core.c         | 55 +++++++++++++++++++++++++++++++++-------
+ net/bluetooth/hci_event.c        | 10 ++++++--
+ net/bluetooth/mgmt.c             | 44 +++++++++++++++++---------------
+ 5 files changed, 99 insertions(+), 34 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 071131f08c0a..fa2d139574d2 100644
+index fa2d139574d2..213b3b56aeff 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1904,6 +1904,8 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
- 				 u8 type);
- void hci_bdaddr_list_clear(struct list_head *list);
+@@ -1906,8 +1906,12 @@ void hci_bdaddr_list_clear(struct list_head *list);
  
-+void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
-+			 u8 *addr_type, bdaddr_t *id_addr);
+ void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
+ 			 u8 *addr_type, bdaddr_t *id_addr);
++struct hci_conn_params *__hci_conn_params_lookup(struct hci_dev *hdev,
++						 bdaddr_t *addr, u8 addr_type);
  struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
  					       bdaddr_t *addr, u8 addr_type);
++struct hci_conn_params *__hci_conn_params_add(struct hci_dev *hdev,
++					      bdaddr_t *addr, u8 addr_type);
  struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 					    bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 5676671d813c..fdebaf3c1982 100644
+index fdebaf3c1982..8150ea0fc21a 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1851,6 +1851,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     enum conn_reasons conn_reason)
- {
- 	struct hci_conn *conn;
-+	bdaddr_t id_addr;
+@@ -515,8 +515,10 @@ static int le_conn_update_sync(struct hci_dev *hdev, void *data)
+ 	struct hci_conn *conn = d->conn;
+ 	struct hci_conn_params *params;
+ 	struct hci_cp_le_conn_update cp;
++	bdaddr_t addr;
+ 	u16 timeout;
+ 	u8 store_hint;
++	u8 addr_type;
+ 	int err;
  
- 	/* Let's make sure that le is enabled.*/
- 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
-@@ -1860,6 +1861,12 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 		return ERR_PTR(-EOPNOTSUPP);
+ 	/* Verify connection is still alive and read conn fields under
+@@ -554,6 +556,9 @@ static int le_conn_update_sync(struct hci_dev *hdev, void *data)
+ 	 */
+ 	hci_dev_lock(hdev);
+ 
++	bacpy(&addr, &conn->dst);
++	addr_type = conn->dst_type;
++
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+ 	if (params) {
+ 		params->conn_min_interval = d->min;
+@@ -561,13 +566,17 @@ static int le_conn_update_sync(struct hci_dev *hdev, void *data)
+ 		params->conn_latency = d->latency;
+ 		params->supervision_timeout = d->to_multiplier;
+ 		store_hint = 0x01;
++
++		/* Report the entry updated, the identity's for an RPA */
++		bacpy(&addr, &params->addr);
++		addr_type = params->addr_type;
+ 	} else {
+ 		store_hint = 0x00;
  	}
  
-+	/* Connect to the peer as if by its identity, under which its
-+	 * connection and parameters are kept. hci_connect_le() puts its RPA
-+	 * on air when the controller cannot resolve it.
+ 	hci_dev_unlock(hdev);
+ 
+-	mgmt_new_conn_param(hdev, &conn->dst, conn->dst_type, store_hint,
++	mgmt_new_conn_param(hdev, &addr, addr_type, store_hint,
+ 			    d->min, d->max, d->latency, d->to_multiplier);
+ 
+ 	return 0;
+@@ -1699,9 +1708,14 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
+ 	if (is_connected(hdev, addr, addr_type))
+ 		return -EISCONN;
+ 
+-	params = hci_conn_params_lookup(hdev, addr, addr_type);
++	/* hci_connect_le_scan() has resolved addr already. Resolving it
++	 * again in each of the lookup and the add would let an IRK that
++	 * arrives in between make the add return existing params, which
++	 * would then be taken for new ones.
 +	 */
-+	hci_rpa_to_identity(hdev, &dst, &dst_type, &id_addr);
-+
- 	/* Some devices send ATT messages as soon as the physical link is
- 	 * established. To be able to handle these ATT messages, the user-
- 	 * space first establishes the connection and then starts the pairing
++	params = __hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (!params) {
+-		params = hci_conn_params_add(hdev, addr, addr_type);
++		params = __hci_conn_params_add(hdev, addr, addr_type);
+ 		if (!params)
+ 			return -ENOMEM;
+ 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 024960e9af66..eb48488ab395 100644
+index eb48488ab395..32703c4d1ebd 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2359,6 +2359,28 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
- 	return 0;
+@@ -2381,9 +2381,13 @@ void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
+ 	rcu_read_unlock();
  }
  
-+/* A peer we hold the IRK of is tracked under its identity address, so
-+ * point *addr and *addr_type at the identity behind an RPA we can resolve.
-+ * SMP can free the IRK without hdev->lock, so the identity is copied to
-+ * @id_addr before leaving the RCU read-side section.
+-/* This function requires the caller holds hdev->lock */
+-struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+-					       bdaddr_t *addr, u8 addr_type)
++/* Like hci_conn_params_lookup(), but without resolving an RPA to its
++ * identity.
 + *
 + * This function requires the caller holds hdev->lock.
 + */
-+void hci_rpa_to_identity(struct hci_dev *hdev, bdaddr_t **addr,
-+			 u8 *addr_type, bdaddr_t *id_addr)
++struct hci_conn_params *__hci_conn_params_lookup(struct hci_dev *hdev,
++						 bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
+ 
+@@ -2397,6 +2401,17 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
++					       bdaddr_t *addr, u8 addr_type)
 +{
-+	struct smp_irk *irk;
++	bdaddr_t id_addr;
 +
-+	rcu_read_lock();
-+	irk = hci_get_irk(hdev, *addr, *addr_type);
-+	if (irk) {
-+		bacpy(id_addr, &irk->bdaddr);
-+		*addr = id_addr;
-+		*addr_type = irk->addr_type;
-+	}
-+	rcu_read_unlock();
++	hci_rpa_to_identity(hdev, &addr, &addr_type, &id_addr);
++
++	return __hci_conn_params_lookup(hdev, addr, addr_type);
 +}
 +
- /* This function requires the caller holds hdev->lock */
- struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- 					       bdaddr_t *addr, u8 addr_type)
+ /* This function requires the caller holds hdev->lock or rcu_read_lock */
+ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+ 						  bdaddr_t *addr, u8 addr_type)
+@@ -2436,13 +2451,17 @@ void hci_pend_le_list_add(struct hci_conn_params *param,
+ 	list_add_rcu(&param->action, list);
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
+-struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+-					    bdaddr_t *addr, u8 addr_type)
++/* Like hci_conn_params_add(), but without resolving an RPA to its
++ * identity.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++struct hci_conn_params *__hci_conn_params_add(struct hci_dev *hdev,
++					      bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
+ 
+-	params = hci_conn_params_lookup(hdev, addr, addr_type);
++	params = __hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (params)
+ 		return params;
+ 
+@@ -2469,6 +2488,20 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 	return params;
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type)
++{
++	bdaddr_t id_addr;
++
++	/* Resolve once, and use the result both to search and as the key
++	 * of a new entry.
++	 */
++	hci_rpa_to_identity(hdev, &addr, &addr_type, &id_addr);
++
++	return __hci_conn_params_add(hdev, addr, addr_type);
++}
++
+ void hci_conn_params_free(struct hci_conn_params *params)
+ {
+ 	hci_pend_le_list_del_init(params);
+@@ -2482,12 +2515,16 @@ void hci_conn_params_free(struct hci_conn_params *params)
+ 	kfree(params);
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
++/* Unlike hci_conn_params_lookup() and hci_conn_params_add(), this matches
++ * addr exactly.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_params *params;
+ 
+-	params = hci_conn_params_lookup(hdev, addr, addr_type);
++	params = __hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (!params)
+ 		return;
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b6c7f9a9f55a..125795339509 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -7580,6 +7580,8 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 
+ 	if (hcon->role == HCI_ROLE_MASTER) {
+ 		struct hci_conn_params *params;
++		bdaddr_t *addr = &hcon->dst;
++		u8 addr_type = hcon->dst_type;
+ 		u8 store_hint;
+ 
+ 		params = hci_conn_params_lookup(hdev, &hcon->dst,
+@@ -7590,12 +7592,16 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev, void *data,
+ 			params->conn_latency = latency;
+ 			params->supervision_timeout = timeout;
+ 			store_hint = 0x01;
++
++			/* Report the entry updated, the identity's */
++			addr = &params->addr;
++			addr_type = params->addr_type;
+ 		} else {
+ 			store_hint = 0x00;
+ 		}
+ 
+-		mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type,
+-				    store_hint, min, max, latency, timeout);
++		mgmt_new_conn_param(hdev, addr, addr_type, store_hint, min, max,
++				    latency, timeout);
+ 	}
+ 
+ 	cp.handle = ev->handle;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d21538634bc3..41bb8f53f3d7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3422,7 +3422,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	set_bit(HCI_CONN_PARAM_REMOVAL_PEND, conn->flags);
+ 
+ 	/* Disable auto-connection parameters if present */
+-	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr, addr_type);
++	params = __hci_conn_params_lookup(hdev, &cp->addr.bdaddr, addr_type);
+ 	if (params) {
+ 		if (params->explicit_connect)
+ 			params->auto_connect = HCI_AUTO_CONN_EXPLICIT;
+@@ -5492,6 +5492,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_cp_set_device_flags *cp = data;
+ 	struct bdaddr_list_with_flags *br_params;
+ 	struct hci_conn_params *params;
++	struct mgmt_addr_info ev_addr = cp->addr;
+ 	u8 status = MGMT_STATUS_INVALID_PARAMS;
+ 	u32 supported_flags;
+ 	u32 current_flags = __le32_to_cpu(cp->current_flags);
+@@ -5526,19 +5527,16 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+-					le_addr_type(cp->addr.type));
++	/* Create a new hci_conn_params if it doesn't exist. One add, which
++	 * resolves an RPA once, rather than a lookup and an add that each
++	 * resolve it and can disagree if the IRK arrives in between.
++	 */
++	params = hci_conn_params_add(hdev, &cp->addr.bdaddr,
++				     le_addr_type(cp->addr.type));
+ 	if (!params) {
+-		/* Create a new hci_conn_params if it doesn't exist */
+-		params = hci_conn_params_set(hdev, &cp->addr.bdaddr,
+-					     le_addr_type(cp->addr.type),
+-					     HCI_AUTO_CONN_DISABLED);
+-		if (!params) {
+-			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
+-				    &cp->addr.bdaddr,
+-				    le_addr_type(cp->addr.type));
+-			goto unlock;
+-		}
++		bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
++			    &cp->addr.bdaddr, le_addr_type(cp->addr.type));
++		goto unlock;
+ 	}
+ 
+ 	supported_flags = hdev->conn_flags;
+@@ -5552,6 +5550,10 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	WRITE_ONCE(params->flags, current_flags);
+ 	status = MGMT_STATUS_SUCCESS;
+ 
++	/* Given an RPA, the flags changed are the identity's */
++	bacpy(&ev_addr.bdaddr, &params->addr);
++	ev_addr.type = link_to_bdaddr(LE_LINK, params->addr_type);
++
+ 	/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
+ 	 * has been set.
+ 	 */
+@@ -5563,7 +5565,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ done:
+ 	if (status == MGMT_STATUS_SUCCESS)
+-		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++		device_flags_changed(sk, hdev, &ev_addr.bdaddr, ev_addr.type,
+ 				     supported_flags, current_flags);
+ 
+ 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
+@@ -8392,6 +8394,7 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	for (i = 0; i < param_count; i++) {
+ 		struct mgmt_conn_param *param = &cp->params[i];
++		bdaddr_t *addr = &param->addr.bdaddr, id_addr;
+ 		struct hci_conn_params *hci_param;
+ 		u16 min, max, latency, timeout;
+ 		bool update = false;
+@@ -8422,21 +8425,22 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			continue;
+ 		}
+ 
++		/* Resolve once, so the lookup and the add below agree */
++		hci_rpa_to_identity(hdev, &addr, &addr_type, &id_addr);
++
+ 		/* Detect when the loading is for an existing parameter then
+ 		 * attempt to trigger the connection update procedure.
+ 		 */
+ 		if (!i && param_count == 1) {
+-			hci_param = hci_conn_params_lookup(hdev,
+-							   &param->addr.bdaddr,
+-							   addr_type);
++			hci_param = __hci_conn_params_lookup(hdev, addr,
++							     addr_type);
+ 			if (hci_param)
+ 				update = true;
+ 			else
+ 				hci_conn_params_clear_disabled(hdev);
+ 		}
+ 
+-		hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
+-						addr_type);
++		hci_param = __hci_conn_params_add(hdev, addr, addr_type);
+ 		if (!hci_param) {
+ 			bt_dev_err(hdev, "failed to add connection parameters");
+ 			continue;
+@@ -8571,7 +8575,7 @@ static int load_conn_subrate(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 			conn = hci_conn_hash_lookup_le(hdev,
+ 						       &hci_param->addr,
+-						       addr_type);
++						       hci_param->addr_type);
+ 			if (conn && conn->state == BT_CONNECTED &&
+ 			    (conn->le_rate_interval < min ||
+ 			     conn->le_rate_interval > max ||
 
 -- 
 2.56.1
