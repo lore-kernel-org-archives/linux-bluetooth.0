@@ -1,91 +1,141 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795580248;
-	b=VSVKZuOsUlZLxSxyubCWXvqxmPrU7Z/4jrufmkMFYIU5ysgzklLqCc3Nc9kWbuHqSnNJ
-	 HGFKpK4vS5MZrtGnw3+kofnOlQB741AultBQ+ZCd/D5kfdx/yOfn+EpoQ/g348kJRQUQr
-	 GoT71Lq6nTgt656PCbhkk9jPCzn7mB8j7neux3Fo+6ijir2IScIrUobL3ETk3QWXVcJfV
-	 kZz3CK3vAZqpF1J6bWWkh8v9sssALn5+zuQUNwUoSX9npwyift6LtD038jvYQPAgL5z/b
-	 oiXa0dKnAj/VIcP+KqrJrE2TRlKVIE+gWyFUIeoBT6kYiREfpSwcc8btJLZtllYJFIQ==
+	t=1795587230;
+	b=3wgU8ksfJEuHNRnrsb959h6NjxvHDOGaNvNF/FIfVcmuLanpcgpKgW3lgFq6LhCL2Lji
+	 gGAsQ9KWXRV6Q7EFlZ5FXCNhOhmTN415NrmOBuveJekasPgjR3N6ArcLHJHY0bNDqIPc8
+	 EUVqyS6/tsrZ5rk24j33ODQWbLtuIn+UFJhP2TkhDniTPnz5AFztTsAQD635doft92MUQ
+	 4U7LyklBN71/VhUNW2Oos61EbNcKqLo/oBuyXrnRvGrSqYUjLhx0iMMeS9dYH4cWM6VkI
+	 o9M5xHizDXDLhs8I7I+YZAjp082d2VEFtFgqDJYzFZJ5Ckc8lYY2euBowtxVscA5Elw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795580248;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1795587230;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=vh6w0T9qHIVxcg/a2KDRjLaoU24jX52JM+LXys/EIIs=;
-	b=bFvKWTfmVotTXD41m0r+IpCFVnUwwcyh50aJabehquQTsv48PrCaU8ZtmacNfKhWVe7z
-	 bAtb9LNoEkdRT3SUMMZ4aMpA1+hXUNPrGly49kj9NGFx79kkQ8Fwm0nj9maknWQq2rhYj
-	 6xWmLKxwZUgsZgS6qBAw1ShyBGOdUYLsSB+jrKMkK8XzRkGXkDHbrvEZwC5myi2ns6HQl
-	 bK80luihm6lEOTXAA5DtilhHB3NHiUh5KKsPY/JDwiwKBYaogMe2Ty4q4OtwYHqxozqiI
-	 5uAxuTWHNHt80qWUPobuR9ntC7HS8DExuEk5l83ZQYnr2ypf3q9p+pTEUh98XDAAOnw==
+	bh=1lJ3K/EilkHlytmEnlIWdtZUx18zfJBzx5n6NoVgMZA=;
+	b=IETCTbMrlrJwwETGjpYASCVYLHGHQcwtvBvXPzN0s/iZBgrXf4yj3YwDVcPDc4/0qlyL
+	 oeGaysoyHcZvNmx0nzcUSwAdPAPmJmnJZH6W3BulFJ436L46/u6SsqYG+114C+kCyfPX/
+	 pk6Dkn6gs5mD9PG+PHb2e/XtTO5dGP5jJb8fLqmaGrCNKWbHa7qggEVRMDj3Rz9f/7WQS
+	 dfyaxY/9q8DXo05eUbKM5hVRSzSnslY/xgtO3yRT7t6je2UjvQMJ10QHMmGQA9pzbQjtw
+	 zX65xKTtGPRQQaYmPgsvdkur42FVBsV/Wj/+Jfd9o1GNNyl7xUNpk/s5EKTMcN9DMIg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0O6stP9T;
-	arc=none smtp.remote-ip=209.85.210.175
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=RqltCb+4;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD7C606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 04:17:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8FD7C606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE95606A31E;
+	Wed, 25 Nov 2026 06:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEE95606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0O6stP9T
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8c6c06b3321so4145494b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 20:17:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795580248; x=1796185048; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vh6w0T9qHIVxcg/a2KDRjLaoU24jX52JM+LXys/EIIs=;
-        b=0O6stP9TzQlA8CbThQ8IZWW1AnsSjQXAZErRCzE31yvF9Idb/AhZDUB2YgD5UacqQ7
-         XTYeaLkDDGNwjDUw0tom++aPn9aWd7/DUgggv2E8QgMuY35Q1vAonihRu7+2yBfq1hmZ
-         z19jtjMrgj4rOI5ib6/D4A2WO0w/bEwpIaJZsCwScdgGmY4mLdnyiWxM41yaQEBW8Wjl
-         Hc40PXxkTcFAO2yezBN0UYyeCgQKiTBoYjuIfuqcHJkL1uB5npUtxncj35TKhW9I0T5f
-         46QsvG6zK/HTdJD4GJZoUPXHVxYFxki52feRf5Sf939DeZkAPVcAKzi0gBfWMWbwkgz0
-         qy9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795580248; x=1796185048;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=vh6w0T9qHIVxcg/a2KDRjLaoU24jX52JM+LXys/EIIs=;
-        b=KApQhczlxIwekoXNrhl4vBdpdKbEBGZywG9NYkwB/N8ktTyDTJqOnT0aSbTOt7Vn7R
-         MqWGXLrZOfErysvopYvxSc8AXGkyx6xHMGHGckX70deCehzte60gu4/Ogn1rJqYo1CMc
-         Wp/lXvtx+0s8+rJKrxrScND0uRpcG6HFePgb6L8hmLm0Gkd/wdRhqsfTGm/IHgHJqwUT
-         HauQ/oYDcTgwrYulFQEW/sd2rC5tKonHjZd8WEekIIdeDXKMUf1/bVrK3afBYZy8VYG4
-         daUikcMbqp/en9KLHiLPT5raEuqaxwoSyU/6FYTsPqAKnibrroqW/uwgkz25dLCQwOIr
-         1ZJw==
-X-Gm-Message-State: APuU4Z8wdDVeT/XfksXznT98gPxGLyL/tHHIddGarCvCQUtyBlJwqenx
-	ZaCL0zvdXceUrqKYDWat1zFRg1lTJx88j1ToHFx7GFovzwdLFtxJgm0wmq9J1A==
-X-Gm-Gg: AZFdTZdExqVkCbBTOESx1fvCHP20LpmCa3wHdbb3peRIc+QTb0sudtkBd/AaoUY4Ro0
-	TmBt7hXTQNNaLPzu2CXtpWBc2Z6xiiAcCjidH12mAWjR+zXlKeNSUb4qmlAF/u6iF4vccS22BWy
-	wrz1iI5oSETIHJQkz/Bu1BZb+kj/leGSuu843nV4r6+yZzyVAjQOGNWaFnRonz2kMid8XNXmxn8
-	A9Og+pyGF4pe0LsWGXsLl7iMGGjoVdk+j8U6ggdGRlwuYSYs9+PVcxk83J2tbVvnKbUxbkD+2AT
-	4TFQeknNFh9xUiX3sTFmRtOPz8HDic6Iuw7LeLYYLZuj7eY3A7b26g/WQdsMYwn3/r6daY2YtYk
-	cgDPSGxyVxwvtibx+usJXm9jVS3EEVd45jKgxvybzmm/DzsM+vzfpr4HWof88mYVbSYCBG7nDVs
-	mpXrq3/uyAfa9I0WcVeC8N07iWkLnjXWgzeU9GB62U3ZWtk/ay5gINsowC34yCdq/wawQVPhDuA
-	opMwJ9g++XE0Nl2viV8hH6e+CEoJaMqUcDaigSaEICijUFIsgiHP/wXi/XNSDCQfeIi4s1cKTbR
-	K/mHZz143yXFfXgtHL7pqYn+QB3S10epGqWOKT8bnCnkJRbD490W
-X-Received: by 2002:aa7:9316:0:b0:8b1:1410:ac5a with SMTP id d2e1a72fcca58-8c87bdb43a3mr14676308b3a.13.1795580247785;
-        Tue, 24 Nov 2026 20:17:27 -0800 (PST)
-Received: from fedora.tail791dd8.ts.net ([2601:1c0:4300:57a:5830:187:53e3:add2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c87343f726sm8503875b3a.36.2026.11.24.20.17.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 20:17:27 -0800 (PST)
-From: Dylan MacKenzie <ecstaticmorse@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dylan MacKenzie <ecstaticmorse@gmail.com>
-Subject: [PATCH BlueZ v2 2/2] input/device: Only auto-reconnect on link loss
-Date: Tue, 24 Nov 2026 20:17:14 -0800
-Message-ID: <20261125041714.2691802-3-ecstaticmorse@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=RqltCb+4
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=1lJ3K/EilkHlytmEnlIWdtZUx18zfJBzx5n6NoVgMZA=; b=RqltCb+47NdqyaEvOeyiNTu41X
+	84FUK7YH1lzhc+XRDU7RDe1ATmwD2JLDQQHYXSptW+C8cOoyJXaeMMoxDrj52mgJbJABc7Wp7C6Ek
+	yMmn7sxUNjG9+JacqyjWHOLLSx44CbPR/BUHV3axpjiiSm5gCjQQXyxxA7H3gdH1t4MGWdJOzFgY/
+	LdhuYc4NBwg0ll800pMNrxw416aXG455yKA7ZRyCJXxDYUE7E96+EFTBNvaDVaODEWfUflZDK22Vc
+	WudMF3wjFMpxyZ/vO15PD+q5sQEnuA9btI8rOSE+Z/fRZgBFloydCASmKFi4tcauXjXpi+0t0+GV5
+	I+QiQsxQ==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xW6GF-00000008Wvh-2FgZ;
+	Wed, 25 Nov 2026 06:13:43 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-doc@vger.kernel.org,
+	David Hildenbrand <david@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	linux-mm@kvack.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	linux-sound@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowangio@gmail.com>,
+	David Heidelberg <david@ixit.cz>,
+	oe-linux-nfc@lists.linux.dev,
+	Chas Williams <3chas3@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Helge Deller <deller@gmx.de>,
+	linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	MPT-FusionLinux.pdl@broadcom.com,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	linux-scsi@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	linux-mtd@lists.infradead.org,
+	Neill Kapron <nkapron@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-usb@vger.kernel.org,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	xen-devel@lists.xenproject.org,
+	Hans de Goede <hansg@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Jan Kara <jack@suse.cz>,
+	linux-fsdevel@vger.kernel.org,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	linux-ext4@vger.kernel.org,
+	Mike Marshall <hubcap@omnibond.com>,
+	devel@lists.orangefs.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-cifs@vger.kernel.org,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Chao Yu <chao@kernel.org>,
+	linux-f2fs-devel@lists.sourceforge.net,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Benson Leung <bleung@chromium.org>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	amd-gfx@lists.freedesktop.org,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	intel-gfx@lists.freedesktop.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-xe@lists.freedesktop.org
+Subject: [PATCH v3 00/12] docs: ioctl-number: update entries
+Date: Tue, 24 Nov 2026 22:13:27 -0800
+Message-ID: <20261125061340.3402300-1-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261125041714.2691802-1-ecstaticmorse@gmail.com>
-References: <20261125041714.2691802-1-ecstaticmorse@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -95,110 +145,121 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Commit 5cbdfbd83d66 ("input: Automatically attempt a reconnect when
-required.") added a timer that pages a HID device every 30 seconds
-for up to 3 minutes after its connection is closed, in order to
-restore the connection of a device that "goes out of range and comes
-back". The timer is armed whenever the interrupt channel is closed
-though, including when the link was terminated on purpose.
+Update file names that define ioctls and update the range of
+ioctl function numbers that are used where they have changed.
 
-This breaks devices which can be bonded to several hosts and expose
-HID next to other profiles, such as earbuds with a head tracking
-sensor (ReconnectMode "any"). When they move to another host they
-disconnect with Remote User Terminated Connection:
+[Since having multiple maintainers trying to merge these would
+cause some conflicts, it would be more manageable for Jon to
+take all of these through the docs-next tree.]
 
-> HCI Event: Disconnect Complete (0x05) plen 4
-        Status: Success (0x00)
-        Handle: 51
-        Reason: Remote User Terminated Connection (0x13)
+ [PATCH 01/12 v2] docs: ioctl-number: update MM entries
+ [PATCH 02/12 v2] docs: ioctl-number: update sound entries
+ [PATCH 03/12 v2] docs: ioctl-number: update block entries
+ [PATCH 04/12 v2] docs: ioctl-number: update networking entries
+ [PATCH 05/12 v2] docs: ioctl-number: update video/fbdev entries
+ [PATCH 06/12 v2] docs: ioctl-number: update SCSI entries
+ [PATCH 07/12 v2] docs: ioctl-number: update MTD entries
+ [PATCH 08/12 v2] docs: ioctl-number: update USB entries
+ [PATCH 09/12 v2] docs: ioctl-number: update virtualization entries
+ [PATCH 10/12 v2] docs: ioctl-number: update FS entries
+ [PATCH 11/12 v2] docs: ioctl-number: update platform entries
+ [PATCH 12/12 v2] docs: ioctl-number: update DRM entries
 
-and 30 seconds later bluetoothd connects HID again, which brings the
-audio profiles back with it and takes the device away from the host
-the user just switched to.
+ Documentation/userspace-api/ioctl/ioctl-number.rst |   91 ++++++++---
+ 1 file changed, 72 insertions(+), 19 deletions(-)
 
-Check why the BR/EDR link last ended, both before starting the timer
-and every time it fires, and do not reconnect if the link was
-terminated by the remote device or by the local host. The check when
-the timer fires covers a device that was lost, came back and left on
-purpose between two attempts. Also cancel a timer that is still pending
-from an earlier link loss when the connection is then closed on
-purpose. Other reasons, including an unknown one, keep reconnecting as
-before.
+v2 changes:
+- address sashiko review comments
+- drop addition of arch/x86/kvm/x86.c (Sean Christopherson)
+- drop moderated mailing lists
+v3 changes:
+- update the scarlett2 sound driver ioctl range (sashiko)
+- rebase all patches in the series
 
-Assisted-by: Claude:claude-fable-5-2
----
- profiles/input/device.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 5b1be2b16..38ad00561 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -24,6 +24,7 @@
- 
- #include "bluetooth/bluetooth.h"
- #include "bluetooth/hidp.h"
-+#include "bluetooth/mgmt.h"
- #include "bluetooth/sdp.h"
- #include "bluetooth/sdp_lib.h"
- #include "bluetooth/uuid.h"
-@@ -1374,6 +1375,26 @@ static int dev_connect(struct input_device *idev)
- 	return -EIO;
- }
- 
-+/* The host is only expected to restore a connection that was lost, e.g.
-+ * because the device went out of range. Do not page a device that terminated
-+ * the link on purpose, or that the host itself disconnected: devices which can
-+ * be bonded to several hosts (e.g. earbuds exposing a HID sensor) would
-+ * otherwise be pulled back from the host they just switched to.
-+ */
-+static bool link_terminated_on_purpose(struct input_device *idev)
-+{
-+	uint8_t reason;
-+
-+	reason = btd_device_get_disconnect_reason(idev->device, BDADDR_BREDR);
-+	if (reason != MGMT_DEV_DISCONN_REMOTE &&
-+				reason != MGMT_DEV_DISCONN_LOCAL_HOST)
-+		return false;
-+
-+	DBG("link terminated on purpose (reason %u), not reconnecting", reason);
-+
-+	return true;
-+}
-+
- static bool input_device_auto_reconnect(gpointer user_data)
- {
- 	struct input_device *idev = user_data;
-@@ -1387,6 +1408,12 @@ static bool input_device_auto_reconnect(gpointer user_data)
- 					btd_device_is_connected(idev->device))
- 		goto bail;
- 
-+	/* The device may have come back and left again since the timer was
-+	 * armed, e.g. to switch to another host.
-+	 */
-+	if (link_terminated_on_purpose(idev))
-+		goto bail;
-+
- 	/* Only attempt an auto-reconnect for at most 3 minutes (6 * 30s). */
- 	if (idev->reconnect_attempt >= 6)
- 		goto bail;
-@@ -1443,8 +1470,13 @@ static void input_device_enter_reconnect_mode(struct input_device *idev)
- 					btd_device_is_connected(idev->device))
- 		return;
- 
--	if (idev->reconnect_timer > 0)
-+	if (idev->reconnect_timer > 0) {
- 		timeout_remove(idev->reconnect_timer);
-+		idev->reconnect_timer = 0;
-+	}
-+
-+	if (link_terminated_on_purpose(idev))
-+		return;
- 
- 	DBG("registering auto-reconnect");
- 	idev->reconnect_attempt = 0;
--- 
-2.56.1
-
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: linux-doc@vger.kernel.org
+Cc: David Hildenbrand <david@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>
+Cc: linux-mm@kvack.org
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: Takashi Iwai <tiwai@suse.com>
+Cc: linux-sound@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Wang <jasowangio@gmail.com>
+Cc: David Heidelberg <david@ixit.cz>
+Cc: oe-linux-nfc@lists.linux.dev
+Cc: Chas Williams <3chas3@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: Helge Deller <deller@gmx.de>
+Cc: linux-fbdev@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: MPT-FusionLinux.pdl@broadcom.com
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Cc: "Martin K. Petersen" <mkp@kernel.org>
+Cc: linux-scsi@vger.kernel.org
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Vignesh Raghavendra <vigneshr@ti.com>
+Cc: Zhihao Cheng <chengzhihao1@huawei.com>
+Cc: linux-mtd@lists.infradead.org
+Cc: Neill Kapron <nkapron@google.com>
+Cc: Andrey Konovalov <andreyknvl@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-usb@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: xen-devel@lists.xenproject.org
+Cc: Hans de Goede <hansg@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eugenio Pérez <eperezma@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: Jan Kara <jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org
+Cc: "Theodore Ts'o" <tytso@mit.edu>
+Cc: linux-ext4@vger.kernel.org
+Cc: Mike Marshall <hubcap@omnibond.com>
+Cc: devel@lists.orangefs.org
+Cc: Paulo Alcantara <pc@manguebit.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: Chao Yu <chao@kernel.org>
+Cc: linux-f2fs-devel@lists.sourceforge.net
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: Tzung-Bi Shih <tzungbi@kernel.org>
+Cc: Benson Leung <bleung@chromium.org>
+Cc: David Airlie <airlied@gmail.com>
+Cc: Simona Vetter <simona@ffwll.ch>
+Cc: dri-devel@lists.freedesktop.org
+Cc: Alex Deucher <alexander.deucher@amd.com>
+Cc: Christian König <christian.koenig@amd.com>
+Cc: amd-gfx@lists.freedesktop.org
+Cc: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
+Cc: Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: intel-gfx@lists.freedesktop.org
+Cc: Matthew Brost <matthew.brost@intel.com>
+Cc: Thomas Hellström <thomas.hellstrom@linux.intel.com>
+Cc: intel-xe@lists.freedesktop.org
