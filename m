@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795599152;
-	b=FmboPcYbw68NSt48fhzfoMWATknDZdcRnLKEWgMRh6o+qUNMywvmZnt/1fqJNx4q097C
-	 kDrXCmy6FiOtB5CF32cSjTwkSB7BZhiHuBB9uMF0W9XRLvgtuwRgDiGgEvTQW+zhieEFe
-	 GB3Puby3nuhCFUu4bjLGbEvoGt0ezJc/51gAKnNC3OvYkQDADGuLlIeq8CuIAu/mY9j73
-	 o2Xoro69IBjfLEgMBY+ELMp3bTWFFhSVroT3sRYwkmK2xTXUgVm4GII6rLVHYcKPnTPv8
-	 QcyZu0nLOnZrmljVI1UlHmZg74iDpTCmTIt1mkGwS8UhS0+/tgN/+j7I6WT5qywmvjQ==
+	t=1795599196;
+	b=CcRKi/AsutlpMGghZRucZuTvR1J+NUJqWdeGU6MNK8eKeyorJ2nvAcgguyn8NXyFOkHE
+	 N3TIllbjZ8Q3hFuFAMCqUwp8juuI/nhcttgVOhlpNCNJRiU6EiMxPtZM5fHKQziGxvsme
+	 hbDAe0+d8Yrs/d1a0mus0r3jq4cewlErY+ufJ0X0GOTBMN0rMDPURVwdleMB5ecBJzs7j
+	 X6r8QfUR19sjc1hOVM40DzB3KE3c2XAp55cyp1n66zrp4GUA9wkm5NIkOEHST979Fc225
+	 AyRRg9NdmxrMGUtsTR7oqXZfBf3hKy5y4S9S6k8DdJTRWmEwdifa4zHHFFqOOJ1y4ow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795599152;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795599196;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=l4RHB6K7RgAz/nQf8J1fwTRQBwHcMKQGbkgU+q0PgV8=;
-	b=2qklUNGaXn8yXDRU4rhp4Nn7yJHm0yVGUVSLxyD8S9tTgegK0KWhx+9ecKdH+A9mS4PC
-	 KpNTpVSb9/xEQIZbrS9aHhk92xskkJ6DAbEgFkO1Q8KIKhbQh4Zk0wwBHE4raCwYDDxCa
-	 EdHn/If2l9GfKCuHKyOpOpcWHWAcOZHaD74CeMKuGHeJRKsKhk1E6b6ER+cvp14oJsnxH
-	 fSOvDPKjWHr4tkKS2mQBsbt6EaI009w2+hcAwcqQnFg8vOvLEC4fOj07/aKkXRAN+d0A2
-	 mpQmMMXnR64Fm/vjcQDMguA2jkOhXligFiEyxR8OOoUjt3R05MnrCue9Sgz8tG8fnZQ==
+	bh=FSmYL94CLAH42+p2nURarn8jPDSqfDJDEGZWaM+zzZk=;
+	b=XBYon1GYl9ezuF7p0yLCCUp3oir8UxCnfXWiOwiHWdhyCfplyovNtBxRCtxpi2iF5FDU
+	 95td8Lrpg+GdbcK9q0dpwNQfKHMs1st0sxBvj0rukGG92+bjvzffGhvN57/8veCwDfI9D
+	 qAlSJo2De7UKq3wCjlDXmc5WyRzS3+VBf8dRkinkaoYgvPFmcY+vC6fkQfv0bDv5LfgAy
+	 rB0IZSbvRkt4Qb3v3MQTTV2f4Rmgpyn7gs9eLqnsjV0939/51rgU1ZSrvX/kpwoS/tVR2
+	 Q4R66H5RBKGRPLU8cdAVUOSjrEW9AAy94sRNjSWQ/cRc2+E6imlqIXRpfF+G5IYa7Vg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="ucWggkp/";
-	arc=none smtp.remote-ip=209.85.128.54
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="t+jv/z5h";
+	arc=none smtp.remote-ip=209.85.221.51
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A26606A323
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 09:32:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B6A26606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3C2606A326
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 09:33:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E3C2606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ucWggkp/
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4bb72b44a97so47485215e9.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 01:32:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=t+jv/z5h
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-492f0a1b685so3803468f8f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 01:33:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795599150; x=1796203950; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795599194; x=1796203994; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=l4RHB6K7RgAz/nQf8J1fwTRQBwHcMKQGbkgU+q0PgV8=;
-        b=ucWggkp/ylQeQo+d3P3B4kePoFLjOBL4EURBC03OYEs6t0KRzCt7GAV9npYPdoHzLU
-         y2QCcusM0/gl1bRT/7n6sOQOlH8ZAZvNUziP9aOJxCeCF9B6O2ZQyb9/irm9jUDgVqfd
-         KBrfejRrsKZfakTfthYUuLt3B3LVYrXRrjsXjXu/0eq13CNTZ28ATtCXjnhlXj8oGqn+
-         y+XiET0B6ez89fSEwIN6oUY3zGE6Mo8w+F66hI0KqkGCVDkgSAUXbPu4jpmIAF3pImhn
-         TMQVlLSY2STfsdpLmQEvN8nj7QxV60X4C4kNhU0wWxhADCPybT0L3FZ+KRhBwXqR8aTP
-         bhmQ==
+        bh=FSmYL94CLAH42+p2nURarn8jPDSqfDJDEGZWaM+zzZk=;
+        b=t+jv/z5hjGeEZm/mbVnKGhsbkhkJJWeN8VnCFyULn7VO4KiVYiknQKEAtQ8MsVmYf8
+         LKvx/zvmxcc21se1l+Wa9RJLJFBNW117WZ4wfoKsn5OH5xoVeJKZs5TC5ThbYb9vRwUe
+         rBV8Njv/LcIDpW/kBFSl60hriN9wJCmov81Eejzr8mVtlDL4I8n9hnJECpQ6dVk7Gu68
+         doyBYGFzRrL4NCp/QaVBrtM75SP7fZo+GWRCWjr66yv6meracAZe3ebRVg95IqQru9tI
+         GNL0uj/OG+xDvfjUdPt6eXAOjG0Q9eNUGVizx+bnpv/A67Ch+WOYm8Ocm6jd++GL3hl4
+         eK1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795599150; x=1796203950;
+        d=1e100.net; s=20260707; t=1795599194; x=1796203994;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=l4RHB6K7RgAz/nQf8J1fwTRQBwHcMKQGbkgU+q0PgV8=;
-        b=LpEYc/w4leYsnC2tztKfF/gd/BvhmcNOzwE6v8mwJpPy4U1/1AwiRp6U8K0rSL9zyA
-         I5cv/zja6/s393WDk/26Jehd5fw4KUZhhi3DNfV37mYBqnPDSZaxXARZZsgdLSmhYBal
-         vWKTQLcaZVCGDWBZXWOac/tB4UmsbDKXK0b6Q0CxTEoCSJq91ElxWp1M9H4dCXKVwo6N
-         0O4g9xRR9P7PFJqjzr9rRairOMqto7LDaPVcgilMCC2bIbcM7rl18N5jrdt5mXwUooYr
-         EELuGP0riO4wd46oatuhgrD1Kfxa/4ioDRlGoER7XgPa39PJp05c/c0aGTp9hTo8M4ks
-         xvQQ==
-X-Forwarded-Encrypted: i=1; AL+hErGSbWSPQz13eFOtRf5oYaTdhs7fXyoK7r7+5MZYPCGHZ+dSBsPkTOdbo5XfPYM0M47PmnzyAUHJpmtMDBic0eM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8Mi3KX+b6aPyLPdd2MIAZMiXFZLzXbUrcQPY/jsJBp5vwnZshx
-	8K89Bu17KPuICEUNp20+6X67kwgUlLzuU1yZtd5ILcB9YB941i5IJJEn
-X-Gm-Gg: AZFdTZffGUH1ZdmNkkPQNug7Flp3l/g7XGK3Etm/q842Qa6sSj7GPWKOzSdC/Llzu7N
-	6UBt8sBkoaH0ZILSuaJblcm5mDezKunIEBFzgPl42W5tTtPgTvpkDeWbagif+S/kbUQjiiW0p8h
-	TtZGGrRTZ0QHMMLOwnHHtGoaTEBSsuwaBvAgir1sdB/3/3As0Idu/D3zRJ7Y69TPW21Wztig7dV
-	69YWZXy6+Ay87VcucrfdSYE9mdbUKmjY2P4T8W0MTImnZrcwW2lfZmXK4i+7lGTWRIGa0UfF897
-	/ixgGVpWYQorH2vOu30b1sCUkJwXs64dKBye/iR/PrcFbPqMnt/zKChm/ElJdsk1B/noA/b5A3g
-	ykjToYyEXZ5bgfouekkX1pXjsttWANnJ0hKYWVQArrsJe8zH+gRpr7xyPBuGULH4ybqO0flDPlv
-	SBU+i+jwNRz5qoOjzOIKybMlgO026KayU53CCs7HRcq5oTm/kryTh03Sd6Kwyi6dJqdPJffzon1
-	hGuvOP2sWDaLxHFbH2iZYOl084keoYJFB403OxK4mbwGosnhI/0f4My0JyrfTi90Mgr98tCdHjC
-	5sEFHo97mabjhq/KMfT0
-X-Received: by 2002:a05:600c:4e02:b0:4bb:5d39:95fa with SMTP id 5b1f17b1804b1-4bb88811c82mr338133785e9.12.1795599149909;
-        Wed, 25 Nov 2026 01:32:29 -0800 (PST)
+        bh=FSmYL94CLAH42+p2nURarn8jPDSqfDJDEGZWaM+zzZk=;
+        b=GIdVgSFyMQd0t3SMIvGUt74C6yMiEe6vGEqAZpuIjudpPk8hAQWX3eTZw3BENexloN
+         WG0Idn68w6oqHb0a60VECDMWb/F2cilWQeTmOVJ81krq7n3LbWMQza/CtAKwG0BMXMLi
+         Qe609SsROC/hJNi5PJZXc4LsNtcsRsS+LDvgCJttNYjxP/JwC2HS5NHFrExaaRhWXTNG
+         GKJZtiEUukNNQSwpHy5KcJMUteHSSIqMqMNZ/iPyn9mlC7JMRwM6dbiWO4IIaGHpbAV8
+         AsmKKsDpsliIRQrjU+dIguYkepXDaPWaI4XmLeY8sBHlqgnzfbXaFrHqm7Yue+57VzrU
+         uGpA==
+X-Forwarded-Encrypted: i=1; AL+hErE3Y/X6LjzQoNIEe9m5tXbj5LYelPbvlHgrAcrr0w0bHpUWf5v0qbIRJoAF7L4EZ6hOkyMI4PaHzhKQ57eaQCw=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/hMfhBa6uPqo2sEdEAj5/6NleGKcxz40JikukfJaLNlGSAQO+p
+	+tgklbxvJ7FsCoAojWz57dr6WKFBhKDgBJGcwCp4qgppQ6LB9s0zaxMx
+X-Gm-Gg: AZFdTZeBto+GWDPe9m3LoZdWCNQPOUoZjBpcwvx5UveWGH/RL1Se+sjmV9TaoRtgslc
+	aCOCp/XOeLZo+sLz+Oad3u4Cd3QnRCCYlmiHSTI4VwmhhU6wdiGUHObC3zBRBd7FtNXTNQGGt7N
+	jzUaxB9PwFIqc8/U5R2wpqA60mJ0fpbHHidsMTnaK7hppi0Sf7/vO1E4N6IbDOYboffOuOG1ufn
+	xxQOw9YpbYkxcYQwtCFIObs6SwN3rDGCMQwJlAq/Yz0PYOx6bVuBrcsf7UuYlyjguPukpg3d696
+	fgKN6KbEJgYWRfUKFWRit6lD4RLRM6BqOjx1p/TPlVV81424vo72vfkq5wd3aaJjhc4eEma33WA
+	A5G2ZZcmbteDYL3CBNPtvba3YBYUTlJvq+zmSUo2anI+dZ4EnAQGrdQ+C4uYIouQ3aCJzoBY67p
+	2p846LukktE4S35k5fLXnIakIsVN84gugKyqPiveQ1fNjIO1TrDOrjkrBwxvmJuH/IH7D/YjMF7
+	Y8X/X6k4ArovoOSLb6zhJ+hWFjS8kR5kBKs6A7DdUOIXf6wzeawUxb/LNWzuDPGT4hrQw9Ra4gh
+	lf7/bNNiAMvg1ObeCECe
+X-Received: by 2002:a05:6000:491d:b0:4ab:f5b0:a7fa with SMTP id ffacd0b85a97d-4b598a60967mr13697952f8f.33.1795599194330;
+        Wed, 25 Nov 2026 01:33:14 -0800 (PST)
 Received: from fedora ([5.131.7.59])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884911e3sm608782495e9.6.2026.11.25.01.32.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b110c3csm32077607f8f.36.2026.11.25.01.33.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 01:32:29 -0800 (PST)
+        Wed, 25 Nov 2026 01:33:13 -0800 (PST)
 From: Petr Vaganov <petrvaganoff@gmail.com>
 To: stable@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -91,9 +91,9 @@ Cc: Petr Vaganov <petrvaganoff@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	lvc-project@linuxtesting.org,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH 6.1] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
-Date: Wed, 25 Nov 2026 16:31:00 +0700
-Message-ID: <20261125093208.224568-1-petrvaganoff@gmail.com>
+Subject: [PATCH 5.10] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
+Date: Wed, 25 Nov 2026 16:33:01 +0700
+Message-ID: <20261125093302.225552-1-petrvaganoff@gmail.com>
 X-Mailer: git-send-email 2.55.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -123,10 +123,10 @@ Signed-off-by: Petr Vaganov <petrvaganoff@gmail.com>
  1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1639097a865f..443a1bb76019 100644
+index 60b1dd16ab0d..0ebfab2c26cb 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3786,18 +3786,22 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4819,18 +4819,22 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  /* SCO data packet */
  static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  {
@@ -153,8 +153,8 @@ index 1639097a865f..443a1bb76019 100644
  
  	hdev->stat.sco_rx++;
  
-@@ -3815,6 +3819,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 				       handle);
+@@ -4848,6 +4852,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 			   handle);
  	}
  
 +drop:
