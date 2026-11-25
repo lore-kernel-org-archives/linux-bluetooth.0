@@ -1,89 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795641133;
-	b=ahH/fjLyOCOItboC3Ln9ic+87wJhTYH8IfvPhLStV55cXq/w5C4u0r6vBrvGZ1a8mzJs
-	 aqYNrVDF/uHjfjwhZvkSPPowcptkE4vHxGqu43orFIJnly4nXAHVIRjLbS/VdYoQlzvfE
-	 g8tNBqjLuV3QD6Su5cKRDgOgoWOLxBnKkT0mPF2uFCJBodIprBZs87TtZbrOyCQYU55T1
-	 ptkyxy7qrZAn7t2yvk/i/c8Ul41uULzVFWrVGMJ3oAUmIavxmWGV6+UVBeBW/IN90BeMJ
-	 1U0/LCwNfGAsWz4sXYq9kmYm5dgLJXh0+L8V7hKFJ8TYvem37Odda8VAVJ5pZK6AI2A==
+	t=1795641134;
+	b=uv6wPzA6FXAyQ1vKLLbuFGTUqU6PIVGOkpqW9FVdkGhVPtJXWfM+mL+Ae4VM6Ldh8M6n
+	 QVyPqoiXwzYpODZ1W/hJ420SGAk3A1ilwAK0igxvlKCYIERbCT/z6idxocv3aPJORtsEl
+	 ymWINM96xXNpUP7hM98oU7fHPFX3lM54JFP86lbC74FuCJepLioev2/mVuh+SZMugagHx
+	 Jq1UsJ85sav2lfl4MV72tK9EgNpQWABCEHxoaDPg6zXnDJ0GbuT4l4/s/ueEK15bnbz2o
+	 nAWQuWVoL3IhC0VgcOTBy5ScfFecskwaZ/N5t45YMN56HAhpThanOPBWIGuwkdXuW9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795641133;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795641134;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=iPcUpTbAheyWu1PDmQsTPJ2jxhnUOGlZsVTSC1jFIuE=;
-	b=uPSITnPDPHPwkMijDBuuE7URhwb0CrlEmlRzdR8Kg6r9sIXY7D+a/N5UXR2x9CsRrjre
-	 +/tJ8k8HJj9xGujWy29E1Hb8XHBIsWvZxoEjhW488sO97Tn9+sIp5zAkNEIc8xabBBu+l
-	 U5Z4AE6+ymrNfX6FNTvYQJkxu6FOmpccFBf7YrNZNTQScs3KEFC6EO9DrSlQTLc99XvLF
-	 4oorkRtStpCqb71sMSIIU4pJyQS45bjY6C2HdJ5Nbwu2ADH3qig8pyubZD1+Nqi46UhrZ
-	 xbKFnB6/waBD3b8dIH06IbeHpvRoKDjXl7ZoFn5Mf+aOg7Gy+KOBlqwUNbwmb79d5Ow==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=HFT2GrIUj2PVu8/dnyxLeG0EZJb2m2iVRvdl+sDB3Ko=;
+	b=YsLP8u2MtKqw2SGq/NIjEzsqt+NBV9kMXPsOnuk43psj1K9leQpKXpX46p0iznWt4XvZ
+	 NBfMLbya28pXw1mL2LUf3E4fA/mJu2g5iqXO8QNSJvp3dRcKl4zPVQjvoruq5s7rvb183
+	 s3kCrJSqfMhjtH8kE+vL7QDE/G7Kj0dSdol2j9YOW+uBAvatv+5EaUboVcoF+U7xem+Sc
+	 +sAq4gdJ9qlI798ZNNreuPCVKu08lkz1TdzbbhYSk3oA6OVHcxH1CURLF5Vle1xjv37ia
+	 Md7Ju47XeI360DZ2O73JqM6hsS4QwCzTgkJnx0ZxujkFLJiSbTyUFelXfimWoYsoSFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=igMTbLSG;
-	arc=none smtp.remote-ip=209.85.221.175
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=G284N+MA;
+	arc=none smtp.remote-ip=209.85.221.178
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2396A606A338
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 21:12:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2396A606A338
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789AB606A331
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 21:12:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 789AB606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=igMTbLSG
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5ec690faf85so2217062e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:12:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=G284N+MA
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5eae1276409so2282635e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:12:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795641132; x=1796245932; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=iPcUpTbAheyWu1PDmQsTPJ2jxhnUOGlZsVTSC1jFIuE=;
-        b=igMTbLSGPFxK52MtP4ijeA+OixGUJAAqKG4/E1/7/klsYU6iEUxcAQ0d1SOmthmeH0
-         ov7qtJ+hy99PhJNNKR3+WJLzIt/K+gQ+uO+HRh3oBhGm/mrDqPffGij0tyC5A/fKwULN
-         yc//FYfexL3PJZadMReIzxy1ZGbUp55hUjmZ0AZzw6LsGQbndL06c5kkOpqZghsfVU+g
-         +eD+ntI52QwRvuy4ZXUTDGxoQJqM1zNbH52LlX+FFqcbpZNq2L/RcDkaoE7IO2MRoTAn
-         AkjJzaL5R66NJ63nChpHAEFaOEw6n5WD4ttVRb1eVCTzeANr7IlW2V2Z6aBPSs3XCjTN
-         OSJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795641132; x=1796245932;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20260707; t=1795641133; x=1796245933; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=iPcUpTbAheyWu1PDmQsTPJ2jxhnUOGlZsVTSC1jFIuE=;
-        b=oezNZNM56/XEM+DKXECBY2VTjID59Vwhuo+mcqWWZH3VAD+5UQArLjL9y63+4dbuOp
-         NyyPUA/gR+QQGHiaXKuMB+R5HEzHPvBtyCgxZXsizFe1zX8xW3LJvQW/Y2kx1Eh79N3x
-         iUufi8q3QrcH+ppqIlIStBRr91TUsA00OJv6P3uufmU+g8H2dyjnmNu9tHlCXmTy38nt
-         ykzUe1q0eudW4K7rJzAnNc+MLvL9Jb9J94K3sVY4O4WrWEdojhsNvwLf4S95y0jZ5x//
-         fivwDH73CqEZqF32dI+i3Hq9sktpCvBUIqd7zviWIFWGkls+sIJiE7WJffsmrCY2e4Ci
-         Dvhw==
-X-Gm-Message-State: APuU4Z+gdqvVhodgZlsl/uDkXHdt2W8xfKXZYD/vSC+oyEIAh1X0NV15
-	JDJWWomFhHl1f/dKByA14Plz7v+o9qAHckSk13Svjw4hs5vjjPvPOf51jr8pOA==
-X-Gm-Gg: AZFdTZe4oEd0JfaIPuiHTJycIsuK6+5aaZDnyYOIX2rfHHf0CIoY6WgqvbT1vEftT8t
-	zAWM2ex9uboXI3SXbzM0ANJDD0rL5JGMpc5Gul1mnqiHBveSfRrof0Yte9erceB4RK432cSWtce
-	cJh0QoNmp72CyY1uOUqvXNernLp8PvXszKGk6S3Px+wmf140NeFD/4ddSGZ4XCnMNBJivNgBgex
-	5zau7ppfoPTIGev0nFauYKbD5zydLSFnOX9zagKK1o2YrjOx6fpCLo9gIlDUPE6ZVFnqlBgT4Sz
-	ELzijQ5pENDb8PYeGK9FmPH1yB51DS7S48phWRKVodBmgVO7EKeHnml4st6qwnkHVu9j6W8Nwq+
-	LxNEsBdQU4b4EOiIt8FtcEoYjIkKoD/MU2Zks/tU+kKfrIb3kT14Lis3YMFMFxeh7UU2kQmDh/f
-	6CPhb6mhIQ25xzeLH/FEtXcfdZnepe1CHXjza/hl9VHZtqin1Micqe/hHOXZBMawUbuTXg7j0uO
-	kGjexsr7a1qs3p7tzPXyLdp1P9VC/Tu5t3gPVQUikUZYLhcTkDamcZyUkHPeO4OXeLNm0FCcCPL
-	ts44Sbgv7/Ukam9sMjzdaYWbUUHfq7QNC81W4nOu1ndhObhZEmpq5HtexcUW7KJu3ro/9bgDS0O
-	U8oHkm5F3WK43Rw/N3ZZeWDD0E7r2c0TaFf7psvl3Nj0cJdzYh8No8Og1YkiQq511JKrgLutKj1
-	hHiVA=
-X-Received: by 2002:a05:6122:338d:b0:5ec:1996:43e5 with SMTP id 71dfb90a1353d-5ee8af210b7mr10900222e0c.14.1795641131952;
-        Wed, 25 Nov 2026 13:12:11 -0800 (PST)
+        bh=HFT2GrIUj2PVu8/dnyxLeG0EZJb2m2iVRvdl+sDB3Ko=;
+        b=G284N+MATbpU27h/ziIfIVIx+Q/VrxmjZ7mp7Kto8Mq76WJahxDWSgcTCnPLkiqqdh
+         btRG/1T1BEprKgFmmYaj2RnbanQKgr3ioxbSPwwu6dtGz8wuTA2z0mj1o9ja40Ojfj7T
+         4EwaTmkIutpDO9T3jS2BXS3zGtQyByMj4o6NOgGG3L/Ml2sQmVQ9t6DbVjKwOQWcfeaB
+         XQTt3CChx/+IsGjhMjcMRI8g1bf9snHidCRnNpEPz8QuZoDcY6qQFxWZv7aMoGBl2Tzp
+         +BqA1s3ZmqeiaSnNdkG0NxbUJ5zwIhJCDprGuo2bKpn6dGWuriboVJiELEwysdyyHc4h
+         6Mkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795641133; x=1796245933;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=HFT2GrIUj2PVu8/dnyxLeG0EZJb2m2iVRvdl+sDB3Ko=;
+        b=Uv9rSll6tGHpiPls/GGEw4+mMUCWZdKIxLrB18sHChnxriOdMtqepw68f7pZsmLqft
+         izMrL9MSn6nRwZLpexoP5i400RCStcEmXjumcJZILP815WIYSUQHln+mNqhKaeI+eAFr
+         Qb1EsDR1DZgFgJNouY2iEEnS1QFz6BtOdJG7HHGVRt+pzPVYcfJwz+Mz9wEu5W1Yjnhi
+         rJQd2uSjpR/+D7b/IJL/6cfKsYC+yWYfpWnwwa/qyd/fef228MkzCoBqEm8f9kN7yIrq
+         Aa3NYtwNAuqsJ3F2utyaBPjn9MTN/KjUfsuZtTupRkHFvVd1OiE/gaSDefxnwwkGURUm
+         Hj7w==
+X-Gm-Message-State: APuU4Z88JO3Kx5Pbwuw18LBcv+FS9N1xaRasDtLHCu8lTMXQGTtyCWpP
+	FYlmxEZ1yoakQuEhRs7C6TodFGSULzCQq7cMryVJGQqHEXCpNoCxR3hGNg0Idg==
+X-Gm-Gg: AZFdTZfFLW4xjqDbW3bB2lHbJLW2tluXnFESQjVc/PG2gL7SAMU73at3PSc5SIK7Lpe
+	QjGTxw79c1a9WgRfrlq7JW5QA8YG7MIVYp/MXVzxLUFSsbHepaNIlYCIRByhFMXqeJH2eNpeBFk
+	ZvjfU53pv09G23w5K+5Xb8f/tlmxXJSkHy+jFZY9oxqwvURwQt7beP52EbARiFaY1oE7cMVlyp/
+	Sf7uTLhT1UAJUmcmLXFuwID5uCLvJjGda71FffrO4OHydURf1k0j8UIYF9+RD3UxsFofJ5KOHRH
+	HTadLKMGhiq2tj1di28wuD/8i93JPSohG2GmYE3GyrnkIr/JZOnl+uBfItWIF5IFr9dc1lJidw6
+	m/ep3437AOH3GN9bqsa+vtdA4hCZCQzGct7y0Ww35205ohUlrZQdwKyotoXEIxGg3S/xuGVWhLO
+	nRqwufp+jw4Kn2i9GWWM73JsgPGIHSwz9xmnuNedmbp1ty2h1OckAUoKzqFU/eb8sBb3fMOQVuO
+	iDB0SDSUgiA9JABxsVZ6ca7jZlZWJ5Q+508B1AoIJ3WPcFtJZMYjiWpsM4ikGGiKQIc+oOkhUyg
+	yDCAEBC8WiLuLmkdUBITzPsBdoB/jmByyPU2j5mdHY9PMJZoweSc1Edld/CrTfaDzRJiMNyP3mA
+	RoRxbCbPvz6HkMZJLdIMxVGGExOTXO0rT9bX8hrhUGCP+Q3GPNe5SoRIsWjZ5Gz1vAHXwO2Ikwk
+	6LZCw=
+X-Received: by 2002:a05:6122:9003:b0:5ee:b4a:681f with SMTP id 71dfb90a1353d-5ee8af6c710mr10479399e0c.20.1795641133440;
+        Wed, 25 Nov 2026 13:12:13 -0800 (PST)
 Received: from lvondent-mobl5.taila91cb8.ts.net ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b556db7sm18316369e0c.4.2026.11.25.13.12.11
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b556db7sm18316369e0c.4.2026.11.25.13.12.12
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 13:12:11 -0800 (PST)
+        Wed, 25 Nov 2026 13:12:13 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 0/4] L2CAP: Fix channels being established with insufficient security
-Date: Wed, 25 Nov 2026 16:12:06 -0500
-Message-ID: <20261125211210.1955598-1-luiz.dentz@gmail.com>
+Subject: [PATCH v7 1/4] Bluetooth: L2CAP: Fix rejecting all Enhanced Credit channels if one is refused
+Date: Wed, 25 Nov 2026 16:12:07 -0500
+Message-ID: <20261125211210.1955598-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261125211210.1955598-1-luiz.dentz@gmail.com>
+References: <20261125211210.1955598-1-luiz.dentz@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -97,125 +101,142 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-l2cap_security_cfm() lowers the security level of a channel to the one
-of the link when encryption completes, and accepts channels waiting for
-the security to be met as long as the status is success, so a channel
-can end up established, or be offered to a listener using
-BT_DEFER_SETUP, over a link that doesn't meet the security level it
-requires, e.g. if the peer disables encryption while the channel waits
-for userspace to authorize it.
+l2cap_ecred_rsp_defer() responds to a request that has some of its
+channels refused with a rejection for all of them, deleting the channels
+that userspace has already accepted as well, e.g. when the listener
+limits the number of channels, like bluetoothd does for EATT.
 
-The first two patches fix the handling of Enhanced Credit Based requests
-when only some of their channels are refused, e.g. when the listener
-limits the number of channels: the response accepts the channels that
-were authorized instead of rejecting all of them, and the socket of a
-refused channel is no longer leaked. The refusal done by the third patch
-relies on them.
+A L2CAP_CREDIT_BASED_CONNECTION_RSP can accept only some of the
+channels of the request: the destination CID of the ones refused is set
+to 0x0000 and the result tells that only some of the connections were
+refused.
 
-The third patch makes l2cap_security_cfm() compare the security level
-of the link with the one required by the channel, which is now kept
-apart from the one of the link in min_sec_level: encryption completing
-below it is a downgrade, so the channel is no longer lowered to match
-it but disconnected, or refused if it was still pending, and the link is
-disconnected if the channel is a fixed one since it can't be
-disconnected at L2CAP. Channels waiting to be accepted or started only
-proceed if the link is encrypted and meets their security level, and
-deferred LE and Enhanced Credit Based channels are refused when
-userspace authorizes them if it no longer does.
+Fix this by responding with L2CAP_CR_LE_NO_MEM if only some of the
+channels were refused, with the destination CID of the ones accepted and
+none for the refused ones, and by deleting only the refused ones. If all
+of them are refused the response is unchanged.
 
-The fourth patch makes a BR/EDR channel visible to the listener only
-once it is offered to it, after the security is met, instead of as soon
-as the connection request is responded as pending, so a listener that
-accepts without waiting to be notified can't authorize a connection
-while authentication is still pending.
+Fixes: 9aa9d9473f15 ("Bluetooth: L2CAP: Fix responding with wrong PDU type")
+Assisted-by: OpenCode:claude-fable-5.2
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 67 +++++++++++++++++++++++++++++++++-----
+ 1 file changed, 58 insertions(+), 9 deletions(-)
 
-Tests for both are sent to the BlueZ mailing list as "[PATCH BlueZ v4
-0/5] Add tests for security of deferred setup".
-
-A channel requiring a security level that pairing can't provide, e.g.
-BT_SECURITY_HIGH when the IO capability is NoInputNoOutput, is now
-refused instead of being connected with the security level the link
-ended up with.
-
-v7:
- - Add a patch fixing the response to an Enhanced Credit Based request
-   rejecting all of its channels, including the ones accepted, when only
-   some of them are refused.
- - Add a patch fixing the socket of a refused Enhanced Credit Based
-   channel being leaked when the others of the request are still pending.
- - Authentication completing before encryption is enabled is not
-   considered encryption being disabled: channels in BT_CONNECT and
-   BT_CONNECT2 wait for it, and fixed channels are not disconnected.
- - Also refuse outgoing channels in BT_CONNECT on a downgrade when the
-   connection request was already sent.
- - Restore the security level requirement of a channel if setting it
-   with BT_SECURITY fails.
-v6:
- - Evaluate the requirement of the channel in l2cap_security_cfm() after
-   taking chan->lock, since it can be changed by setsockopt() meanwhile.
- - Treat encryption being disabled as a downgrade for fixed channels,
-   since l2cap_check_encryption() doesn't handle them, and don't resume
-   channels the link doesn't meet the security level of.
- - Also refuse outgoing channels in BT_CONNECT on a downgrade.
- - Close a deferred channel refused when userspace authorizes it with the
-   channel kept locked, so it can't be authorized by another thread
-   meanwhile.
-v5:
- - Require the link to be encrypted for channels above
-   BT_SECURITY_LOW, since the security level of the link is updated when
-   authentication completes, before encryption is enabled.
- - Disconnect the link if a fixed channel is downgraded no matter its
-   state, so one still waiting for security doesn't bypass it.
- - Keep the security level required by a channel in min_sec_level
-   instead of comparing with sec_level, which follows the one of the
-   link, so channels that only asked for BT_SECURITY_LOW, like SMP, are
-   not considered downgraded when the link is paired again with a lower
-   security level.
- - Refuse deferred LE Credit Based and Enhanced Credit Based channels
-   when userspace authorizes them if the link doesn't meet their
-   security level, instead of closing them from l2cap_security_cfm(),
-   since rejecting an Enhanced Credit Based channel deletes the others
-   of the same request.
- - Refuse deferred LE Credit Based channels in l2cap_security_cfm() when
-   the link doesn't meet their security level.
-v4:
- - Disconnect the link instead of the channel if a fixed channel is
-   downgraded, since it can't be disconnected at L2CAP.
- - Call chan->ops->close() when a channel was deleted by the downgrade,
-   so its socket is not leaked, and also refuse deferred LE Credit
-   Based channels in BT_CONNECT2.
- - Only start channels in BT_CONNECT if the link meets their security
-   level.
-v3:
- - Don't use l2cap_chan_check_security(), which may start
-   authentication or encryption, compare the security levels instead.
- - Treat encryption completing below the security level of a channel as
-   a downgrade and disconnect it instead of lowering its security
-   level.
- - Only let accept() return children in BT_CONNECT2, as
-   bt_accept_poll() does.
-v2:
- - Drop BT_SK_ACCEPTED and the changes to l2cap_sock_defer().
- - Add the second patch for listeners accepting while the security is
-   still pending.
-
-Luiz Augusto von Dentz (3):
-  Bluetooth: L2CAP: Fix rejecting all Enhanced Credit channels if one is
-    refused
-  Bluetooth: L2CAP: Fix leaking the socket of refused Enhanced Credit
-    channels
-  Bluetooth: L2CAP: Don't offer deferred channels before security is met
-
-Mohammed Alquraini (1):
-  Bluetooth: L2CAP: Fix accepting channels with insufficient security
-
- include/net/bluetooth/l2cap.h |   7 ++
- net/bluetooth/af_bluetooth.c  |   6 +-
- net/bluetooth/l2cap_core.c    | 204 +++++++++++++++++++++++++++++++---
- net/bluetooth/l2cap_sock.c    |  54 +++++++--
- net/bluetooth/rfcomm/core.c   |   1 +
- 5 files changed, 246 insertions(+), 26 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 943effc86740..a15ffcdd1330 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4065,6 +4065,34 @@ static void l2cap_ecred_list_defer(struct l2cap_chan *chan, void *data)
+ 	}
+ }
+ 
++struct l2cap_ecred_defer_count {
++	int pending;
++	int accepted;
++	int refused;
++};
++
++static void l2cap_ecred_list_count(struct l2cap_chan *chan, void *data)
++{
++	struct l2cap_ecred_defer_count *count = data;
++
++	if (test_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
++		return;
++
++	switch (chan->state) {
++	case BT_CONNECT2:
++		/* Still pending accept */
++		count->pending++;
++		return;
++	case BT_CONNECTED:
++		count->accepted++;
++		return;
++	default:
++		/* If not connected or pending accept it has been refused */
++		count->refused++;
++		return;
++	}
++}
++
+ struct l2cap_ecred_rsp_data {
+ 	struct l2cap_chan *locked_chan;
+ 	struct {
+@@ -4072,6 +4100,7 @@ struct l2cap_ecred_rsp_data {
+ 		__le16 scid[L2CAP_ECRED_MAX_CID];
+ 	} __packed pdu;
+ 	int count;
++	bool partial;
+ };
+ 
+ /* Lock @chan if it is not @locked_chan, and has same or lower nesting level.
+@@ -4141,14 +4170,23 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
+ 	chan->ident = 0;
+ 
+ 	/* Unreachable, check in l2cap_ecred_conn_req. If reached, drop rest */
+-	if (WARN_ON_ONCE(rsp->count >= ARRAY_SIZE(rsp->pdu.scid)))
++	if (WARN_ON_ONCE(rsp->count >= ARRAY_SIZE(rsp->pdu.scid))) {
+ 		rsp->pdu.rsp.result = cpu_to_le16(L2CAP_CR_LE_NO_MEM);
++		l2cap_chan_del(chan, ECONNRESET);
++		goto done;
++	}
+ 
+-	/* Include all channels pending with the same ident */
+-	if (!rsp->pdu.rsp.result)
++	/* Include all channels pending with the same ident, the ones refused
++	 * have no destination CID if only some of them were.
++	 */
++	if (chan->state == BT_CONNECTED) {
+ 		rsp_flex->dcid[rsp->count++] = cpu_to_le16(chan->scid);
+-	else
++	} else {
++		if (rsp->partial)
++			rsp_flex->dcid[rsp->count++] = 0;
++
+ 		l2cap_chan_del(chan, ECONNRESET);
++	}
+ 
+ done:
+ 	if (locked)
+@@ -4161,8 +4199,8 @@ void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_ecred_rsp_data data;
++	struct l2cap_ecred_defer_count count = {};
+ 	u16 id = chan->ident;
+-	int result = 0;
+ 
+ 	if (!id)
+ 		return;
+@@ -4181,13 +4219,24 @@ void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan)
+ 	data.pdu.rsp.result  = cpu_to_le16(L2CAP_CR_LE_SUCCESS);
+ 
+ 	/* Verify that all channels are ready */
+-	__l2cap_chan_list_id(conn, id, l2cap_ecred_list_defer, &result);
++	__l2cap_chan_list_id(conn, id, l2cap_ecred_list_count, &count);
+ 
+-	if (result > 0)
++	if (count.pending)
+ 		return;
+ 
+-	if (result < 0)
+-		data.pdu.rsp.result = cpu_to_le16(L2CAP_CR_LE_AUTHORIZATION);
++	/* Only some of the channels may have been refused, e.g. if the
++	 * listener limits the number of channels, in which case the others
++	 * are accepted.
++	 */
++	if (count.refused) {
++		if (count.accepted) {
++			data.pdu.rsp.result = cpu_to_le16(L2CAP_CR_LE_NO_MEM);
++			data.partial = true;
++		} else {
++			data.pdu.rsp.result =
++				cpu_to_le16(L2CAP_CR_LE_AUTHORIZATION);
++		}
++	}
+ 
+ 	/* Build response */
+ 	__l2cap_chan_list_id(conn, id, l2cap_ecred_rsp_defer, &data);
 -- 
 2.56.0
 
