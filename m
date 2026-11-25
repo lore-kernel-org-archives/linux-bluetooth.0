@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795615190;
-	b=PO6xL2Ndq2QW4+Uwp+jmfUs+1ZsdIOikvs3RX9X7SD1GxOpUB5mb8XLzL1AZiWgWG63v
-	 MDQw/+v8oxu72OvUs0xNTuqkTcaj7XtnZpqvHcmClGvNgbfm1akLqJVjrEnJFrbVY7E3r
-	 cKuh/mBLqQ/k5z0rAgrHKWcawFZWFeV98msHv7wEbvD71V4N9Ve71hT0bKYXijQqe4oZk
-	 IGEyHrhsoc1JxGc38w+vd49ic233PSuVb0+/h61OzMjfqGX9930xxEybP41+f0l37sPie
-	 vRSstel1aP2KjAwiQqv4Q41Or1beOrASKiYV8pZxl1xFnYN1OI4iu7BSLUVvih9Tfow==
+	t=1795615194;
+	b=d0LRfkvw9ej9O+d7Xr5MzVzh28Gws52vFtU29/BLfzlI0cegcBIxAW+p8JraDYjAg86t
+	 /V6LAgqhbW0xI0R/UH11LEO3BfoMR6ANUb2xOXVuEhvfXfsJdIrTCAvBR2X002vxPiHZs
+	 ctD80aixDP5Ax0VPbv/8O8o26VX63w+XVlyNFc5Jc7YGBhy+AU7uYHoe6LglFMU6nhL2d
+	 MsJhrjCMkr66bDP07dxsqzO106n3cgNAE77vv7inhinHk8XrNI6QSEBsMOflplFBwlfm7
+	 X2EMj23mop8MGqWBqgKYrYrcKiP4Ccuqh3sV03Mr350pmqXJh2bc525vP5cOs7qniaw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795615190;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795615194;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=yYdOdyh0WowXFIv06NnKcJkbXieih1/fluA9vNsvyFc=;
-	b=kNjM/aoI6U6u2MlrcccCPf++o1GgiKIvuNvaANvQJKv1+desJ5PYgL+nY8PxSTmO8a4D
-	 uH57JN3L6f7tYQVxKKlvuHI96In4jeTxdYImbHdG/w2ZTtstDPyZfiEiq+hl7s32RyL2f
-	 RFnKXAU8XeeqnITjRxQGZ+27HqnVqijE4hDMdt6RHDRmvdBekNnlz9sD77xqhmxRWmn3l
-	 VdxUlBCnwxtdbdqwitgJSA+86GaGQRMrHrGHB6JqTdV0MNkWkRwIifxmq0G67nzARJfdy
-	 XBnTk0Ze+/BCTQyA5tEEV1G+G+gc+OEVp9+cEbK6NW9c8zThyoFO+GRxv70RZivzLfQ==
+	bh=/i1AWHwYlBYllRQmEBTMsajgoaO2HBUmLOsCfs1bkio=;
+	b=rtFt4J8l25L4+sJUAxqEebPowfMxEUm4FJKyK68jXnCLdbWr4Uqv/nbQ3FJznv+oi0/E
+	 CBTXdOqroLtB/t/qZNHQf+7UPQT9inlNxwXrIF0jXcp/rTl9iuzXOUpilweg6sqOZBVnv
+	 DiHOrIp6ashdmA1TzxW0t0nSNSb435cllJDPu+HEa0R0SX0imQDRNJEiUqeAyD3jMhaGd
+	 3XjbNnbF4h3YuwTrrEe0cXncsnxKNJbrURRWi/FCEcqZa5wVUtW0cR4lL/Ip7C9WGq6z9
+	 HVF4yBtsSp6bMNFOdzcWUUKQvnGsYXMs4eBw+ol0RPDkA9Qyw4Ner2AKmDW2oeiIuXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WeS5O4oU;
-	arc=none smtp.remote-ip=209.85.216.53
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IvUIcSvw;
+	arc=none smtp.remote-ip=209.85.210.182
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402EA606A31E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:59:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 402EA606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267F3606A31E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:59:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 267F3606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WeS5O4oU
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3ae1da332bcso2988089a91.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 05:59:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=IvUIcSvw
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8b612fd74e1so1960491b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 05:59:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795615189; x=1796219989; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795615193; x=1796219993; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=yYdOdyh0WowXFIv06NnKcJkbXieih1/fluA9vNsvyFc=;
-        b=WeS5O4oUEdmaep+E/3OeChM2n+HaAKQaPWa7CBYGgK7QWgP5ti2pl/bsOBT0ablmqg
-         E9VbTOc7DN1DwLCjtanoFrJH4kvCbAySx/u4J6gxjNDVLkIuOS5g+EtZRWKZPOJp/1hr
-         BgALJ4V/UUGr337QRZ0ImpZaXUDIqAgnStf/FT6jdyFGc4Buguij6YoVvg8f9W5Eji4c
-         ouWpBbTeiTXAyG6r8PDxpzlgfXibfeP52tAgQuUPPtrlwdGdxWUGzvTK6ufh69iRMSPJ
-         cF4m0r9Q0RyyMp2YIzesefJ1ZUlpioReK4WaLT3BIS3oqYBMSi64O9KC/9wyQhW9REnL
-         EDyg==
+        bh=/i1AWHwYlBYllRQmEBTMsajgoaO2HBUmLOsCfs1bkio=;
+        b=IvUIcSvwIEKeStYvCEZkyRkQyd2l8HHztZEtP6YfhkMkVrhJEn6kWXHYHCW1yogsdH
+         8iKl3n/pSANAPar97Z0LAPgJBFlDyCjCTFyed/QaDvXvXGWUdeZI2XFXFLfgEqOMvHL8
+         tgOwkinlw81HL8nwl0NnRrjK5R3/Nn10U3cUNSbbhV2PKoKsPr6YFnyYMzOfWrvGNw7p
+         59Tbiu/aFV+M73WD2xSKZlqkD6kpH36LeGyUATrvM9RDwzYMgjex9/x7T2DeYSdxBWyw
+         I3H598kS4ChEpNWoYzaUSMmYBewLgPj9zWORC5jARBwli8yBT7EtCtSETft8IKNn7ueI
+         rgQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795615189; x=1796219989;
+        d=1e100.net; s=20260707; t=1795615193; x=1796219993;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yYdOdyh0WowXFIv06NnKcJkbXieih1/fluA9vNsvyFc=;
-        b=UwwGYp+dHd3Xdzy70b6QEwRJc3nM7wUwUuGtqgeKqypuddMGOsaEyXibIug3l73jVl
-         qsw85SwlXTPGrazF4Y/1kSYg1q2h1+pywCG5FfL5QeVJRpN5z8ONy3QxeIteNHA++rTG
-         /OIyauXYWGl2ATxmNQ2TP5ARoD0S1rTwEjNxuI8oEo2yT6Ro0RmNWEc5XUXwZxav5/jq
-         HToqe+eD/AfJiVgLLuO1424USFConEuEKyq1WyN+NNa5nKVikTBPa5x7ZX52+tDydst5
-         IvGPCfT6ClUSNry3/NsbcPd4W5xxm1da0vJk4MHj4g2/RrPg+hMChMSGVtUNbVFMJ9VT
-         cVKg==
-X-Gm-Message-State: APuU4Z8N5zLsm3JuW4vzHiEwPR9zaOwKT/q1H4ZMkJ3rODKudqBtAqNs
-	2btbmDCqyDEQxX8stXO/TMmQZIeheN0visgKvXdfpahGyP05v00K6Hom
-X-Gm-Gg: AZFdTZcwW5h+cYZx35yePiynT9DXbHr2temPfQ0PfpgwOp8yfqRIFAaDFkhZ2keUIaC
-	IXOXnRB+ieCmo+nqRp4BMvShU9Bn2Rii5a83EZUDv0Z8rPgSZmxdGKVPdKdFbZn8pjMUm7pNRzX
-	Whgr6bkGjAi0e78W7XApJHWFDot5cNmbqQx2Xp1h/q7pDUcvwqfZoyBS7aLc05aVkKu2mTntNg8
-	YwX9V+MyhjQyVapu+IH4zP/U6vpu3/tVTK1Sv7dFRZILuMkoWEHD/bDH6/41mSfBI0fUA9GZXuz
-	gjtUChUiuwBfoIioapVZIEFclJHJIp7Vf+B/mWP4zUyKCsH1NtZlbAdaTbscPmTeb5LlDWkk4PX
-	aUJ+42xHbgE0+1MV6Qz//qygxUPOpnMcXnKHl10KW68ZjKV7Iz0mf7W/Im15wG4dr2qHLjUasjT
-	4VyFQ8z3WaU6P+QcwtRvz/SqTyriXrDX+UWSBGQrj0l3bS9zaMhsqxwtcMn8k/52ZTSn7TKSKRr
-	/9VmxBo7Yq0vAs6MVeAX9VhVXlqrszcFXh/ULhq8+JJnBP0jclZdxoGxwnHj7bdu1tTii6tgKYN
-	I35QQ0+tiyEES+GrBzegZiC5LRt2N2ekN6qXzOYXv8kwhA==
-X-Received: by 2002:a17:90b:1a90:b0:3b0:e388:d9da with SMTP id 98e67ed59e1d1-3b41c92ce29mr15610058a91.29.1795615189361;
-        Wed, 25 Nov 2026 05:59:49 -0800 (PST)
+        bh=/i1AWHwYlBYllRQmEBTMsajgoaO2HBUmLOsCfs1bkio=;
+        b=t6k2wj5TMulDFFJcahupU/g/qlXId5kd4oOrZ0nP0k0gKxHyqgawcX29AJWRS7Cn6T
+         X9fSrlVi89iqNnkIxASqjSyv3LL3TtDk/KGkXT13KQT6bk1knOQ4otnn+IVdRRQlqbWq
+         xOFCmQ2b+2tVYA9Bx2lavYitsj7LtpBXSD5rqAAanKjFZD7G8D+BLLWW0OYWxEUJeiRC
+         g/wrZnOuXCw1ga9aDYF/jlsOVLAzpKfizfrLMnNHZJWny8rYYp87FbgGvQt+ZyRseyhM
+         SzdzG3tYLSf3W+8fAYNe05Sz9/zTIjYuKTq/OMJd60sll+h2Zwxy7qGp4ZK+oga1JjgA
+         aRfw==
+X-Gm-Message-State: APuU4Z8V0SlZ7hGjlq581QE11hYLZ1NRdKO8ZxifmXQDfFYkuxy6WILR
+	WbXScsjZ0wq8vXH/FTP5mxAI8A5W/c4juJpTtHENdMxn+5aqkkewv4X9
+X-Gm-Gg: AZFdTZcRikc3unjJJJjw0V+uRxPBIHRVLkqo6rlUKKIqpf7+d1ONReeEASvDQSral7k
+	QMV5b3pVhGFDFBe2soFQy9dGb1npYf4dGv0AD3INkoQdcHHAd0xuVUqNBtvQTwBfwxv53yjahAe
+	nSbwcOI6aR3xAW9VUAjdZDfvgUYHucVbPMxNl1tDoUJe2Yvq0uXIEZXIbmhQo3Vkm1y8Ykla0ul
+	Z9m7ksYSvT0/3mrDI7z72GU0N0/hPZvOVhEW1PB6SenYLxjgL450ii0Yp3p7K2P9xSZ+pi1LB6i
+	DkXg6Uo8/QfHZXpFZl+eW0rLKv4Ie1MVa62NXNFEFNiX4tTAgRj2NBgPec0SzBEPEWbpPWth+WM
+	5uUUweJQ6jO1CEhCiGd3WsXr6lMz/YwU0HrObfAU5MMih3reJrJXzGaUJqsdqYGO5wTTWBQI60v
+	a+kqOZtfvdAxbK6BOwMvKUj6kVeyyoUd1Vn0Dj673pI2c1PCEOP0h5jvTJ4asKp4yBkNE5vnVgP
+	LAixPJ2ag/1tsRqAiuZhhoMyoil0Wp2kcRW56+pipUckxr6zJOfrzE+esNtjnleykJ9+uJ/KFLg
+	L2gBDciNbZkVsFeIi9IbXxIPaQ==
+X-Received: by 2002:a05:6a21:511:b0:3f9:bcb9:30dc with SMTP id adf61e73a8af0-4014d14d4f5mr17022559637.38.1795615193316;
+        Wed, 25 Nov 2026 05:59:53 -0800 (PST)
 Received: from localhost ([111.228.63.84])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6cea7c38sm9143860a12.2.2026.11.25.05.59.46
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6cea7c38sm9143860a12.2.2026.11.25.05.59.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 05:59:49 -0800 (PST)
+        Wed, 25 Nov 2026 05:59:53 -0800 (PST)
 From: Cen Zhang <zzzccc427@gmail.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -85,9 +85,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	baijiaju1990@gmail.com,
 	jjzuming@gmail.com,
 	zzzccc427@gmail.com
-Subject: [PATCH 1/2] Bluetooth: L2CAP: Match configuration responses to channel requests
-Date: Wed, 25 Nov 2026 21:59:38 +0800
-Message-Id: <pm-bluetooth-objects-candidate-0069-v11-7d5800a0c21420dddac0-1@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: L2CAP: Serialize BT_SECURITY with connection teardown
+Date: Wed, 25 Nov 2026 21:59:39 +0800
+Message-Id: <pm-bluetooth-objects-candidate-0069-v11-7d5800a0c21420dddac0-2@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <pm-bluetooth-objects-candidate-0069-v11-7d5800a0c21420dddac0-0@gmail.com>
 References: <pm-bluetooth-objects-candidate-0069-v11-7d5800a0c21420dddac0-0@gmail.com>
@@ -102,222 +102,300 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A peer can delay a BR/EDR Configuration Response until the channel is
-deleted. If another channel keeps the ACL connection alive, a new
-channel can reuse the SCID. l2cap_config_rsp() selects by SCID without
-checking which request the response belongs to:
+The connected socket BT_SECURITY path calls smp_conn_security() while
+holding only its socket and channel locks. The callee requires exclusion
+from l2cap_conn_del(), but the fixed SMP child can be torn down before
+teardown reaches the later socket channel:
 
-  Signaling worker                  Local socket
-  send CONF_REQ(A, i)
-  disconnect and remove A
-                                    create B with A's SCID
-  send CONF_REQ(B, j)
-  receive delayed CONF_RSP(A, i)
-    SCID lookup selects B
-    update B's options
+  BT_SECURITY syscall               HCI disconnect
+  hold socket and channel locks
+  smp_conn_security()
+    chan = conn->smp
+                                    delete SMP child
+                                    wait for the socket channel
+    l2cap_chan_lock(chan)
 
-Record the local identifier at every Configuration Request send and
-check it before applying a response. Peer request identifiers must not
-overwrite that local identifier. Consume terminal responses before a
-retry can publish a new identifier, while retaining it for PENDING and
-continuation responses.
-
-Reject zero MPS in RFC response options before publishing it to the
-channel. A stale or malformed response must not introduce a zero divisor
-to the receive-space calculation. The report below shows the delayed
-zero-MPS response racing with receive-space accounting.
+Use l2cap_chan_lock_conn() for BT_SECURITY and its matching unlock helper
+on exit. This takes the existing connection mutex before the channel and
+socket locks, excluding SMP child teardown across the security call.
 
 The excerpt below retains the headline and stack traces.
 
-Oops report as below:
+The receive path uses the same helper in
+commit 5beb86f98c3d4 ("Bluetooth: L2CAP: return LE credits from
+recvmsg under the conn lock"). The nested connection, channel and
+socket lock order follows
+l2cap_sock_defer().
 
-    Oops: divide error: 0000 [#1] SMP KASAN NOPTI
+KASAN report as below:
 
-    RIP: 0010:l2cap_publish_rx_avail+0x159/0x490
+    BUG: KASAN: slab-use-after-free in smp_conn_security+0x268/0x960
+    Read of size 4 at addr ffff888110c2700c by task pmbd0211-client/530
 
     Call Trace:
      <TASK>
-     l2cap_sock_recvmsg+0x442/0xa00
+     dump_stack_lvl+0x93/0xd0
+     print_report+0xce/0x630
+     ? smp_conn_security+0x268/0x960
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? __pfx_l2cap_sock_recvmsg+0x10/0x10
-     sock_recvmsg+0x1c5/0x210
-     __sys_recvfrom+0x1d4/0x2c0
-     ? __pfx___sys_recvfrom+0x10/0x10
+     ? __virt_addr_valid+0x20d/0x410
+     ? smp_conn_security+0x268/0x960
+     kasan_report+0xe0/0x110
+     ? smp_conn_security+0x268/0x960
+     kasan_check_range+0x105/0x1b0
+     smp_conn_security+0x268/0x960
+     ? find_held_lock+0x2b/0x80
+     ? __pfx_smp_conn_security+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? __x64_sys_poll+0x11a/0x430
+     ? lock_release+0xc8/0x280
+     ? __might_fault+0xdd/0x190
+     l2cap_chan_check_security+0x16a/0x2b0
+     l2cap_sock_setsockopt+0xc88/0x2270
+     ? __pfx_sock_has_perm+0x10/0x10
      ? srso_alias_return_thunk+0x5/0xfbef5
-     ? xfd_validate_state+0x24/0x150
-     ? __pfx___x64_sys_poll+0x10/0x10
-     __x64_sys_recvfrom+0xe5/0x1c0
-     ? lockdep_hardirqs_on_prepare+0xea/0x1a0
+     ? __pfx_l2cap_sock_setsockopt+0x10/0x10
+     ? free_zapped_rcu+0xd0/0x1e0
+     ? srso_alias_return_thunk+0x5/0xfbef5
+     ? selinux_socket_setsockopt+0x66/0x80
+     ? __pfx_l2cap_sock_setsockopt+0x10/0x10
+     do_sock_setsockopt+0x1fb/0x430
+     ? __pfx_do_sock_setsockopt+0x10/0x10
+     __sys_setsockopt+0x106/0x180
+     __x64_sys_setsockopt+0xc2/0x160
      ? srso_alias_return_thunk+0x5/0xfbef5
      ? trace_hardirqs_on+0x18/0x160
      do_syscall_64+0x115/0x6a0
      entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    RIP: 0033:0x7fd37c082687
+    RIP: 0033:0x7fdfe600a2ba
 
      </TASK>
 
-    RIP: 0010:l2cap_publish_rx_avail+0x159/0x490
+    Allocated by task 514:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     __kasan_kmalloc+0xaa/0xb0
+     __kmalloc_cache_noprof+0x251/0x610
+     l2cap_chan_create+0x47/0x930
+     l2cap_new_connection+0x1f/0x280
+     l2cap_connect_cfm+0x46c/0xe60
+     hci_le_remote_feat_complete_evt+0x417/0x680
+     hci_le_meta_evt+0x30c/0x5c0
+     hci_event_packet+0x4e8/0xc70
+     hci_rx_work+0x367/0xf00
+     process_one_work+0x908/0x19c0
+     worker_thread+0x65c/0xe40
+     kthread+0x34f/0x460
+     ret_from_fork+0x659/0x940
+     ret_from_fork_asm+0x1a/0x30
 
-Fixes: 7b1c0049be3a ("Bluetooth: Read RFC conf option on a successful Conf RSP")
+    Freed by task 514:
+     kasan_save_stack+0x33/0x60
+     kasan_save_track+0x14/0x30
+     kasan_save_free_info+0x3b/0x60
+     __kasan_slab_free+0x5f/0x80
+     kfree+0x307/0x580
+     l2cap_chan_put+0x273/0x3a0
+     l2cap_conn_del+0x41f/0x860
+     l2cap_disconn_cfm+0x87/0xd0
+     hci_disconn_complete_evt+0x30f/0x990
+     hci_event_packet+0x894/0xc70
+     hci_rx_work+0x367/0xf00
+     process_one_work+0x908/0x19c0
+     worker_thread+0x65c/0xe40
+     kthread+0x34f/0x460
+     ret_from_fork+0x659/0x940
+     ret_from_fork_asm+0x1a/0x30
+
+Fixes: b25120e1d5f2 ("Bluetooth: L2CAP: Fix L2CAP_ECRED_CONN_RSP response")
 Signed-off-by: Cen Zhang <zzzccc427@gmail.com>
 ---
 This patch was written with assistance from Codex (OpenAI).
 
- net/bluetooth/l2cap_core.c | 50 +++++++++++++++++++++++++++++---------
- 1 file changed, 38 insertions(+), 12 deletions(-)
+ net/bluetooth/l2cap_sock.c | 158 +++++++++++++++++++++----------------
+ 1 file changed, 88 insertions(+), 70 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0d4f3341bd47f..069c0aabae0f1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1739,7 +1739,8 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 			}
- 
- 			set_bit(CONF_REQ_SENT, &chan->conf_state);
--			l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-+			chan->ident = l2cap_get_ident(conn);
-+			l2cap_send_cmd(conn, chan->ident, L2CAP_CONF_REQ,
- 				       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
- 			chan->num_conf_req++;
- 		}
-@@ -3973,6 +3974,10 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 	    (chan->mode == L2CAP_MODE_BASIC || chan->state == BT_CONNECTED))
- 		return -ECONNREFUSED;
- 
-+	if ((rfc.mode == L2CAP_MODE_ERTM ||
-+	     rfc.mode == L2CAP_MODE_STREAMING) && !rfc.max_pdu_size)
-+		return -ECONNREFUSED;
-+
- 	chan->mode = rfc.mode;
- 
- 	if (*result == L2CAP_CONF_SUCCESS || *result == L2CAP_CONF_PENDING) {
-@@ -4212,12 +4217,13 @@ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
- 	if (test_and_set_bit(CONF_REQ_SENT, &chan->conf_state))
- 		return;
- 
--	l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-+	chan->ident = l2cap_get_ident(conn);
-+	l2cap_send_cmd(conn, chan->ident, L2CAP_CONF_REQ,
- 		       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
- 	chan->num_conf_req++;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index d8a7b5f4baf64..fae2c64eb39e3 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -929,12 +929,96 @@ static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
+ 	return 0;
  }
  
--static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
-+static int l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- {
- 	int type, olen;
- 	unsigned long val;
-@@ -4237,7 +4243,7 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 	BT_DBG("chan %p, rsp %p, len %d", chan, rsp, len);
- 
- 	if ((chan->mode != L2CAP_MODE_ERTM) && (chan->mode != L2CAP_MODE_STREAMING))
--		return;
-+		return 0;
- 
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		int ret = l2cap_get_conf_opt(&rsp, rsp_end, &type, &olen, &val);
-@@ -4260,6 +4266,10 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 		}
- 	}
- 
-+	if ((rfc.mode == L2CAP_MODE_ERTM ||
-+	     rfc.mode == L2CAP_MODE_STREAMING) && !rfc.max_pdu_size)
-+		return -ECONNREFUSED;
++static int l2cap_sock_set_security(struct sock *sk, sockptr_t optval,
++				   unsigned int optlen)
++{
++	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	struct l2cap_conn *conn;
++	struct bt_security sec;
++	bool have_conn;
++	int err = 0;
 +
- 	switch (rfc.mode) {
- 	case L2CAP_MODE_ERTM:
- 		chan->retrans_timeout = le16_to_cpu(rfc.retrans_timeout);
-@@ -4274,6 +4284,8 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 	case L2CAP_MODE_STREAMING:
- 		chan->mps    = le16_to_cpu(rfc.max_pdu_size);
- 	}
++	have_conn = l2cap_chan_lock_conn(chan);
++	lock_sock(sk);
 +
-+	return 0;
- }
- 
- static inline int l2cap_command_rej(struct l2cap_conn *conn,
-@@ -4467,7 +4479,8 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
- 	    result == L2CAP_CR_SUCCESS) {
- 		u8 buf[128];
- 		set_bit(CONF_REQ_SENT, &chan->conf_state);
--		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-+		chan->ident = l2cap_get_ident(conn);
-+		l2cap_send_cmd(conn, chan->ident, L2CAP_CONF_REQ,
- 			       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
- 		chan->num_conf_req++;
- 	}
-@@ -4555,7 +4568,8 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 		if (test_and_set_bit(CONF_REQ_SENT, &chan->conf_state))
- 			break;
- 
--		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-+		chan->ident = l2cap_get_ident(conn);
-+		l2cap_send_cmd(conn, chan->ident, L2CAP_CONF_REQ,
- 			       l2cap_build_conf_req(chan, req, sizeof(req)), req);
- 		chan->num_conf_req++;
- 		break;
-@@ -4679,7 +4693,6 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		goto unlock;
- 	}
- 
--	chan->ident = cmd->ident;
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
- 	if (chan->num_conf_rsp < L2CAP_CONF_MAX_CONF_RSP)
- 		chan->num_conf_rsp++;
-@@ -4715,7 +4728,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 	if ((chan->state == BT_CONFIG || chan->state == BT_CONNECTED) &&
- 	    !test_and_set_bit(CONF_REQ_SENT, &chan->conf_state)) {
- 		u8 buf[64];
--		l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ,
-+		chan->ident = l2cap_get_ident(conn);
-+		l2cap_send_cmd(conn, chan->ident, L2CAP_CONF_REQ,
- 			       l2cap_build_conf_req(chan, buf, sizeof(buf)), buf);
- 		chan->num_conf_req++;
- 	}
-@@ -4767,12 +4781,22 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 	lockdep_assert_held(&chan->conn->lock);
- 
- 	/* Connected channels may also receive reconfiguration responses. */
--	if (chan->state != BT_CONFIG && chan->state != BT_CONNECTED)
-+	if ((chan->state != BT_CONFIG && chan->state != BT_CONNECTED) ||
-+	    !test_bit(CONF_REQ_SENT, &chan->conf_state) ||
-+	    !chan->ident || chan->ident != cmd->ident)
- 		goto done;
- 
-+	/* Consume this request before a retry publishes a new ident. */
-+	if (result != L2CAP_CONF_PENDING &&
-+	    !(flags & L2CAP_CONF_FLAG_CONTINUATION))
-+		chan->ident = 0;
++	if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
++	    chan->chan_type != L2CAP_CHAN_FIXED &&
++	    chan->chan_type != L2CAP_CHAN_RAW) {
++		err = -EINVAL;
++		goto unlock;
++	}
 +
- 	switch (result) {
- 	case L2CAP_CONF_SUCCESS:
--		l2cap_conf_rfc_get(chan, rsp->data, len);
-+		if (l2cap_conf_rfc_get(chan, rsp->data, len) < 0) {
-+			l2cap_send_disconn_req(chan, ECONNRESET);
-+			goto done;
++	/* mic_len was added at the end of struct bt_security, so
++	 * accept the shorter struct as well, leaving mic_len unset.
++	 */
++	if (optlen < offsetofend(struct bt_security, key_size)) {
++		err = -EINVAL;
++		goto unlock;
++	}
++
++	err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
++				       optlen);
++	if (err)
++		goto unlock;
++
++	if (sec.level < BT_SECURITY_LOW ||
++	    sec.level > BT_SECURITY_FIPS) {
++		err = -EINVAL;
++		goto unlock;
++	}
++
++	/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4,
++	 * Part E, Section 7.7.8: MIC_Length 0x00 is 32 bits,
++	 * 0x01 is 64 bits and 0x02 is 128 bits; all other
++	 * values are reserved for future use.
++	 */
++	if (sec.mic_len > 0x02) {
++		err = -EINVAL;
++		goto unlock;
++	}
++
++	chan->sec_level = sec.level;
++	chan->mic_len = sec.mic_len;
++
++	conn = l2cap_chan_conn(chan);
++	if (!conn)
++		goto unlock;
++
++	/* change security for LE channels */
++	if (chan->scid == L2CAP_CID_ATT) {
++		l2cap_chan_req_mic_len(chan, conn->hcon);
++		if (smp_conn_security(conn->hcon, sec.level)) {
++			err = -EINVAL;
++			goto unlock;
 +		}
- 		clear_bit(CONF_REM_CONF_PEND, &chan->conf_state);
- 		break;
++
++		set_bit(FLAG_PENDING_SECURITY, &chan->flags);
++		sk->sk_state = BT_CONFIG;
++		chan->state = BT_CONFIG;
++
++	/* or for ACL link */
++	} else if ((sk->sk_state == BT_CONNECT2 &&
++		    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
++		   sk->sk_state == BT_CONNECTED) {
++		if (!l2cap_chan_check_security(chan, true))
++			set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
++		else
++			sk->sk_state_change(sk);
++	} else {
++		err = -EINVAL;
++	}
++
++unlock:
++	release_sock(sk);
++	l2cap_chan_unlock_conn(chan, have_conn);
++	return err;
++}
++
+ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 				 sockptr_t optval, unsigned int optlen)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+-	struct bt_security sec;
+ 	struct bt_power pwr;
+ 	struct l2cap_conn *conn;
+ 	int err = 0;
+@@ -950,79 +1034,13 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	if (level != SOL_BLUETOOTH)
+ 		return -ENOPROTOOPT;
  
-@@ -4812,7 +4836,8 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 				goto done;
- 			}
++	if (optname == BT_SECURITY)
++		return l2cap_sock_set_security(sk, optval, optlen);
++
+ 	l2cap_chan_lock(chan);
+ 	lock_sock(sk);
  
--			l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+			chan->ident = l2cap_get_ident(conn);
-+			l2cap_send_cmd(conn, chan->ident,
- 				       L2CAP_CONF_REQ, len, req);
- 			chan->num_conf_req++;
- 			if (result != L2CAP_CONF_SUCCESS)
-@@ -8171,7 +8196,8 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			    res == L2CAP_CR_SUCCESS) {
- 				char buf[128];
- 				set_bit(CONF_REQ_SENT, &chan->conf_state);
--				l2cap_send_cmd(conn, l2cap_get_ident(conn),
-+				chan->ident = l2cap_get_ident(conn);
-+				l2cap_send_cmd(conn, chan->ident,
- 					       L2CAP_CONF_REQ,
- 					       l2cap_build_conf_req(chan, buf, sizeof(buf)),
- 					       buf);
+ 	switch (optname) {
+-	case BT_SECURITY:
+-		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
+-		    chan->chan_type != L2CAP_CHAN_FIXED &&
+-		    chan->chan_type != L2CAP_CHAN_RAW) {
+-			err = -EINVAL;
+-			break;
+-		}
+-
+-		/* mic_len was added at the end of struct bt_security, so
+-		 * accept the shorter struct as well, leaving mic_len unset.
+-		 */
+-		if (optlen < offsetofend(struct bt_security, key_size)) {
+-			err = -EINVAL;
+-			break;
+-		}
+-
+-		err = copy_struct_from_sockptr(&sec, sizeof(sec), optval,
+-					       optlen);
+-		if (err)
+-			break;
+-
+-		if (sec.level < BT_SECURITY_LOW ||
+-		    sec.level > BT_SECURITY_FIPS) {
+-			err = -EINVAL;
+-			break;
+-		}
+-
+-		/* BLUETOOTH CORE SPECIFICATION Version 7.0 | Vol 4,
+-		 * Part E, Section 7.7.8: MIC_Length 0x00 is 32 bits,
+-		 * 0x01 is 64 bits and 0x02 is 128 bits; all other
+-		 * values are reserved for future use.
+-		 */
+-		if (sec.mic_len > 0x02) {
+-			err = -EINVAL;
+-			break;
+-		}
+-
+-		chan->sec_level = sec.level;
+-		chan->mic_len = sec.mic_len;
+-
+-		conn = l2cap_chan_conn(chan);
+-		if (!conn)
+-			break;
+-
+-		/* change security for LE channels */
+-		if (chan->scid == L2CAP_CID_ATT) {
+-			l2cap_chan_req_mic_len(chan, conn->hcon);
+-			if (smp_conn_security(conn->hcon, sec.level)) {
+-				err = -EINVAL;
+-				break;
+-			}
+-
+-			set_bit(FLAG_PENDING_SECURITY, &chan->flags);
+-			sk->sk_state = BT_CONFIG;
+-			chan->state = BT_CONFIG;
+-
+-		/* or for ACL link */
+-		} else if ((sk->sk_state == BT_CONNECT2 &&
+-			    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
+-			   sk->sk_state == BT_CONNECTED) {
+-			if (!l2cap_chan_check_security(chan, true))
+-				set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
+-			else
+-				sk->sk_state_change(sk);
+-		} else {
+-			err = -EINVAL;
+-		}
+-		break;
+-
+ 	case BT_DEFER_SETUP:
+ 		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
+ 			err = -EINVAL;
