@@ -1,84 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=87.248.110.83
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795618276;
-	b=uzreGCcIyri5VHV6L0kde+NwUTOrTk6Isa/GG+owTTlcx1e6sSHvK39s8rkWEZlMCvWw
-	 Jr9TpuDE4A/V+sW9K7EXdt3B1CmoX8nqx0HxPyFGju2xS4pw9NmYK6MW0qGt1MJ51xbMx
-	 Aqgbb37GU7oZZ0EbHuRIN24EPxRq4nL47Ny4xo+454YXz+20XlLkTi6WJif5vu4ir3aEL
-	 SYPD4tWZLLZHRsschpDNV30Afx2dn5SClBsJ2NycTdE5xWBtIsxiglYIMii+5Wtp2K+Cs
-	 74YESV7A5iOsSR+a1Kac+aenmegOVeiA4g9dNk/PVNKnThMxb0LdwnBzj3M0jMbiuWQ==
+	t=1795618344;
+	b=DX9dvXIa1h+xw+YiarsiJWgBD6wSbZ6PG2t2HhvNFbFEIZvLmDRGTXNlvGZRhprGE3St
+	 8OoO73730TtlTjs25ZEeys6ajC5JSGeMbcTZVRWC9NBESXv2nx2sN7/I8huHKX5hj711b
+	 k3EfbZ3OreRrJF4xr9AZqVNs8tugvrdRZ3GTnzHjRF/OpY8QJLhCRNIrwcgrUodjO4H+r
+	 rL/2QaU983eL2fDQAK8OsCww1gXp/O4bnxH6nu2gswYdje6M0Xf1on40nbHSwmYw6vd8u
+	 pyb3ApeN5z3Q9shsOPl41lOXp7Xg//l4kGJDSegZ/uYw8JCtzIXTgHTOWQWLU4E23sw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795618276;
-	h=DMARC-Filter:DKIM-Signature:X-SONIC-DKIM-SIGN:X-YMail-OSG:X-Sonic-MF:
-	 X-Sonic-ID:Received:Received:Date:From:Subject:To:Message-Id:
-	 References:X-Mailer:MIME-Version:Content-Type;
-	bh=9CYaoxSjlHJ+FvXfoHxW+enGH3xd4ZAKRU72YxVRmJA=;
-	b=KNeMBoFARHggRkcW20kFP19mHC1B3xQ1hlYA0Qya2mHz4hNpxgkjQjg6rIAEpzmdLTHz
-	 Ii0ePcLuMBvhg71ee4bosngQDDo2Fem7BL48SPeAPmoIacQu+qeOElBY/GS2XBmNZD2gM
-	 fsmlqvs1QCNus8+h/lVyt1TMmxkfNfwcdMBokwBRSE4levBIcXGlZVg63AqkVCIQzYgV2
-	 lWnVuamyd4wzeHW9+kZPLPW5zsWlLMWJ/Gt0epLq9QuZtHEcfjMnMCuMiM0KZ82UGMMEh
-	 tJfL/LfIdCeQtapexW83hwhROXpxAak1hb0DGreLIWHCQL/sgPAu90nLSRNKR4Vh/Ng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795618344;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=AwuVOJaZNdU5KtTHzIORLk7WYXEDBjijnn4sWXXxfBQ=;
+	b=1OQvUfAJoKdA7Bb/yc6FAekJ2DQv7jA78HEKHwZ1noNO+eKBnRt62Ers1fYmTPHK4fOj
+	 KC1x851VPnkhM+0GRED5DZzLwmFK8d0Guwh1L0qa93X3cG9t8zN4C17Ihjn+eAkRZUoD+
+	 h8Qn+dAvBZG3D9rsLgU5ZsNjyBwFXOBx205fmMJXbwiQYOG3bacBpUPl67SV30/nOWRgs
+	 naCAWX+Bhhx/Oq2junQLqELiE+iB6SjBMaXyDR1PoUVjOTaFBbWRzfF6M8V3X3Y/MSEuF
+	 /LvXflyXQ+GNrc2ukLwKoWaaQwHf/7KcD1v5XfEke8NEpuEs/D6dGRaOmbutk2hZ5Rg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=yahoo.de;
-	spf=pass smtp.mailfrom=yahoo.de;
-	dkim=pass header.d=yahoo.de header.i=@yahoo.de header.a=rsa-sha256 header.s=s2048 header.b=ZjOuG2G2;
-	arc=none smtp.remote-ip=87.248.110.83
-Received: from sonic302-20.consmr.mail.ir2.yahoo.com (sonic302-20.consmr.mail.ir2.yahoo.com [87.248.110.83])
+	dmarc=pass header.from=streamunlimited.com;
+	spf=pass smtp.mailfrom=streamunlimited.com;
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=cRggvxaz;
+	arc=none smtp.remote-ip=209.85.221.53
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73578606A326
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 14:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73578606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4D2606A31E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 14:52:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B4D2606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=yahoo.de header.i=@yahoo.de header.a=rsa-sha256 header.s=s2048 header.b=ZjOuG2G2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.de; s=s2048; t=1795618272; bh=9CYaoxSjlHJ+FvXfoHxW+enGH3xd4ZAKRU72YxVRmJA=; h=Date:From:Subject:To:References:Content-Type:From:Subject:Reply-To:Content-Type; b=ZjOuG2G2bOjeu897H2JPap/m3HWoZ43qvYheRFn2DYBUhPysonoOL3eK6q7AfZSEaJ2tPM2hwed4UD92XO5ajT5pGUHn8iBFtXbN+/9eYWQ6S/QbhrDIupVnZsyBn2VlzyLPhkbEaMzw6LkhWIxQQpPlLp/adX1JCljRHuy2DirHUZqNGFzVMiTlxqn1uNmBshwv+RpQUjwQJ/Ouqs/aFXyz2Igojm1e+qbZj2yj9P7UFQWpid3e78XTsDeEtqzCKxZ5SC9zu2h2qO0s+WDsoNl5xKCzy/7nRltNsg9ah0QIMQBl+O1QzcB7uZ3JbEZptddHhilFpo4svy0Y1qbzkA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1795618272; bh=aFRnzSEbGW6w4xbET7bp02mAAmBKwV/QVa69amk+VeM=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=CzSySks1y5QSe1m0YTYWq0I+631k1X3YdzN399UdewVIRfn2DQ5TjB5adYatAcQbF3bT3qx2kO/vQuJ8cKhQOK8RcCG9BQkTaGUX6SnOX7LkOTZ9KevqYU1ul8EwOdZ/N+bBJhvMrab+7cRQ1nZPkLydUUQ8wZiJ3TlvxB2osoJXZPu1er9Ja5w+47i0hvwAJHe6w89apgMGx1TINKs9OBE6hVGYsyBlbRSk7S0DOny4jStQ2X2okclDkXtQH3xBVmTKKbuMX0IoVKguyPy0ahcx3TO80rhDnW0cGZ8rG8zYXyxRM6AVgSLdPmxxgoxj23OytRNybElj8iuHAsSgew==
-X-YMail-OSG: MqOe1wEVM1k5aZ4udFSBqnvyV5OiB9X8jcRw8H4xgmXwJZHELr4CVHFLvZxIdaA
- u5MhoXJkzSlhM35klcg9n9VU2ED_EuEUqhdvXI7uMEXMEK5zcuSwfMm0ccQAxrkLHA_ZCaXhy0em
- 2gyhsyALhIpzyK3CH0Sq8d0AOZQpntvzU6o9vd_BTw97YiSfEOVP7_ZzyeZxjK5LaKqVjoGJ9999
- 3qn7r4oJZMHWnrfFRDPrY9JQToM6tYlHNqcDFmPV8q9UaQGtvxi_Us59t_20OooKyAaO7VuAbneK
- dLYb6D7I9vJUSMczz4j5zX5s14prjcuWO5GqUcJlNxEKto9AJSu9I36RDuMr93GP3h8NqMM2dVSf
- S1FEnMn4LQGUUmLo6pa1fGeBk4w6B8dEvyNSNqzs1fH7J314kQ3rqbtD.YT3YN7Y8RLWE4q7ReYb
- ZAzLmjJvswVMudpiCVQcq3o.Zkhy_bATGz04is9Eo3pPAyKAnHzrB3GkA_jbL1cjlkDXwAC5CRSA
- D9CSB9pPFg12tvHSw4T5K_gawst3SoMBzaZr5WYIB_RTHcPhT4EXC6Ynp8WlTxtuy4gKEEE9.t9j
- fQo4Y7yIwgg1DUBjp.3V7dRqiqnGx.edh_ekAgETuKnFwVV1H_q6q3aLKFWgQn0aCAwIGAkfucFn
- 4aiFelsWm6mPqiMjws5FWULL1IUT6UXiqt1X3KEZaN5konT7kWNma3.pthDvpKDv53t4Euknae43
- t6XowS1fUIN.M0dBdQz4l7Oz86uu21E5VU3Uxj4Nr8.2DWsCbtsKZVofsrBsrLG4hHUyCDDSI7xv
- OtORLaSerDli3LNYjVl6esqzply0kXoP7qlE6XAh7AhJ0WTo4nbfA.9fYygOtIfX1SNY7yhju0pd
- dNAqVuFf6mupSpwaVgsFRqGIl0zLy8SXAK5521A92dpYPHx7Ahe5XiCb.RN08AnN5vV.p.OOPhO3
- CGecpQvc1Qn9eKLEXTtNazNIlSW_7qNmNa2bD2fKik3Gyfvn48j.mn12QgrcIMVejphyVMr7q.90
- CN9zm31wvzQoDcmvQYXYTdavZJi2xcP3jSqSMOcdP.46de99jCD..qIQuk1tbAzk3eW5vFCDtgcE
- CZmJ8bJK_GkxuxCq7OKRRmg9IDuOWbcJ.Ho.AGbVNCgUwjTIe034IkA8MuDsLUsSTpkaZBTmJqP7
- Dz_E.whX7wUiviAVdIHys1tKeke8N8bydeXL1M_9Q_5NaJyYRzn_IGAl_cCxB.tqFCExjnwDsj3t
- 8fGt9j..kVSD1YtTGwsxLSzm0qACRHUdQ68Cp1c6mC3pYM9Lh1U7u4tUAHzew4XHdc1lz9kEPUII
- T1hM814Ysk9CHh9c1Qq1npI43oMHAwKdZhYPIhiUuGoJDtJ7Fb0UKQsVCY1Qp2WwnUUzDjoeJiKG
- lcK5LcYChb5wgWYwXMxSNqooiWmCv8CMNqA8jq1HAZxsgpx9ZdjFwuBoMIVxj5atnSWIomWGq.f_
- aLy3sBoujD0D_iIz4cZm0wfuqxWKUzk57D2M4eY4_1p77OWJHwgnWL3JoGJ3HXXLlowGyUfitgQx
- 50ije6L6HH7NGFrMW6HUNXgZD81ttWX4trCtyDSoasEjMLb7F2_.3ZV1OlXpe9Dnqwb96aQV4o4l
- g7FshU0V8117OTFEU2iB3.ac.F5mnb7jiukltc41fZ2pSQzje2FMUDgTNyjoe_3jXmmdFxPxJPAR
- F0Q3GCeeKaJSGE85.QdQ9VSctgTt6ay1kWHq68h_I2sS.LNCRTEnHZJPdcSV3UtTyBJfJ3WEks1L
- kOZRmB41xhXdmItD3Hg.yo9EJPyKgq8NU90u7BSWVZdbW6RFxZOptSHZnDlmFEIyV72XBXoDjHl6
- CRml00HfsXapgArhceQRfJHBN0wrck_5HkAP2iEy0fvOBtAh0mO7DaGyah2zs15cWCWj42n8j1m5
- h.NGdSDU2bZNm4WuLIb3i9cfv_FHbseqb9v7QZ_axNk0z5GQCEyrh7MyDTZF4jqif00rWgzbxcUB
- hf6I3M65f6Q_QBPBG5dS14ogzDo.0TyEZ6jQSnaRJ9Hds0Jfpr3Q_lj6EBeNt7kyrTumt_.q8DwZ
- 5caFl9UjKDJBag1MIy7LIj7_6Drx4PuImmiMyNuebdKCwDAv2rWZnosRZly8RvkeDyNgsw5UTFmi
- LLO1zVHAhZSESE5vGPpwH_iEyF2qpwW3gurdw2N8d1gjFAs29dAQ2tedyVBXsj0U.ds0E.L1SmlK
- lVdr1IpQ8dUP6Xn7kp_Jn4qIOAlIMmaGXYeQOKJFbQUADK0I-
-X-Sonic-MF: <liomelfreenet@yahoo.de>
-X-Sonic-ID: 980bb0a4-4f5e-46ca-8449-7db3c6f334f2
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic302.consmr.mail.ir2.yahoo.com with HTTP; Wed, 25 Nov 2026 14:51:12 +0000
-Received: by hermes--production-ir2-7c4859dc89-4b5bc (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID fcd8a5f6908677769006221981b6c025;
-          Wed, 25 Nov 2026 14:51:09 +0000 (UTC)
-Date: Fri, 20 Nov 2026 22:15:52 +0100
-From: liom <liomelfreenet@yahoo.de>
-Subject: btusb/btrtl: Realtek RTL8761B USB (0bda:a728) stuck in reset loop
- after reboot ("command 0xfc61 tx timeout"), only replug recovers
-To: linux-bluetooth@vger.kernel.org
-Message-Id: <GEKTOT.TVVWLWVXU3XC3@yahoo.de>
-References: <AN2TOT.3MREKCXKFUKD3@yahoo.de>
-X-Mailer: geary/46.0
+	dkim=pass (1024-bit key, unprotected) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=cRggvxaz
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-48e47347279so3552138f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 06:52:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1795618341; x=1796223141; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AwuVOJaZNdU5KtTHzIORLk7WYXEDBjijnn4sWXXxfBQ=;
+        b=cRggvxazQzAxcBIHQD/iuBttEPCPxTVggzC+hw+Cz5+ztu7Q8zY2dAkIP1gzHa0EGy
+         8TCzJdNFFt1iCal6bB1fR8CYKUyRJYlyO0KWKbTMXqQnbQKPs9d49BPnrHBj0rl/ieA5
+         oOs2W09BcHyxN+lO2ru47Lzm5Ck/GZmPgfs2I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795618341; x=1796223141;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=AwuVOJaZNdU5KtTHzIORLk7WYXEDBjijnn4sWXXxfBQ=;
+        b=VaAM9wQRZXJctj9Q8ysfScEPpBy4dRx+LaNFHprRVPCqXnWfJGnLnnPuyAZ7XaDMlz
+         W0OEgShdWlsx6wm3UGHTws/xA79SBmr1XoasWHi8Nojs3Xo3nNdXGJRxmB7SqI7TMfkd
+         ozKaJ4+vetibdLlRKddX795bX2Aa4kGwFuFT9tJATjM4XjKnzEqk8uw6iTOqp+FDP+5Z
+         ngo0f1dyUrFTLI4RmnDw/1NZRtKoBwx6eWXwdHLrJMWItZpAvzMf2YjUIUiQ/rqvoH39
+         KesvfREXMCdAQRn3ocTBlytQwx1YeuZr7JwxGvDWL1X/mxqEd/2jGUkN0MRxM925/Kfd
+         6L0w==
+X-Gm-Message-State: APuU4Z9SmH/PwkhIU8j7/oB70RCLTtcQ9Ss3jGCyJo4t62Jp1Xcxqa/F
+	W4ZBH7qQdX+9xQEN7A0WoZGUOQWUfNah33vDs5z5VpGfzB3GCI4EMZbXeiSkjA6kCWAe0vuKCaf
+	0HI0u
+X-Gm-Gg: AZFdTZePVnIhM5y0UrxL5LSDNKljZFQchTI1+rYqDIOr2VUhuQOgj4ZT2iXGLN0LHAB
+	xEZYljAj5dfDSnpkOb+MMacjhDcshVXtIPlrKmQd3KzhXk2IYwz5dO1MKFrwdEWsx6gcynOfGt1
+	PsJdOtpdJU6oHJZUcf9JEyvzi9CqgWtZVoD0NqXU9wkAeYQPd25q4MfU7bbPY5eN+V1lzqeg+Eo
+	Rq77g9zKc7XkvpgPg3bL+zYqL8exw7b3Un+XX6tk5xWvZvWAsq0Cejp6Jq6zVHscDvwRhmsf/Wg
+	3ecgi3IhxraFNRzJ9j7cBRDyWbWfLh7U3/jgCgcaYU0hCX2YHU3qETVvjXa5OdlLg+VBMSS3N37
+	pVwmfwF15vBBPGEty7gPZ0KZcW9n/7gipkoAR09/QHVmUiYD/gtCrJTeWEGb+7fgFJ94+c4lW2t
+	N6nRkAxfKHAYE4XGOr0TjATWeqXUtFNJtmIqfOqxVxO7Y/e3gu3DQA6qIc7gilslLFItJiT9gQN
+	4+dOfRyN/EDzZt312/cLn0JF0B636FSLEPvyH7cCewaPaZ6or9kINt7uITRvkLHM/dBwHRTO+Vz
+	ErPxx1ypW/4innhwOJ+Xnal+7j94r66cVkJvQnGdbcNt8qaXaHlDbW46VNSXT8UcvKob0N9Ob26
+	sgQYW1aU=
+X-Received: by 2002:a05:6000:4809:b0:4aa:842f:5f78 with SMTP id ffacd0b85a97d-4abb759e947mr34409206f8f.46.1795618341353;
+        Wed, 25 Nov 2026 06:52:21 -0800 (PST)
+Received: from ?IPV6:2a01:390:0:101:641b:80e1:c5fc:b7eb? ([2a01:390:0:101:641b:80e1:c5fc:b7eb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6a67f204sm41148873f8f.21.2026.11.25.06.52.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2026 06:52:20 -0800 (PST)
+Message-ID: <95e7ae51-6025-4b32-a712-7a3de01faf4f@streamunlimited.com>
+Date: Wed, 25 Nov 2026 15:52:20 +0100
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,358 +89,262 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ 1/2] avrcp: Defer init until service discovery
+ completes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20261124133954.4009535-1-simon.mikuda@streamunlimited.com>
+ <CABBYNZL7ekOUHtuvw5e-J_b+AESLYJ5E=gABnNfjaELhBoo_Og@mail.gmail.com>
+Content-Language: en-US
+From: Simon Mikuda <simon.mikuda@streamunlimited.com>
+In-Reply-To: <CABBYNZL7ekOUHtuvw5e-J_b+AESLYJ5E=gABnNfjaELhBoo_Og@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Good point Luiz.
 
+I have re-run all AVRCP test cases and they passed with these changes 
+fine (on RPi5 with Intel BE200 chip)
 
+BR
+Simon
 
-Summary
--------
-After a reboot, a Realtek USB Bluetooth adapter (0bda:a728, identified 
-by btrtl
-as RTL8761B, lmp_subver=8761) does not respond to the first command 
-(0xfc61).
-btusb resets the device in an endless loop. Bluetooth is unusable until 
-the
-adapter is physically unplugged and replugged. After replugging, 
-firmware
-loads normally and the adapter works.
-The problem started after upgrading from Ubuntu 22.04 to Ubuntu 26.
-
-Environment
------------
-- Ubuntu 26 (upgraded from 22.04)
-- Kernels tested, same behaviour: 7.0.0-43-generic (Ubuntu) and
-  7.3.4-070304-generic (mainline build)
-- bluez 5.85-4ubuntu0.4
-- linux-firmware 20260319.git217ca6e4
-- Adapter: Realtek "Bluetooth 5.4 Radio", USB ID 0bda:a728, bcdDevice 
-2.00
-
-Symptoms
---------
-Immediately after loading btusb (or after reboot), the log repeats about
-every 2-3 seconds:
-
-  Bluetooth: hci0: command 0xfc61 tx timeout
-  Bluetooth: hci0: RTL: Failed to generate devcoredump
-  Bluetooth: hci0: Resetting usb device.
-  Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
-  usb 3-4: reset full-speed USB device number 4 using xhci_hcd
-
-In this state "bluetoothctl" reports "No default controller available".
-No "loading rtl_bt/..." line appears before the first timeout.
-
-After physically replugging, the log shows normal initialisation:
-
-  Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000b lmp_ver=0a 
-lmp_subver=8761
-  Bluetooth: hci0: RTL: rom_version status=0 version=1
-  Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_fw.bin
-  Bluetooth: hci0: RTL: loading rtl_bt/rtl8761bu_config.bin
-  Bluetooth: hci0: RTL: fw version 0xdfc6d922
-
-Reproducibility
----------------
-Occurs after every reboot. Not observed during normal operation.
-
-What was tried (no effect)
---------------------------
-- Different kernels: 7.0.0-43-generic and 7.3.4-070304-generic
-- modprobe -r btusb && modprobe btusb
-- Unbind/bind of the xHCI controller (0000:0b:00.3)
-- Different USB port on a different xHCI controller (bus 1 instead of 
-bus 3):
-  same behaviour
-- uhubctl: no compatible hub (no per-port power switching on this port)
-- rfkill: not blocked (soft/hard: no)
-- Power settings adjusted
-
-Not yet tested
---------------
-- Kernel 6.8.0-147-generic (still installed)
-- The adapter on another computer
-- Shutdown/power-on instead of reboot
-- Whether it worked on 22.04 with the same adapter: it did work before
-  the upgrade (reported by the user, not verified against older logs)
-
-Attachments
------------
-
-Bluetooth: hci0: command 0xfc61 tx timeout
-Bluetooth: hci0: RTL: Failed to generate devcoredump
-Bluetooth: hci0: Resetting usb device.
-Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
-
-
-
-Bus 001 Device 004: ID 0bda:a728 Realtek Semiconductor Corp. Bluetooth 
-5.4 Radio
-Couldn't open device, some information will be missing
-Negotiated speed: Full Speed (12Mbps)
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0bda Realtek Semiconductor Corp.
-  idProduct          0xa728 Bluetooth 5.4 Radio
-  bcdDevice            2.00
-  iManufacturer           1 Realtek
-  iProduct                2 Bluetooth 5.4 Radio
-  iSerial                 3 00E04C239987
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength       0x00b1
-    bNumInterfaces          2
-    bConfigurationValue     1
-    iConfiguration          0
-    bmAttributes         0xe0
-      Self Powered
-      Remote Wakeup
-    MaxPower              500mA
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        0
-      bAlternateSetting       0
-      bNumEndpoints           3
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x81  EP 1 IN
-        bmAttributes            3
-          Transfer Type            Interrupt
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0010  1x 16 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x02  EP 2 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x82  EP 2 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               0
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       1
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       2
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       3
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       4
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       5
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              4
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0031  1x 49 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0031  1x 49 bytes
-        bInterval
-
-/:  Bus 001.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/9p, 480M
-    |__ Port 002: Dev 002, If 0, Class=Mass Storage, Driver=uas, 480M
-    |__ Port 003: Dev 004, If 0, Class=Wireless, Driver=btusb, 12M
-    |__ Port 003: Dev 004, If 1, Class=Wireless, Driver=btusb, 12M
-/:  Bus 002.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/3p, 
-10000M
-/:  Bus 003.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/4p, 480M
-    |__ Port 001: Dev 002, If 0, Class=Human Interface Device, 
-Driver=usbhid, 12M
-    |__ Port 001: Dev 002, If 1, Class=Human Interface Device, 
-Driver=usbhid, 12M
-    |__ Port 001: Dev 002, If 2, Class=Human Interface Device, 
-Driver=usbhid, 12M
-    |__ Port 001: Dev 002, If 3, Class=Human Interface Device, 
-Driver=usbhid, 12M
-/:  Bus 004.Port 001: Dev 001, Class=root_hub, Driver=xhci_hcd/4p, 5000M
-
-
-
+On 11/24/26 17:15, Luiz Augusto von Dentz wrote:
+> Hi Simon,
+>
+> On Tue, Nov 24, 2026 at 8:40 AM Simon Mikuda
+> <simon.mikuda@streamunlimited.com> wrote:
+>> When the remote connects AVCTP before SDP has found its AVRCP records,
+>> as iOS does on the first connection after pairing, neither controller
+>> nor target is initialized and the session stays without them. Wait for
+>> the service discovery with device_wait_for_svc_complete() instead.
+>>
+>> The remote uses the session meanwhile: iOS asks for the supported
+>> events and registers for EVENT_VOLUME_CHANGED right away, and would
+>> not get absolute volume otherwise. Report every supported event from
+>> the start, the remote registers only those it uses, and create the
+>> target when the control channel connects so these registrations are
+>> kept; target_init() completes it from the SDP record. A volume
+>> registration with no volume set yet starts at max volume, which
+>> target_init() set only for 1.4 controllers with category 2.
+>>
+>> Assisted-by: Claude:claude-opus-5-5
+>> ---
+>>   profiles/audio/avrcp.c | 102 ++++++++++++++++++++++-------------------
+>>   1 file changed, 55 insertions(+), 47 deletions(-)
+>>
+>> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+>> index 2f214e982..f7c988ec0 100644
+>> --- a/profiles/audio/avrcp.c
+>> +++ b/profiles/audio/avrcp.c
+>> @@ -252,6 +252,7 @@ struct avrcp {
+>>          bool pos_changed_supported;
+>>          uint8_t transaction;
+>>          struct pending_pdu *pending_pdu;
+>> +       unsigned int svc_complete_id;
+>>   };
+>>
+>>   struct passthrough_handler {
+>> @@ -1614,12 +1615,6 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+>>          if (!(session->supported_events & (1 << pdu->params[0])))
+>>                  goto err;
+>>
+>> -       if (!session->target) {
+>> -               pdu->params_len = cpu_to_be16(1);
+>> -               pdu->params[0] = AVRCP_STATUS_INVALID_COMMAND;
+>> -               return AVC_CTYPE_REJECTED;
+>> -       }
+>> -
+>>          switch (pdu->params[0]) {
+>>          case AVRCP_EVENT_STATUS_CHANGED:
+>>                  len = 2;
+>> @@ -1648,6 +1643,10 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+>>                  len = 1;
+>>                  break;
+>>          case AVRCP_EVENT_VOLUME_CHANGED:
+>> +               /* Start at max volume if none has been set yet */
+>> +               if (media_transport_get_a2dp_volume(dev) < 0)
+>> +                       media_transport_set_a2dp_volume(dev, 127);
+>> +
+>>                  volume = media_transport_get_a2dp_volume(dev);
+>>                  if (volume < 0)
+>>                          goto err;
+>> @@ -4263,16 +4262,15 @@ static void session_init_browsing(struct avrcp *session)
+>>                                                          destroy_browsing);
+>>   }
+>>
+>> -static struct avrcp_data *data_init(struct avrcp *session, const char *uuid)
+>> +static struct avrcp_data *data_init(struct avrcp *session,
+>> +                                       struct avrcp_data *data,
+>> +                                       const char *uuid)
+>>   {
+>> -       struct avrcp_data *data;
+>>          const sdp_record_t *rec;
+>>          sdp_list_t *list, *protos;
+>>          sdp_profile_desc_t *desc;
+>>          int port = 0;
+>>
+>> -       data = g_new0(struct avrcp_data, 1);
+>> -
+>>          rec = btd_device_get_record(session->dev, uuid);
+>>          if (rec == NULL)
+>>                  return data;
+>> @@ -4348,14 +4346,9 @@ static void avrcp_connect_browsing(struct avrcp *session)
+>>
+>>   static void target_init(struct avrcp *session)
+>>   {
+>> -       struct avrcp_server *server = session->server;
+>>          struct avrcp_data *target;
+>> -       struct avrcp_player *player;
+>>          struct btd_service *service;
+>>
+>> -       if (session->target != NULL)
+>> -               return;
+>> -
+>>          service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
+>>
+>>          if (service == NULL) {
+>> @@ -4363,47 +4356,22 @@ static void target_init(struct avrcp *session)
+>>                  return;
+>>          }
+>>
+>> -       target = data_init(session, AVRCP_REMOTE_UUID);
+>> -       session->target = target;
+>> +       target = data_init(session, session->target, AVRCP_REMOTE_UUID);
+>>
+>>          DBG("%p version 0x%04x", target, target->version);
+>>
+>>          btd_service_connecting_complete(service, 0);
+>>
+>> -       player = g_slist_nth_data(server->players, 0);
+>> -       if (player != NULL) {
+>> +       if (target->player != NULL) {
+>>                  int8_t init_volume;
+>> -               target->player = player;
+>> -               player->sessions = g_slist_prepend(player->sessions, session);
+>>
+>>                  init_volume = btd_device_get_volume(session->dev);
+>>                  media_transport_set_a2dp_volume(session->dev, init_volume);
+>>          }
+>>
+>> -       session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+>> -                               (1 << AVRCP_EVENT_TRACK_CHANGED) |
+>> -                               (1 << AVRCP_EVENT_TRACK_REACHED_START) |
+>> -                               (1 << AVRCP_EVENT_TRACK_REACHED_END) |
+>> -                               (1 << AVRCP_EVENT_SETTINGS_CHANGED);
+>> -
+>>          if (target->version < 0x0104)
+>>                  return;
+>>
+>> -       if (avrcp_volume_supported(target)) {
+>> -               session->supported_events |=
+>> -                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+>> -               /* Check if transport volume hasn't been initialized then set it
+>> -                * to max so it works properly if the controller attempts to
+>> -                * subscribe to AVRCP_EVENT_VOLUME_CHANGED.
+>> -                */
+>> -               if (media_transport_get_a2dp_volume(session->dev) < 0)
+>> -                       media_transport_set_a2dp_volume(session->dev, 127);
+>> -       }
+>> -
+>> -       session->supported_events |=
+>> -                               (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+>> -                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
+>> -
+>>          /* Only check capabilities if controller is not supported */
+>>          if (session->controller == NULL)
+>>                  avrcp_get_capabilities(session);
+>> @@ -4430,7 +4398,8 @@ static void controller_init(struct avrcp *session)
+>>                  return;
+>>          }
+>>
+>> -       controller = data_init(session, AVRCP_TARGET_UUID);
+>> +       controller = data_init(session, g_new0(struct avrcp_data, 1),
+>> +                                                       AVRCP_TARGET_UUID);
+>>          session->controller = controller;
+>>
+>>          DBG("%p version 0x%04x", controller, controller->version);
+>> @@ -4460,8 +4429,35 @@ static void controller_init(struct avrcp *session)
+>>          avrcp_connect_browsing(session);
+>>   }
+>>
+>> +static void session_svc_complete(struct btd_device *dev, int err,
+>> +                                                       void *user_data)
+>> +{
+>> +       struct avrcp *session = user_data;
+>> +
+>> +       session->svc_complete_id = 0;
+>> +
+>> +       if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) != NULL)
+>> +               controller_init(session);
+>> +
+>> +       if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) != NULL)
+>> +               target_init(session);
+>> +}
+>> +
+>>   static void session_init_control(struct avrcp *session)
+>>   {
+>> +       struct avrcp_player *player;
+>> +
+>> +       /* The remote may register for events before its records are known,
+>> +        * target_init() completes the target from them.
+>> +        */
+>> +       session->target = g_new0(struct avrcp_data, 1);
+>> +
+>> +       player = g_slist_nth_data(session->server->players, 0);
+>> +       if (player != NULL) {
+>> +               session->target->player = player;
+>> +               player->sessions = g_slist_prepend(player->sessions, session);
+>> +       }
+>> +
+>>          session->passthrough_id = avctp_register_passthrough_handler(
+>>                                                          session->conn,
+>>                                                          handle_passthrough,
+>> @@ -4473,11 +4469,19 @@ static void session_init_control(struct avrcp *session)
+>>                                                          session);
+>>          session->control_handlers = control_handlers;
+>>
+>> -       if (btd_device_get_service(session->dev, AVRCP_TARGET_UUID) != NULL)
+>> -               controller_init(session);
+>> +       /* Report every event supported: the remote registers those it uses */
+>> +       session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+>> +                               (1 << AVRCP_EVENT_TRACK_CHANGED) |
+>> +                               (1 << AVRCP_EVENT_TRACK_REACHED_START) |
+>> +                               (1 << AVRCP_EVENT_TRACK_REACHED_END) |
+>> +                               (1 << AVRCP_EVENT_SETTINGS_CHANGED) |
+>> +                               (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+>> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
+>> +                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+> So this seems to disregard what version we are operating on so we
+> don't foresee any problems with sessions getting unknown event bits
+> being set? I guess we can only do that if we are absolutely sure
+> PTS/Qualification will never ever be updated to check bits considered
+> RFU (e.g 1.3).
+>
+>> -       if (btd_device_get_service(session->dev, AVRCP_REMOTE_UUID) != NULL)
+>> -               target_init(session);
+>> +       session->svc_complete_id = device_wait_for_svc_complete(session->dev,
+>> +                                                       session_svc_complete,
+>> +                                                       session);
+>>   }
+>>
+>>   static void controller_destroy(struct avrcp *session)
+>> @@ -4513,6 +4517,10 @@ static void session_destroy(struct avrcp *session, int err)
+>>
+>>          session_abort_pending_pdu(session);
+>>
+>> +       if (session->svc_complete_id)
+>> +               device_remove_svc_complete_callback(session->dev,
+>> +                                               session->svc_complete_id);
+>> +
+>>          service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+>>          if (service != NULL) {
+>>                  if (session->control_id == 0)
+>>
+>> base-commit: 1608f836188610aabeff5a3164169ebe0360e443
+>> --
+>> 2.43.0
+>>
+>>
+>
