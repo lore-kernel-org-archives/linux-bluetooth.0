@@ -1,89 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795612150;
-	b=Cyq49KyiEg3BKwwyVVohk/wXwPBnnYbRAhavS+YfpDz1+mhD2dpTZ95bKynrIe6rEpMo
-	 Aly79Vc0J6SIEQT4QrtcyDjPTMYVz8RqAvW9PW3YSe411Zi9ZdG4QcmToF0+NrsOAgigY
-	 PEkwAz4FqWhFxaV9i55/O28hc7aziuaJdcpLrFJ/1mfPYi0zZgnMCi/HCm6IebBtZFvmy
-	 zC2pqFDmBNWhIOSc/QOogRlrj77YEY8exajHvqpMFcsqm5W7ovAkeFwJu+lf2+gswwCYL
-	 kGo/2AdsGF2pVNW58/ElTPqsCTSO+DqLpBtZLHVGySpKHSDi8PKWSPBNVYRhSQaJLpQ==
+	t=1795612154;
+	b=nY8/GHQo3FFHsYeSwM+ykDBsrwzzJuggbwQAyxaCtuyr0pHBd9rbalTB57dd6QIIxW2q
+	 rkWZCRSuy2JriCu1bPQcK9OUXAM4A8wJNK7G8hnrLnNKhg5sphGMT2PnnUBLH4v+ZVCx1
+	 MOlxk2XsH6R2QrV6lTyNTsSnbjTGBoFURxL/oWoJDqAHnwj/csWWWllTnrNDI6R8mteH7
+	 wb6ER52koeRIATW3hhc5K4eEo26dbYotbIwP8rZ0s0j4EVmzEKZFH/vkGqfA7MEVdWmO+
+	 YJQQmtAkgEHNllPK6754uomdA+DFDaBB2iFP6Vk1m128ptJbicaiKuVYqPywfFI1fVQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795612150;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795612154;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=MJicF0N40L/p8mJ4Pm+onD5txxDN49WzZBXuet0XzS8=;
-	b=NGadSGQqAcoRR9zlhoynDqHKwcF4a7kR8QPbX4MnvL99jFqWfwJDoLAsZ5c0acF+pb/J
-	 jZxBXUUKmwPw/9DOoZT/RzCcll17EuSKNZcsiJGDmW2m1PSuNKS1mrqFkfqxJUPp+mTv/
-	 EDQ5NiO+BYnphHdIE7H8+niBNz/5/onnVFGzyCue0uwt++Hibn9KmkEJnbZkPrACWI87r
-	 0Rv8KQXHx3KpKh0BlNH3Uu6XaAqPcYaxt+lsz204CEx71r5RRjXDp8f+aFeJoKqlgHMOx
-	 4tAaPCWVoO4XlzmEn2dN8+YsCa9Tr5GEWV6lilurKmMDSbY4zJA02lGxEuZ1jLkVM1Q==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=PHAySPim9C43/yZnOc3cvmysHiJR3smT0StLMumDRAI=;
+	b=pVPjza7rjsqf2y+FKdB0dc6gZ0/8b5Se2ioS8ofPgCgegX0Oi3LMif+7e0wSW/CmNPFY
+	 FkOkAL4Fu0c3Ys6C7BSzFG4X3X6Rc34G+xwN0CBSYfOradn3wo7arqHfv0eAj79fTAoVp
+	 AZSdHqE4jxi2Hkko+f6JEfLgs3rvrID33/hTrggd4b+r1kXfYwoGVao88t2kgE4iSE13G
+	 qCf+WaRWIqTWknZ71D6cVwJopIz6oSk/c7xnhr7O8BdGafa+5LVwPmt7cGppfVvjKTwGW
+	 6wmlaNerta//fx5e3rXIyWQrLPzgh2nGHoMmIAPNpKLMpKuewNO5DXfVzSYMmf6Lerw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yW1xMJUh;
-	arc=none smtp.remote-ip=209.85.222.51
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RxsJJchF;
+	arc=none smtp.remote-ip=209.85.221.174
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D32D606A329
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:09:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3D32D606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67259606A338
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:09:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67259606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yW1xMJUh
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-980c4f5c921so1559301241.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 05:09:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=RxsJJchF
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-5eafaeb8684so1690707e0c.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 05:09:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795612149; x=1796216949; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MJicF0N40L/p8mJ4Pm+onD5txxDN49WzZBXuet0XzS8=;
-        b=yW1xMJUhIaNsmWIeNH9jopmG0amXarJ6nK80pYgmjOWaaKHkVo8ef8EY/+0U7Ib2aE
-         Ln6hkyO9PzHiS7+MURY5RbHUQnu+lEmLVGGEx2bhOEOrM4a3EUvLrckeTPCK2KBLxO2X
-         svUwpx+UUWPZ4QJszfFODL8V052zjSS400sqA/BfVBwS0CDyrBhDy5WulPF8SNb0DabG
-         F08rYjrNOzLBtnU8AH/iMVo8QJZJ83w8oxo5eFOA6OUDQgKN6PB5C+TUMzS5WZinDxq6
-         W334DofO/9Y6v00Yma16C/EmMQvOtagA+Sn/EVLDKoCf+fFq7J+1BxdSjUczGLbLWLdL
-         DL/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795612149; x=1796216949;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1795612153; x=1796216953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=MJicF0N40L/p8mJ4Pm+onD5txxDN49WzZBXuet0XzS8=;
-        b=XlWoMbWzHA04mS2lWM8+MxoE28zOKj75AZZxqmXP7a67Tmvn5DW1hZWBd6AkavB22w
-         cig3OTUZWoKoqsvAGO2Q+vOcFXlxGrVvkQTM/mID81rcNhSdSWsBI7XscRKcmsx428PY
-         DoTCN/w3a2YGULUvllGbOMnWmc0h5kR3kY8ajLk8K/+iSyhuDufxd8oDYp0/SBJD1h9F
-         5zqdL5R1kmEkvztAVhDj8Z8jWuKPfpN+wrWBArNmIY729exn/Yk+aAAaA4JK0b5j/753
-         hLf9O6029Amv7JBg6ioDTEUDuPR0VSQTsAfAOnWOgItB73n1l08S7DhZZMnFb2pPApWS
-         8OgQ==
-X-Gm-Message-State: APuU4Z80w2nkNyLLz+/RSbEHvAjR8b1FqsUfJKFY1ciRwGuRRhKvlDHl
-	0y+HGfHQ2Klz00oeiMBdlcHNFB/OHm3fp+80DW03lRnxeP+40lxQtsBXfdEbou4E
-X-Gm-Gg: AZFdTZeZ7W9QHnjp57a2uouQo6rBW0Y0YY9IA9kV4pZsQ1K0ipTaXWm0IdWgZKiMMzA
-	IC2OIqab9qK48hJsgBXVslBSjY2eEicfYlfYVVSpBE7zQbsNmbwXZ1SvgaA2UNMVEGuBElYaIj1
-	LJg/8niFkW6coAmQ9Q/gsbbs2d0Hjwych5W7QsMZq+L3HW4jB1fS1EPkY0/X4UUAk35DBoqDlJO
-	aFZnTwdpx0PcTvlv62UZ/VOm5l0mkvyK1Zl+bROgivv1ddisfzfE/w/YCjH7sAPVphv9eLjoJOl
-	I3MifrMYXrbO97IPaUJHVtQ5MqTxfhp/WPTPsUKxyDnWrm1el0CUFIOrPgfwzlRkUjXYOpqCi8a
-	h+Gr7ncUhOFWwcgf/76qn+IISX29AfLx6YCRs+sYomwk+6P9M7snV5ye4wG2moTTMy+oPwamwYd
-	lItWvQniRcPOWjJrNP0kgYFGhMQdNsPDT6LRgIeL5G1FSP8/XtmzeGEUSWIKzr4PsCBiR8FMQNT
-	3lhHy43jLDhHrUP8N45PZpzg/4awkivgjhegWhKCy0Lju7tIfQAmKFZdM5dn3rnVOcxaczv8sIh
-	nP1IymXlScSlFwgjKMwP0nuxijSbjMr7Gg==
-X-Received: by 2002:a05:6122:1d4a:b0:5e1:c1c8:9ff9 with SMTP id 71dfb90a1353d-5ee8adf5aacmr9174197e0c.2.1795612149095;
-        Wed, 25 Nov 2026 05:09:09 -0800 (PST)
+        bh=PHAySPim9C43/yZnOc3cvmysHiJR3smT0StLMumDRAI=;
+        b=RxsJJchFa6vwNKJ5kT7eX7qkOiUJtxEsvnKmz2KCQv7xtV4H+inaaf3uvySby+Yl+O
+         s2tJnaeQBMj0IckjOmw3kf25yy++QnPlSZBmnea8u5Y0eKL8ZqzBZ/55XxRHb1v9+2PW
+         CyUgTJtPqbykeIvbxG2QDipU4+Kkqu4xx8MTBBY/LK2bB6Xs9pCuF1QuK/LYdP63/yoS
+         89dXoIKxASIECMp7rgQdEoK695sFT8+QVm82j6idoh0pwxETrkP8CoTZImoeYKhd+dCS
+         aLenBsH6/fJd3QqX/zTces7ARUklHWkw+k2u/ny6SBoAajIVEuairxsEh8Rk4R/WKXTv
+         AHYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795612153; x=1796216953;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=PHAySPim9C43/yZnOc3cvmysHiJR3smT0StLMumDRAI=;
+        b=v26OaMzuCdGWB1P/05Exf0jRm6+KqEQqNojOMA8hmprEW26Ya83+20TiAhQUh/FP9t
+         Zb+oE0/yC2xvuam/9be9EJ0JjVM97MJxbLmAq83APq8SP7iXWncDtvdHn8+QgP694gYx
+         E7eWhGiliBns8taO3IL7f5kN3OuY9n7Ml4oiYvgEovWafBUi+485AltE0MB6gt/RrdUR
+         E7GR9p18jR+mA1wBhiPnOyjjBFaCAXWy4APHd/18Sau7HhAwOEqkxNAwDbCZaDzKTD/l
+         TCzMRhUrdtzywTHFg+1qIjYS2V+yyFh1d5T51b7LJiO7+fMei389SlufYJosYo55p7A0
+         rBtQ==
+X-Gm-Message-State: APuU4Z/jIIf6qDOU2/XlrZxMyUi1labKd9Q2Wc1KDZ4/5hBkdrx9REWO
+	mYP6ZJx7txbCaC7TIoeBCgDxmhJ0xCWmlFDDYvrfLY6jUwTVB3gu1zUcliT+efqA
+X-Gm-Gg: AZFdTZfEBIm+WYqAYZixAAuYAzftfxSmqvyS+7idRNsqs+udMVWvm2dkCxy9AMwW+ZU
+	IuyEMdn8UKOU5Ly22vsosbCF59gbLSN39OOETrX+89FNmnCZF78NoC0joYN05TPbz4G09Q4xbnh
+	j4ap2VrkAJKIrdstxpjktK6Lnzn+seqEtORXS9Ub0P4NnQb4hCOM0TNzkR/ulzpuxobB/FKKv0e
+	ewQQl1NJwgVJ7jKfhlLLzbX2WlZCMKH/dQ9blhMdhkiI5qxVN8obxlddHIKiCbBsoqSsTI8B0XR
+	JTAMhhfViU/h6FEr7xU2dLTWmKpMyhmb7q83YBKBlPvYXyUrXwmG75deHS1yPWr+WinOnPOR9CY
+	iyK2RYu5WMofFwUMN5o+29j4BRrE1Fje5SQmx5OrejC3n7bjsHrG6KxoCE9Xyj6YANkR5c7ByNV
+	ZSypCsN3PlJROu45S24unBwfr/5+m76oEpgRB8vRSiW3w1NuiDID5CBTTyoWlbutW+gl983jg4z
+	uX29/ZT2QFci1zukGH2HKUzKrL+15KDm1Lr0HxNanRavsTBrTgcXjlPlcpQ3w3l87cMnl8PfEZG
+	z9VVr5hJ7ncZv8Z2zdEKjXWdmScua0oQBUTnbVI82Ta79S/K83aYBA==
+X-Received: by 2002:a05:6122:310f:b0:5ee:13ad:6c8c with SMTP id 71dfb90a1353d-5ee8aeaadcfmr8794727e0c.7.1795612153064;
+        Wed, 25 Nov 2026 05:09:13 -0800 (PST)
 Received: from shine.local ([168.196.221.52])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b60b201sm17299447e0c.14.2026.11.25.05.09.06
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee8b60b201sm17299447e0c.14.2026.11.25.05.09.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 05:09:08 -0800 (PST)
+        Wed, 25 Nov 2026 05:09:12 -0800 (PST)
 From: "Andrei A. Bykov" <andreiab9019@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 0/2] Bluetooth: fix bonded LE peripheral reconnect completion and holds
-Date: Wed, 25 Nov 2026 10:08:26 -0300
-Message-ID: <20261125130828.18441-1-andreiab9019@gmail.com>
+Subject: [PATCH v4 1/2] Bluetooth: hci_sync: keep unrelated replies away from event waiters
+Date: Wed, 25 Nov 2026 10:08:27 -0300
+Message-ID: <20261125130828.18441-2-andreiab9019@gmail.com>
 X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261125130828.18441-1-andreiab9019@gmail.com>
+References: <20261125130828.18441-1-andreiab9019@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -95,64 +99,122 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes two issues in the Bluetooth HCI layer seen when a
-bonded Windows central reconnects to a Linux LE HID peripheral.
+An asynchronous command can finish while a synchronous request waits for
+its terminal event. For example, an LE LTK Request Reply can complete
+before LE Read Remote Features Complete arrives. Completing the waiter
+with that reply releases the feature-discovery hold too early.
 
-Changes since v3:
-- Rebase onto bluetooth-next at f57f78086ab5. IncrementalBuild reset to
-  origin/master, where the newly added MT7922 data-length block changed
-  the context of patch 2. Keep that block intact and apply the same LE
-  setup check below it. Patch 1 is unchanged.
+Keep valid unrelated Command Complete and Command Status replies away
+from event waiters after processing their command handlers and credits.
+Continue scheduling queued commands and preserve unmatched Reset recovery.
 
-Changes since v2:
-- Rebase onto bluetooth-next at 6a40daae69b0. The Bluetooth CI bot
-  could not apply v2 because the key-refresh configuration code moved
-  into hci_conn_refresh_key(). Update that shared helper in patch 2 so
-  both Key Refresh Complete event formats use the same path.
-- Preserve the LE setup abort checks in both feature-complete handlers
-  on the new base. Patch 1 has no functional changes.
+Do not identify the current waiter solely by HCI_CMD_PENDING: timeout
+and cancellation can leave it set with an old req_skb. Capture the actual
+synchronous command carrying HCI_REQ_SKB even when that flag is already
+set. Callback-less commands must not replace the waiter. Drop the stale
+socket reference when replacing the request, but preserve the same skb
+backing storage and socket reference when Reset recovery resends it.
+The request skb is still replaced on the ordered command/event workqueue.
 
-Changes since v1:
-- Refresh the saved synchronous request after timeout or cancellation,
-  preserving socket references across controller reset resends.
-- Keep the LE feature hold across encryption and key refresh. Explicitly
-  abort failed setup and prevent later events from reporting success.
+This also lets the next synchronous command complete normally after an
+event timeout, without waiting for the old terminal event to arrive.
 
-Both v4 patches apply in order with git am on the pinned bluetooth-next
-base and the GitHub workflow branch used by Bluetooth CI. I reproduced
-the IncrementalBuild sequence on f57f78086ab5 using BlueZ's ci.config:
-make olddefconfig, then git am and make net/bluetooth/ drivers/bluetooth/
-after each patch. Both builds passed. Local model tests pass 152
-command-dispatch checks and 66 connection-lifetime checks with GCC,
-Clang and ASan/UBSan, including checks for the MT7922 path.
+Fixes: 2615fd9a7c25 ("Bluetooth: hci_sync: Fix overwriting request callback")
+Signed-off-by: Andrei A. Bykov <andreiab9019@gmail.com>
+---
+ net/bluetooth/hci_core.c  | 16 +++++++++++++++-
+ net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 1 deletion(-)
 
-The v2 backport to Linux 7.3.5 passed repeated bonded reconnects,
-approximately seven hours without observed connection loss, and Windows
-Bluetooth off/on. Those hardware results are from v2. In separate
-Windows suspend/resume attempts, the test HID application could still
-wait for an HID subscription after BlueZ reported a connection.
-
-OpenAI Codex assisted with analysis, patch preparation and tests.
-Sashiko provided the findings addressed in v2.
-
-v1: https://lore.kernel.org/r/20261121033104.441146-1-andreiab9019@gmail.com
-v2: https://lore.kernel.org/r/20261124140956.15296-1-andreiab9019@gmail.com
-v2 CI: https://patchwork.kernel.org/comment/27404265/
-v3: https://lore.kernel.org/r/20261124211127.41609-1-andreiab9019@gmail.com
-v3 CI: https://github.com/bluez/bluetooth-next/pull/1221#issuecomment-7151355640
-
-Andrei A. Bykov (2):
-  Bluetooth: hci_sync: keep unrelated replies away from event waiters
-  Bluetooth: hci_core: preserve LE feature holds across encryption
-    events
-
- include/net/bluetooth/hci_core.h |  9 +++++++-
- net/bluetooth/hci_core.c         | 16 +++++++++++++-
- net/bluetooth/hci_event.c        | 36 +++++++++++++++++++++++++-------
- 3 files changed, 52 insertions(+), 9 deletions(-)
-
-
-base-commit: f57f78086ab54f3b3122fbaeba2c842ba7bb6d00
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 024960e9a..072ab361f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4386,11 +4386,25 @@ static int hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 		kfree_skb(skb);
+ 	}
+ 
++	/* A synchronous command starts a new waiter, even if an earlier
++	 * event waiter timed out without clearing HCI_CMD_PENDING. Commands
++	 * without a completion callback must not replace the waiter.
++	 */
+ 	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
+-	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
++	    (bt_cb(hdev->sent_cmd)->hci.req_flags & HCI_REQ_SKB)) {
++		/* hci_resend_last() clones the same command during reset
++		 * recovery. It does not own another socket reference.
++		 */
++		if (hdev->req_skb &&
++		    hdev->req_skb->head == hdev->sent_cmd->head)
++			return err;
++
+ 		hci_dev_lock(hdev);
++		if (hdev->req_skb && hci_skb_sk(hdev->req_skb))
++			sock_put(hci_skb_sk(hdev->req_skb));
+ 		kfree_skb(hdev->req_skb);
+ 		hdev->req_skb = skb_get(hdev->sent_cmd);
++		hci_dev_set_flag(hdev, HCI_CMD_PENDING);
+ 		hci_dev_unlock(hdev);
+ 	}
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a9b6a6cca..014207d2d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4862,6 +4862,18 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
+ 
+ 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+ 
++	/* An unrelated command may complete while a request waits for its
++	 * terminal event. Process the reply and command credits, but do not
++	 * complete the pending request with that command's response.
++	 * Unmatched replies must still reach hci_req_cmd_complete(), e.g.
++	 * for the spontaneous Reset workaround during initialization.
++	 */
++	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
++	    hdev->req_skb && hci_skb_event(hdev->req_skb) &&
++	    hci_skb_opcode(hdev->req_skb) != *opcode &&
++	    hci_sent_cmd_data(hdev, *opcode))
++		goto queue_next;
++
+ 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
+ 			     req_complete_skb);
+ 
+@@ -4871,6 +4883,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
+ 		return;
+ 	}
+ 
++queue_next:
+ 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
+ 		queue_work(hdev->workqueue, &hdev->cmd_work);
+ }
+@@ -4982,6 +4995,18 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+ 
+ 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+ 
++	/* An unrelated command may complete while a request waits for its
++	 * terminal event. Process the reply and command credits, but do not
++	 * complete the pending request with that command's response.
++	 * Unmatched replies must still reach hci_req_cmd_complete(), e.g.
++	 * for the spontaneous Reset workaround during initialization.
++	 */
++	if (READ_ONCE(hdev->req_status) == HCI_REQ_PEND &&
++	    hdev->req_skb && hci_skb_event(hdev->req_skb) &&
++	    hci_skb_opcode(hdev->req_skb) != *opcode &&
++	    hci_sent_cmd_data(hdev, *opcode))
++		goto queue_next;
++
+ 	/* Indicate request completion if the command failed. Also, if
+ 	 * we're not waiting for a special event and we get a success
+ 	 * command status we should try to flag the request as completed
+@@ -4998,6 +5023,7 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+ 		}
+ 	}
+ 
++queue_next:
+ 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
+ 		queue_work(hdev->workqueue, &hdev->cmd_work);
+ }
 -- 
 2.56.1
 
