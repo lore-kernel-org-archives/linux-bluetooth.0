@@ -1,59 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795649276;
-	b=y3rrW2EnVBK3gWkIpCVuwa/W730cYHf1/AUonQw6ihgv0kIGY/5AGwhi+uB3dA6XKNVl
-	 52QiOJD9LDIZ5ecyEvsAaGCiDOJZNTZUgrFEXoexGg+jxChcHxoexlSgfmguUlEvaQHPN
-	 XKnCSUHx62VxVHXT50xgSEABZwllzKtsh3cSCcJTVtenGIu18ffyNdvgucoor/uOuuj1z
-	 B8JU8dwtbnFL0x41uKMzYM9w4ePlsMdUxArZlUPrqfPOzdV50jDO0voVbjHrGR6+ZTz3A
-	 V/pBkxGGCz0v11QMwVAptvFhUvCKTVrK7ankJZsumucCMoe8QaMrf5wxT//7WbqfdtQ==
+	t=1795649296;
+	b=l9kY3hxxvfRYmb/dSLCIEmgVHbBFyhzQEbzQi4jmlih3lGd2yWZ9IOx0c6GL7f7JulWo
+	 qspxi7Hu9C8NwjRzTafu8uD4rreMXdNhD2oH5F/XJsCZYaGd/uCb7As1IEBXvjdMlnk0J
+	 IN69h0KhAuiQDzq0BTLpW7tKB+EtBAp4PoK48F6QxM7/5lVN/js5w1IkgIbKV/gF/aCuT
+	 EIQJYExHmpxgjBAeg/CtY0GqU3MBAuRlk4RfQkNXxXkVGTr/3//F+UJDMlIw766PdMgrU
+	 z2yHESGcDH+Qsb1YDBU54Y6cXI8OZmo1ZmyFLWTdIllmCDa8pEznGlHMX3KrR9+QkJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795649276;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795649296;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
 	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=Wu7e98kB1kmUDz/+g7/Epixio77x0w+jAEKSfYfciMw=;
-	b=BQkdjh/hmylONc9Tg/btyn+PUsjLfqvhiX6k9scsVJGEtw4aul18LoO0YESY3vUlALKd
-	 cmKG0DIeveg5ARwrhmpswKoo2ZLvrcI6JVPYVUTxCIfSDSeeaowUKiuDsY6bHbOm48oMs
-	 Ihw+F+SnAODzecFNZOneevBOJkOvN6y9Rh/IzC5Ymqa66fvIUCkPKKCQC+mJPx0DcjTX6
-	 TT+wqxKRPYi/DlegNnsbWnvUYZGETcgJlJU49YxpTHLIbqcxATDfR/3IRFSQ7tqj6N7yV
-	 HTT/++lZ1gsz5XXROYkIDoppIubqsP2RLQMQeY5Ej/FM5oaeC1sVHLmMvtgQBwb31lA==
+	bh=iULYMwwT9Yz0ZAC4dZBowl5vTUSi9rHR+70m2dDHYGA=;
+	b=RpUZJhIk49ZtCqj3xKEFumWjSqWSgNlR5k6YwLVhpyLo2lgHZ9kLqlSE3Ez177Th5+kH
+	 HIkmemqW+ZklRZQdUk5s8D2zKkQYYbibQ4y8TnKvPM+oBD/hIWCmd59cIH/zC8lCxo1yo
+	 qKYxsC3z3KWENpc770E9w8eYzkXWy7w5css5NwOK+RgP15pqib571t/iiWuZR/0050tNV
+	 v8+mudKprIzbA+EJCOt7lAgbVd85JlUG00q2TCCSghat+Its1+xt0vKwOBTD6SgnE6e2p
+	 KbO+Q1jt/CFZzcRuV3iQSsF/QLM2eMGxuDqDyq8Wvk2Tr3h2Imz2ugA/VTXiCcQxPyQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=proton.me;
 	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=bxz5dslk75g25ndfe7pno7phxq.protonmail2 header.b=IHfKcvVi;
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=zdFsIZ2h;
+	arc=none smtp.remote-ip=185.70.43.103
+Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F3F606A31E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 23:27:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A4F3F606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7EE606A31E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 23:28:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DD7EE606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=bxz5dslk75g25ndfe7pno7phxq.protonmail2 header.b=IHfKcvVi
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=zdFsIZ2h
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=bxz5dslk75g25ndfe7pno7phxq.protonmail2; t=1795649273;
-	x=1795908473; bh=Wu7e98kB1kmUDz/+g7/Epixio77x0w+jAEKSfYfciMw=;
+	s=protonmail2; t=1795649292; x=1795908492;
+	bh=iULYMwwT9Yz0ZAC4dZBowl5vTUSi9rHR+70m2dDHYGA=;
 	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=IHfKcvViVghehBo2KEvUfEEsMEgHaifvB4H6jTZUj2z5BbBj1lbxiCFnbUAZq9Opq
-	 Q0yRgDe7Ej/VIs1ooZjHq0CSK3xnWKruJEz8Q87XLq13XOwPUQocd0kl4J2zdxMiLH
-	 9jRj8PNckQmkc+e0QJOIdNOZQThBkw2s1VN+fHEsLmdss5TqnoHT1cSVf5LF+0Cu9T
-	 XlRnqbIZUyEgo0E/Ne6xy6WhnSoW8AdHx38pTkuip6UeQi/zurTLBZch0uYPB/pW85
-	 HycbV7o7Qqo8s/En3UvtxUn163CA4n0KZZZwqLcBjLMTnUwkNbCKjQMTrTMPFHRL0M
-	 ae2mOVTfsRbwg==
-Date: Wed, 25 Nov 2026 23:27:49 +0000
+	b=zdFsIZ2h97bQFvEA5XskE5X/oZwiSdLomrvYFQYRHvIMpH9JAM76PfZYoL/Y7FA7T
+	 ijm4HeiNs6n38HjJPqS4CCHyJr2/CzRsQ+5GNRx+zhOTsJK1A2L5ZPGRjMhX29xA+T
+	 +Zye8sBkYbutxJ79+SvU9ICwZ+Wp+7NH/Ic0Co2OPZ1QJyqA4JR9YR/CbujabRF+aN
+	 pc7V+RgBQMkiDcoiwmh89Ijd6dbcwQRxBaU466NYRNlnKDqiwhcfcqkdCISF+gTbkM
+	 frnOPccQ4iVr4olBXm6yHORcpC+xlDlVApqfn2tHDhkr7T6sOVkSTzWKg7ncA6VEAC
+	 Lh9gxCtmVG69A==
+Date: Wed, 25 Nov 2026 23:28:07 +0000
 To: linux-bluetooth@vger.kernel.org
 From: Kyle Pepper <cochcoder@proton.me>
-Subject: [RFC PATCH BlueZ v6 2/4] asha: Add connection interval STATUS helper
-Message-ID: <dbb0806e7425e651c1394f98e4c8dcaa7383e535.1795648818.git.cochcoder@proton.me>
+Subject: [RFC PATCH BlueZ v6 3/4] asha: Notify observed connection intervals
+Message-ID: <4670f4555d9e556c582ab7627b40aa10e00eb1c9.1795648818.git.cochcoder@proton.me>
 In-Reply-To: <cover.1795648818.git.cochcoder@proton.me>
 References: <20261029002158.1036153-1-cochcoder@proton.me> <20261106235122.719665-1-cochcoder@proton.me> <cover.1795489294.git.cochcoder@proton.me> <cover.1795535897.git.cochcoder@proton.me> <cover.1795648818.git.cochcoder@proton.me>
 Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: 035d51eb4259d2e12a5109a1b7636108020ac551
+X-Pm-Message-ID: 0e6d0d835ac9fa5bffc2d62c9437837b0211b31d
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -66,158 +66,316 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Send the observed interval to both attached hearing aids, including a
-peer that has not started streaming. Match the encoding used by
-Android's hearing aid stack and reject intervals that do not fit in its
-byte field.
+Cache successful connection intervals per adapter and match each update
+to the ATT connection handle. Announce the cached value before START and
+notify attached devices when an initial or updated interval arrives. The
+cached value is the last one observed; a requested update may still be
+pending and is announced when it completes. Clear disconnected handles
+so reused links cannot inherit stale values.
 
-Track attachment after ROP and PSM discovery separately from the set of
-previously started aids. Remove that membership on reset or free and
-keep a replacement when an older object for the same side is released.
+The observer only sees events after the adapter is probed, so a link
+that was already connected when bluetoothd started has no cached
+interval until its next update, and nothing is sent for it.
 
 Assisted-by: OpenCode:gpt-6.1-sol
 Assisted-by: Codex:gpt-6
 ---
- src/shared/asha.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/asha.h |  1 +
- 2 files changed, 73 insertions(+)
+ profiles/audio/asha.c | 231 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 231 insertions(+)
 
-diff --git a/src/shared/asha.c b/src/shared/asha.c
-index ddd14547b..0582f8814 100644
---- a/src/shared/asha.c
-+++ b/src/shared/asha.c
-@@ -40,6 +40,7 @@
- #define ASHA_CHRC_LE_PSM_OUT_UUID "2d410339-82b6-42aa-b34e-e2e01df8cc1a"
+diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
+index d86224764..e6a9ded62 100644
+--- a/profiles/audio/asha.c
++++ b/profiles/audio/asha.c
+@@ -39,6 +39,11 @@
+ #include "src/profile.h"
+ #include "src/service.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
++#include "src/shared/hci.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-client.h"
++#include "monitor/bt.h"
 =20
- static struct queue *asha_devices;
-+static struct queue *asha_attached;
+ #include "profiles/audio/asha.h"
+ #include "profiles/audio/media.h"
+@@ -51,6 +56,18 @@
+ /* The default of 672 does not work */
+ #define ASHA_CONNECTION_MTU 512
 =20
- static unsigned int bt_asha_status(struct bt_asha *asha, bool connected);
-=20
-@@ -58,6 +59,34 @@ static bool match_set_member(const void *data, const voi=
-d *user_data)
- =09return set->left =3D=3D user_data || set->right =3D=3D user_data;
- }
-=20
-+static bool match_attached_side(const void *data, const void *user_data)
-+{
-+=09const struct bt_asha *other =3D data;
-+=09const struct bt_asha *asha =3D user_data;
++/* HCI handles include zero; a zero cached interval means unknown. */
++#define ASHA_NUM_HANDLES 0x0f00
 +
-+=09return other->right_side =3D=3D asha->right_side &&
-+=09=09=09!memcmp(other->hisyncid, asha->hisyncid, 8);
++struct asha_adapter {
++=09struct btd_adapter *adapter;
++=09struct bt_hci *hci;
++=09uint16_t intervals[ASHA_NUM_HANDLES];
++};
++
++static struct queue *asha_adapters;
++static struct queue *asha_streams;
++
+ struct bt_asha_device {
+ =09struct bt_asha *asha;
+ =09struct btd_device *device;
+@@ -62,6 +79,203 @@ struct bt_asha_device {
+ =09unsigned int resume_id;
+ };
+=20
++static bool match_adapter(const void *data, const void *user_data)
++{
++=09const struct asha_adapter *data_adapter =3D data;
++
++=09return data_adapter->adapter =3D=3D user_data;
 +}
 +
-+static bool match_attached_peer(const void *data, const void *user_data)
++static bool asha_get_handle(struct bt_asha_device *asha_dev, uint16_t *han=
+dle)
 +{
-+=09const struct bt_asha *other =3D data;
-+=09const struct bt_asha *asha =3D user_data;
++=09struct bt_att *att;
++=09struct l2cap_conninfo info;
++=09socklen_t len =3D sizeof(info);
++=09int fd;
 +
-+=09return other->right_side !=3D asha->right_side &&
-+=09=09=09!memcmp(other->hisyncid, asha->hisyncid, 8);
-+}
-+
-+static void remove_attached(struct bt_asha *asha)
-+{
-+=09queue_remove(asha_attached, asha);
-+
-+=09if (queue_isempty(asha_attached)) {
-+=09=09queue_destroy(asha_attached, NULL);
-+=09=09asha_attached =3D NULL;
-+=09}
-+}
-+
- static struct bt_asha_set *find_asha_set(struct bt_asha *asha)
- {
- =09return queue_find(asha_devices, match_hisyncid, asha);
-@@ -182,6 +211,8 @@ struct bt_asha *bt_asha_new(void)
-=20
- void bt_asha_reset(struct bt_asha *asha)
- {
-+=09remove_attached(asha);
-+
- =09if (asha->status_notify_id) {
- =09=09bt_gatt_client_unregister_notify(asha->client,
- =09=09=09=09=09=09asha->status_notify_id);
-@@ -214,6 +245,7 @@ void bt_asha_state_reset(struct bt_asha *asha)
-=20
- void bt_asha_free(struct bt_asha *asha)
- {
-+=09remove_attached(asha);
- =09update_asha_set(asha, false);
- =09gatt_db_unref(asha->db);
- =09bt_gatt_client_unref(asha->client);
-@@ -263,6 +295,39 @@ static int asha_send_acp_without_response(struct bt_as=
-ha *asha,
- =09return 0;
- }
-=20
-+bool bt_asha_set_connection_interval(struct bt_asha *asha, uint16_t interv=
-al)
-+{
-+=09struct bt_asha *other;
-+=09uint8_t cmd[] =3D {
-+=09=090x03,=09=09/* STATUS */
-+=09=090x02,=09=09/* LE connection parameter update */
-+=09=090x00,=09=09/* Interval, in 1.25 ms units */
-+=09};
-+=09bool success;
-+
-+=09/*
-+=09 * Android's ASHA document lists only the update type for this STATUS,
-+=09 * but its hearing aid stack appends the new interval as one more
-+=09 * byte and sends it to both sides. Reject a value that does not fit
-+=09 * in that byte instead of truncating it.
-+=09 */
-+=09if (!asha || !asha->client || !asha->acp_handle ||
-+=09=09=09=09interval < 0x0006 || interval > UINT8_MAX)
++=09if (!asha_dev->asha->client)
 +=09=09return false;
 +
-+=09cmd[2] =3D interval;
-+=09success =3D asha_send_acp_without_response(asha, cmd, sizeof(cmd)) =3D=
-=3D 0;
-+=09other =3D queue_find(asha_attached, match_attached_peer, asha);
++=09att =3D bt_gatt_client_get_att(asha_dev->asha->client);
++=09fd =3D bt_att_get_fd(att);
 +
-+=09/* Notify an attached peer even if it has not started streaming yet. */
-+=09if (other && other !=3D asha && other->client && other->acp_handle) {
-+=09=09if (asha_send_acp_without_response(other, cmd, sizeof(cmd)) < 0)
-+=09=09=09success =3D false;
++=09/* The ATT socket identifies this link even when CoC is not open. */
++=09if (fd < 0 || getsockopt(fd, SOL_L2CAP, L2CAP_CONNINFO,
++=09=09=09=09=09=09=09&info, &len) < 0) {
++=09=09DBG("Could not read ASHA connection handle");
++=09=09return false;
 +=09}
 +
-+=09return success;
++=09if (len !=3D sizeof(info) || info.hci_handle >=3D ASHA_NUM_HANDLES)
++=09=09return false;
++
++=09*handle =3D info.hci_handle;
++=09return true;
 +}
 +
- unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
- =09=09=09=09=09=09=09=09void *user_data)
++static void asha_notify_interval(struct bt_asha_device *asha_dev,
++=09=09=09=09=09uint16_t handle, uint16_t interval)
++{
++=09/* Only announce an interval observed on this connection. */
++=09if (!interval)
++=09=09return;
++
++=09DBG("ASHA connection h%u interval %u", handle, interval);
++
++=09if (!bt_asha_set_connection_interval(asha_dev->asha, interval))
++=09=09DBG("Could not send ASHA connection interval notification");
++}
++
++static void asha_send_interval(struct bt_asha_device *asha_dev)
++{
++=09struct asha_adapter *data;
++=09uint16_t handle;
++
++=09data =3D queue_find(asha_adapters, match_adapter,
++=09=09=09=09=09device_get_adapter(asha_dev->device));
++=09if (!data || !asha_get_handle(asha_dev, &handle))
++=09=09return;
++
++=09asha_notify_interval(asha_dev, handle, data->intervals[handle]);
++}
++
++struct interval_update {
++=09struct asha_adapter *adapter;
++=09uint16_t handle;
++};
++
++static void asha_update_stream(void *data, void *user_data)
++{
++=09struct bt_asha_device *asha_dev =3D data;
++=09struct interval_update *update =3D user_data;
++=09uint16_t handle;
++
++=09if (device_get_adapter(asha_dev->device) !=3D update->adapter->adapter =
+||
++=09=09=09!asha_get_handle(asha_dev, &handle) ||
++=09=09=09handle !=3D update->handle)
++=09=09return;
++
++=09asha_notify_interval(asha_dev, handle,
++=09=09=09=09=09update->adapter->intervals[handle]);
++}
++
++static void asha_update_interval(struct asha_adapter *data, uint16_t handl=
+e,
++=09=09=09=09=09=09=09uint16_t interval)
++{
++=09struct interval_update update =3D { .adapter =3D data, .handle =3D hand=
+le };
++
++=09if (handle >=3D ASHA_NUM_HANDLES)
++=09=09return;
++
++=09data->intervals[handle] =3D interval;
++=09queue_foreach(asha_streams, asha_update_stream, &update);
++}
++
++static void asha_conn_update(const void *param, uint8_t size, void *user_d=
+ata)
++{
++=09const struct bt_hci_evt_le_conn_update_complete *ev =3D param;
++
++=09if (size !=3D sizeof(*ev) || ev->status)
++=09=09return;
++
++=09asha_update_interval(user_data, get_le16(&ev->handle),
++=09=09=09=09=09=09get_le16(&ev->interval));
++}
++
++static void asha_conn_complete(const void *param, uint8_t size, void *user=
+_data)
++{
++=09const struct bt_hci_evt_le_conn_complete *ev =3D param;
++
++=09if (size !=3D sizeof(*ev) || ev->status)
++=09=09return;
++
++=09asha_update_interval(user_data, get_le16(&ev->handle),
++=09=09=09=09=09=09get_le16(&ev->interval));
++}
++
++static void asha_enhanced_conn_complete(const void *param, uint8_t size,
++=09=09=09=09=09=09=09void *user_data)
++{
++=09const struct bt_hci_evt_le_enhanced_conn_complete *ev =3D param;
++
++=09if (size !=3D sizeof(*ev) || ev->status)
++=09=09return;
++
++=09asha_update_interval(user_data, get_le16(&ev->handle),
++=09=09=09=09=09=09get_le16(&ev->interval));
++}
++
++static void asha_disconn_complete(const void *param, uint8_t size,
++=09=09=09=09=09=09=09void *user_data)
++{
++=09const struct bt_hci_evt_disconnect_complete *ev =3D param;
++=09struct asha_adapter *data =3D user_data;
++=09uint16_t handle;
++
++=09if (size !=3D sizeof(*ev) || ev->status)
++=09=09return;
++
++=09handle =3D get_le16(&ev->handle);
++
++=09if (handle < ASHA_NUM_HANDLES)
++=09=09data->intervals[handle] =3D 0;
++}
++
++static int asha_adapter_probe(struct btd_profile *profile,
++=09=09=09=09=09=09struct btd_adapter *adapter)
++{
++=09struct asha_adapter *data;
++
++=09data =3D new0(struct asha_adapter, 1);
++=09data->adapter =3D adapter;
++=09data->hci =3D bt_hci_new_raw_device(btd_adapter_get_index(adapter));
++
++=09if (!data->hci)
++=09=09goto fail;
++
++=09if (!bt_hci_register_subevent(data->hci, BT_HCI_EVT_LE_CONN_COMPLETE,
++=09=09=09=09=09asha_conn_complete, data, NULL) ||
++=09=09!bt_hci_register_subevent(data->hci,
++=09=09=09=09=09BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE,
++=09=09=09=09asha_enhanced_conn_complete, data, NULL) ||
++=09=09!bt_hci_register_subevent(data->hci,
++=09=09=09=09=09BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE,
++=09=09=09=09=09asha_conn_update, data, NULL) ||
++=09=09!bt_hci_register(data->hci, BT_HCI_EVT_DISCONNECT_COMPLETE,
++=09=09=09=09=09asha_disconn_complete, data, NULL))
++=09=09goto fail;
++
++=09if (!asha_adapters)
++=09=09asha_adapters =3D queue_new();
++
++=09queue_push_tail(asha_adapters, data);
++=09return 0;
++
++fail:
++=09bt_hci_unref(data->hci);
++=09free(data);
++=09return -EIO;
++}
++
++static void asha_adapter_remove(struct btd_profile *profile,
++=09=09=09=09=09=09struct btd_adapter *adapter)
++{
++=09struct asha_adapter *data;
++
++=09data =3D queue_remove_if(asha_adapters, match_adapter, adapter);
++
++=09if (!data)
++=09=09return;
++
++=09bt_hci_unref(data->hci);
++=09free(data);
++
++=09if (queue_isempty(asha_adapters)) {
++=09=09queue_destroy(asha_adapters, NULL);
++=09=09asha_adapters =3D NULL;
++=09}
++}
++
+ static char *make_endpoint_path(struct bt_asha_device *asha_dev)
  {
-@@ -373,6 +438,13 @@ static void check_probe_done(struct bt_asha *asha)
- =09=09=09=09=09sizeof(zeroes)) =3D=3D 0)
+ =09char *path;
+@@ -118,6 +332,8 @@ static void connect_cb(GIOChannel *io, GError *err, gpo=
+inter user_data)
+=20
+ =09asha_dev->io =3D io;
+=20
++=09asha_send_interval(asha_dev);
++
+ =09bt_asha_start(asha_dev->asha, conn_data->cb,
+ =09=09=09=09=09conn_data->cb_user_data);
+ }
+@@ -361,6 +577,11 @@ static int asha_source_device_probe(struct btd_service=
+ *service)
+ =09asha_dev->asha =3D bt_asha_new();
+ =09asha_dev->io =3D NULL;
+=20
++=09if (!asha_streams)
++=09=09asha_streams =3D queue_new();
++
++=09queue_push_tail(asha_streams, asha_dev);
++
+ =09btd_service_set_user_data(service, asha_dev);
+=20
+ =09return 0;
+@@ -382,6 +603,13 @@ static void asha_source_device_remove(struct btd_servi=
+ce *service)
  =09=09return;
+ =09}
 =20
-+=09if (!asha_attached)
-+=09=09asha_attached =3D queue_new();
++=09queue_remove(asha_streams, asha_dev);
 +
-+=09/* Keep attachment separate from the set of previously started aids. */
-+=09queue_remove_if(asha_attached, match_attached_side, asha);
-+=09queue_push_tail(asha_attached, asha);
++=09if (queue_isempty(asha_streams)) {
++=09=09queue_destroy(asha_streams, NULL);
++=09=09asha_streams =3D NULL;
++=09}
 +
- =09if (asha->attach_cb) {
- =09=09asha->attach_cb(asha->attach_cb_data);
- =09=09asha->attach_cb =3D NULL;
-diff --git a/src/shared/asha.h b/src/shared/asha.h
-index 9e62fcde8..e6b2e7a0d 100644
---- a/src/shared/asha.h
-+++ b/src/shared/asha.h
-@@ -66,6 +66,7 @@ unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_=
-cb_t cb,
- unsigned int bt_asha_stop(struct bt_asha *asha);
+ =09bt_asha_free(asha_dev->asha);
+ =09g_free(asha_dev);
+ }
+@@ -514,6 +742,9 @@ static struct btd_profile asha_source_profile =3D {
+ =09.remote_uuid=09=3D ASHA_PROFILE_UUID,
+ =09.experimental=09=3D true,
 =20
- bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume);
-+bool bt_asha_set_connection_interval(struct bt_asha *asha, uint16_t interv=
-al);
++=09.adapter_probe=09=3D asha_adapter_probe,
++=09.adapter_remove=09=3D asha_adapter_remove,
++
+ =09.device_probe=09=3D asha_source_device_probe,
+ =09.device_remove=09=3D asha_source_device_remove,
 =20
- bool bt_asha_attach(struct bt_asha *asha, struct gatt_db *db,
- =09=09struct bt_gatt_client *client, bt_asha_attach_cb_t probe_cb,
 --=20
 2.56.1
 
