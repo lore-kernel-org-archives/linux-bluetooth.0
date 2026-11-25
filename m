@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795622426;
-	b=tyZfS0zQJEjmJI7YoIlIo18T3AAZHXIuF5tFN9vNbs/HDnreKcMFacK4s+UDJkv1BIbD
-	 RtluuwxzcA6m716bQKDP+RxLyWXUttSTxJDB5Vn1YD3Y53ZIFBNY8Rekcgaahse9D40r9
-	 ra/1RzEYkZ2zMG43vjoO+7bXP0+TeR8ATO2EQMWo+V0u4kuRtgWHfLvU2kX4DlKO2+csw
-	 pyLz3Q3xj5tAaA/wlsvppj1unRKH1qWFyqirs3zTn//OpjBaFapbrBoc82d+yDxXHwbh/
-	 tu9laaEU6bKx+g9mLdmVjunaSJJIIJOMpxLJGBD8JOXPeAH6Q9W3JSMpSOqTrOL9R0g==
+	b=FX88RdEia48b30Qrf+P5IatoSU73qxsTCOl3G1IwwGyPef8qfGWnyxXcAuHl5AOpvadE
+	 zKf0vjNM9rgElNYcF2sbOyMG0D6kpJ1Avv9+upX8B8mTBvLh/bYEhKBXAXGtbJqkE+UMm
+	 N5CN1CYAvFXjXYBcyEExO+apXsAOgaMl6TZEeDygXo6QlmLTMg9ekTSjnSkZ0OlKDO37l
+	 eOz+qZ1BfhvbvQra2BK7IRYJeUWJjzrLEMWtTUbndd7g+MwSElWNg+sg+P/alHmhmSbgC
+	 pEBPKIVUYpH0ZNECXwKbaAYgQTdbB9ccqQiCeThxmg7Ge4kJI5HkxghoGamx5JAEVnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795622426;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=3Lmvr/7eooTC3FHNPEwlA9BRE4zJFLXFk1uqhZP1QDI=;
-	b=bIXQtei8xqxrBuPwk7I00GnRrMf4zEATu7oGTgm+j6EaDVBNml72gLoQdzKlEw/0PnPE
-	 OVSQ1mRtWldR/rke4zQQCBrgh2Fc5xuvCYJXXbgBgd6NFBGhEKDKZqxRtx8x3K4Egc+eL
-	 19WlTLAhY61hDSeIE/UTIv0sOLxKimA5WsiLMoTQ3Kle3yGbMTAJ1PNtCERNI4v6EcCLT
-	 AsJZqhQDD0UO/f4wQV0VXmcPZg+RaZ0tqdAotxPYMwvWwSMv+B9Nix8ldPeQRdRzA7RVw
-	 xVKVzEVxpaVhvbRLA+NOHJZTuEoYXlIt3ML1EsUss0oJz5jPtg3vB35a381rpZ3Nfqg==
+	bh=z8CPHifgbrYj6tkLh25010bVskSYe89pgAlLXtXCMcA=;
+	b=IAvHyizINr/sFXZ4+krtMnkuoygz6s4zJvfeT+YSkuidBOrHeZlNvEFpwGy5/wsakgzp
+	 dnMmJBffGFOshsyOocV8zE4IJIJdCOQnV1R8sJdVOCpO9pgubgNA8aatB7KECPg4h9HJm
+	 AZLwBJPlUC9NuMIulPyMVuXMWrYgExnO29k/SSUur2OxBPBAVwYYijGIBScQ1j9B4N+QD
+	 L8lVmJOesX5RHqi12uHCONX37AeVHo/050bVCeuhWxZFRYtDCEGDDNl6MXZWiCJQZ5CYo
+	 BOoFclQrgo/RyTU+RKGc3GdzoRTDs01u2NRe2RBY11maWCoy5Gbwh51nqpsOB4xY+fQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=qkxIfACY;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=iq8DlxbP;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73DD606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9769D606A32D
 	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 16:00:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D73DD606A333
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9769D606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=qkxIfACY
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=iq8DlxbP
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1795622424;
-	bh=M+ymb1nIQO8xhG8JY9juj1lBpgKsly+PjH7gZj1MjgE=;
+	bh=NmHlHxD6ZkScGBBB3+zgEJW6bIgZ9it26kku/JG79hc=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qkxIfACYyCUawgxuyfGG9b5WvY4dVvpNpzLUMj/9ggy3VPcEPQqNTcqWFFidGURMg
-	 uHSEXZAuBEedmPsA2ylJM4gyAV/3FztZnUNHyrTWdRTRcS6JWEYsx6ykxbfzEh6oKT
-	 ZQV8PWXsvE7NSkeSoCPCKMw0iFzlyhIo2D/AFAWA9nDatHn5kBAb7sJSRrgUDvh2Hp
-	 nPs3od3xl72+RtD19IaRJxDuxYmRiiVJfF45svnMIAVoroF+njdnjokOCNEN95aoay
-	 JclZYA8B105g61AQcjFmFPOvBsw1FryYmkf43kbLe9oteek6yKo8+T+zALTtO9ssqo
-	 9zyD6pU8ginIw==
+	b=iq8DlxbPEVl2id5Pp6evXS37mJIa/ymGioEOnwqDMqc7B2g5RODw3VQmLFiVsZkl7
+	 g2s3nFiacY28oGReC6Q1TshhBqaQDhzjGO7Ny0NPQ6agPI/S6+h2UyvMGAfzplEgA+
+	 uUxNOYR85mUDjkFVpfiXT1ot2gazd3r8sV9Xn0Kf7E+kqr2dXaWuq24kN7ygfxQpD9
+	 31wPkiYsJLKfEXAz8nVNAk5NhhrYfAhKFHiP6aKivD947vq66fyASbXq6L7khLuHEU
+	 7NoD55uOURn7R4tGMhYTcMWFOT+nRs3smTznxxnxLz/u7999Y4bzTxztgRamgRUdXM
+	 Pf2xQqD1xydQg==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5781917E10D0
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1A08017E1031
 	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 17:00:24 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 3/3] client/btpclient: Add BTP_EV_GAP_SEC_LEVEL_CHANGED support
-Date: Wed, 25 Nov 2026 17:00:18 +0100
-Message-ID: <20261125160018.590013-4-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v5 2/3] org.bluez.Device: Make Security Level props optional
+Date: Wed, 25 Nov 2026 17:00:17 +0100
+Message-ID: <20261125160018.590013-3-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261125160018.590013-1-frederic.danis@collabora.com>
 References: <20261125160018.590013-1-frederic.danis@collabora.com>
@@ -70,175 +70,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-When supported, send BTP_EV_GAP_SEC_LEVEL_CHANGED from org.bluez.Device1
-SecurityLevel property changes, mapped to the matching BTP level, and
-skip levels with no BTP equivalent (no security/encryption yet).
-Postponed this BTP event after device services has been retrieved to be
-in sync with auto-pts expectation.
-
-SecurityLevel's BT_SECURITY_MEDIUM only indicates encryption is
-desired, not that it is active: also check EncryptionType before
-reporting this level as encrypted, and refresh the BTP event on
-EncryptionType changes too.
-
-Replay the cached security level when GAP registers, or a device
-proxy is added, for a device that is already connected and resolved,
-so its security state isn't missed.
-
-This reduces connection time for the BAP tests.
+The SecurityLevel and EncryptionType properties are available only
+when kernel supports MGMT_EV_SECURITY_LEVEL_CHANGED events.
 ---
-v2->v3: Only read and report SecurityLevel when ServicesResolved becomes
-  true: device_remove_connection() clears ServicesResolved without
-  clearing the cached sec_level, so the ServicesResolved handler was
-  emitting a stale security-level-changed event when an encrypted peer
-  disconnected.
-v3->v4: Fetch the device's Address/AddressType D-Bus properties instead
-  of reading the btp_device struct fields directly, consistent with the
-  other event builders in this file (btp_gap_device_connection_ev(),
-  btp_identity_resolved_ev()).
-v4->v5: BT_SECURITY_MEDIUM only means encryption is desired, not that
-  it is active: now also check EncryptionType before reporting this
-  level, and refresh the event on EncryptionType changes too. Replay
-  the cached security level in btp_gap_device_found_ev() for devices
-  that are already connected and resolved when GAP registers or the
-  proxy is added, so their security state isn't missed. Moved
-  btp_security_level_changed_ev() before its only caller,
-  btp_gap_device_found_ev(), to drop its forward declaration.
+ doc/org.bluez.Device.rst | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
- client/btpclient/gap.c | 85 +++++++++++++++++++++++++++++++++++++++++-
- src/shared/btp.h       | 11 +++++++
- 2 files changed, 85 insertions(+), 1 deletion(-)
-
-diff --git a/client/btpclient/gap.c b/client/btpclient/gap.c
-index 33a6c1693..2731329ef 100644
---- a/client/btpclient/gap.c
-+++ b/client/btpclient/gap.c
-@@ -2399,6 +2399,58 @@ failed:
- 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
- }
+diff --git a/doc/org.bluez.Device.rst b/doc/org.bluez.Device.rst
+index f3e4bfa4a..6a433024e 100644
+--- a/doc/org.bluez.Device.rst
++++ b/doc/org.bluez.Device.rst
+@@ -490,8 +490,8 @@ Examples:
  
-+static void btp_security_level_changed_ev(struct l_dbus_proxy *proxy)
-+{
-+	struct btp_device *device = find_device_by_proxy(proxy);
-+	struct btp_adapter *adapter = find_adapter_by_device(device);
-+	const char *str_addr, *str_addr_type;
-+	uint8_t level, enc_type;
-+	struct btp_gap_sec_level_changed_ev ev;
-+
-+	if (!device || !adapter)
-+		return;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "SecurityLevel", "y", &level))
-+		return;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str_addr))
-+		return;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s",
-+								&str_addr_type))
-+		return;
-+
-+	str2ba(str_addr, &ev.address);
-+	ev.address_type = strcmp(str_addr_type, "public") ?
-+				BTP_GAP_ADDR_RANDOM : BTP_GAP_ADDR_PUBLIC;
-+	switch (level) {
-+	case BT_SECURITY_MEDIUM:
-+		/* This level only means encryption is desired, not that it
-+		 * is active yet: only report it once EncryptionType confirms
-+		 * encryption is actually in use.
-+		 */
-+		if (!l_dbus_proxy_get_property(proxy, "EncryptionType", "y",
-+								&enc_type) ||
-+								!enc_type)
-+			return;
-+
-+		ev.sec_level = BTP_GAP_SEC_LEVEL_UNAUTH_ENC;
-+		break;
-+	case BT_SECURITY_HIGH:
-+		ev.sec_level = BTP_GAP_SEC_LEVEL_AUTH_ENC;
-+		break;
-+	case BT_SECURITY_FIPS:
-+		ev.sec_level = BTP_GAP_SEC_LEVEL_AUTH_SC;
-+		break;
-+	default:
-+		/* No security/encryption yet, no BTP level to report. */
-+		return;
-+	}
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_SEC_LEVEL_CHANGED,
-+					adapter->index, sizeof(ev), &ev);
-+}
-+
- static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
- {
- 	struct btp_device *device = find_device_by_proxy(proxy);
-@@ -2518,6 +2570,12 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+ :bluetoothctl: > bearer <dev> [last-seen/bredr/le]
  
- 		btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_CONNECTED,
- 				adapter->index, sizeof(ev_conn), &ev_conn);
-+
-+		/* Replay the cached security level for devices that were
-+		 * already connected and secured before GAP registered or
-+		 * this proxy was added.
-+		 */
-+		btp_security_level_changed_ev(proxy);
- 	}
- }
+-byte SecurityLevel [readonly, experimental]
+-```````````````````````````````````````````
++byte SecurityLevel [readonly, optional, experimental]
++`````````````````````````````````````````````````````
+ Indicate the Security Level of a connection.
  
-@@ -2736,6 +2794,19 @@ void gap_property_changed(struct l_dbus_proxy *proxy, const char *name,
- 			 */
- 			if (!prop)
- 				btp_gap_device_connection_ev(proxy, prop);
-+		} else if (!strcmp(name, "SecurityLevel") ||
-+					!strcmp(name, "EncryptionType")) {
-+			bool resolved;
-+
-+			/* Postpone security level changed event after services
-+			 * has been resolved.
-+			 */
-+			if (l_dbus_proxy_get_property(proxy,
-+					"ServicesResolved", "b", &resolved) &&
-+					!resolved)
-+				return;
-+
-+			btp_security_level_changed_ev(proxy);
- 		} else if (!strcmp(name, "AddressType")) {
- 			/* Address property change came first along with address
- 			 * type.
-@@ -2747,8 +2818,10 @@ void gap_property_changed(struct l_dbus_proxy *proxy, const char *name,
- 			if (!l_dbus_message_get_arguments(msg, "b", &prop))
- 				return;
+ Possible values:
+@@ -511,8 +511,8 @@ Possible values:
+ :4:
+ 	FIPS authenticated pairing with encryption
  
--			if (prop)
-+			if (prop) {
- 				btp_gap_device_connection_ev(proxy, prop);
-+				btp_security_level_changed_ev(proxy);
-+			}
- 		}
- 	}
- }
-diff --git a/src/shared/btp.h b/src/shared/btp.h
-index ee5d7bd21..8cae0e765 100644
---- a/src/shared/btp.h
-+++ b/src/shared/btp.h
-@@ -296,6 +296,17 @@ struct btp_gap_identity_resolved_ev {
- 	bdaddr_t identity_address;
- } __packed;
+-byte EncryptionType [readonly, experimental]
+-````````````````````````````````````````````
++byte EncryptionType [readonly, optional, experimental]
++``````````````````````````````````````````````````````
+ Indicate the Encryption type in use for a connection.
  
-+#define BTP_GAP_SEC_LEVEL_UNAUTH_ENC		0x01
-+#define BTP_GAP_SEC_LEVEL_AUTH_ENC		0x02
-+#define BTP_GAP_SEC_LEVEL_AUTH_SC		0x03
-+
-+#define BTP_EV_GAP_SEC_LEVEL_CHANGED		0x89
-+struct btp_gap_sec_level_changed_ev {
-+	uint8_t address_type;
-+	bdaddr_t address;
-+	uint8_t sec_level;
-+} __packed;
-+
- struct btp_gatt_service {
- 	uint16_t start_handle;
- 	uint16_t end_handle;
+ Possible values:
 -- 
 2.43.0
 
