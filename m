@@ -1,60 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.251.105.195
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795613893;
-	b=PDwDPUubh4ftPWeC7f3pnJMbrAPFl3gQHfJv6BWvTVdlDz9KKWNU1VTH4hTJSX/0WyhF
-	 98pWSNUmpwOJNEX19OUFAV522eHBzVonPm+kfGfLsBDWiiueDMlncK/Y5WbqbaIcI0b4L
-	 /uxE3quRbBST4U4ryOHQeeFQkbEuwnkdRL69WhM4LR08gvlWYrX3+uQBSLyG/Pnew+iad
-	 6CIkOvt65nqj5vSdxeZPAFbbLE04HLMNEBeNrL7vdddVaY0BvEERPFEZ7FV3OTANVlzrQ
-	 T8YAX51hlm4jRryevOPAaVKP5ks0HUGsrjVcmTxx/5xHpb/d+O4nAUK69r8wMVNe3fQ==
+	t=1795613891;
+	b=di/Og03lMnfX9PRED5rQIN82xLtZMnsUYKfpvfDUvml5RoxFEzT25oy5TtVX7OUJ/R1H
+	 a9+P0n7CtKNZ8IQaFXSpMIJ9KVvqlqzy68kFijPq4466v0FAHr/Nm1J2/AkGyeoqDXwqy
+	 p7brTCGdLHGei8cXd6VMuk2eUcaQe9kaJO00Kk7IdftsyT8yipFYop+n05nTCpJeIZE3U
+	 OjkQm+fecOmOpUu2nsZyKCSj/l1crZSH9GAo0Z2LNxEl0IZ/knrJLbOL+Mns0sAAKvVvv
+	 eWrblH8U74JAm7S9ncYJ5M4mz3HQ50BKDDibkZiZrrSw1yRvGaSrxwxjYTFTfo1jJ8Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795613893;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795613891;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=x7ejeRsD7RvBwqtFIIlQrgJWafGAJz5D15H/54TyaEY=;
-	b=btaOgNx7dE6+xUDWo4ZyJdihGcVR5uyc9RxgVveLwGPEl8Z1nxXi7qowBc4WJCeYMB1i
-	 eWZMhYRLloJgm4+mcNZutgSNjnXJmlXydXDkH977iF+Ye45JZIcp5mgbTazdfRspeMBpB
-	 LMRTkpwwbj2FxCL0nGXgNC9zJY9KVLoWkgT+ujUcFdGtlf3ErbelGp7/U1eByv2al/jLe
-	 t+2n5itj+1yVe368rZYJbabhZKbS25qThTx+1pL+VDRrOU+1bSw1IsAtjsA6sFx8f7R+V
-	 KxGyVHSf+yTn4K1570D6xa6r+17pza7EuQhQP3ZjfEOsm6cbFGWmZTfULO5DifwtGlg==
+	bh=nnfldrxVqnwD0l+JUb6ygeubAqMPHbB+66XHdGscDaI=;
+	b=uES1aFaJqxOh5cRbjNF1Y4ZU5LvtEOdGKWkRBQVb/bg9tCWlX1A2HrOEEWi9sNbjy/2B
+	 Icdb2JMU9+wyPwLgbfVXqGREj3ME4AxaOEXx97S57KKCrfu3PSEiTEtx+QkC8C9/cM/vQ
+	 QmHVvFdDC/RqSZNCS22oKyRe7c/YqdqM+WJJEh3T1CspXa9AaKJh8zmWItgLOZCwbs5PK
+	 RMHeGxi+PIe0LaolFs2Bv7FHfDtBbJlq8iRwqFXbNHEMGZOOSOoG/jXX2aNO1dtCalQ90
+	 BNjztWDUFZs0KMDMjYzbbSgsqY4RIcnM8KoCyqDheLAE8Rnhd4doZEAaW/slX6jqZyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=collabora.com;
 	spf=pass smtp.mailfrom=collabora.com;
-	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=XyG9Oyd3;
+	dkim=pass header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=lKeIcqpM;
 	arc=none smtp.remote-ip=148.251.105.195
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686A6606A329
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:38:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 686A6606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA39606A327
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 13:38:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBA39606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=XyG9Oyd3
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.a=rsa-sha256 header.s=mail header.b=lKeIcqpM
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1795613889;
-	bh=rOnqzF+24CfGstuH56kRTZA4wlD3Ds70b/fgp21yUTs=;
+	bh=b1+O2fLwsIlx70aasaOU4GzmbMAdIBhPfkuiShyKzjU=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=XyG9Oyd3rSyFrwgIGtoU9G5vxusN+5SykqyAJUkyLST5x3iOcvUHIsU+I5gZRqR5E
-	 s73vNWjoGrSYaENgV4/CBvKKB7DPX5LEBESqO87Iez6S2GzdY5qAUZJaoRfISbmg90
-	 i7TdTasvJSsslp7bzJfkWI159CJH9Zypuqilrbra04R6JzowBD7qBAr8U+lGt05Emu
-	 AcKeVtwWghaHkkZefqiB8aQaSu7WoPYnLa10qU6fLq5bV2fAit2bqajBh6v4OUOvXP
-	 ZgBzFKSDEy61f7m/JJHJbwZjr//xrVmTwZqYwbFWWQR/UxETwPMjhw/OusYW1ItobL
-	 2ljpk/llCl0+w==
+	b=lKeIcqpM0GKfHYhwjF8t/IH7yye98tKKwSB8QJIkxxedKTKKhAqA1Z3j/h0adN8wS
+	 MpYh3hdfGo+Em3lZlj3oFTFWfnGjsX6naQBPVdx0v/h+dSZU7BuSo7lEncjpNDfxL6
+	 UXddS0kOlFAtT+Z8COJpt0x9oZ1vqFrEJdq4OrGV8zcoKCP68sxDZiAvofP8Xk7v3m
+	 peQNvZ08hKi882ZjnmzCpc0xnyru2whX6+SYPj2WhxELpQZw5AkIm09au0AtlwLf3C
+	 abuWDfZweos7tJFPH3maI6uUz5TeLiR5oSsa6cXjKJ3i9ulGi8uLLsnkiSf7Zn8Lx/
+	 DCiuE0L60RuMw==
 Received: from fdanis-ThinkPad-X1.. (unknown [100.64.1.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id B6D1517E1031
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4582517E09ED
 	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 14:38:09 +0100 (CET)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 6/6] monitor: Reassemble OBEX PDUs split across RFCOMM UIH frames
-Date: Wed, 25 Nov 2026 14:37:56 +0100
-Message-ID: <20261125133756.551659-7-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v5 4/6] monitor: Reassemble L2CAP ERTM/Streaming SDUs
+Date: Wed, 25 Nov 2026 14:37:54 +0100
+Message-ID: <20261125133756.551659-5-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261125133756.551659-1-frederic.danis@collabora.com>
 References: <20261125133756.551659-1-frederic.danis@collabora.com>
@@ -70,546 +70,651 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The RFCOMM MTU is typically much smaller than the maximum OBEX PDU
-length, so a single OBEX PDU can be split across several UIH frames.
-uih_frame() decoded each UIH frame's payload independently, so any
-OBEX PDU spanning more than one frame failed to parse ('frame too
-short').
+From: Frédéric Danis <frederic.danis.oss@gmail.com>
 
-Buffer UIH information bytes per index/handle/DLCI/direction
-(obex_frag_list[]/obex_frag_get()) until a complete PDU (3-byte
-opcode+length header plus body) is available, then decode it and
-keep any leftover bytes for the next frame. Key this reassembly, and
-the OBEX session/request state tracked alongside it, on the full DLCI
-rather than just the server channel number, since two concurrent
-connections can share a server channel while using distinct DLCIs.
+L2CAP ERTM/Streaming mode can segment a single upper-layer SDU across
+several I-frames (Start/Continuation/End SAR values). Previously each
+fragment was dissected independently, so OBEX PDUs spanning more than
+one fragment failed to parse ('frame too short') and S-frames (which
+carry no SAR field or payload) were incorrectly sent to the upper
+layer dissector as empty frames, adding further false positives.
 
-Drop the buffer and session state for a DLCI when it is torn down
-(rfcomm_remove_channel(), called alongside obex_remove_channel() on
-DISC/DM) so a later renegotiation of the same DLCI doesn't resume
-from stale fragments. A DISC/DM on DLCI 0 closes the whole RFCOMM
-multiplexer, taking every data channel running over it down with it
-without a DISC/DM of its own for each; clear all of their OBEX state
-in that case too, via rfcomm_remove_handle() and the new
-obex_remove_rfcomm_sessions(), while keeping SDP-learned channel
-mappings for a future reconnect.
+Add per-channel, per-direction SDU reassembly buffers
+(chan->sdu_rx[]), filled across Start/Continuation/End I-frames and
+handed to the upper layer dissector only once the full SDU is
+available. S-frames are now skipped entirely before PSM dispatch.
+Each direction's expected TxSeq is tracked alongside its buffer: a
+fragment matching the previous TxSeq is a retransmitted duplicate and
+is discarded instead of being appended again, and a fragment whose
+TxSeq doesn't match the expected value means a prior fragment was
+lost, so the in-progress SDU is discarded rather than reassembled
+past the gap.
 
-The RFCOMM L2CAP transport (PSM 0x0003) itself can also close while
-the ACL link stays up, leaving the same per-DLCI state stale without
-any RFCOMM-level DISC/DM being seen. Detect this in sig_disconn_req()
-and clear it the same way.
+While an SDU is still being reassembled (Start/Continuation
+fragments), the raw per-fragment payload is still hexdumped so no
+bytes are lost from the trace, but OBEX decoding itself only runs
+once on the complete SDU (on the End fragment).
 
-While a PDU is still incomplete and buffered, show the UIH frame's
-own payload so partial OBEX data isn't silently dropped from the
-trace, mirroring the L2CAP SAR reassembly path.
+To avoid printing bytes twice (once as a raw Start/Continuation
+fragment dump, and again inside a header value dump once the full
+PDU is decoded), obex_packet() now also takes the base and size of
+the fragment that triggered the call (the whole buffer for RFCOMM/
+Unsegmented/untracked channels, or just the last physical I-frame's
+payload for a just-completed SAR reassembly). Internal hexdumps in
+obex.c are routed through a small obex_hexdump() helper that clips
+output to only the bytes carried by that fragment.
 
-sig_disconn_req() tested this with chan_list[key & 0x7fff].psm, but
-l2cap_chan_key() only sets the 0x8000 bit itself when it resolves to
-a chan_list[] entry; it falls back to the raw CID otherwise, which
-isn't restricted to below 0x8000, so an untracked CID could read past
-the end of chan_list[]. Add is_rfcomm_chan_key(), bounds-checking the
-index against MAX_CHAN before dereferencing.
+Since headers are serialized near the start of a PDU while a SAR
+reassembly's last fragment carries only its final bytes, restrict
+this clipping to Body/End-of-Body: Application Parameters and
+Target/Who header values are always shown unclipped, otherwise their
+contents would be dropped whenever they land in an earlier fragment
+than the one that completed reassembly.
+
+A retransmitted duplicate of the Start fragment (same TxSeq) that
+began the SDU currently being reassembled was not recognized as
+such, so any already-buffered Continuation fragments for it were
+discarded and reassembly restarted from scratch even though no data
+was actually lost on the wire. Track the TxSeq of the Start fragment
+that began the in-progress SDU and discard a repeat of it the same
+way a duplicate Continuation/End fragment is discarded.
 
 Assisted-by: Claude:claude-sonnet-5
 ---
-v2->v3: New in v3.
-v3->v4:
-  - Add rfcomm_remove_handle(), called from the HCI disconnect
-    complete handler, to free every fragment buffer still tracked for
-    an ACL handle that goes away without an RFCOMM DISC/DM on each of
-    its channels.
-  - Widen the reassembly buffer's length/position tracking from
-    uint16_t to uint32_t, and clamp the amount handed to obex_packet()
-    on a malformed declared length to l2cap_frame.size's uint16_t
-    range, keeping any excess buffered for the next call instead of
-    reporting an incorrect remaining size.
+v1->v2: Fix commit title issue
+v2->v3:
+  - Retitled from "monitor: Reassemble L2CAP ERTM/Streaming fragments
+    before dissecting" (subject line was exceeding the mailing list's
+    80-character limit with the series prefix).
+  - Track the expected TxSeq per direction alongside each reassembly
+    buffer: a fragment matching the previous TxSeq is a retransmitted
+    duplicate and is discarded instead of being appended again, and a
+    fragment whose TxSeq doesn't match the expected value means a prior
+    fragment was lost, so the in-progress SDU is discarded rather than
+    reassembled past the gap.
 v4->v5:
-  - While a PDU is still incomplete and buffered, hexdump the UIH
-    frame's own payload instead of showing nothing, mirroring the
-    L2CAP SAR reassembly path, so partial OBEX data isn't silently
-    dropped from the trace.
-  - Key the reassembly buffer and its OBEX session/request state on
-    the full DLCI (server channel plus direction bit) instead of just
-    the server channel number, since two concurrent connections can
-    share a server channel while using distinct DLCIs.
-  - Treat a DISC/DM on DLCI 0 as closing the whole RFCOMM multiplexer,
-    clearing every data channel's OBEX state via the new
-    obex_remove_rfcomm_sessions() and rfcomm_remove_handle(), since no
-    per-channel DISC/DM is seen for each of them, while keeping the
-    SDP-learned channel mappings for a future reconnect.
-  - Detect the RFCOMM L2CAP transport (PSM 0x0003) itself closing
-    while the ACL link stays up, in sig_disconn_req(), and clear the
-    same per-DLCI state in that case too.
-  - Add is_rfcomm_chan_key(), bounds-checking the chan_list[] index
-    against MAX_CHAN before dereferencing it in sig_disconn_req():
-    l2cap_chan_key() only sets the 0x8000 bit when it resolves to a
-    chan_list[] entry, but falls back to the raw CID otherwise, which
-    isn't restricted to below 0x8000, risking a read past the end of
-    chan_list[].
+  - Track the TxSeq of the Start fragment that began the in-progress
+    SDU (start_seq) and compare a new Start fragment against it, so a
+    retransmitted duplicate of that same Start fragment is recognized
+    and discarded instead of needlessly dropping the already-buffered
+    Continuation fragments.
 
- monitor/l2cap.c  |  38 +++++++--
- monitor/l2cap.h  |   2 +
- monitor/obex.c   |  83 ++++++++++++++----
- monitor/obex.h   |   2 +
- monitor/packet.c |   1 +
- monitor/rfcomm.c | 215 +++++++++++++++++++++++++++++++++++++++++++++--
- 6 files changed, 311 insertions(+), 30 deletions(-)
+ monitor/l2cap.c  | 266 +++++++++++++++++++++++++++++++++++++++++++----
+ monitor/obex.c   |  63 +++++++++--
+ monitor/obex.h   |   3 +-
+ monitor/rfcomm.c |   2 +-
+ 4 files changed, 303 insertions(+), 31 deletions(-)
 
 diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index d8d6058d0..ecd0d5940 100644
+index a43b9237c..d8d6058d0 100644
 --- a/monitor/l2cap.c
 +++ b/monitor/l2cap.c
-@@ -477,6 +477,19 @@ uint16_t l2cap_chan_key(uint16_t index, bool in, uint16_t handle, uint16_t cid)
- 	return cid;
- }
+@@ -86,9 +86,27 @@
+ #define L2CAP_SAR_START		0x01
+ #define L2CAP_SAR_END		0x02
+ #define L2CAP_SAR_CONTINUE	0x03
++#define L2CAP_SAR_NONE		0xff	/* S-frame, no SAR field */
  
-+/* True if key is a l2cap_chan_key() value resolved to a chan_list[] entry
-+ * (as opposed to a raw, unresolved CID) for the RFCOMM transport PSM
-+ * (0x0003). The 0x8000 bit alone doesn't guarantee key was resolved, since
-+ * a raw dynamic CID may also have it set; the low bits must additionally
-+ * be bounds-checked against MAX_CHAN before indexing chan_list[].
+ #define MAX_CHAN 64
+ 
++/* Reassembled L2CAP SDU for ERTM/Streaming mode channels using
++ * segmentation (SAR Start/Continuation/End). Tracked separately per
++ * direction since a bidirectional channel may have independent SDUs
++ * in flight each way.
 + */
-+static bool is_rfcomm_chan_key(uint16_t key)
-+{
-+	uint16_t i = key & 0x7fff;
-+
-+	return (key & 0x8000) && i < MAX_CHAN && chan_list[i].psm == 0x0003;
-+}
-+
- static struct chan_data *get_chan(const struct l2cap_frame *frame)
- {
- 	int i;
-@@ -1387,6 +1400,7 @@ static void sig_config_rsp(const struct l2cap_frame *frame)
- static void sig_disconn_req(const struct l2cap_frame *frame)
- {
- 	const struct bt_l2cap_pdu_disconn_req *pdu = frame->data;
-+	uint16_t scid_key, dcid_key;
- 
- 	print_cid("Destination", pdu->dcid);
- 	print_cid("Source", pdu->scid);
-@@ -1400,12 +1414,24 @@ static void sig_disconn_req(const struct l2cap_frame *frame)
- 	 * DCID is the recipient's own CID, which matches "scid" when the
- 	 * request came from the peer (frame->in) - see l2cap_chan_key().
- 	 */
--	obex_remove_session(frame->index, frame->handle,
--			l2cap_chan_key(frame->index, !frame->in, frame->handle,
--						le16_to_cpu(pdu->scid)));
--	obex_remove_session(frame->index, frame->handle,
--			l2cap_chan_key(frame->index, frame->in, frame->handle,
--						le16_to_cpu(pdu->dcid)));
-+	scid_key = l2cap_chan_key(frame->index, !frame->in, frame->handle,
-+						le16_to_cpu(pdu->scid));
-+	dcid_key = l2cap_chan_key(frame->index, frame->in, frame->handle,
-+						le16_to_cpu(pdu->dcid));
-+	obex_remove_session(frame->index, frame->handle, scid_key);
-+	obex_remove_session(frame->index, frame->handle, dcid_key);
-+
-+	/* If the closing channel is the RFCOMM transport (PSM 0x0003),
-+	 * the ACL link stays up but every RFCOMM data channel (DLCI)
-+	 * multiplexed over it loses its L2CAP transport without a
-+	 * per-channel DISC/DM of its own. Drop their OBEX session and
-+	 * fragment reassembly state too, keeping the SDP-learned channel
-+	 * mappings for a future reconnect.
-+	 */
-+	if (is_rfcomm_chan_key(scid_key) || is_rfcomm_chan_key(dcid_key)) {
-+		obex_remove_rfcomm_sessions(frame->index, frame->handle);
-+		rfcomm_remove_handle(frame->index, frame->handle);
-+	}
- }
- 
- static void sig_disconn_rsp(const struct l2cap_frame *frame)
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 1c1f7e609..6cfc25f8c 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -364,4 +364,6 @@ void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 
- void rfcomm_packet(const struct l2cap_frame *frame);
- 
-+void rfcomm_remove_handle(uint16_t index, uint16_t handle);
-+
- void l2cap_dequeue_frame(struct timeval *delta, struct packet_conn_data *conn);
-diff --git a/monitor/obex.c b/monitor/obex.c
-index 14f471c62..be2bbca7d 100644
---- a/monitor/obex.c
-+++ b/monitor/obex.c
-@@ -269,6 +269,73 @@ void obex_remove_session(uint16_t index, uint16_t handle, uint16_t channel)
- 	obex_clear_profile(index, handle, channel);
- }
- 
-+/* Drop every session's request/profile state for this index/handle,
-+ * regardless of channel, used when the whole ACL link is going away
-+ * (see obex_disconnect_handle()).
-+ */
-+void obex_remove_all_sessions(uint16_t index, uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_REQ; i++) {
-+		if (obex_req_list[i].index == index &&
-+				obex_req_list[i].handle == handle)
-+			memset(&obex_req_list[i], 0, sizeof(obex_req_list[i]));
-+	}
-+
-+	for (i = 0; i < MAX_OBEX_PROFILE; i++) {
-+		if (!obex_profile_list[i].channel)
-+			continue;
-+
-+		if (obex_profile_list[i].index == index &&
-+				obex_profile_list[i].handle == handle)
-+			memset(&obex_profile_list[i], 0,
-+					sizeof(obex_profile_list[i]));
-+	}
-+}
-+
-+/* RFCOMM DLCIs only use 6 bits (0-63), while channel values used for
-+ * direct L2CAP OBEX sessions are either a raw dynamic CID (>= 0x0040)
-+ * or an index into l2cap.c's channel table with the 0x8000 bit set
-+ * (see l2cap_chan_key()), so this bound reliably tells the two apart.
-+ */
-+#define MAX_RFCOMM_DLCI 0x3f
-+
-+/* The RFCOMM multiplexer (DLCI 0) or its underlying L2CAP transport is
-+ * being torn down, which takes every RFCOMM data channel multiplexed
-+ * over it down with it, even though no per-channel DISC/DM is seen for
-+ * each of them. Drop their request/profile state only, same as
-+ * obex_remove_channel() would for a single channel, but keep the
-+ * SDP-learned channel mappings so a future reconnect on the same ACL
-+ * link doesn't need SDP repeated, and leave alone any unrelated direct
-+ * L2CAP OBEX session sharing the same ACL handle.
-+ */
-+void obex_remove_rfcomm_sessions(uint16_t index, uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_REQ; i++) {
-+		if (obex_req_list[i].channel > MAX_RFCOMM_DLCI)
-+			continue;
-+
-+		if (obex_req_list[i].index == index &&
-+				obex_req_list[i].handle == handle)
-+			memset(&obex_req_list[i], 0, sizeof(obex_req_list[i]));
-+	}
-+
-+	for (i = 0; i < MAX_OBEX_PROFILE; i++) {
-+		if (!obex_profile_list[i].channel ||
-+				obex_profile_list[i].channel >
-+							MAX_RFCOMM_DLCI)
-+			continue;
-+
-+		if (obex_profile_list[i].index == index &&
-+				obex_profile_list[i].handle == handle)
-+			memset(&obex_profile_list[i], 0,
-+					sizeof(obex_profile_list[i]));
-+	}
-+}
-+
- void obex_disconnect_handle(uint16_t index, uint16_t handle)
- {
- 	int i;
-@@ -283,11 +350,7 @@ void obex_disconnect_handle(uint16_t index, uint16_t handle)
- 						sizeof(obex_chan_list[i]));
- 	}
- 
--	for (i = 0; i < MAX_OBEX_REQ; i++) {
--		if (obex_req_list[i].index == index &&
--				obex_req_list[i].handle == handle)
--			memset(&obex_req_list[i], 0, sizeof(obex_req_list[i]));
--	}
-+	obex_remove_all_sessions(index, handle);
- 
- 	for (i = 0; i < MAX_OBEX_PSM; i++) {
- 		if (!obex_psm_list[i].psm)
-@@ -298,16 +361,6 @@ void obex_disconnect_handle(uint16_t index, uint16_t handle)
- 			memset(&obex_psm_list[i], 0,
- 						sizeof(obex_psm_list[i]));
- 	}
--
--	for (i = 0; i < MAX_OBEX_PROFILE; i++) {
--		if (!obex_profile_list[i].channel)
--			continue;
--
--		if (obex_profile_list[i].index == index &&
--				obex_profile_list[i].handle == handle)
--			memset(&obex_profile_list[i], 0,
--					sizeof(obex_profile_list[i]));
--	}
- }
- 
- static void obex_set_last_request(uint16_t index, uint16_t handle,
-diff --git a/monitor/obex.h b/monitor/obex.h
-index 019ed6174..7aeb0cae0 100644
---- a/monitor/obex.h
-+++ b/monitor/obex.h
-@@ -110,6 +110,8 @@ bool obex_channel(uint16_t index, uint16_t handle, uint8_t channel,
- 							const char **profile);
- void obex_remove_channel(uint16_t index, uint16_t handle, uint8_t channel);
- void obex_remove_session(uint16_t index, uint16_t handle, uint16_t channel);
-+void obex_remove_all_sessions(uint16_t index, uint16_t handle);
-+void obex_remove_rfcomm_sessions(uint16_t index, uint16_t handle);
- void obex_disconnect_handle(uint16_t index, uint16_t handle);
- 
- void obex_add_psm(uint16_t index, uint16_t handle, uint16_t psm);
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 7414910c7..ca68c54ae 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -12315,6 +12315,7 @@ static void disconnect_complete_evt(struct timeval *tv, uint16_t index,
- 	if (evt->status == 0x00) {
- 		release_handle(le16_to_cpu(evt->handle));
- 		obex_disconnect_handle(index, le16_to_cpu(evt->handle));
-+		rfcomm_remove_handle(index, le16_to_cpu(evt->handle));
- 	}
- }
- 
-diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-index 90ddc3596..1188072ae 100644
---- a/monitor/rfcomm.c
-+++ b/monitor/rfcomm.c
-@@ -386,12 +386,118 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	return true;
- }
- 
-+/* An OBEX PDU may be split across several RFCOMM UIH frames since the
-+ * RFCOMM MTU is typically much smaller than the maximum OBEX PDU
-+ * length. Information bytes are buffered per index/handle/DLCI and
-+ * direction until a complete PDU (3-byte opcode+length header plus
-+ * body) is available; complete PDUs are then decoded and any leftover
-+ * bytes are kept for the next frame.
-+ *
-+ * The full DLCI (server channel plus direction bit), not just the
-+ * server channel number, identifies the session: two connections to
-+ * the same server channel but opened by different initiators use
-+ * distinct DLCIs and must not share a reassembly buffer.
-+ */
-+#define MAX_OBEX_FRAG 64
-+
-+struct obex_frag_data {
-+	uint16_t index;
-+	uint16_t handle;
-+	uint8_t dlci;
-+	bool in;
-+	uint8_t *buf;
-+	uint32_t len;
++struct l2cap_sdu {
++	uint8_t *data;
++	uint16_t len;
++	uint16_t total;
++	int32_t next_seq;	/* expected TxSeq of the next fragment, or
++				 * -1 if no reassembly is in progress
++				 */
++	int32_t start_seq;	/* TxSeq of the Start segment that began
++				 * the in-progress SDU, or -1 if none
++				 */
 +};
 +
-+static struct obex_frag_data obex_frag_list[MAX_OBEX_FRAG];
-+
-+static struct obex_frag_data *obex_frag_get(uint16_t index, uint16_t handle,
-+						uint8_t dlci, bool in)
+ struct chan_data {
+ 	uint16_t index;
+ 	uint16_t handle;
+@@ -103,11 +121,21 @@ struct chan_data {
+ 	uint16_t sdu;
+ 	uint8_t  fcs;
+ 	int8_t   req_fcs;
++	struct l2cap_sdu sdu_rx[2];
+ 	struct packet_latency tx_l;
+ };
+ 
+ static struct chan_data chan_list[MAX_CHAN];
+ 
++static void reset_sdu_rx(struct chan_data *chan)
 +{
-+	int i, n = -1;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (!obex_frag_list[i].dlci) {
-+			if (n < 0)
-+				n = i;
-+			continue;
-+		}
-+
-+		if (obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle &&
-+				obex_frag_list[i].dlci == dlci &&
-+				obex_frag_list[i].in == in)
-+			return &obex_frag_list[i];
-+	}
-+
-+	if (n < 0)
-+		return NULL;
-+
-+	obex_frag_list[n].index = index;
-+	obex_frag_list[n].handle = handle;
-+	obex_frag_list[n].dlci = dlci;
-+	obex_frag_list[n].in = in;
-+	obex_frag_list[n].buf = NULL;
-+	obex_frag_list[n].len = 0;
-+
-+	return &obex_frag_list[n];
++	free(chan->sdu_rx[0].data);
++	free(chan->sdu_rx[1].data);
++	memset(chan->sdu_rx, 0, sizeof(chan->sdu_rx));
++	chan->sdu_rx[0].next_seq = -1;
++	chan->sdu_rx[1].next_seq = -1;
 +}
 +
-+static void obex_frag_reset(struct obex_frag_data *frag)
-+{
-+	free(frag->buf);
-+	frag->buf = NULL;
-+	frag->len = 0;
-+}
-+
-+static void rfcomm_remove_channel(uint16_t index, uint16_t handle,
-+							uint8_t dlci)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (obex_frag_list[i].dlci == dlci &&
-+				obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle) {
-+			obex_frag_reset(&obex_frag_list[i]);
-+			memset(&obex_frag_list[i], 0,
-+					sizeof(obex_frag_list[i]));
-+		}
-+	}
-+}
-+
-+/* An ACL handle may be disconnected without an RFCOMM DISC/DM on each
-+ * of its channels (e.g. the link is simply dropped), which would
-+ * otherwise leave both directions' reassembly buffers and their slots
-+ * allocated. Free every fragment buffer still tracked for this handle.
-+ */
-+void rfcomm_remove_handle(uint16_t index, uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_OBEX_FRAG; i++) {
-+		if (!obex_frag_list[i].dlci)
-+			continue;
-+
-+		if (obex_frag_list[i].index == index &&
-+				obex_frag_list[i].handle == handle) {
-+			obex_frag_reset(&obex_frag_list[i]);
-+			memset(&obex_frag_list[i], 0,
-+					sizeof(obex_frag_list[i]));
-+		}
-+	}
-+}
-+
- static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
+ 			uint16_t psm, uint8_t mode, uint8_t ctrlid)
  {
- 	uint8_t credits;
- 	struct l2cap_frame *frame = &rfcomm_frame->l2cap_frame;
- 	struct rfcomm_lhdr *hdr = &rfcomm_frame->hdr;
- 	uint8_t channel = RFCOMM_GET_CHANNEL(hdr->address);
-+	uint8_t dlci = RFCOMM_GET_DLCI(hdr->address);
-+	struct obex_frag_data *frag;
-+	uint8_t *buf;
-+	uint32_t pos;
+@@ -147,6 +175,7 @@ static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
+ 	if (n < 0)
+ 		return;
  
- 	if (!channel)
- 		return mcc_frame(rfcomm_frame, indent);
-@@ -410,11 +516,83 @@ static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
- 	if (!frame->size)
- 		return true;
++	reset_sdu_rx(&chan_list[n]);
+ 	memset(&chan_list[n], 0, sizeof(chan_list[n]));
+ 	chan_list[n].index = frame->index;
+ 	chan_list[n].handle = frame->handle;
+@@ -169,6 +198,10 @@ static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
+ 	chan_list[n].req_fcs = -1;
  
--	if (obex_channel(frame->index, frame->handle, channel, NULL))
--		obex_packet(frame, channel, frame->size);
--	else
-+	/* The server channel number is only used to resolve the
-+	 * SDP-learned mapping; the DLCI (which also encodes which side
-+	 * opened the connection) is the actual session/reassembly key,
-+	 * since two connections can share a server channel number.
-+	 */
-+	if (!obex_channel(frame->index, frame->handle, channel, NULL)) {
-+		packet_hexdump(frame->data, frame->size);
+ 	chan_list[n].seq_num = seq_num;
++	chan_list[n].sdu_rx[0].next_seq = -1;
++	chan_list[n].sdu_rx[1].next_seq = -1;
++	chan_list[n].sdu_rx[0].start_seq = -1;
++	chan_list[n].sdu_rx[1].start_seq = -1;
+ }
+ 
+ static void release_scid(const struct l2cap_frame *frame, uint16_t scid)
+@@ -184,11 +217,13 @@ static void release_scid(const struct l2cap_frame *frame, uint16_t scid)
+ 
+ 		if (frame->in) {
+ 			if (chan_list[i].scid == scid) {
++				reset_sdu_rx(&chan_list[i]);
+ 				chan_list[i].handle = 0;
+ 				break;
+ 			}
+ 		} else {
+ 			if (chan_list[i].dcid == scid) {
++				reset_sdu_rx(&chan_list[i]);
+ 				chan_list[i].handle = 0;
+ 				break;
+ 			}
+@@ -576,8 +611,11 @@ static char *mode2str(uint8_t mode)
+ 	}
+ }
+ 
+-static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
++static uint8_t l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl,
++					uint16_t *sdu_len, uint16_t *txseq)
+ {
++	uint8_t sar = L2CAP_SAR_NONE;
++
+ 	display_printf("      %s:",
+ 		ctrl & L2CAP_EXT_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
+ 
+@@ -589,20 +627,18 @@ static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
+ 		if (ctrl & L2CAP_EXT_CTRL_POLL)
+ 			display_printf(" P-bit");
+ 	} else {
+-		uint8_t sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
++		sar = (ctrl & L2CAP_EXT_CTRL_SAR_MASK) >>
+ 						L2CAP_EXT_CTRL_SAR_SHIFT;
+ 		display_printf(" %s", sar2str(sar));
+ 		if (sar == L2CAP_SAR_START) {
+-			uint16_t len;
++			if (!l2cap_frame_get_le16(frame, sdu_len))
++				return L2CAP_SAR_NONE;
+ 
+-			if (!l2cap_frame_get_le16(frame, &len))
+-				return;
+-
+-			display_printf(" (len %d)", len);
++			display_printf(" (len %d)", *sdu_len);
+ 		}
+-		display_printf(" TxSeq %d",
+-			(ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
+-						L2CAP_EXT_CTRL_TXSEQ_SHIFT);
++		*txseq = (ctrl & L2CAP_EXT_CTRL_TXSEQ_MASK) >>
++						L2CAP_EXT_CTRL_TXSEQ_SHIFT;
++		display_printf(" TxSeq %d", *txseq);
+ 	}
+ 
+ 	display_printf(" ReqSeq %d", (ctrl & L2CAP_EXT_CTRL_REQSEQ_MASK) >>
+@@ -610,10 +646,15 @@ static void l2cap_ctrl_ext_parse(struct l2cap_frame *frame, uint32_t ctrl)
+ 
+ 	if (ctrl & L2CAP_EXT_CTRL_FINAL)
+ 		display_printf(" F-bit");
++
++	return sar;
+ }
+ 
+-static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
++static uint8_t l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl,
++					uint16_t *sdu_len, uint16_t *txseq)
+ {
++	uint8_t sar = L2CAP_SAR_NONE;
++
+ 	display_printf("      %s:",
+ 			ctrl & L2CAP_CTRL_FRAME_TYPE ? "S-frame" : "I-frame");
+ 
+@@ -625,20 +666,17 @@ static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
+ 		if (ctrl & L2CAP_CTRL_POLL)
+ 			display_printf(" P-bit");
+ 	} else {
+-		uint8_t sar;
+-
+ 		sar = (ctrl & L2CAP_CTRL_SAR_MASK) >> L2CAP_CTRL_SAR_SHIFT;
+ 		display_printf(" %s", sar2str(sar));
+ 		if (sar == L2CAP_SAR_START) {
+-			uint16_t len;
+-
+-			if (!l2cap_frame_get_le16(frame, &len))
+-				return;
++			if (!l2cap_frame_get_le16(frame, sdu_len))
++				return L2CAP_SAR_NONE;
+ 
+-			display_printf(" (len %d)", len);
++			display_printf(" (len %d)", *sdu_len);
+ 		}
+-		display_printf(" TxSeq %d", (ctrl & L2CAP_CTRL_TXSEQ_MASK) >>
+-						L2CAP_CTRL_TXSEQ_SHIFT);
++		*txseq = (ctrl & L2CAP_CTRL_TXSEQ_MASK) >>
++						L2CAP_CTRL_TXSEQ_SHIFT;
++		display_printf(" TxSeq %d", *txseq);
+ 	}
+ 
+ 	display_printf(" ReqSeq %d", (ctrl & L2CAP_CTRL_REQSEQ_MASK) >>
+@@ -646,6 +684,8 @@ static void l2cap_ctrl_parse(struct l2cap_frame *frame, uint32_t ctrl)
+ 
+ 	if (ctrl & L2CAP_CTRL_FINAL)
+ 		display_printf(" F-bit");
++
++	return sar;
+ }
+ 
+ #define MAX_INDEX 16
+@@ -2815,6 +2855,133 @@ static void smp_packet(uint16_t index, bool in, uint16_t handle,
+ 	opcode_data->func(&frame);
+ }
+ 
++/* Reassemble ERTM/Streaming mode SAR fragments (Start/Continuation/End)
++ * into a single SDU before handing it to the upper layer dissector.
++ * Returns true when frame now holds a complete payload ready for
++ * dispatch (either because sar is the end of a multi-fragment SDU, or
++ * because reassembly could not be tracked and the single fragment
++ * should be dispatched as-is). Returns false while more fragments are
++ * still expected. *owned is set to true only when frame->data was
++ * replaced by a heap-allocated reassembled SDU that the caller must
++ * free; it is left untouched (false) whenever frame->data still
++ * points into the original (borrowed) packet buffer.
++ */
++static bool l2cap_sdu_reassemble(struct chan_data *chan, bool in,
++					uint8_t sar, uint16_t sdu_len,
++					uint16_t txseq, uint16_t seq_mod,
++					struct l2cap_frame *frame, bool *owned)
++{
++	struct l2cap_sdu *sdu;
++	uint32_t len;
++	uint16_t prev_seq;
++
++	*owned = false;
++
++	if (!chan)
 +		return true;
-+	}
 +
-+	frag = obex_frag_get(frame->index, frame->handle, dlci, frame->in);
-+	if (!frag) {
-+		obex_packet(frame, dlci, frame->size);
-+		return true;
-+	}
++	sdu = &chan->sdu_rx[in ? 1 : 0];
 +
-+	buf = realloc(frag->buf, frag->len + frame->size);
-+	if (!buf) {
-+		obex_frag_reset(frag);
-+		obex_packet(frame, dlci, frame->size);
-+		return true;
-+	}
++	if (sar == L2CAP_SAR_START) {
++		if (sdu->data) {
++			if (sdu->start_seq == (int32_t) txseq) {
++				/* Retransmitted duplicate of the Start
++				 * segment that began the SDU currently
++				 * being reassembled: no data was lost,
++				 * keep buffering as before.
++				 */
++				print_text(COLOR_ERROR,
++					"duplicate Start segment TxSeq %u"
++					" discarded", txseq);
++				return false;
++			}
 +
-+	memcpy(buf + frag->len, frame->data, frame->size);
-+	frag->buf = buf;
-+	frag->len += frame->size;
-+
-+	pos = 0;
-+
-+	while (frag->len - pos >= 3) {
-+		struct l2cap_frame pdu_frame = *frame;
-+		uint16_t pdu_len = get_be16(frag->buf + pos + 1);
-+
-+		if (pdu_len < 3) {
-+			/* Malformed declared length: hand over as much of
-+			 * the rest of the buffer as fits in l2cap_frame.size
-+			 * (uint16_t) and let obex_packet() report the error,
-+			 * rather than buffering indefinitely. Any excess
-+			 * stays buffered and is retried on the next call.
-+			 */
-+			uint32_t remaining = frag->len - pos;
-+
-+			if (remaining > UINT16_MAX)
-+				remaining = UINT16_MAX;
-+
-+			pdu_frame.data = frag->buf + pos;
-+			pdu_frame.size = remaining;
-+			obex_packet(&pdu_frame, dlci, pdu_frame.size);
-+			pos += remaining;
-+			break;
++			print_text(COLOR_ERROR,
++				"incomplete SDU replaced by new Start segment");
++			free(sdu->data);
 +		}
 +
-+		if (frag->len - pos < pdu_len)
-+			break;
++		sdu->len = 0;
++		sdu->total = sdu_len;
++		sdu->data = malloc(sdu_len);
 +
-+		pdu_frame.data = frag->buf + pos;
-+		pdu_frame.size = pdu_len;
-+		obex_packet(&pdu_frame, dlci, pdu_len);
++		if (!sdu->data) {
++			sdu->total = 0;
++			sdu->next_seq = -1;
++			sdu->start_seq = -1;
++			return true;
++		}
 +
-+		pos += pdu_len;
-+	}
-+
-+	if (pos == frag->len) {
-+		obex_frag_reset(frag);
++		sdu->next_seq = (txseq + 1) % seq_mod;
++		sdu->start_seq = txseq;
 +	} else {
-+		/* Still waiting for more fragments: show this frame's own
-+		 * payload so partial OBEX data isn't silently dropped from
-+		 * the trace, mirroring the L2CAP SAR reassembly path.
-+		 */
- 		packet_hexdump(frame->data, frame->size);
- 
-+		if (pos) {
-+			memmove(frag->buf, frag->buf + pos, frag->len - pos);
-+			frag->len -= pos;
++		if (!sdu->data) {
++			print_text(COLOR_ERROR,
++					"unexpected continuation segment");
++			return true;
 +		}
++
++		prev_seq = (sdu->next_seq + seq_mod - 1) % seq_mod;
++
++		if (sdu->next_seq >= 0 && txseq == prev_seq) {
++			/* Retransmitted duplicate of the last fragment
++			 * already appended: discard it and keep waiting
++			 * for the genuine next fragment.
++			 */
++			print_text(COLOR_ERROR,
++				"duplicate segment TxSeq %u discarded",
++				txseq);
++			return false;
++		}
++
++		if (sdu->next_seq >= 0 && txseq != (uint16_t) sdu->next_seq) {
++			/* A gap means a fragment was lost (or capture
++			 * started mid-SDU): the SDU can no longer be
++			 * reassembled correctly, so discard it rather
++			 * than silently producing a corrupted payload.
++			 */
++			print_text(COLOR_ERROR,
++				"gap in reassembly (expected TxSeq %u, got"
++				" %u), discarding SDU", sdu->next_seq, txseq);
++			free(sdu->data);
++			sdu->data = NULL;
++			sdu->len = 0;
++			sdu->total = 0;
++			sdu->next_seq = -1;
++			sdu->start_seq = -1;
++			return true;
++		}
++
++		sdu->next_seq = (txseq + 1) % seq_mod;
 +	}
 +
++	len = sdu->len + (uint32_t) frame->size;
++	if (len > sdu->total)
++		len = sdu->total;
++
++	if (len > sdu->len)
++		memcpy(sdu->data + sdu->len, frame->data, len - sdu->len);
++	sdu->len = len;
++
++	if (sar != L2CAP_SAR_END)
++		return false;
++
++	if (sdu->len != sdu->total)
++		print_text(COLOR_ERROR, "reassembled SDU length mismatch");
++
++	frame->data = sdu->data;
++	frame->size = sdu->len;
++	*owned = true;
++
++	sdu->data = NULL;
++	sdu->len = 0;
++	sdu->total = 0;
++	sdu->next_seq = -1;
++	sdu->start_seq = -1;
++
++	return true;
++}
++
+ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 			uint16_t psm, const void *data, uint16_t size)
+ {
+@@ -2823,6 +2990,13 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 	uint32_t ctrl32 = 0;
+ 	uint16_t ctrl16 = 0;
+ 	uint8_t ext_ctrl;
++	uint8_t sar = L2CAP_SAR_UNSEGMENTED;
++	uint16_t sdu_len = 0;
++	uint16_t txseq = 0;
++	uint16_t seq_mod = 64;
++	uint16_t frag_len = size;
++	void *sdu_buf = NULL;
++	bool owned;
+ 
+ 	switch (cid) {
+ 	case 0x0001:
+@@ -2889,7 +3063,9 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 						frame.psm, mode2str(frame.mode),
+ 						frame.mode, frame.chan);
+ 
+-				l2cap_ctrl_ext_parse(&frame, ctrl32);
++				sar = l2cap_ctrl_ext_parse(&frame, ctrl32,
++							&sdu_len, &txseq);
++				seq_mod = 16384;
+ 			} else {
+ 				if (!l2cap_frame_get_le16(&frame, &ctrl16))
+ 					return;
+@@ -2902,7 +3078,9 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 						frame.psm, mode2str(frame.mode),
+ 						frame.mode, frame.chan);
+ 
+-				l2cap_ctrl_parse(&frame, ctrl16);
++				sar = l2cap_ctrl_parse(&frame, ctrl16,
++							&sdu_len, &txseq);
++				seq_mod = 64;
+ 			}
+ 
+ 			display_printf("\n");
+@@ -2916,6 +3094,46 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 			if (chan && chan->fcs && frame.size >= 2)
+ 				frame.size -= 2;
+ 
++			/* Size of just this I-frame's own payload, before
++			 * it is possibly replaced by the full reassembled
++			 * SDU below. Used so the OBEX dissector can limit
++			 * fallback/binary hexdumps to the bytes carried by
++			 * the final fragment, instead of repeating bytes
++			 * already shown while earlier fragments (Start/
++			 * Continuation) were buffered.
++			 */
++			frag_len = frame.size;
++
++			if (sar != L2CAP_SAR_UNSEGMENTED &&
++					sar != L2CAP_SAR_NONE) {
++				if (!l2cap_sdu_reassemble(chan, frame.in, sar,
++								sdu_len, txseq,
++								seq_mod,
++								&frame,
++								&owned)) {
++					/* Still buffering (Start/Continue):
++					 * show the raw fragment payload, the
++					 * upper layer dissector only runs
++					 * once the SDU is fully reassembled.
++					 */
++					if (frame.size)
++						packet_hexdump(frame.data,
++								frame.size);
++					return;
++				}
++
++				if (owned)
++					sdu_buf = (void *) frame.data;
++			}
++
++			break;
++		}
++
++		/* S-frames (supervisory, e.g. RR/REJ) carry no SDU payload
++		 * and must not be handed to upper layer dissectors.
++		 */
++		if (sar == L2CAP_SAR_NONE) {
++			free(sdu_buf);
+ 			break;
+ 		}
+ 
+@@ -2945,11 +3163,13 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 		default:
+ 			if (obex_psm(index, handle, frame.psm))
+ 				obex_packet(&frame, l2cap_chan_key(index, in,
+-								handle, cid));
++							handle, cid), frag_len);
+ 			else
+ 				packet_hexdump(frame.data, frame.size);
+ 			break;
+ 		}
++
++		free(sdu_buf);
+ 		break;
+ 	}
+ }
+diff --git a/monitor/obex.c b/monitor/obex.c
+index 6e69412ff..14f471c62 100644
+--- a/monitor/obex.c
++++ b/monitor/obex.c
+@@ -1018,6 +1018,36 @@ static void print_unicode_header(const char *label, const uint8_t *data,
+ 	print_field("%*c%s: %s", indent, ' ', label, buf);
+ }
+ 
++/* When an OBEX PDU was reassembled from multiple L2CAP SAR fragments,
++ * the Start/Continuation fragments have already been hexdumped as raw
++ * bytes by the L2CAP layer while they were buffered. Limit hexdumps
++ * done while decoding the fully reassembled PDU to the bytes carried
++ * by the final (End) fragment, so the same bytes aren't printed twice.
++ * base is the start of the reassembled PDU and from is the byte offset
++ * (from base) where the final fragment begins, or 0 when the whole PDU
++ * came from a single, unsegmented frame.
++ */
++static void obex_hexdump(const uint8_t *base, uint16_t from,
++					const uint8_t *data, uint16_t len)
++{
++	uint32_t offset;
++
++	if (!len)
++		return;
++
++	offset = data - base;
++
++	if (offset + len <= from)
++		return;
++
++	if (offset < from) {
++		len -= from - offset;
++		data += from - offset;
++	}
++
++	packet_hexdump(data, len);
++}
++
+ /* Application Parameters (Tag/Len/Value) tag tables for profiles whose
+  * tag assignments are known. Tag IDs and names are taken from the
+  * PBAP/MAP/BIP specifications; types indicate how to decode a tag's
+@@ -1196,7 +1226,10 @@ static void obex_print_apparam_tag(enum obex_profile profile, uint8_t tag,
+ 
+ 		/* Known tag but unexpected length (or a raw-bytes type):
+ 		 * still show the tag's name, with a length + hexdump
+-		 * instead of a decoded value.
++		 * instead of a decoded value. Application Parameters are
++		 * small labeled values (not bulk payload like Body), so
++		 * always show them in full instead of clipping to the
++		 * current SAR fragment.
+ 		 */
+ 		print_field("%*c%s: [len %d]", indent, ' ', table[i].str,
+ 									len);
+@@ -1232,7 +1265,8 @@ static void obex_print_apparam(const uint8_t *data, uint16_t size,
+ }
+ 
+ static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent,
+-							uint16_t channel)
++					uint16_t channel, const uint8_t *base,
++					uint16_t dump_from)
+ {
+ 	while (frame->size > 0) {
+ 		uint8_t hdr_id;
+@@ -1301,6 +1335,16 @@ static bool obex_print_headers(struct l2cap_frame *frame, uint8_t indent,
+ 						obex_get_profile(frame->index,
+ 							frame->handle,
+ 							channel));
++				else if (vlen && (hdr_id == OBEX_HDR_BODY ||
++						hdr_id == OBEX_HDR_BODY_END))
++					/* Body/End-of-Body can carry large,
++					 * reassembled payloads spanning
++					 * several SAR fragments already
++					 * hexdumped individually; clip to
++					 * avoid duplicating those bytes.
++					 */
++					obex_hexdump(base, dump_from, data,
++									vlen);
+ 				else if (vlen)
+ 					packet_hexdump(data, vlen);
+ 			}
+@@ -1366,7 +1410,8 @@ static bool obex_setpath_fields(struct l2cap_frame *frame, uint8_t indent)
  	return true;
  }
  
-@@ -533,12 +711,31 @@ void rfcomm_packet(const struct l2cap_frame *frame)
- 		if (!uih_frame(&rfcomm_frame, indent))
- 			goto fail;
- 	} else if (ctype == 0x43 || ctype == 0x0f) {
--		/* DISC or DM: the RFCOMM channel is being torn down, drop
--		 * any OBEX state tracked for it so a later renegotiation
--		 * of the same channel number isn't misdecoded.
--		 */
--		obex_remove_channel(frame->index, frame->handle,
--					RFCOMM_GET_CHANNEL(hdr.address));
-+		uint8_t dlci = RFCOMM_GET_DLCI(hdr.address);
+-void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
++void obex_packet(const struct l2cap_frame *frame, uint16_t channel,
++							uint16_t frag_len)
+ {
+ 	struct l2cap_frame obex_frame;
+ 	struct l2cap_frame *f = &obex_frame;
+@@ -1377,9 +1422,15 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
+ 	bool is_request = false;
+ 	const uint8_t *trailer;
+ 	uint16_t trailer_len;
++	const uint8_t *dump_base;
++	uint16_t dump_from;
+ 
+ 	l2cap_frame_pull(f, frame, 0);
+ 
++	dump_base = frame->data;
++	dump_from = (frag_len < frame->size) ?
++					frame->size - frag_len : 0;
 +
-+		if (!dlci) {
-+			/* DISC or DM on DLCI 0: the whole RFCOMM
-+			 * multiplexer is being torn down, taking every
-+			 * data channel running over it down with it, even
-+			 * though no per-channel DISC/DM is seen for each of
-+			 * them. Drop all of their OBEX state, but keep the
-+			 * SDP-learned channel mappings so a reconnect on
-+			 * the same ACL link doesn't need SDP repeated.
-+			 */
-+			obex_remove_rfcomm_sessions(frame->index,
-+								frame->handle);
-+			rfcomm_remove_handle(frame->index, frame->handle);
-+		} else {
-+			/* DISC or DM: the RFCOMM channel is being torn
-+			 * down, drop any OBEX state tracked for it so a
-+			 * later renegotiation of the same DLCI isn't
-+			 * misdecoded.
-+			 */
-+			obex_remove_channel(frame->index, frame->handle,
-+									dlci);
-+			rfcomm_remove_channel(frame->index, frame->handle,
-+									dlci);
-+		}
+ 	if (f->size < 3)
+ 		goto fail;
+ 
+@@ -1440,7 +1491,7 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
+ 			goto fail;
+ 	}
+ 
+-	if (!obex_print_headers(f, indent, channel))
++	if (!obex_print_headers(f, indent, channel, dump_base, dump_from))
+ 		goto fail;
+ 
+ 	if (is_request)
+@@ -1450,12 +1501,12 @@ void obex_packet(const struct l2cap_frame *frame, uint16_t channel)
+ 	if (trailer_len) {
+ 		print_field("%*cTrailing data: [len %d]", indent, ' ',
+ 							trailer_len);
+-		packet_hexdump(trailer, trailer_len);
++		obex_hexdump(dump_base, dump_from, trailer, trailer_len);
  	}
  
  	return;
+ 
+ fail:
+ 	print_text(COLOR_ERROR, "frame too short");
+-	packet_hexdump(frame->data, frame->size);
++	obex_hexdump(dump_base, dump_from, frame->data, frame->size);
+ }
+diff --git a/monitor/obex.h b/monitor/obex.h
+index 5af28ea8b..019ed6174 100644
+--- a/monitor/obex.h
++++ b/monitor/obex.h
+@@ -101,7 +101,8 @@
+ #define OBEX_HDR_TYPE_UINT8	0x80
+ #define OBEX_HDR_TYPE_UINT32	0xc0
+ 
+-void obex_packet(const struct l2cap_frame *frame, uint16_t channel);
++void obex_packet(const struct l2cap_frame *frame, uint16_t channel,
++							uint16_t frag_len);
+ 
+ void obex_add_channel(uint16_t index, uint16_t handle, uint8_t channel,
+ 							const char *profile);
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 89cbf6087..d830684a9 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -405,7 +405,7 @@ static bool uih_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	}
+ 
+ 	if (obex_channel(frame->index, frame->handle, channel, NULL))
+-		obex_packet(frame, channel);
++		obex_packet(frame, channel, frame->size);
+ 	else
+ 		packet_hexdump(frame->data, frame->size);
+ 
 -- 
 2.43.0
 
