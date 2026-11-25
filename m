@@ -1,143 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795587252;
-	b=ewHlSMP8rpLkWIDVpUu41zVc6v846CBULUzYbDWL5lgRx7JME+UPXSC9h7OJgI5uOe6o
-	 zw8bWzmquWmjXhxbNSG54VNa7+3CQLVhpGRsRQoBlSdBhg6wJjO86d7/hEDMAG61GXm4E
-	 rXy/Xmr1i2daMHBgj1bQG53juSDuBJPxDUKuWDb1ydTD0eUCqESGD/hxPWZAqlDwS+A7G
-	 I6WI7BPjtWWkCMaaWwnkTqWgvH7MW1ovnDwEGxBmmfcHzbWCWuFiqPWdFDRx2D2z0JbIg
-	 xqqc9/ItCuDetehAUUyEEazeanAX/2Tc0Rm4wM38wSWMGaY1YkGdMLxH7VELnQxMftg==
+	t=1795589075;
+	b=kcLyybgMgwfshfUApqX5fTnkjtov8d2t/q+lB4DjLH/AQCBSfxCgHBMczOd9xBJennJY
+	 oZ/DLlm4xBQr5f83UypbN7/Q0j+j/LSY783hkUdV/ve3NC4Vlrt8fjB57HcdP/zEBrlbd
+	 SyFNkC4HPONbsTSAs2kgwDB3ACjZOh5KmLxb7N311VonAANiSyuXri9jc9qVY5x1Yktdt
+	 3ARiy388vRBjzr1MYHi/zqcZAdddzTslXLbLFtubDAXqVVFaH+/ROlsEEgX3aij1YQ4rg
+	 VDbkstJCo8+ZP5E7zH8znrTh0hjIBDVhJ5qGAdVHR8cmydI9cMLVfPWO2pr71DirmvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795587252;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=nH1JDKUpxZKr2E7xywv7sSC/lG5A4nxPxWDHndTmH+U=;
-	b=hUhEEe/BfZ5BXebxZ3LAwfTmiEjluT69SppI5QVfVblHOxk88Kodfewj3MaGdqcKs03T
-	 mkhZpRKKAfCQaYxsNXTj+bfW6j1ij8UoIu2tEDxGo8O+sM/rIp5J3OHgcvO2TRCGI7RKF
-	 DbwomOpyLkM2ULZRD1y/+belpPDmBhTO01Y44XYoNmH0h08JPhm3+0LiYnDzzcQhIOj9N
-	 F4VFnSuiEz4vtWLsTlHuu1NT96oftX7pZu5p041qm3Ky+L0TK2SPa72rGR8EMjLPYYu39
-	 7mvQF41r1fbgBxZ3N3heLL19aL5g4pvZci/jyOOTyL5Hb2ix/QcdWE347c22d/HJQww==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795589075;
+	h=Received:DKIM-Signature:Received:From:To:Subject:Date:
+	 X-Bugzilla-Reason:X-Bugzilla-Type:X-Bugzilla-Watch-Reason:
+	 X-Bugzilla-Product:X-Bugzilla-Component:X-Bugzilla-Version:
+	 X-Bugzilla-Keywords:X-Bugzilla-Severity:X-Bugzilla-Who:
+	 X-Bugzilla-Status:X-Bugzilla-Resolution:X-Bugzilla-Priority:
+	 X-Bugzilla-Assigned-To:X-Bugzilla-Flags:X-Bugzilla-Changed-Fields:
+	 Message-ID:Content-Type:Content-Transfer-Encoding:X-Bugzilla-URL:
+	 Auto-Submitted:MIME-Version;
+	bh=lcY5bKa9gz2QZmwpaknzwa5cYgQlwbTX5eC/BbhyFq8=;
+	b=DnZu/w8VWLcEA+6GYmwc713XOD6gLyqshtqLmX/8kaWQwX7hZLZ5acrKjSYdZUTRoa9N
+	 iIepMcRZ4ICXelzGZu4v22S9YxzPJdTr7047zQJ67g1nZx8K27zCcG9R13fvd+ySvyNZX
+	 bUG8/TxxUT7w+5+zdzl+CIfgyN0hpuPdQtT4bGCRCh/rxtZmp68EYWpEX49bxRCnfZoZW
+	 RQAn0EPW6EB00knwA7BA2QPhAj6BUL1VGkIwMYNT810ms2zlF656dn5DpzVXIFZP8z9yd
+	 6Osc141W9tt7fGgeaseYO//hRroetoC6ep8Ed2ayDl1agoth+f9zz4h0yb/kXIRNelg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=OQ10UQlo;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NgTVIZmf;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC72606E94B;
-	Wed, 25 Nov 2026 06:14:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2FC72606E94B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562CD606A321
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 06:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=OQ10UQlo
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
-	To:From:Sender:Reply-To:Content-ID:Content-Description;
-	bh=nH1JDKUpxZKr2E7xywv7sSC/lG5A4nxPxWDHndTmH+U=; b=OQ10UQlojOOElMejsET63HIbzZ
-	3DHzvbtYIGqi3qtZVmlnOiTGbSwjJaXCrsDgpHInm2eUGr8Xc79IeDQYDrtJVitNB0FwJZCPO4B8q
-	+iOBeVWlbGzBejGX44u6FBx6jMlOzwnzs0/RPybD92JWe+ZEhd2F0VZXPfoSXXKlqmHkpJj3BYeff
-	PI7xG81lPzaQFyumhKdnS4tNxkr8IW9Cdx3c7fbkK4m5X/Zh5Rgxrc0VYPw9ZDhRuFltHqM60uFWP
-	hZDBs8jxgJq594XvPuA6d95qyJlYfVavjeq76w/EreE8GdBtyeqVTX0Sp6D1XhKyU0S94iu4liry5
-	Ut1LqIcw==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xW6Gh-00000008Wvh-0GYM;
-	Wed, 25 Nov 2026 06:14:11 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>,
-	David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev,
-	Chas Williams <3chas3@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>,
-	linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org,
-	Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org,
-	Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org,
-	Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: [PATCH v3 12/12] docs: ioctl-number: update DRM entries
-Date: Tue, 24 Nov 2026 22:13:39 -0800
-Message-ID: <20261125061340.3402300-13-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261125061340.3402300-1-rdunlap@infradead.org>
-References: <20261125061340.3402300-1-rdunlap@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NgTVIZmf
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6406E1F000C4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 06:44:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795589074;
+	bh=lcY5bKa9gz2QZmwpaknzwa5cYgQlwbTX5eC/BbhyFq8=;
+	h=From:To:Subject:Date;
+	b=NgTVIZmf30yZ0DEj3G8Q1c8snwm3hr+1qoo9Ixd6RIu97Fswz+pNtq39mZxNzwir7
+	 ICPskaDzV/o56aGjrVw0xTO9EeR+WFOioo6csauJWIl8Eq68q/thc9A089THpiHR0c
+	 RA9pPHt+nj8uBhBAtBuLftx3aLitsMVPtLUGfD+njN/DxKLzhKbRLqEADt31hZS4dQ
+	 Guepuy+Jg6P/TjPsazUub0qrE84y7Beh3hyviZ1/kGv2zmYJOt8xH91XqSeeZ2KUze
+	 2I/lhd++x9WOLbbZOD7QEgr16T1Y8oAA4TW6KS3UUGAP1IB2p2AN26VX0WhWBgMNet
+	 hRpn32ddVk4ig==
+Received: by aws-us-west-2-korg-bugzilla-alma10-1.codeaurora.org (Postfix, from userid 48)
+	id 60DDB240040C; Wed, 25 Nov 2026 06:44:34 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 222326] New: Bluetooth: btusb/btmtk: add USB ID 13d3:3589 for
+ MediaTek MT7927 / MT6639 (SAPPHIRE NITRO+ X870EA)
+Date: Wed, 25 Nov 2026 06:44:34 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: smak.nsk@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys bug_status bug_severity priority
+ component assigned_to reporter cf_regression
+Message-ID: <bug-222326-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -147,66 +83,96 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-Update the list of files where DRM ioctls are defined.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D222326
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-v2: no change
-v3: rebase
+            Bug ID: 222326
+           Summary: Bluetooth: btusb/btmtk: add USB ID 13d3:3589 for
+                    MediaTek MT7927 / MT6639 (SAPPHIRE NITRO+ X870EA)
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 7.3.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: smak.nsk@gmail.com
+        Regression: No
 
-[Since having multiple maintainers trying to merge these would
-cause some conflicts, it would be more manageable for Jon to
-take all of these through the docs-next tree.]
+MediaTek MT7927 / MT6639 (AMD RZ738) combo Wi-Fi 7 + Bluetooth 5.4 adapter =
+on
+SAPPHIRE NITRO+ X870EA PhantomLink PE uses USB VID/PID 13d3:3589 for Blueto=
+oth.
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-doc@vger.kernel.org
-Cc: David Airlie <airlied@gmail.com>
-Cc: Simona Vetter <simona@ffwll.ch>
-Cc: dri-devel@lists.freedesktop.org
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: Christian König <christian.koenig@amd.com>
-Cc: amd-gfx@lists.freedesktop.org
-Cc: Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Cc: Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: intel-gfx@lists.freedesktop.org
-Cc: Matthew Brost <matthew.brost@intel.com>
-Cc: Thomas Hellström <thomas.hellstrom@linux.intel.com>
-Cc: intel-xe@lists.freedesktop.org
+- Motherboard: SAPPHIRE NITRO+ X870EA PhantomLink PE (BIOS 5.41, 09/30/2026)
+- PCIe Wi-Fi: 0a:00.0 [14c3:6639] (works with mt7925e)
+- USB Bluetooth: 13d3:3589 (IMC Networks / MediaTek Inc. Wireless_Device,
+bcdDevice=3D1.00, class e0:01:01)
 
- Documentation/userspace-api/ioctl/ioctl-number.rst |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Checked mainline torvalds/linux (v7.4-rc4) and bluetooth-next: 13d3:3588 is
+listed in drivers/bluetooth/btusb_main.c (btusb.c in 7.3) and
+drivers/bluetooth/btmtk.c (btmtk_mt6639_devs[]), but 13d3:3589 is missing f=
+rom
+both.
 
---- linux-next-20261123.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ linux-next-20261123/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -98,6 +98,7 @@ Code  Seq#    Include File
- 0x1b  all                                                              InfiniBand Subsystem
-                                                                        <http://infiniband.sourceforge.net/>
- 0x20  all    drivers/cdrom/cm206.h
-+0x20  00-01  drivers/gpu/drm/amd/amdgpu/amdgpu_umr.h
- 0x22  all    scsi/sg.h
- 0x3E  00-0F  linux/counter.h                                           <mailto:linux-iio@vger.kernel.org>
- '!'   00-1F  uapi/linux/seccomp.h
-@@ -268,7 +269,7 @@ Code  Seq#    Include File
- 'c'   08     drivers/scsi/ch.c                                         conflict!
- 'c'   80-9F  arch/s390/include/asm/chsc.h                              conflict!
- 'c'   A0-AF  arch/x86/include/asm/msr.h conflict!
--'d'   00-FF  linux/char/drm/drm.h                                      conflict!
-+'d'   00-FF  drm/drm.h                                                 conflict!
- 'd'   02-40  pcmcia/ds.h                                               conflict!
- 'd'   F0-FF  linux/digi1.h
- 'e'   all    linux/digi1.h                                             conflict!
-@@ -292,6 +293,8 @@ Code  Seq#    Include File
-                                                                        <mailto:zapman@interlan.net>
- 'h'   00-1F  linux/hpet.h                                              conflict!
- 'h'   80-8F  fs/hfsplus/ioctl.c
-+'i'   00-02  drm/i915_drm.h
-+'i'   00-04  drm/xe_drm.h
- 'i'   00-3F  linux/i2o-dev.h                                           conflict!
- 'i'   0B-1F  linux/ipmi.h                                              conflict!
- 'i'   80-8F  linux/i8k.h
+Without this VID/PID, btusb binds as a generic USB Bluetooth device and fai=
+ls
+HCI reset:
+
+  usb 11-1: New USB device found, idVendor=3D13d3, idProduct=3D3589, bcdDev=
+ice=3D
+1.00
+  usb 11-1: Product: Wireless_Device
+  usb 11-1: Manufacturer: MediaTek Inc.
+  Bluetooth: hci0: status 0x0c
+  Bluetooth: hci0: Opcode 0x0c03 failed: -16
+
+Windows driver confirmation (SAPPHIRE official
+MTK_WHQL_BT_V1.1148.0.639/mtkbtfilter.inf from
+https://www.sapphiretech.com/en/consumer/mb_nitro_x870ea-ple-polar#Download=
+):
+
+  %Generic.DeviceDescRZ738% =3D MTKBT_T0_2, USB\VID_13D3&PID_3589&MI_00
+
+Proposed additions:
+
+1. drivers/bluetooth/btusb_main.c (drivers/bluetooth/btusb.c in 7.3), along=
+side
+0x13d3/0x3588:
+   { USB_DEVICE(0x13d3, 0x3589), .driver_info =3D BTUSB_MEDIATEK |
+                                                BTUSB_WIDEBAND_SPEECH },
+
+2. drivers/bluetooth/btmtk.c (btmtk_mt6639_devs[]), alongside 0x13d3/0x3588:
+   { 0x13d3, 0x3589 }, /* SAPPHIRE NITRO+ X870EA PhantomLink PE */
+
+Verification on real hardware:
+Tested locally on 7.3.5 by adding 13d3:3589 to btusb and btmtk and providing
+mediatek/mt7927/BT_RAM_CODE_MT6639_2_1_hdr.bin (extracted from vendor
+mtkbt_v2.dat, build 20261021201254, 573205 bytes):
+
+  usbcore: registered new interface driver btusb
+  Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20261021201254
+  Bluetooth: hci0: Device setup in 1883518 usecs
+  Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is
+advertised, but not supported.
+  Bluetooth: hci0: AOSP extensions version v1.00
+  Bluetooth: MGMT ver 1.23
+
+bluetoothctl show:
+  Controller F0:68:E3:A8:A4:E7 (public)
+  Manufacturer: 0x0046 (70)
+  Version: 0x0d (13)
+  Powered: yes
+
+bluetoothctl scan on immediately discovered nearby Bluetooth devices (13
+devices in 3s).
+
+Note: upstream linux-firmware currently only ships the Wi-Fi blobs in
+mediatek/mt7927/ and does not yet include BT_RAM_CODE_MT6639_2_1_hdr.bin.
+
+--=20
+You are receiving this mail because:
+You are the assignee for the bug.=
