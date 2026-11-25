@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795626147;
-	b=Fkr2ro0497timYbSTYWtpixq4a7RjLbcvvZfvq1Xp0MCBafMqBCCDjGah2NvZ33nhkxr
-	 m7dGFfIjA88rmhi6bb5myn+bG9eDLk4bG3DE8SxYWZgrDaociYouH+VtcoNa4mBWNrvzV
-	 KB4dR7qAOBhx35rlMxwbyJ2/BpJWINIWZ1egfaemaKBNoUbkUCn81TykLaT/jjuH5sPyl
-	 dIdBIkfbxIGlynhbSnIj5Xopr6xEzi+wfRqx2hxgIjO+ipCKz6cAMAx+D48B8ScyuBpZt
-	 2Gcz8MWCiGfic2gNeCZ66Qbn3UVIty6Yyl4nXa0E/QhUd8JcExFfurGoC53pn2qY2jQ==
+	t=1795626158;
+	b=c6LzfXu6Hpv+xR7k+6DuDL9SPYMKH8F0YxpgSTe6YW/Jtp6byIn5RxyM/69BT8h/nzHR
+	 S7FzrDA4W6U0F7vi3FXxyoPYERtcGvDdOzi4jg9CNKNwIa6qCqFBQ3WKqRSFeR5Ok7VTR
+	 +wFu1o53vzEvbAbmdKaNOdmwXKA6OdTg0W5/8kbN7Bq+CqVtzyC1uTO0YtxAh/btU/6pg
+	 Qb3Ob6LKo0dwzwonORdnTRMUTb6qnWOKOQ16NTUpNx5Gl9SXshVeANQPKdTf5TQep19nv
+	 D6ygJHkEkh/iLSsyqv1SwKwrc3HJXLL3L/zPS1chzsa2rwbObaWakkBPszeFwr9hm2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795626147;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795626158;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=SErjOTrSGSDMiLGjixQ2gCs0KfJD9qp9egXWIClx/iM=;
-	b=TS5faT/FpsZxNof7k1rOdFG3L3m2Za08P45n3Ko0bKwdIB2wwsZMYKA1RnqPhQQpO4W8
-	 tIUfa27ulkK2SyILsYvbl7f7GhpXO7Cpxjh3X2s2ybdb5JwWFAM6NvtcNtQMnk/nFAsyU
-	 z73ts/Hd6PkYQkdxC9Rnf/YnOtt0RUbudw3XlCt+2ZoEXtkLxSg4N9EeXF7BvH+RK4SPP
-	 ySPULocRDOtTSNFpByJQ/lCxK2aTGzOvAdnuJ5Xa7VlczSh7oi1BTCWrWquf5uamSDh+B
-	 SaBHPFbRklsfFRU7qY7TLrb4kwfnCmeiZ86PgdmvE2k+/0I1T4jFG/QO29tAnKNfGDA==
+	bh=PjLK88ML88j7FnC8DztMEdbl/fQEL1AokCLS2jOWttc=;
+	b=DfYQ1VkEuWVhMvfgIbFvI1HyeIlOCJsfo/NTEnQAo4detZFR91QPO2PvphK1ZJ+nxpMV
+	 JgEwpG24EQc4ZYkUihmG50/WoTfNc4mWtDDwbtAC01fq0dHmi3ClPdCvP0p6W3pOtYRBi
+	 ExLs3vKUinnKZ++WG+VoeQJGyTHY+drjle4RHu5UrcdTV7feor4IgF2Sm0SnJQ8zGOsTv
+	 uvVmYNK5oFB2VxYKkWrEtx7Qz03E0m9Tu4qm1qhykCAZppvM2miF+9uYhuVDYMihqsaz0
+	 nS21tT3C/Jv0cuoUZhnhGd1RInZ+3TLknqqYsHex6ouiBQamp4adrE9QhRbppoRccyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=a97pRdpc;
-	arc=none smtp.remote-ip=209.85.221.49
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=puZZaaxb;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72500606A31E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 17:02:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72500606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFA7606A31E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 17:02:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EFA7606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=a97pRdpc
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-48e46e449e8so3902641f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 09:02:27 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=puZZaaxb
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb702a7548so54021045e9.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 09:02:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795626146; x=1796230946; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795626157; x=1796230957; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=SErjOTrSGSDMiLGjixQ2gCs0KfJD9qp9egXWIClx/iM=;
-        b=a97pRdpcHICr6Rnkb4JvtGhIcJWtRyZpiUB0VKsxp1ccqGWzRYuuIzqyZgh+iwuWYY
-         7+XA/7FrxxapbacvUfrekhr4cpF5Hkzt9oruf+016gs2CEuiPgFW5tFvLA8Swpp2Y+UI
-         HXV+tG+mSXrW950DybabP2/RFKHaYapgF1SlQ=
+        bh=PjLK88ML88j7FnC8DztMEdbl/fQEL1AokCLS2jOWttc=;
+        b=puZZaaxbFRR3FOfoAJqwua0M/GqAG10fLBKTjO65dchNIRtSUbKz6SNQQCWITEWxVI
+         T+9JLZWFEl3ak92xYMT6VYj5ZtNgCGj7IsI5S6CPf+rEQX8SWEUicJD+nzw7c2tWus+k
+         8IRc4nMfnwiNlVFqJMqmWMjv4lbKqfeQjSNsE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795626146; x=1796230946;
+        d=1e100.net; s=20260707; t=1795626157; x=1796230957;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=SErjOTrSGSDMiLGjixQ2gCs0KfJD9qp9egXWIClx/iM=;
-        b=UY5RRUJEZWAihzwI/HDKDADSKFiVyvJLwo0no5jPx7Sg2AcJ/0oxc7uPOOaRF5s/f1
-         4A7R8TSeygdv7DpZIwgk0JhmpvoAz85ZcrsEmRryKUMP+f3fO2YTbItYrbODM9vbKyI1
-         eezacNBFjoRexdeaaX7aaAeQ57KuX7i7ch0sUWLlLcOKDoL/hYKMAZLCTC7kKlw14Rdg
-         j2bWX94+0PhS7uqL0C8ZboQX3upU8o2trezkImQigtPYH6leTGvvjqPru+LRjSwANuKs
-         eUn7SrvAAyg4PvHgHnLWE1Qfe0ECj1GTTKwTcVjQeXo9dPoR+V1RoDEjwphfX7wqbjhc
-         s3sA==
-X-Gm-Message-State: APuU4Z85bYJbgAOJwUL4NSXweWB1yvpt0BcZbxSEwnGiEdJSC7WIzIVt
-	Tl12VDvS7gWxYS3JY+DruYDlNIVjRfr4Uxs6U+yp1vhh722u5WKSWOgtWCMLMMI3KzBH2WpC1ZR
-	cl0io
-X-Gm-Gg: AZFdTZeZIB8MXpbrMv3qhrAINMGu3oL3NmvE6necapSnw5ooPCVyIA02DH3JdqSoTT3
-	UFjRdnY/xg+d7hi2LAIoq92l6+liYBkyv52qNS1mt/55uy61amR5I7I8r8zHEspJT+dKAmzAd2d
-	ujW60W+3cAjd8wRJe2e6p4ZtkWUJ8/hMmmn6nW9f4bpLOVM8qbl49BQpxSV7rm0JaKi9xxO85PU
-	WIP+JTvXmc58CPYvfd6+PYHZR53OfPP2rk88vL5+mVXlnfoebvp2uDXH7No0hiofHYAPaj6wSNu
-	YMN1EsqiCqQRufPamV1LnvI+/03R/6koxWzin/YnCT7e+tl9eGdXJCqKmxTiNvtFq+HmfFC1u+B
-	QABmCZIt1j1jMCy9snE1tTCjaFa/qkgsmhUYf1qMIaUOvMKsvL49SiU6rtb5ikVwFuqz4bt23RP
-	5e4cft2Plp85utiH+Staos8YE9BXfM94ZkDxVHE53mgIeL5MGZholZcReOW+HsfXMYyiRUNu0sH
-	RrW9fkBEae+VVX8gksJy10rjdqpqhyVkh1ZBCyXNRnyi23pn5WILb54PKJ9enqYh5BUFFYDRaFd
-	JNo2RvamN9jWtIT58qIDFITnQW5ni8ow3Dwjj/goAU2WyctLvQ==
-X-Received: by 2002:a5d:64c9:0:b0:4b3:f000:1bdc with SMTP id ffacd0b85a97d-4b3f0001c13mr17325814f8f.45.1795626145853;
-        Wed, 25 Nov 2026 09:02:25 -0800 (PST)
+        bh=PjLK88ML88j7FnC8DztMEdbl/fQEL1AokCLS2jOWttc=;
+        b=qCjRF6xeGETckfr9/9j3TU+Qlh9xWn1JF86CeFMKxoh8lzavzjPtW/wnHWDcIsgNJ3
+         eBQxkYy2Nc2YEEHi7INR0AP6rdcJfOhyusS4rY8AUVEHMFlRQD3Rd1hfHmkAqMXCgdUf
+         FlMVw10a/BguZ/jnWqdLUx5ZfipCR5BW6S0AWI6iwdvpIuCclEC27spNufOrpOg3f6L2
+         rExBZc+Nvrkt5jNo2qaTxD7ARfxC0q/4w0yDkrM0wJ5i+YYu2kxo3GaAAWMrwHWIwDq+
+         9WTI1G1AXgn6YsHaGiAr+AfokTGd6qG8SU/DTdOWff4L9vJNrl2w+AHZuennVKkRrc6q
+         L0pA==
+X-Gm-Message-State: APuU4Z/PLE2mnhhMDRHkfpE471VbQg6J/BQOk61icBNSiu6b+xIOpSep
+	sOEZQZKRswqh3/vYM6TbrDop8HhO5Qk/Zj6Z+07v4Ma+cD0BpQzkFJxcbhV6sn42pTJZyUD2DUU
+	bRHcg
+X-Gm-Gg: AZFdTZcDon4UvKYGxnVDSJJCVykj3nE2HPjLpP48Wug+yOEgxZGoPphyn1u2fGeZKi/
+	I94t+mKcvQjlWiPL8Eu6x53BoPWigYca+TkKUBbaCtQBqqyLTb80mHWjGvUMbzwfOi2JBUa/8Ik
+	ST2p4YwDK5y+pGpUCEJXRVHMKNSSD8rDef1CrdPY5N/i0fVttHRiJCOIlD/9NALkqm3l2PIwVCm
+	mImeVIQBtndVatJmMtkMLPYsDZBiBW/SwIe+/SVYP1PpnqMTHe3ZnjSre2vYCT5OXw/V0uPKL9w
+	MDAe68sN2XgfpsizbUgF7LcGDBe5vyPcdi7Jydddow/86TPCWmrE97YDWsaR2zLFKezatjdXVDx
+	Otm5Tt4EdHzeLi/pq27HnE+lFW7j+7X2zk8GB7DJRhVDNULa7DRQCZcY4pviBUIEubbkyAxfhdW
+	+Gn4fRXZhA0uH2AuEZaLRBfD5/UB9KqqyWW+9XPi3X2gVc1vuBxT9p+2IcVp5lWMoyNZTVaVxE6
+	BM1T+osYlYktjdMr/okrB9qgJ+DxZm7P+BJf33QbqvLJlQsI01nO47kLfRq5rkQctZwxq6619T0
+	2AwEZyaZZctRY763SwXvl0Jfn95DM32S9SxPv0QGESvEhwq8qZIfzWrzibg/wi3lP2BxXLA=
+X-Received: by 2002:a05:600c:638f:b0:4bb:6752:8400 with SMTP id 5b1f17b1804b1-4bb8881a2bbmr340844635e9.17.1795626156802;
+        Wed, 25 Nov 2026 09:02:36 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:641b:80e1:c5fc:b7eb])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b9add26sm35745748f8f.44.2026.11.25.09.02.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb884b7515sm728785135e9.13.2026.11.25.09.02.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 09:02:25 -0800 (PST)
+        Wed, 25 Nov 2026 09:02:36 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v2] a2dp: Don't suspend a sink stream on our own
-Date: Wed, 25 Nov 2026 18:02:24 +0100
-Message-ID: <20261125170224.1648830-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ v4 1/4] shared/bap: Remove broadcast sink PACs in bt_bap_remove_pac()
+Date: Wed, 25 Nov 2026 18:02:31 +0100
+Message-ID: <20261125170234.1648990-1-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -91,83 +91,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the remote source starts a stream that no transport owner takes
-within 5 seconds, or the owner goes away without Release(), BlueZ
-suspends the stream. Some phones then wait for us to resume it and
-never start it again. PTS GAVDP/ACP/APP/TRC/BV-02-C fails the same way.
+bt_bap_remove_pac() looked for the PAC in the sink, source and broadcast
+source lists only, so a broadcast sink PAC stayed in broadcast_sinks
+after its endpoint was freed. When the endpoint owner goes away, like
+WirePlumber restarting, the next BIGInfo matches the stale PAC and
+bluetoothd crashes:
 
-Leave suspending a sink stream to the remote source. Release() still
-suspends it, and source streams keep the timer. A sink transport whose
-owner goes away while the stream plays is now pending, not idle, so it
-can be acquired again.
+  pac_bcast_config (endpoint=<freed>) at profiles/audio/media.c
+  pac_config () at profiles/audio/media.c
+  bap_bcast_config () at src/shared/bap.c
+  bt_bap_stream_config () at src/shared/bap.c
+  create_stream_for_bis () at profiles/audio/bap.c
+  bis_handler () at profiles/audio/bap.c
+  bt_bap_parse_base () at src/shared/bap.c
+  big_info_report_cb () at profiles/audio/bap.c
 
+Fixes: d49ea14f70da ("shared/bap: Add support for BAP broadcast sink")
 Assisted-by: Claude:claude-opus-5-5
 ---
-Changes in v2:
-- transport: a sink transport whose owner goes away while the stream
-  plays is pending, not idle, so TryAcquire() works again
+Changes in v4:
+- bap: Start multi-line comments on the line after /* (coding-style M2)
 
- profiles/audio/a2dp.c      |  8 ++++++--
- profiles/audio/transport.c | 13 ++++++++++++-
- 2 files changed, 18 insertions(+), 3 deletions(-)
+ src/shared/bap.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 3eb3e3bfd..d4d100986 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1409,7 +1409,10 @@ static gboolean start_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (!a2dp_stream)
- 		return FALSE;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 8fc28de52..9404bddba 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -4864,6 +4864,9 @@ bool bt_bap_remove_pac(struct bt_bap_pac *pac)
+ 	if (queue_remove_if(pac->bdb->broadcast_sources, NULL, pac))
+ 		goto found;
  
--	if (!a2dp_stream->locked)
-+	/* Leave suspending a sink stream to the remote source: some phones
-+	 * wait for us to resume a stream we suspended.
-+	 */
-+	if (!a2dp_stream->locked && a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
- 		a2dp_stream->suspend_timer = timeout_add_seconds(
- 					SUSPEND_TIMEOUT,
- 					(timeout_func_t) suspend_timeout,
-@@ -3604,7 +3607,8 @@ gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session)
- 		/* Set timer here */
- 		break;
- 	case AVDTP_STATE_STREAMING:
--		if (avdtp_suspend(session, stream->stream) == 0)
-+		if (sep->type == AVDTP_SEP_TYPE_SOURCE &&
-+				avdtp_suspend(session, stream->stream) == 0)
- 			stream->suspending = TRUE;
- 		break;
- 	case AVDTP_STATE_IDLE:
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index ad2fc2c1c..0e22e1188 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -458,6 +458,7 @@ static guint transport_a2dp_suspend(struct media_transport *transport,
- 	struct a2dp_transport *a2dp = transport->data;
- 	struct media_endpoint *endpoint = transport->endpoint;
- 	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
-+	struct avdtp_stream *stream;
- 
- 	if (owner != NULL) {
- 		if (a2dp->resume_id) {
-@@ -469,7 +470,17 @@ static guint transport_a2dp_suspend(struct media_transport *transport,
- 									owner);
- 	}
- 
--	transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+	/* A sink stream is left for the remote to suspend: until then it is
-+	 * playing, just not acquired.
-+	 */
-+	stream = transport_a2dp_get_stream(transport);
++	if (queue_remove_if(pac->bdb->broadcast_sinks, NULL, pac))
++		goto found;
 +
-+	if (!strcmp(media_endpoint_get_uuid(endpoint), A2DP_SINK_UUID) &&
-+			avdtp_stream_get_state(stream) == AVDTP_STATE_STREAMING)
-+		transport_set_state(transport, TRANSPORT_STATE_PENDING);
-+	else
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+
- 	a2dp_sep_unlock(sep, a2dp->session);
+ 	return false;
  
- 	return 0;
+ found:
 
 base-commit: 1608f836188610aabeff5a3164169ebe0360e443
 -- 
