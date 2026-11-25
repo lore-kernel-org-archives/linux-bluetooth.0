@@ -1,107 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.227.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795593544;
-	b=aRvB5oQFiFUorgje5aOS5r9hqT7s3CfXK1H6mKQAiRuLc7ithpoLPJqDAInAcjtvkDWf
-	 6qlw3uOefdQmMrCWoE+T6kYtNH058cL4hfUE8KFvveUtaBn26UJTOW+LDHxZIx//YI6AV
-	 3/upf7TrUxHlV2nj6ACKiaOoMkBqSOX5FGflmtkJ3soifmZXsjUHZ8qJoZ6mSSH/XZ6qK
-	 N07/K8eVk+/mQwEfclY0GaDML12b3PcjywdavVAkmcHk+4Q+/mdZCAVEYQlLUsPIWOKSO
-	 UtMvcVT+MYQdGPxUAfu0h3B3mtyDXZBqlWEcLaGQuiUKcNCyxU6Avy4FEAV8X72F4xg==
+	t=1795593986;
+	b=wSltgDbsAccVdwEGEHnb3TFBQLgkll374jz6AxmLTBR5q7/JemsgkOXX8Y/a7kz7W9Yd
+	 lvjjrdNXmAdvwL7AtvJRpLgS+fcXjRY0JzkXqTBtzVNrWecqx2Wm1fHAZST+wHGViE4Cz
+	 FaUDAJFa3R3tdi5eHHBcQXBPCGREn7Q/FJ8IDNKshhoEXWAasEUy1pYeZoDjtILRakBFA
+	 jX1QNlb4SaRSi4hzuQ/EovSBZmgEPQKuCGU1H7qTJJn9FlgYFyoedCbd8bWaut08FaZkt
+	 DOTFPJhDDOtdyEmgNBNwW2K6UENez7kfiDrBw3ECn1SXDqn9BjnfKMNVvlGv496SpJQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795593544;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=Q6JZExf6RoZAgk7MbtKBkHAAQAgV+I5kcvcPOVpTCHA=;
-	b=t/YMeOIc3GFiDKed+rePcQ0M/eKcj38fpKsQ9FFQkpydAvYXVgfyUqzrVfYufH4KZtkN
-	 1s55X3xaOfiQcMFgNrfL2YYnLtnthtg6NXo0waXfzYz5Hk08Msxw0a9gdtHGr7L6MHKQK
-	 FUzCHTXmA7dy8ucIOHDk0tanUQb3n/Q7AYJwdq+ecTX8EgVDvPBRZ6F9FsD0wh6KCY8rP
-	 ZZVQhhencJFKJ2gPSCnh7X2ldUfXiuOlMT+ZrKeGihDiXdZXgPREKmD3h+jB5QUaXOp//
-	 dUK/iYbuN2kl8XyXTMOSn+VaEWFDpRD0lW/uWDBbbk/a8Ym4bRZIHNwthuighPmbcVw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795593986;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=qtWuoC5FN2MELDFAKVm54MaDOVUHKz/6gxfQ29IMYEs=;
+	b=Hsfs2nAM1xkpvXqykcjYZ3W4PurNyQKOBM0CTsfEjnr5F3yE8G1pgnJCjp/9X1TXnDud
+	 uqnQtnpXkseVBGYplG5wJkOIgUDDfAg5xi5AeAFwr3WVrn40cAY9rkRvdj4gwIeejCAQK
+	 WsErRjR8R2BUEI9Xo8z+2uLOCCR1HsTJXfz7HuFFpnLgGKiKzN3qdPuTvP9uBzkdg8t38
+	 WMtl78VLWKrtU98/ImDF29S2l53/SxAvG5I8CwZp1hQdD6UdR8Ylchy9ln97rmbA+7v5B
+	 sXxjP/9S7VkH/ZBJIXQDuPMb/YHo5t3GHMdmFZdgCKiKtXXo2eZ7A03gIVGiP8IUYaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="Ct7/b+bz";
-	arc=none smtp.remote-ip=74.125.227.131
-Received: from mail-pj2-f3.google.com (mail-pj2-f3.google.com [74.125.227.131])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gUIFb+z3;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597A1606A31E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 07:59:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 597A1606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED1C606A31E;
+	Wed, 25 Nov 2026 08:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ct7/b+bz
-Received: by mail-pj2-f3.google.com with SMTP id 98e67ed59e1d1-3adc0ac3566so1303511a91.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Nov 2026 23:59:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795593544; x=1796198344; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Q6JZExf6RoZAgk7MbtKBkHAAQAgV+I5kcvcPOVpTCHA=;
-        b=Ct7/b+bzPpEZBzNUOR+J+LvkmOFyNKxWkERMMrXoIJ1SGFlsLgh076Y1lFHX5ooATm
-         Ws6nO2DyjD4hx/S+EgaxesFOiyUigOl0bh32eUUiFlvW4KKdJ1RUlnkPt0uen20xesG6
-         P/KCC+5a2FWLny7FJDnNWXq171YjrfAbUVa5nfaiFo4JvHuN+MZi+sXQERNzmqolITSc
-         hzKDJ6iwXNIAQCZNZIrUlX6+GP6kXJVaSFdo63KPaqS4Wgo/chjop6gEHOxBSKi5SNgX
-         y+G7s44PbnZ4Yy/TJap3wqxEVAAKJUh8FBtCJQ5kY3SvGxyKZt/6pBVGkvmPk7g9v/NX
-         J1yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795593544; x=1796198344;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Q6JZExf6RoZAgk7MbtKBkHAAQAgV+I5kcvcPOVpTCHA=;
-        b=zi4Xp1Bz9eR/ePys2rMwb5enfRo1Lou+UofpuIht6dIpekWLaFmmpxQoskVHE/ofqI
-         lesWbDMwaXNQpri7skzUm6rwULyO0Kps/+22pGVYDviziNHV2rcxrjDtoldqBPqqLbxz
-         r+zag1zmuitLvHQym+vEbfEppQ5ULum4XyuIKowGEvytb9NuhEwyCRsmn4WRmZKLqLE/
-         GiZOm8PrCnoxmUNPG/L+KhG+tvC8w4YCcToWQwI5OegtrDzAsEuLGP3QNVY0nPSH8ukD
-         jgD1J3t1FP2W0Vy9d9RWpraTqzZmmdVzh1wYb9B+36r1IVE59lrTiJ9o15zaxYa1W9mp
-         DdtQ==
-X-Gm-Message-State: APuU4Z+T/+u0ROlztELfxXAVL5pcZFHIh6r2T7MVFAVxspTJhblHBW3Y
-	EI9Qh84t/JoG9neVyc5U1l0aYunWB8yMFOurI40360xzJj2JUA+hc0+n
-X-Gm-Gg: AZFdTZeEeY3iuAt6Eu+moImso+6qgu0z/YVz4MG7/wU/NPmYOCajjaC/5ilOsViTKmm
-	9of2UpiO4GKmgZEdNxx1Jb2x9ycrUH4L0P3NBX7WLnlve8itiz5nhXFEEZD3AmXxDdjFDKCoWfU
-	XhQMl6Q3O9D4YZJ8RmRDe93RwXiCbicLlJtbDKo0AxP1lvgo0E3khk2ZNVS1uwbrqHPJ775VfhN
-	8v+eZ6oCt0l14xdNuPyX+lf+H7X1HmPW8wqr+2t0wMeOXuOE/Eyb+O7gGlbfEQk4VU9hiae3yNh
-	Bj9g9cVjVfhQ5tPHtbfJUGrNWj+yGYpVRMimorqo9HK0zjFycifE97ibui9MLwOC9UmNs7GSj7f
-	7IjjcrGH0Uhoar+R0jkS4mLgAyL2g0COItNhG62yPE3r9HRYjBozn9Q8UIXwkN2ULh1O7Tg80Tb
-	kv18S3OVAalw7i/P659GLMjpXrY73FKWNDS0YwX9ltAqo9kX5XJTuypQgJhBPsYkseSrFaf3De3
-	uUMaSHwG3xk0p8BYZIDkFv7Hpe7M2Mr2hA22h/wg2voFfBn0JLQTEQzriUIUFCF1aDQasQBYwOX
-	3vABp6ksKTpEaCZMOfpEUW2JFOuKqgXYZPBAoifESCGrdftjjCma9bj+mKzVSRsnSTP8L0J9ER8
-	Y
-X-Received: by 2002:a17:90b:1802:b0:3b0:c11a:9026 with SMTP id 98e67ed59e1d1-3b41c95fa0cmr16370673a91.55.1795593543512;
-        Tue, 24 Nov 2026 23:59:03 -0800 (PST)
-Received: from BSDHENRYMA-PC1.localdomain ([43.132.141.18])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41ad0b52dsm28779384a91.5.2026.11.24.23.58.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 23:59:02 -0800 (PST)
-From: Henry Martin <bsdhenrymartin@gmail.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	jcperdomo100@gmail.com,
-	leitao@debian.org,
-	rollkingzzc@gmail.com,
-	oss@fourdim.xyz,
-	skokovmaksimevg@gmail.com,
-	pav@iki.fi,
-	safa.karakus@secunnix.com,
-	benquike@gmail.com,
-	peng.fan@nxp.com,
-	tim.bird@sony.com,
-	nicoyip.dev@gmail.com,
-	aliamemis@disroot.org,
-	pengpeng@iscas.ac.cn,
-	imv4bel@gmail.com,
-	mikhail.v.gavrilov@gmail.com,
-	suunj1331@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: RFCOMM: fix race on dlc->session in RFCOMM_CONNINFO getsockopt
-Date: Wed, 25 Nov 2026 15:58:51 +0800
-Message-ID: <20261125075852.641537-1-bsdhenrymartin@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gUIFb+z3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A421F000D4;
+	Wed, 25 Nov 2026 08:06:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795593985;
+	bh=qtWuoC5FN2MELDFAKVm54MaDOVUHKz/6gxfQ29IMYEs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gUIFb+z3EoGY/k5hBc/4s5BAcJqoX9NRdGz5EQ6vBgq3rKgAr7rBRsJERd4dmZigO
+	 sgMEGylJulCdyIpDhHG6/2txMVQjqrlwfpZxIzCQD9ih0XAAV5jcvSffX4lkzrl50w
+	 cDOqkERHka2UohPOATjzjz7RQTUHWII6+yvEv/39m5kvL8wGeIVNx0KY9I4eCtkGIO
+	 7CyKz2J4/slnL7IdCSuRKiy7aSog5s+20Q6CNmFwovssbysi2Rs0WtFZQmgkhVyUTp
+	 WzzU5qaaMeAJRyM1mX5Ul3b1ERZi7ZWbYDbm/BGlP2UbP3Rj7THpZilyDmxSEyIYfZ
+	 j4WqRkjdYr7Qg==
+Date: Wed, 25 Nov 2026 10:06:21 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Nikhil Agarwal <nikhil.agarwal@amd.com>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Chris Lu <chris.lu@mediatek.com>, Mans Rullgard <mans@mansr.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Cornelia Huck <cornelia.huck@de.ibm.com>,
+	Andrew Morton <akpm@osdl.org>, Jeff Garzik <jeff@garzik.org>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+	Dan Williams <djbw@kernel.org>, linux-kernel@vger.kernel.org,
+	driver-core@lists.linux.dev, linux-input@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-acpi@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-pci@vger.kernel.org, iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev, Alexey Kardashevskiy <aik@amd.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>, linux-sound@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v4 21/33] driver core: Introduce a generic device trust
+ level
+Message-ID: <20261125080621.GW14811@unreal>
+References: <20261124-device-trust-core-v4-0-037eb0d17b1f@nvidia.com>
+ <20261124-device-trust-core-v4-21-037eb0d17b1f@nvidia.com>
+ <1bc8f048-4d35-484b-af60-2d13541e683f@infradead.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -111,201 +101,52 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1bc8f048-4d35-484b-af60-2d13541e683f@infradead.org>
 
-The RFCOMM_CONNINFO getsockopt handler checks dlc->session under
-lock_sock() and then follows it:
+On Tue, Nov 24, 2026 at 04:13:16PM -0800, Randy Dunlap wrote:
+> Hi Leon,
+> 
+> On 11/24/26 1:43 AM, Leon Romanovsky wrote:
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 0b3c140babd94..8a94482f0b19b 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -1259,6 +1259,20 @@ Kernel parameters
+> >  	dell_smm_hwmon.fan_max=
+> >  			[HW] Maximum configurable fan speed.
+> >  
+> > +	device_trust	[KNL]
+> > +			Enable device trust with blocked as the implicit default.
+> > +
+> > +	device_trust.default=
+> > +			[KNL] Set initial trust policy for all devices, including
+> > +			hotplugged devices.
+> > +			Format: { default | blocked | adversarial | unrestricted }
+> > +			No trust options selects legacy unrestricted mode, preserving
+> 
+> By "No trust options," do you mean using
+> 	"device_trust.default="
+> or just
+> 	"device_trust", which says above means "blocked"?
+> 
+> If I want the status quo (before generic trust levels), do I need to do
+> anything? If so, what?
 
-    l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+I mean that if you do nothing and do not write to any device_trust*
+knob, the system will continue to work exactly as it does now. That is
+what "No trust options" means.
 
-Nothing serializes this against rfcomm_session_close().  The session
-thread unlinks every dlc with __rfcomm_dlc_close() - which sets
-d->session = NULL - and then frees the session in rfcomm_session_del(),
-all under rfcomm_mutex and without ever touching lock_sock.
+Thanks
 
-An ioctl(RFCOMMCREATEDEV) with REUSE_DLC replaces the dlc state_change
-callback with rfcomm_dev_state_change(), which does not take
-lock_sock(), and sets sk_state to BT_CLOSED only after rfcomm_dev_add()
-returns.  During that window every check in the CONNINFO branch passes
-while a full-session shutdown from the peer unlinks and frees the
-session, and the check and the dereference lose the race, e.g.:
-
-  KASAN: slab-use-after-free in rfcomm_sock_getsockopt+0x714
-  Read of size 8 (session->sock) at addr ffff88810dfce210 by task poc
-  Allocated by rfcomm_session_add (rfcomm_run)
-  Freed by rfcomm_session_close (rfcomm_run)
-
-If the free lands between the check and the dereference instead, the
-dereference faults on a NULL l2cap socket.
-
-rfcomm_session_close() runs under rfcomm_mutex from the session
-thread.  Take rfcomm_mutex before lock_sock() in the CONNINFO path so
-that the session cannot be unlinked or freed between the check and the
-dereference.  This is the order the rest of the driver uses:
-rfcomm_connect_ind() takes lock_sock(parent) with rfcomm_mutex held,
-rfcomm_sk_state_change() runs from __rfcomm_dlc_close() with it held,
-and the connect and shutdown paths drop the socket lock before calling
-into the core.
-
-Move the CONNINFO branch into its own helper so the rfcomm_mutex
-acquire/release is unconditional on every path (clang thread-safety),
-and copy the result to user space after dropping both locks, so that a
-faulting user buffer cannot stall the session thread.
-
-This issue was discovered by Tencent CodeBuddy Security.
-Cc: stable@vger.kernel.org
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
----
-Fixes: points at the initial git commit because both the CONNINFO
-dereference and the REUSE_DLC wiring predate git history.
-
-v1 -> v2: add the Fixes: tag (checkpatch); untabify the quoted line
-          (gitlint); move the CONNINFO branch into a helper so the
-          rfcomm_mutex acquire/release is unconditional (clang
-          thread-safety analysis failed the conditional form on v1).
----
- include/net/bluetooth/rfcomm.h |  4 ++
- net/bluetooth/rfcomm/core.c    |  6 +--
- net/bluetooth/rfcomm/sock.c    | 73 +++++++++++++++++++++++-----------
- 3 files changed, 55 insertions(+), 28 deletions(-)
-
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 9dc5fd4cb8c81..251ae43b44003 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -148,6 +148,10 @@ struct rfcomm_msc {
- 
- /* ---- Core structures, flags etc ---- */
- 
-+extern struct mutex rfcomm_mutex;
-+#define rfcomm_lock()	mutex_lock(&rfcomm_mutex)
-+#define rfcomm_unlock()	mutex_unlock(&rfcomm_mutex)
-+
- struct rfcomm_session {
- 	struct list_head list;
- 	struct socket   *sock;
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 8a4205347c4ac..063a66b28cf7c 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -42,10 +42,8 @@ static int channel_mtu = -1;
- 
- static struct task_struct *rfcomm_thread;
- 
--static DEFINE_MUTEX(rfcomm_mutex);
--#define rfcomm_lock()	mutex_lock(&rfcomm_mutex)
--#define rfcomm_unlock()	mutex_unlock(&rfcomm_mutex)
--
-+/* Serializes session_list walks and dlc/session teardown. */
-+DEFINE_MUTEX(rfcomm_mutex);
- 
- static LIST_HEAD(session_list);
- 
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 3fb8b54749482..ecaffc408e736 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -737,8 +737,7 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
- 	return err;
- }
- 
--static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname,
--				      sockopt_t *sopt)
-+static int rfcomm_sock_getconninfo(struct socket *sock, sockopt_t *sopt)
- {
- 	struct sock *sk = sock->sk;
- 	struct sock *l2cap_sk;
-@@ -746,12 +745,60 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname,
- 	struct rfcomm_conninfo cinfo;
- 	int err = 0;
- 	size_t len;
-+
-+	len = min_t(size_t, sopt->optlen, sizeof(cinfo));
-+
-+	/* The CONNINFO branch follows dlc->session, which
-+	 * rfcomm_session_close() unlinks and frees under rfcomm_mutex.
-+	 * Take the mutex first, like every other path that walks
-+	 * dlc->session: it must be held before lock_sock().
-+	 */
-+	rfcomm_lock();
-+	lock_sock(sk);
-+
-+	if ((sk->sk_state != BT_CONNECTED &&
-+	     !(sk->sk_state == BT_CONNECT2 &&
-+	       rfcomm_pi(sk)->dlc->defer_setup)) ||
-+	    !rfcomm_pi(sk)->dlc->session) {
-+		err = -ENOTCONN;
-+		goto out;
-+	}
-+
-+	l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
-+	conn = l2cap_pi(l2cap_sk)->chan->conn;
-+
-+	memset(&cinfo, 0, sizeof(cinfo));
-+	cinfo.hci_handle = conn->hcon->handle;
-+	memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
-+
-+out:
-+	release_sock(sk);
-+	rfcomm_unlock();
-+
-+	/* Copy out after dropping the locks: a faulting user buffer must
-+	 * not stall the session thread.
-+	 */
-+	if (!err && copy_to_iter(&cinfo, len, &sopt->iter_out) != len)
-+		err = -EFAULT;
-+
-+	return err;
-+}
-+
-+static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname,
-+				      sockopt_t *sopt)
-+{
-+	struct sock *sk = sock->sk;
-+	int err = 0;
-+	size_t len;
- 	u32 opt;
- 
- 	BT_DBG("sk %p", sk);
- 
- 	len = sopt->optlen;
- 
-+	if (optname == RFCOMM_CONNINFO)
-+		return rfcomm_sock_getconninfo(sock, sopt);
-+
- 	lock_sock(sk);
- 
- 	switch (optname) {
-@@ -785,28 +832,6 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname,
- 
- 		break;
- 
--	case RFCOMM_CONNINFO:
--		if ((sk->sk_state != BT_CONNECTED &&
--		     !(sk->sk_state == BT_CONNECT2 &&
--		       rfcomm_pi(sk)->dlc->defer_setup)) ||
--		    !rfcomm_pi(sk)->dlc->session) {
--			err = -ENOTCONN;
--			break;
--		}
--
--		l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
--		conn = l2cap_pi(l2cap_sk)->chan->conn;
--
--		memset(&cinfo, 0, sizeof(cinfo));
--		cinfo.hci_handle = conn->hcon->handle;
--		memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
--
--		len = min(len, sizeof(cinfo));
--		if (copy_to_iter(&cinfo, len, &sopt->iter_out) != len)
--			err = -EFAULT;
--
--		break;
--
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
--- 
-2.53.0
-
+> 
+> > +			bus policy and existing authorization. Otherwise blocked is the> +			implicit default. An explicit value wins regardless of option
+> > +			order. default preserves bus policy; other values replace it.
+> > +			unrestricted disables runtime policy changes.
+> > +			See Documentation/driver-api/driver-model/device-trust.rst.
+> 
+> thanks.
+> -- 
+> ~Randy
+> 
