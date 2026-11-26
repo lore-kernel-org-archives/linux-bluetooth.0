@@ -1,83 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795679765;
-	b=cbjFPgVgg9gvJNGwdehcAufbwjASWpncE4JAnMBS5Ug9L18TyaS/AK7U3/FLdiW2X4sF
-	 ZXJN7lYP4W0OYrN27n0Q3nXHRz5ZZBIPxP9zeMW8FmYFJb6OOAwL6biNNY8pZPrrD60V+
-	 YkTYBWJYA7HDkmQ1GktsmcPctysT7o9Z49sMak0CW3QTAxl5oUz58pqmTVqDnABg7FQQk
-	 iGv90LHmN+LN22aAAdKKTrjs4wJsFnhWlE17XfZdRqZzrYWygA0E0SSOu18Tm6z0udshX
-	 EeHZRNkIN+RWPeMfJwAZ0GdSCx19xkSmZ0GLS/VpC/wObWN3E4vESeZU4OpcEc0te/Q==
+	t=1795679769;
+	b=z682bxsye327X4x8sJ4myq2SU/fk5i2OebJZ4SQzxeFcOqAYFo3a3kvqDUObDA/S2VN8
+	 hh2lIjJr4gVU3hKoQ/UMDZf3k4sPDNOaDbwcnCC3n8tU7wjPFT9qdFGnwMu1QE3OL97hj
+	 u8xVSB6K784BBToTJT9yeKpe4Fa5mKPY+Mlvb6xQLr5HDBLFO1xeo+3y7YXKVT5NPt16W
+	 oreuexozdUiwjSa1gCvX1IJJDj++qNHzUUaqmKXH7xAJ3ETF1Hf+Oio+edoPs1kfbuisb
+	 4VhAeqyqv0FPwTJTGywSsyLpXERtppLssKi0YVhAofWe6dp49bpwbA0UcbV3FYWKeZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795679765;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795679769;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=0MJDhqAb9koNt1RgW5GuhBq8i/bxOmY78SeKm0Wu/0k=;
-	b=is+6yeaL18fHKq/sNiThFysvhQEff5XuuydlrpqfZHcZxuQ5+ZEl1wyszQLvrdYH5rH7
-	 ZqHIIeOamD6mXXANh95rLtW4rthk8o6U+P5/10dlZcELDHAGnJIe2nVRHtrjj6KHnnwi2
-	 HhE87sNEskiSD2vUxOtGgcHOQ5pVaZVuVmFBBnmNqZVSsQeCzOdeFfs1IE/aVk02gaA5d
-	 hi03WE/HtgByvOjfVcHNUQWT9tHOQOt8JkMbGz0GrpAPFbX/EHH0FQP9hQSj2L0arnkmn
-	 m1PbDx0+Ar5bgjf1mLSATptD4w6glLewHGmD5bLgZQ/nSEzc5KMb2q2i+gXUmdaVdYg==
+	bh=N3Tx02Jp98cRkBGwMPHz68HqVRd2amYTzVID8QsJKng=;
+	b=dR9FX+G846jMB201U3wvYzyaC2KMPfExtLF3puIQJFo3o333AyG+DcZAdlHEuXIlyUyx
+	 8gcgHoVDuBYeStn0Oe1gcu+WRRkRqCLtSl/WFivhDw7LoHk851hvYMP2tiuqlSXuO8iTW
+	 50D75q5VpnJw/bbagcShKUtzC6TVwlieU1bK31qGRZwXBhieql7IvSU2LL3enXQPlnNKV
+	 FiWqiel0WCduU5asVpRUGhmWj5VFem8wdDV8gb9CB8aj+MRarEWwiEIQqtM+x9Vlh97jQ
+	 VhY9EoJC50U3GcGI1Bq4gqXDSoJCuATpVWgO3zFh12sE16z9Ya/R6j3wj2fIqW5rFLA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xcdHZ6Q0;
-	arc=none smtp.remote-ip=209.85.216.41
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LSWCa4xb;
+	arc=none smtp.remote-ip=209.85.216.53
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DD3606A321
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 07:56:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73DD3606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC79606A32C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 07:56:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4BC79606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xcdHZ6Q0
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3b413f6dda6so843626a91.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 23:56:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LSWCa4xb
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3b403511a3eso985259a91.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 23:56:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795679765; x=1796284565; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795679767; x=1796284567; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=0MJDhqAb9koNt1RgW5GuhBq8i/bxOmY78SeKm0Wu/0k=;
-        b=xcdHZ6Q0+9g45rmJitQGxeDxL0Quibj7eKZt5HuxDddOkMjN3/evd3mWznIbi/qwUW
-         P/edBPSqSsyERsAjDvk6V7hqxZP8w4GH2Yr9qmJm+058OjG9Z02yGlgMzRHOgL8j+UUT
-         uvXNFx/UGaH6y74nLeaPLCIYlo+SWElUk1HDrNb6ZKdE/sNNnSEd5/Lz+Wdu+PggjfFs
-         3MR1ZvRIQKgcKTMHd0H2JtC1+ZAbF1HmQqYSkaxbehpDi6HGH4V8Yd4SlWMW/NmZciU0
-         dDMNJd11l7+wW2ZN5Mz5ZKbagXjCRutuPRlLixpe9mNp0a8tE521SJk2u+aimawEhaRu
-         xMOA==
+        bh=N3Tx02Jp98cRkBGwMPHz68HqVRd2amYTzVID8QsJKng=;
+        b=LSWCa4xbEMFn/1XVUrL8aEGm6aPJ629ADCtFC6HBcfD9UboeWGV/xxFuW8i7ocUMSZ
+         3vPMOOgdgZOARtD1Ouo+4ey4ylnH/TONCTG6ZZdJE3AIeGgQxvfabedsxonFpExlAx4n
+         7NXfkRA86CXlMcEh2uUvmeJUfTrrNZ11oCiUhhCZpAsjnLsPMMrvdIk0R8aeBCTHCF/y
+         1epXY2cb4J9/W3vX+BgopX6Z7BcIM5gkztXdkosHlyJhMKtb78T21Jb9B1HUH8eipG5d
+         aqApnn6R8rvCYWj17lK8/RPTlwElruXknIjnqmuaSvOsmx+MNdMhv3L8bgZ2qMpyrktX
+         witQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795679765; x=1796284565;
+        d=1e100.net; s=20260707; t=1795679767; x=1796284567;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0MJDhqAb9koNt1RgW5GuhBq8i/bxOmY78SeKm0Wu/0k=;
-        b=HafLx9kNNofFlTkuWvuBgOIKtfdxaokHm3M9x4lWBHN4hZ7a9XSwngGTdSedR/HlFR
-         N22NeKEGA1yjdtLXMOhr7jCQcpqFRhwPmXwmjW4NOcg1pq45GZgl1tqnTrxV8f+mOHU4
-         AMae5j5cYYTsleWFwHFkhe2qmU+X1jAE5SOiQQkW8klo6AYYuwKjp6Cx+t8w8NCC/S0N
-         eK5z9mDcrbXu6/2CLS+QdmOCG+HOLkM0QqXkvnBDhIc+98BTVXJ2UV1B2G1Y9+R0BJcD
-         Hqxua2K/9a+q7NMuZ6rDwrCtCUDEmOZZUenDEb2WZ8MQoiaDDVHqQDlYHyj1XLo1bghr
-         lUxw==
-X-Forwarded-Encrypted: i=1; AL+hErHe2M2e5CoHVmVi2jhmsoFsbA6XQ4isZkTKJE13ZgAlaEpWUad+KP04/c+n1ZucA8WA4knJ3qcucSc85LCH5a4=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8r9hTU/5plSUS0sthu6dHN5F9ks95HYTd805jwtxM02xFcSYzp
-	qJQFqpcaZ15+AML0LFAJpzH7PLj1p/VRbvb9fVZ1t1zU7jZT9F0ABTQM
-X-Gm-Gg: AZFdTZc7Pa1OJddrhgsBDWrYgKuYcj7xq0kPP6hiYg4rpIh91ybZQFTEwokjJRj2g5H
-	L8BIze4XRi2jh/S6HXBqe/RuyewGM5QN5EeyVRTCkwk442PXmyxp8KGvM3BeZmkzsWaHG4IamJt
-	kiSqbsviSQujD/EiRKRiWytxocC9t0oGMbjo4Y58COHlWnR0eb4qR9KqYclUbtesJRUT+a1JadB
-	Z5amk023feSAVBieV9Pdpkv8aVOkjsAIFuxQVvQQiushBet+dKE/1fsdGKeWHJkA/4TXCwiMiYp
-	AO5jmaE69nvv1XNBOaeXtKIGn04LnNXpTYcBmVHRKERc8ViPVk5ZFohzviRHKAVO5k+sh3ylTmC
-	bguqeH2eKjoBFDvShQRS4uaLl3ORiCMkf/SycD7XMGefTavUKAySaTmmmZE/f8U1NP+qsYl5yfz
-	UP+y7xYfVpN+djzOd5NWXoCj+ocKpE1EOmQZ00Fb/QgNBwWDOAI2CjPZb7cc3UuCrnmpy7i0j9J
-	bgqBV/7R7VXY9vJTQgSy+n1ZuCFtSSxSWD9L4TQlpAM81pNbowLmTeAyPArYeHgyWWEzciumJeJ
-	+sfmf1gbZyB53aIgcL5qi7n4FPERmNt9Q0EhzYOhcOZFNm297Q==
-X-Received: by 2002:a17:90b:498c:b0:3ac:73c7:9c07 with SMTP id 98e67ed59e1d1-3b41c55b914mr28943310a91.0.1795679764805;
-        Wed, 25 Nov 2026 23:56:04 -0800 (PST)
+        bh=N3Tx02Jp98cRkBGwMPHz68HqVRd2amYTzVID8QsJKng=;
+        b=0Jzd/ZTyouiQCxTovpN7dPvfhxYHu723ThCYQeYIU49Az+1wvC4ucybwl+LGdLDwRw
+         4TsiysSTPbtgnA0La6JVayy8PiUiN1jv8vzHT7nftloBc9Mfdtmli4cQNTTADaRKKPHA
+         02J1gZSTNEufSGNmk1rNWxtDKNjyElCPe7iZ6AJAeKI8CVlWZfBwqB5MfMWdybSytPYS
+         73ZfxX/KpQ4wXKVxWB6lcwn5DFDCNOMhLIfJCczTS4ChTSKrSGFEy7iTYCkHrmHXZcDC
+         KJGsoEMfJznWzbN2jin2FE2vn15W3LbBZX241Z/mPnt0+vyt0+z4V8nS2xqMLFlGBPo6
+         Ggyw==
+X-Forwarded-Encrypted: i=1; AL+hErGRRtPRBlZt2dfXLsR3OGWbQ7o0BHXCzAdvjfeq1OcVgPPaepsssqSve/qwUs/AgMv2LpLQIVK0mla9yFTMdls=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/57gH82Cx4jB8sMx7YMt1WRjalshDY77eYM+tjuN5GCfnI6Xiw
+	CWRMz/FuGOUKMxqykJ4FKVvMjfsmdZgEz7NsNbFPyFXmkcWfMcY8zfVG
+X-Gm-Gg: AZFdTZdRRIjwz2fERLckwArgPIlnCjSlflpE68Q4IPuGuGQVVpwU99TkJxPXwjBNO7U
+	1vTGNYJVPAVsKrr4bR0+vITqBjM6fhFVN/GgbH03jAYcHYqEKzSoHgFyigaxmj9Ltmmr77GvaeQ
+	uLEZ1wopRqILajk8QYjYH9sItF8pGUgfyYpXRhjBUPEDIW4jHQcNknb4sY+cv3Xi6LKYwdupN0B
+	Y+5ClOlkcHv1aWH/ESE4csWchNOFXUtte2VHTsCPuoacBFQHTg/6zQqefA7r55nDTwfc5m83Bx/
+	whmmaYzpoD96LQq7lIQbUMA3SccUlDEPTFV+fa7IrOMM3BuUyU4G6iL8EdvrLHws0ZrnT7aKB72
+	c3h/SsnqEhvd2+kc4d3CDlhMcw2Aeh0SDFp41B5KHsnpkliF+36GAWdAhPjqPCkxf8khvPe/V7X
+	iWBS/WDXaExZST8NViVC5sYNRey/mFc3Pb0yCy2zCoGHWOrgWOztjOqskCo/aiRqPFcF0ca9WI+
+	+BPzdmQuS5a0IBfXEreAU/sujbAdQ+9Cbf2n8rFTNUAcwVaUhFfz10T28INexauVgMsWVNhR2Cn
+	0pLqwwkE6J/ULYu4HhRFhapJR5cC0yQ8a9pqc0959gCsFPtRiQ==
+X-Received: by 2002:a05:6a20:9f08:b0:3ef:2f72:c7e5 with SMTP id adf61e73a8af0-4014ae6fe31mr34992104637.2.1795679767425;
+        Wed, 25 Nov 2026 23:56:07 -0800 (PST)
 Received: from security.datascience.hku.hk ([175.159.181.20])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6d03adafsm10690855a12.23.2026.11.25.23.56.02
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cde6d03adafsm10690855a12.23.2026.11.25.23.56.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 23:56:04 -0800 (PST)
+        Wed, 25 Nov 2026 23:56:07 -0800 (PST)
 From: Yu Junzhe <junzheyu1@gmail.com>
 To: stable@vger.kernel.org
 Cc: Yu Junzhe <junzheyu1@gmail.com>,
@@ -87,9 +87,9 @@ Cc: Yu Junzhe <junzheyu1@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6.y 2/3] Bluetooth: hci_core: lookup hci_conn on the ACL RX path
-Date: Thu, 26 Nov 2026 07:55:53 +0000
-Message-ID: <20261126075554.106-3-junzheyu1@gmail.com>
+Subject: [PATCH 6.1.y 3/3] Bluetooth: hci_core: lookup hci_conn on the ACL RX path
+Date: Thu, 26 Nov 2026 07:55:54 +0000
+Message-ID: <20261126075554.106-4-junzheyu1@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261126075554.106-1-junzheyu1@gmail.com>
 References: <20261118123533.25-1-junzheyu1@gmail.com> <20261119035758.45-1-junzheyu1@gmail.com> <2026-11-19-1-daily-reply-0012@kernel.org>
@@ -108,25 +108,25 @@ Content-Transfer-Encoding: 8bit
 commit 79a2d4678ba90bdba577dc3af88cc900d6dcd5ee upstream.
 
 Move the hci_conn lookup into l2cap_recv_acldata() and hold the
-l2cap_conn before dropping hci_dev_lock. 6.6.y has
+l2cap_conn before dropping hci_dev_lock. 6.1.y has
 l2cap_conn_hold_unless_zero(). sco_conn and iso_conn have no kref, so
 those paths are unchanged.
 
-Cc: stable@vger.kernel.org # 6.6
+Cc: stable@vger.kernel.org # 6.1
 Fixes: 5af1f84ed13a ("Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync")
 Signed-off-by: Yu Junzhe <junzheyu1@gmail.com>
 
 ---
  include/net/bluetooth/hci_core.h |  3 ++-
  net/bluetooth/hci_core.c         | 25 ++++++++-----------------
- net/bluetooth/l2cap_core.c       | 23 ++++++++++++++++++-----
- 3 files changed, 28 insertions(+), 23 deletions(-)
+ net/bluetooth/l2cap_core.c       | 29 ++++++++++++++++++++++-------
+ 3 files changed, 32 insertions(+), 25 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 62804d98d..e0deaa54b 100644
+index f47a88d39..1a483be00 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -837,7 +837,8 @@ extern struct mutex hci_cb_list_lock;
+@@ -824,7 +824,8 @@ extern struct mutex hci_cb_list_lock;
  /* ----- HCI interface to upper protocols ----- */
  int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
  int l2cap_disconn_ind(struct hci_conn *hcon);
@@ -137,10 +137,10 @@ index 62804d98d..e0deaa54b 100644
  #if IS_ENABLED(CONFIG_BT_BREDR)
  int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 84d9a445e..a54d29bad 100644
+index 7ec3af3a4..580921ff4 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3798,13 +3798,14 @@ static void hci_tx_work(struct work_struct *work)
+@@ -3802,13 +3802,14 @@ static void hci_tx_work(struct work_struct *work)
  static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  {
  	struct hci_acl_hdr *hdr;
@@ -157,7 +157,7 @@ index 84d9a445e..a54d29bad 100644
  	}
  
  	handle = __le16_to_cpu(hdr->handle);
-@@ -3816,23 +3817,13 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3820,23 +3821,13 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
  
  	hdev->stat.acl_rx++;
  
@@ -187,10 +187,10 @@ index 84d9a445e..a54d29bad 100644
  
  /* SCO data packet */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 94fddc456..5b5a9e763 100644
+index d7bb11931..a8a3afabe 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -7752,13 +7752,24 @@ struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
+@@ -7908,13 +7908,24 @@ struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
  }
  EXPORT_SYMBOL(l2cap_conn_hold_unless_zero);
  
@@ -218,7 +218,7 @@ index 94fddc456..5b5a9e763 100644
  
  	conn = hcon->l2cap_data;
  
-@@ -7766,12 +7777,13 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+@@ -7922,11 +7933,14 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  		conn = l2cap_conn_add(hcon);
  
  	conn = l2cap_conn_hold_unless_zero(conn);
@@ -227,17 +227,28 @@ index 94fddc456..5b5a9e763 100644
 -	hci_dev_unlock(hcon->hdev);
 +	hci_dev_unlock(hdev);
  
- 	if (!conn) {
- 		kfree_skb(skb);
--		return;
+-	if (!conn)
+-		goto drop;
++	if (!conn) {
++		kfree_skb(skb);
 +		return -EINVAL;
- 	}
++	}
  
  	BT_DBG("conn %p len %u flags 0x%x", conn, skb->len, flags);
-@@ -7885,6 +7897,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- unlock:
- 	mutex_unlock(&conn->lock);
- 	l2cap_conn_put(conn);
+ 
+@@ -7954,7 +7968,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		if (len == skb->len) {
+ 			/* Complete frame received */
+ 			l2cap_recv_frame(conn, skb);
+-			return;
++			return 0;
+ 		}
+ 
+ 		BT_DBG("Start: total len %d, frag len %u", len, skb->len);
+@@ -8020,6 +8034,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 
+ drop:
+ 	kfree_skb(skb);
 +	return 0;
  }
  
