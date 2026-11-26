@@ -1,84 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.175
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795695547;
-	b=l5EZqBJi+jNK77E9YOUAU2rabwXsaq7sycSQkc8eO6GUGK1iSGe/Gnk0xdoJXxSaLHGb
-	 o1cN073nY/FWWHa/cKZxAJSrcnGJGmQlgRbbpUcRmE3aBk1z+zx6gdwYBPZ5/HO6iAcpW
-	 cuiRbarkulS/j09ZGw6/ENvwk73qTqaFcK9rQ2m9HIosr5ajOr2jctvvLkt/wJ7QBKwHH
-	 i39E0NN6dAlEWGe5unpDWdRmevIRQzXs0iQMxZuXT6DCgalP9FMuLzU1rvH07rGzLWhl+
-	 noZtd1CENu/u3WASPK6SybLZYUAAtwT0TwB8uEyIBrUIEgV+YIwh1O/CO7jzPBO7a5Q==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795695547;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
-	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
-	 Reply-To;
-	bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
-	b=q0wgmCkCzYlyyJFzYXXV9FM68QlTP+rII+sfzYTX3IsLWP+eguutDd8qsu1G1zNwCCql
-	 Nsw56IT9GlG8aBSpwQdDlRvrFtm+YE0flRDGA0jnj94z/Z4TrPiTdGAYdr1HE8JF7CuvX
-	 ImhmpmP+RKGE6SHOMN8235i4u8PIqzlp/3kgozXCpKQ9f7/9wz3oPhi5biVNEAV6M2GFu
-	 z+upCal//m4TFfgAgv4SVmzEjiDzeteelsz3HMbb4topITlkrQ3eFfyZaXf583WCM0Lz7
-	 noyzwt3qvhlRkQCxF+ygMf6J9oTYakDxsCluqDUgVGnupy7NBK+8SMGSEwX+y1sa5mA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c41wAodG;
-	arc=none smtp.remote-ip=209.85.222.175
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795695835;
+	b=Ij+p/wQCTf4nw+PRuexOvjZhDO2WtJRuNqvoUEhifoHvD2BWd+qnJLiWeBlooOOmyOaI
+	 +1HkvhbgO72pJa7JHfHxcHUWRNIWfXZ8OiRSHEGDByUbGx+iK5KN0lOz3OJmRE6rd6mID
+	 oz90mYBwA+BEf0s39hzmklot/072MCJoxcWp7ZtMaiAGngXRHcKHWOy2tFXsb7kQqKVaM
+	 9yzbYBscWGRLZ8VFIf0mUvB5VtCBNRtlSbzrM1I4h/Ma4KXlxaNtjLp141sXgf808fICr
+	 FcFymha7ov1smxwgLbI5sD/aJh7Kk4e/Jo8OADd9Dun8v6MtzhayBx+2DIboLWQNeAg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795695835;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=iJzrRVs9RQ4G2YFEK+V6KlkfumNBBKmZb7GN7c3YMF4=;
+	b=NnXHom7e/v256jdYPZqSyk3n6uG43+es4ipKFX0l2fOXZ2iv2j2wjUXQZADxpSoi/ut9
+	 ZrZZIkMIOctexojY+Y5ggPXzHLTRJEFWp5zQuGMgCI67FcMV6TMQNhXlPuaxTn42BhFJ6
+	 IkT7AGrJPWgSwCv7yaLiTn3Ow5W1SZ6HPKv0Tv4DaDRb/aXfyfSEh77IG7n7xHVdTTheu
+	 6xWpTGEJlK6sKllQfhHAbQW3GGusClIgWz9lA3Rep8Qwi+2GXkHt0TXvjKW0om5/uQ9hr
+	 jRAk+n4SK/E7ZsHuzCsSwTxLktQxjIQPePASLPlxmQ4q3dizWEaaZpH/AQia1bqytKA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VHHPwdYZ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6943E606A31E;
+	Thu, 26 Nov 2026 12:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VHHPwdYZ
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795695835;
+	b=v14Kw95cHlm8vDDXpWGIgW4+ehUHYxckuTSZU6VSc6NPxPlGOpSX0nnFg2GO8Ho2sENJ
+	 16UNX8hq0Q2xJz7Y7ZZF8iLTf89vTWhGZBe7F66n2BcHiTy4KlVtRM9K0qZ/7zApceHLb
+	 TlSLkCkqmd7JfjBsy6y3fjK5HD45Y94DejcNvXYq5aT6t21nufiHH5kvqTsZsv9kaZemq
+	 wYeNUjO/UQDUBq+uB6tD4fRYMjNnscbe2ysCFwANlSmQGjktrKKjVq94UXwH+wvMOxkcz
+	 efNtsRXg6YigvZCQDmmOrqxS5GMXm9//8N3wf9hErrZmqwXbDIPrySRrym/jppH7X4A==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795695835;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=iJzrRVs9RQ4G2YFEK+V6KlkfumNBBKmZb7GN7c3YMF4=;
+	b=VbDuarfyQJUolAOSOXVENnE9nrEfyh8ohDAfz1hscJrYpacze8vqHccM48WHoPD6sGRL
+	 XfvzW8fFgwzngiA5jD0+9smwdYCl4pgQjoITCanBtu+hRYVrj6YQrmjmfZgq5NEEyzUjJ
+	 BinKFxpuDY2Z819xj01Th81ghk2y8gmsTVaoDDuwOC3lysdFK/fUtylySXbCSYceNjSIN
+	 dA9K2mM+z85PFEfjIu3ngfvXzQmd/3KWyxmSHs2+pJ7GZghupWOuEfjHUHg4MZ2nQ/2bZ
+	 Jd2NdlI21GUjbNAFJOz3gJ5k8LSKIOxMqPGtCYzSNIyLIfNz2fGzebUzIWTF5DCAyoA==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD91E606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 12:19:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD91E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c41wAodG
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-94962d80d34so411475185a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 04:19:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795695546; x=1796300346; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
-        b=c41wAodGe2Xq0BzV+vmax1TWqPeVK1vLgJG0IJ9v/lBB3ItwngwOyAQWpDGeIJsBGw
-         pA5uZ5/P6nSIZmfwEVTzVKpwCO7EdOlGQz/ylRqBC7aidsOfNswlAw5yaP50MaHS9Kue
-         hx9L5ANjnk4mdMpXxorA/Ndd8R/IQ6k58ScioTJfkBOVxbqNJrg3FlHD3Wj9wZmxVvar
-         1mSG37veUIXJSH8/xMejqFYscohJ4E47eG2WcEqoTzktMgPJKl0C2OihcrWGgXVlgr+4
-         aNucMRLsaqjMSicUtaRJDyjmtIYG+Zp+IkjKAgDfSWzARfVSfuzzT5WFm8yEh/PdmBQm
-         x4HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795695546; x=1796300346;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version
-         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
-        b=KNGvkRpkE2Vh7cVm/Y0BCzo+0z7vqHq1Kb/iVxAlcclE3tVcL1R2y8KCADbCJLdxrJ
-         biTAWP/v6zjAQwLR5YMv8rkpuOkHM8269G6iBiWHc0r/X1OWeGjBWh4tGfyrFYb/arTV
-         0eWl3egd3uxJ6npi1yljiXxhYIUuSTLN/1Sdc3SNgOdfUCLOuYjTuOl1HQ6vWStRnpD1
-         vrH0rotL4/GRBiuHVkwxeAayIz627BHrXKa0l85ocKX26+VkYUAcXcZsShrBks+11c8Y
-         JUyNsKrhe6+NfJsF7Glf47cFByAc2diKD8IQ8X3AWhRVbX+Fp3lh3rJPSZQJSlZRf/7m
-         7BSw==
-X-Gm-Message-State: APuU4Z8qSDm3/qn/T8dIQGyaVrPNru1hYSYsc6kq0hBkPBpcv/C8AYaG
-	b7eTae17fPYOkTUjh2HMMTyn7QqeqFG6SO6P//UVbcLpIJuEi37t1WP3fggH7oWj
-X-Gm-Gg: AZFdTZc9B862CxK1psy/k3F5LyxyhDVBBQjdKk8tp0J/DPtvj94eU21pcN6GCYwg1qD
-	NOMJm7G+aQlfyf0LwCWg3whvzAZ4E2G5S6OKmf8LXCP/coe5NVqTVlW78hcNptMKczeuA7TNzNn
-	5WFekUVQ10EzwdYEqSFMz18lQUOq2Rlvqm13LQe5qv6/6ETYXCqKVWAOH/f40KIL+sc7e+G6Y05
-	MaDYr6+sT++i2joOnT6bvavdevG4Jma6sUHSj9TPUby6Cdhx5u9frHK+XTraNqmcR/Qgj3KpLSn
-	oHTIcEFCG5zGJ1dLa6I1GUxhRdbIgEoiaIjkk2se56VV4eYCIX10nNjjrzjQ9X9AvG2owew6FrC
-	htxn1PJtPiy02FNZMB7DETQk/1gXjtgFoKbQYNYafnh71SZmirxbfvh6/rouUs7MGEei71jFp6W
-	vDQbp33m7I4+gQofR/IBCBZ9nNZpDq3jbeEyFhA5+euDSwSeeMPUrskSwt6+9Mt15LVY/HvQZoD
-	Im8Ufl69ykWiGZFXY1fk0qBSdT32lQZ0/kbI41B/8rVQ1StluuwzrcWocZRgw==
-X-Received: by 2002:a05:620a:880e:b0:947:a431:adf2 with SMTP id af79cd13be357-949ba8246bdmr3308553185a.1.1795695545719;
-        Thu, 26 Nov 2026 04:19:05 -0800 (PST)
-Received: from [172.17.0.2] ([40.75.14.236])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb38322csm1559782485a.17.2026.11.26.04.19.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 04:19:05 -0800 (PST)
-Message-ID: <6b0823b9.154b9e68.25e3e4.8f86@mx.google.com>
-Date: Thu, 26 Nov 2026 04:19:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6772002658817133066=="
+	by smtp.kernel.org (Postfix) with ESMTPS id BA5C11F000C4;
+	Thu, 26 Nov 2026 12:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795695835;
+	bh=iJzrRVs9RQ4G2YFEK+V6KlkfumNBBKmZb7GN7c3YMF4=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=VHHPwdYZiH6CCGRzyqpCKlJynJqUq9uTXkmnUIrJOZarWTMnXVx8+FsX907uz5h6i
+	 NXWPD69jHYiObGKBYPIZmXG81qGLE3Wh4oZlJ0Qd+oMS2vbESBXHRPwX3jjXDcwpwp
+	 hRchhHOfU4nePrby8oOsivDkkLKOOWYMljYDlvpu3/vUvHwhBQdfxyDGpTbO2t/qBv
+	 gnSCX+5Lvry7dhgjjHKCcHREbszW7Q7jBYFqK6/k65eMRBttz69R52HlruhUH63uD/
+	 LYfnel43T9Y34vdQxbJzpqKXg2nfpHu5VRHyTl49L0uPbv5mqTZDDgXDQn9sSVkbc1
+	 aStDfjCTbJK/Q==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 47BF14D406;
+	Thu, 26 Nov 2026 12:23:53 +0000 (UTC)
+From: Dickson Wu via B4 Relay <devnull+dickson.wu.certik.com@kernel.org>
+Date: Thu, 26 Nov 2026 12:21:49 +0000
+Subject: [PATCH 6.1.y] Bluetooth: hci_sysfs: Fix NULL pointer dereference
+ in device_del()
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -88,47 +83,151 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, junzheyu1@gmail.com
-Subject: RE: Bluetooth: hci_core: lookup hci_conn on the RX path
-In-Reply-To: <20261126075554.106-2-junzheyu1@gmail.com>
-References: <20261126075554.106-2-junzheyu1@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6772002658817133066==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20261126-so1b-bt-61-v1-1-8d8aab8cdda7@certik.com>
+X-B4-Tracking: v=1; b=H4sIAFwkCGsC/0WNQQ7CMAwEv1L5jAvuwVR8BXGIU0ODUILigEBV/
+ 04CB4472p1dwDQHNTh0C2R9Bgsp1kCbDvzs4kUxTDXDsBuYaGC0RIJSkAlpP7Inr8I8Qh3cs57
+ D6ys7AvfUv+H0w/aQq/rSRK0ozhQlu+jnhkzjVFK6YePb/wGs6wfPlBC0oAAAAA==
+X-Change-ID: 20261126-so1b-bt-61-1786c1ceb668
+To: stable@vger.kernel.org
+Cc: Krystian Kaniewski <krystianmkaniewski@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795695708; l=4951;
+ i=dickson.wu@certik.com; s=dickson-b4; h=from:subject:message-id;
+ bh=AOy+xS7hWv9W3/G8I56JVzz4ZYrY5cSCIxB/uF4Cbxg=;
+ b=9cwHTY3N6WIzmbMAT9KH1Rt/TJNmQyTvNO8w4O0Q1LdYtzOr2jal5fci36k6FvRzVE/YR7pnb
+ 9wYXXYSz1VuCQLn/Ryvpx/+CzyC4mOIbkXUuf7eYPxJURIs1kwhAP4T
+X-Developer-Key: i=dickson.wu@certik.com; a=ed25519;
+ pk=fxH7FS4FdojeJSGLJzgKdfO51Rvr4EW30yinj2mc1vg=
+X-Endpoint-Received: by B4 Relay for dickson.wu@certik.com/dickson-b4 with
+ auth_id=1647
+X-Original-From: Dickson Wu <dickson.wu@certik.com>
+Reply-To: dickson.wu@certik.com
 
-This is an automated email and please do not reply to this email.
+From: Krystian Kaniewski <krystianmkaniewski@gmail.com>
 
-Dear Submitter,
+commit 9b851b09b392da68bd715601f10a5adb2d8d19b8 upstream.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+A NULL pointer dereference in klist_put() occurs when a child device (such
+as a BNEP network device in bnep_session) is concurrently being
+unregistered while hci_conn_del_sysfs() reparents child devices.
 
------ Output -----
+This is caused by a race condition between hci_conn_del_sysfs() and
+concurrent child device unregistration (e.g. bnep_session calling
+unregister_netdev()). During device unregistration, device_del() snapshots
+a non-NULL parent pointer. Concurrently, hci_conn_del_sysfs() finds the
+child device using device_find_any_child() and calls device_move() to
+reparent it to NULL, which removes the node from its parent's klist and
+clears knode_parent. Subsequently, device_del() calls
+klist_del(&dev->p->knode_parent) using the stale parent snapshot, causing
+klist_put() to dereference knode_klist(n)->put on an already removed node,
+resulting in a NULL pointer dereference.
 
-error: patch failed: include/net/bluetooth/hci_core.h:843
-error: include/net/bluetooth/hci_core.h: patch does not apply
-error: patch failed: net/bluetooth/hci_core.c:3865
-error: net/bluetooth/hci_core.c: patch does not apply
-error: patch failed: net/bluetooth/iso.c:2424
-error: net/bluetooth/iso.c: patch does not apply
-error: patch failed: net/bluetooth/l2cap_core.c:7895
-error: net/bluetooth/l2cap_core.c: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+This race was introduced by commit 27aabf27fd01 ("Bluetooth: fix
+use-after-free in device_for_each_child()"), which replaced
+device_find_child(..., __match_tty) with device_find_any_child() in
+hci_conn_del_sysfs(). That change was intended to avoid a use-after-free
+where conn->dev outlived its parent hdev->dev when child devices held
+references to conn->dev, because conn->dev only held a reference to
+hdev->dev while registered in sysfs.
 
-Please resolve the issue and submit the patches again.
+Fix the issue properly by taking an explicit reference to the parent device
+with get_device(&hdev->dev) in hci_conn_init_sysfs() and dropping it with
+put_device(parent) in bt_link_release() when the conn device is freed. This
+ensures that hdev->dev remains valid for the entire lifecycle of conn->dev,
+resolving the underlying use-after-free. With the parent reference held
+properly, restore the __match_tty filter in hci_conn_del_sysfs() so that
+device_move() is only invoked on persistent RFCOMM TTY devices as
+originally intended, eliminating the race condition with unregistering
+network devices.
 
+Fixes: 27aabf27fd01 ("Bluetooth: fix use-after-free in device_for_each_child()")
+Assisted-by: Gemini:gemini-3.7-flash syzbot
+Reported-by: syzbot+6df45dd3d03e1a9aca96@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6df45dd3d03e1a9aca96
+Link: https://syzkaller.appspot.com/ai_job?id=f1c0e740-db21-40af-a9ff-84db0fd8b8bd
+Signed-off-by: Krystian Kaniewski <krystianmkaniewski@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+[ adapted to 6.1.y: device_find_child() match callback takes void * ]
+Signed-off-by: Dickson Wu <dickson.wu@certik.com>
+---
+6.6.y and newer already have this fix. The only change from upstream
+is the __match_tty() signature: device_find_child() takes a void *
+match argument on this branch.
+
+Tested on v6.1.193:
+- x86_64 allmodconfig W=1 build of net/bluetooth/hci_sysfs.o, base
+  vs patched, no new warnings
+- booted the patched kernel with CONFIG_BT=y under QEMU/KVM. I didn't
+  reproduce the race.
+
+The backport and the test runs were prepared with AI coding tools
+(OpenAI Codex agents, with review by Claude). I went over the result
+before signing off.
+---
+ net/bluetooth/hci_sysfs.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index b1886e517a78..89cd9ea1ba43 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -11,7 +11,10 @@ static struct class *bt_class;
+ static void bt_link_release(struct device *dev)
+ {
+ 	struct hci_conn *conn = to_hci_conn(dev);
++	struct device *parent = dev->parent;
++
+ 	kfree(conn);
++	put_device(parent);
+ }
+ 
+ static const struct device_type bt_link = {
+@@ -19,6 +22,16 @@ static const struct device_type bt_link = {
+ 	.release = bt_link_release,
+ };
+ 
++/*
++ * The rfcomm tty device will possibly retain even when conn
++ * is down, and sysfs doesn't support move zombie device,
++ * so we should move the device before conn device is destroyed.
++ */
++static int __match_tty(struct device *dev, void *data)
++{
++	return !strncmp(dev_name(dev), "rfcomm", 6);
++}
++
+ void hci_conn_init_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -27,7 +40,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
+ 
+ 	conn->dev.type = &bt_link;
+ 	conn->dev.class = bt_class;
+-	conn->dev.parent = &hdev->dev;
++	conn->dev.parent = get_device(&hdev->dev);
+ 
+ 	device_initialize(&conn->dev);
+ }
+@@ -67,7 +80,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+ 	while (1) {
+ 		struct device *dev;
+ 
+-		dev = device_find_any_child(&conn->dev);
++		dev = device_find_child(&conn->dev, NULL, __match_tty);
+ 		if (!dev)
+ 			break;
+ 		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
 
 ---
-Regards,
-Linux Bluetooth
+base-commit: 1ca1436ccc68275d0b43b6a730b3940fcc46b7c2
+change-id: 20261126-so1b-bt-61-1786c1ceb668
+
+Best regards,
+--  
+Dickson Wu <dickson.wu@certik.com>
 
 
---===============6772002658817133066==--
