@@ -1,50 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.107
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795719609;
-	b=ukIiwZCJqkZo0z6pTP/zMjctyM2eyBdbM9Ytve7s0lUDefwWSfqNqN3n3YMYZa6Gxs9E
-	 yEeXm/LzF2Dg+LuVAkBKFxzyOr4EDEtaiS32nfDdrTxziCVFbriLXisMzQBT4V5O2L1AI
-	 C2fpN32gYPwGNzqFEqENSR45X8LEfCOvvxqEIJi7m598QydgpLDUIgyRItBIb9wz+6iyq
-	 IeFobv3ZFxQqkx2ItxtEYR8zpMEsUdMK3LVOhgoJWD5/C8jIDvZE/XOEkE063EUapjmYO
-	 uJmbzni+4YnLztdMISyOnhvXvdYVlk28KUWbkJZcr/ukYkNrB0eEQ5Yjsycx+eZQ1Fw==
+	b=wivP18+v6WbkO3pGBE5ysYqbEdcWe/11pGyZ0jeEIg8/A7xOzQE/ZTWeQ6fu87rgPv33
+	 MDuXVKsfowh0mp5cUeXGvc9w7jgiVLACWwh8oOuTUJpCF0a4wOzM6te6CFofvilvWTOzi
+	 R7MuUMfma9UO5FdJAzMMBe0OCTMCcAPknhPLK64QIxBNRhLg3irxuzMxZJ/kMKCWaIzVl
+	 J1tbHfOjKm0wKZFr4HimzVh6aXNlncmY0vEnIcfn1DhSAA56bROpk8WBA5Hp+ZJaKwCKK
+	 T0bTvp+BNRKxFxjG1kEQuz1YGrJ+GMxPxuKH074wMHjb+QE8wHvum0z74JG3Sq7vMMA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795719609;
 	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
 	 Subject:Message-ID:In-Reply-To:References:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=M/MaulyTDWRlXEo0XH/+KmygHsZopRd+M68viLANIDA=;
-	b=NrIbLVGIamSVmWXLaMUqi3r2DnmBRSKyvvo8EjeSrEeraj0+LweUggoJFSyAsVwwRjLa
-	 nDG/63LAVjI9KB/yZLOf/+6LeBddJ82iXIygooMdYDDP3cUxRVDEPF4VTuCQxmfjms4Wo
-	 RlpLzDxi9du1DFpwtklw5ZvQ66VI+FcKN3yv4AgPdYibJ8bU0D+aB+7qObaRSYyLPvE6P
-	 rbpBMj7N1DqxIakioSr86MLVTsP1gq2G4I1eTtyuguNeaB0MrN31Nxvj95+82Ck5v5LIh
-	 62tu/WLdbanwk8lboHZ+vkTGe7Rc2HNXG4YNu5JOKmQl8crx8z6XY8DJZZBgMTZkelQ==
+	bh=K7ymiYInnsuA5Q53EewPdrFYhNjoCzCpkr9WJ9qOr0A=;
+	b=BvFeIG98vE0QDWSbgl+HTmFtCKbjaRUSDSrGt29l4nKVdT6qkh/zxKjtdbf6TADGMlP6
+	 q3ulAAEZshMdyJ7/Lr7TCYZk9cd9gUW/TQaPDbpC53KqlwKN4ONWTPXMquxaPf0Xfwqck
+	 w/8oSsPl6n/J3sNmraA42wWJhzcInr14W/yt3VysHFlNarVcr96v1S1Kh46bA8Bw87lGV
+	 VKNlIlO93VZrdloO4IYOpYkDia9VJPRe6ijJnDUF686aZndr7TLp1P2EFAhYVtglqahRn
+	 feNcQcApVQfCt+8XuDZfje78PrRQcHU8fhG7LVQdukMIJZE8j+xAVmfVQ2Fw9w8XuVA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=michaelmcallister.org;
 	spf=pass smtp.mailfrom=michaelmcallister.org;
-	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=5QpuZVt3;
-	arc=none smtp.remote-ip=109.224.244.108
-Received: from mail-244108.protonmail.ch (mail-244108.protonmail.ch [109.224.244.108])
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b="Ilud/c35";
+	arc=none smtp.remote-ip=109.224.244.107
+Received: from mail-244107.protonmail.ch (mail-244107.protonmail.ch [109.224.244.107])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C09D606A336;
-	Thu, 26 Nov 2026 19:00:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C09D606A336
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA01606A33A;
+	Thu, 26 Nov 2026 19:00:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AA01606A33A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=5QpuZVt3
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=Ilud/c35
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=michaelmcallister.org; s=protonmail2; t=1795719605; x=1795978805;
-	bh=M/MaulyTDWRlXEo0XH/+KmygHsZopRd+M68viLANIDA=;
+	d=michaelmcallister.org; s=protonmail2; t=1795719606; x=1795978806;
+	bh=K7ymiYInnsuA5Q53EewPdrFYhNjoCzCpkr9WJ9qOr0A=;
 	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
 	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=5QpuZVt36MgzmRHb00LLPzSfqjtq+rHY5GVdD6c7netajtqUTiUenHL/oSZmPL6lP
-	 cTLIzWFSHc3o+wikUbFup2B4HmJ2q/ToagS4M0QWw4AfROKgkZWlLH+AuBdzwHU7pK
-	 Om73Bud6G6v3Sw3HFW7gNLJa3HiMfuV53ZBROH4aXpRm5H4WFhC6ZTmLpPoeuKflzD
-	 iJf+KzgDdM7cZPoh5Z0MsUVxZL4aPTBNSYosBVRYLyvJFG3XmXfwMWTe0B9dej1xzS
-	 //iOO1KadtEbyi2osiXLKQZcJ2T5FUWh1hIv81WKXpHBkH0DGOhp9v8vfOpuqB3ka0
-	 ruRLPJHuvdkWA==
-X-Pm-Submission-Id: 4jb5TF0S3bz2ScX2
+	b=Ilud/c35MsgyW/kepDF19UqaOv4HtanH55j53Y0PbtGwPjYXhJKePH9nQwvelN3sR
+	 EE0S5yyL1JgRFhL90BNX6RexGgDs36OBCUjgZ5pp9THfk01kh2+kHA7KDS6kCmVTHp
+	 MfFazIjOLmpbQA9OnVN+b4W2DlYQOyeeWtsL3zNdu8wLCYJEvMoz5r7eyt8HyejiXh
+	 wlV7fwImTcpRhpImk+j5Emj9iTkvpcfIIBZHaRnpPK77yc6GNEzMTh/BirsBXOBJ+1
+	 q+F17pPqIykbONJoXHkWVTzOX2gYKMrnHdqfYD8S4VMARGjF4dQCd/ztOcwbJ7Qa9r
+	 eUq5dEev/jpDQ==
+X-Pm-Submission-Id: 4jb5TK1Qlbz2ScXZ
 From: Michael McAllister <me@michaelmcallister.org>
 To: marcel@holtmann.org, luiz.dentz@gmail.com
 Cc: brgl@kernel.org, enderaoelyther@gmail.com, linux-arm-msm@vger.kernel.org,
@@ -54,9 +54,8 @@ Cc: brgl@kernel.org, enderaoelyther@gmail.com, linux-arm-msm@vger.kernel.org,
  shuai.zhang@oss.qualcomm.com, zhaojinming@uniontech.com,
  me@michaelmcallister.org
 Date: Thu, 26 Nov 2026 18:59:41 +0000
-Subject:
- [PATCH v4 2/4] Bluetooth: qca: Power off after unregistering the HCI device
-Message-ID: <179571958167.81221.16925052773581892055.wcn3950-poweroff-v4-2@michaelmcallister.org>
+Subject: [PATCH v4 3/4] Bluetooth: qca: Handle failed power-pulse writes
+Message-ID: <179571958168.81221.2447983225223068787.wcn3950-poweroff-v4-3@michaelmcallister.org>
 In-Reply-To: <179571958163.81221.3368253997777320112.wcn3950-poweroff-v4-0@michaelmcallister.org>
 References: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
  <hvwqozj3r7n7igxw5qogu7xxya4fkhqanb334sroj37ufzdizu@qarvtlkkulmj> <179571958163.81221.3368253997777320112.wcn3950-poweroff-v4-0@michaelmcallister.org>
@@ -72,68 +71,36 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-qca_serdev_remove() powers off while HCI setup and UART writes can still
-be running. Leave power-off to qca_close(), after HCI unregistration and
-write-work cancellation, while the serial transport is still available.
+A failed UART write leaves hardware flow control disabled. A zero-byte
+write is also treated as success even though no pulse was queued.
 
-Check the actual port state before sending the power-off pulse, since
-PROTO_READY is already clear during protocol cleanup. Start serdev
-controllers in QCA_BT_OFF so registration failure does not send a pulse
-before HCI allocation or power-on.
+Require the one-byte pulse to be accepted and restore flow control on
+the error path, returning -EIO for a zero-byte write.
+
+Fixes: f9558270b85c ("Bluetooth: hci_qca: use wait_until_sent() for power pulses")
 
 Signed-off-by: Michael McAllister <me@michaelmcallister.org>
 ---
- drivers/bluetooth/hci_qca.c | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ drivers/bluetooth/hci_qca.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 0f893f16a..53239b0ab 100644
+index 53239b0ab..d341481cd 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -616,6 +616,7 @@ static int qca_open(struct hci_uart *hu)
- 	hu->priv = qca;
+@@ -1426,9 +1426,10 @@ static int qca_send_power_pulse(struct hci_uart *hu, bool on)
+ 	serdev_device_write_flush(hu->serdev);
+ 	hci_uart_set_flow_control(hu, true);
+ 	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+-	if (ret < 0) {
++	if (ret != sizeof(cmd)) {
+ 		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
+-		return ret;
++		hci_uart_set_flow_control(hu, false);
++		return ret < 0 ? ret : -EIO;
+ 	}
  
- 	if (hu->serdev) {
-+		set_bit(QCA_BT_OFF, &qca->flags);
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
- 
- 		switch (qcadev->btsoc_type) {
-@@ -2286,11 +2287,7 @@ static void qca_power_off(struct hci_uart *hu)
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
- 	case QCA_WCN3998:
--		/* Both of these write to the serial port which may have
--		 * already been closed by hci_uart_close(), which closes
--		 * the port if HCI_QUIRK_NON_PERSISTENT_SETUP is set.
--		 */
--		if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-+		if (hu->serdev_open) {
- 			host_set_baudrate(hu, 2400);
- 			qca_send_power_pulse(hu, false);
- 		}
-@@ -2664,22 +2661,6 @@ static void qca_serdev_remove(struct serdev_device *serdev)
- {
- 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
- 
--	switch (qcadev->btsoc_type) {
--	case QCA_WCN3988:
--	case QCA_WCN3990:
--	case QCA_WCN3991:
--	case QCA_WCN3998:
--	case QCA_WCN6750:
--	case QCA_QCA2066:
--	case QCA_WCN6855:
--	case QCA_WCN7850:
--		if (qcadev->vregs_on)
--			qca_power_off(&qcadev->serdev_hu);
--		break;
--	default:
--		break;
--	}
--
- 	hci_uart_unregister_device(&qcadev->serdev_hu);
- }
- 
+ 	serdev_device_wait_until_sent(hu->serdev, timeout);
 -- 
 2.39.5
 
