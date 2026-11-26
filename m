@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795675698;
-	b=jrYiwNUjjrTRnBBi9HQMFFAEb5CzF4CpeERI7cJjWyDPhl+wIH5iEhdlUmTe0fN/SqF1
-	 AelEobsFXIu7GG1LqLjTHLUdy7PAcS/z1WuiJoQ6l86D3LW4By2/O5uVg5anhO3WNQmbU
-	 mDDpI1OV/s4Jslxb7w61IXmLlxZdCm5lfQzgb2HlLyKrea+TmxehGZnYNi+Dc4rjnEZi4
-	 qZ+J2ZpKVdtzdXE5TF9TcWybGCmHE7by9pQ9K/PVKOSQcoBT2NVopnz0twz+OGGvfUQ1Z
-	 KSPYeLKxYcUPBMGP7xH1Beb2Zg77XUasP5r0tQPXJLM4HKB7E3wypJaf/K6oUadCykw==
+	t=1795675701;
+	b=0ta9o+EA/nicJBjZpbgAlSTqsOA3F+jZmapKAxbDXmM7QDx4hp+igzLEUHMy82JLfHIc
+	 bnfZRDuarRkfvWFkx9sTMrRFO8XUYHOnng5SpO+kbpc28qyZ8/w6KAOMrdz0YG2q1Hs2l
+	 7hJ/4q/ef0BtEpOTKeS8Wb2xtK3qiXfwC9ivXGRGoLowQdf8wVQelFGJu/LsxY28p5iqV
+	 eqoo8vNjjm9c3vciOfA0T92LW+I2dHhgonpZQDUP2+yvNrgBneFnd3ktonbLjUmII7Ios
+	 rTv6kkvBd/J+xd5Xhv6OOdlbxztPkN04RZxLtNaUbvHVPR0Q2uL+RGTtTv34HD75aNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795675698;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795675701;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:
 	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 X-Received:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=JJIAUY2TWn2r0xsHgJmvcGao2tDlSK+Gzt1h9IE8acE=;
-	b=LeQytsxmmcjkARm/jNAG4LaIiq3LIBKdM2G5kzmsj4Rex9mtAHck6DktXiLgpmb57OSe
-	 JMBK4MxscMvL/3k69AF49ec3ijE7PpahyYZBqzPJthU+dSKFKZzqehUU3llg+rRs+e1Vg
-	 JgUxFzmgU/h2wLLY5ybkjXv0jLiAAHttnovKH2m9xbynVMZscXR1s08g+cn0rjiAMb9+C
-	 PGi1x191SisZaN3FULklqz+h0CC/KBJhZPF73FE0De81mY61jFmPjaR78G5IxFqKHkVI0
-	 NB21hgWujS3ucNbqrAfHjr6OcVVf9nnDlElOqm933m9P/I0c8ORqcaBNI4ptsuB/qgw==
+	bh=M2BrMkSPI6vZbrPBGOtyoFX7eotWXB0/zUbgHscIdz4=;
+	b=RF6FzbnU4vSqh/4ko0U18s6i/wPOfiRaWfvHTuPt3tNdt/66hqStkZNLHBNYUGDJdG1g
+	 AB3pO6fZcqkac6JNTBXg9UpHgdVz17mW9g+E+QrcDvzmor/TaY70tiJAcXMOOoAo0HTHt
+	 Gg+GSjuyn7izNpgtLQE2m5yC73VMSxbxx69Oz0zg9drXcIGGn9jDdLSaWEI3Lwn8Q//xv
+	 7Txl6wEQ03kbDvGKAGlICnmdCTxgmedvDOech1NcaKMUUD5keUbU7o9BTSPvpYxmqkGUg
+	 chQQFqa4RFfM4YL0P/3bfAaXvZ3kuuH1AUagkMcBM+rZnFokRKz/FTHQ4LLLeegMuFA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=canonical.com;
 	spf=pass smtp.mailfrom=canonical.com;
-	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=k3MVnZbA;
-	arc=none smtp.remote-ip=185.125.188.122
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=PUdil2NF;
+	arc=none smtp.remote-ip=185.125.188.123
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CFC606A6A5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96CFC606A6A5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05476606A68C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 05476606A68C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=k3MVnZbA
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=PUdil2NF
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3765C3FE38
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:14 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 30F2D3F68B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1795675694;
-	bh=JJIAUY2TWn2r0xsHgJmvcGao2tDlSK+Gzt1h9IE8acE=;
+	s=20251003; t=1795675689;
+	bh=M2BrMkSPI6vZbrPBGOtyoFX7eotWXB0/zUbgHscIdz4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=k3MVnZbApj3NzxjM4wq5LgC0i8CKyKnzvirQus49oyBygweqeqauYjmUeys6NBIgc
-	 DTakKHrzbVvhMuc6eB0FipC2o7xl6TWQTcX68hJOEroKg08QkCcmvcwFfGqc9zzruu
-	 +BywvbsZRWBy3f8+JmxNFPDokPWQ2mZHSEDgMk5xIYdz9Z6B9yDsR5K8kifzxpZQMI
-	 vf//I3m5VL9kMXtfhjA8rRphrNjT4i2i6FBUevGjxk8v3qjj3i/8sIcIuQa6LfURCw
-	 GgUo6q+IPIifrm+gtMnpqG94txNQZOOnPMGNn4tcIlAoeV0QK0xgOBpAvM1SQiyYFq
-	 3NQOeJ2gjVm39nFQWTQrlHBL/iuFj008v+FG4hFURS/7+flMyp1vlcTaEHnsutMenz
-	 saPJ3gNBgWAjYJku/pZGES1d4GUcKdx7a/0NHNMrqU88MhLGPfQz1FiZNGrBEl46PS
-	 LxsvCN384leIGtoQk7jTqFuU7JOl7rqvhcMPWia8tYHN7dD0aRiWal8bTA+XE8/6Dl
-	 QlodPIB0VlP1QiltvHi4c98Dags6nfFAmuMTSBIUYKWzLmxyu1mTbj+N9svcLiFhCM
-	 tEoMEBxSMVYQaB+2FLOraAYPce18/CUiS0QvQ49EGVZscaLuZ8Ug+PkPONpORuT91a
-	 oqShilA0Q+GnAM1KQ6UKFcV8=
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cd3b9e70f88so1403441a12.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:48:14 -0800 (PST)
+	b=PUdil2NF6dbQM25+tmU+4iOdj7tFhZLCHyxwVHLP1uZJDs9iUdL7epRXQV5izfevf
+	 AZgqxqCSK9TD9R0bNTZtoEDfzJkuxMc5DM1Xg+4mo+dbNP64UNjGnZdhESvJXFXmKv
+	 jEmK47DZc55k1viU5V5UlYm+Zv1U9u7ZK5nYw+7Hq38IBY5nSVGm0ngrjddn8s2UQJ
+	 aSkRWxsY0Y0Yv1RJBo8Y5Jh2YIXODZtIoWjh8ytfAP5eF8q1N/+Xuips+2D7BC8/u6
+	 8BasSDslgkxDBrGrDsZywGR9Yz4oJtEgBoEOKvs3VxTMt0zNgue8Y/BI9e231DDYVP
+	 ygwuJkveVvXBDF3rQOj3GpSBll/7spCPT4IHT89NkyhCbSvlb7CiqvssxkjeFZ77pS
+	 1LRq8QhTqu1jyCQSbpnfSU9WAyaIMXQKd/iHAT2HWLq/vT8t24brvJKa0xadiGX4hN
+	 SQEfeJ7ZdZ7bnYAJOPr+GJ7dkFaMLMtujvUVC+ZCfAhwik4DOH0q55VDbSHRXkjltt
+	 uqCzvBvfSlW0TuUQ7S4eF4wi/sFvx7L4Z3oI0wbglG9cK/FbJJuDeRdOnv6UuCXnB4
+	 tC2t10UmDKUJxD6Cq1Yl3W54mzydknyRldQQIK3+In2dZ24WcOJx6HWMdlLYHmexak
+	 oVV48mv1PygowcDxjMwliI6U=
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3b427e5a37dso5396746a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:48:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795675692; x=1796280492;
+        d=1e100.net; s=20260707; t=1795675688; x=1796280488;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JJIAUY2TWn2r0xsHgJmvcGao2tDlSK+Gzt1h9IE8acE=;
-        b=pdYkfGm/IYGqcZfzhz6RsEB8RRzdTL16TB82RKPzSAmf2J9qt5taszLSjgHUGTurWE
-         +xkucMqYe87vwwD3xS40SoA15wQTYzWGZCn/3Up0aUg8ni4w014pRMmJgqube9JHULc+
-         oNhSxHkXZa1VUd6ZBE0JK2LagLAnpwQQDEAT2iQ73QUDwmRVl97hfsIlOpaIUzp9AQic
-         yj+nj9dyQwKEir2WL5Hp9XNrG1bRrnvcknCwusWqtUW288tcuo9nnFD8Z4kJT0787dmR
-         en1N3153NZww3F4OI0Fpmyjh/DM/kMpyh+p913E/MVVoq0wD+G23jQELSvxwnhv4QTcM
-         z9VQ==
-X-Gm-Message-State: APuU4Z+IXgZiEr1Yd0vg1CMgYF0N9Rvs9c4f/96QjXuIkRK0vfrw59Tg
-	iNvk+tqQCkzDb1EkAWA8eZeVDS1fKnXauRJaAn31WyiLdClO2r+tgqBpKeQEJfXcx7fQjfm/VfC
-	sfUcIaaVcSTKLNu9FVQTz6Sh+fU4HlQwvQhWUDcPWxB6vv7l8Pe4zuNmlKiIPA6rzKsUtAWfyxj
-	TnQY8Nt8k0EFti+wV1d5Yp
-X-Gm-Gg: AZFdTZdw5YBCl892TZfLtefYfVPXhlSeJdA3ZHX9q0jy9p3kVwmEpdbo1dombQrWwQe
-	SJ5UcmNwtYQde9qpi6ECPYPy+BWjSdHsUcIJuaeeD32eAaEcGpnrE0L4XRFAi+2RadzSxCev94/
-	1g3ZeMqaOYF6uJdIX6piT7UW+cVTkxVNP5rBJ792TO6h5ni29JK1TNNZ+9zZpkHlgpz3sjrfZQ8
-	qk3d9eQ14m3sBNIByqF34LPRfWVYlNxvu8AWqHOBp/gat0kFnLbi68+ZejjNHt4npO5BbYgmq2K
-	aIfhHG9otOeGqRUT7j/YRlTip47NMVgpsfMWzjSdaZkaDJ12GZro8DYz/7RPEVM/oI+/eMjP58W
-	5jQiObpehqy+I50juWLWGSGB+lHCkWmIuPoAoJdvW48bbu+rkT1spUcPSmXRbpRaES3bAIRH0n/
-	dK2WgQRXfxGBoQMcfVmp6hZZFnpkZg5QnT3g==
-X-Received: by 2002:a17:90b:1b0d:b0:3b4:ab19:ae08 with SMTP id 98e67ed59e1d1-3b4ab19af42mr10630929a91.57.1795675692388;
-        Wed, 25 Nov 2026 22:48:12 -0800 (PST)
-X-Received: by 2002:a17:90b:1b0d:b0:3b4:ab19:ae08 with SMTP id 98e67ed59e1d1-3b4ab19af42mr10630918a91.57.1795675691891;
-        Wed, 25 Nov 2026 22:48:11 -0800 (PST)
+        bh=M2BrMkSPI6vZbrPBGOtyoFX7eotWXB0/zUbgHscIdz4=;
+        b=qJRO/ZxZHhj8ktei7mJmmZy836dpCmYEXIMCuElsf1mdKV5/po0reBVfiYGkQAKCXN
+         DBFA/6abWcYy0UozMv6nx4VJ5ykLCFoPYML//aQwjxuFKCAuA6tDDW4e8v9qYeB4qnu5
+         BdW+4PAwBRavXXnaDV3QE8NcbSjU4kqGorPnqODGPdlkv5UblEnUQOoZShpvalikcTHD
+         4vkaUDR4E7TfFw5DmIkQyaT99AJ2Z7UC7YPlJtLbLp13YOYvyOqNUuA9oY+boTms3/xG
+         NKFlxm4ahWFdRBAoM5uj4CtGYbibQlCfmqUNuBWDaR5ZPSeoG2R1Vqok3/H3l0jNnWzC
+         pWtw==
+X-Gm-Message-State: APuU4Z9mggw3n8bFefalmOQmLRAYo4xXKaKtr0Ws5qivFrc+Yq4+2jjf
+	rjnY634LHmkg3H5mArxoRN/kZFG7IrMZiSigg7gG1lX7I9glTWVGMx5rl0qlAMsbgHgR4J89DTd
+	L2utBfhzoQMD82WBFJ/cgV5iNbOMdk+IpwVjb6hlQeq5I7WrRgfbczD4BbgHV9ie4ZMFajtDWHx
+	nw8Bm44TA2ptT46yWPKyh1
+X-Gm-Gg: AZFdTZeOI9BUBE0myAB9K0HXpnOKkNJU2hnKV1fUTtfQc6fD+tCUDqie+2yYwctDXJD
+	nTCa2HLZLb91r2wN0lZT5bDo6W0Ubk6q8VwfbBVscguzTu9bDT66R7UTc31y14fOivUlFwoowgR
+	FrylppRwoWdxY3V+g3rYM36FOTJ+I+nCmbkGNwk+HOj5urjvK4RJleNQlh7G9Mq9kpNRaUhBTit
+	vwUYxDXKVnOkR2TDcoE0S3uYlohXov4fOh4skmCT1LN2crfQEiQVTkf7ZUMYNR/amDtBsirESqc
+	WGa2BKipSpnYzeAvKbrwpI5XyDOwvvM16njiVqSgDeSTmLHxzoNMNVT4hYIpYHqaVYzN0YVGZYs
+	IifZYoNhsgr+KAQyKrMILHUaq9bHsxaAaInN1197N3OOiFHIYQjcD+u8AZarpULyRYkPnrxdODv
+	5qFTz4CrLGIYZduMgA/fBBNlEQaQmPFAYfdQ==
+X-Received: by 2002:a17:90b:2b4c:b0:3b0:a7b5:c037 with SMTP id 98e67ed59e1d1-3b41c7b6145mr19433878a91.1.1795675687675;
+        Wed, 25 Nov 2026 22:48:07 -0800 (PST)
+X-Received: by 2002:a17:90b:2b4c:b0:3b0:a7b5:c037 with SMTP id 98e67ed59e1d1-3b41c7b6145mr19433860a91.1.1795675687172;
+        Wed, 25 Nov 2026 22:48:07 -0800 (PST)
 Received: from kchsieh-C1-X14-laptop (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b2156c2sm13787468a91.0.2026.11.25.22.48.10
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b2156c2sm13787468a91.0.2026.11.25.22.48.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 22:48:11 -0800 (PST)
+        Wed, 25 Nov 2026 22:48:05 -0800 (PST)
 From: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: hadess@hadess.net
-Subject: [PATCH BlueZ v2 3/3] mpris-proxy: Check OBEX session proxy before use
-Date: Thu, 26 Nov 2026 14:47:59 +0800
-Message-ID: <20261126064759.95429-4-kaichuan.hsieh@canonical.com>
+Subject: [PATCH BlueZ v2 0/3] mpris-proxy: Fix possible crash on OBEX transfer
+Date: Thu, 26 Nov 2026 14:47:56 +0800
+Message-ID: <20261126064759.95429-1-kaichuan.hsieh@canonical.com>
 X-Mailer: git-send-email @GIT_VERSION@
 In-Reply-To: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
 References: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
@@ -109,59 +109,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-connect_obex_session() can leave the inner OBEX proxy NULL, e.g. when
-CreateSession fails, while the player keeps the session. A Track change
-carrying an ImgHandle then passes a NULL proxy to
-g_dbus_proxy_get_path() and the resulting NULL path is used in pointer
-arithmetic, crashing the process. find_player_by_obex() likewise feeds
-a NULL path to g_str_has_prefix().
+Hi Bastien,
 
-Skip players whose OBEX session has no proxy and check the path before
-use.
+Sorry for the mess with the consolidated patch, and thanks for the
+review.
 
-Fixes: 01a5a26814 ("mpris-proxy: Add mpris:artUrl support")
-Closes: https://github.com/bluez/bluez/issues/2569
-Link: https://github.com/bluez/bluez/pull/2631
-Signed-off-by: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
----
- tools/mpris-proxy.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Yes, your reading is correct: your two patches are re-sent here as
+patches 1 and 2, unmodified and with your authorship kept. Patch 3
+contains what was left of my contribution after the split: the inner
+OBEX proxy guards for the failed-CreateSession case discussed in
+issue #2569.
 
-diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index 125bc85d4..8547fa908 100644
---- a/tools/mpris-proxy.c
-+++ b/tools/mpris-proxy.c
-@@ -2617,10 +2617,11 @@ static void obex_get_image(struct player *player, const char *handle)
- 	const char *path;
- 	char *filename;
- 
--	if (!player->obex)
-+	if (!obex_session || !obex_session->obex)
- 		return;
- 
- 	path = g_dbus_proxy_get_path(obex_session->obex);
-+
- 	player->filename = g_strconcat(g_get_tmp_dir(), "/",
- 				path + strlen(BLUEZ_OBEX_CLIENT_PATH "/"),
- 				"-", handle, NULL);
-@@ -2820,12 +2821,15 @@ static struct player *find_player_by_obex(const char *path)
- 	for (l = players; l; l = l->next) {
- 		struct player *player = l->data;
- 		struct obex_session *session = player->obex;
--		const char *obex_path = NULL;
-+		const char *obex_path;
- 
--		if (session == NULL)
-+		if (session == NULL || session->obex == NULL)
- 			continue;
- 
- 		obex_path = g_dbus_proxy_get_path(session->obex);
-+		if (obex_path == NULL)
-+			continue;
-+
- 		if (g_str_has_prefix(path, obex_path))
- 			return player;
- 	}
+All three patches carry Fixes: 01a5a26814 ("mpris-proxy: Add mpris:artUrl
+support"), which introduced the affected code path and first shipped in
+5.80. The code content is identical to the consolidated version that
+passed the BlueZ CI on 2026-11-06 (CheckPatch, GitLint, builds, smatch,
+scan-build and functional tests, series 1203891), only split differently.
+
+Downstream bug report with reproducer and analysis:
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/2172906
+
+Regarding regression tests: I agree they would be worthwhile. I could
+not find an existing harness that covers mpris-proxy, which is a
+standalone client tool rather than a daemon component, so neither unit/
+nor test/functional/ has anything to build on. If there is a preferred
+place for such tests, I am happy to add one as a follow-up.
+
+Bastien Nocera (2):
+  mpris-proxy: Fix possible crash
+  mpris-proxy: Avoid session->obex dereference
+
+Kai-Chuan Hsieh (1):
+  mpris-proxy: Check OBEX session proxy before use
+
+ tools/mpris-proxy.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
 -- 
 2.53.0
 
