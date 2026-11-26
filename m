@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795675694;
-	b=kiAQe231fX3o4RJ2hg6CAZhSR2NXaYHeYgAgWGQbOVP2T+HlWz4S+M4fxWrTzkKYqxq3
-	 8CFazTR0ZRBJRchMCAT36fF9Vg1LUJQ1cNrgee2lGV7d93YGL2Ace48331CLdr/WiG1Jr
-	 hv09bc8bZzBUwin8WRDa4Ojrld//6y/m36KnV9C4Ifzuvj9p+wQtomnKRNeGysPmJdVRZ
-	 rX5gLuGIKob5M4eT6bfMNNnqtR/J+zUsfFW85fK3mnQX3TT25TF1mu+rlC4bn+DPgszRG
-	 nJA9M/4pX1bUw0Cgl8+KYTxUs92Dp4z1g7ttPm+6WhGF3+kosB18eSbjIWCWOWOdgKg==
+	t=1795675695;
+	b=3GBgNT4WHKdjIxY6JBddx/80ghw+UKJFrbk7/48A1+x8iSsJX8uALogLYwSCluggT8Hr
+	 +3nLQsE/8vq61SUigyxxzqE/7vdQ54tSw7w1VJEDXf8FGNxsaCvtr1btpzZ1USl6zizcV
+	 oeFF/bXyP0e6T62i80uZFdQfAV/92AdEC1kjQbqU9xqYoPiwK2iLbACIZfkW61hyoFWEh
+	 eaO+63wOhzFlG79StC8xK59KiHZyAgGNO1UEasExdeNAbBZgAltQS3MohGY3m6xEym/QA
+	 KYj+SJEaoNZvhkArUCHpjf4Zus5wOUvNwCUWp6EVN49kayFW20EynFAPs0okr/BKvGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795675694;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795675695;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:
 	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 X-Received:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
-	b=0cuMXT7Qn7xiKtlnAxZ3tBrg/AcK2YlWNoUgEmMZCQseDqE9kbTEn+GedK5B0J2ajNpy
-	 1b/PtJqIDqkhfSmzPEdDuaneTemkRfhX2OxQqCpXoCrFRM1len0jpLtXBx7B3LLGRH+jU
-	 9AURj2Y4uEj0nOD8CVJ+0Nu92X9RGy6xsKWgREmD/TZogGzKzojt5HdYUEPg5JWBRNBUg
-	 S8j1Das3DG43GIXieh4S4fNDMyN7dcimy45e6AG3kMDCEqezI8sqlKTtHKIRAD0y73JCr
-	 inb++r6P2rv2ChOlfh9eCGqBGQG1hoCf0ZNr0t4uAXHe20HXUFE/0cnD4SMbJatrE5g==
+	bh=Jomht0ZwIA00EnoMqIhdiZT52fKUzUkgHp2390iWoPY=;
+	b=cFAf8KMMkjodp9XfIRbqOCNgMDSpTie0wit/G4e8fMXFXKSR4ujcCtvicwie5AV+99SM
+	 EwIvtwertsziFFGD1Mw/UPT5cnfvmCDPN6LMyWzO2QG90ZdWxy0/JmztL2ph37YI25jRe
+	 Ms7x4eIwJZ/u0GNWFHyt2rP+mxXcOIxHK0EVNWineI+3WtlMRN3F2/y2PnVEahiWakJaE
+	 5LGCjZ2ueogImPvjnOvLmZfqc2abVgEcHLaJBnemzRCALXEE4Ik06vGkZgw1OFabB/k0y
+	 mfzk5EXoWiUO/PojRIQ3QYiuAjho9hpO3en/QX1Rk7NmwRyTL60iVL889MZlUA4DEfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=canonical.com;
 	spf=pass smtp.mailfrom=canonical.com;
-	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=BCQKX1O3;
-	arc=none smtp.remote-ip=185.125.188.123
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=R0cMTq3P;
+	arc=none smtp.remote-ip=185.125.188.122
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B69606A685
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4B69606A685
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193B6606A69C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 193B6606A69C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=BCQKX1O3
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=R0cMTq3P
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6342D3F641
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:12 +0000 (UTC)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id B75473FE2D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1795675692;
-	bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
+	s=20251003; t=1795675690;
+	bh=Jomht0ZwIA00EnoMqIhdiZT52fKUzUkgHp2390iWoPY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=BCQKX1O3z8y9MUnsGS6tA4adp06i8zMGXlqArdp7uK3d36ppNyx4VykBfG3BvxNqD
-	 QRU5S1GkHvLlEZ0ukogtDWHE7G70u1j/ZxPSY/v6A01XteEiTozoZ9wnNA03X7Pxtx
-	 MT2GaBivQJRI57LWJYH1vOYxtxAH4GO42/dy8GPATohermxAnkeHX0FP3SFTARni5J
-	 ROeRy4tLdVEui0xTAVZMR0he+sq02vL3sVYpy1SJgQQ38KTUyPqRhfiCHycYOnSD1U
-	 IediwqAXyp8ET1DVZ2B5tA4OsJ2lz1w0mTh4fqT1WVUHPyK0CHH5gKdclLODaE7Wlh
-	 MWztGEtXksteYj+edy+q+3ZG6FMtGi15R7+R9YGDs8QjJQh4Wo/Ozdjfe6qbcDVt15
-	 0JlWBxOa6j2ee2A1OTkahbkHv4WiWLS2py7qOONxsrybRWKYpX8WPDSIax1DxmfCps
-	 plqLtduOOCGGABz7V2fkXYIP02bgsNbE0NHtzKElOzPUJ/rWpuRqDXSxCIcz6tpbtA
-	 LgDhhY0wkUapAl8pHBz8Rt/k7KqFX7T5Y6c8Pq36yOId0zdUNzAd2uhJi1Q/jtuZwN
-	 hWaLXtF/HowS86735p+DMJ0+6TBPQVn+G/doIgERA/w9gZp37NifK3EpK8/Uc4GWM5
-	 pr0zOPr1JWF9ejsfazAWjaqc=
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3b3b4208826so4732708a91.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:48:12 -0800 (PST)
+	b=R0cMTq3PdZ9gB69ucYurfhqyJ41+U9XaRZeNtMZAzPNCY/13F+BEBe3CE1mSOR3Hr
+	 LeNdaOrqwQ0gK5Xj8f4NVNn5FN9b6BUgi9JV/Mx9FcbPN2PpTQQGOuj6uR637GTPvz
+	 iM77K7s07WM9DPCf/99Y7dDcJs7TddFqrFp89qM0I7pd0SYatUZietX4nVWElUankx
+	 eD+5/tfcl/ni2609AEgMm3ma545SumRe5ww0ilwiIPQKyRJUqax9cTNk4NXA3fL6zt
+	 5RvVPwpVBr+VzaAm2jScx1eBdEiXZ86F7FFvmN4kFNbDtS5ePg39E8hXqd73F8xKzn
+	 KjKu4NJagfoufW/Y/0dhIbJGXFO6xGXq74GuJtacu5RaRAsvU3+t1DlSP/jqVSLt9k
+	 NL6kwn6ONtQNai98KOmVysSVz1Lx8REnmjGo3CWOR3sAiJa40NtlmObMgEtv688lHz
+	 Rn5pMNVc00HuCJ+ZvuXh2vaFBjOp4i0yuc1nw/EQgzmBILAbYruIr7PDYd9EwZFooD
+	 vPbKVVpa+K4hHrf4vgyOITt6IKbYAfKI2tj8vaxB89hfvs9tD/bA+onvcolMmGt38z
+	 05/Uk6289DObHoU6uYJ66mcKsEXNrb5rADi2GC4f0cgmg7GSgqOBWGhS6AH9+8YPhD
+	 WAexZF4nDmo76K9/aJKQ+rII=
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3b41b099809so5750148a91.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:48:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795675691; x=1796280491;
+        d=1e100.net; s=20260707; t=1795675689; x=1796280489;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
-        b=u1z117rAPZqNjhFr1+iiyE6CLvmL/JGR5AgiJNQY6vWDFqPkoVS4uCdzKg4rY5YvGN
-         aKgGtyBiuz/aJ6bS9E1woCdK0YSHZYa51dbLCCy641iV7kqvGh6u+tlWClHBeexH+c2Q
-         7i955RCsHUfbbO+k4kGECp6/lW/0qT51O+naRdg7/5RIkvstqJJkkx7Dz0+Qg++PjKJN
-         Psoy356NyO/70hhtPmicLVQap8asfdYt1Ac8oeMH0xMAP/FQPKlGxjD//64qEgB1iWUL
-         AUFTSPwILeb3WX0Sj/1d8bmxKHyCGnHgprLF+2jRC7P91Fmal2oQlKwyUD0VaXl2L3Wd
-         l9tg==
-X-Gm-Message-State: APuU4Z8SP5Mf1T6eFlhFd+EzjOv9dKVSkIEwB2JP2Na2AtWU54SkuKDc
-	rPmYlHi7XQLbKwilxOi18kwxX5tecXB8cGt80YflIOtuSzAjHmwU6BIIbKHFgPKn1AU5Is3sYEt
-	GdKwqGYFzTE68MbedBHC/DqDwypSpVFIuoK7XHbOmb06c/9+R3vRRyKbDonPNudRpNzKB0c6VSc
-	y03xf+NxCLDbVh7aZRzQ9B
-X-Gm-Gg: AZFdTZdCWhjDSBLbrvaV98qMdhZFGzAp4OsbBz46TdKwCVSjWX6TThtNJRXSpZUQMEv
-	c8vA4jQwDQIDmj1f6DHCyQ0bTfEzDxurMYDeHztl1FvAWiL/tlt0sv2JVfXWAaCoX8bQJR6RJ5n
-	EZsYO9Zq15A/HWjfldwz5PxVVGg9wB5bk6E+0fmRO0uagy65zB4+01BJEpFcIkGteQWD0UpczW3
-	5HJfDiMdeEQVXg9Y0bJwISKOVOR9xqHbSsMhgpheA5iXaRRFEJ0IYEBJe/9w9o5/tIu/j/o+CN6
-	zLgzdbiG5Os2mjJ8y/lbmZigINSlAT6P/adXdBqLtdcd+nFMiv5d7Ow+ApPR7sy/EjqKsiqToxj
-	+k8+uwzYXRoLhcbJyXsDcu18FKOmAlBQYSBJqJOemY4G1Arn60+Rpd5vHq5TqbBjDUJdn7wyejF
-	spG7Ol/XkbOxffHgh6S1eFaKRnSwbCrFibgw==
-X-Received: by 2002:a17:90b:3cc7:b0:3b3:c6b1:2277 with SMTP id 98e67ed59e1d1-3b41c93cdc8mr13827843a91.32.1795675690810;
-        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
-X-Received: by 2002:a17:90b:3cc7:b0:3b3:c6b1:2277 with SMTP id 98e67ed59e1d1-3b41c93cdc8mr13827835a91.32.1795675690384;
-        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
+        bh=Jomht0ZwIA00EnoMqIhdiZT52fKUzUkgHp2390iWoPY=;
+        b=bbI5TY2ulfwOjTxaHkeDPoy/dHvy0hh7jh94I4AdOGL7pGpLPN4DHyhWkQVM8Io+Xd
+         7nVJws4DKX6sj4DJla35wcx+OvIUiSVUBpPYh8sA0yWeobuEB2zxSaGL1PFNkpM20DiP
+         T/KLXC38tzq1DlcEQQIrrpA/OJMM9hm7yroqs9bXawjTFNLQ2yO/9Z83lad193dQDTyW
+         itXgB0O0T4lMqnfLxX5YiqH720z2EX9Rq8thgFqiH4IMYotCeHRJKgw6MkwmGzBqH8bL
+         Pq0c/8KDC1zaZ0mpfill6uzHKTAXqAOl/pYnY8G5XSr15JZGsUbIvDPH0IaV4IsYNgV3
+         Q1zw==
+X-Gm-Message-State: APuU4Z/9aitn+1chi2n9vOWXwiU4oetDZQufKFXjm04p+/+fbu8oNYYR
+	lMpaA32oghtdJLx7qD6RnBZH+K9vpSqCg/RChc6Rp77racqWgrx8am3FONzNyn1o3Q1q2YpMlBq
+	MW7m6BpkM4AXpMSzDn6xHdIGH9axggdgxjX8R3yHm7l79cMMrC1iW+Xbu9SoZMTk6aVqbxE6BRd
+	ts090xj0TshEzaztWvbT5R
+X-Gm-Gg: AZFdTZdpX8ERbSrQ2eGu4lVmlykHlEaOX6gtfCQHh0dBV8Roq83RB/k4it1iuEOd33d
+	9mvCMr4gYNGVXcYRpHrz5kkM5J97ERjFPQ3t00jrwH8NkBO0JLId2e8B9jslwNzmLiYFln7VipW
+	9TsklEqkDb1agDbCLzgxqP4hNnJFbMeKvuCAQzX0gYv5cKWTR4kKvEvZTDVJAQK93dahrHGrK1r
+	q0tNkePqJnhitaFm+CI+mc8YrT2fgmvFch7IHVqd8BPVpSyXZ1NJTXRO/qO7TPh4MNGfHAJS+56
+	X6vgzzv/YguLLk9gVDTDPIIR9AfzYyPIvrQy0x3zOXu+ykuxLAMomLVstBYlx9biRNT7JKhBNHv
+	dYMxOgSx7sHUL+O8hmAIVJ4fJvke0X/D+KNM+NEcMGJ81asYY0R1gXpgNgR8/tPmtx/0xhBWvH4
+	af917OX/CP7bqfJqY3Q+VVvyRKVYq6JCaAcg==
+X-Received: by 2002:a17:90b:2f8c:b0:39e:4c81:6c5f with SMTP id 98e67ed59e1d1-3b41c92c175mr18037850a91.26.1795675689219;
+        Wed, 25 Nov 2026 22:48:09 -0800 (PST)
+X-Received: by 2002:a17:90b:2f8c:b0:39e:4c81:6c5f with SMTP id 98e67ed59e1d1-3b41c92c175mr18037840a91.26.1795675688839;
+        Wed, 25 Nov 2026 22:48:08 -0800 (PST)
 Received: from kchsieh-C1-X14-laptop (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b2156c2sm13787468a91.0.2026.11.25.22.48.09
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b2156c2sm13787468a91.0.2026.11.25.22.48.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
+        Wed, 25 Nov 2026 22:48:08 -0800 (PST)
 From: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: hadess@hadess.net
-Subject: [PATCH BlueZ v2 2/3] mpris-proxy: Avoid session->obex dereference
-Date: Thu, 26 Nov 2026 14:47:58 +0800
-Message-ID: <20261126064759.95429-3-kaichuan.hsieh@canonical.com>
+Subject: [PATCH BlueZ v2 1/3] mpris-proxy: Fix possible crash
+Date: Thu, 26 Nov 2026 14:47:57 +0800
+Message-ID: <20261126064759.95429-2-kaichuan.hsieh@canonical.com>
 X-Mailer: git-send-email @GIT_VERSION@
 In-Reply-To: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
 References: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
@@ -111,52 +111,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Bastien Nocera <hadess@hadess.net>
 
-Protect against trying to access session->obex variable that might be
-null after failure to create the session object.
+find_player_by_obex() doesn't check whether session->obex is a valid
+pointer before dereferecing it, but all code paths that assign it use
+create_obex_session() to assign it, a function that can fail.
 
+Check whether session->obex is null before dereferencing it.
+
+ #0 find_player_by_obex at tools/mpris-proxy.c:2819
+ #1 obex_property_changed at tools/mpris-proxy.c:2929
+ #2 add_property at gdbus/client.c:373
+ #3 update_properties at gdbus/client.c:399
+ #5 properties_changed at gdbus/client.c:537
+ #6 signal_filter at gdbus/watch.c:416
+ #7 message_filter at gdbus/watch.c:566
+ #10 message_dispatch at gdbus/mainloop.c:59
+ #13 g_main_context_dispatch_unlocked at ../glib/gmain.c:4451
+ #14 g_main_context_iterate_unlocked at ../glib/gmain.c:4516
+
+Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2466640
 Fixes: 01a5a26814 ("mpris-proxy: Add mpris:artUrl support")
 Signed-off-by: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
 ---
- tools/mpris-proxy.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ tools/mpris-proxy.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index 79cd52706..125bc85d4 100644
+index e06b9ea3e..79cd52706 100644
 --- a/tools/mpris-proxy.c
 +++ b/tools/mpris-proxy.c
-@@ -1306,7 +1306,7 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
- 		const char *handle, *path;
- 		char *filename, *uri;
+@@ -2816,8 +2816,12 @@ static struct player *find_player_by_obex(const char *path)
+ 	for (l = players; l; l = l->next) {
+ 		struct player *player = l->data;
+ 		struct obex_session *session = player->obex;
+-		const char *obex_path = g_dbus_proxy_get_path(session->obex);
++		const char *obex_path = NULL;
  
--		if (!player || !player->obex)
-+		if (!player || !player->obex || !player->obex->obex)
- 			return -EINVAL;
- 
- 		path = g_dbus_proxy_get_path(player->obex->obex);
-@@ -2614,9 +2614,13 @@ static void obex_get_image(struct player *player, const char *handle)
- 	DBusMessage *msg;
- 	DBusMessageIter iter, array;
- 	struct obex_session *obex_session = player->obex;
--	const char *path = g_dbus_proxy_get_path(obex_session->obex);
-+	const char *path;
- 	char *filename;
- 
-+	if (!player->obex)
-+		return;
++		if (session == NULL)
++			continue;
 +
-+	path = g_dbus_proxy_get_path(obex_session->obex);
- 	player->filename = g_strconcat(g_get_tmp_dir(), "/",
- 				path + strlen(BLUEZ_OBEX_CLIENT_PATH "/"),
- 				"-", handle, NULL);
-@@ -2674,7 +2678,7 @@ static void device_property_changed(GDBusProxy *proxy, const char *name,
- 			player->obex = NULL;
++		obex_path = g_dbus_proxy_get_path(session->obex);
+ 		if (g_str_has_prefix(path, obex_path))
+ 			return player;
  	}
- 
--	g_dbus_proxy_unref(session->obex);
-+	g_clear_pointer(&session->obex, g_dbus_proxy_unref);
- 	g_dbus_proxy_unref(session->device);
- 	obex_sessions = g_slist_remove(obex_sessions, session);
- 	g_free(session);
 -- 
 2.53.0
 
