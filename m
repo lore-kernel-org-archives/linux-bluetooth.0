@@ -1,59 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795652279;
-	b=fcYJcmtQpA6M19Z5/sK6Cj0CyNDXZa05M3LM/pVt4JVcVRSK4XV7jWMkpqyhIifXPqYh
-	 sIyaM3RGMBXz1cIv9tqty4fLKnEqP2vOXs34glUk0g021bgY+JlYYMh5Eo/sG+bSAfu1Q
-	 dRTx/XDqPW12p91KbJ6aWHfDSBvLC+0drl5oLaJ/wjydBGODpkKOI8TVR1OGpxE79ZF1V
-	 XuApHk6CdusRKwJD0F9JM+SpsNrpa96L8QoRMLJLiOgglpoWM45hRlmRKOgZXndov6BO8
-	 poqbvrt2w+62Tmdp+fR6UFAXXGtvIr51UEGq9VmHEmdLxUFeA+Gyb0MxptWOjASfiKg==
+	t=1795654322;
+	b=NJOPWMsOYVrENCrAsZxkdLANBzkvOuf3NTPYBjMchTburinagy71ROz8Oo3Lkc0wmvMX
+	 +j4IPeR4ZDAn4QowObalGO7er9PrrABkYYxkY1fU6rznmGq3hWfWBhkbFeJHZfMhP2evR
+	 1NT5roKMRbDfdlGLdWFc4HjTECSbjXScp8S2jrsVKUjWp2igDAoIIm9hgf2p67YLrDZYl
+	 4za9oZXBFqImduvC8hfO4KGF+oSh2d0fnFVdlXGJ/VBOQ02/737Uz4p6qFplriz8Ka367
+	 zacSAFxkhjb/igervTy9kQ32zgXq9gpHUogNZPMm/jMurlCmfPXjKWS+2hdYodAK2JA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795652279;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=cGyYjtdJLDPZe4O6i4XavUGd/lBFZH277wryqEVx55I=;
-	b=IL7kPdPywlqu4G4oK2d1DssIXi1B9KGVla7O6gapIQ0282UFrpU5ikFkCiGeMzXKbklc
-	 4Nv/N9/5FYa/T7gBarqOLMSyiBVkVa70i4Vjtgng8UTp+0n5dd2yhUMwM80toLRCpgMqJ
-	 y0C8BacUGwwtD9EgX23Dzn7Ck5NKXLw9FYcjCvQo9pePJjLRItpK1kvL7UgVbys9CiCpI
-	 Rpew08AOgHj8ENrS5skoCjPPru/TWJHgS1NYu8BZx2J/1gauW38i9mco3+uPZIliC2LuM
-	 ZwUdRQbx7jIKiPbQKf28wkYAdDQYXmGi9798DnUUbzoPCvTFYA4GC8rZrePHcVJ/LZg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795654322;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=45JWSX+Fng39s3lrT3Tm1SqXfxJ/BpeCnwOcdv05O14=;
+	b=ywewF9DeqGn//5n7jmNxzsj+44kNPXzMm9bfbF3sjSLVeykOLgbajG81bWF7pxMw+szx
+	 wQIzqJxMh8AiDRimFi3pm02LK6Nadt5QvRi6Qkl6w59RNtjADG2xGLZ+nq8Y9Kn4qyiK+
+	 Ld5NPyvcwgOre3jjwoIewoyDTVfv3C9s7T7bZEiwzhFBJ3EHH7OOOwGi5w4H0obDIWDsl
+	 DtT8d+xKK3qehbsJwWDG+TOPHIrBpen9CmPTusZQEcG56/yAc5+GREEwVqaedruC5+QeI
+	 rREwYEVD+D0KI9N4HQh5C7sQcyY11GeZWN0MH2fi1v6Z52fajUfkMlPHbpBILfC2Hpg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b="W/lFewgH";
-	arc=none smtp.remote-ip=185.70.43.103
-Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BieVWqu0;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=fA2zNKuK;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B487606A323
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 00:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B487606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95B3606A31E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 00:52:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B95B3606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=W/lFewgH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1795652275; x=1795911475;
-	bh=cGyYjtdJLDPZe4O6i4XavUGd/lBFZH277wryqEVx55I=;
-	h=Date:To:From:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=W/lFewgHYmVNR+tT0HLjTfGUJm3e5/HyeOAoqFzhxSlOkbdcEeB0VLQ0eo9fYoUf9
-	 XBISZReHNdYhjuuPh7/o6hPjA3CfQeikd1eoBMuBTmJT3UnwpXONzAl9miHjfksuQc
-	 r7sZm4ZY2SFP8fg5p1iV7f4ymPNZFGsDy9R7TP0Mw8zYWmu6ouF25RDP4IdMtYbhf0
-	 nOcrx5PRbR1t62cT6QYEkY3A0uDabBNE7/czy3iV8wLZU4K4cJCGT7ErpZozapDEjl
-	 8ZZ935DH/LiRRAtHfOyEPo1/1IDGNJnQ1y99n34UpUYzaWubciMabWRIg7g6NgXMfX
-	 P0GRXH+Lssk1w==
-Date: Thu, 26 Nov 2026 00:17:49 +0000
-To: linux-bluetooth@vger.kernel.org
-From: cochcoder <cochcoder@proton.me>
-Subject: Re: [RFC PATCH BlueZ v4] l2cap-tester: Check compatible interval preferences
-Message-ID: <2qA5MM8cgOoJxL_dqVBP1UFjp3NVMCWcucmjj94Yk3d0xkbBoBhIK0gIFdW_BlRHDEi3289S-GQB07UvxnVnnHciXNphOmlGwTTHWNX9yzE=@proton.me>
-In-Reply-To: <e9181806a0382a9ed0312caaf39048c222476fc3.1795528108.git.cochcoder@proton.me>
-References: <20261031181244.123461-1-cochcoder@proton.me> <20261031193734.189558-1-cochcoder@proton.me> <ee66ad17c264d1db6b42eb97d359f134817c6750.1795497229.git.cochcoder@proton.me> <e9181806a0382a9ed0312caaf39048c222476fc3.1795528108.git.cochcoder@proton.me>
-Feedback-ID: 97716137:user:proton
-X-Pm-Message-ID: c73e3e6d952650aef135ffd471c412f1f7573cd0
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=BieVWqu0;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=fA2zNKuK
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6APJB1Dc1358012
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 00:52:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	45JWSX+Fng39s3lrT3Tm1SqXfxJ/BpeCnwOcdv05O14=; b=BieVWqu0TohhazCL
+	dZGnIy2gPy8/Y4rCfwsOljr8c3pdpnXDAR5FLzMsHvoO2U5jUgD5Y26MXWPV09b8
+	xo/R5kBsDHQM1xaUNSjD0F8aisR4GhattVUhNRYNE4JnC9DGgcBMUOwRR0y+pqE1
+	FXtazPIhcbU4z1RsYRgah7cRrjio1L592wYxeOJK9/C+Y9tZSFYoY3iuvELwbRxQ
+	AK18N2J2tjk+8XtnKoxVwXP7tCesgnRhXFB/QgZj0Igg80f4/ms2K0PzhuultGsr
+	ULUQM34AlDh3NDX8CrZSZY7XfhS/QbQTTV9HJRH/Mkv92ZGUCZx7l6vmAGArx4TU
+	Ad5weQ==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j5yaxtkby-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 00:52:00 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3b3fcce67c4so1169975a91.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 16:52:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795654320; x=1796259120; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=45JWSX+Fng39s3lrT3Tm1SqXfxJ/BpeCnwOcdv05O14=;
+        b=fA2zNKuKDB5wMBcrJ5MQf5klFN0kkGBnM5MHGcCMI+wDL/OKSMxmhUoCt+6Ufr28rb
+         8tvlBIyXVS8QXIiyGtZJKq7OluXi+TjswC1AviZDzyTpqV0xUncX4rDJ21kUoaiACieK
+         bbUY86H8W6RuURfXGkbqeGZwiw20jCM75PGlWm+XfEZSCey3UBr2G9utZm5l6IyynTnU
+         Co4YbcuuxSPGzY73wvIL8YOFPiVBvG1MPPtAeVrI8+hysf0OMfyy95Rmz09l5TUSXjA7
+         Wz+wFYUdxiIqDeKvLwYYsoEdZ6BfyBo4WOAP1eCltbWabFesIY28TRA+GvOEeHrBMsLC
+         zjwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795654320; x=1796259120;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=45JWSX+Fng39s3lrT3Tm1SqXfxJ/BpeCnwOcdv05O14=;
+        b=W/vVMdUxJVAooYLCRQ5oIlv8aYsC2k+Dj/AqfQx1EHgBUPzBmG6J+0LnqbfZ2xcMm+
+         c3KNFIhSF4f4/xazmKy5ZgDVoRE3Bb7Br8r0fy3CdTyqwSCsk++d6pOU2ZQgnLimt38x
+         Vi9/MbaAhPo+cqdgyEZFgz5bPAhEcrxU6qzsy+Oo2ew9cHKWE3NJXf2DxZDBSLikb0bo
+         gsENpMjgfV6Hp495qfPMSkuvnLy2QxBMlZlVTt8pvFb3PJ8hoLpdKAsM31ppcmzF9jFP
+         344J4APyU8qopudymq1FLzdCLOYNL1/6w7DKh0DzUdHS7Umd+o/I2/GEDJrFfAy3t2yE
+         l8XQ==
+X-Forwarded-Encrypted: i=1; AL+hErHkBbSqf8DKgMp9ta4QAjqYqRbJOxZAkFc4w0iGlkaowVbDyAg53weI9ZpyO1lWZyZkIWHmEFkVox8muo4zpmg=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/fjf6Q0ea/MpOrc6WhwjpK0mn/2cHTs0Sk/pGNBEQNTnhcZjmE
+	OoWiXAQ5TX/LCA1yJZK/qYOhjpZLv1W3VuNA8Inz0S7JNrPe8dE4bQ917CvCxa6JQp+BqcWDg7Z
+	FTfxJdIOp0vgzFPpijBc5LbhNDdfzfhFRORf0Xv4UnBMsOusBlFwGhQdeASQ983a3As1ap0M=
+X-Gm-Gg: AZFdTZdSUD6q3ZJZ6cBOp95siV32P4NG3Lt7om5WmDsyNHI/qQ/9IAx3rNddY0ofGkp
+	LyCIxylmkKq0PUBp6WD/AIBvnRXgYK0r9d0dQyzCxAnL47Mg5/G9qfoRARQUYb674bTxxtxqYCD
+	xT7kypg3pf/Dnl/yDBocZiFezIQit3jlfRvqmKyF0pyg00fJzxGO6ij3hfhwvNxoe8ZfXDHWn5N
+	Hi/2DB/Z3WyPpFwb3CwJPEfsTfQIt6dWdcoODxas+I58cs8omMmXEzIQ5hqzLsX4vjrR81a8hla
+	uxnkMve0VZbvx//mdJtIKZ1zLYq7iru5udg0ZF7RPmdgiDZk7qOOnTxDUIPPcM4ahzvDy/QT/3p
+	itw88uUDIpJw0wn/D6v6TAePD1QQPN2iUtigAv+FQuAMtBm+x5RA5fsXPhzNOynoXxYhifVHQMu
+	RN2ObItoGgBCoE3skUlCDShjIpi3UI4LB/pcQcbx4=
+X-Received: by 2002:a17:90b:1dcd:b0:3b3:bcc2:490 with SMTP id 98e67ed59e1d1-3b41c7c77f8mr31139924a91.1.1795654320085;
+        Wed, 25 Nov 2026 16:52:00 -0800 (PST)
+X-Received: by 2002:a17:90b:1dcd:b0:3b3:bcc2:490 with SMTP id 98e67ed59e1d1-3b41c7c77f8mr31139888a91.1.1795654319618;
+        Wed, 25 Nov 2026 16:51:59 -0800 (PST)
+Received: from [10.249.21.64] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b7a8c64sm13359766a91.3.2026.11.25.16.51.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2026 16:51:59 -0800 (PST)
+Message-ID: <b5219ca5-a8bb-4dd3-a4b1-692ab362d400@oss.qualcomm.com>
+Date: Thu, 26 Nov 2026 08:51:55 +0800
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -63,300 +116,79 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REPORT] btusb: QCA9377 13d3:3503 on ROM firmware: HCI hang
+ during mSBC SCO
+To: Iaroslav Voitovych <yaroslav.voytovych@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Shuai Zhang <shuai.zhang@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Tibor Harcsa <silurust@gmail.com>
+References: <20261029013350.360574-1-yaroslav.voytovych@gmail.com>
+ <bf27c4e0-31ac-4ee6-b7ba-afc6744e5c0a@oss.qualcomm.com>
+ <20261124043440.1206949-1-yaroslav.voytovych@gmail.com>
+Content-Language: en-US
+From: Zijun Hu <zijun.hu@oss.qualcomm.com>
+In-Reply-To: <20261124043440.1206949-1-yaroslav.voytovych@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: nXpaHBHx5wrSAgIxo5qRKAPp-wkFKHFZ
+X-Proofpoint-ORIG-GUID: nXpaHBHx5wrSAgIxo5qRKAPp-wkFKHFZ
+X-Authority-Analysis: v=2.4 cv=ULpIjyfy c=1 sm=1 tr=0 ts=6b0782b0 cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
+ a=DAFMqZBfVSRFwNYT9vAA:9 a=QEXdDO2ut3YA:10 a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI2MDAwMiBTYWx0ZWRfX3gCj/EMoHxNg
+ 2VrwJkMweXvD1Ytmsx3licIVoNZj5I+PFwEldw+ISAwZy2fAk4Cis95sD6WU5DxqbMRS1HCftca
+ pqb8uF9CRllYnjSjp87L1GodYbroKKY1+QRE1HpA6pgrYuZNHNlpkiy/gFzIn6d6XjhshvDOCGJ
+ 6Apl6I1XFaifpOynptHJMzfghm9SNLmMyD2W8ELLp/QSeDfDEsqxGNeh7Kr7MSdnSPG2vrzyEGH
+ Ms7q8vUY3MsY9MoEk3hm9XSmvSmuQ+TW5rkD5Bt30zbsRklvC2XeGZrvKkFcSQie3RuG87gd6EJ
+ slDH1ZfY9S0U2jIkmwkuOfFDkw/htYXFjGgM993mJ2sBgHDnbn1RzRxR3JT+w7GlmSWyaUXTbIY
+ Vnu8RUuLVBmJfJixMe9ypSFCpJoh4pxDU6+ZHcyyBf6Ldn4NpBIVlqgwjICM3p4C8SCWdM2yJAF
+ m2/3hhACUShAC//Ef0Q==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI2MDAwMiBTYWx0ZWRfX95RhZPpnzMfU
+ Vd38v+WjANDvMrOCifgqBF2OZlXTJ8BE22HgWP+cmQj/Pl361mseVrz5c0gz0P+75MVfpvfNRnD
+ lXJFCYWQ50eaSYNXAYXwOn6LDQMt6+k=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-25_05,2026-11-25_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1015 priorityscore=1501 malwarescore=0 impostorscore=0
+ bulkscore=0 spamscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611260002
 
-Hi,=20
-Please consider this patch as withdrawen since the=20
-patch it relied on has been withdrawen.
-https://lore.kernel.org/linux-bluetooth/20261124140405.3096828-1-cochcoder@=
-proton.me/=20
-Thanks,
-Kyle
-
-
-On Tuesday, November 24th, 2026 at 8:51 AM, Kyle Pepper <cochcoder@proton.m=
-e> wrote:
-
-> Load local connection preferences and check the peer's L2CAP response
-> and the resulting HCI Connection Update parameters. Cover overlapping
-> and disjoint ranges, containment, a shared endpoint, and preservation
-> of peer latency and timeout.
->=20
-> Assisted-by: OpenCode:gpt-6.1-sol
-> Assisted-by: Codex:GPT-6
-> ---
-> Previous version: https://lore.kernel.org/r/ee66ad17c264d1db6b42eb97d359f=
-134817c6750.1795497229.git.cochcoder@proton.me
-> CI report: https://github.com/bluez/bluez/pull/2892
->=20
-> Changes since v3:
-> - Wrap three lines to satisfy the 80-column CI check. No behavior change.
->=20
-> Overlap cases require the companion Linux preference policy:
-> https://lore.kernel.org/r/b6847b841127362e423b49f9e48118f97985865d.179549=
-7229.git.cochcoder@proton.me
->=20
-> Validation: whitespace-only comparison against v3 and source checkpatch
-> with --max-line-length=3D80. V3 remote CI passed all eight other jobs.
-> Fresh native interval/controller execution remains unavailable locally.
->=20
->  tools/l2cap-tester.c | 214 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 214 insertions(+)
->=20
-> diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-> index 4d2c5cd..a17c67d 100644
-> --- a/tools/l2cap-tester.c
-> +++ b/tools/l2cap-tester.c
-> @@ -59,6 +59,7 @@ struct test_data {
->  =09int step;
->  =09struct queue *io_channels;
->  =09struct tx_tstamp_data tx_ts;
-> +=09unsigned int interval_events;
->  };
-> =20
->  struct l2cap_conn_subrate {
-> @@ -154,6 +155,7 @@ struct l2cap_data {
-> =20
->  =09/* Change security level to this after connecting */
->  =09int change_sec_level;
-> +=09const struct interval_test *interval;
->  };
-> =20
->  static void print_debug(const char *str, void *user_data)
-> @@ -4428,6 +4430,194 @@ done:
->  =09close(sk);
->  }
-> =20
-> +enum interval_event {
-> +=09INTERVAL_EVENT_UPDATE =3D 0x01,
-> +=09INTERVAL_EVENT_RESPONSE =3D 0x02,
-> +};
-> +
-> +struct interval_test {
-> +=09uint16_t local_min;
-> +=09uint16_t local_max;
-> +=09uint16_t peer_min;
-> +=09uint16_t peer_max;
-> +=09uint16_t expect_min;
-> +=09uint16_t expect_max;
-> +=09uint16_t peer_latency;
-> +=09uint16_t peer_timeout;
-> +};
-> +
-> +/* Local, peer and selected ranges (1.25 ms), peer latency, timeout (10 =
-ms). */
-> +static const struct interval_test interval_cases[] =3D {
-> +=09{ 16, 16, 16, 24, 16, 16, 0, 600 },
-> +=09{ 24, 40, 6, 6, 6, 6, 0, 600 },
-> +=09{ 16, 24, 80, 160, 80, 160, 0, 600 },
-> +=09{ 16, 16, 16, 16, 16, 16, 0, 600 },
-> +=09{ 16, 32, 8, 24, 16, 24, 0, 600 },
-> +=09{ 8, 24, 16, 32, 16, 24, 0, 600 },
-> +=09{ 16, 24, 8, 32, 16, 24, 0, 600 },
-> +=09{ 8, 32, 16, 24, 16, 24, 0, 600 },
-> +=09{ 16, 24, 24, 32, 24, 24, 0, 600 },
-> +=09{ 16, 16, 16, 24, 16, 16, 4, 200 },
-> +};
-> +
-> +static const struct l2cap_data interval_data[] =3D {
-> +=09{ .interval =3D &interval_cases[0] },
-> +=09{ .interval =3D &interval_cases[1] },
-> +=09{ .interval =3D &interval_cases[2] },
-> +=09{ .interval =3D &interval_cases[3] },
-> +=09{ .interval =3D &interval_cases[4] },
-> +=09{ .interval =3D &interval_cases[5] },
-> +=09{ .interval =3D &interval_cases[6] },
-> +=09{ .interval =3D &interval_cases[7] },
-> +=09{ .interval =3D &interval_cases[8] },
-> +=09{ .interval =3D &interval_cases[9] },
-> +};
-> +
-> +static void interval_complete(struct test_data *data, enum interval_even=
-t event)
-> +{
-> +=09data->interval_events |=3D event;
-> +
-> +=09if (data->interval_events =3D=3D (INTERVAL_EVENT_UPDATE |
-> +=09=09=09=09=09=09INTERVAL_EVENT_RESPONSE))
-> +=09=09tester_test_passed();
-> +}
-> +
-> +static void interval_command(uint16_t opcode, const void *param, uint8_t=
- len,
-> +=09=09=09=09=09=09=09void *user_data)
-> +{
-> +=09struct test_data *data =3D user_data;
-> +=09const struct l2cap_data *l2data =3D data->test_data;
-> +=09const struct interval_test *test =3D l2data->interval;
-> +=09const struct bt_hci_cmd_le_conn_update *cp =3D param;
-> +
-> +=09if (opcode !=3D BT_HCI_CMD_LE_CONN_UPDATE)
-> +=09=09return;
-> +
-> +=09if (len !=3D sizeof(*cp)) {
-> +=09=09tester_warn("Invalid LE Connection Update length %u", len);
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09tester_print("LE update: interval %u-%u, latency %u, timeout %u",
-> +=09=09=09get_le16(&cp->min_interval),
-> +=09=09=09get_le16(&cp->max_interval),
-> +=09=09=09get_le16(&cp->latency), get_le16(&cp->supv_timeout));
-> +
-> +=09if (get_le16(&cp->min_interval) !=3D test->expect_min ||
-> +=09=09=09get_le16(&cp->max_interval) !=3D test->expect_max ||
-> +=09=09=09get_le16(&cp->latency) !=3D test->peer_latency ||
-> +=09=09=09get_le16(&cp->supv_timeout) !=3D test->peer_timeout) {
-> +=09=09tester_warn("Expected interval %u-%u, latency %u, timeout %u",
-> +=09=09=09=09test->expect_min, test->expect_max,
-> +=09=09=09=09test->peer_latency, test->peer_timeout);
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09interval_complete(data, INTERVAL_EVENT_UPDATE);
-> +}
-> +
-> +static void interval_response(uint8_t code, const void *param, uint16_t =
-len,
-> +=09=09=09=09=09=09=09void *user_data)
-> +{
-> +=09struct test_data *data =3D user_data;
-> +=09const struct bt_l2cap_pdu_conn_param_rsp *rsp =3D param;
-> +
-> +=09if (code !=3D BT_L2CAP_PDU_CONN_PARAM_RSP || len !=3D sizeof(*rsp) ||
-> +=09=09=09=09=09=09get_le16(&rsp->result)) {
-> +=09=09tester_warn("Connection Parameter Update was not accepted");
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09interval_complete(data, INTERVAL_EVENT_RESPONSE);
-> +}
-> +
-> +static void interval_connected(uint16_t handle, void *user_data)
-> +{
-> +=09struct test_data *data =3D user_data;
-> +=09const struct l2cap_data *l2data =3D data->test_data;
-> +=09const struct interval_test *test =3D l2data->interval;
-> +=09struct bthost *host =3D hciemu_client_get_host(data->hciemu);
-> +=09struct bt_l2cap_pdu_conn_param_req req =3D {
-> +=09=09.min_interval =3D cpu_to_le16(test->peer_min),
-> +=09=09.max_interval =3D cpu_to_le16(test->peer_max),
-> +=09=09.latency =3D cpu_to_le16(test->peer_latency),
-> +=09=09.timeout =3D cpu_to_le16(test->peer_timeout),
-> +=09};
-> +
-> +=09if (!bthost_l2cap_req(host, handle, BT_L2CAP_PDU_CONN_PARAM_REQ,
-> +=09=09=09=09&req, sizeof(req), interval_response, data))
-> +=09=09tester_test_failed();
-> +}
-> +
-> +static void interval_loaded(uint8_t status, uint16_t len, const void *pa=
-ram,
-> +=09=09=09=09=09=09=09void *user_data)
-> +{
-> +=09struct test_data *data =3D user_data;
-> +=09struct bthost *host =3D hciemu_client_get_host(data->hciemu);
-> +=09struct tester_io *io;
-> +=09int sk;
-> +
-> +=09if (status) {
-> +=09=09tester_warn("Could not load connection preferences");
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09bthost_set_connect_cb(host, interval_connected, data);
-> +=09bthost_add_l2cap_server(host, 0x0080, NULL, NULL, NULL);
-> +
-> +=09if (!hciemu_add_central_post_command_hook(data->hciemu,
-> +=09=09=09=09=09=09interval_command, data)) {
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09sk =3D create_l2cap_sock(data, 0, 0, 0, BT_MODE_LE_FLOWCTL);
-> +
-> +=09if (sk < 0) {
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09if (connect_l2cap_sock(data, sk, 0x0080, 0) < 0) {
-> +=09=09close(sk);
-> +=09=09tester_test_failed();
-> +=09=09return;
-> +=09}
-> +
-> +=09io =3D tester_io_new(sk);
-> +=09tester_io_set_close_on_unref(io, true);
-> +=09data->io_channels =3D queue_new();
-> +=09queue_push_tail(data->io_channels, io);
-> +}
-> +
-> +static void test_interval_preferences(const void *test_data)
-> +{
-> +=09struct test_data *data =3D tester_get_data();
-> +=09const struct l2cap_data *l2data =3D data->test_data;
-> +=09const struct interval_test *test =3D l2data->interval;
-> +=09uint8_t buf[sizeof(struct mgmt_cp_load_conn_param) +
-> +=09=09=09=09=09=09sizeof(struct mgmt_conn_param)];
-> +=09struct mgmt_cp_load_conn_param *cp =3D (void *) buf;
-> +=09struct mgmt_conn_param *param =3D cp->params;
-> +
-> +=09memset(buf, 0, sizeof(buf));
-> +=09cp->param_count =3D cpu_to_le16(1);
-> +=09memcpy(&param->addr.bdaddr, hciemu_get_client_bdaddr(data->hciemu),
-> +=09=09=09=09=09=09sizeof(param->addr.bdaddr));
-> +=09param->addr.type =3D BDADDR_LE_PUBLIC;
-> +=09param->min_interval =3D cpu_to_le16(test->local_min);
-> +=09param->max_interval =3D cpu_to_le16(test->local_max);
-> +=09param->timeout =3D cpu_to_le16(600);
-> +
-> +=09if (!mgmt_send(data->mgmt, MGMT_OP_LOAD_CONN_PARAM, data->mgmt_index,
-> +=09=09=09=09sizeof(buf), buf, interval_loaded, data, NULL))
-> +=09=09tester_test_failed();
-> +}
-> +
->  static void test_l2cap_ethtool_get_ts_info(const void *test_data)
->  {
->  =09struct test_data *data =3D tester_get_data();
-> @@ -4439,6 +4629,30 @@ int main(int argc, char *argv[])
->  {
->  =09tester_init(&argc, &argv);
-> =20
-> +=09test_l2cap_le("L2CAP Interval - Prefer overlap", &interval_data[0],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Fast HID fallback", &interval_data[1]=
-,
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Slow idle fallback", &interval_data[2=
-],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Exact match", &interval_data[3],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Lower overlap", &interval_data[4],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Upper overlap", &interval_data[5],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Local range contained",
-> +=09=09=09&interval_data[6], setup_powered_client,
-> +=09=09=09test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Peer range contained",
-> +=09=09=09&interval_data[7], setup_powered_client,
-> +=09=09=09test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Shared endpoint", &interval_data[8],
-> +=09=09=09setup_powered_client, test_interval_preferences);
-> +=09test_l2cap_le("L2CAP Interval - Preserve latency and timeout",
-> +=09=09=09&interval_data[9], setup_powered_client,
-> +=09=09=09test_interval_preferences);
-> +
->  =09test_l2cap_bredr("Basic L2CAP Socket - Success", NULL,
->  =09=09=09=09=09setup_powered_client, test_basic);
->  =09test_l2cap_bredr("Non-connected getpeername - Failure", NULL,
->=20
-> base-commit: 1608f836188610aabeff5a3164169ebe0360e443
+On 11/24/2026 12:33 PM, Iaroslav Voitovych wrote:
+> linux-firmware lists these two files for QCA61x4 USB chips. Whether
+> they are the intended files for this module is what only Qualcomm
+> can tell.
 > 
+> Three questions, and what each answer would change:
+> 
+> 1. Are the Rome 3.2 rampatch and NVM the intended files for the
+>    Bluetooth controller of a QCA9377 module that reports ROM 0x302?
+>    btusb has BTUSB_QCA_ROME for three IDs whose commits name QCA9377:
+>    04ca:3015 (0a03f98b98c2), 0cf3:e500 (0324d19cb998) and 13d3:3503;
+>    I have measured only the last. If yes, that would support using
+>    the same setup for other matching IDs. If no, what should
+>    13d3:3503 load instead?
+> 
+
+no, let me try to up-stream QCA9377 BTUSB firmware, you may override
+the one loaded currently by QCA9377 as WAR
+we will think about how to support it.
+
+> 2. Is there a list of the USB IDs that need this setup, or a reliable
+>    way to recognise them? This year, 13d3:3503, 0b05:1868 and
+>    0b05:1825 were each added after a user reported BLE-scan errors.
+>    A list would help add missing entries before users hit failures.
+> 
+> 3. Is this loss of HCI responses after mSBC link-up a known issue of
+>    ROM 0x302 build 0x111? If so, is there an erratum, an affected ROM
+>    range, or a rampatch or NVM revision known to address it? That
+>    would help determine whether other modules with this ROM need the
+>    same firmwar
+
