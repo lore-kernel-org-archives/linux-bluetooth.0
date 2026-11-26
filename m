@@ -1,113 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795673224;
-	b=xv8axPMQOsd9GuqZAyPt5Ju3f/Sq8fEakEcl/SGZS+CIPluLG2Hs+wwnoEU2Zl61RdME
-	 aP+YRtUQRDc0V/gNvqyG6kzrynPNt8jTIFvAsT867elTczUzXY+FXXIw+k9thusCh2wtN
-	 a132W/vipcARg8uG1ETE+bVTTnTZPvQ+2y//1/gYRusGeBYTwTiw26NKBtPqMmjb2fTjs
-	 FbY/bClpGR7lZWhrOKFtWTH1IOwUDgTlcqNLVMqHTRU5BqtfLiZh8z7FG+hDP9let2Pne
-	 Ub9N7p47qVgXKmDvU4H2MwTa5esLNJTAnfWbsUe1yilqchViwqG5mXuyAoPsiwGQSAQ==
+	t=1795675694;
+	b=kiAQe231fX3o4RJ2hg6CAZhSR2NXaYHeYgAgWGQbOVP2T+HlWz4S+M4fxWrTzkKYqxq3
+	 8CFazTR0ZRBJRchMCAT36fF9Vg1LUJQ1cNrgee2lGV7d93YGL2Ace48331CLdr/WiG1Jr
+	 hv09bc8bZzBUwin8WRDa4Ojrld//6y/m36KnV9C4Ifzuvj9p+wQtomnKRNeGysPmJdVRZ
+	 rX5gLuGIKob5M4eT6bfMNNnqtR/J+zUsfFW85fK3mnQX3TT25TF1mu+rlC4bn+DPgszRG
+	 nJA9M/4pX1bUw0Cgl8+KYTxUs92Dp4z1g7ttPm+6WhGF3+kosB18eSbjIWCWOWOdgKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795673224;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Sender:Received:Date:
-	 From:To:Cc:Subject:Message-ID:Mail-Followup-To:MIME-Version:
-	 Content-Type:Content-Disposition;
-	bh=4vEv4zWesqwl2OdkZUsIGqo+gUaqxzOcgiEIZ0178vQ=;
-	b=moSd+isq1OhChXqfMk5If9wFVV6LwN7spzSWm1jXjKghKEj/aMEX8+F/ACKBZUPgiWKg
-	 V0rZ5biC1ORTyNsq242yi7r2PHaZ8imNcbHVig0hz7UnYa70q/ESX9FtzqfNLOx99Kt+N
-	 vU9sMJzEWQalc/stZMil7IsA2dlOXWvUueEbzxAA9uyUe3AfmCrXTHOPqMkeHejhuN/sk
-	 DWUWIh/1FoIb7Xgm3hkbU2zrf4GzLptA4siKOLNMdTEQB9Ou4kN9Dx0gFeJTawsIBh46v
-	 MkJvKTpGoZ89lmZ2t96M3dMw4MOaHVNJKwnxPvSkQhlREGANGCRIGW6PzqjKaAEqacg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795675694;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:
+	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
+	b=0cuMXT7Qn7xiKtlnAxZ3tBrg/AcK2YlWNoUgEmMZCQseDqE9kbTEn+GedK5B0J2ajNpy
+	 1b/PtJqIDqkhfSmzPEdDuaneTemkRfhX2OxQqCpXoCrFRM1len0jpLtXBx7B3LLGRH+jU
+	 9AURj2Y4uEj0nOD8CVJ+0Nu92X9RGy6xsKWgREmD/TZogGzKzojt5HdYUEPg5JWBRNBUg
+	 S8j1Das3DG43GIXieh4S4fNDMyN7dcimy45e6AG3kMDCEqezI8sqlKTtHKIRAD0y73JCr
+	 inb++r6P2rv2ChOlfh9eCGqBGQG1hoCf0ZNr0t4uAXHe20HXUFE/0cnD4SMbJatrE5g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=debian.org;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="m/RIFmtJ";
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=canonical.com;
+	spf=pass smtp.mailfrom=canonical.com;
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=BCQKX1O3;
+	arc=none smtp.remote-ip=185.125.188.123
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A82606A31E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:07:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E2A82606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B69606A685
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4B69606A685
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=m/RIFmtJ
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4bb85e07aadso81238245e9.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:07:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795673222; x=1796278022; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:mail-followup-to
-         :message-id:subject:cc:to:from:date:sender:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4vEv4zWesqwl2OdkZUsIGqo+gUaqxzOcgiEIZ0178vQ=;
-        b=m/RIFmtJ5wHoWDb9ay9vpzOKu2gH8VeNfvVJoCdpBOZId0ptKtXlQMdDs1XUwGxOYm
-         tHjXVIjzf69xhVaJT94qXMlodAotjrfYvNUHS/qJ9tUtcOd4cvjGygIYi4m98sokLfsH
-         KqvuJFfUOlA5j2U3wmQlL+5l6DCNmXlUt1SWm/hBdu0LojTmGTnf5PpmJJ3SeQrM61kJ
-         a1nmzacdqb3730/apkZSn36Q0VDknHxrMb4QS20RfH4TSR/x+2db+tZ53G8z8P3gT5Fh
-         cKhCFyHfbGsZgOpuA+c3hH0OKr9XrYx8DaqLDc/hmgUgqmXfMxzONxI9W0frNvaxXE10
-         Ixgg==
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=BCQKX1O3
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6342D3F641
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 06:48:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1795675692;
+	bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=BCQKX1O3z8y9MUnsGS6tA4adp06i8zMGXlqArdp7uK3d36ppNyx4VykBfG3BvxNqD
+	 QRU5S1GkHvLlEZ0ukogtDWHE7G70u1j/ZxPSY/v6A01XteEiTozoZ9wnNA03X7Pxtx
+	 MT2GaBivQJRI57LWJYH1vOYxtxAH4GO42/dy8GPATohermxAnkeHX0FP3SFTARni5J
+	 ROeRy4tLdVEui0xTAVZMR0he+sq02vL3sVYpy1SJgQQ38KTUyPqRhfiCHycYOnSD1U
+	 IediwqAXyp8ET1DVZ2B5tA4OsJ2lz1w0mTh4fqT1WVUHPyK0CHH5gKdclLODaE7Wlh
+	 MWztGEtXksteYj+edy+q+3ZG6FMtGi15R7+R9YGDs8QjJQh4Wo/Ozdjfe6qbcDVt15
+	 0JlWBxOa6j2ee2A1OTkahbkHv4WiWLS2py7qOONxsrybRWKYpX8WPDSIax1DxmfCps
+	 plqLtduOOCGGABz7V2fkXYIP02bgsNbE0NHtzKElOzPUJ/rWpuRqDXSxCIcz6tpbtA
+	 LgDhhY0wkUapAl8pHBz8Rt/k7KqFX7T5Y6c8Pq36yOId0zdUNzAd2uhJi1Q/jtuZwN
+	 hWaLXtF/HowS86735p+DMJ0+6TBPQVn+G/doIgERA/w9gZp37NifK3EpK8/Uc4GWM5
+	 pr0zOPr1JWF9ejsfazAWjaqc=
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3b3b4208826so4732708a91.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 22:48:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795673222; x=1796278022;
-        h=content-disposition:content-type:mime-version:mail-followup-to
-         :message-id:subject:cc:to:from:date:sender:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4vEv4zWesqwl2OdkZUsIGqo+gUaqxzOcgiEIZ0178vQ=;
-        b=MGFHNLG7th19G9Pg7Ck2ZmeHEuMg29YhwBg7kCSEUHl1b7AZZ5zyBDzmRmHJgOaSYY
-         89KnccJxncwqnGPBdStAumZS6KJzlMe+i7EkSxnFJZushaVVthWpCu4M6+jgSQD3lW6J
-         4FMOXU9ltyIT/AunIPaPxkNNrW662GMj2mYOAsoVq+dczT8ooxFhJ8U8y3wjZC7xal7J
-         jHeC0onRvS5Vt04jJYx9mUvYF8+yqkZ1nK7/eX/01o+Q0i4VRHcaTmAJvtv6Q+osRYP5
-         cRMI9VEbZoHSYT3DZAd3+N7qlbWqRR4zJ4C6OP9sGZBBCCDzqeYQVnMPTmm/XGT+zLs/
-         ZLkg==
-X-Gm-Message-State: APuU4Z92QJ+sBK7e81fZdRMNUCHUOj0f762+UHTdD/tufAp4P+PV6YOX
-	BcD4sWz42HK3OFtr7hYV8qjn73qT2x5lG81A427BX003pfFPE0XzgfQ3
-X-Gm-Gg: AZFdTZcvangeIt6MklbHNc/pyt38zjcb4Y9hAb03cmxar9BieBzLIbfsGridbl0waIH
-	bV7QERje18TbgnDrMvczNscvMf/lVrvoRq9PiasFwr/r0X0kHNVheK4nsETwmJdmthkKUZLDEJN
-	/72mZs6hkbvxzEN0a+h9ulLgGvQqUjgh8wTcnp0ksXVWoGB7QPf7xISkRHwlWFtqve8FxO2+rrx
-	5C7VVUxnSs/lebCg/L5IKvcxjjQwD0KsBhdn1bOQ66WeXtPwTxLVsb/e81tkE9phxUayUGqE6Jx
-	9WPtXvYr0oJXHQJptA/9dDD7xqEWemYYNvuZGC0xDKDXc/bg+1qxMEJoQtqYwOZ3zR2j0MhWSgW
-	h3zCoWSWpgk+nRvqcM6lU6DCQ/S832hjoJzR69llTy6HfSYojDq8I1Uf1jjbDqy8HA20pMWPqZX
-	YTWh0hnLk0xta8jJxgTF2kbS040RLNAxX6R9SO/k+f+hsZaHHJF598a1H2XG8+6IrRSSmQezk+6
-	Z7aiFmOi/P/hmARnG8zLe3mGRNT/pZ2a9MHRR0HbN3jv++9gyLrHo5NI0sSjmwgJQY9vvSBeiVL
-	bdmpTRbXVVT7014z/TObwzA4loc7xMywYhhwIzAenyCyOcV68pQXbU5jikftb1DLJl5qXeA/ywl
-	uLw/T+2Jx2w==
-X-Received: by 2002:a05:600c:4f50:b0:4a2:1612:637a with SMTP id 5b1f17b1804b1-4bb888063f3mr499671215e9.16.1795673222070;
-        Wed, 25 Nov 2026 22:07:02 -0800 (PST)
-Received: from eldamar.lan (c-82-192-247-196.customer.ggaweb.ch. [82.192.247.196])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb88f148aasm228217135e9.0.2026.11.25.22.07.00
+        d=1e100.net; s=20260707; t=1795675691; x=1796280491;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qdYH1K8w7WsDh2ghihjMdSuDb2TZ6+Qd4sMaL0SithI=;
+        b=u1z117rAPZqNjhFr1+iiyE6CLvmL/JGR5AgiJNQY6vWDFqPkoVS4uCdzKg4rY5YvGN
+         aKgGtyBiuz/aJ6bS9E1woCdK0YSHZYa51dbLCCy641iV7kqvGh6u+tlWClHBeexH+c2Q
+         7i955RCsHUfbbO+k4kGECp6/lW/0qT51O+naRdg7/5RIkvstqJJkkx7Dz0+Qg++PjKJN
+         Psoy356NyO/70hhtPmicLVQap8asfdYt1Ac8oeMH0xMAP/FQPKlGxjD//64qEgB1iWUL
+         AUFTSPwILeb3WX0Sj/1d8bmxKHyCGnHgprLF+2jRC7P91Fmal2oQlKwyUD0VaXl2L3Wd
+         l9tg==
+X-Gm-Message-State: APuU4Z8SP5Mf1T6eFlhFd+EzjOv9dKVSkIEwB2JP2Na2AtWU54SkuKDc
+	rPmYlHi7XQLbKwilxOi18kwxX5tecXB8cGt80YflIOtuSzAjHmwU6BIIbKHFgPKn1AU5Is3sYEt
+	GdKwqGYFzTE68MbedBHC/DqDwypSpVFIuoK7XHbOmb06c/9+R3vRRyKbDonPNudRpNzKB0c6VSc
+	y03xf+NxCLDbVh7aZRzQ9B
+X-Gm-Gg: AZFdTZdCWhjDSBLbrvaV98qMdhZFGzAp4OsbBz46TdKwCVSjWX6TThtNJRXSpZUQMEv
+	c8vA4jQwDQIDmj1f6DHCyQ0bTfEzDxurMYDeHztl1FvAWiL/tlt0sv2JVfXWAaCoX8bQJR6RJ5n
+	EZsYO9Zq15A/HWjfldwz5PxVVGg9wB5bk6E+0fmRO0uagy65zB4+01BJEpFcIkGteQWD0UpczW3
+	5HJfDiMdeEQVXg9Y0bJwISKOVOR9xqHbSsMhgpheA5iXaRRFEJ0IYEBJe/9w9o5/tIu/j/o+CN6
+	zLgzdbiG5Os2mjJ8y/lbmZigINSlAT6P/adXdBqLtdcd+nFMiv5d7Ow+ApPR7sy/EjqKsiqToxj
+	+k8+uwzYXRoLhcbJyXsDcu18FKOmAlBQYSBJqJOemY4G1Arn60+Rpd5vHq5TqbBjDUJdn7wyejF
+	spG7Ol/XkbOxffHgh6S1eFaKRnSwbCrFibgw==
+X-Received: by 2002:a17:90b:3cc7:b0:3b3:c6b1:2277 with SMTP id 98e67ed59e1d1-3b41c93cdc8mr13827843a91.32.1795675690810;
+        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
+X-Received: by 2002:a17:90b:3cc7:b0:3b3:c6b1:2277 with SMTP id 98e67ed59e1d1-3b41c93cdc8mr13827835a91.32.1795675690384;
+        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
+Received: from kchsieh-C1-X14-laptop (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b44b2156c2sm13787468a91.0.2026.11.25.22.48.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 22:07:01 -0800 (PST)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 6B47ADC05F6; Thu, 26 Nov 2026 07:06:59 +0100 (CET)
-Date: Thu, 26 Nov 2026 07:06:59 +0100
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Edward Adam Davis <eadavis@qq.com>, Sasha Levin <sashal@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org,
-	"W. John White" <whitewj-debian-bugreport@outlook.com>,
-	=?iso-8859-1?Q?P=E9ter_B=E1tori?= <batori.peter@gmail.com>,
-	Mael Bras <mael.bras.ext@idnow.io>, tycho673 <tycho673@gmail.com>,
-	hanta <hantahrabal@disroot.org>, skiwithme <skiwithme@optimum.net>,
-	Suvam Sen <suvamsen2004@gmail.com>, Celimar <celimarj@gmail.com>
-Subject: [regression 6.1.y] 967473b1e8bb ("Bluetooth: L2CAP: Fix
- slab-use-after-free Read in l2cap_send_cmd") causes backtraces and
- non-working bluetooth
-Message-ID: <179567271700.947722.15185762256491350563@eldamar.lan>
-Mail-Followup-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Edward Adam Davis <eadavis@qq.com>, Sasha Levin <sashal@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org,
-	"W. John White" <whitewj-debian-bugreport@outlook.com>,
-	=?iso-8859-1?Q?P=E9ter_B=E1tori?= <batori.peter@gmail.com>,
-	Mael Bras <mael.bras.ext@idnow.io>, tycho673 <tycho673@gmail.com>,
-	hanta <hantahrabal@disroot.org>, skiwithme <skiwithme@optimum.net>,
-	Suvam Sen <suvamsen2004@gmail.com>, Celimar <celimarj@gmail.com>
+        Wed, 25 Nov 2026 22:48:10 -0800 (PST)
+From: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: hadess@hadess.net
+Subject: [PATCH BlueZ v2 2/3] mpris-proxy: Avoid session->obex dereference
+Date: Thu, 26 Nov 2026 14:47:58 +0800
+Message-ID: <20261126064759.95429-3-kaichuan.hsieh@canonical.com>
+X-Mailer: git-send-email @GIT_VERSION@
+In-Reply-To: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
+References: <6b7836f674530e930c8fc7431a50b5d2eec017f4.camel@hadess.net>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -117,55 +107,56 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Control: forwarded -1 https://lore.kernel.org/regressions/179567271700.947722.15185762256491350563@eldamar.lan
+From: Bastien Nocera <hadess@hadess.net>
 
-Hi
+Protect against trying to access session->obex variable that might be
+null after failure to create the session object.
 
-In Debian we got a series of regression reports with after updating
-the 6.1.y kernel to 6.1.192, the bugreports are bit hard to follow to
-the amount of people contributing, they are right now:
+Fixes: 01a5a26814 ("mpris-proxy: Add mpris:artUrl support")
+Signed-off-by: Kai-Chuan Hsieh <kaichuan.hsieh@canonical.com>
+---
+ tools/mpris-proxy.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-https://bugs.debian.org/1154123
-https://bugs.debian.org/1154206
-https://bugs.debian.org/1154212
-https://bugs.debian.org/1154648
-https://bugs.debian.org/1154673
-https://bugs.debian.org/1154866
-https://bugs.debian.org/1154879
-https://bugs.debian.org/1155192
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 79cd52706..125bc85d4 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -1306,7 +1306,7 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
+ 		const char *handle, *path;
+ 		char *filename, *uri;
+ 
+-		if (!player || !player->obex)
++		if (!player || !player->obex || !player->obex->obex)
+ 			return -EINVAL;
+ 
+ 		path = g_dbus_proxy_get_path(player->obex->obex);
+@@ -2614,9 +2614,13 @@ static void obex_get_image(struct player *player, const char *handle)
+ 	DBusMessage *msg;
+ 	DBusMessageIter iter, array;
+ 	struct obex_session *obex_session = player->obex;
+-	const char *path = g_dbus_proxy_get_path(obex_session->obex);
++	const char *path;
+ 	char *filename;
+ 
++	if (!player->obex)
++		return;
++
++	path = g_dbus_proxy_get_path(obex_session->obex);
+ 	player->filename = g_strconcat(g_get_tmp_dir(), "/",
+ 				path + strlen(BLUEZ_OBEX_CLIENT_PATH "/"),
+ 				"-", handle, NULL);
+@@ -2674,7 +2678,7 @@ static void device_property_changed(GDBusProxy *proxy, const char *name,
+ 			player->obex = NULL;
+ 	}
+ 
+-	g_dbus_proxy_unref(session->obex);
++	g_clear_pointer(&session->obex, g_dbus_proxy_unref);
+ 	g_dbus_proxy_unref(session->device);
+ 	obex_sessions = g_slist_remove(obex_sessions, session);
+ 	g_free(session);
+-- 
+2.53.0
 
-The issue appers to be introduced by the backport of b4f82f9ed43a
-("Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd")
-to 6.1.y which landed at 967473b1e8bb6d941e034ec1f76de40ccf54a8cf. The
-backtrace shown is involving:
-
-[   40.687744] list_del corruption, ffff8a27c10efe80->prev is LIST_POISON2 (dead000000000122)
-[   40.687829] kernel BUG at lib/list_debug.c:56!
-[   40.687865] invalid opcode: 0000 [#1] PREEMPT SMP PTI
-[   40.687900] CPU: 2 PID: 893 Comm: bluetoothd Kdump: loaded Tainted: G           I        6.1.0-55-amd64 #1  Debian 6.1.192-1
-[   40.687960] Hardware name: /NUC6i7KYB, BIOS KYSKLi70.86A.0051.2018.0110.1800 01/10/2018
-[   40.688002] RIP: 0010:__list_del_entry_valid.cold+0x4b/0x6f
-[   40.688574] Call Trace:
-[   40.688594]  <TASK>
-[   40.688614]  hci_chan_del+0x18/0x90 [bluetooth]
-[   40.688745]  l2cap_chan_put+0x106/0x130 [bluetooth]
-[   40.688890]  l2cap_sock_release+0xca/0x100 [bluetooth]
-[   40.689038]  __sock_release+0x3a/0xb0
-[   40.689070]  sock_close+0x11/0x20
-[   40.689096]  __fput+0x90/0x250
-[   40.689124]  task_work_run+0x56/0x90
-[   40.689154]  exit_to_user_mode_prepare+0x23d/0x240
-[   40.689191]  syscall_exit_to_user_mode+0x17/0x40
-[   40.689226]  do_syscall_64+0x69/0xb0
-[   40.689452]  entry_SYSCALL_64_after_hwframe+0x6e/0xdb
-[   40.689845]  </TASK>
-
-But reverting the commit does not immediately seem to be an option as
-this is as well the fix for CVE-2025-21969. Is there something broken
-in the backport or a missing requisite?
-
-Regards,
-Salvatore
