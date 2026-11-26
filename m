@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795664447;
-	b=bJVXh2wh1Icy9yNXDEH29Z+VuyhJyIXfytMqL0oQb+s81ZxzYTqn4tIZtwdbuYhqhjKx
-	 SSi4/JStyadZ2/7UHjyOCSDflPdZpAejmsLPyPoAK+K+TvytGjGRbXg/z4Bu133IVutZa
-	 LPrm1xv4ViuSazmNlPObSsbVcP3Oh9zmtj1Lt65HUsYlgx/NM9IkMQdZoHHzET9VNso3a
-	 3ly5bC3Z/XxVXwx66WIfxLHm7i/lwm173vKVO9IFNh2m+fqq4FjqJxiIHcpy66k4dudUR
-	 BfsAJmUhRA+BDs+0ORHUVmf+RZMghnERStW5Zl0e6vyrCQcs2XUaFkIGr6/hjylcQLQ==
+	t=1795664564;
+	b=yXvhVNnTqoddtZGGLa61++FWTrEI/UDIOGc2/YiJyYYsMEazvlh7C3mmIsTeBHIFlyJK
+	 Ony5OijpIpRpHXFHNtBeK/eMqBc5tHBpQDNdxWOpL2S3cTVoMSJlGyKm323Omy/UUmK26
+	 Mn8xm+r7ScpqmVmKKxzp56kqxireCSlkVlo2d5EajJ5LrOZySn0hbDEl2YTBY8gGZpLDg
+	 8AJzwzir2WQSiiS2XWJMyOXbvlFsVLaJ3Y02aAn0olHT5xO2wmxvtaTxSOf2SStpGJv/9
+	 5iCR+v+/26+ZtYN9DweN/wtv/YM7ARRphnINZKrvjt5H6G7rtHCGmwX4NOvI0RmGPwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795664447;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795664564;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
 	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
 	 Reply-To;
-	bh=jzfbg9KzmkYOgPiaCIXO6LOxVG+4f0A/g8uf98oqBZc=;
-	b=rNpuqmmxPkql1jdue2scTOQd0uV4beBg5SP+Dn/MwA6QAS9hXpOA2StTbnJmTjJgK1Kw
-	 4Viqg5EvTgcIRJRwkRTFkpqB2YmerJzzvobp+o6r0yL7oZl9XxBLm3nV//eFK7esYsGhA
-	 Ciu5nWFOc4jEbAt4yyPFOCkeOwdOTkw4KtwH8FZ/3bOACjKsoLTPGC2hB64FTa82SC5VT
-	 enmHJk9jlRF/ydVZyI6aJh1oPw4Le0ol85Dp2b6gLCfqnWygCVyrXrvXYwlNqezV82+/N
-	 96oOuw6xgNeFzMKHRMo3Ck5XCaha7ZPhBtvVatk+YYghWLzamuQAecUCma9LPIvyxZg==
+	bh=vJPdSVuZzSbaKVPPWB25k7jAjhNyLJmmKRDirx6QXrI=;
+	b=ra+gAx4t2NAAmHNDQyKB2hbKF0qIV+MrUajMcBxxQesIzeZynLvaIIwCaHpuGD8JRlkA
+	 B23tDfsMYiWC+KTTmg9f/Ux3zZN/cOT7T93K9lfydynUJjAfCaByFArqs4yH+HwXVmxAw
+	 P6DlS4vGNq9ec/mByf1bcG+owSF7FtdUW2ANO0dk9HVZGpyf7uKft3lnx/Cu9lgcWeM3/
+	 +2YKCObXclD3JhJ2l2TnedwVLGNVaslGo80htKy6bIeoP2rur0ErWMTofML6nb3QhCVO6
+	 kJzR3/3SvCb0Hi91/XGrk6+jPrBKZj+ce4+FRJ7UNY3HqBiO4jL5I7/zpTdMIZABU4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bW5CawAM;
-	arc=none smtp.remote-ip=209.85.216.46
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gbCa6YR5;
+	arc=none smtp.remote-ip=209.85.214.176
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A51606A32E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 03:40:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2A51606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2188F606A31E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 03:42:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2188F606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bW5CawAM
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3ac9f49b984so3768111a91.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 19:40:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gbCa6YR5
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2f0426a65e0so41458445ad.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 19:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795664446; x=1796269246; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795664563; x=1796269363; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=jzfbg9KzmkYOgPiaCIXO6LOxVG+4f0A/g8uf98oqBZc=;
-        b=bW5CawAMy9ifkeuukygQtPQ71LzlbbpmLXS6FO1g8pegfGLs7EF3wFjXFvb3tZ8Vl3
-         q6CZEpYyCalSnsb0csMOn2wEMzdzngTBo7Wy56pP4220sM8JrG72QWvxnYy2XTtrddXn
-         8yHYMsd+VBdmp8Xxxj/uPDFRLYk/9FsAHEcbt40134+nbOS04Q/IBYaDe3hJH+mn7oBc
-         3iFkzZ90/PVFOMwHAIIKMZCnzUnIB+n+8Dm34yTM3sYhCIJIF12AaP/zprjB1CZlO5Ic
-         tIv25qmEuXh8HvNjt8D151VkkjJkQ4HQHN8LJiqUwkNLDhR5d7FFE4Qxt27kHDbTMGFg
-         K2AQ==
+        bh=vJPdSVuZzSbaKVPPWB25k7jAjhNyLJmmKRDirx6QXrI=;
+        b=gbCa6YR5TNU+x0At90nxg7cEj5OEmzYcPMeTfBIKpmHNFw2OVP/JKsmpk564rCtvsV
+         cK6nGJn7ncTnvQAgWTgziebuxSqYMf2gRyj4qaBZQeE7RLKT5H/85aTO+1a43eMm6h8V
+         y5e4jj5qiMFG4ehP7VEeapVQJLrFsVnvTedbONwtNyNTObYUdoqY0Oi2i3CBTJKAXKl1
+         VmvBAXuauSD3TN11PuoufWwpWf/HDE/wAd2aWP3tt0dg0AW7h1Nt/pzIIyhNEHRFQj83
+         iGUFIX7IDspdXa6dCAyxtXkK1hQ0cjfb02XmuDIs8IOHa4B7HQvDatxEV70Pga4fwmic
+         2r9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795664446; x=1796269246;
+        d=1e100.net; s=20260707; t=1795664563; x=1796269363;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version
          :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=jzfbg9KzmkYOgPiaCIXO6LOxVG+4f0A/g8uf98oqBZc=;
-        b=zcsG6iwHMvu78uQje40Q8UzVHaZdqKujh6t04EDiMs55lhsjQsrVvThK2lVtWMdQ6u
-         RkZtJ3M4YRp19K8X78EP6UnMIHI4Lu01AqZ2ZIOeUT7EbMpcm9Pe+BXJ0o489d8jk6eT
-         WEKUiw0Xlf7t0KFfEz9WUoUOe04c2L38Z6lXdkOpiAHFWFYDt4nu2kCwcCQrUA63VLFz
-         CtgVcYDF8r2LjgnMd+pzQbadTfF27xGcyz4Agr0dlsAenViWvBvJW8Lda6Xzqaf0ekiP
-         SGCMQt8w+9WtnRrhaBv09xE/+/yGX4nW0t0cKtlkT8wGLCRqx6IsUu5QxgWmwk12f/cm
-         xBwQ==
-X-Gm-Message-State: APuU4Z+u2F4UdX3K7DJD7IGrzwFmOVxTePYNAEEXJ8/7VNqcdedbQatE
-	eBTN4C/l8r5ZEQXmylVmexJNV/DpQZSc1JmASNThoIUl/FwB0kR9hPfhxCvyqw==
-X-Gm-Gg: AZFdTZfswhtyZSn0v0tkyut+JWxla+GcU5ogcFPCwA5FYQFcgzqgwwcohu/BmRcHGyc
-	Bny0Nf3VRqaOhVJ+BskypJhjGygloFKPFTjWwLVZflLT9SLNp+tGADUAd96ue4Uio2sOEDxGYpN
-	iquODVJMB/y7zanu/9F8rPLw2XpJ0EvJJfjLhewx/x+ZCW8EZ4C3+GjE8kYZcLX93MbYv6fIgcl
-	64Zvf0LbLq1R73lmP6+YtTy7DI1X+mnY/bHuuXKguWRRPFyOwsIkDbmNMTW/caDycp2S977Ri9Y
-	lUfM6LofueoRrwa4/tB9ks8VRjOUTbUedqmVx8DSDyVQU8rvbuYr89cE2e0wb7wIw1Um0PZ2Pk9
-	gvuXBlUEA8rdpkjblNcpWkeRI40Ti9WdInJkb4axw2OGqTJ6QmLDwDXRCWzzH/lbhJxSieZVNN3
-	qaQ6jHjpYdkTxlQE5Hpg/QDLWNKXwEF1v7bwY63YSr93Cb3BgLwZTBGnuF4k91Teruxjh+AHKfC
-	IjVyX4vDa1iIeLyRrePAngORGNNBjxUEPER7HzuBE/po6UNPjsuZzEYMxuAD5Izmb7nHjYXgoX8
-	66bGg3PANzaUjZ3lagbx8osq8rWvYilW6HLm1w==
-X-Received: by 2002:a17:90b:2f8c:b0:3ac:9ed8:f301 with SMTP id 98e67ed59e1d1-3b41c93fac6mr12809300a91.30.1795664445987;
-        Wed, 25 Nov 2026 19:40:45 -0800 (PST)
-Received: from [172.17.0.2] (ec2-3-42-157-95.us-west-2.compute.amazonaws.com. [3.42.157.95])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b405d63728sm35556341a91.8.2026.11.25.19.40.45
+        bh=vJPdSVuZzSbaKVPPWB25k7jAjhNyLJmmKRDirx6QXrI=;
+        b=C9b+dD9edCVwHzmnE9WlkwNOKJQE77mUq4JmU1TPjvOf9iHLCKsLUGcSCyvPaZC1Ei
+         YBgeSHqX5CU9RgnmO0Ua5oIohadqRwuPtvSlNWsgM+qO7zGHnBMyowDfQj1HjugYghuu
+         PsjcSv8Ig8mhAhN+gcHndyMl4B8hO+H/b+TLF8CDkdNvX1pQk7neWwQNl7131ucjtsAl
+         FBhhfXDZgMUzbh3JmfLOrF/1jeRXt9AJssLujXHpVlk6FX/Xd6Ik59Xrjqdfb9+SeEPQ
+         RagPyZdvTXGFMuyFZcJ7nEmB0IZz0/sbKd8QUQFzrD0i7iJfFWj2XN1zm8SVCGMD+ubU
+         Jugw==
+X-Gm-Message-State: APuU4Z80i/gtsQlzGQoesiqE4yoUR4FJ/CfsOB52SQL57BCG1TRCxX+Y
+	kvlbxMQmmdsgNHwyjkj6CchEkMKSY8hIcoR3tvLKZ5qp7sS2IQz+c/Ynwq/xOi4N
+X-Gm-Gg: AZFdTZd+R6IGzJz2b+EYlOf/ZjDz6l0qf4bxYXLfo6IteUR6ReK79F+fyCo6meBRkfo
+	EiXVlqxsCks+HnKyKfYScIubbB8PRWWKODgg5kpY5IEdiSaIeLHJAS7fKJG/kgoBRz8en/xdorj
+	IWLIh+4Hxttu31Mg/hAg8+UD6KS6r91RuH6f4O3RzXYHKtrbTX6Gzm42N7EVZ/GufjYUL9DPBoG
+	IXj0LJ6EuOFOvH+VfNmxjPVZEgBS4sR3fGP6eeDhriYO7A1h0002KYLPEAlQ5BPHMeP+PsJsa1g
+	rbehS7grdZgFgCM99/fB0JSn5bzSUZcHu/VO6vB8FD3Wv3V03qBPCbmNr1JgJCIbpw22C8dBf0l
+	4KpbG4mnu3DfgvTzGn22UxQoJGQDLyuuH9jWC9velJLh/3setn7urGCz10KZNFuBSBU2L04dIY0
+	mB5YXOFrT+AfGoKrgxcwK0p+vDuZmI7eAgUNbTn5WX4Ro6fupptTs1yfSBUdtVyVjdcFuA2PBmc
+	vmT4xOCtWshqeBsMJEfajO8m2rHHIh+ROZffCYZ/iG9EvUyFPwX1Ru4UGfj5eRSNU+lCYRKKgKn
+	0xmg2zU=
+X-Received: by 2002:a17:902:ec8b:b0:2f0:3e5f:2a18 with SMTP id d9443c01a7336-2f03f21cebcmr161218135ad.39.1795664563486;
+        Wed, 25 Nov 2026 19:42:43 -0800 (PST)
+Received: from [172.17.0.2] ([20.236.14.70])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2f03f14a432sm96903585ad.75.2026.11.25.19.42.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2026 19:40:45 -0800 (PST)
-Message-ID: <6b07aa3d.8b4f3826.80158.2947@mx.google.com>
-Date: Wed, 25 Nov 2026 19:40:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4365368507818160749=="
+        Wed, 25 Nov 2026 19:42:43 -0800 (PST)
+Message-ID: <6b07aab3.04260434.40df3.04fd@mx.google.com>
+Date: Wed, 25 Nov 2026 19:42:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7858545630847264883=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -90,13 +90,13 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cochcoder@proton.me
-Subject: RE: [v14,1/2] Bluetooth: L2CAP: Restrict LE credits to connected CoCs
-In-Reply-To: <6aff9cb5ebb1f1512734d5ecdac876a2cc0c86bc.1795650070.git.github.filter194@slmail.me>
-References: <6aff9cb5ebb1f1512734d5ecdac876a2cc0c86bc.1795650070.git.github.filter194@slmail.me>
+To: linux-bluetooth@vger.kernel.org, rosenp@gmail.com
+Subject: RE: Bluetooth: btintel_pcie: fix context analysis error in YoYo config sets
+In-Reply-To: <20261126000439.318058-1-rosenp@gmail.com>
+References: <20261126000439.318058-1-rosenp@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============4365368507818160749==
+--===============7858545630847264883==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,32 +107,40 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/series/1222694/
+PW Link:https://patchwork.kernel.org/series/1222708/
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.38 seconds
+CheckPatch                    PASS      0.53 seconds
 VerifyFixes                   PASS      0.05 seconds
-VerifySignedoff               PASS      0.04 seconds
-GitLint                       PASS      0.15 seconds
-SubjectPrefix                 PASS      0.04 seconds
-BuildKernel                   PASS      20.00 seconds
-CheckAllWarning               PASS      23.08 seconds
-CheckSparse                   PASS      24.55 seconds
-BuildKernel32                 PASS      20.45 seconds
-CheckKernelLLVM               PASS      21.50 seconds
-TestRunnerSetup               PASS      482.98 seconds
-TestRunner_l2cap-tester       PASS      13.70 seconds
-IncrementalBuild              PASS      19.11 seconds
+VerifySignedoff               PASS      0.05 seconds
+GitLint                       FAIL      0.18 seconds
+SubjectPrefix                 PASS      0.05 seconds
+BuildKernel                   PASS      23.40 seconds
+CheckAllWarning               PASS      26.86 seconds
+CheckSparse                   PASS      29.00 seconds
+BuildKernel32                 PASS      23.88 seconds
+CheckKernelLLVM               PASS      25.74 seconds
+TestRunnerSetup               PASS      552.92 seconds
+IncrementalBuild              PASS      22.06 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: btintel_pcie: fix context analysis error in YoYo config sets
+
+9: B1 Line exceeds max length (154>80): "  drivers/bluetooth/btintel_pcie.c:1052:12: error: mutex 'data->mac_access_lock' is not held on every path through here [-Werror,-Wthread-safety-analysis]"
+10: B1 Line exceeds max length (142>80): "  drivers/bluetooth/btintel_pcie.c:1110:4: error: releasing mutex 'data->mac_access_lock' that was not held [-Werror,-Wthread-safety-analysis]"
 
 
-
-https://github.com/bluez/bluetooth-next/pull/1231
+https://github.com/bluez/bluetooth-next/pull/1232
 
 ---
 Regards,
 Linux Bluetooth
 
 
---===============4365368507818160749==--
+--===============7858545630847264883==--
