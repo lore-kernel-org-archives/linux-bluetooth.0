@@ -1,54 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.175
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795688383;
-	b=ZSCUdcuNAfJl8cF44TsV6c/LrU1OaWAabkB9e5Ws1aVQ03dX26KyKPi0/Vw8d2CR+nwQ
-	 X5sR5gGAzSnCus7bQnNF0+Gz/YWfnSN810Q919anUi/5eSlGwleGk1GIsSVix3SYVK7aT
-	 2/5BrqQ+qwBYvhUKh9RHFN5a8NgBkLYi3MX58aOiho8nfw9qtThbsuKn8uaJA6qRo2izv
-	 Y5Ubrx6gEjjsUzqCnVeaE/NrkAia+3wL0uzKRNxgeJt2Mb+Qficraufv+pnoolzQ9y7UM
-	 lyvj/LHYtf6at/kq+qF0ubs2WbacjH8X25cedM5kTn0q/ICKgRoGAGOCQVb+hJ6SW/w==
+	t=1795695547;
+	b=l5EZqBJi+jNK77E9YOUAU2rabwXsaq7sycSQkc8eO6GUGK1iSGe/Gnk0xdoJXxSaLHGb
+	 o1cN073nY/FWWHa/cKZxAJSrcnGJGmQlgRbbpUcRmE3aBk1z+zx6gdwYBPZ5/HO6iAcpW
+	 cuiRbarkulS/j09ZGw6/ENvwk73qTqaFcK9rQ2m9HIosr5ajOr2jctvvLkt/wJ7QBKwHH
+	 i39E0NN6dAlEWGe5unpDWdRmevIRQzXs0iQMxZuXT6DCgalP9FMuLzU1rvH07rGzLWhl+
+	 noZtd1CENu/u3WASPK6SybLZYUAAtwT0TwB8uEyIBrUIEgV+YIwh1O/CO7jzPBO7a5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795688383;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=7yiqVziuoi4MUfhVWRGe9sc8is8UXpPYgU3rcxw8mKU=;
-	b=Dg48ZPNFHDQDOxatKMk2f3Dd3O8VwJCSbbaQC04REysWUCRsqWJZ57cQsNMWgvBn+1MX
-	 iiuNJpUgAtoUL1SZcj9N7sTpfX2BEVQOr/3nD3y7PCdWaXW89uGiX2u27xsdna8cV3+KP
-	 x8J1pS2REhXV/C1BMQTX1mVttErK05jYdrWyR07IUMg7Bsprf9hRIdlJle5lm8tH6oU2z
-	 lUYjaS2K6S0vy1Q+YTebG4sreufOY/fEI8I9rX+l9O/J6jcIEcp797mReQVxOcR/pxFCo
-	 +Mr1OaLob0VGDQSDWIVCvVP4B7pBoWxHSs1zVACIKR8iFwAC/lYyJsS6TUVEKJqQnrA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795695547;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
+	b=q0wgmCkCzYlyyJFzYXXV9FM68QlTP+rII+sfzYTX3IsLWP+eguutDd8qsu1G1zNwCCql
+	 Nsw56IT9GlG8aBSpwQdDlRvrFtm+YE0flRDGA0jnj94z/Z4TrPiTdGAYdr1HE8JF7CuvX
+	 ImhmpmP+RKGE6SHOMN8235i4u8PIqzlp/3kgozXCpKQ9f7/9wz3oPhi5biVNEAV6M2GFu
+	 z+upCal//m4TFfgAgv4SVmzEjiDzeteelsz3HMbb4topITlkrQ3eFfyZaXf583WCM0Lz7
+	 noyzwt3qvhlRkQCxF+ygMf6J9oTYakDxsCluqDUgVGnupy7NBK+8SMGSEwX+y1sa5mA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=bVU339Zw;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c41wAodG;
+	arc=none smtp.remote-ip=209.85.222.175
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86B5606A31E;
-	Thu, 26 Nov 2026 10:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD91E606A31C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 12:19:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD91E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=bVU339Zw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B7331F000CA;
-	Thu, 26 Nov 2026 10:19:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1795688382;
-	bh=7yiqVziuoi4MUfhVWRGe9sc8is8UXpPYgU3rcxw8mKU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bVU339ZwHLeIYWtY5sVcD1LAE2FstDOZkhQJjmHk+mpCwl/BkMu0SvUuyg1FC5BJF
-	 +jdEcGOYrQm1DYnjYRKvXs73van3bMg9FNhLs3M43/e3h0fIct1TFQKHGrxqqiXUPr
-	 0pw8uz6W2b7b3qGit/RvwCZWkKPZwCHAvZomLdbc=
-Date: Thu, 26 Nov 2026 11:20:03 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Yu Junzhe <junzheyu1@gmail.com>
-Cc: stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: Re: [PATCH 0/3] Bluetooth: hci_core: lookup hci_conn on the RX path
-Message-ID: <2026112622-galley-skipping-e8a2@gregkh>
-References: <20261118123533.25-1-junzheyu1@gmail.com>
- <20261119035758.45-1-junzheyu1@gmail.com>
- <2026-11-19-1-daily-reply-0012@kernel.org>
- <20261126075554.106-1-junzheyu1@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c41wAodG
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-94962d80d34so411475185a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 04:19:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795695546; x=1796300346; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
+        b=c41wAodGe2Xq0BzV+vmax1TWqPeVK1vLgJG0IJ9v/lBB3ItwngwOyAQWpDGeIJsBGw
+         pA5uZ5/P6nSIZmfwEVTzVKpwCO7EdOlGQz/ylRqBC7aidsOfNswlAw5yaP50MaHS9Kue
+         hx9L5ANjnk4mdMpXxorA/Ndd8R/IQ6k58ScioTJfkBOVxbqNJrg3FlHD3Wj9wZmxVvar
+         1mSG37veUIXJSH8/xMejqFYscohJ4E47eG2WcEqoTzktMgPJKl0C2OihcrWGgXVlgr+4
+         aNucMRLsaqjMSicUtaRJDyjmtIYG+Zp+IkjKAgDfSWzARfVSfuzzT5WFm8yEh/PdmBQm
+         x4HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795695546; x=1796300346;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=B9Zn9rUIEsdGYOkWKBrdmKaJ//yjXTonKx5H7LyaUPo=;
+        b=KNGvkRpkE2Vh7cVm/Y0BCzo+0z7vqHq1Kb/iVxAlcclE3tVcL1R2y8KCADbCJLdxrJ
+         biTAWP/v6zjAQwLR5YMv8rkpuOkHM8269G6iBiWHc0r/X1OWeGjBWh4tGfyrFYb/arTV
+         0eWl3egd3uxJ6npi1yljiXxhYIUuSTLN/1Sdc3SNgOdfUCLOuYjTuOl1HQ6vWStRnpD1
+         vrH0rotL4/GRBiuHVkwxeAayIz627BHrXKa0l85ocKX26+VkYUAcXcZsShrBks+11c8Y
+         JUyNsKrhe6+NfJsF7Glf47cFByAc2diKD8IQ8X3AWhRVbX+Fp3lh3rJPSZQJSlZRf/7m
+         7BSw==
+X-Gm-Message-State: APuU4Z8qSDm3/qn/T8dIQGyaVrPNru1hYSYsc6kq0hBkPBpcv/C8AYaG
+	b7eTae17fPYOkTUjh2HMMTyn7QqeqFG6SO6P//UVbcLpIJuEi37t1WP3fggH7oWj
+X-Gm-Gg: AZFdTZc9B862CxK1psy/k3F5LyxyhDVBBQjdKk8tp0J/DPtvj94eU21pcN6GCYwg1qD
+	NOMJm7G+aQlfyf0LwCWg3whvzAZ4E2G5S6OKmf8LXCP/coe5NVqTVlW78hcNptMKczeuA7TNzNn
+	5WFekUVQ10EzwdYEqSFMz18lQUOq2Rlvqm13LQe5qv6/6ETYXCqKVWAOH/f40KIL+sc7e+G6Y05
+	MaDYr6+sT++i2joOnT6bvavdevG4Jma6sUHSj9TPUby6Cdhx5u9frHK+XTraNqmcR/Qgj3KpLSn
+	oHTIcEFCG5zGJ1dLa6I1GUxhRdbIgEoiaIjkk2se56VV4eYCIX10nNjjrzjQ9X9AvG2owew6FrC
+	htxn1PJtPiy02FNZMB7DETQk/1gXjtgFoKbQYNYafnh71SZmirxbfvh6/rouUs7MGEei71jFp6W
+	vDQbp33m7I4+gQofR/IBCBZ9nNZpDq3jbeEyFhA5+euDSwSeeMPUrskSwt6+9Mt15LVY/HvQZoD
+	Im8Ufl69ykWiGZFXY1fk0qBSdT32lQZ0/kbI41B/8rVQ1StluuwzrcWocZRgw==
+X-Received: by 2002:a05:620a:880e:b0:947:a431:adf2 with SMTP id af79cd13be357-949ba8246bdmr3308553185a.1.1795695545719;
+        Thu, 26 Nov 2026 04:19:05 -0800 (PST)
+Received: from [172.17.0.2] ([40.75.14.236])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-949bb38322csm1559782485a.17.2026.11.26.04.19.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Nov 2026 04:19:05 -0800 (PST)
+Message-ID: <6b0823b9.154b9e68.25e3e4.8f86@mx.google.com>
+Date: Thu, 26 Nov 2026 04:19:05 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6772002658817133066=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -58,48 +88,47 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261126075554.106-1-junzheyu1@gmail.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, junzheyu1@gmail.com
+Subject: RE: Bluetooth: hci_core: lookup hci_conn on the RX path
+In-Reply-To: <20261126075554.106-2-junzheyu1@gmail.com>
+References: <20261126075554.106-2-junzheyu1@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Thu, Nov 26, 2026 at 07:55:51AM +0000, Yu Junzhe wrote:
-> Sasha, this replaces the 6.6-only v2.
-> 
-> 79a2d4678ba9 ("Bluetooth: hci_core: lookup hci_conn on RX path on
-> protocol side") is in v6.18 and is already in bluetooth.git. These
-> diffs are for the stable trees that still lack it. They do not apply
-> to bluetooth.git HEAD, so the BlueZ CI apply check will fail. Please
-> review them for the stable branches.
-> 
-> 6.12.y already has l2cap_conn_hold_unless_zero() and
-> iso_conn_hold_unless_zero(). 6.6.y and 6.1.y have the L2CAP helper
-> only. sco_conn has no kref on any of the three, so SCO is unchanged.
-> hci_conn_get() does not pin sco_conn.
-> 
-> Booted KASAN guests, same racer (patch-test/repro.c):
-> 
-> - 6.12.119 unpatched printed slab-use-after-free in l2cap_recv_acldata.
->   6.12.119 with patch 1/3 finished 371 connect/auth/disconnect rounds
->   and printed no KASAN report. The racer exercises ACL, not ISO.
-> - 6.6.162 with patch 2/3 finished 123 rounds and printed no KASAN
->   report. That image is a build of this diff. The earlier #1 image
->   still contained the v1 SCO and ISO edits.
-> - 6.1.193 with patch 3/3 booted and completed one connection with no
->   KASAN report. The racer then lost sync with the virtual controller
->   (unexpected command-complete length), so it did not repeat the
->   6.12 and 6.6 stress.
-> 
-> Yu Junzhe (3):
->   Bluetooth: hci_core: lookup hci_conn on the ACL and ISO RX paths
->   Bluetooth: hci_core: lookup hci_conn on the ACL RX path
->   Bluetooth: hci_core: lookup hci_conn on the ACL RX path
+--===============6772002658817133066==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Why are these different subjects?
+This is an automated email and please do not reply to this email.
 
-Also, don't send a patch series for different branches.  Please redo
-this, one patch per branch, and keep the changelog and subjects
-identical to upstream.
+Dear Submitter,
 
-thanks,
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-greg k-h
+----- Output -----
+
+error: patch failed: include/net/bluetooth/hci_core.h:843
+error: include/net/bluetooth/hci_core.h: patch does not apply
+error: patch failed: net/bluetooth/hci_core.c:3865
+error: net/bluetooth/hci_core.c: patch does not apply
+error: patch failed: net/bluetooth/iso.c:2424
+error: net/bluetooth/iso.c: patch does not apply
+error: patch failed: net/bluetooth/l2cap_core.c:7895
+error: net/bluetooth/l2cap_core.c: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6772002658817133066==--
