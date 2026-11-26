@@ -1,98 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.53
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795661100;
-	b=QCDg8e+VYbLRUAWTkk5NmQ7sHQgivb53BzJFg9JD1Uqm7vu44dGInM55ijd6Tc2V//Dh
-	 y/L5n1n0690liHSPditS/9Ur+MxsWkn7sephu4sCp9SHPN8tg+lemh8GDJvCzVpCnifFz
-	 +CqZkuoWctQYKQgWXr1FCiWXYewCq6ijEq6u2Ph5dsgp5JYMtSvbCKX67ssr0FM8rXq7P
-	 eGLAuYlU7OvuTWA/o2w0jTfa9OiZt7M6NDjP+j0BHjHqvd955lV1+xnAjTm4CP7YHHwQ6
-	 fFoHCeNt4Wd3E3SeYkNUmbNqZKl1dlIHXDW3B+CTkv/WWGr2T6Fu9rHBVjOIshlbqgw==
+	t=1795661110;
+	b=Bv8GTtwz6exbpSqM28JIpf7S+qp1nIVNCwxXHTyJIL90ib+OUy6Iuu9ppVGlv0QVl1n+
+	 3w83pp4CyOTCgta6a8y6J2VjMORJhgM+9MTDmY1lLCyK0llMVT8NGokwlaYlB3KtahVGC
+	 p30vaDrK1xY/9eXHU1ytrPTbyoxToZ3ZU0SmubgtZa7wP2h8P8ffYZ/vePP/xjkPOwPyx
+	 7XTmqFSIYdDeWLrGTWTNgk7h5J6ClJ84mQnaAGEmqBExmkxTRhkSBBEES7t6hqXMKMT/n
+	 CksMEoj1i8SXla0f13YFPZgY3kpPAYSoS3TWI5IKG2q0yw5QJkJo3yHQscBRNaTKBXg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795661100;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795661110;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 MIME-Version:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
 	 Content-Type;
-	bh=VhNUJQwP8CSjFXalqYtowL6Skz/j8h1yFOaRbiFXG5k=;
-	b=RYGKi8keWF3G16itimoGbkOEd1aGgAQGdyz3o7HvHoO40y9Bi7hhqkNt69gqWLLnaxPt
-	 La9b9apYigD3GSn2JwNaIumYKNcmzw765TlN6Ar1f8z3zb7EH60ul1xDWefn+O40zcvEU
-	 uzaj8uGvCor0JFemJuCK9/B/lxJFYb8U4oltAzYz/X7xP0yFI4tmUQXNeoetYwdCk60Za
-	 O1RhXC7K0R6HUuheX0+luyCshIOnRx5YIKYrx8bF5KvjoRNyKHLMpdf27XIlHQMHgQE/h
-	 gcb67BESaqZayykji6urtcrGtfLQfCv/5DZO2UeQgP36Ta6MjPF4i7g038cXUQYlyrA==
+	bh=/0xg9WnJ4xA4j3RnhckkeXOmdyeehSClwBqizSGK2+E=;
+	b=tSD8Qbvr6MjVvEEMq4FUhhqnqgVYiuzYsHZh7aZ5MfCksGNXMRgAr2/tCWUuzVcd4Fjj
+	 snW7tzkJxX+l9imCc1LAD6THtStDsBtttNssgBf9lPsuaN6AUd9qUVfiSsTVTw/r8UZ6g
+	 NTCs2MQp/XbIBlCO9iulQ/anCKx4KhdPhrz6gkEHpIhONvZZrJG789KLj3kGJepcD83hj
+	 fkdP7lCX65M/3n/feQRO5oP+t45+BnZNDneXr8B4x22SsD8IBUQyyS8O50JAgEkn3W/6O
+	 50jIe+npbZlN7XNfMr2+vSvSpXfskBfLlxNR1JdEKhGIicY+yHmN6o6Sd3FCodG1xqw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=certik.com;
 	spf=pass smtp.mailfrom=certik.com;
-	dkim=pass header.d=certik.com header.i=@certik.com header.a=rsa-sha256 header.s=google header.b=HInRNYWB;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.52
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	dkim=pass header.d=certik.com header.i=@certik.com header.a=rsa-sha256 header.s=google header.b=YSZyFojK;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.53
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C4A606A31E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 02:45:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76C4A606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FA1606A32C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 02:45:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41FA1606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=certik.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=certik.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=certik.com header.i=@certik.com header.a=rsa-sha256 header.s=google header.b=HInRNYWB
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-67db763cec7so6732806d50.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 18:45:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795661099; cv=none;
+	dkim=pass (1024-bit key) header.d=certik.com header.i=@certik.com header.a=rsa-sha256 header.s=google header.b=YSZyFojK
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-67dae7d3f7dso7753225d50.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Nov 2026 18:45:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795661109; cv=none;
         d=google.com; s=arc-20260327;
-        b=X0cD4wVNoYIhEmmn132mgSKORgXpdxyTb5HpHfayegnHgW+GgAYG1YSQnMIMPKWnuS
-         DIMs3Zjd9cscubLyDkaCCHT+hqd/LM0rV8jGQ2SjtdNx87LqTXkKRhRZruF/So/ikUSQ
-         RofA+JSF9xoFMI6vsyacuOryT6ks1+nMp4vu3MGnTtGVbKLQIuJCFPAuYL7oC/oX6x0B
-         qlmvMepEnTGpHzlCEAGQJdiNldvU0wEWQflK9Sf5lxObJidS2lpK5bSnkUU9BqOJwjz9
-         p4Ush/1udkFeqB1W3k58VIOAxDZnh1lgAja29SpuxjurTcyIR8EWht6OfXHxGTnYkrqR
-         u1Zg==
+        b=qkqzfxtUqiMTTFUxjUMOPqcsNTsgAQtPlEf4ZkVv37VQrIa7UPmGuHcSI147vspkzK
+         Vji6NIWsuWpBz1nuObR6vDD9JryKsTT7Oe99j6QasZJ3Opbxc04ZGn5+3A1V3Sf+RQf/
+         BqJbBRJS6Z7mEs5YRZUPy97bBRZNw/+nv40d22cOvs+l70QiFSoP5eDWk2aOyykydSJi
+         l/Jy5i5mythsi/gyCjoMMfWLDqkRq9ZepmIQUhBjhPH/Y2WEw4hoGPoQ7fcfDBLQQPD0
+         1ttqH/aXIHHLWSHbYvEmcuSSplxWXjXTQgVIrIOUPTPjGN5BhhgKN6unDVx7ktynCaxz
+         +vJQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=VhNUJQwP8CSjFXalqYtowL6Skz/j8h1yFOaRbiFXG5k=;
-        fh=7OoS/mxPcSV34q3NiWuHJpGFA7Rx0dHsCKwWgw464SU=;
-        b=QnShfeGWzWlJlmn0MQ0TeHjTn4AV5IXfJedaFcAAu1N62ln3ylkZW158gctucnE2t4
-         oV7VTIj9qYS+FiERDyJcZ0yXeFRadPgev6TiFQR3DWvxuv0isxIBS/iMbTii91gJa8JJ
-         yyJ+3v5aLTlzwykw2GmS5AmNrGy/7YtruvhXKHBRxO6NVnwUfVuXyu7L8WwkqVE6+oHn
-         CRJLkW1OUxmgsiWTtRouiijVauJOfJXqt4E318ISpPYUtka2bwgTSzkFI8s6BeTQ3N7Y
-         Ov5vchC9zQxYARRAzDPNN+7d4uXurDQXj3mTslkZuGf6aS5DTX/TMcuQckLNMiW66ucN
-         RZTg==;
+        bh=/0xg9WnJ4xA4j3RnhckkeXOmdyeehSClwBqizSGK2+E=;
+        fh=lI+JBhi1IVNPoQku9hilk8nTs4gRVS7p7tzu7a7JqBc=;
+        b=OQzKrIksduQFb2WgSK+9xCm1VQFjUGHhU0Rn05Hcd5H1G/Hj+ZMhMN2B7Psa9ABj03
+         sK4mRPwKGyBA8KnRzxkLwbU9Ig45nbrZNlpFr9gao1jI1nPzvdYvcE+Cd3/0n/tII5um
+         uKN4omCm7JrHYIdXQU5saqajca1wWCHLsJwID2OJ9a7j7PPpeFAAgxN9KbmRTdxKXBJg
+         231KBxAlPxzFRwTnSkWPINlTbEd1ZFvawa1FPDzIo2fgLyhUDYpIUfqbRE/u/vvjkQ0X
+         8yct9+a0HAtbNxsZj3iUciZKm3smftlG+LY3nz0N4P33seok02AYbl5JNsQtxAVrS1Dz
+         +8Qw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=certik.com; s=google; t=1795661099; x=1796265899; darn=vger.kernel.org;
+        d=certik.com; s=google; t=1795661109; x=1796265909; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:mime-version:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=VhNUJQwP8CSjFXalqYtowL6Skz/j8h1yFOaRbiFXG5k=;
-        b=HInRNYWBEpAkttfKoUKhCN9ya9AJs+VgL556Fw0wlghjBJgcF7YfaYfSn/XV7OSihH
-         d28Fx/8m05flpEmtgBQiIQImNSRC7jvfPY2GgPaXLkWB/j0u3kj+4oBOh1+bJU2Senjo
-         pHbJABXpDnhrWieTIszJo78B4jmxB7MU7NZgw=
+        bh=/0xg9WnJ4xA4j3RnhckkeXOmdyeehSClwBqizSGK2+E=;
+        b=YSZyFojKq3bG4WC8T2VFHphp90WVwR7sQy3s2Qq53CeOw3XNRFZpI+qpJ8Qn7ADhDL
+         FoWn/llGclwpr+4muEtL7hKhwiI7VYdLwR+O578uaAIWwOdogiNtRPiD5fJqZoEQgxFm
+         7yDkzZ7FAWOSyE0aq2XI+LAwnl7i/58KxcCHI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795661099; x=1796265899;
+        d=1e100.net; s=20260707; t=1795661109; x=1796265909;
         h=content-type:cc:to:subject:message-id:date:from:mime-version
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=VhNUJQwP8CSjFXalqYtowL6Skz/j8h1yFOaRbiFXG5k=;
-        b=KGj9PH6XF9M1GT6W8WN8qa4DhZMl+dNzkzPlvXBUGL888sImFW1F7du+Daz6L9/Z+h
-         P08FO0JYwj6Xju5v+6Wz6gikv8gcMkEfxUrVyAOlIZjoakS0MxoZt2NNJ9IrKUPjGeNn
-         jv7W2/a3A46yAfcvS9GJWlgeSR6kfYJAq3jnmaR1B0HqxgZ2EwC1XTtENNufnwppeAjr
-         G5j0AzHds11QL8RFeXRM/KbjvqZn/b1xJVKTim3m6akNj10TD78Ab/tr/vc0lSFD5gYk
-         tEJdJ9MbDvLBLUQGYPyQ0c1yCjqjC92obTjS3kbWSnaY1qiWEkuqX2dbUzE8vxleQgXW
-         cSdQ==
-X-Forwarded-Encrypted: i=1; AL+hErGfwghZ3j3zWzQpIEhokbyRbF/b54zwNj5Q+ZaAUkPjWRHUHkbeTnpRBSf5Q8tKktpNomgW9hPwg75xCZawFoM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+v+XSfMp2X0sUWJkNPtzIN70YrmkwQ9nEhDth6TL/+T827PQfO
-	pdqDhxTYTBigK8uhVdet7vljgtlBE/eoS+E0Ptus/y/WA5+wl+gc2kS8OZHwQJ+ivwEVZowv4dd
-	iAnMcFQVtx7HD/DU8aNmg2CgrQvBHisRyG09j44AniQ==
-X-Gm-Gg: AZFdTZeZssk+EJMdZ/dKLcHck6PcglZaCkWB85+qF6gDc5hlUod2vtSPFIPypsid7z9
-	E6SnsBJNgeqmPaOQFF1cCVKE1yVW3ic3WaTJuVQsdqJTCi0XTxZX4ySS86+RGVUbjFEWKeyo5Hh
-	s0XNMfKYrykVPPrZtQfLUdN5LznFAz2gmmImielvrSRHtEPDVJ7G4T1lVcnAZYbq87s5o8dncaf
-	qSPtUssOJ28bThxbqUJDKb3wiWZGBzmj8M6rZNKw2cT2xDrzJXbZceDac/aERbMUiTXOZ34UQOm
-	6vd4r6TakSGF/XFCI9gprI5F1H/+mgaYvWsgQ4n393kjOvt2kVrZ/g5YrYkG//YT2mo9E+EGeu0
-	YDMV4ritisB16/zOczeU/LOMXSX1gd3p95NlMzKMgQEVJ9b8H7ycyEuNfFP/iZqVtOLpn606UfF
-	L/BsujvwrObdeA9DVGAc4W0gOySRe6BSNisMF3L78AeK1TTrmLs7kk9j3Kt8uM7OaO2L3Jlk6Tr
-	RoPpyoxMhN9aUpr//9Oy74C24rpdRSXeli0
-X-Received: by 2002:a05:690e:1388:b0:67c:1cf8:84fc with SMTP id
- 956f58d0204a3-67df44f731dmr8007625d50.125.1795661099430; Wed, 25 Nov 2026
- 18:44:59 -0800 (PST)
+        bh=/0xg9WnJ4xA4j3RnhckkeXOmdyeehSClwBqizSGK2+E=;
+        b=hmxwT/XpJDLAZODbnTdrq0FLpW2Q8lLZZmQ+qEKRDLAKMagkSt09Qq3WGPQxlBvAZS
+         drb5qsh2j0HtVlseDyfq0g9tdNRlxDSZTdWGsUaSeDJjkZXLhgCpgFqkjdnvbSaEVrmY
+         fGKt9DhAQFw8/1weelUIsj5QXzByhLHnwX1tuGKySrI9U/KqKXhpx+3d0OV77Ihv/SeZ
+         voHDNHd0A73tzyhwFJQgZCB3UDCC1xhS0F8jmyxcofp5PIpl8v87KasGBRWnLLriSxHA
+         vLOovUv5Uko9Imchj93aXM7+fppZUbtWB7UTxSv1VPqzK0J23KxNDi6x8MqBtCkw0vto
+         bH+A==
+X-Forwarded-Encrypted: i=1; AL+hErFcbv3iG/z0nzJaAznYOlzrKEYD9S6xexI5KWJBjUu21KkPQ2noKgKzWU5Ap3MIuAJ/+6g5/jMpFUPDbBNqEpo=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/W4KDIlKrlgJWrdhf13o3I9NDbOhYpkdh81OZpsBBIeFKBjcXF
+	66FcOnM5YbM2ejtSeag2B1TTrmb/unq3735VHMUgGibLlnJFmwd/LvWDzsyceEdr75jzq4rhwJS
+	gglA2awdC1d+y6/G8t+wUSk+E75erpqPplqCrlNy2rg==
+X-Gm-Gg: AZFdTZcVU+n2+yiCLRCL8tz2XrTbQPYqpqcBKK+6UllErjBLrJADiRLaMvdhB/EvV2K
+	jZ7JZnaC005KUWZMlJOnDq7QtbUBOtHzbnelbxQ81XmdHyRiKTpAUCmyUTsWFibL0w81Cw/jDgk
+	O3mF5+OAbTDDkZhmyXFmlEBGUjlL3/+xv/FYv8SIB1Qh4+5R/W0f/TRbsu0oSCilNdNKa1T/myU
+	l2OXZK9lBb3a+rQ5j5oS9Ws8nCrcHApstejWV71OysS2pkfEhCkyN7gIaCuXuXhYmEq2M+18aTb
+	aIdgkkHnYpe7YrsazJJ3+RLf6HNgkup9T5ypNQFoZnYOMsyQrSCyq+7udP0E75oPDrY+HdCj4CO
+	ygxADCn2OaNp0xFmd0wqZgQIqHP9LYViVbSc0c59CQ6XRX3tkvj9DXOQRkky9z26DAKhkn2aEt8
+	8Yyk3vmpjMtdBsNE/qesATk6lxyIjDx0HMy1ls5tytEuebdfYnrqaS7dnoLm8D0jVW0jjK/okSv
+	A9EEaTdVN1ZYf+8LE9QyremsnKgyzhwGTMo
+X-Received: by 2002:a05:690e:438d:b0:67d:b9c2:3d39 with SMTP id
+ 956f58d0204a3-67df44556ecmr4098773d50.97.1795661109244; Wed, 25 Nov 2026
+ 18:45:09 -0800 (PST)
 Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Wed, 25 Nov 2026 18:44:59 -0800
+ Wed, 25 Nov 2026 20:45:08 -0600
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -103,10 +103,10 @@ List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 From: Dickson Wu <dickson.wu@certik.com>
-Date: Wed, 25 Nov 2026 18:44:59 -0800
-X-Gm-Features: Aa3M54rZmltByzdyAAi6FQe8eTe1tx6OXDLIAOKM4fBYabFft5IXKXsVufugpMg
-Message-ID: <CAFaZ9epjtBjMgjWapQR6QAzUYK4Ytq1m+VvwFv1Wu9kYauW0Zg@mail.gmail.com>
-Subject: [PATCH 6.1.y] Bluetooth: hci_uart: clear HCI_UART_SENDING when
+Date: Wed, 25 Nov 2026 20:45:08 -0600
+X-Gm-Features: Aa3M54paIFJUchZVb6P5CQuzxQRXvyj5HLL0xeT27KaPRrHW7XTFKnxEJ06Kuhw
+Message-ID: <CAFaZ9ep1MzprNHirA++5XpLuQC4PhibJr_FBWHxEt=Exvic1QA@mail.gmail.com>
+Subject: [PATCH 6.6.y] Bluetooth: hci_uart: clear HCI_UART_SENDING when
  write_work is canceled
 To: stable@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
@@ -136,11 +136,11 @@ Link: https://lore.kernel.org/linux-bluetooth/07e0a28650773abec711ee492fdb1bf5d2
 Cc: stable@vger.kernel.org
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-[ adapted to 6.1: no disable_work_sync()/enable_work(), use tx_lock
+[ adapted to 6.6: no disable_work_sync()/enable_work(), use tx_lock
 and HCI_UART_FLUSHING around cancel_work_sync() ]
 Signed-off-by: Dickson Wu <dickson.wu@certik.com>
 ---
-6.12.y and 6.18.y already have this. 6.1 has no disable_work_sync() or
+6.12.y and 6.18.y already have this. 6.6 has no disable_work_sync() or
 enable_work(), so instead of disabling write_work during the flush this
 adds a tx_lock and an HCI_UART_FLUSHING bit. hci_uart_tx_wakeup() won't
 queue write_work while a flush is running, the flush cancels and waits
@@ -152,7 +152,7 @@ The serdev follow-up, ee43bade37c4 ("Bluetooth: hci_serdev: serialize
 flush with transmit work"), isn't in 6.12.y or 6.18.y yet, so it's not
 included here.
 
-Tested on v6.1.193:
+Tested on v6.6.163:
 - x86_64 allmodconfig W=1 build of drivers/bluetooth/, base vs patched,
   no new warnings
 - x86_64 defconfig with BT_HCIUART, BT_HCIUART_SERDEV and BT_HCIUART_H4
@@ -173,7 +173,7 @@ before signing off.
  3 files changed, 31 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 0116dbaf7431..1378ae614ca4 100644
+index 548e58e69eb7..8c43ffb30725 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
 @@ -116,6 +116,8 @@ static inline struct sk_buff
@@ -270,10 +270,10 @@ index 0116dbaf7431..1378ae614ca4 100644
 
  	/* disable alignment support by default */
 diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index 158b057ed3a6..b3148a84e9af 100644
+index 753343ca8489..835ec8f2f09e 100644
 --- a/drivers/bluetooth/hci_serdev.c
 +++ b/drivers/bluetooth/hci_serdev.c
-@@ -312,6 +312,7 @@ int hci_uart_register_device(struct hci_uart *hu,
+@@ -313,6 +313,7 @@ int hci_uart_register_device_priv(struct hci_uart *hu,
 
  	if (percpu_init_rwsem(&hu->proto_lock))
  		return -ENOMEM;
@@ -282,7 +282,7 @@ index 158b057ed3a6..b3148a84e9af 100644
  	err = serdev_device_open(hu->serdev);
  	if (err)
 diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 70449949d527..195957f41f28 100644
+index 39f39704be41..2687f76cc01b 100644
 --- a/drivers/bluetooth/hci_uart.h
 +++ b/drivers/bluetooth/hci_uart.h
 @@ -12,6 +12,8 @@
