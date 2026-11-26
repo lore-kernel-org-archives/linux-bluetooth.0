@@ -1,97 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.179
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795711742;
-	b=wrUmOu4wECmI+N4HSD6kuQJF9+CHU+IlVLxYXx/mNOPrY5Kzv+yDQB2EdirMqgVnLp0r
-	 cbWV6c+w3mpCrkdZfeJmVX/X4drfkB92AyQmpXsC9ZTsoFhtKvea+C2npVL+ZkNpeJoq8
-	 oy/zXFT+WxTjB0+IpU5L/GsOmrDz2Pi+xaxhbJyOpYRUOZY3PdEJua1qKswaK8m5AxZDM
-	 wO7YUdpPMzHCUN2mu57VpNf2WjHzw47wTWWn2/5aTPcC1c+jcLjSANcc5E3IZ+MgCELvb
-	 /QXfAdtK7G4jWpNmHaZSL9zr/6vu1iOwnudo1gjLAAiEmOTF4xZ2TaqbKX0dfAGjWGg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795711742;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:MIME-Version:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Content-Type;
-	bh=4gY/UuIx8X4kDzDA3uET14/OSNEJBfL504RFyUB8moY=;
-	b=k+N1QGrTWRidmv9/LKqZqB0xSZh3SlwjwRiqDifNAuQGPb37ulgzotOPXJVl379svP5D
-	 jUDYOGXI8JAjBalqBzYGqw4aJr11IoAAXkT6ZifXVFSAp138Ykb/2urQ47iR5Fd+JoQ3d
-	 R6/HxmcolGrSz/lz8xhECC4UflzXWHoSa3RUc1xOF4g/wTI2canw/vR/ZDztpDpo+46lI
-	 QxIIDbm5+YO9MxGnQbSvlJVtFKrEigKwHhRCxhKXzilxb1gO437nqD2GqmZD1xow2QoRX
-	 vCyehsl8MRp71731VEt3x9MADxEy3kxRMwk7a2QcNeqVvixslDoYbL0n/xnQ64QsB/g==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=f3zpdAqW;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.179
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.172
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795719602;
+	b=08A3JBu7c87hrN+ufJzrSqGhA7xPJ7S6MJV+KaALukLt8EDUaCaqL/I60BOQqcY1X/PU
+	 /dWdTXnTfb68zpwh39quKG6zgMXGGRST4h5nzNbL0O+W0apZGpA+rG0wlgYRvbN35xn9t
+	 gAONRadKq06+zr4jv8GoWL1CB7ZuVMnhglGMCzhcp0vfnM/IioRPnwyFo3hSvbSePhNae
+	 a4a6+YuBemDNCmf72xneh8mmn88weCPPAs6mxtMqZg0L/ETQVRJsGQ0UncrDsQrr/s5U1
+	 vOMOysFvUo3FaB0OAsOK5HvRWnGsaT6vD1zXMnD/3lKizkT55A9nsRrxvrry9LtFEow==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795719602;
+	h=DMARC-Filter:DKIM-Signature:X-Pm-Submission-Id:From:To:Cc:Date:
+	 Subject:Message-ID:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=whyYBFaRg7vM5AgWVPAf0VahbrPtCCLkEesp43DsjqQ=;
+	b=2Z6CwoKNX+K5qxa8nLxKIdaUvDyL1y7yuVV1Gw/VD+btZZ7sF3MmJa32FCAPPthea3x4
+	 gpPtysMgjl8bblzqlEplejQCyzmuTKPARzGNHCgHu53hRR5fglIh9crgfCJ0uWuANL4yU
+	 R0nGINa/U25T6jsRjLavDSRVi8jCSHqbk2J7KHgCayiRxaVZyl0UdAoSYV5qIRaZrLfpp
+	 PlRzRxS6NzQp87ZVkESN70iJuOvZU64Ss39ksldVAfAku65heccgj2AZqg+CvZjXkQgun
+	 hJEnS/zJLD8jdVdSUnw4P+gNlrCEFDFiGV8OxjZRzbpmC8yju8pOIrx97TczdCrlk9A==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=michaelmcallister.org;
+	spf=pass smtp.mailfrom=michaelmcallister.org;
+	dkim=pass header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b="QmgCDZj/";
+	arc=none smtp.remote-ip=185.70.43.172
+Received: from mail-43172.protonmail.ch (mail-43172.protonmail.ch [185.70.43.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F38B606A31C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 16:49:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F38B606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2308606A326;
+	Thu, 26 Nov 2026 19:00:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2308606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=michaelmcallister.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelmcallister.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=f3zpdAqW
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-8b4c685c751so63200287b3.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Nov 2026 08:49:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795711741; cv=none;
-        d=google.com; s=arc-20260327;
-        b=e7iE+nmt6+PDrZ6iSWjOrbmNRI7UKsbumNCIhe/YPZT1pC/tTKilkOyXgnzFqz9XA3
-         hh+EZiBNcihafULet4ksKxtXMf1GEFRC++S/+cs1q+jH+IQLH+gNZvCiMn1TcPd8/By1
-         VrsLHxiFlNhX8bykKqvZXbGHC3TxXbMFYh/Sw3jgBmEUDRUkAUYBNjIFFyBs8XZu3Trv
-         BAJVEJilW5pDcqYCk6MSelFNLmbs4H+gkRyfyo1O8dQUPlAMA2pfYXdazGOAVNDeKN57
-         enYT6zN8l16yASHKLrg0l5KJueHVslzIO97UD58D6Z3VK476ML9JfZ3yhzPWkNpcWhZ3
-         M9KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=4gY/UuIx8X4kDzDA3uET14/OSNEJBfL504RFyUB8moY=;
-        fh=4lGQI6056MBa4/oovMyIYaKLn+Wz/24RGvUivMmQP8E=;
-        b=mx3haquD+YocohqGF3c+mMbeG9FjtewHc4oRaT6McFNc3ZtffiCufDgpgX2hGRI03s
-         gouxICQmKv8LK10F5Zc57NGDoETKfX5QHu7DdUokidxoeIxtR3gJiqkCD/jy0NCF0SZU
-         JBumuicIkogiAPTpZawOATd8MPcCgGxDUHhcbEUNUwOuGISjnakwu9x+BwpNZxscwLFl
-         LA7OCo5VcE0rx3rVlGiiDVMF5ltYq5dY5FvRWHZnsGNT3aafXch0iCPNYIvlPSwzm1P1
-         g/RnjV1lviY5aIF3+Wj7+yOiQcq5BnAOKcWFm2a+NZ6+U5By7frHseXwRVYIkQKQA88p
-         JSMg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key, unprotected) header.d=michaelmcallister.org header.i=@michaelmcallister.org header.a=rsa-sha256 header.s=protonmail2 header.b=QmgCDZj/
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795711741; x=1796316541; darn=vger.kernel.org;
-        h=content-type:to:subject:message-id:date:from:mime-version:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=4gY/UuIx8X4kDzDA3uET14/OSNEJBfL504RFyUB8moY=;
-        b=f3zpdAqWzIkukp6FgTC9G6Q66Sv3ed7cYDvL/q/v33TftqvVwlc602QuoOMt9FbXYW
-         4Hs8gzacM3QqWxbqrwii4v14xIfcQLgzPJzjlPXkf8i0l1BERH27dTNs4y2xLk8Wt4ba
-         KiRvBKI7W2hT5PsoruWLm6J9ZEFvSvKWGWk0/Qm34hnvzvTtbqkV8d0iyU//b8b3IkfT
-         tuHZ57ezpfGspYb9BzTjNDWRD+Hp+hLJwGLVQi5rTc3rlaqzocAzev8OiPn4f76h9f1F
-         cJTFDIDtpT5QrW7A9WokOJxj3rxU+PT0cItgXiPGFzWD5dDqioglOBOBRlKEqFOJjOvq
-         kPHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795711741; x=1796316541;
-        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4gY/UuIx8X4kDzDA3uET14/OSNEJBfL504RFyUB8moY=;
-        b=nK+VT9XLKVhj6tMYPiJxguCP3Woah4oEpqlr8PE6StZ45TPGl4+2QEG9OdLyqWd5Es
-         Ernx4xvWrsc+AD8SDyfB2Y+/Ncac3aw0OEmbzekafv1fDeuOOHicCsdiJYbnch85Dzh0
-         3VEyxsw8kcB6yqUkdcJJOWQkAoApkr95JCZiTZRemllCK0d9GYCJgTwX1cdhHmmnkSl/
-         Q4cP46WSwExquWgkquBFUSpojBsbWx+8NHhA13pRwO9PJ6Nrqg4kdnXkUg+NPaltYBPL
-         QKVZcFuDO30wYZHT8/Ca5xJUSOo0b49LjVOcZ9+8VFyUL4fkVASTtJ0h4uGFqWVyb6vs
-         X7XQ==
-X-Gm-Message-State: APuU4Z+0Tl0McJDpk9ZQwv+vgxAgz7zL6Tfi8Q8kLJnc9ZKXrdG1/ee3
-	k8OW/nQMWwR/c5OIiTvIbFVSOPyUgtv2wc8n4LNkN1xOrPkcc3D1kiaYXf5gZAP6WeR1IhVM7b3
-	x9S3hqjqE0VP7unzkABRbihcc6I3NL6Q6JA==
-X-Gm-Gg: AZFdTZeMGhYkO2uH5Cj3UyT0WEH3DD4p66lWZg/X+S/5J0RHKQ/xI8Jut05/6XXaYEO
-	VmXQsMBg3sV+geKmRLqYDhpxASa00Tjuw7nB5rx2f2DP03oqBV3G15MCo45UeNF5I8MvuTGV98F
-	WZsI5pofK/UHmmNg2mFD7GjSIw8xgDIlApsdag/a2MRx4lzrEVMLlEANrLg+I7qliuC6H6tq6Jf
-	cf8LE+8I9D3kcZGk8cZcv6kkSTmYcv/mYiCce40DsnMrzMnfSVT/MpBEgap0BJ5gMUXi2BfKPbY
-	PsRGWNfWPR6awMnWSQTt9hGgkCR1weyRWpqPestOTrePhxJ/La4UsyybHxLr5ISz5ddg5finNwR
-	vAMNTNStDrPzd592nH29Lr5yysUb/aT1kJEoC
-X-Received: by 2002:a05:690c:9201:b0:8b5:6a79:627b with SMTP id
- 00721157ae682-8b56a79630amr21982687b3.25.1795711741066; Thu, 26 Nov 2026
- 08:49:01 -0800 (PST)
-Received: from 77377267392 named unknown by gmailapi.google.com with HTTPREST;
- Thu, 26 Nov 2026 10:49:00 -0600
+	d=michaelmcallister.org; s=protonmail2; t=1795719599; x=1795978799;
+	bh=whyYBFaRg7vM5AgWVPAf0VahbrPtCCLkEesp43DsjqQ=;
+	h=From:To:Cc:Date:Subject:Message-ID:In-Reply-To:References:From:To:
+	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=QmgCDZj/m7tbtM278xysX2kjWvUTUrdv/K+i+aRJmkQE6ofnp61zKnLi08lnZ7117
+	 +XWKetSWyCrANrkm4XImz/lYhCUvt+6zyGEtgIuYdHQ0ZI2rVT3Iq21JCsUDMq++iW
+	 ky+GL0UgPCd8w831XMQLgA7JRT6Bg9KkysXr/QIcb7Wuudv6V/Xgqw2/axK0Qve32I
+	 jR5F8h3B7pcMhBpArVThTcoYYgtnK+KkeS2gCjuRTbu67uulNvy7rbcMzw1s0H5scb
+	 8CZAaLYIiHJ5TEt73ReFdMCYDfboBghy2JM5yuHqt7Uq4qCANz9ytrTzHmdqsjDR7W
+	 YrF8ZNGXRJnzA==
+X-Pm-Submission-Id: 4jb5T91Gqfz2ScXX
+From: Michael McAllister <me@michaelmcallister.org>
+To: marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: brgl@kernel.org, enderaoelyther@gmail.com, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lumag@kernel.org, markus.probst@posteo.de, mka@chromium.org,
+ phone-devel@vger.kernel.org, quic_bgodavar@quicinc.com,
+ shuai.zhang@oss.qualcomm.com, zhaojinming@uniontech.com,
+ me@michaelmcallister.org
+Date: Thu, 26 Nov 2026 18:59:41 +0000
+Subject: [PATCH v4 0/4] Bluetooth: qca: Power off WCN3950 safely
+Message-ID: <179571958163.81221.3368253997777320112.wcn3950-poweroff-v4-0@michaelmcallister.org>
+In-Reply-To: <hvwqozj3r7n7igxw5qogu7xxya4fkhqanb334sroj37ufzdizu@qarvtlkkulmj>
+References: <179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org>
+ <hvwqozj3r7n7igxw5qogu7xxya4fkhqanb334sroj37ufzdizu@qarvtlkkulmj>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -101,53 +70,48 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: dkl rozyccy <dkl.rozyccy@gmail.com>
-Date: Thu, 26 Nov 2026 10:49:00 -0600
-X-Gm-Features: Aa3M54rj8svRazozH1MRYePirjuM1Rk82CTLAupWjsZW9MvDjcnpK_LTs2nHo1k
-Message-ID: <CABo4nEvLVN2W2hDaQJ20QjzpJf3AwsTVvra7=9wiZhG0fnbi3Q@mail.gmail.com>
-Subject: RTL8761BU / TP-Link UB500 (2357:0604): persistent USB reset loop
- after warm reboot
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+Hi,
 
-I can confirm a similar Bluetooth initialization failure on a TP-Link
-UB500 adapter using the Realtek RTL8761BU chipset.
+On my Moto G10, turning Bluetooth off leaves its four regulator votes
+enabled. This series adds the missing WCN3950 power-off handling and fixes
+the UART teardown ordering needed to send the pulse safely.
 
-Environment:
-- Debian 13, amd64
-- Kernel: 7.3.4+deb13-amd64
-- Kernel taint: 0
-- BlueZ: 5.82-1.1
-- firmware-realtek: 20260916-1~bpo13+1
-- USB ID: 2357:0604
-- Firmware version: 0xdfc6d922
-- USB host controller: UHCI
+I've split the unregister/TX fix out as requested and rebased these four
+patches onto the current Bluetooth tree, including Zhao's flush and close
+changes. This series depends on that standalone fix.
 
-The following errors repeatedly appear after a warm reboot:
+Tested as a module backport on my Moto G10 running 7.2.9: six Bluetooth
+off/on cycles and driver unbind/rebind with Bluetooth both off and on.
+The four regulator votes dropped to zero on every power-off, and Bluetooth
+came back on each time. One firmware download needed a retry and recovered;
+the original driver also needed retries in the same six-cycle test.
 
-Bluetooth: hci0: command 0xfc61 tx timeout
-Bluetooth: hci0: RTL: Failed to generate devcoredump
-Bluetooth: hci0: Resetting usb device.
-Bluetooth: hci0: RTL: RTL: Read reg16 failed (-110)
+Thanks,
+Michael
 
-The issue was reproduced during three controlled reboots. Physical
-unplugging and reconnecting restored normal operation every time.
+Changes in v4:
+- Submit the unregister/TX fix separately from this series.
+- Rebase onto f57f78086ab5, retaining the merged flush and close fixes.
+- Move controller TX flushing into the standalone unregister fix.
+- The separate Marvell prerequisite from v3 is now upstream.
 
-Unsuccessful workarounds:
-- USB deauthorization and reauthorization.
-- Disabling per-device USB autosuspend.
-- Setting btusb enable_autosuspend=0.
-- Explicitly powering down the Bluetooth controller through BlueZ
-before system shutdown.
+v3: https://lore.kernel.org/179484638195.54009.1916641645532262287.wcn3950-poweroff-v3-0@michaelmcallister.org/
 
-The final reboot confirmed that all power-management settings
-persisted and BlueZ successfully powered down the controller before
-shutdown. Nevertheless, the initialization failure recurred.
+Michael McAllister (4):
+  Bluetooth: hci_serdev: Track whether the serial port is open
+  Bluetooth: qca: Power off after unregistering the HCI device
+  Bluetooth: qca: Handle failed power-pulse writes
+  Bluetooth: qca: Power off WCN3950
 
-No previous working kernel version has been conclusively established.
+ drivers/bluetooth/hci_qca.c    | 34 +++++++++-----------------------
+ drivers/bluetooth/hci_serdev.c | 36 +++++++++++++++++++++++++++-------
+ drivers/bluetooth/hci_uart.h   |  3 +++
+ 3 files changed, 41 insertions(+), 32 deletions(-)
 
-I hope these additional observations help identify the underlying issue.
 
-Kind regards
+base-commit: f57f78086ab54f3b3122fbaeba2c842ba7bb6d00
+prerequisite-patch-id: 4f7b2f10b0911886f60ec40656c453138c3570f0
+-- 
+2.39.5
+
