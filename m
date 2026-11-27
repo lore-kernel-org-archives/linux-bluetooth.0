@@ -1,89 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795769740;
-	b=3uzE1bM4xwRKdvzVOImVcRgKhkpBe6FnYxA0HL7wNh80c5ZPt6EOlP2ZL1tNw1tfruiH
-	 MI8ts2tbbzUXyGl/sUS3ZW/N2/R5bEYHt3RX5CTWPHeORMZ4hn2LmPns2kPPXTXOw7U2+
-	 q6zjJ1h5C8+uoni7rSh3nFc5ahmefvYbI6VhBwk7E/Qe99+bejy9Xp0LGnwTbSOYXlMgt
-	 6TX6j6fyz3xcbphlsFjxdcMHXiCEg9Sgezwk+8lpyPaPSpVmmNe/MTPZtfo1OHeqwGD/t
-	 CrXFuReWghhGf3WTv9iwGPIXGUUtk15VTX4zeI6pnIHvxGWbdkMT3GoChnNevknxL/A==
+	b=o8Pu8xMZc4EDdgFpGyc6uwISzXJJNA6nlgY1RDJxQ1lKqHFXRgNVCaZIlhNs66T2gByh
+	 6RlAh9sZU0ghS3Ix499+epxIbtvDH8ztrnYhZVMyLjQERS2YkcL7JqdVnal8dC5vinE4R
+	 5xqu5xARxxY+nmzA8TLefA181aFfAWsF++aYf92vLyb09mHYAH7eAVI6Z+GlvyDpmNif+
+	 LgZr7zYKIHHjWdBWjiW9Ma+qvJnSM/nvas2OsWSC+uUUh1ZSRgE5AGQ573TPJvC7Zz207
+	 tfGrBWaZwT39WOvOHyUZb7J/O435dbFG5fVJJvZDEIekZ0dSfK7numO8UDgcAKABqVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795769740;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=2qWb9dMqXIQ3pPtaIuImVFX0gUrWC9x9aabsHQmedns=;
-	b=iHr1RVcVcCACIwqD8GNA2mravIpORP9Xr3pN+r77BCF4OBfsorUtvNbYcO5BuZ1vKsAi
-	 1vhbZm0AK2iIxQh4KvUnVACLikkBHKaDwsCgMqJEiiRobGQZhF9Y9iZjgVQNvPzP4eAid
-	 iXZAA1qOgrfHmAYIwSQrprurAPPq4AQfcKIqBh8aUDLObdqrbotXAd6PGVMw6BtSZ3ieS
-	 Bmly1B8+pMJ6CR+WuG4W/LXdSbjOHkGi4DjZu/wKUuj/6MAiz2Ps9L0Ryip1kHfZkquDu
-	 bJjyg4D952jkMkc9i1E6j1gKNL/IclaEqAiKKlYkIeOPKDiHanWo0XKfsHMH/aqIErw==
+	bh=KfyoOSDGvVrYRNKElNYbnsag/qbQypAtRdT9m3QRxG8=;
+	b=Rl8XXpaeajdAkxgdcYS/aXgl61TBCPuCFQjOEcg5nEjMqIHDfRuFfyOseysL0LYGXZEz
+	 RoboTPhERs4U32HZIcm6y5B67CcaOYKqWpSUeDC6LnfP0ygbwRWC5BCR7HzX6lOyB4V5E
+	 d0SCXjw9wqzkWc5xT3Rncxnb8xXuXyZQaXHDuyp4pg3rTCgyL14Vc3lIkP6xvoDgVwxxv
+	 w8ufOi94ZK/FPfbjYBtBxLikosU8GvLAayuLT0vWYZI//DP6rTk4qWTVvdt1yIDM+LaAg
+	 ThuPQ25qd4s+cmvP3GMZxRzzle+AFdzsGr1JEzPG4DVQ8CwWJq7JxaT3UtBdunvzryQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dt4CUDXu;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F80iK+mh;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DF4606A32F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98DF4606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E5606A335
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 488E5606A335
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dt4CUDXu
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bbb0db845aso563615e9.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:55:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=F80iK+mh
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4a3ac4ac65bso447794f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:55:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795769738; x=1796374538; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795769739; x=1796374539; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=2qWb9dMqXIQ3pPtaIuImVFX0gUrWC9x9aabsHQmedns=;
-        b=Dt4CUDXuaMgudQAF/bqtEpqBQowHavaVA2Hf8k89wg+vXB+Z5Xes0AoD7a0yMOGxKt
-         YrMznycjNG0b8MDjp5agBYfA56fPQQceRlqFZJcg0B85dxn1GTBZWz826Pq+hQHOtRKH
-         MPJ3cmnWdwJFFVfvTz5+mo1wPm/SaUfuEYNAyg1DGzOGxL1VYK6R6ZnUqJiPjTvW+HUD
-         jssu4aLmdxRWAJz5cUqECop379IEXvFludOHr5wFft9+Tp+0XqbXLMdGRxhzjuLvkH5R
-         JBUQ4BkCOxwMYvokOtLz/1AyMDdk1I0uSb7KbwcSWhioCj2uOFCJSM4qmI6x0zVTtFzc
-         MpEA==
+        bh=KfyoOSDGvVrYRNKElNYbnsag/qbQypAtRdT9m3QRxG8=;
+        b=F80iK+mhB07Mw1bUrg0i1WT0+V/T1dLB1AMaD/dwS6QpJCK6e5djKl12D0IfAizqRN
+         9YoNdTKA8dOVStUfubh/8b7+kTAlAz/4jV/FbdYeCps703GlW7CRIkPrEaTz4Z7BsuzN
+         YppdEg8CA58UwsvprKJvhGrnALCoefI7qQvJo2GypBiI8eaWdHP5TB9+eVmEMF9YMTQ8
+         2HtNmrmwlgX6MuZ8QEOlm5QZUnRLsRgXh2i0NeEo96n29O8dWII/DFFWkjjM86dIYPSL
+         eK3H5ec+xSu9R4TnzzDCvdOt7myl11YR0KiMCpNDyHzAXj7k+aafDBa+A+4K03pDZIpj
+         uyDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795769738; x=1796374538;
+        d=1e100.net; s=20260707; t=1795769739; x=1796374539;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2qWb9dMqXIQ3pPtaIuImVFX0gUrWC9x9aabsHQmedns=;
-        b=OECiC9dAL/EW10JUFRhaJknAyPTN+Yi2WEXiwClC+5i5dD+Vm+pQc0tX4GE+vIBEho
-         a3qyvbOFRQm8EqYMWOMcIN71UljZiMwwy5+720fvJMGC1Ld4wE2t9veRcjm0saal43Oq
-         gVXccNa1WEHVxHsftiO/dmwTg3XYKlkZmLEeXIEAjKcW21Mlspeum4XPo5G3lx6aQXvI
-         7kQEfDvMKWG9meWHVwNHCwQcPRn6JAN7YUichGMnTpRR4C1Xgz14Z9zauU8AVC5xpBOA
-         2qOfTkovGC1yv3boWbBavbo2PYxM8PBCfGom85l7kULLO/gLGBkQQco6F6hfJI3gzPkX
-         jCFA==
-X-Gm-Message-State: APuU4Z85o5IK2lg8nJRfNOauuFeCo86sAdSrIcYlZAAj8+4yiJMybJmd
-	fRAReWzNTgMCu7xewUgavuJ4ew20DGEQtA/RAMMWvhZMBo0bhB7NU90Zm8vrhFH3
-X-Gm-Gg: AZFdTZeIh9qxF0oE8SKmcBxP2Bx6EnllFRr7gDo42FNikBUApuWUcVxdP+j+UeKqfwA
-	mfsAKXjyf6nwSAZ6HuA1a+I6nCjpvxkpuipmhFhPJsP107eccnL5hboaiiS68w5H0rfdx9wVmrC
-	YFovHBNACZ6XJx7X9BbS3tFXMHWhDiFWrUR8OHRBC8yBt4AsZZIpbeYvJfeycAlCACK4FhBRUP0
-	Ur7OT60SU347oMJ+hzEW5mNtTZZyuH2jB2ABcu+vrd4352uEwiT6/HducAMVqHuDa1OSYZz/ta/
-	f4b/1vgD24AoslT3KDTKlJwknBEjYgvEdVc/zawx6Q8l/sOQfzBlvmr4ylY/Te5OW/NBxxoGhG0
-	F1ztU7UUf8AI3jE6+N7KhYXpqxOJw6eBmDBwUyeGFhEKqj4pcYKfEYyK1ho4JDUobUrJ5QLnZAs
-	Maxpr5zo6imBBztgXKhNyou+vZr80LSB0Nktj646SPN6YlRpW+t47Xvka8oCsgrznucrv73fBlE
-	f1Wmv9WBJ0uy4Emm2uuXXpt0JaM50aRUOTxBRTXmn+CuHR/CMhYAtB+l+L11C7TcDIbCd83Yh5u
-	iGpJoWYEveTzJSEt2pMrcv3k3YF4vEfEZpY=
-X-Received: by 2002:a05:600c:1113:b0:4bb:a9f6:8bbe with SMTP id 5b1f17b1804b1-4bba9f68bc2mr78838215e9.0.1795769738000;
+        bh=KfyoOSDGvVrYRNKElNYbnsag/qbQypAtRdT9m3QRxG8=;
+        b=ir98A3Yqyc1Mt2/2q/RtvJaNJuCWMcifG2bRP49/KeDsSqtwx+8O0C3cdHxU6j4TK3
+         Z1usZBm+6R+spj9HSzLJGhwXSRmiGhasiYwgj7tUPs3KRMwl8a5/EnmnqnVHcOYIyCOq
+         ia2+HluxW7RTkKlhGIns+qHqkDdjxP7T5M8Wrk8y/B+SDMK/lUX7PXTnBb1hCgA9FSdR
+         ExjpLGMg5HoDUI7aZoPstOl+KnKA32z1tcATn7td1WtivC+DR54AYp+mFUy9Z/OBLjnA
+         rrM4eWNrHqb8ZJsxjNpoT0aObHxhUnF9yZZ/dzJ6vxWkSHkNLMQcTgdvL0vdoOrwp2Ak
+         0xPA==
+X-Gm-Message-State: APuU4Z/1grCWXjlcBpiGW8cy/bFfsrA9wnWIlOJLmvxs00DmWp+mJW3N
+	Fyr9ewNhGjHvPlZkhByZUZw/MhgQOR3rKhxtnVgPAjXKwdmalRBb8wy5kRbht13w
+X-Gm-Gg: AZFdTZeauGckH/bZMKLNQLYSbeG9jd6Wtsnw5++DiedYhxh8+aQQMddVlH9DzNtil8l
+	NWnKpz8W4eIRLBqdih0V3soBfg6sXurc2XA+l4q/ROQ+hFqLdpdnHGkq8jzFmYEC5HfFsgYgyah
+	HcvQk0nNUUuAK78Gqc96JxhJYUDELrquF6ldOsCJh6eaQBjEx5EeJ2lk4WlN4bYejaVAGeFesgr
+	O8xilEfrlAhbqnbnblXj/41GlDRIEcsLXMrXI9M2U8U8VoFulO+H1cdAks96xJFQU+Cg2I2frOe
+	VfQ0Mnk8vmY0soVx/Tigrh8crmOBLjy/KxVnTDhppWdAZb/DKGJZoDulvtXGWkJcuJ6NXAzaTQb
+	Qt7PE9Ucy9B4xojbSinRTf5ripsOGOSYt6vFjMPk7rALImN3YqxVqr46NC/SlM1qs7uUjBQra6x
+	wMrOA9LL8b5Cpc8GeNZ4mtqjUHRAFpxWUTc8Ocbc7hEOW0u0vMxHHgX6YhAEwbbgtdbfxirsCKG
+	8rFaaDbfSeLfmCnkAOvSGgvALWWqD5RmYSCbWAO3QLfhtbzoZjPTJL04sGjim7e6p41seCuzy25
+	CnqFp+yp/LZFIsI9gBXkfKN7PEJZTdeJH0o=
+X-Received: by 2002:a05:600c:8206:b0:4a0:1f9e:5f78 with SMTP id 5b1f17b1804b1-4bb88787d87mr410472855e9.0.1795769738520;
         Fri, 27 Nov 2026 00:55:38 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm739587505e9.14.2026.11.27.00.55.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm739587505e9.14.2026.11.27.00.55.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:55:37 -0800 (PST)
+        Fri, 27 Nov 2026 00:55:38 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	Roland Schober <rolandschober1968@gmail.com>
-Subject: [RFC PATCH BlueZ 3/9] monitor: Decode periodic advertising and PAwR MGMT commands and events
-Date: Fri, 27 Nov 2026 09:55:19 +0100
-Message-ID: <20261127085525.264299-4-rolandschober1968@gmail.com>
+Subject: [RFC PATCH BlueZ 4/9] client/mgmt: Add pa-params, pa-data and pawr-serve commands
+Date: Fri, 27 Nov 2026 09:55:20 +0100
+Message-ID: <20261127085525.264299-5-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127085525.264299-1-rolandschober1968@gmail.com>
 References: <20261127085525.264299-1-rolandschober1968@gmail.com>
@@ -98,279 +98,312 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Decode Add Periodic Advertising Parameters, Add Periodic Advertising
-Data, Set Periodic Advertising Subevent Data and the events Periodic
-Advertising Subevent Data Request and Periodic Advertising Response
-Report:
+pa-params adds periodic advertising to an instance created with
+add-ext-adv-params, with the parameters of Periodic Advertising with
+Responses if subevents are given. pa-data sets the data of a periodic
+advertising train.
 
-@ MGMT Command: Add Periodic... (0x005d) plen 10  {0x0001} [hci0] 2.520884
-        Instance: 1
-        Min interval: 318.75 msec (0x00ff)
-        Max interval: 318.75 msec (0x00ff)
-        Num subevents: 5
-        Subevent interval: 60.00 msec (0x30)
-        Response slot delay: 10.00 msec (0x08)
-        Response slot spacing: 10.000 msec (0x50)
-        Num response slots: 5
-@ MGMT Command: Add Periodic A.. (0x005e) plen 8  {0x0001} [hci0] 2.811226
-        Instance: 1
-        Data length: 6
-@ MGMT Event: Periodic Adverti.. (0x0035) plen 3  {0x0002} [hci0] 2.764373
-        Instance: 1
-        Subevent start: 1 (0x01)
-        Subevent data count: 3 (0x03)
-@ MGMT Event: Periodic Advert.. (0x0036) plen 16  {0x0002} [hci0] 4.669477
-        Instance: 1
-        Subevent: 0 (0x00)
-        TX status: Subevent was transmitted (0x00)
-        Num responses: 1
-        Entry 0
-          TX power: not available (0x7f)
-          RSSI: -59 dBm (0xc5)
-          CTE type: 0xff
-          Response slot: 0 (0x00)
-          Data status: Complete (0x00)
-          Data length: 6
+pawr-serve answers the subevent data requests of an instance, with
+the data given or with manufacturer data which carries the subevent
+and a counter, and prints the response reports. It runs until it is
+stopped.
 
 Assisted-by: Claude:claude-fable-5-2
 ---
- monitor/packet.c | 204 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 204 insertions(+)
+ client/mgmt.c | 275 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 275 insertions(+)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index eddf8706a..1ecbe8050 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -18436,6 +18436,99 @@ static void mgmt_hci_cmd_sync_rsp(const void *data, uint16_t size)
- 	print_hex_field("Response", data, size);
+diff --git a/client/mgmt.c b/client/mgmt.c
+index a7069e5bb..be0d7cf90 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -2504,6 +2504,267 @@ static void cmd_hci_cmd(int argc, char **argv)
+ 	}
  }
  
-+static void mgmt_add_periodic_adv_params_cmd(const void *data, uint16_t size)
++static void pa_params_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
 +{
-+	const struct mgmt_cp_add_periodic_adv_params *cp = data;
-+	uint16_t min_interval = le16_to_cpu(cp->min_interval);
-+	uint16_t max_interval = le16_to_cpu(cp->max_interval);
++	const struct mgmt_rp_add_periodic_adv_params *rp = param;
 +
-+	print_field("Instance: %u", cp->instance);
-+	print_field("Min interval: %.2f msec (0x%4.4x)", min_interval * 1.25,
-+								min_interval);
-+	print_field("Max interval: %.2f msec (0x%4.4x)", max_interval * 1.25,
-+								max_interval);
-+	print_field("Num subevents: %u", cp->num_subevents);
-+	print_field("Subevent interval: %.2f msec (0x%2.2x)",
-+			cp->subevent_interval * 1.25, cp->subevent_interval);
-+	print_field("Response slot delay: %.2f msec (0x%2.2x)",
-+			cp->response_slot_delay * 1.25,
-+			cp->response_slot_delay);
-+	print_field("Response slot spacing: %.3f msec (0x%2.2x)",
-+			cp->response_slot_spacing * 0.125,
-+			cp->response_slot_spacing);
-+	print_field("Num response slots: %u", cp->num_response_slots);
-+}
-+
-+static void mgmt_instance_rsp(const void *data, uint16_t size)
-+{
-+	uint8_t instance = get_u8(data);
-+
-+	print_field("Instance: %u", instance);
-+}
-+
-+static void mgmt_add_periodic_adv_data_cmd(const void *data, uint16_t size)
-+{
-+	struct iovec iov = { .iov_base = (void *) data, .iov_len = size };
-+	const struct mgmt_cp_add_periodic_adv_data *cp;
-+
-+	cp = util_iov_pull_mem(&iov, sizeof(*cp));
-+	if (!cp)
-+		return;
-+
-+	print_field("Instance: %u", cp->instance);
-+	print_field("Data length: %u", cp->data_len);
-+
-+	if (iov.iov_len != cp->data_len) {
-+		print_text(COLOR_ERROR, "  invalid packet size");
-+		print_hex_field("  Data", iov.iov_base, iov.iov_len);
-+		return;
++	if (status != 0) {
++		error("Add Periodic Advertising Parameters failed with status "
++				"0x%02x (%s)", status, mgmt_errstr(status));
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +
-+	print_eir("Data", cp->data, cp->data_len, true);
-+}
-+
-+static void mgmt_set_pa_subevent_data_cmd(const void *data, uint16_t size)
-+{
-+	struct iovec iov = { .iov_base = (void *) data, .iov_len = size };
-+	const struct mgmt_cp_set_pa_subevent_data *cp;
-+	const struct mgmt_pa_subevent_data *se;
-+	uint8_t i;
-+
-+	cp = util_iov_pull_mem(&iov, sizeof(*cp));
-+	if (!cp)
-+		return;
-+
-+	print_field("Instance: %u", cp->instance);
-+	print_field("Num subevents: %u", cp->num_subevents);
-+
-+	for (i = 0; i < cp->num_subevents; i++) {
-+		se = util_iov_pull_mem(&iov, sizeof(*se));
-+		if (!se)
-+			break;
-+
-+		print_field("Entry %u", i);
-+		print_field("  Subevent: %u (0x%2.2x)", se->subevent,
-+							se->subevent);
-+		print_field("  Response slot start: %u",
-+						se->response_slot_start);
-+		print_field("  Response slot count: %u",
-+						se->response_slot_count);
-+		print_field("  Data length: %u", se->data_len);
-+
-+		if (!util_iov_pull(&iov, se->data_len))
-+			break;
-+
-+		print_eir("  Data", se->data, se->data_len, true);
++	if (len < sizeof(*rp)) {
++		error("Too small (%u bytes) reply", len);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +
-+	/* Fewer entries than announced, or octets after the last one */
-+	if (i < cp->num_subevents || iov.iov_len) {
-+		print_text(COLOR_ERROR, "  invalid packet size");
-+		if (iov.iov_len)
-+			print_hex_field("  Data", iov.iov_base, iov.iov_len);
-+	}
++	print("Periodic advertising set on instance %u", rp->instance);
++
++	bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +}
 +
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -18719,6 +18812,15 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x005C, "Load Connection Subrate",
- 				mgmt_load_conn_subrate_cmd, 2, false,
- 				mgmt_null_rsp, 0, true },
-+	{ 0x005D, "Add Periodic Advertising Parameters",
-+				mgmt_add_periodic_adv_params_cmd, 10, true,
-+				mgmt_instance_rsp, 1, true },
-+	{ 0x005E, "Add Periodic Advertising Data",
-+				mgmt_add_periodic_adv_data_cmd, 2, false,
-+				mgmt_instance_rsp, 1, true },
-+	{ 0x005F, "Set Periodic Advertising Subevent Data",
-+				mgmt_set_pa_subevent_data_cmd, 2, false,
-+				mgmt_instance_rsp, 1, true },
- 	{ }
- };
- 
-@@ -19383,6 +19485,104 @@ static void mgmt_security_level_changed_evt(const void *data, uint16_t size)
- 	mgmt_tlv_list_free(tlv_list);
- }
- 
-+static void mgmt_pa_subevent_data_request_evt(const void *data,
-+							uint16_t size)
++static void cmd_pa_params(int argc, char **argv)
 +{
-+	const struct mgmt_ev_pa_subevent_data_request *ev = data;
++	struct mgmt_cp_add_periodic_adv_params cp;
++	uint16_t index;
 +
-+	print_field("Instance: %u", ev->instance);
-+	print_field("Subevent start: %u (0x%2.2x)", ev->subevent_start,
-+							ev->subevent_start);
-+	print_field("Subevent data count: %u (0x%2.2x)",
-+			ev->subevent_data_count, ev->subevent_data_count);
-+}
++	memset(&cp, 0, sizeof(cp));
++	cp.instance = strtoul(argv[1], NULL, 0);
++	cp.min_interval = cpu_to_le16(strtoul(argv[2], NULL, 0));
++	cp.max_interval = cpu_to_le16(strtoul(argv[3], NULL, 0));
 +
-+static void mgmt_pa_response_report_evt(const void *data, uint16_t size)
-+{
-+	struct iovec iov = { .iov_base = (void *) data, .iov_len = size };
-+	const struct mgmt_ev_pa_response_report *ev;
-+	const struct mgmt_pa_response *rsp;
-+	const char *str;
-+	uint8_t i;
-+
-+	ev = util_iov_pull_mem(&iov, sizeof(*ev));
-+	if (!ev)
-+		return;
-+
-+	print_field("Instance: %u", ev->instance);
-+	print_field("Subevent: %u (0x%2.2x)", ev->subevent, ev->subevent);
-+
-+	switch (ev->tx_status) {
-+	case 0x00:
-+		str = "Subevent was transmitted";
-+		break;
-+	case 0x01:
-+		str = "Subevent was not transmitted";
-+		break;
-+	default:
-+		str = "Reserved";
-+		break;
-+	}
-+
-+	print_field("TX status: %s (0x%2.2x)", str, ev->tx_status);
-+	print_field("Num responses: %u", ev->num_responses);
-+
-+	for (i = 0; i < ev->num_responses; i++) {
-+		rsp = util_iov_pull_mem(&iov, sizeof(*rsp));
-+		if (!rsp)
-+			break;
-+
-+		print_field("Entry %u", i);
-+
-+		if (rsp->tx_power == 0x7f)
-+			print_field("  TX power: not available (0x7f)");
-+		else
-+			print_field("  TX power: %d dBm (0x%2.2x)",
-+					rsp->tx_power, (uint8_t) rsp->tx_power);
-+
-+		if (rsp->rssi == 0x7f)
-+			print_field("  RSSI: not available (0x7f)");
-+		else
-+			print_field("  RSSI: %d dBm (0x%2.2x)", rsp->rssi,
-+							(uint8_t) rsp->rssi);
-+
-+		print_field("  CTE type: 0x%2.2x", rsp->cte_type);
-+		print_field("  Response slot: %u (0x%2.2x)",
-+				rsp->response_slot, rsp->response_slot);
-+
-+		switch (rsp->data_status) {
-+		case 0x00:
-+			str = "Complete";
-+			break;
-+		case 0x01:
-+			str = "Incomplete, more data to come";
-+			break;
-+		case 0xff:
-+			str = "Failed to receive the response";
-+			break;
-+		default:
-+			str = "Reserved";
-+			break;
++	if (argc > 4) {
++		if (argc != 9) {
++			error("Either none or all five PAwR parameters");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +		}
 +
-+		print_field("  Data status: %s (0x%2.2x)", str,
-+							rsp->data_status);
-+		print_field("  Data length: %u", rsp->data_len);
-+
-+		if (!util_iov_pull(&iov, rsp->data_len))
-+			break;
-+
-+		print_eir("  Data", rsp->data, rsp->data_len, true);
++		cp.num_subevents = strtoul(argv[4], NULL, 0);
++		cp.subevent_interval = strtoul(argv[5], NULL, 0);
++		cp.response_slot_delay = strtoul(argv[6], NULL, 0);
++		cp.response_slot_spacing = strtoul(argv[7], NULL, 0);
++		cp.num_response_slots = strtoul(argv[8], NULL, 0);
 +	}
 +
-+	/* Fewer responses than announced, or octets after the last one */
-+	if (i < ev->num_responses || iov.iov_len) {
-+		print_text(COLOR_ERROR, "  invalid packet size");
-+		if (iov.iov_len)
-+			print_hex_field("  Data", iov.iov_base, iov.iov_len);
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send(mgmt, MGMT_OP_ADD_PERIODIC_ADV_PARAMS, index,
++			sizeof(cp), &cp, pa_params_rsp, NULL, NULL) == 0) {
++		error("Unable to send Add Periodic Advertising Parameters");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +}
 +
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -19484,6 +19684,10 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_conn_subrate_evt, 18, true },
- 	{ 0x0034, "Security Level Changed",
- 			mgmt_security_level_changed_evt, 8, false },
-+	{ 0x0035, "Periodic Advertising Subevent Data Request",
-+			mgmt_pa_subevent_data_request_evt, 3, true },
-+	{ 0x0036, "Periodic Advertising Response Report",
-+			mgmt_pa_response_report_evt, 4, false },
- 	{ }
++static void pa_data_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	const struct mgmt_rp_add_periodic_adv_data *rp = param;
++
++	if (status != 0) {
++		error("Add Periodic Advertising Data failed with status "
++				"0x%02x (%s)", status, mgmt_errstr(status));
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (len < sizeof(*rp)) {
++		error("Too small (%u bytes) reply", len);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	print("Periodic advertising data set on instance %u", rp->instance);
++
++	bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_pa_data(int argc, char **argv)
++{
++	uint8_t buf[sizeof(struct mgmt_cp_add_periodic_adv_data) + 252];
++	struct mgmt_cp_add_periodic_adv_data *cp = (void *) buf;
++	long data_len = 0;
++	uint16_t index;
++
++	memset(buf, 0, sizeof(buf));
++	cp->instance = strtoul(argv[1], NULL, 0);
++
++	if (argc > 2) {
++		data_len = 252;
++		if (!str2bytearray(argv[2], cp->data, &data_len))
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	cp->data_len = data_len;
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	if (mgmt_send(mgmt, MGMT_OP_ADD_PERIODIC_ADV_DATA, index,
++			sizeof(*cp) + data_len, cp, pa_data_rsp, NULL,
++			NULL) == 0) {
++		error("Unable to send Add Periodic Advertising Data");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
++/* What pawr-serve answers the subevent data requests with */
++static struct {
++	uint8_t instance;
++	uint8_t num_subevents;
++	uint8_t num_response_slots;
++	uint8_t data[251];
++	long data_len;
++	uint8_t counter;
++} pawr;
++
++static void pawr_data_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	if (status != 0)
++		error("Set Periodic Advertising Subevent Data failed with "
++			"status 0x%02x (%s)", status, mgmt_errstr(status));
++}
++
++static void pawr_data_request(uint16_t index, uint16_t len, const void *param,
++							void *user_data)
++{
++	const struct mgmt_ev_pa_subevent_data_request *ev = param;
++	uint8_t buf[sizeof(struct mgmt_cp_set_pa_subevent_data) + 253];
++	struct mgmt_cp_set_pa_subevent_data *cp = (void *) buf;
++	size_t pos = sizeof(*cp);
++	uint8_t i;
++
++	if (len < sizeof(*ev)) {
++		error("Too small (%u bytes) pa_subevent_data_request event",
++									len);
++		return;
++	}
++
++	if (ev->instance != pawr.instance)
++		return;
++
++	print("hci%u pa_subevent_data_request: instance %u start %u count %u",
++			index, ev->instance, ev->subevent_start,
++			ev->subevent_data_count);
++
++	cp->instance = ev->instance;
++	cp->num_subevents = 0;
++
++	for (i = 0; i < ev->subevent_data_count; i++) {
++		struct mgmt_pa_subevent_data *subevent = (void *) (buf + pos);
++		uint8_t data[sizeof(pawr.data)];
++		uint8_t data_len = pawr.data_len;
++
++		subevent->subevent = (ev->subevent_start + i) %
++							pawr.num_subevents;
++
++		/* Without data from the command line: manufacturer data
++		 * with the subevent and a counter.
++		 */
++		if (data_len) {
++			memcpy(data, pawr.data, data_len);
++		} else {
++			data[0] = 0x05;
++			data[1] = 0xff;
++			data[2] = 0x59;
++			data[3] = 0x00;
++			data[4] = subevent->subevent;
++			data[5] = pawr.counter++;
++			data_len = 6;
++		}
++
++		if (pos + sizeof(*subevent) + data_len > sizeof(buf))
++			break;
++
++		subevent->response_slot_start = 0;
++		subevent->response_slot_count = pawr.num_response_slots;
++		subevent->data_len = data_len;
++		memcpy(subevent->data, data, data_len);
++
++		pos += sizeof(*subevent) + data_len;
++		cp->num_subevents++;
++	}
++
++	if (mgmt_send(mgmt, MGMT_OP_SET_PA_SUBEVENT_DATA, index, pos, buf,
++					pawr_data_rsp, NULL, NULL) == 0)
++		error("Unable to send Set Periodic Advertising Subevent Data");
++}
++
++static void pawr_response_report(uint16_t index, uint16_t len,
++					const void *param, void *user_data)
++{
++	const struct mgmt_ev_pa_response_report *ev = param;
++	const uint8_t *ptr;
++	uint8_t i;
++
++	if (len < sizeof(*ev)) {
++		error("Too small (%u bytes) pa_response_report event", len);
++		return;
++	}
++
++	ptr = ev->responses;
++	len -= sizeof(*ev);
++
++	for (i = 0; i < ev->num_responses; i++) {
++		const struct mgmt_pa_response *rsp = (const void *) ptr;
++		char str[2 * 251 + 1];
++		uint8_t j;
++
++		if (len < sizeof(*rsp) || len < sizeof(*rsp) + rsp->data_len) {
++			error("Truncated pa_response_report event");
++			return;
++		}
++
++		for (j = 0; j < rsp->data_len; j++)
++			sprintf(str + 2 * j, "%02x", rsp->data[j]);
++		str[2 * rsp->data_len] = '\0';
++
++		print("hci%u pa_response_report: instance %u subevent %u "
++			"tx_status %u slot %u rssi %d status 0x%02x data %s",
++			index, ev->instance, ev->subevent, ev->tx_status,
++			rsp->response_slot, rsp->rssi, rsp->data_status, str);
++
++		ptr += sizeof(*rsp) + rsp->data_len;
++		len -= sizeof(*rsp) + rsp->data_len;
++	}
++}
++
++/* Runs until it is stopped */
++static void cmd_pawr_serve(int argc, char **argv)
++{
++	uint16_t index;
++
++	memset(&pawr, 0, sizeof(pawr));
++	pawr.instance = strtoul(argv[1], NULL, 0);
++	pawr.num_subevents = strtoul(argv[2], NULL, 0);
++	pawr.num_response_slots = strtoul(argv[3], NULL, 0);
++
++	if (!pawr.num_subevents) {
++		error("Invalid number of subevents");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (argc > 4) {
++		pawr.data_len = sizeof(pawr.data);
++		if (!str2bytearray(argv[4], pawr.data, &pawr.data_len))
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	mgmt_register(mgmt, MGMT_EV_PA_SUBEVENT_DATA_REQUEST, index,
++					pawr_data_request, NULL, NULL);
++	mgmt_register(mgmt, MGMT_EV_PA_RESPONSE_REPORT, index,
++					pawr_response_report, NULL, NULL);
++
++	print("Serving subevent data of instance %u", pawr.instance);
++}
++
+ /* Wrapper to get the index and opcode to the response callback */
+ struct command_data {
+ 	uint16_t id;
+@@ -6354,6 +6615,20 @@ static const struct bt_shell_menu mgmt_menu = {
+ 		cmd_conn_subrate,	"Load Connection Subrate"	},
+ 	{ "hci-cmd",		"<opcode> [event] [timeout] [param...]",
+ 		cmd_hci_cmd,	"Send HCI Command and wait for Event"	},
++	{ "pa-params",		"<instance> <min_interval> <max_interval> "
++				"[num_subevents] [subevent_interval] "
++				"[response_slot_delay] [response_slot_spacing] "
++				"[num_response_slots]",
++		cmd_pa_params,
++			"Add periodic advertising to an instance, with "
++			"responses if it has subevents"			},
++	{ "pa-data",		"<instance> [data...]",
++		cmd_pa_data,
++			"Set the periodic advertising data of an instance" },
++	{ "pawr-serve",		"<instance> <num_subevents> "
++				"<num_response_slots> [data...]",
++		cmd_pawr_serve,
++			"Answer subevent data requests, print responses" },
+ 	{} },
  };
  
 -- 
