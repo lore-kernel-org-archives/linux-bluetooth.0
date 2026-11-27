@@ -1,89 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795769739;
-	b=YJbhG1h9nNMOEHKHLxF1NnL57TJWomc/NEJ48nMrBLm93mNZJ2R/EWQOmW+nZUqkXA2q
-	 s9eruhKW1cccg3AbhtaPz3jE3x134E7JW4TMgGn5ZOwp2E8mBnTTViLF/XoKVPZyKX3VH
-	 OwaYnmS6CXiVR9c++ys8weAE15dh1TnvXYWRidNNTJZ1GY2I30/ldbipfaQktunyUhrGF
-	 VMm21I32Y6EneRlgBpvOIiocdDtJ9sVEAK2cFPGgSOCmeHj93KGaocT150VljLL6l+kIj
-	 GelX5GOnXBJQFLfa925v2UDl8didpuQ7S7OizphxCaW4eUlf/NcUhZVBa6ZkSQQlvmg==
+	b=fKyrRN3FAVurYptRR6/Kh3Uv6BrUQSVbkuJ1J/yWRMWo0nrrA5SX9EvW8HRbvvp6xm6f
+	 A5zHRdjAJp2FTjobLK10ZAXh1+8xaJRPnGl97dWn/ea+LKrwCRZoahEseHQ2lJ4BUt4rX
+	 uFIwWu7bFpbBskAHVyJ9++xQb0AUJt/cf2pUE+W02Ngzza0p0SCSJXTTEJ1HuIEkEviD2
+	 l6L1a68Yw0w5Ay8CUfynTj5jfZU3gWmAyrlo/WpW1cle8qS8D560u2LbenpPY0SdpvfnW
+	 bu/oPbTAl1/Z6ykfB/x1h2McimgMDuv95orY692BDGRIHsaHVXatnv63ppg5iewunWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795769739;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=JAqdVbCJBi6EcXY5EwsC83sJDEzFW9PhvwgxwHT7kk0=;
-	b=p/ARWy3DZ4RxSzp57bFLDjx7IPe2SZQGK/RDmCYXp1QE3Fy1d1ZMFKS6xaatai8JdZTG
-	 oWYOrxYtJViGmB7H4QBYmKnz3GI/2mIqHFzoPIXXvi1jvL3kWR32/P1GXjeK3l/zX0/8a
-	 s8wgqQbdz1A17Zk93P39veqlRO2mGqnHol28/XYt+VQL63Uh1WvLnTJqqIJffSfuDVVvD
-	 JAxAcd3RmY9YLmWvOp16i0GGiUiNYCNacK2PcLWRxmhAJvAwyHTIvQWfb2v+xOM9mc0O7
-	 oEXFlkicIMjK7nWfe+J24GetjtlWhRvtQIz7vjU9HF5o+DOnkpy5BSjaVs+/NQMgHhg==
+	bh=kubRkhm0m/C509e3jFutg79S8V4q3DZ3veA8BC3VikM=;
+	b=SE3kg5hx1wTWJ14jeurdGhml9odzV8BARI9cRIDWofs4OdWt9JTcYm47SgymOxUDhF1o
+	 U5uY/Q5VaejIG5vzbmJDdryV7u/ecs5HvmOuX4VhuJhyAUDy8cynJa4fYgFfnSrW3zUFw
+	 hLHBE5cNc01TjVpQoXXMJpYZlst6kYi6LqVPb+WxRsWhB0M0iuY9qQzQLtNr3OhBJ9YhQ
+	 9DfdSxPZi3k9N+LKap+AiKFD4yGmh+RlZp7eFVd8QJagXyBLB2DQmXHE+b1cDkcif5Mz2
+	 xIB1rOcIOFkGOso8f8XNmmWWVOmeh1VYAvMZieBa/XjmtykhENgmLEFAZVDg0x/qK/w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c7uz0x2a;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QyAmssu7;
+	arc=none smtp.remote-ip=209.85.128.42
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEABE606A326
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AEABE606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C869606A32D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C869606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=c7uz0x2a
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb6756bb1cso5043615e9.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:55:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QyAmssu7
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a56e05568aso17903855e9.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:55:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795769737; x=1796374537; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795769738; x=1796374538; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=JAqdVbCJBi6EcXY5EwsC83sJDEzFW9PhvwgxwHT7kk0=;
-        b=c7uz0x2aD0SgdnQ8WFroCk1QlOOCnm8eqnHcSj0c1FpzRqbCtGvq10vnoE9bVK5hGI
-         ekkoIboom+xDF9iUbYtf0nOO8Tee5Ez8z/h43Y3ErcFrx23qy0isNiWZovPqH/PipqE8
-         ORwDuxTnfC4+jRP2satETfO6XJJyz7vwC+QtYOh3Au/66yWzAdVh4inRDIul1g0kzgbq
-         YKzsggpRcvytXoEzW3/etCGuWZM76++Hn+JwzdDBP8laQzA8pNts/qnUc+81AdaTxUif
-         n0Zm9AU+qQugcOuzdiplr25c/XINvmmC9Tl/F8zLqxKbTnUJJmddzKTKO3zyKfev/aG+
-         UoDw==
+        bh=kubRkhm0m/C509e3jFutg79S8V4q3DZ3veA8BC3VikM=;
+        b=QyAmssu7COw4YEcRQfuxeBHc6EU4cdIYQhCNqosphOFYb9Ogpe8g70r9Zaq0OFXzRs
+         EBu/MIzRhcIaLOG+tXN3RG7ipEWIlYW64F2ocn+GuhwMmotwJMn4sHUXuSc0QAjezfzG
+         67WKZ4UsXONFBA/rZLVwcrJ9DzK414zKXqLgc64uCK+4CA7ToLRvZ/3W5fiOuuKcDeru
+         D7VwnZfa3c7SnGLPmiwQekYOMxhdIO6vAMSWwpgED5JnQhctMGW/oHWByVhaM0Vs22CP
+         SHaRZcdNpGJEmjjAjseLA3w+P/0nh8gtMYdf2xlijIO9BjWUAuC4MEDt5BRU3kGDaJDC
+         BUbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795769737; x=1796374537;
+        d=1e100.net; s=20260707; t=1795769738; x=1796374538;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JAqdVbCJBi6EcXY5EwsC83sJDEzFW9PhvwgxwHT7kk0=;
-        b=EbzDVk3GXmJAaq1y6qS5AajuuPfv56uowe1NOGugX9MGPQy2DCdhN5zHc+vUveKD6s
-         RcXWAQQmpcOJ2Pmgf+KhfgLieA/kR97awZVNwCtaI7CfMuUTpo4HS6hsNLANZKq1Leiz
-         QuxISG+7rrFpIuMXACti9ctNRp/o3eSICZEuh+EqQhU6hctV+lKXUu9jKaPMiqfcjOEl
-         /qCPdtnx26roxvo3sbbevLoZtXvIgwGtEjpnUnITusWvNGNsxdoplwnPC0pF0YDK8kaG
-         YDllM3xeLb07QhEu4zqkzva4nPb+JMg5K/OPTic7lM8PhBWHhXV7iLPNCedJHMlSGWeX
-         yX+w==
-X-Gm-Message-State: APuU4Z9ucoFowd9GurK/ohfrlmTDsszpuqRmClmM+VzSygPS5Ml9I+Yq
-	OlIX3CKijuSMYnxni/k9d3ANSGR8JFouujiHgx+/BE65m9AGoo6B1C9eNqH8ikZt
-X-Gm-Gg: AZFdTZdpmkgy8LMDnAoUBIAg2bBUWZpOJ6sC5m3qdNkPYnZBKaP6vXkSRyAsi/1Tkqv
-	0Q3OmOVT67sELqC7yHvETfxvL4tOYuAofHxolefDGHQogupVWkQqNmEUiTI41GBiWhTOCkyzLWg
-	9zXWwSU3lx53/P4lm7P5YRPWOdts7Wf47LHc0r3fiU+7p22MRnxOIhJp3E7tHeVIO8J0DHlq+bS
-	ZNP3cwkmS9eIRYNrBEBXaqCuvetdSkXoEMwYnx9Xl9sxZBaknVsf1yiqMmryrN3UfLtCxCzs4j7
-	NwZMjMZ31TjOgb7RnSo8In+Gw7uiIDx++9AncVnw7FUqWftzQe0wWjjfCr0MWGNvsmYPlvaeqww
-	0bA1YWvyn29LSdAQkOA79gA0DGCwso+FdW8/Ggw674SlEfj0bljX70sKNLcDvmOigQhx/0XpEf6
-	YoZyC9sqMoU7VPpYcm/Kn2WOnc3daCV5bzCJEB+ZcmH3wt1cQ1A8Gcjig9AlfDsR1SFmyGXAnw3
-	hZ6gQZtrXpfOHM9rf/DScsUMcS1UxGgv/j7S+IAWVUCBIBNepJvhq8VP3aLjmLsMd/sf6fDqSLq
-	moRkUM4k7IxizOAyoS/iXr7UY4NBVuoIXPY=
-X-Received: by 2002:a05:600c:21ca:b0:4bb:68ed:a356 with SMTP id 5b1f17b1804b1-4bb887ec919mr330106175e9.1.1795769736998;
-        Fri, 27 Nov 2026 00:55:36 -0800 (PST)
+        bh=kubRkhm0m/C509e3jFutg79S8V4q3DZ3veA8BC3VikM=;
+        b=o6FRKK6n4UURLO/1qaRFDUlT+ob8jfhWbl0uxu80/PS4NlAm43OyBC3t0LAvygWTAd
+         n6Uf2NnFGjialMMXEQFxT2UMfeqZLiE0VGbD/wIbkhXO47izc+Z87eF3iCgLuZQlFaC2
+         qUa8M4o1g9AqHyTTnuxYeusPVF2F3fcSgzMVtzO6yw8KNTQImirc+B/y8tGUTxuG16Xd
+         5gu+OE4Lx/0EU+dt6SMtp+f8vO5ApuIdK1CgatD1nzPePue65OSt2RJAK4G9ZEwIQiVS
+         /Tf/4Hw6c0HA4CKd+ZVOcAlP/7L8knFxY/FWucVNzr3nVZNmwwQxIybyBlm+TSfcWlzg
+         rBGA==
+X-Gm-Message-State: APuU4Z+Dvr7wfPOvfbIY/GHTsZSnsdl22nHpXlwAyEmbK3u6XXjB+Krf
+	di+VrQ02RytJprn9avW1hTn/MWsXnGvfeO8QgCWANytLDLtea5qlCyjEKG41iHXQ
+X-Gm-Gg: AZFdTZdctRBpsAiU5PhcWVZcLA1J+dAtThlfYDMVPFll8hGFp4/B/wedwfWwW+RhyLG
+	GxAsH3gbPHNMp6rJAbz5IjBTZB3QUz4Hb7M4w6N0dSSZjARgaq/PHFGnpUtp3ze0RcRLny8CaEv
+	K81ZJkMKXMm5S8QqElUkgrX3BFht8wI2jp534UKqeP1DfUQpoElcINxjUwn1RYnt/mKUG+hYLTq
+	AAgHaFl21vUIDwaNehtlxv8op11CzBnUdtel60fQg6TOAW+LZ2kDPKJJcsGTScSfzlJqErcGpC3
+	7c0lfr/5SjwxzUr87bsNZIwL7r8o2JCLB2qzBU3W+SVchL/2kOa1/shOzqa9yIx7l2E9rCtHoFr
+	3pYKVFg274bjYKT8zv/lGHXPekZkdEiBgIrRZndunExjQRgKS09yU3pJ0PEdqypBDRLRERaLg/7
+	r6PDKLQSzTO8BLvEHf7zYRQ4dgRPydUIcHUjJLcWFltFTlSEY3Wd0YrQwrKXcCKDTbKxYd3YVZI
+	+oKQz0PaD2jRNx3/pxf5nzNbkXqIpL2XVds3iA5RpcBv+jBrcEV5oxNwH2QA+A7yHCUQCcRdsBC
+	OGqxrWan6cjmbguNV0DM36i4K+sljzAjiNzF
+X-Received: by 2002:a05:600c:1088:b0:4a2:417:7db5 with SMTP id 5b1f17b1804b1-4bb887f43cdmr374046515e9.2.1795769737536;
+        Fri, 27 Nov 2026 00:55:37 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm739587505e9.14.2026.11.27.00.55.36
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm739587505e9.14.2026.11.27.00.55.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:55:36 -0800 (PST)
+        Fri, 27 Nov 2026 00:55:37 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	Roland Schober <rolandschober1968@gmail.com>
-Subject: [RFC PATCH BlueZ 1/9] doc/mgmt: Add periodic advertising and PAwR commands and events
-Date: Fri, 27 Nov 2026 09:55:17 +0100
-Message-ID: <20261127085525.264299-2-rolandschober1968@gmail.com>
+Subject: [RFC PATCH BlueZ 2/9] lib/mgmt: Add periodic advertising and PAwR definitions
+Date: Fri, 27 Nov 2026 09:55:18 +0100
+Message-ID: <20261127085525.264299-3-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127085525.264299-1-rolandschober1968@gmail.com>
 References: <20261127085525.264299-1-rolandschober1968@gmail.com>
@@ -98,241 +98,126 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add Periodic Advertising Parameters makes an advertising instance
-periodic and, with subevents, Periodic Advertising with Responses.
-Add Periodic Advertising Data sets the data of a periodic advertising
-train. Set Periodic Advertising Subevent Data and the events Periodic
-Advertising Subevent Data Request and Periodic Advertising Response
-Report carry the data of the subevents and the responses to them.
+Add the MGMT commands and events for periodic advertising and Periodic
+Advertising with Responses (PAwR):
+
+ - Add Periodic Advertising Parameters (0x005d)
+ - Add Periodic Advertising Data (0x005e)
+ - Set Periodic Advertising Subevent Data (0x005f)
+ - Periodic Advertising Subevent Data Request event (0x0035)
+ - Periodic Advertising Response Report event (0x0036)
 
 Assisted-by: Claude:claude-fable-5-2
 ---
- doc/mgmt-protocol.rst | 208 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 208 insertions(+)
+ lib/bluetooth/mgmt.h | 74 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/doc/mgmt-protocol.rst b/doc/mgmt-protocol.rst
-index c4e1421e3..899b5c6f5 100644
---- a/doc/mgmt-protocol.rst
-+++ b/doc/mgmt-protocol.rst
-@@ -4278,6 +4278,153 @@ Possible errors:
- :Invalid Index:
- :Not Supported:
+diff --git a/lib/bluetooth/mgmt.h b/lib/bluetooth/mgmt.h
+index af71be828..450d20afb 100644
+--- a/lib/bluetooth/mgmt.h
++++ b/lib/bluetooth/mgmt.h
+@@ -838,6 +838,49 @@ struct mgmt_cp_load_conn_subrate {
+ 	struct mgmt_conn_subrate params[];
+ } __packed;
  
-+Add Periodic Advertising Parameters
-+```````````````````````````````````
++#define MGMT_OP_ADD_PERIODIC_ADV_PARAMS	0x005D
++struct mgmt_cp_add_periodic_adv_params {
++	uint8_t  instance;
++	uint16_t min_interval;
++	uint16_t max_interval;
++	uint8_t  num_subevents;
++	uint8_t  subevent_interval;
++	uint8_t  response_slot_delay;
++	uint8_t  response_slot_spacing;
++	uint8_t  num_response_slots;
++} __packed;
++struct mgmt_rp_add_periodic_adv_params {
++	uint8_t  instance;
++} __packed;
 +
-+:Command Code:		0x005D
-+:Controller Index:	<controller id>
-+:Command Parameters:	Instance (1 Octet)
-+:...:			Min_Interval (2 Octets)
-+:...:			Max_Interval (2 Octets)
-+:...:			Num_Subevents (1 Octet)
-+:...:			Subevent_Interval (1 Octet)
-+:...:			Response_Slot_Delay (1 Octet)
-+:...:			Response_Slot_Spacing (1 Octet)
-+:...:			Num_Response_Slots (1 Octet)
-+:Return Parameters:	Instance (1 Octet)
++#define MGMT_OP_ADD_PERIODIC_ADV_DATA	0x005E
++struct mgmt_cp_add_periodic_adv_data {
++	uint8_t  instance;
++	uint8_t  data_len;
++	uint8_t  data[];
++} __packed;
++struct mgmt_rp_add_periodic_adv_data {
++	uint8_t  instance;
++} __packed;
 +
-+This command is used to make an advertising instance a periodic advertising
-+instance. The instance has to exist: the command is sent between Add Extended
-+Advertising Parameters, which creates the instance, and Add Extended
-+Advertising Data, which enables it:
++struct mgmt_pa_subevent_data {
++	uint8_t  subevent;
++	uint8_t  response_slot_start;
++	uint8_t  response_slot_count;
++	uint8_t  data_len;
++	uint8_t  data[];
++} __packed;
 +
-+.. csv-table::
-+	:header: "Step", "Command"
-+	:widths: auto
++#define MGMT_OP_SET_PA_SUBEVENT_DATA	0x005F
++struct mgmt_cp_set_pa_subevent_data {
++	uint8_t  instance;
++	uint8_t  num_subevents;
++	uint8_t  subevents[];
++} __packed;
++struct mgmt_rp_set_pa_subevent_data {
++	uint8_t  instance;
++} __packed;
 +
-+	1, Add Extended Advertising Parameters
-+	2, Add Periodic Advertising Parameters
-+	3, Add Periodic Advertising Data (optional)
-+	4, Add Extended Advertising Data
-+
-+The instance must use one of the secondary channel flags (Secondary Channel
-+with LE 1M, LE 2M or LE Coded) and must not be connectable.
-+
-+The Min_Interval and Max_Interval parameters specify the range of the periodic
-+advertising interval in units of 1.25 ms (range: 0x0006 to 0xFFFF).
-+
-+A Num_Subevents of 0 makes the instance plain periodic advertising, and the
-+remaining parameters are ignored. Any other value (range: 0x01 to 0x80) makes
-+it Periodic Advertising with Responses, which requires the controller to
-+support the Periodic Advertising with Responses - Advertiser feature. The
-+remaining parameters are then those of the HCI command LE Set Periodic
-+Advertising Parameters [v2]:
-+
-+.. csv-table::
-+	:header: "Parameter", "Unit", "Description"
-+	:widths: auto
-+
-+	Subevent_Interval, 1.25 ms, Time between the subevents of one periodic advertising event
-+	Response_Slot_Delay, 1.25 ms, Time from the start of a subevent to its first response slot
-+	Response_Slot_Spacing, 0.125 ms, Time between the starts of two response slots
-+	Num_Response_Slots, , Number of response slots of a subevent
-+
-+The controller checks these values against each other and against the
-+interval. The data of the subevents is requested with the Periodic Advertising
-+Subevent Data Request event.
-+
-+Remove Advertising stops the periodic advertising and removes the instance.
-+
-+This command can only be used when the controller is powered.
-+
-+This command generates a Command Complete event on success or a Command Status
-+event on failure.
-+
-+Possible errors:
-+
-+:Failed:
-+:Busy:
-+:Rejected:
-+:Not Supported:
-+:Invalid Parameters:
-+:Invalid Index:
-+
-+Add Periodic Advertising Data
-+`````````````````````````````
-+
-+:Command Code:		0x005E
-+:Controller Index:	<controller id>
-+:Command Parameters:	Instance (1 Octet)
-+:...:			Data_Length (1 Octet)
-+:...:			Data (0-252 Octets)
-+:Return Parameters:	Instance (1 Octet)
-+
-+This command is used to set the data of the periodic advertising train of an
-+instance which was made periodic with Add Periodic Advertising Parameters. It
-+may be sent again to change the data while the train is running.
-+
-+The Data parameter holds advertising data structures, each with its length
-+and type. The kernel does not add anything to it.
-+
-+An instance with Periodic Advertising with Responses has no such data: the
-+data of its subevents is set with Set Periodic Advertising Subevent Data.
-+
-+This command can only be used when the controller is powered.
-+
-+This command generates a Command Complete event on success or a Command Status
-+event on failure.
-+
-+Possible errors:
-+
-+:Failed:
-+:Rejected:
-+:Invalid Parameters:
-+:Invalid Index:
-+
-+Set Periodic Advertising Subevent Data
-+``````````````````````````````````````
-+
-+:Command Code:		0x005F
-+:Controller Index:	<controller id>
-+:Command Parameters:	Instance (1 Octet)
-+:...:			Num_Subevents (1 Octet)
-+:...:			Subevent[] (1 Octet)
-+:...:			Response_Slot_Start[] (1 Octet)
-+:...:			Response_Slot_Count[] (1 Octet)
-+:...:			Data_Length[] (1 Octet)
-+:...:			Data[] (variable)
-+:...:			...[]
-+:Return Parameters:	Instance (1 Octet)
-+
-+This command is used to set the data of subevents of an instance with
-+Periodic Advertising with Responses. It is the answer to the Periodic
-+Advertising Subevent Data Request event and may hold the data of any number of
-+the requested subevents.
-+
-+The Response_Slot_Start and Response_Slot_Count parameters specify the
-+response slots of the subevent the controller listens to. A count of 0 means
-+that no response is expected.
-+
-+All entries of one command are sent to the controller in a single HCI command:
-+the entries, each with its four octets of header, are limited to 253 octets
-+in total.
-+
-+The controller accepts the data of a subevent only for a limited time before
-+the subevent. Data which arrives too late, or for a subevent which was not
-+requested, fails the command, and nothing is transmitted in that subevent.
-+
-+This command can only be used when the controller is powered.
-+
-+This command generates a Command Complete event on success or a Command Status
-+event on failure.
-+
-+Possible errors:
-+
-+:Failed:
-+:Rejected:
-+:Invalid Parameters:
-+:Invalid Index:
-+
- Events
- ------
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -1156,6 +1199,32 @@ struct mgmt_ev_security_level_changed {
+ 	uint8_t	tlv_data[];
+ } __packed;
  
-@@ -5599,3 +5746,64 @@ Possible values for the Encryption type:
- 	0x02, AES-CCM encryption
++#define MGMT_EV_PA_SUBEVENT_DATA_REQUEST	0x0035
++struct mgmt_ev_pa_subevent_data_request {
++	uint8_t  instance;
++	uint8_t  subevent_start;
++	uint8_t  subevent_data_count;
++} __packed;
++
++struct mgmt_pa_response {
++	int8_t   tx_power;
++	int8_t   rssi;
++	uint8_t  cte_type;
++	uint8_t  response_slot;
++	uint8_t  data_status;
++	uint8_t  data_len;
++	uint8_t  data[];
++} __packed;
++
++#define MGMT_EV_PA_RESPONSE_REPORT		0x0036
++struct mgmt_ev_pa_response_report {
++	uint8_t  instance;
++	uint8_t  subevent;
++	uint8_t  tx_status;
++	uint8_t  num_responses;
++	uint8_t  responses[];
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1250,6 +1319,9 @@ static const char *mgmt_op[] = {
+ 	"Mesh Send Cancel",
+ 	"HCI Cmd Sync",
+ 	"Load Connection Subrate",
++	"Add Periodic Advertising Parameters",
++	"Add Periodic Advertising Data",
++	"Set Periodic Advertising Subevent Data",
+ };
  
- This event will be sent to all management sockets.
-+
-+Periodic Advertising Subevent Data Request
-+``````````````````````````````````````````
-+
-+:Event Code:		0x0035
-+:Controller Index:	<controller id>
-+:Event Parameters:	Instance (1 Octet)
-+:...:			Subevent_Start (1 Octet)
-+:...:			Subevent_Data_Count (1 Octet)
-+
-+This event indicates that the controller is ready to accept the data of
-+Subevent_Data_Count subevents of an instance with Periodic Advertising with
-+Responses, starting with the subevent Subevent_Start and wrapping to subevent
-+0 after the last one. The data is set with the Set
-+Periodic Advertising Subevent Data command.
-+
-+This event will be sent to all management sockets.
-+
-+Periodic Advertising Response Report
-+````````````````````````````````````
-+
-+:Event Code:		0x0036
-+:Controller Index:	<controller id>
-+:Event Parameters:	Instance (1 Octet)
-+:...:			Subevent (1 Octet)
-+:...:			TX_Status (1 Octet)
-+:...:			Num_Responses (1 Octet)
-+:...:			TX_Power[] (1 Octet)
-+:...:			RSSI[] (1 Octet)
-+:...:			CTE_Type[] (1 Octet)
-+:...:			Response_Slot[] (1 Octet)
-+:...:			Data_Status[] (1 Octet)
-+:...:			Data_Length[] (1 Octet)
-+:...:			Data[] (variable)
-+:...:			...[]
-+
-+This event reports the responses received in the response slots of a subevent
-+of an instance with Periodic Advertising with Responses.
-+
-+Possible values for the TX_Status parameter:
-+
-+.. csv-table::
-+	:header: "Value", "Description"
-+	:widths: auto
-+
-+	0x00, The subevent was transmitted
-+	0x01, The subevent was not transmitted
-+
-+The parameters of a response are those of the HCI event LE Periodic
-+Advertising Response Report. TX_Power and RSSI are in dBm, with 0x7F for a
-+value which is not available. Possible values for the Data_Status parameter:
-+
-+.. csv-table::
-+	:header: "Value", "Description"
-+	:widths: auto
-+
-+	0x00, Data complete
-+	0x01, "Data incomplete, more data to come"
-+	0xFF, Failed to receive the response
-+
-+This event will be sent to all management sockets.
+ static const char *mgmt_ev[] = {
+@@ -1306,6 +1378,8 @@ static const char *mgmt_ev[] = {
+ 	"Mesh Packet Complete",
+ 	"Connection Subrate",
+ 	"Security Level Changed",
++	"Periodic Advertising Subevent Data Request",
++	"Periodic Advertising Response Report",
+ };
+ 
+ static const char *mgmt_status[] = {
 -- 
 2.47.3
 
