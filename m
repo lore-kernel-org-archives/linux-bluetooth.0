@@ -1,90 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795769659;
-	b=UX4zH2aAbCVZI/z61hQNXudZRDti4a9ZPDtvqIEzt/JmSw8GH5R0aHgO3FtmGHsi8DWD
-	 yDBWO5AATfH3mAP2TCHoJifVpIxPLv/hJJ1Z8Lh26bhIFOMJ2tgtnL7xKLafk5wRmaYT5
-	 hT8yD17nDe+KIJUtp2xoa0yuAs7xp3XE2lP8ymnR8IfAKBIygp7o/yU62NvwFBjX79kqI
-	 PLnZznabvsL51kqx4iKrE4FTgvW+zcpMWOzYn059SHbpwpbyAIO/5zQ2MAGYvGtrJtXzf
-	 fg220kX0uaJy3Av4QuRuCdiFPiva/xrpXRGZvMKJFDFMmrQ/L7FBdJ00U6z3eI30guw==
+	b=PR1mnPXzCjpa807YrcZ24I/Q802AzvtXChjAfI7u0yziY6cVY9MKszN3qO2L189lGSI8
+	 H2ZmcKVAL5DzEMckFmX2AFxpSBF/CYmuhIoy/HwNTm9lYqIhuaSkDrkWNaN3sifS3SIne
+	 mHMUly6kae8Cf4Y1Rk/FNaVqOXUb0PahYxiHamfy+YvBVfkygFnLurkvLtRyaaL4uf2Pk
+	 DSNfMtHd8kJ8sHW/DFbzmgJ+SNtIliZqekcnwA8CCyndKjmPbKl/HwVUibtdwuCMVv68R
+	 EqXORZTJEmUxRnvAdUoFh2v8bFChXIfZGec9naGbPr6/syCCcGcx8k2mLqad9fQ429Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795769659;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=tsSPL51FeALmAR/qfsWQKAbY9gJVU1A5IbpKy4+QT3M=;
-	b=PjbYVxER/mU6ZvANPKfDMeaB04EpnMdPT8xpwA0f5aPJQNB900N6ssPNCE9gtOHjPp9w
-	 wYtTI4JVFhfpp4SZYihlDErSxe0QuFO3IlB2cvy/GiUwd7gDRLAn8FIuhYKcnkKCDn1LU
-	 qIbaxtOQRLwRRsz5I6SOJkhnTEbR5nveyLKevdXDMKZ6LfKt2pbZS33wd5nRTI2H7va2X
-	 abtRoEbKmRyDNC44kFvQUBkYftMRcE90/O/3jya7RSorfinGOiPG5adFYLmsfaA8NeUPx
-	 ty/X+4kPSY6PrCfndF+G6W8jv1+FeBWj0jkbjuMNNkpvIaOZqTbML9hWptEgjpvBcYw==
+	bh=SBdlVp6yrAAXIVKvOv5jmkIQ0ZdG1zCMdwQVVHV861A=;
+	b=dKVEzo5F1IVIJ0V1S7NifYviRDFHTZ+0730e6BCDdqw+wrA2lr/pWbYQa6Y/V5Q6hKO6
+	 xYrJInk3c9ifAhgDm8+48djRl1v1oqRloEzTwlfNWRv3W1lYfW3S+ZXIK3hq67qfIkFKf
+	 0HnmuapgEdOA7YkAQiRJv4epkcnKDuNZWCz2dKUEwbTNTU25QR+d23sCu4rvgWEMq96rv
+	 w2CAWKkbNy0CzSVooNUEHl/F8PcQNabty4/JIX8XCw9JkQMzvNrKF9iUl0v/Cm12f0xzp
+	 y5f/c/ZbYdQLyMFt3JkxsjLBJm5IiQ3DxjxuHfyRufbEN/M/AmsEUMHK4zA1y6wkVlQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9Rp0HVo;
-	arc=none smtp.remote-ip=209.85.218.46
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="mq769/OU";
+	arc=none smtp.remote-ip=209.85.218.47
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0002606A31E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:54:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0002606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A863606A327
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:54:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A863606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Z9Rp0HVo
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c5187b42a2dso62331066b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:54:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=mq769/OU
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c5187b42a2dso62331166b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:54:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795769657; x=1796374457; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795769658; x=1796374458; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=tsSPL51FeALmAR/qfsWQKAbY9gJVU1A5IbpKy4+QT3M=;
-        b=Z9Rp0HVoEbjKX7732gt3ukPvqsNPph59kJEeHCtFNhVqTT/Oz7D5VsTJ1kihHxvf7g
-         xlYZJ2Dr8EP5+y6m3HY2y9jftZqIU9EZTSnbrFPTYtJMwIvgExj3bcmXfMzyLqg7vXrI
-         Nftmvt/QKkgWlDmBsZlEg2FwndqrwS6nJ/skpSZ4kCBDdV7/6lNvV4qEw7CTE2kZOB5I
-         veV/DZToTmWaUuw+eIGAJG4uiy1E1J+IDYAy8sj//qF1T8vKnGMj+Lxc+ranFXaC/u42
-         q3q0qrxiTa2lRnNZP9DaUWm1Bh3FWry91DA3sp/iKb61YXcTds98NAjWBQHR62qFqrEo
-         7lCw==
+        bh=SBdlVp6yrAAXIVKvOv5jmkIQ0ZdG1zCMdwQVVHV861A=;
+        b=mq769/OUqolspBhJ0dmHxhJWQq5vtMCDBYLHxBCLki44+rB+VM/I26GEPBqdd9/IH5
+         kgddkhuH++u084sU0vCFBJyGHuQZh80dCPevL5ApyFrsA+Wy2yhc8caam18MgdX4Mfja
+         Zt+ypan6DFU/jdR2xHDx5rJkfcczGv0VNfJL2ii7hQV47sV+OryiOrvgwa9S38Zpmonh
+         Fsi+g1Qklqw4oKM+7MZT3+Tecy2K6HwccdpsWfzlYmgJlcnAy0eCa8bQbHgR283pS0R0
+         kQh/hlQXvI0YTn/pkoua+GQCWxXV8YmHbW/g37X3pJft5bJlhpnNLc90GRHyWqfcB7iD
+         KtUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795769657; x=1796374457;
+        d=1e100.net; s=20260707; t=1795769658; x=1796374458;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=tsSPL51FeALmAR/qfsWQKAbY9gJVU1A5IbpKy4+QT3M=;
-        b=Hoetva0U+uSQx+zW3dnBYVXfwhpaL6VUQXL0ll9b9WqYA9jLE1tkV1mkGMg1ZogQ1k
-         lRf3s9MFdIf0eoJ5plriq7AwaqHBR/SjChY0gC0sXlR6E4S8dDBr68oB0HpzgWMhlms3
-         NsXTRDE36kd06iJOCCGmUYgVs6puF109Q8pVR//HK76jlrnSN4b2OgkPPMdMd/nIrVfB
-         dC0w3d0KVeA0arTQYzf2cVzrZ04IVQaxSw5wDgjXK3JHVDr0ZICxKJ7Tq32HYtvaxhVy
-         Xj0EwA0uVZvUjD5wmGjH6Wc5ApDhMvQ6N48SBA3rFTGk/GEmZ/8cDgycR603u4USkPKz
-         zFOg==
-X-Gm-Message-State: APuU4Z8qQCPIyWGhRm45GDXcpErihpQdRuZQdcUJ7Ye/GbFDe8eHB3Df
-	S7chPe/PfTqcXUHA/DgutYJgYn5L3VxloS7zd34AbifoJdfkhfWSuo2xW42DQ0m1
-X-Gm-Gg: AZFdTZed1mpA93Qq+ltnFLC/qeYD+tUH14cog5h+EBxUqcZsdaoN+tagBYz+unxV2Vf
-	U/dYSuITK/MZUCa60ytKjyXNMVf4jBNNl+0lxUF1TOk6+LNJg8Zo9ccqrbo86aEHb8TkuZau2+6
-	AE8tO2lSFbJD0TzYguMRxBRalaTJl31Gjv6rblTha5W3fSR0Yx6ztDwArG1IWbL3kkcEZsp0L/q
-	qO57B8vYzuke6r3GoMSjG5TI3KxLMmY8OhoqcSuhx0Rsx9T0PKmpQjT3Qq03iYdsRktDczG5W+l
-	RaX+FOV6jNbeXpDHBAVqJIS7ipcQczfKFpSAMugouA0OJncWKsimIGZ6xCGDKl4bDHpe/k6bC1v
-	8d/Vwj2VT7Capgz4X+CeCthHWMERo18zkTkDLgE+OfjbTkaWmGXK8E8T1rE/e7FcOTNB7ptZ17q
-	rkK4RMHTRcI3QSul1/wdWiOUK7LDgTaXQH4jGRiLp3dR+/mi6b7lDR7BqeaZb2R5dvOrKurwJJ4
-	nA8oVfULIr8kze2E2YNrsU4a6lg/FqjC5vT6UUJn2I11MT5A5XsNCzjR3NmcFxG/eF/LaGongTM
-	USQQ/HjE8QqQmFIeefkOyCPDhQoMNeZKCho=
-X-Received: by 2002:a17:906:68d5:b0:c51:4fd:1aef with SMTP id a640c23a62f3a-c513a50ab80mr1922559366b.2.1795769657087;
+        bh=SBdlVp6yrAAXIVKvOv5jmkIQ0ZdG1zCMdwQVVHV861A=;
+        b=YYoMcmUc2Fm6buInRfvhUbW0fxFryz70DkRm1KVs+CjCakdlLu775bu1Gi8YxL5vIQ
+         VwjiQbl1qu1Q/t17gWIGvXKeCQjTrLBjppewro66CAxyNzhaJOsH8hipIHSH2rtbjeKT
+         FGl0yY09o/EU5IKwnXREomAzTP/Co2a//EbjnEebQpkhKZ2fy05wg8gmqoubolwpNHF3
+         mWYPkSVcb75eX2kbl+otX+pyTm1weOe90eLIxYXiG8osJeLsyn5R4DiFRKHOxHMJ2EjY
+         HA/QDKplI5zTsupkuZqff7gWtg8STz4pSSzYZObRuKMkH3wRC5lWYegjaXtO7COiiW/6
+         3Z6Q==
+X-Gm-Message-State: APuU4Z/kx8WiCQpll6T+RWYMUJmbR6Gb7Fu3nF3Ajq6qu+eg38NKbw86
+	xIry25PRSIBjwZ+DJmGg4Fj4JwKrkXC36MVBdE9UFqHxXBW4fYqbYdFBKla9Nx0h
+X-Gm-Gg: AZFdTZfGauURj5TOx4TCQ7tCCY5r1CtfMT6iJQcQf5eadyVoVT4cPG2qcWY9iphcEW8
+	yegfKssa6zT8GShoQVZUKgZDLalFWUOISkt9bs1rwfLpKrtQQ/grm+l70GFSXq5xtHwrRmhjbmR
+	TXuncJa/5/BQiDYnh1I3XDAljPQF3cqdh8u6uBczm19MfQPxbAp8V1NjWlYg/E2V/Dc0qJOABHT
+	LHMcMdV91WIITJzDftVoh5ZLwdogAdMA0WmVKf2bdt09NK+6shHdLu4eLpGMgBjnAoZcMVTsMFx
+	/QjgrPPCFVh99I8uqkBFSQ1z/XK+w6aVE0yMsN9Woyf36K4d9RszRsgwd2bKV+UIPApoc3khqn6
+	NT17PBWsmfYAGn/z3U/XSszDlupuJ/U5B2xYb4b0NrWZtkOYxzgeS/56IbXfqtWcDrMbA3X1Zh5
+	IKt74m85GBZ+q0lfhUXoxsPn7Y/7/7PUB/VVx0m32DQeB6BVzqx0pTIrv696zjXD8W3ob8nOnKO
+	OGVfLAseAXFXhE24N57sDCe8IcX4z05lAMI4pLMcpf6mRxVvhrEnuwflSXuBa0OWOC3ef2l9tQb
+	s3owBqMeJUMo15girWHAAKa3SW0EJyYyMb8=
+X-Received: by 2002:a17:906:3e41:b0:c46:ae89:cd3c with SMTP id a640c23a62f3a-c513a3971a7mr1713568766b.1.1795769657588;
         Fri, 27 Nov 2026 00:54:17 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c513aea28f4sm870688166b.33.2026.11.27.00.54.16
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c513aea28f4sm870688166b.33.2026.11.27.00.54.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:54:16 -0800 (PST)
+        Fri, 27 Nov 2026 00:54:17 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	marcel@holtmann.org,
 	Roland Schober <rolandschober1968@gmail.com>
-Subject: [RFC PATCH 1/5] Bluetooth: hci: Add Periodic Advertising with Responses definitions
-Date: Fri, 27 Nov 2026 09:53:56 +0100
-Message-ID: <20261127085401.263615-2-rolandschober1968@gmail.com>
+Subject: [RFC PATCH 2/5] Bluetooth: hci_sync: Disable periodic advertising before removing a set
+Date: Fri, 27 Nov 2026 09:53:57 +0100
+Message-ID: <20261127085401.263615-3-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127085401.263615-1-rolandschober1968@gmail.com>
 References: <20261127085401.263615-1-rolandschober1968@gmail.com>
@@ -99,127 +99,82 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the HCI definitions of the advertiser side of Periodic Advertising
-with Responses (PAwR), from the Bluetooth Core Specification 5.4:
+The controller answers LE Remove Advertising Set and LE Clear Advertising
+Sets with Command Disallowed while periodic advertising is enabled on
+a set. Only a BIG enables periodic advertising so far, and its removal
+disables it first on its own.
 
- - the LE feature bits of the PAwR advertiser and scanner;
- - LE Set Periodic Advertising Parameters [v2], which adds the subevent
-   and response slot timing to the periodic advertising parameters;
- - LE Set Periodic Advertising Subevent Data, by which the host hands
-   the controller the data of the next subevents;
- - LE Periodic Advertising Subevent Data Request, by which the
-   controller asks for that data;
- - LE Periodic Advertising Response Report, which carries the responses
-   received in the response slots of a subevent.
+Disable it in the removal itself, so that an instance which is made
+periodic over MGMT can be removed with Remove Advertising.
 
 Assisted-by: Claude:claude-fable-5-2
 Signed-off-by: Roland Schober <rolandschober1968@gmail.com>
 ---
- include/net/bluetooth/hci.h      | 59 ++++++++++++++++++++++++++++++++
- include/net/bluetooth/hci_core.h |  6 ++++
- 2 files changed, 65 insertions(+)
+ net/bluetooth/hci_sync.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ac64780274a5..81ff64dc82ac 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -659,6 +659,8 @@ enum {
- #define HCI_LE_ISO_BROADCASTER		0x40
- #define HCI_LE_ISO_SYNC_RECEIVER	0x80
- #define HCI_LE_LL_EXT_FEATURE		0x80
-+#define HCI_LE_PAWR_ADVERTISER		0x08	/* byte 5 */
-+#define HCI_LE_PAWR_SCANNER		0x10	/* byte 5 */
- #define HCI_LE_CS			0x40
- #define HCI_LE_CS_HOST			0x80
- #define HCI_LE_SCI			0x01	/* byte 9 - Shorter Connection Intervals */
-@@ -2294,6 +2296,37 @@ struct hci_cp_le_set_host_feature {
- 	__u8     bit_value;
- } __packed;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index ee426ffeaa03..a1c723aad55e 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2263,6 +2263,13 @@ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 	if (err)
+ 		return err;
  
-+struct hci_le_per_adv_subevent_data {
-+	__u8    subevent;
-+	__u8    response_slot_start;
-+	__u8    response_slot_count;
-+	__u8    data_len;
-+	__u8    data[] __counted_by(data_len);
-+} __packed;
++	/* The controller refuses to remove an advertising set which has
++	 * periodic advertising enabled.
++	 */
++	err = hci_disable_per_advertising_sync(hdev, instance);
++	if (err)
++		return err;
 +
-+/* What fits one command next to handle and num_subevents */
-+#define HCI_MAX_PER_ADV_SUBEVENT_DATA_LEN	253
-+
-+#define HCI_OP_LE_SET_PER_ADV_SUBEVENT_DATA	0x2082
-+struct hci_cp_le_set_per_adv_subevent_data {
-+	__u8    handle;
-+	__u8    num_subevents;
-+	__u8    subevents[];
-+} __packed;
-+
-+#define HCI_OP_LE_SET_PER_ADV_PARAMS_V2		0x2086
-+struct hci_cp_le_set_per_adv_params_v2 {
-+	__u8    handle;
-+	__le16  min_interval;
-+	__le16  max_interval;
-+	__le16  periodic_properties;
-+	__u8    num_subevents;
-+	__u8    subevent_interval;
-+	__u8    response_slot_delay;
-+	__u8    response_slot_spacing;
-+	__u8    num_response_slots;
-+} __packed;
-+
- #define HCI_OP_LE_READ_ALL_LOCAL_FEATURES	0x2087
- struct hci_rp_le_read_all_local_features {
- 	__u8    status;
-@@ -3380,6 +3413,32 @@ struct hci_evt_le_big_info_adv_report {
- 	__u8    encryption;
- } __packed;
+ 	if (instance) {
+ 		hci_dev_lock(hdev);
  
-+#define HCI_EV_LE_PER_ADV_SUBEVENT_DATA_REQ	0x27
-+struct hci_ev_le_per_adv_subevent_data_req {
-+	__u8    handle;
-+	__u8    subevent_start;
-+	__u8    subevent_data_count;
-+} __packed;
-+
-+struct hci_le_per_adv_response {
-+	__s8    tx_power;
-+	__s8    rssi;
-+	__u8    cte_type;
-+	__u8    response_slot;
-+	__u8    data_status;
-+	__u8    data_len;
-+	__u8    data[] __counted_by(data_len);
-+} __packed;
-+
-+#define HCI_EV_LE_PER_ADV_RESPONSE_REPORT	0x28
-+struct hci_ev_le_per_adv_response_report {
-+	__u8    handle;
-+	__u8    subevent;
-+	__u8    tx_status;
-+	__u8    num_responses;
-+	__u8    responses[];
-+} __packed;
-+
- #define HCI_EVT_LE_ALL_REMOTE_FEATURES_COMPLETE 0x2b
- struct hci_evt_le_read_all_remote_features_complete {
- 	__u8    status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4aa0b49ae104..250245186702 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2140,6 +2140,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- /* Periodic advertising support */
- #define per_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_PERIODIC_ADV))
+@@ -2392,6 +2399,32 @@ int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 	return hci_start_adv_sync(hdev, instance);
+ }
  
-+/* Periodic Advertising with Responses support */
-+#define pawr_adv_capable(dev) \
-+	((dev)->le_features[5] & HCI_LE_PAWR_ADVERTISER)
-+#define pawr_scan_capable(dev) \
-+	((dev)->le_features[5] & HCI_LE_PAWR_SCANNER)
++/* The controller refuses to clear the advertising sets while one of them has
++ * periodic advertising enabled.
++ */
++static int hci_disable_per_advertising_all_sync(struct hci_dev *hdev)
++{
++	u8 instances[HCI_MAX_ADV_INSTANCES];
++	struct adv_info *adv;
++	u8 i, n = 0;
++	int err;
 +
- /* CIS Master/Slave and BIS support */
- #define iso_capable(dev) (cis_capable(dev) || bis_capable(dev))
- #define iso_enabled(dev) (le_enabled(dev) && iso_capable(dev))
++	hci_dev_lock(hdev);
++	list_for_each_entry(adv, &hdev->adv_instances, list) {
++		if (adv->periodic_enabled && n < ARRAY_SIZE(instances))
++			instances[n++] = adv->instance;
++	}
++	hci_dev_unlock(hdev);
++
++	for (i = 0; i < n; i++) {
++		err = hci_disable_per_advertising_sync(hdev, instances[i]);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int hci_clear_adv_sets_sync(struct hci_dev *hdev, struct sock *sk)
+ {
+ 	int err;
+@@ -2404,6 +2437,10 @@ static int hci_clear_adv_sets_sync(struct hci_dev *hdev, struct sock *sk)
+ 	if (err)
+ 		return err;
+ 
++	err = hci_disable_per_advertising_all_sync(hdev);
++	if (err)
++		return err;
++
+ 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CLEAR_ADV_SETS,
+ 					0, NULL, 0, HCI_CMD_TIMEOUT, sk);
+ }
 -- 
 2.47.3
 
