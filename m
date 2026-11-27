@@ -1,86 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795782435;
-	b=Ad/Rmc4+iI9QBz0TKKv6S3CbIfzD+mmLJSHDTvUfaGsxD0WYlUPHwoaUjUT0W84TvJ3m
-	 4zpTcis0/DyMz3SB0WB4MXnqjMh7i2dFPYd+mWyIa0X8dQJiJAtzRFrEPDUnyXdFZHxXH
-	 m0u3oXOfLOYBEPugfEd9sgZq8cnnO2r3P8OxPNFdFjQP3NOhDZhpj5wGrTsQfzUBuNvwG
-	 zcVRwJ5CuKcQRPDXDjhD5HhMsl6hKVpRYNGokYPFliSw5MbubkwLiEqzdPw6ZNYVSpX7z
-	 pw25Ymvf592PMyhNt7/vN9sjRnl4M6AW7aygbpefHGKmW3IK0/e1iDf3eYrZOnHeufQ==
+	t=1795782436;
+	b=P2ECZ3mhk8prw9dNmCMD4KbHaBH/SsIlxsn3kl0ji3zwGJNbByBjkMVxdyp9upc3/+tS
+	 fAjAZ1J8LT71v2FG8RXQgqtfT+U9h8xwAAb1rTBdiIEJU2L/4nYPMQHgmasU9roX1X5BN
+	 ABsrxpuW0IxCzfw9JI+fqrKcjPNzb8syMWRG8jjpygH2IeHLLlkrFbAfP3o9LFITVI3R6
+	 NOccYKxxR9HUTFaRY+tq3IToiOyq8HvWpUT3tue+d0cQm37h6hWEzvs/fWIviG4MKErMG
+	 WVZ24sfgys/XaVWcQwHnvLifdMKSoRrYbZCwzYRS6g7drNyO05Iewc24m0ccP88UQfA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795782435;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795782436;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=yENNkmY31x3X++2X3tmmsBLfXaNfduzp6BbIwefqCTI=;
-	b=RLYEnus4GbnikXMErRmNmm5bxyRiYnvHKQJGVjP6e1uvfz2GNZbvCvag8vnAxjY5sdqZ
-	 xMOwjw+pJ15UzLtoSkdsx9ftRXkpYy/dzEy3YXY/6ql0i9mmRzI2zOxXgQFqsUXn+m0Zf
-	 X5LpznjvwJ106B155IEDdIpyjHqWHrTbf7cPYzOnC5Y+fTxPbqUxqV8h2J4dX+dtXiV0m
-	 revZNoe7yKfTAc34nA5KUNoTgGTVF3jRxCjkyRICImsyh94cdZForWYRaQWaxx8XmERZV
-	 0X24zlgJ1Ny3YDAHWilX+0xZ4Glbgy3gGoXFY4/Qa/yYfuQyz/YN0KtSzaTJYDER4kQ==
+	bh=ygqqbAshNaRZQXcIlH/IlH9uF7tgQ2T+0CvynnyUrT4=;
+	b=xme656DyDHEpnbb3cP9hsfSrTo9aBDoxxknnvEk/yUwtXJytc8PRhdMYRVdcxVUnOp4h
+	 eAALTL9d8/ufUsDyXbohzw9YCK03RXZgTqXLKX6kgpAVf3kHodvukGS5G08wWS4gsQ+bk
+	 4HjX7FdUcGGnufEnusrEkOQHgl6nJ2T8XjQfCF/fyOrVja3mqMrCJ79fiItwEjjlSSRNB
+	 ROjDgX7iqS39d9GaHmpws1wHQzJ6spN4OKBCAFQih3GWSMde+KSvEHFPxyGzdJ6Z57O8n
+	 D8GJYfwOW8tQkLdsGQWKA0NtziHo569Wl86RCrozeCrkL8CUroUQSD6kZVdBckanGFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=streamunlimited.com;
 	spf=pass smtp.mailfrom=streamunlimited.com;
-	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=1N+6ToKL;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dkim=pass header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=RSI9AeKY;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7A8606A330
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 12:27:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DE7A8606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4AF606A32D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 12:27:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE4AF606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=streamunlimited.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=1N+6ToKL
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-490d59c3edaso5471241f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 04:27:14 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=streamunlimited.com header.i=@streamunlimited.com header.a=rsa-sha256 header.s=google header.b=RSI9AeKY
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4a357b1c649so4643207f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 04:27:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1795782433; x=1796387233; darn=vger.kernel.org;
+        d=streamunlimited.com; s=google; t=1795782434; x=1796387234; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=yENNkmY31x3X++2X3tmmsBLfXaNfduzp6BbIwefqCTI=;
-        b=1N+6ToKLQHtQzV3+jZPQTuiWYajtEbF8oKzKkDrW3lPj73WYPsPkpPTGKUY1QdgUZo
-         c55Sg3petPOFbJQcVlaM0OU/7etp+2szSYBOrN1t3bpTC2kC2YbPY9p/gcIgrK5KsUjH
-         DO4ifhx26zxZsqEUaWr5Kt1EA6prDGWrB4l+M=
+        bh=ygqqbAshNaRZQXcIlH/IlH9uF7tgQ2T+0CvynnyUrT4=;
+        b=RSI9AeKYHpcde44Uf2LoK63hBWUStea6PvCeCC7VDK2tmVI6C+faKcesTFqOeQll11
+         I57vRADWRekSwPn/17Q3WPKJdugWK08uqf/2SVuDroKRN5ahkBTzeBIoydQCeMfqXNcB
+         jjD8vc/kYuynavNt1RNHHePXN0nmJyRLRzQ8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795782433; x=1796387233;
+        d=1e100.net; s=20260707; t=1795782434; x=1796387234;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yENNkmY31x3X++2X3tmmsBLfXaNfduzp6BbIwefqCTI=;
-        b=Ayu3lQ4VwUvRgSXm0NSM/G4NXXD66W51d60VQZUNLgP1vWGpbq4nG9+m8Rk111pidI
-         lUAiHmGYhaTlrWY2tDselMl/7XhE+YMieo+T4AWAu/y47dnFj3L414YEwHnUKg6dVMgI
-         CBXQGE9IAL+AdKztBXWbfYKNizGf2bZqLjj7+dkJnIYtv7/WfN/jxCTYyKSYaKiFTck3
-         S8dX29tppoUiNja8CL4uDb+AGBdA2DZXhqauysG4c8pHCLkQlqU0GRpB5CeAPPZQsPvF
-         iTAC02mygAh7Pu5vu2hZAFVAaCBTeIlROI9Aa1Gkj89sFi4zNSImUmKKRGPs0uuFKNC3
-         jQKw==
-X-Gm-Message-State: APuU4Z9gBtpt7TUo/vuSDyJz+DA7W4zRUz+zWA+7aq0TaKHesITSYZhW
-	V/gvGv0ROd0gdPeWrHD9H352AFq+1RxuyMO3u9TpnirfdQnepC/EVNLLRYayIAbgSIs2VaKHKsX
-	alCqa
-X-Gm-Gg: AZFdTZeXbsA4Q08ZY8WgrEIAXbIIqLlgBXuJh3EZr31412PrhABmJ8NFH8bR7dzJ7Y+
-	9AcH3RcFhI/L8uOf1sSTCBMgWVMGQMg8RfUlbXUMjqXWSRZ/2hwZiy3/MGzNlQ0u0voH4FcVfIl
-	C3D8sn8iNivzXjNOesQEdcTWRu5UAcjAdI3Y7+a8OhHwfFkztkzCuAFfAqD/PuVc/VQ3Wq4aOlb
-	ucXNvyrknMJQ2VzOd/xXoBovi/FcaWxMELcBNdUTQeLcow8J4lYm8qA2dvhbTJVRPhjFpwlHrA5
-	ukmpzhdnMxFwtw61/JsKTHQq3jaMatqSC/Qz/33ZEKbqAr3mVoB07q5PMi5PIo4XY/+6wz/QE8S
-	Q9wJETL2dpjS6yA+WJy3184JBl39YWwglGGw9llcBHkH5V6FpORONK0lZ5LkQnZY4pwvPWDS4W1
-	ttk74IhsvT2oZSb1nMGZouew+tx+L1xmqz1OF4FbWpcg175DqUeoxDjOEHzkaURipjnU+iKX5jT
-	AxYCfH2mVfSLaOgA9fXibqI7dczYC9ijAYfXkmmfnTiL64o4qTjSSTp8HeY4wxeretgqHMxS3TE
-	Ig3Z1lfuLqHNVfhIt/qfW3Pxuoc2E2k78kjqYY4gpRi00EAkpg==
-X-Received: by 2002:a05:6000:40ce:b0:488:8347:a110 with SMTP id ffacd0b85a97d-4abafd02fa0mr51503578f8f.7.1795782433239;
-        Fri, 27 Nov 2026 04:27:13 -0800 (PST)
+        bh=ygqqbAshNaRZQXcIlH/IlH9uF7tgQ2T+0CvynnyUrT4=;
+        b=0Sj4AvR9BX6OlkvS8zyg0AfqNTdZio3SJywJmT2f9trYpT5SZxJ4n636SvHnJr2o6O
+         pucPP8YOB3+DT6YklSwg2QmJ0ZWZMMM/K8BLjMRwuP9jyD0Q4rE8TW4QIU6t9eEXNkE1
+         upK7ol+cIQ74Vk8+Ab1KyZRF5I8+rVR0GLDzbOPrrI9f5IaKiJFIPbUdq9S7lqyu62wI
+         AV04mjMKI8/hkflY9DxwlkmD4+eYHJnf6m48HP1Pc4FHUykSdOtnZEYabLnMCaC3IJKW
+         iCmCJo8kXKoFocKm8pZktxcDqEG+HfhOvSn40L0qYSDu/nDL+v1Pt1hBBB4DFqOFLAo5
+         pveQ==
+X-Gm-Message-State: APuU4Z851kIMZUj0iHK+AyCZZYD6mtn5iH/CoOcEpa1ZjxDuU49QYefW
+	xZOC64OgbUzXuvLK6s80G7vdsdlnnFgRg3rYitEkjUqp5hoiQgl5RTJtQVdhwKA67acogC86Eww
+	24GGR
+X-Gm-Gg: AZFdTZfmSqY/FV4l3LHWTNi9NWNEHq3oVE8QDElvieos/FhB7trwA60wLL6PaBt0EdZ
+	qsAUJtX++ej9Xkytn4fxw7QlGYZ/LE4aP7GstnAaVRuSjHW9992j9ezyrZABVE7NIRi2y3rwi2O
+	XevWfDMrX/LcuBEj7nh3mF2EMxuV/xiQM2WvP/3QHN1jUbz1IhkEjiPLveqweWPcwE/ksvXf4Hf
+	C3X37IBSUVL2DD7FSp+NCmjfUASUwEbdTOHKHSeBLZcVC8aEMrwxhdrlkGC1MgWgSE0Ea+5oUPI
+	d3dsDiv3HCO2fhym2Prbm6L2E3B/pcCzFtZOed9nxb6sHDAHg48z4HLFcoznkC/33B6rKwbuO18
+	1UYRmF+PmXvjwPpP2riIeIMZrh8ztqs2w3EFZrBFqhVCeWci+umA66kbCWkxTpi+/sdfCck77fx
+	+aaDJN+PjlkUKTzYtHa8v+lbLGKcAOQtHN6QAfcnPH4cwvtHcnEpQUZTcIHA/AezE0Q7kiyak/i
+	ZdcHAMXsRN7GjI3Ow0Ox90KTz/xX3SQ7XkPoEKtvvNprM2CQq7tlAt3/cIAoa5d6KHA0eyEj0Jo
+	U9UlaefsOt5LpDyPElleebtCKWjKlWubfg+wBRZvk4c6gafOcQ==
+X-Received: by 2002:a05:6000:1a8f:b0:4ae:43e9:da61 with SMTP id ffacd0b85a97d-4ae43e9daa2mr43351037f8f.4.1795782434031;
+        Fri, 27 Nov 2026 04:27:14 -0800 (PST)
 Received: from SMI-ubuntu.sueba ([2a01:390:0:101:1a97:1eed:9575:b56f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b10b1ebsm48053420f8f.33.2026.11.27.04.27.12
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6b10b1ebsm48053420f8f.33.2026.11.27.04.27.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:27:12 -0800 (PST)
+        Fri, 27 Nov 2026 04:27:13 -0800 (PST)
 From: Simon Mikuda <simon.mikuda@streamunlimited.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 2/3] l2test: Add -j to send a burst for each line on stdin
-Date: Fri, 27 Nov 2026 13:27:04 +0100
-Message-ID: <20261127122705.2393602-3-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 3/3] l2test: Add -k to open several enhanced credit based channels
+Date: Fri, 27 Nov 2026 13:27:05 +0100
+Message-ID: <20261127122705.2393602-4-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261127122705.2393602-1-simon.mikuda@streamunlimited.com>
 References: <20261127122705.2393602-1-simon.mikuda@streamunlimited.com>
@@ -95,93 +95,124 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With -j, a sending mode waits for a line on stdin before each burst
-and sends as many frames as the line says, or -N's when it has no
-number. A tester can then ask for data when it is ready for it, for
-example after it reconfigured the channel:
+With -k num, l2test connects num channels in one
+L2CAP_ECRED_CONN_REQ, or accepts num channels on one listener. The
+first ones are connected with deferred setup, so the kernel puts them
+into the request of the last one. The mode runs on the last channel and
+the others stay open while it does.
 
-    echo 2 | l2test -w -X ext-flowctl -V le_public -j
+Separate l2test processes cannot do this: the kernel only bundles the
+deferred channels of one process.
+
+    l2test -n -X ext-flowctl -V le_public -P 0x80 -k 2 <bdaddr>
 
 Assisted-by: Claude:claude-opus-5-5
 ---
- tools/l2test.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ tools/l2test.c | 42 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 39 insertions(+), 3 deletions(-)
 
 diff --git a/tools/l2test.c b/tools/l2test.c
-index dbfeae50a..e0149c89e 100644
+index e0149c89e..c432296a3 100644
 --- a/tools/l2test.c
 +++ b/tools/l2test.c
-@@ -120,6 +120,7 @@ static int linger = 0;
- static int reliable = 0;
+@@ -121,6 +121,7 @@ static int reliable = 0;
  static int timestamp = 0;
  static int defer_setup = 0;
-+static bool stdin_frames;
+ static bool stdin_frames;
++static int num_chans = 1;
  static int priority = -1;
  static int rcvbuf = 0;
  static int32_t phy = -1;
-@@ -1078,7 +1079,7 @@ static void do_send(int sk)
- 	/* Without -b each frame is as large as the channel's MTU */
- 	bool follow_mtu = data_size < 0;
- 	uint32_t seq;
--	int i, fd, len, buflen, size, sent;
-+	int i, fd, len, buflen, size, sent, burst;
+@@ -536,6 +537,11 @@ static int do_connect(char *svr)
+ 	struct l2cap_options opts;
+ 	socklen_t optlen;
+ 	int sk, opt;
++	/* All but the last of -k channels are deferred: the kernel puts them
++	 * into the connection request of the last one (enhanced credit based
++	 * mode), and they stay open while its mode runs.
++	 */
++	bool defer = num_chans > 1;
  
- 	syslog(LOG_INFO, "Sending ...");
+ 	/* Create socket */
+ 	sk = socket(PF_BLUETOOTH, socktype, BTPROTO_L2CAP);
+@@ -655,12 +661,31 @@ static int do_connect(char *svr)
+ 	else
+ 		goto error;
  
-@@ -1120,6 +1121,19 @@ static void do_send(int sk)
- 		usleep(send_delay);
- 
- 	seq = seq_start;
-+	burst = num_frames;
+-	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
++	if (defer) {
++		opt = 1;
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &opt,
++							sizeof(opt)) < 0) {
++			syslog(LOG_ERR, "Can't enable deferred setup: %s (%d)",
++							strerror(errno), errno);
++			goto error;
++		}
 +
-+next_burst:
-+	/* With -j, a burst for each line: its number of frames, -N's without */
-+	if (stdin_frames) {
-+		char line[16];
-+
-+		if (!fgets(line, sizeof(line), stdin))
-+			return;
-+
-+		num_frames = atoi(line) > 0 ? atoi(line) : burst;
++		/* Or connect() waits for a request that is not sent yet */
++		fcntl(sk, F_SETFL, fcntl(sk, F_GETFL) | O_NONBLOCK);
 +	}
 +
- 	while ((num_frames == -1) || (num_frames-- > 0)) {
- 		if (follow_mtu)
- 			data_size = omtu = current_omtu(sk);
-@@ -1149,6 +1163,9 @@ static void do_send(int sk)
- 						!(seq % (count + seq_start)))
- 			usleep(send_delay);
++	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0 &&
++				!(defer && errno == EINPROGRESS)) {
+ 		syslog(LOG_ERR, "Can't connect: %s (%d)",
+ 							strerror(errno), errno);
+ 		goto error;
  	}
-+
-+	if (stdin_frames)
-+		goto next_burst;
- }
  
- static void send_mode(int sk)
-@@ -1455,6 +1472,8 @@ static void usage(void)
- 	printf("Options:\n"
- 		"\t[-b bytes] [-i device] [-P psm] [-J cid]\n"
++	if (defer) {
++		num_chans--;
++		return do_connect(svr);
++	}
++
+ 	/* Get current options */
+ 	if (getopts(sk, &opts, true) < 0) {
+ 		syslog(LOG_ERR, "Can't get L2CAP options: %s (%d)",
+@@ -686,7 +711,7 @@ static void do_listen(void (*handler)(int sk))
+ 	struct sockaddr_l2 addr;
+ 	struct l2cap_options opts;
+ 	socklen_t optlen;
+-	int sk, nsk, opt;
++	int sk, nsk, opt, accepted = 0;
+ 
+ 	/* Create socket */
+ 	sk = socket(PF_BLUETOOTH, socktype, BTPROTO_L2CAP);
+@@ -807,6 +832,11 @@ static void do_listen(void (*handler)(int sk))
+ 							strerror(errno), errno);
+ 			goto error;
+ 		}
++
++		/* The first -k channels stay open, the mode runs on the last */
++		if (++accepted < num_chans)
++			continue;
++
+ 		if (fork()) {
+ 			/* Parent */
+ 			close(nsk);
+@@ -1474,6 +1504,8 @@ static void usage(void)
  		"\t[-I imtu] [-O omtu]\n"
-+		"\t[-j] send -N frames for each line on stdin (or as many as\n"
-+		"\t   the line says)\n"
+ 		"\t[-j] send -N frames for each line on stdin (or as many as\n"
+ 		"\t   the line says)\n"
++		"\t[-k num] num channels (ext-flowctl): connected in one\n"
++		"\t   request, or accepted; the mode runs on the last one\n"
  		"\t[-L seconds] enable SO_LINGER\n"
  		"\t[-W seconds] enable deferred setup\n"
  		"\t   0: don't enable (default)\n"
-@@ -1493,7 +1512,7 @@ int main(int argc, char *argv[])
+@@ -1512,7 +1544,7 @@ int main(int argc, char *argv[])
  
  	bacpy(&bdaddr, BDADDR_ANY);
  
--	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:mnpqrstuwxyz"
-+	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:jmnpqrstuwxyz"
+-	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:jmnpqrstuwxyz"
++	while ((opt = getopt(argc, argv, "a:b:cde:f:g:i:jk:mnpqrstuwxyz"
  		"AB:C:D:EF:GH:I:J:K:L:MN:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
  		switch (opt) {
  		case 'r':
-@@ -1564,6 +1583,10 @@ int main(int argc, char *argv[])
- 			data_size = atoi(optarg);
+@@ -1587,6 +1619,10 @@ int main(int argc, char *argv[])
+ 			stdin_frames = true;
  			break;
  
-+		case 'j':
-+			stdin_frames = true;
++		case 'k':
++			num_chans = atoi(optarg);
 +			break;
 +
  		case 'i':
