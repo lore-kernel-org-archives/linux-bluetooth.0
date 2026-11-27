@@ -1,57 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.210.214.84
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795763319;
-	b=by9OLqfQyTY+bxP2uSlM+1O5K1NeoTIzuCLR7I8XLSCkc1gEWuWJlU88xar16tPVdGY3
-	 PPoK4aq7lMaUrv5QiiNplzsbx+EaYTYF4hgKBCG7rkA1iGliBXY9YNE6XjrL9qe3XiK3E
-	 YPN25E41Ax0/Y0JGn8PDNZdhUpeHxUh1MPHZcyZYQ+7F4JzwXGtuN5j7i8Dn7YrpwHqQX
-	 +eBCr3m+3ut1iCyDqEGJv3r90gNE7BbIILLKmmxef9nxEx+yl7d5nGtlSKfkN0asyNeXp
-	 Q3ne9nEMljPT7dAWhh8D4JxXPv8spuiNDfb539YhDhSCJtDeXoNMCsrXb54hpWDpFyA==
+	t=1795765564;
+	b=x/Il5ZbQvvyQwb4XhANBl6FKzJVNcA9UrLH41Aqnfid44lSCj3R5rlJ9x2YJnUty3PqP
+	 AFAL2Y9MNtR/XfH4Pcbpy9MXHlzDGdqhAXDsd+ByeZH1sVY091FTbLdNizQOhIDUs0HCM
+	 P8X6CBzjPgyaddSF3btUti9ChUAuqsF//LvKowihDLOlfFkaUpPG2GTHdyMNvndPsuiyN
+	 GU2QkBaaofBGI0gv5UmJsZG46JncPzuMJaR+B9+mMyqgT2mln0CIM8tTiWkwf5kHgGpgO
+	 K7RPYxO92Fvw37AeWfmVrmCr76+HxHu1/uad7BmLRMwKkFf5bhmbfTHqqMk0T9hNGIA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795763319;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-CM-SenderInfo;
-	bh=uTud52MSv5zlX5vzr0q2e7lP5nMrrTTxhkLocH5qEKA=;
-	b=2d7HBxP3q42RpRCLkdZhD25qIEEwt79uqPKZlHMAChL6rSG+Lp/hfGi3bURxiR8WMgEf
-	 Nb7eoz5oNQxIUiSx0l71H5Zg2BIUeITqhdcT6AeBr8LSRYtRQYrvIIDMKNL8NXwyZp9BA
-	 bMzGlliaNeayCU9nuArABm8r7zW6yrE8l6VZn+39KDnOEaA+Aj9duioWirq1N4Fm/SPLn
-	 dP8uyCqyECW6fesXrZf+Ely0irTSmS1UDuyPySiSqrsCK6l3C8mYA8Og0mffe9/QI+haS
-	 Axo2iAt/h6rX/yVq1Y/JowXW26E9NknQoy16mod1/ZRI7n6TKJ0mVBl+vz6vHSqGr3A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795765564;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=60/T6+akL3zw9Tl0SMa78bohTXbd4Uco2RW4UlB8Nmw=;
+	b=QFlq1L2uPXQ+zttZDCchlJ/1LgfVedGQOPZVdac7t8FccGADbiC2knXksWq9oYi5Ord2
+	 nEbQxvTcIWOGiYQiKGwH+nB6jlKb71Gku2bJ7rawFFUi4tFLTR4E8j7PHB45BS+5BDiX8
+	 cd2Xuvqsl6Zx6wrhIRm/RbnioPhjKu+Fxadu43sv4artF4huO6s+F2mYfKh675wwzKlQ4
+	 hBrGMpdiQKh/dSEAHPlupZxLR9QaNRTmNF88lG05eRCQyfxao/e9QOKXhJS4njh/WomML
+	 2ncEXs8+b5oCwT/njX0w9mBig5NmKSDMv5SRIiFMIKax2Vf8UtvqLCkjnMiWt0iDUQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=163.com;
-	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=p6WLV8RV;
-	arc=none smtp.remote-ip=220.197.31.4
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	dmarc=pass header.from=codewreck.org;
+	spf=pass smtp.mailfrom=codewreck.org;
+	dkim=pass header.d=codewreck.org header.i=@codewreck.org header.a=rsa-sha256 header.s=2 header.b=lkg1fSGQ;
+	arc=none smtp.remote-ip=62.210.214.84
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A96D606A31C;
-	Fri, 27 Nov 2026 07:08:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A96D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B74606A31C;
+	Fri, 27 Nov 2026 07:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 12B74606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=p6WLV8RV
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=uT
-	ud52MSv5zlX5vzr0q2e7lP5nMrrTTxhkLocH5qEKA=; b=p6WLV8RVcCkTGo0TNp
-	r+jDu02gG8TWbIMVghQ4nD3sQri96VKP+0cecT2i1k1zBVkwU/Ao5QwOz+3CpdxN
-	xlqypjrsUduhdMwmKRjpN2scHmTC88ObHOjhsu9D8xAqeicAUBC39RODnAMZZgts
-	HwmVhR83ecx9LeXIdDotYLMWw=
-Received: from liumingshu.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD33wVdLAlr0sYrLQ--.54228S2;
-	Fri, 27 Nov 2026 15:08:28 +0800 (CST)
-From: 17868388227@163.com
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: virtio_bt: fix skb double-free when send fails
-Date: Fri, 27 Nov 2026 15:08:13 +0800
-Message-Id: <20261127070813.662250-1-17868388227@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.a=rsa-sha256 header.s=2 header.b=lkg1fSGQ
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 0E74D14C2D6;
+	Fri, 27 Nov 2026 08:45:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1795765562;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60/T6+akL3zw9Tl0SMa78bohTXbd4Uco2RW4UlB8Nmw=;
+	b=lkg1fSGQaEiD11F4o2d9A1BE98P1ZnmYkxDCY8+bC07INXVVo2YYFxWTctLVs7n9I52aDn
+	Q03YL8QypxcVOoKseUmqC3HAcDbPZBF7PHL6T/oEPEQ33KTQKRo5BIGfDonMPXNCZVa8bf
+	vWY7uJUJr65c7zTK9/eXhqEjgePZl8vfFn0K3CSzeAR8oHtBHNX/JjpRp99CGgCcbfsf7V
+	kroHlVSUnLtlbE38bWTwpM2PMZ7oeRfa1yOFcEr/EWj+4zCIDTsI+B9RR81AnZgBfj5wxB
+	RKVTBJYZnODzqB5UN4A6rvG8aPbzAeCvGHyw/vp8rLudQWVjcM9JcJhCWE9CFA==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 9d6bf9f9;
+	Fri, 27 Nov 2026 07:45:56 +0000 (UTC)
+Date: Fri, 27 Nov 2026 16:45:41 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Edward Adam Davis <eadavis@qq.com>, Sasha Levin <sashal@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
+	stable@vger.kernel.org,
+	"W. John White" <whitewj-debian-bugreport@outlook.com>,
+	=?utf-8?B?UMOpdGVyIELDoXRvcmk=?= <batori.peter@gmail.com>,
+	Mael Bras <mael.bras.ext@idnow.io>, tycho673 <tycho673@gmail.com>,
+	hanta <hantahrabal@disroot.org>, skiwithme <skiwithme@optimum.net>,
+	Suvam Sen <suvamsen2004@gmail.com>, Celimar <celimarj@gmail.com>
+Subject: Re: [regression 6.1.y] 967473b1e8bb ("Bluetooth: L2CAP: Fix
+ slab-use-after-free Read in l2cap_send_cmd") causes backtraces and
+ non-working bluetooth
+Message-ID: <awk1JT1VMzHDecib@codewreck.org>
+References: <179567271700.947722.15185762256491350563@eldamar.lan>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -61,94 +76,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD33wVdLAlr0sYrLQ--.54228S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAFyfWr1DXF1kAFy3GrWxJFb_yoW5Ar4UpF
-	4Ykr9xArWDJF10vFW7Jr48ury5Awsrury3KrZ2gw1Y9r43JrWUWryIya4jq3WUCr93Ca17
-	XF4vqryDCFs09aDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07bb5lnUUUUU=
-X-CM-SenderInfo: bprxmlaytymjisx6il2tof0z/xtbC6gxDK2sJLGwHKwAA3A
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <179567271700.947722.15185762256491350563@eldamar.lan>
 
-From: Mingshu Liu <26031212613@stu.xidian.edu.cn>
+Salvatore Bonaccorso wrote on Thu, Nov 26, 2026 at 07:06:59AM +0100:
+> [   40.687744] list_del corruption, ffff8a27c10efe80->prev is LIST_POISON2 (dead000000000122)
+> [   40.687829] kernel BUG at lib/list_debug.c:56!
+> [   40.687865] invalid opcode: 0000 [#1] PREEMPT SMP PTI
+> [   40.687900] CPU: 2 PID: 893 Comm: bluetoothd Kdump: loaded Tainted: G           I        6.1.0-55-amd64 #1  Debian 6.1.192-1
+> [   40.687960] Hardware name: /NUC6i7KYB, BIOS KYSKLi70.86A.0051.2018.0110.1800 01/10/2018
+> [   40.688002] RIP: 0010:__list_del_entry_valid.cold+0x4b/0x6f
+> [   40.688574] Call Trace:
+> [   40.688594]  <TASK>
+> [   40.688614]  hci_chan_del+0x18/0x90 [bluetooth]
 
-A double-free of struct sk_buff and a subsequent use-after-free were
-observed in virtbt_send_frame() when virtqueue_add_outbuf() fails.
-hci_send_frame() frees the same skb again after hdev->send() returns
-an error.
 
-This issue was triggered by our custom device emulation and fuzzing
-framework on Linux 7.3 (7.3.0-00001-g0aef6eb5c859-dirty).
-The extra local commit only adds kcov and does not touch virtio_bt.c.
-The same error path is still present on mainline. The failure depends
-on a broken TX virtqueue: the device first completes a buffer whose
-used-ring id is not a head, the queue is marked broken, and the next
-virtqueue_add_outbuf() returns -EIO.
+This might be fixed by commit ab4eedb790ca ("Bluetooth: L2CAP: Fix
+corrupted list in hci_chan_del") ?
 
-The crash trace is as follows:
+Ah, now I see it even has
+>  Fixes: b4f82f9ed43a ("Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd")
+and you're reporting about this very commit, so there's little doubt..!
 
-  virtio_bt virtio0: tx:id 3 is not a head!
-  Bluetooth: hci0: sending frame failed (-5)
-  BUG: KASAN: slab-use-after-free in sk_skb_reason_drop+0x3c/0x1b0
-  Read of size 4 at addr ffff88800ae5bee4 by task kworker/u17:0/71
-  Workqueue: hci0 hci_tx_work
-  Call Trace:
-   <TASK>
-   sk_skb_reason_drop+0x3c/0x1b0
-   hci_send_frame+0x34a/0x420
-   hci_tx_work+0x87a/0xcd0
-   process_one_work+0x8cd/0x1900
-   worker_thread+0x5a1/0xd10
-   kthread+0x325/0x410
-   ret_from_fork+0x566/0x7f0
-   ret_from_fork_asm+0x1a/0x30
-   </TASK>
+That commit got backported to 6.12 but not 6.1, there's a merge conflict
+but it's not too hard to resolve, I'll send the patch since I've done
+the work.
+(As far as I can see it's not queued at this point, sorry if someone
+else has also been doing the same)
 
-  Allocated by task 50:
-   __alloc_skb+0x14c/0x6e0
-   l2cap_send_cmd+0x96/0xbf0
-   l2cap_conn_start+0x33c/0x9e0
-   l2cap_info_timeout+0x82/0xa0
-
-  Freed by task 71:
-   kfree_skbmem+0x18a/0x1f0
-   sk_skb_reason_drop+0x10e/0x1b0
-   virtbt_send_frame+0x1bc/0x210
-   hci_send_frame+0x26a/0x420
-   hci_tx_work+0x87a/0xcd0
-
-The object belongs to skbuff_head_cache and is 240 bytes. The 4-byte
-read is skb->users.
-
-The issue arises because virtbt_send_frame() calls kfree_skb(skb) when
-virtqueue_add_outbuf() fails and still returns that error.
-hci_send_frame() treats a negative return as "the caller still owns
-the skb" and frees it a second time. Both calls run in the same
-hci_tx_work. The skb was never queued to the device.
-
-Fix this by leaving the skb to hci_send_frame() on the error path.
-Undo the preceding skb_push() so the buffer handed back matches the
-one the caller passed in.
-
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Mingshu Liu <26031212613@stu.xidian.edu.cn>
----
- drivers/bluetooth/virtio_bt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index c20d54088..c6bb602b4 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -103,7 +103,7 @@ static int virtbt_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	err = virtqueue_add_outbuf(vbt->vqs[VIRTBT_VQ_TX], sg, 1, skb,
- 				   GFP_KERNEL);
- 	if (err) {
--		kfree_skb(skb);
-+		skb_pull(skb, 1);
- 		return err;
- 	}
- 
 -- 
-2.34.1
-
+Dominique Martinet | Asmadeus
