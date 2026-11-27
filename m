@@ -1,89 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795769743;
-	b=tnFHNHPpSl2OZX9CFFtc2IC7oDHSVjjou+QaPS3CcFzdGJ1AJXOgIAavCUbSHvfed3CO
-	 wxwcaVVKTrCcvzrVBLyy/sRjmPuWYeXuffvgN1xuuSXQknI9pipd2X6s72gsuON1isgBr
-	 obFG2+BhNmhCe0bIHK5JefWL0KyUI47YkQo+AYZpN+7os2h6vmaNZS1dKQgrOkxKee9qd
-	 FJdyVPeNmuw2JDK76MeAl9GaSwCRnvgkUzYcLmYrbhEYMI67yqVoUcgoaYteINfUwdLmC
-	 GyBUAB6gGFqqxcTPSUsHPV1oKTyyjc3L8kLLzoXlEOctQFolw2EcUBqAbJnL696mQgg==
+	t=1795769744;
+	b=M4jaed/+h+Xb/OI3i28Hme+8MjtpDwcrJs61/cGBnDtIxd0FwlIZlfhhte0pC0Lfe81W
+	 WiriDX2gdXZ7lriMtIqjWGotG8jFq51bbu8/yLqNY49r2/KhfEk9mvEFGYgu9s9Cv4rzI
+	 N3b2FXQG2ZSuKfCE1aoYJvRd7T3ZJ06N8p2zx/phdbbLKDYq6DdgVR4EKaRtvTuG2R7nE
+	 1+psqGdviuGuIpMLb0K04ct0i4wQYs95mMuo+CidTrWTe3BKGVB7RefhLzWcDM1oYbdfC
+	 0xGNi7XG5cdq1PYSbo5ofO7VngMvAD1d8Exkq0oPLcGGtOJfIuMbgI2QDGx0sdnp4NA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795769743;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795769744;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=eaNxglRDpFibUEICNCYvMjBfoeCe1nExjBnGSdVIj50=;
-	b=zfGEPWy9uRXDMvz55grIXVREJADOqPABwZ4ys5exqIXbUFtNgTn1Yr27CWT2Q3BUETHR
-	 VwMWD/PqElIqnwEI8F/lRJi22gpHtgJjMuJB/B7iGWIvXEcGYGouGPxPAC+E4xlF4xUhW
-	 YpL3VIFZulc9UbV9l+cjJu9U9P1as0y9PIFft4bikmqNHwVsX89iv/g0h+egYNoXSAAVh
-	 AvLUB2xvhH1QJ57x8i3yGlYRfm70qTycIPcVhkbbKzIqjKCuqa6VsM/n5xwsnPrtJhnd1
-	 4bcnZr4vBzKUF6Usnrny3L1XFiwZfs/UXpiHxBGumknPrhsww7QkI5RuHcXG+Fjvm/g==
+	bh=sQjGQPB3t+vUpPn8H0/vg/l/SqIjAPLrBSP9nxJzrRY=;
+	b=i7AP5BN1zXKpGowu6PbfnpWisNvXQnetlXe6oyMAhx7Wr/itPDpRiYXgUQAzdf2w21kt
+	 bZMTM5e8Wr4pQRV2JsHrZ5eY28ZsUQFl02/w83CYNQHYOvOSGb45qzIijFeN8Hq3/ZT/H
+	 eikD5Mj06A97uVKHhx3H8coRWb1BG6EcskwSQD710pEt6rKf+E6kzfwhpAQMIwgx2RWRc
+	 VdMrUKsvLKjYOoJVP/XJk1Lvoo8NAAf4UAQPUygeRbNiqaEAGbQEoEWUBWQa8JwQ/NMmU
+	 pkvxx5gmeJwRGoQk1v2PEccQgPrSoNCO3ym68Jqp1YwLWKUZnDCd38zflRX24XhxuWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HVolr1IP;
-	arc=none smtp.remote-ip=209.85.128.44
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=UP20gIOi;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99095606A32C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99095606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299DF606A32A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 08:55:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 299DF606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HVolr1IP
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a68f888a41so7442605e9.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=UP20gIOi
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb76bb36c7so5999595e9.3
         for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 00:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795769741; x=1796374541; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=eaNxglRDpFibUEICNCYvMjBfoeCe1nExjBnGSdVIj50=;
-        b=HVolr1IPStml5l5uEOWY5fyv1bxuggJ9MuWTxSXfcD5cXFoWonfZ0ZOUrXZPOj/mNq
-         Q3sGMdY5EQk64DtGYzB4CVV0XwBpw/ej05XMQpuL76laiJ64OEiTSldlAOaT6a3dZc/G
-         ycb2HYEHtCqNjBR/hOiF4XFhh/s6Bcoyyql2tG/pkwwWQ2aRRCEnebyvB4FKVMYIHmfd
-         RrdWF5S0O03X7sx/xPz9kyYRJKW9uZJiz9mU8Sp6bbfXQSc5JAfjbM3nOKf4rTNow9Kc
-         bjIb5pUc8Gsx8/HIpWnglu+9Knq/7LobebfkE3ACcMGxQVcME3dXBLhTnlwuUCqyxIkz
-         Vj0g==
+        bh=sQjGQPB3t+vUpPn8H0/vg/l/SqIjAPLrBSP9nxJzrRY=;
+        b=UP20gIOi5NPWfc6c49UelyQXtCGz68img/SX8Bs1F+IEA0rcCjAtEVHjqybIovEr3v
+         MoN3Scf58P5efvusaB2f3Xv7mFUtJviH/+MPSI/qgfFgxFKWjqhGhVHODT16CSKkhaXK
+         XydkvOd4q4rqXDotDE7z2p8TQwTvQFLlrKw5ay0Tla67iqdwxilKiw6mMCVajosxp8lG
+         a45hE5BzFl2ghkeD1ctq0zKWGh58imangvCd0SBa3CATGg6WvBTIen8NJjcNhE2t/cIG
+         eNvYBJl1odE7qbsanFSlC40xS605xJ1LURAENCXCn1G8qexNAMd75+DwS7YPsFXlRdTB
+         lU6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795769741; x=1796374541;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=eaNxglRDpFibUEICNCYvMjBfoeCe1nExjBnGSdVIj50=;
-        b=IWBWbviK0p+Gm6WSp3QmEOq+SZnE61/65ywPT7T+iTDuw2Amz5mYpevM87kDCr2wmQ
-         ljlEmJNC0bwSC1IDFnP2t0988LnRX6GOhHUPUvUL9/O76LZ+Fw+8MLcgqjeuVUaxCOf3
-         9jllBMJpdnv+CokXXRPlIS44pEiaDqAX6s5olTN1hEmJoHV4L4NwV9SLnYRYRUwwUtDV
-         fgVxDji2JFqmJ1nEHbgg8AFxUCXcX/BK3lUiBUJjce/b2qOSlm1kB+a6oO3fn0l+vXZ/
-         v4SBR8VkPvuSh76J2LLWa+iWGbR3bisqtbgqunFkP5PUVD+T1uzz0wBA4bPW7XVZjs5j
-         AtwQ==
-X-Gm-Message-State: APuU4Z8uWVWU/DvsD1wY/gs8faNHkWJCNz2ZyLmiqzVP4WXY7+3EiGpD
-	qI4TXmwPSESBaDq6himIh6yDKXBTXeoc+sjNrvM+VBeaG15lh6fQCB7lQW/cZkss
-X-Gm-Gg: AZFdTZcIgVDX7iepOyTrNptAUVPyM2g7hkz0snKNLttbZPHXcfwv0fbhs6HQs8NAAHz
-	NF4V0MyAsNjv1xEuWBtsqfcya5ikG/0HMMT4sN6GCHeu84HXwDL2BUbdcd6PxmRbtHknMykumgH
-	kwOE3Ja1KSjkkh2HZT89kB9JZ4U8mVO2tiNVyw/ert8l44lgBE/w2VTHD4MbneNX7W3t2/mRnrZ
-	I0PnBzia1nD+/AFlXpaFZJwZyWpGCY63FgU7hwynlWGMuH8fjHoeCdTvBoQz7RIFOwkQuDKosvp
-	nN4+vm2VK4kCtCXKONjyumcRQTKbUzRHPmE3/6gyOGwvPlj0H2QTqw8XKDO7VKBTp7UHsBIHaT/
-	cStk7pGK7N1uYGHxm14mP/TPjfaoEXh71I2yVITsxU1ay7ACTnz4aCA1sR67yzfN+X+aX+026B+
-	rdCeYxhEm0xk8IhtfivSHtzNxudS4IlM1KZFXFbr+pgfULScMK23dX85+/x8nF0qp5edcI9tlxa
-	fRJlps05CEdIp/c0z2HZEXA61HD8FQjqg7b2ArZ8eSMUE+TogW592rM4IO4IrRkeMhnqt45XSEE
-	0Kbwq2dMAzetnVBzUO4AdJqkdjtegzfqJ/U=
-X-Received: by 2002:a05:600c:8210:b0:4bb:7ad8:99f2 with SMTP id 5b1f17b1804b1-4bb88785da4mr440666165e9.0.1795769740785;
-        Fri, 27 Nov 2026 00:55:40 -0800 (PST)
+        bh=sQjGQPB3t+vUpPn8H0/vg/l/SqIjAPLrBSP9nxJzrRY=;
+        b=HUj4sWUtCr0sn0tEKlQAV4vFTyJsOWUjffbqH8EDihRmnd+h59u+HLtY2fvhwoctJu
+         w+0jWWIqZxZqsFk7y2FbDFtpYSqKmuCetuKU7oqIlE8L1zSlZiKzXbQJhRAWaUqIH2/p
+         +W5SsgXyRPR31rzz8wT81bjApv5wAhQpLJICdTHghj3HmwaDuSKCH51pJ9r46QCVVNxc
+         qNHSoBXPyx+CluFCLrRntHTpoeQNHQIKBjL9giIlKpKESGMEQO6ZHH3AXph15V4mTv8u
+         oX5+y8CscxayQdE8JGDVUvotY9bI4gMZKnRxEWRggzMwLTsglDmvGpv6PnYcPLqak8eo
+         jYKg==
+X-Gm-Message-State: APuU4Z/xk8mPka4sL6+79IrZJiZyuvzUbzKs8oHJojcd7VNTk4tbu+0f
+	ABmSWcFOivrOO0DNUP0rXmXr1OGtJNVGdGg6wNp5NMR+QM7YuFBmrqSCHGMbBw3Q
+X-Gm-Gg: AZFdTZfkX4FdBydRY5M4tQVw7Zy2QcUDxZGLNcfV1/CuvbzxG5SKWND+yFwu611M8M0
+	wHOrJ1nLJ0S9RblnvSYlYZV/HMSkMws6Zo5dawox424Ib9mS2d2MX3VW36HQVAbCiGC7Z8Vpged
+	Zk/cbyf3fehkgUrsxGOoVPmTqOjMDnSPcFjpzi/sqHva4DmyBBCvKGqd1+spf+iYbLwhuzQlrQD
+	dKXKFMF0UnaGDCffleiovVg+6bhweHAIVi78jlaoRQJocConpCk5V7FZKXwTtv0r/OoT1fb+Wzh
+	/q9qdzgqG33DyX3t4b2h85wfs2xetyBqh2E64JfOp1dAlBde7wAIMxc98guMIf15dTUGfNl2eyF
+	N+YE4c0/T5xEkJXn2yE/+h89G17b0Sr1qIwKUgTlCPPDT11smZhstLLhtoh+6fMwKhuG4FznOrX
+	PN8OSm3+sxQvVmyIjwr+y3nolGj6oLR4cc5zj5LOZE+ViXcZyJimmDZ02AM/8m0iYcQKlKfm2nC
+	Mwtiv3pEjM3uanV3+JEfw0Z189imPzSfR1FZZdDURYhQHVVW65D/l4Pg7UYx//5EOoQG9yE/AB6
+	229aMPhXlPQEgD30+FRihkldVV+31j/eoeWWRM8AvwIrqTOy9DxQQluw
+X-Received: by 2002:a05:600c:8284:b0:4bb:6c01:de9c with SMTP id 5b1f17b1804b1-4bb887f55c1mr426630385e9.2.1795769741360;
+        Fri, 27 Nov 2026 00:55:41 -0800 (PST)
 Received: from schinder.corp.hoffmann-group.com ([2003:8:2:4::5])
         by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm739587505e9.14.2026.11.27.00.55.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 00:55:40 -0800 (PST)
+        Fri, 27 Nov 2026 00:55:41 -0800 (PST)
 From: Roland Schober <rolandschober1968@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com,
 	Roland Schober <rolandschober1968@gmail.com>
-Subject: [RFC PATCH BlueZ 8/9] emulator/btdev: Add Periodic Advertising with Responses advertiser
-Date: Fri, 27 Nov 2026 09:55:24 +0100
-Message-ID: <20261127085525.264299-9-rolandschober1968@gmail.com>
+Subject: [RFC PATCH BlueZ 9/9] mgmt-tester: Add periodic advertising and PAwR tests
+Date: Fri, 27 Nov 2026 09:55:25 +0100
+Message-ID: <20261127085525.264299-10-rolandschober1968@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127085525.264299-1-rolandschober1968@gmail.com>
 References: <20261127085525.264299-1-rolandschober1968@gmail.com>
@@ -98,351 +98,1067 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the advertiser side of Periodic Advertising with Responses to
-controllers of version 6.0 and later:
+Add tests for Add Periodic Advertising Parameters, Add Periodic
+Advertising Data, Set Periodic Advertising Subevent Data and the
+Periodic Advertising Subevent Data Request event:
 
- - the PAwR Advertiser feature;
- - LE Set Periodic Advertising Parameters [v2], which checks the
-   subevent parameters against each other and against the interval;
- - LE Periodic Advertising Subevent Data Request, sent once per
-   periodic advertising interval for all subevents while the train is
-   enabled;
- - LE Set Periodic Advertising Subevent Data, which takes the data of
-   a subevent once per request: before the first request it answers
-   Too Early, a second time Too Late.
-
-LE Set Periodic Advertising Data is refused for a set with subevents.
-Nothing is transmitted and no responses are reported.
+ - the HCI commands sent for plain periodic advertising and for
+   Periodic Advertising with Responses, on a second instance as well;
+ - parameters and states which are refused, and controllers without
+   the features;
+ - Remove Advertising and Set Powered off with a train running, where
+   periodic advertising has to be disabled before the advertising set
+   is removed;
+ - subevent data sent before the controller asked for it, in answer to
+   its request, in two commands at once and twice for one subevent.
 
 Assisted-by: Claude:claude-fable-5-2
 ---
- emulator/btdev.c | 249 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 248 insertions(+), 1 deletion(-)
+ tools/mgmt-tester.c | 1024 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1024 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c4ade031e..e13cf4d4b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -267,6 +267,14 @@ struct btdev {
- 	uint8_t  le_pa_data_len;
- 	uint8_t  le_pa_data[MAX_PA_DATA_LEN];
- 	uint8_t  le_pa_handle;
-+	uint8_t  le_pa_num_subevents;
-+	uint8_t  le_pa_subevent_interval;
-+	uint8_t  le_pa_rsp_slot_delay;
-+	uint8_t  le_pa_rsp_slot_spacing;
-+	uint8_t  le_pa_num_rsp_slots;
-+	bool     le_pa_data_requested;
-+	uint8_t  le_pa_subevents[16];	/* Subevents which wait for data */
-+	unsigned int le_pa_subevent_id;
- 	uint8_t  le_ltk[16];
- 	uint8_t  hdt_def_mic_len;
- 	uint8_t  hdt_def_format;
-@@ -694,7 +702,13 @@ static void btdev_reset(struct btdev *btdev)
- 		btdev->inquiry_id = 0;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 18dbd3f89..2a1771ea8 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -8191,6 +8191,906 @@ static void setup_command_generic(const void *test_data)
  	}
- 
-+	if (btdev->le_pa_subevent_id > 0) {
-+		timeout_remove(btdev->le_pa_subevent_id);
-+		btdev->le_pa_subevent_id = 0;
-+	}
-+
- 	btdev->le_pa_enable = 0x00;
-+	btdev->le_pa_num_subevents = 0;
- 
- 	queue_remove_all(btdev->conns, NULL, NULL, conn_remove);
- 	queue_remove_all(btdev->le_ext_adv, NULL, NULL, le_ext_adv_free);
-@@ -6048,6 +6062,7 @@ static int cmd_set_pa_params(struct btdev *dev, const void *data,
- 		dev->le_pa_min_interval = cmd->min_interval;
- 		dev->le_pa_max_interval = cmd->max_interval;
- 		dev->le_pa_handle = cmd->handle;
-+		dev->le_pa_num_subevents = 0;
- 	}
- 
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_PA_PARAMS, &status,
-@@ -6055,6 +6070,203 @@ static int cmd_set_pa_params(struct btdev *dev, const void *data,
- 	return 0;
  }
  
-+static int cmd_set_pa_params_v2(struct btdev *dev, const void *data,
-+							uint8_t len)
-+{
-+	const struct bt_hci_cmd_le_set_pa_params_v2 *cmd = data;
-+	struct bt_hci_rsp_le_set_pa_params_v2 rsp;
-+	uint16_t min_interval = le16_to_cpu(cmd->min_interval);
-+	uint16_t max_interval = le16_to_cpu(cmd->max_interval);
++/* Periodic advertising and Periodic Advertising with Responses over MGMT */
++static const uint8_t pa_ext_adv_params[] = {
++	0x01, /* instance */
++	0x80, 0x00, 0x00, 0x00, /* flags: secondary channel LE 1M */
++	0x00, 0x00, /* duration */
++	0x00, 0x00, /* timeout */
++	0x00, 0x00, 0x00, 0x00, /* min_interval */
++	0x00, 0x00, 0x00, 0x00, /* max_interval */
++	0x7f, /* tx_power */
++};
 +
-+	memset(&rsp, 0, sizeof(rsp));
-+	rsp.handle = cmd->handle;
++static const uint8_t pa_ext_adv_params_2[] = {
++	0x02, /* instance */
++	0x80, 0x00, 0x00, 0x00, /* flags: secondary channel LE 1M */
++	0x00, 0x00, /* duration */
++	0x00, 0x00, /* timeout */
++	0x00, 0x00, 0x00, 0x00, /* min_interval */
++	0x00, 0x00, 0x00, 0x00, /* max_interval */
++	0x7f, /* tx_power */
++};
 +
-+	if (!queue_find(dev->le_ext_adv, match_ext_adv_handle,
-+					UINT_TO_PTR(cmd->handle))) {
-+		rsp.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		goto done;
-+	}
++static const uint8_t pa_ext_adv_params_conn[] = {
++	0x01, /* instance */
++	0x81, 0x00, 0x00, 0x00, /* flags: connectable, LE 1M */
++	0x00, 0x00, /* duration */
++	0x00, 0x00, /* timeout */
++	0x00, 0x00, 0x00, 0x00, /* min_interval */
++	0x00, 0x00, 0x00, 0x00, /* max_interval */
++	0x7f, /* tx_power */
++};
 +
-+	if (dev->le_pa_enable) {
-+		rsp.status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
++static const uint8_t pa_ext_adv_params_legacy[] = {
++	0x01, /* instance */
++	0x00, 0x00, 0x00, 0x00, /* flags: none, legacy PDUs */
++	0x00, 0x00, /* duration */
++	0x00, 0x00, /* timeout */
++	0x00, 0x00, 0x00, 0x00, /* min_interval */
++	0x00, 0x00, 0x00, 0x00, /* max_interval */
++	0x7f, /* tx_power */
++};
 +
-+	/* With subevents: an interval of at least 7.5 ms, response slots
-+	 * which follow the subevent packet and a train which fits the
-+	 * periodic advertising interval (all in units of 1.25 ms, the
-+	 * spacing in 0.125 ms).
-+	 */
-+	if (min_interval < 0x0006 || min_interval > max_interval ||
-+			cmd->num_subevents > 0x80 ||
-+			(cmd->num_subevents &&
-+			(cmd->subevent_interval < 0x06 ||
-+			cmd->num_subevents * cmd->subevent_interval >
-+							min_interval ||
-+			(cmd->num_response_slots &&
-+			(!cmd->response_slot_delay ||
-+			cmd->response_slot_delay >= cmd->subevent_interval ||
-+			cmd->response_slot_spacing < 0x02))))) {
-+		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
++static const uint8_t pa_ext_adv_data[] = {
++	0x01, /* instance */
++	0x04, /* Ad data len */
++	0x00, /* Scan response data len */
++	0x03, /* Section length */
++	0x19, /* GAP Appearance */
++	0x01,
++	0x23,
++};
 +
-+	dev->le_pa_properties = le16_to_cpu(cmd->properties);
-+	dev->le_pa_min_interval = cmd->min_interval;
-+	dev->le_pa_max_interval = cmd->max_interval;
-+	dev->le_pa_handle = cmd->handle;
-+	dev->le_pa_num_subevents = cmd->num_subevents;
-+	dev->le_pa_subevent_interval = cmd->subevent_interval;
-+	dev->le_pa_rsp_slot_delay = cmd->response_slot_delay;
-+	dev->le_pa_rsp_slot_spacing = cmd->response_slot_spacing;
-+	dev->le_pa_num_rsp_slots = cmd->num_response_slots;
++static const uint8_t pa_ext_adv_data_2[] = {
++	0x02, /* instance */
++	0x04, /* Ad data len */
++	0x00, /* Scan response data len */
++	0x03, /* Section length */
++	0x19, /* GAP Appearance */
++	0x01,
++	0x23,
++};
 +
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_PA_PARAMS_V2, &rsp, sizeof(rsp));
++static const uint8_t pa_instance_1[] = { 0x01 };
++static const uint8_t pa_instance_2[] = { 0x02 };
++static const uint8_t pa_instance_all[] = { 0x00 };
 +
-+	return 0;
-+}
++static const uint8_t pa_params[] = {
++	0x01, /* instance */
++	0x50, 0x00, /* min_interval: 100 ms */
++	0x50, 0x00, /* max_interval */
++	0x00, /* num_subevents */
++	0x00, /* subevent_interval */
++	0x00, /* response_slot_delay */
++	0x00, /* response_slot_spacing */
++	0x00, /* num_response_slots */
++};
 +
-+static int cmd_set_pa_subevent_data(struct btdev *dev, const void *data,
-+							uint8_t len)
-+{
-+	struct iovec iov = { .iov_base = (void *) data, .iov_len = len };
-+	const struct bt_hci_cmd_le_set_pa_subevent_data *cmd;
-+	const struct bt_hci_le_pa_subevent_data *se;
-+	struct bt_hci_rsp_le_set_pa_subevent_data rsp;
-+	uint8_t i;
++static const uint8_t pa_params_2[] = {
++	0x02, /* instance */
++	0x50, 0x00, /* min_interval: 100 ms */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, 0x00, 0x00, 0x00,
++};
 +
-+	memset(&rsp, 0, sizeof(rsp));
++static const uint8_t pa_params_short[] = {
++	0x01, /* instance */
++	0x05, 0x00, /* min_interval: below 7.5 ms */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, 0x00, 0x00, 0x00,
++};
 +
-+	cmd = util_iov_pull_mem(&iov, sizeof(*cmd));
-+	if (!cmd)
-+		return -EINVAL;
++static const uint8_t pa_params_min_max[] = {
++	0x01, /* instance */
++	0x51, 0x00, /* min_interval: above the maximum */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, 0x00, 0x00, 0x00,
++};
 +
-+	rsp.handle = cmd->handle;
++static const uint8_t pawr_params[] = {
++	0x01, /* instance */
++	0x50, 0x00, /* min_interval: 100 ms */
++	0x50, 0x00, /* max_interval */
++	0x05, /* num_subevents */
++	0x06, /* subevent_interval: 7.5 ms */
++	0x02, /* response_slot_delay: 2.5 ms */
++	0x08, /* response_slot_spacing: 1 ms */
++	0x05, /* num_response_slots */
++};
 +
-+	if (!queue_find(dev->le_ext_adv, match_ext_adv_handle,
-+					UINT_TO_PTR(cmd->handle))) {
-+		rsp.status = BT_HCI_ERR_UNKNOWN_ADVERTISING_ID;
-+		goto done;
-+	}
++/* The first data request comes after one interval: time to be too early */
++static const uint8_t pawr_params_slow[] = {
++	0x01, /* instance */
++	0x40, 0x06, /* min_interval: 2 s */
++	0x40, 0x06, /* max_interval */
++	0x05, /* num_subevents */
++	0x06, /* subevent_interval: 7.5 ms */
++	0x02, /* response_slot_delay: 2.5 ms */
++	0x08, /* response_slot_spacing: 1 ms */
++	0x05, /* num_response_slots */
++};
 +
-+	/* Only a running train with subevents asks for data */
-+	if (!dev->le_pa_enable || dev->le_pa_handle != cmd->handle ||
-+						!dev->le_pa_num_subevents) {
-+		rsp.status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
++static const uint8_t pawr_params_subevents[] = {
++	0x01, /* instance */
++	0x50, 0x00, /* min_interval */
++	0x50, 0x00, /* max_interval */
++	0x81, /* num_subevents: more than 128 */
++	0x06, 0x02, 0x08, 0x05,
++};
 +
-+	if (!cmd->num_subevents || cmd->num_subevents > 0x0f) {
-+		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
++static const uint8_t hci_pa_params[] = {
++	0x01, /* handle */
++	0x50, 0x00, /* min_interval */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, /* properties */
++};
 +
-+	for (i = 0; i < cmd->num_subevents; i++) {
-+		se = util_iov_pull_mem(&iov, sizeof(*se));
-+		if (!se || !util_iov_pull(&iov, se->data_len)) {
-+			rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			goto done;
-+		}
++static const uint8_t hci_pa_params_2[] = {
++	0x02, /* handle */
++	0x50, 0x00, /* min_interval */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, /* properties */
++};
 +
-+		if (se->subevent >= dev->le_pa_num_subevents ||
-+				se->response_slot_start +
-+				se->response_slot_count >
-+				dev->le_pa_num_rsp_slots) {
-+			rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			goto done;
-+		}
-+	}
++static const uint8_t hci_pa_params_v2[] = {
++	0x01, /* handle */
++	0x50, 0x00, /* min_interval */
++	0x50, 0x00, /* max_interval */
++	0x00, 0x00, /* properties */
++	0x05, /* num_subevents */
++	0x06, /* subevent_interval */
++	0x02, /* response_slot_delay */
++	0x08, /* response_slot_spacing */
++	0x05, /* num_response_slots */
++};
 +
-+	if (iov.iov_len) {
-+		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
++static const uint8_t hci_pa_enable[] = { 0x01, 0x01 };
++static const uint8_t hci_pa_enable_2[] = { 0x01, 0x02 };
++static const uint8_t hci_pa_disable[] = { 0x00, 0x01 };
++static const uint8_t hci_pa_remove_set[] = { 0x01 };
 +
-+	/* Data is taken once for each subevent asked for: before the first
-+	 * request it is too early, a second time it is too late.
-+	 */
-+	iov.iov_base = (void *) cmd->subevents;
-+	iov.iov_len = len - sizeof(*cmd);
++static const uint8_t pa_data[] = {
++	0x01, /* instance */
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x00, /* Manufacturer data */
++};
 +
-+	for (i = 0; i < cmd->num_subevents; i++) {
-+		se = util_iov_pull_mem(&iov, sizeof(*se));
-+		util_iov_pull(&iov, se->data_len);
++static const uint8_t pa_data_len[] = {
++	0x01, /* instance */
++	0x05, /* data_len: one more than there is */
++	0x03, 0xff, 0x59, 0x00,
++};
 +
-+		if (!dev->le_pa_data_requested) {
-+			rsp.status = BT_HCI_ERR_TOO_EARLY;
-+			goto done;
-+		}
++static const uint8_t hci_pa_data[] = {
++	0x01, /* handle */
++	0x03, /* operation: complete */
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x00,
++};
 +
-+		if (!(dev->le_pa_subevents[se->subevent / 8] &
-+						BIT(se->subevent % 8))) {
-+			rsp.status = BT_HCI_ERR_TOO_LATE;
-+			goto done;
-+		}
-+	}
++static const uint8_t pa_subevent_data_0[] = {
++	0x01, /* instance */
++	0x01, /* num_subevents */
++	0x00, /* subevent */
++	0x00, /* response_slot_start */
++	0x05, /* response_slot_count */
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x00,
++};
 +
-+	iov.iov_base = (void *) cmd->subevents;
-+	iov.iov_len = len - sizeof(*cmd);
++static const uint8_t pa_subevent_data_1[] = {
++	0x01, /* instance */
++	0x01, /* num_subevents */
++	0x01, /* subevent */
++	0x00, /* response_slot_start */
++	0x05, /* response_slot_count */
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x01,
++};
 +
-+	for (i = 0; i < cmd->num_subevents; i++) {
-+		se = util_iov_pull_mem(&iov, sizeof(*se));
-+		util_iov_pull(&iov, se->data_len);
++static const uint8_t hci_pa_subevent_data_0[] = {
++	0x01, /* handle */
++	0x01, /* num_subevents */
++	0x00, /* subevent */
++	0x00, /* response_slot_start */
++	0x05, /* response_slot_count */
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x00,
++};
 +
-+		dev->le_pa_subevents[se->subevent / 8] &=
-+						~BIT(se->subevent % 8);
-+	}
++static const uint8_t pa_subevent_data_none[] = {
++	0x01, /* instance */
++	0x00, /* num_subevents */
++};
 +
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA, &rsp,
-+							sizeof(rsp));
++static const uint8_t pa_subevent_data_short[] = {
++	0x01, /* instance */
++	0x01, /* num_subevents */
++	0x00, 0x00, 0x05,
++	0x05, /* data_len: one more than there is */
++	0x03, 0xff, 0x59, 0x00,
++};
 +
-+	return 0;
-+}
++static const uint8_t pa_subevent_data_long[] = {
++	0x01, /* instance */
++	0x01, /* num_subevents */
++	0x00, 0x00, 0x05,
++	0x04, /* data_len */
++	0x03, 0xff, 0x59, 0x00,
++	0x00, /* an octet after the last entry */
++};
 +
-+/* Ask the host for the data of all subevents, once per periodic advertising
-+ * interval.
++static const struct setup_mgmt_cmd pa_setup_instance[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++};
++
++static const struct setup_mgmt_cmd pa_setup_instance_conn[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params_conn,
++		.send_len = sizeof(pa_ext_adv_params_conn),
++	},
++};
++
++static const struct setup_mgmt_cmd pa_setup_instance_legacy[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params_legacy,
++		.send_len = sizeof(pa_ext_adv_params_legacy),
++	},
++};
++
++static const struct setup_mgmt_cmd pa_setup_instances[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params_2,
++		.send_len = sizeof(pa_ext_adv_params_2),
++	},
++};
++
++static const struct setup_mgmt_cmd pa_setup_periodic[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pa_params,
++		.send_len = sizeof(pa_params),
++	},
++};
++
++static const struct setup_mgmt_cmd pa_setup_train[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pa_params,
++		.send_len = sizeof(pa_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_DATA,
++		.send_param = pa_ext_adv_data,
++		.send_len = sizeof(pa_ext_adv_data),
++	},
++};
++
++/* Instance 1 advertises, instance 2 has the periodic advertising train */
++static const struct setup_mgmt_cmd pa_setup_trains[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_DATA,
++		.send_param = pa_ext_adv_data,
++		.send_len = sizeof(pa_ext_adv_data),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params_2,
++		.send_len = sizeof(pa_ext_adv_params_2),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pa_params_2,
++		.send_len = sizeof(pa_params_2),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_DATA,
++		.send_param = pa_ext_adv_data_2,
++		.send_len = sizeof(pa_ext_adv_data_2),
++	},
++};
++
++static const struct setup_mgmt_cmd pawr_setup_periodic[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pawr_params,
++		.send_len = sizeof(pawr_params),
++	},
++};
++
++static const struct setup_mgmt_cmd pawr_setup_train[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pawr_params,
++		.send_len = sizeof(pawr_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_DATA,
++		.send_param = pa_ext_adv_data,
++		.send_len = sizeof(pa_ext_adv_data),
++	},
++};
++
++static const struct setup_mgmt_cmd pawr_setup_train_slow[] = {
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_PARAMS,
++		.send_param = pa_ext_adv_params,
++		.send_len = sizeof(pa_ext_adv_params),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++		.send_param = pawr_params_slow,
++		.send_len = sizeof(pawr_params_slow),
++	},
++	{
++		.send_opcode = MGMT_OP_ADD_EXT_ADV_DATA,
++		.send_param = pa_ext_adv_data,
++		.send_len = sizeof(pa_ext_adv_data),
++	},
++};
++
++static const struct hci_cmd_data pa_params_hci_cmds[] = {
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_PARAMS,
++		.len = sizeof(hci_pa_params),
++		.param = hci_pa_params,
++	},
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_ENABLE,
++		.len = sizeof(hci_pa_enable),
++		.param = hci_pa_enable,
++	},
++	{},
++};
++
++static const struct hci_cmd_data pa_params_2_hci_cmds[] = {
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_PARAMS,
++		.len = sizeof(hci_pa_params_2),
++		.param = hci_pa_params_2,
++	},
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_ENABLE,
++		.len = sizeof(hci_pa_enable_2),
++		.param = hci_pa_enable_2,
++	},
++	{},
++};
++
++static const struct hci_cmd_data pawr_params_hci_cmds[] = {
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_PARAMS_V2,
++		.len = sizeof(hci_pa_params_v2),
++		.param = hci_pa_params_v2,
++	},
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_ENABLE,
++		.len = sizeof(hci_pa_enable),
++		.param = hci_pa_enable,
++	},
++	{},
++};
++
++/* Periodic advertising has to be disabled before the set is removed */
++static const struct hci_cmd_data pa_remove_hci_cmds[] = {
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_ENABLE,
++		.len = sizeof(hci_pa_disable),
++		.param = hci_pa_disable,
++	},
++	{
++		.opcode = BT_HCI_CMD_LE_REMOVE_ADV_SET,
++		.len = sizeof(hci_pa_remove_set),
++		.param = hci_pa_remove_set,
++	},
++	{},
++};
++
++static const uint8_t hci_pa_disable_2[] = { 0x00, 0x02 };
++
++static const struct hci_cmd_data pa_remove_all_hci_cmds[] = {
++	{
++		.opcode = BT_HCI_CMD_LE_SET_PA_ENABLE,
++		.len = sizeof(hci_pa_disable_2),
++		.param = hci_pa_disable_2,
++	},
++	{
++		.opcode = BT_HCI_CMD_LE_CLEAR_ADV_SETS,
++		.len = 0,
++	},
++	{},
++};
++
++static const struct generic_data pa_params_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_hci_list = pa_params_hci_cmds,
++};
++
++static const struct generic_data pa_params_success_2 = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instances,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instances),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params_2,
++	.send_len = sizeof(pa_params_2),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_2,
++	.expect_len = sizeof(pa_instance_2),
++	.expect_hci_list = pa_params_2_hci_cmds,
++};
++
++static const struct generic_data pa_params_not_powered = {
++	.setup_settings = settings_le,
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_REJECTED,
++};
++
++static const struct generic_data pa_params_no_instance = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_params_connectable = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance_conn,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance_conn),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_params_legacy = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance_legacy,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance_legacy),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_params_short_interval = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params_short,
++	.send_len = sizeof(pa_params_short),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_params_min_above_max = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params_min_max,
++	.send_len = sizeof(pa_params_min_max),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++/* For a controller without the feature, with or without an instance */
++static const struct generic_data pa_params_not_supported = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pa_params,
++	.send_len = sizeof(pa_params),
++	.expect_status = MGMT_STATUS_NOT_SUPPORTED,
++};
++
++static const struct generic_data pawr_params_not_supported = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pawr_params,
++	.send_len = sizeof(pawr_params),
++	.expect_status = MGMT_STATUS_NOT_SUPPORTED,
++};
++
++static const struct generic_data pawr_params_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pawr_params,
++	.send_len = sizeof(pawr_params),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_hci_list = pawr_params_hci_cmds,
++};
++
++static const struct generic_data pawr_params_too_many_subevents = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_PARAMS,
++	.send_param = pawr_params_subevents,
++	.send_len = sizeof(pawr_params_subevents),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_data_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_periodic,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_periodic),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_DATA,
++	.send_param = pa_data,
++	.send_len = sizeof(pa_data),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_PA_DATA,
++	.expect_hci_param = hci_pa_data,
++	.expect_hci_len = sizeof(hci_pa_data),
++};
++
++/* The data can be changed while the train runs */
++static const struct generic_data pa_data_success_running = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_train),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_DATA,
++	.send_param = pa_data,
++	.send_len = sizeof(pa_data),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_PA_DATA,
++	.expect_hci_param = hci_pa_data,
++	.expect_hci_len = sizeof(hci_pa_data),
++};
++
++static const struct generic_data pa_data_not_periodic = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_instance,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_instance),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_DATA,
++	.send_param = pa_data,
++	.send_len = sizeof(pa_data),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_data_invalid_len = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_periodic,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_periodic),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_DATA,
++	.send_param = pa_data_len,
++	.send_len = sizeof(pa_data_len),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_data_subevents = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_periodic,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_periodic),
++	.send_opcode = MGMT_OP_ADD_PERIODIC_ADV_DATA,
++	.send_param = pa_data,
++	.send_len = sizeof(pa_data),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_remove_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_train),
++	.send_opcode = MGMT_OP_REMOVE_ADVERTISING,
++	.send_param = pa_instance_1,
++	.send_len = sizeof(pa_instance_1),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = pa_instance_1,
++	.expect_alt_ev_len = sizeof(pa_instance_1),
++	.expect_hci_list = pa_remove_hci_cmds,
++};
++
++static const struct generic_data pawr_remove_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_opcode = MGMT_OP_REMOVE_ADVERTISING,
++	.send_param = pa_instance_1,
++	.send_len = sizeof(pa_instance_1),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_1,
++	.expect_len = sizeof(pa_instance_1),
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = pa_instance_1,
++	.expect_alt_ev_len = sizeof(pa_instance_1),
++	.expect_hci_list = pa_remove_hci_cmds,
++};
++
++static const struct generic_data pa_remove_all_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_trains,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_trains),
++	.send_opcode = MGMT_OP_REMOVE_ADVERTISING,
++	.send_param = pa_instance_all,
++	.send_len = sizeof(pa_instance_all),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = pa_instance_all,
++	.expect_len = sizeof(pa_instance_all),
++	.expect_hci_list = pa_remove_all_hci_cmds,
++};
++
++static const struct generic_data pawr_power_off = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_opcode = MGMT_OP_SET_POWERED,
++	.send_param = set_powered_off_param,
++	.send_len = sizeof(set_powered_off_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_ignore_param = true,
++};
++
++static const struct generic_data pa_subevent_data_no_subevents = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pa_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pa_setup_train),
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_0,
++	.send_len = sizeof(pa_subevent_data_0),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_subevent_data_not_powered = {
++	.setup_settings = settings_le,
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_0,
++	.send_len = sizeof(pa_subevent_data_0),
++	.expect_status = MGMT_STATUS_REJECTED,
++};
++
++static const struct generic_data pa_subevent_data_no_entries = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_none,
++	.send_len = sizeof(pa_subevent_data_none),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_subevent_data_short_entry = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_short,
++	.send_len = sizeof(pa_subevent_data_short),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const struct generic_data pa_subevent_data_trailing = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_long,
++	.send_len = sizeof(pa_subevent_data_long),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++/* The controller refuses data it has not asked for yet */
++static const struct generic_data pa_subevent_data_too_early = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train_slow,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train_slow),
++	.send_opcode = MGMT_OP_SET_PA_SUBEVENT_DATA,
++	.send_param = pa_subevent_data_0,
++	.send_len = sizeof(pa_subevent_data_0),
++	.expect_status = MGMT_STATUS_FAILED,
++	.expect_hci_command = BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA,
++	.expect_hci_param = hci_pa_subevent_data_0,
++	.expect_hci_len = sizeof(hci_pa_subevent_data_0),
++};
++
++/* What a test sends when the controller asks for subevent data, and the
++ * status it expects for each command.
 + */
-+static bool pa_subevent_data_request(void *user_data)
++struct pawr_answer {
++	const void *param;
++	uint16_t len;
++	uint8_t status;
++};
++
++static const uint8_t pawr_data_request_all[] = {
++	0x01, /* instance */
++	0x00, /* subevent_start */
++	0x05, /* subevent_data_count */
++};
++
++static const struct pawr_answer pawr_answers_one[] = {
++	{ pa_subevent_data_0, sizeof(pa_subevent_data_0),
++						MGMT_STATUS_SUCCESS },
++	{ }
++};
++
++/* Both commands are out before the controller answers the first */
++static const struct pawr_answer pawr_answers_two[] = {
++	{ pa_subevent_data_0, sizeof(pa_subevent_data_0),
++						MGMT_STATUS_SUCCESS },
++	{ pa_subevent_data_1, sizeof(pa_subevent_data_1),
++						MGMT_STATUS_SUCCESS },
++	{ }
++};
++
++/* The controller takes the data of a subevent once */
++static const struct pawr_answer pawr_answers_too_late[] = {
++	{ pa_subevent_data_0, sizeof(pa_subevent_data_0),
++						MGMT_STATUS_SUCCESS },
++	{ pa_subevent_data_0, sizeof(pa_subevent_data_0),
++						MGMT_STATUS_FAILED },
++	{ pa_subevent_data_1, sizeof(pa_subevent_data_1),
++						MGMT_STATUS_SUCCESS },
++	{ }
++};
++
++static const struct generic_data pawr_data_request = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++};
++
++static const struct generic_data pawr_answer_success = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA,
++	.expect_hci_param = hci_pa_subevent_data_0,
++	.expect_hci_len = sizeof(hci_pa_subevent_data_0),
++	.send_param = pawr_answers_one,
++};
++
++static const struct generic_data pawr_answer_two = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_param = pawr_answers_two,
++};
++
++static const struct generic_data pawr_answer_too_late = {
++	.setup_settings = settings_powered_le,
++	.setup_mgmt_cmd_arr = pawr_setup_train,
++	.setup_mgmt_cmd_arr_size = ARRAY_SIZE(pawr_setup_train),
++	.send_param = pawr_answers_too_late,
++};
++
++static void pawr_answer_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct btdev *dev = user_data;
-+	struct bt_hci_evt_le_pa_subevent_data_request ev;
-+	uint8_t start = 0;
++	struct test_data *data = tester_get_data();
++	const struct pawr_answer *answer = user_data;
 +
-+	if (!dev->le_pa_enable || !dev->le_pa_num_subevents) {
-+		dev->le_pa_subevent_id = 0;
-+		return false;
++	tester_print("Set PA Subevent Data: %s (0x%02x)",
++					mgmt_errstr(status), status);
++
++	if (status != answer->status) {
++		tester_warn("Expected status 0x%02x", answer->status);
++		tester_test_failed();
++		return;
 +	}
 +
-+	/* LE Periodic Advertising Subevent Data Request event */
-+	if (!(dev->le_event_mask[4] & 0x40))
-+		return true;
-+
-+	/* The event takes up to 15 subevents */
-+	while (start < dev->le_pa_num_subevents) {
-+		uint8_t count = dev->le_pa_num_subevents - start;
-+		uint8_t i;
-+
-+		if (count > 0x0f)
-+			count = 0x0f;
-+
-+		for (i = start; i < start + count; i++)
-+			dev->le_pa_subevents[i / 8] |= BIT(i % 8);
-+
-+		dev->le_pa_data_requested = true;
-+
-+		ev.handle = dev->le_pa_handle;
-+		ev.subevent_start = start;
-+		ev.subevent_data_count = count;
-+
-+		le_meta_event(dev, BT_HCI_EVT_LE_PA_SUBEVENT_DATA_REQUEST,
-+							&ev, sizeof(ev));
-+
-+		start += count;
++	if (status == MGMT_STATUS_SUCCESS &&
++			(length != sizeof(pa_instance_1) ||
++			memcmp(param, pa_instance_1, length))) {
++		tester_warn("Unexpected return parameters");
++		tester_test_failed();
++		return;
 +	}
 +
-+	return true;
++	test_condition_complete(data);
 +}
 +
- static int cmd_set_pa_data(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
-@@ -6062,6 +6274,14 @@ static int cmd_set_pa_data(struct btdev *dev, const void *data,
- 	uint8_t status = BT_HCI_ERR_SUCCESS;
- 	uint8_t data_len = cmd->data_len;
- 
-+	/* A train with subevents carries its data in the subevents */
-+	if (dev->le_pa_num_subevents && dev->le_pa_handle == cmd->handle) {
-+		status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		cmd_complete(dev, BT_HCI_CMD_LE_SET_PA_DATA, &status,
-+							sizeof(status));
-+		return 0;
++static void pawr_data_request_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	const struct pawr_answer *answer = test->send_param;
++
++	/* Only the first request of the train is answered */
++	if (!data->mgmt_alt_ev_id)
++		return;
++
++	mgmt_unregister(data->mgmt_alt, data->mgmt_alt_ev_id);
++	data->mgmt_alt_ev_id = 0;
++
++	if (length != sizeof(pawr_data_request_all) ||
++			memcmp(param, pawr_data_request_all, length)) {
++		tester_warn("Unexpected data request:");
++		util_hexdump('>', param, length, print_debug, "");
++		tester_test_failed();
++		return;
 +	}
 +
- 	if (data_len > MAX_PA_DATA_LEN)
- 		data_len = MAX_PA_DATA_LEN;
- 
-@@ -6284,6 +6504,24 @@ static int cmd_set_pa_enable(struct btdev *dev, const void *data, uint8_t len)
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_PA_ENABLE, &status,
- 							sizeof(status));
- 
-+	if (dev->le_pa_subevent_id > 0) {
-+		timeout_remove(dev->le_pa_subevent_id);
-+		dev->le_pa_subevent_id = 0;
++	for (; answer && answer->param; answer++) {
++		test_add_condition(data);
++
++		mgmt_send(data->mgmt, MGMT_OP_SET_PA_SUBEVENT_DATA,
++					data->mgmt_index, answer->len,
++					answer->param, pawr_answer_callback,
++					(void *) answer, NULL);
 +	}
 +
-+	dev->le_pa_data_requested = false;
-+	memset(dev->le_pa_subevents, 0, sizeof(dev->le_pa_subevents));
++	test_condition_complete(data);
++}
 +
-+	if (dev->le_pa_enable && dev->le_pa_num_subevents) {
-+		/* The interval is in units of 1.25 ms */
-+		unsigned int msec = le16_to_cpu(dev->le_pa_min_interval) *
-+								5 / 4;
++/* Wait for the first data request of the train and answer it */
++static void test_pawr_answer(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
 +
-+		dev->le_pa_subevent_id = timeout_add(msec,
-+						pa_subevent_data_request,
-+						dev, NULL);
++	if (test->expect_hci_command) {
++		hciemu_add_central_post_command_hook(data->hciemu,
++						command_hci_callback, data);
++		test_add_condition(data);
 +	}
 +
- 	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
- 		struct btdev *remote = btdev_list[i];
- 
-@@ -8362,7 +8600,10 @@ done:
- 	CMD(BT_HCI_CMD_LE_READ_ALL_REMOTE_FEATURES, \
- 			cmd_le_read_all_remote_features, NULL), \
- 	CMD(BT_HCI_CMD_LE_SET_HOST_FEATURE_V2, \
--			cmd_set_host_feature_v2, NULL)
-+			cmd_set_host_feature_v2, NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_PA_PARAMS_V2, cmd_set_pa_params_v2, NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_PA_SUBEVENT_DATA, cmd_set_pa_subevent_data, \
-+			NULL)
- 
- static const struct btdev_cmd cmd_le_6_0[] = {
- 	CMD_COMMON_ALL,
-@@ -8382,6 +8623,8 @@ static void set_le_60_commands(struct btdev *btdev)
- 	btdev->commands[47] |= BIT(2);	/* LE Read All Local Features */
- 	btdev->commands[47] |= BIT(3);	/* LE Read All Remote Features */
- 	btdev->commands[47] |= BIT(4);	/* LE Set Host Feature V2 */
-+	btdev->commands[46] |= BIT(5);	/* LE Set PA Subevent Data */
-+	btdev->commands[47] |= BIT(1);	/* LE Set PA Parameters v2 */
- 	btdev->cmds = cmd_le_6_0;
- }
- 
-@@ -9159,6 +9402,7 @@ static void set_bredrle_features(struct btdev *btdev)
- 
- 	if (btdev->type >= BTDEV_TYPE_BREDRLE60) {
- 		btdev->version = 0x0e;
-+		btdev->le_features[5] |= BIT(3); /* PAwR Advertiser */
- 		btdev->le_features[7] |= BIT(7); /* LL Extended Features */
- 	}
- 
-@@ -9381,6 +9625,9 @@ void btdev_destroy(struct btdev *btdev)
- 	if (btdev->inquiry_id > 0)
- 		timeout_remove(btdev->inquiry_id);
- 
-+	if (btdev->le_pa_subevent_id > 0)
-+		timeout_remove(btdev->le_pa_subevent_id);
++	data->mgmt_alt_ev_id = mgmt_register(data->mgmt_alt,
++					MGMT_EV_PA_SUBEVENT_DATA_REQUEST,
++					data->mgmt_index,
++					pawr_data_request_callback,
++					NULL, NULL);
++	test_add_condition(data);
++}
 +
- 	bt_crypto_unref(btdev->crypto);
- 	del_btdev(btdev);
+ static const uint8_t add_advertising_param_empty[] = {
+ 	0x01,			/* adv instance */
+ 	0x00, 0x00, 0x00, 0x00,	/* flags: none */
+@@ -16211,6 +17111,130 @@ int main(int argc, char *argv[])
+ 				setup_add_ext_adv_on_off,
+ 				test_command_generic);
  
++	test_bredrle52("Add Periodic Adv Params - Success",
++				&pa_params_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Success (2nd instance)",
++				&pa_params_success_2,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Not powered",
++				&pa_params_not_powered,
++				NULL, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - No instance",
++				&pa_params_no_instance,
++				NULL, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Connectable",
++				&pa_params_connectable,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Legacy PDUs",
++				&pa_params_legacy,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Interval too short",
++				&pa_params_short_interval,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - Min above max interval",
++				&pa_params_min_above_max,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle50("Add Periodic Adv Params - Not supported (5.0)",
++				&pa_params_not_supported,
++				NULL, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Params - PAwR not supported (5.2)",
++				&pawr_params_not_supported,
++				NULL, test_command_generic);
++
++	test_bredrle60("Add Periodic Adv Params - PAwR Success",
++				&pawr_params_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Add Periodic Adv Params - PAwR too many subevents",
++				&pawr_params_too_many_subevents,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Data - Success",
++				&pa_data_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Data - Success (train running)",
++				&pa_data_success_running,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Data - Not periodic",
++				&pa_data_not_periodic,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Add Periodic Adv Data - Invalid length",
++				&pa_data_invalid_len,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Add Periodic Adv Data - Instance with subevents",
++				&pa_data_subevents,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Remove Advertising - Periodic Success",
++				&pa_remove_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle52("Remove Advertising - Periodic Success (All)",
++				&pa_remove_all_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Remove Advertising - PAwR Success",
++				&pawr_remove_success,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set Powered - Off with PAwR train",
++				&pawr_power_off,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - No subevents",
++				&pa_subevent_data_no_subevents,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - Not powered",
++				&pa_subevent_data_not_powered,
++				NULL, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - No entries",
++				&pa_subevent_data_no_entries,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - Entry beyond the packet",
++				&pa_subevent_data_short_entry,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - Octets after the entries",
++				&pa_subevent_data_trailing,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("Set PA Subevent Data - Too early",
++				&pa_subevent_data_too_early,
++				setup_command_generic, test_command_generic);
++
++	test_bredrle60("PA Subevent Data Request - Success",
++				&pawr_data_request,
++				setup_command_generic, test_pawr_answer);
++
++	test_bredrle60("Set PA Subevent Data - Success",
++				&pawr_answer_success,
++				setup_command_generic, test_pawr_answer);
++
++	test_bredrle60("Set PA Subevent Data - Success (two commands)",
++				&pawr_answer_two,
++				setup_command_generic, test_pawr_answer);
++
++	test_bredrle60("Set PA Subevent Data - Too late",
++				&pawr_answer_too_late,
++				setup_command_generic, test_pawr_answer);
++
+ 
+ 	/* MGMT_OP_SET_DEVICE_ID
+ 	 * Using Bluetooth SIG for source.
 -- 
 2.47.3
 
