@@ -1,67 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795798955;
-	b=k5mx/REUeK3E4Gw4Kwc/Ah+snS5jPn6TCiuQHfhSWIwmyCiQxgnkG5jJRsCkRPpNS6QT
-	 +7CozVlRX0Qyo4qEl9hNoCl5iq8HmPP7/TtOKzYNczbE8ccUR9VcDofzNQf/HIpqCc950
-	 e7DSUN6Gs9qxu5cHthVzp6SFg10gwv/JGAz65TvRj8rkHsRSN8a9DxkWGJjmBZITIiIxI
-	 HeB46KDui5rztc2UQeTmvXbyrijQ1jAZ9snXiRGPOxgVxEDXwflIsU9D7kOGEZ8xUCw+c
-	 WFsWNaKkfLfINMzzLHLDdJzVIg0GxOqAQqChoGc4enK2INv2CGnWW5HaD9Swirya1Bw==
+	t=1795798957;
+	b=JTCsa0xv/ZpL23ltdY7lVtr3fnvf2HNZ7O4Mr0R+mSipLrpuu+zVn8yQ1dmsZHjA36c3
+	 h4cQYEDA3Fta9nkZzBcXS4kcL0MEPzgFjnezMagP4iQDEcvkhSYB4H1Zopm9m/bbojQHL
+	 rR7ksTgj7e5NTtjyRlChubciwUaJrvnQq61D3VpWOXpJqGt8YIrITL66mZdcL/ZYSn0cC
+	 ZGkbjrJC/vl7VnubA/2NAvtvyLdSsBmf8zv8wyk0Q8o5ncKlXNsPLRlGaYnXgSOONsJ8D
+	 706WdWyGKbIeoNvkWnWNX4E2KCfKpZrpAmBXbRugIQ1TY+VjOVTzkhnnhz0nDK+4Nbg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795798955;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795798957;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=RIbCZV3n02t122v9jYgXjK6KQZHTCpSZCprTxUaIcuY=;
-	b=IBVQAJqlTdB68tgdYh5r9S8xwx7vbzTx06NATuqmEmLcFGNpDNACNgjuLWLbfDFqS5U7
-	 buB3Ld7aXr4wdQVy1/NeAvOsw79cjVL/OXgJu5UvDTcchB32S+PjoNKvVU8vAzZaoOuEL
-	 l6f+1tUfqa1ezVMxhckApJawcxJtXmO16hknBUMgT+qJ/VSFQXtAAGTvNOpwSgSNqnVB/
-	 few+ThzVg9oVrMdXeNckcvSsSSu5Qsd3dO88ELhwR2oIG6VRPCQ85IOWhq3Imaqq6SFYZ
-	 /1pqogDk6zyJ+sDHzaOmYJTtfUOwoGhZNG4OzypFUS6UasMhuduE2lV/nrdkYCppjKg==
+	bh=g0ZA2Zm+yf6dcFjeGcZOuWIa1/Lg3tCSAeo8dRAw1OM=;
+	b=47xRgTSgobZVCCBL3cQ9CD68YAcjMFud0fO2ZfxX/o+4YZja6BwVXLZTuTddRPXnTDkr
+	 5ckAsYVHABcf2sQb3vln4WSptGePzBfddpnrx6WA3nCx8ubIlLHmAT5KtetYYobyn/fM6
+	 a7dmgDZP6ZFLcIUt2E1KBptmWw2V9bZ89wErGmH2XdT3mBL9HaymOrgV22EAn69lgFUb4
+	 64iB2S6S+oaOsQIJPL/j9DGE79R8t3tBVO8FOUkmcrjqiUcQBWWV1eFyFBFrQ/i0BtZtf
+	 cCO8x1JvXdiba70UoffTByxNTZZUYqq9DvFERc8uSDIU+YxZrT0NfuGSkCdqaxEFoIQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HMeBPhTD;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hp8SiUsG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997F4606A332;
-	Fri, 27 Nov 2026 17:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F93B606A330;
+	Fri, 27 Nov 2026 17:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HMeBPhTD
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 965491F00925;
-	Fri, 27 Nov 2026 17:02:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hp8SiUsG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 223581F00898;
+	Fri, 27 Nov 2026 17:02:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795798955;
-	bh=RIbCZV3n02t122v9jYgXjK6KQZHTCpSZCprTxUaIcuY=;
+	s=k20260515; t=1795798957;
+	bh=g0ZA2Zm+yf6dcFjeGcZOuWIa1/Lg3tCSAeo8dRAw1OM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HMeBPhTDUcNcDwuInzyOBXEubg/eyFTj26RNglepbo6MrNgwnlHG7Tk9XqWTEEf69
-	 zwY4dc2cUjxBAZksUrfT5fdRpNmZ7A2Op0ARpVH5oTWOGPxdb7rLTqGLMWiPwPIIP3
-	 d0Br/lD3QILL7olUFGpE5WxQ6GmdI7W//5bD+O3F+ZK74A/QBEsYkQWGJDt7zlK0BG
-	 u+nW3pAVgDASXRokwbMLA6SS7cgNn/ObDZKZLEc7YlKkP2sVTuHMKR9LY13GM5I65R
-	 LrIgk49dvBpzyHoBohvpgnoasnjNNSAj4SOXfot+6bmh/u3Ap3dnYqmaTFhR4zYRpz
-	 Um7wzjJuwVGSg==
+	b=Hp8SiUsGsVsLYwe4AY1IzXY8yoo4kY+nWyA8d841E23QBXU65tWDti8G8DOiXBxyU
+	 Jf1hwC5Sjb01cUuC0nQJuMZTiemHKa241bOak04b19yMqJih2YvqUGC/cxOQmT+OCn
+	 z43Dvg3UmPoAI0MkA+oa93/PLDJVbWTpBvHcUXkHrRxC7/LCK2rodp4ef8m8dPEtSD
+	 AuZBg3A7ES2MVZIpxF2q+m9ShQkBFrgym29R30RJUTdRwwrnMuNgj1DQDqbiSlYljD
+	 a3D7SkjDnXGbu/tjCSXrdbT9WewYQwCIhu0ji2gYAcw9fhMv17m3brakfXoKp0ew/E
+	 AsZB6vqDYdO9g==
 From: Sasha Levin <sashal@kernel.org>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Edward Adam Davis <eadavis@qq.com>,
-	Marcel Holtmann <marcel@holtmann.org>
+To: stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
+	Krystian Kaniewski <krystianmkaniewski@gmail.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org,
-	regressions@lists.linux.dev,
-	stable@vger.kernel.org,
-	"W. John White" <whitewj-debian-bugreport@outlook.com>,
-	=?UTF-8?q?P=C3=A9ter=20B=C3=A1tori?= <batori.peter@gmail.com>,
-	Mael Bras <mael.bras.ext@idnow.io>,
-	tycho673 <tycho673@gmail.com>,
-	hanta <hantahrabal@disroot.org>,
-	skiwithme <skiwithme@optimum.net>,
-	Suvam Sen <suvamsen2004@gmail.com>,
-	Celimar <celimarj@gmail.com>,
-	Salvatore Bonaccorso <carnil@debian.org>
-Subject: Re: [regression 6.1.y] 967473b1e8bb ("Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd") causes backtraces and non-working bluetooth
-Date: Fri, 27 Nov 2026 12:01:23 -0500
-Message-ID: <2026-11-26-1-daily-reply-0035@kernel.org>
+	Dickson Wu via B4 Relay <devnull+dickson.wu.certik.com@kernel.org>,
+	Dickson Wu <dickson.wu@certik.com>
+Subject: Re: [PATCH 6.1.y] Bluetooth: hci_sysfs: Fix NULL pointer dereference in device_del()
+Date: Fri, 27 Nov 2026 12:01:24 -0500
+Message-ID: <2026-11-26-1-daily-reply-0036@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <179567271700.947722.15185762256491350563@eldamar.lan>
-References: <179567271700.947722.15185762256491350563@eldamar.lan>
+In-Reply-To: <20261126-so1b-bt-61-v1-1-8d8aab8cdda7@certik.com>
+References: <20261126-so1b-bt-61-v1-1-8d8aab8cdda7@certik.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -73,16 +65,11 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-> But reverting the commit does not immediately seem to be an option as
-> this is as well the fix for CVE-2025-21969. Is there something broken
-> in the backport or a missing requisite?
+> A NULL pointer dereference in klist_put() occurs when a child device (such
+> as a BNEP network device in bnep_session) is concurrently being
+> unregistered while hci_conn_del_sysfs() reparents child devices.
 
-A missing requisite: ab4eedb790ca ("Bluetooth: L2CAP: Fix corrupted list in
-hci_chan_del"), the upstream fix for b4f82f9ed43a, which has the same list_del
-corruption trace in its changelog. It doesn't apply to 6.1 as is, so it needed
-a backport.
-
-Queued it for 6.1, together with two later fixes for it, thanks.
+Queued for 6.1, 5.15 and 5.10, thanks.
 
 -- 
 Thanks,
