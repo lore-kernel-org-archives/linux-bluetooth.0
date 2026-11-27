@@ -1,69 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.216.248.212
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.222.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795785923;
-	b=AjcLbim3khL0tVftDY1RzPLxpEjFiMs8wnNa4O1ksSonKwbMmgk/YSFG1ybAvsXrWBeg
-	 1IGZ0jSeYzSxIprArIR+93zzfAjH+UsePKrWt+TSCwZsM/sqo2uRMFjCfymhDR1Clwg4h
-	 9IStazXMC4pDUxDGc/xCS9TuVwOK7W+9M+xMkyIQbzlL6/qVr8/H7ESd/dskmzxZkD6yh
-	 KatJq3fDIA45QTnYs8ZlVeEl5zuyYjua4gPiufUErftiIrfb1pTAhCXl5WjMiw97jWOA8
-	 wrIYytuEXWwcao+sbyaAlIxtz4z4bQNNAnDgh1FB+jfFRkW0mURvsN21h2dvt0MDlVg==
+	t=1795786190;
+	b=09azvHkUw7PbDI0jJyMbIiohJWVDWasxm7AzrIFUEwh+GuBx/e5A0j+IYfeA0QNwXW9R
+	 0guj75WdgYPafAAbsG7uxX4QF7h517bKLH1wbEKHUyr5JdC8N3JQZXAY0IhF/F2WCYS/i
+	 /apl4wECGCIUsK4RByzfKOifm4OZwrg6ya8xmgaL7+YQnarJCLVPYKsLq40dvBeZC7qmB
+	 sobW5f8wTaQj0ZPmjK8OS6WZioV8V0NyjOGzzIPRYkgMHaUQsn1/KHabkg/5rLsgDsAzP
+	 h6iDGk7RcKNBqbx0ZXlV/1Zj+1gqw5remunGal0txJfMTkjIoUO2uRn7DlI3s66lOBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795785923;
-	h=DMARC-Filter:From:DKIM-Signature:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=EuIob5V9U10hB6iTNAiC/d0Z5n6c6oBePPnlN7Pncy8=;
-	b=OQu4FjnyHlbqxJB5FINrqlNAlsu7lvcn2ACIRmSODMRDBxRTqfe7UHTfXE0cKYwRgqt/
-	 mBv690RrM5F2Zuvxi8rAh6Kswie5Jo9rGLfGoTOkpdDkbC0IsLQ3CmHlbatYRD2EyKErI
-	 ikY2WtWEdSKPak9dCiJaDkKmjQYlf2+T8kenlEpF3ZibHgfCUmty8DNY8GC+bcZ4BswCZ
-	 gdiDsuDrRcf3bPK1mMCtUpnoRspew8HsEsEI6bwaqS5ilP5iSpZ843k+5orG2glNIQZnC
-	 EFjmByF14sVeQGsp8tJbKk58OJlyEa2ZIsyxd5hzehDKlkt8BmkuVCgzKkU0ASqEO7Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795786190;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Message-ID:Date:
+	 Content-Type:MIME-Version:From:To:Subject:In-Reply-To:References:
+	 Reply-To;
+	bh=zpgo3Tj55tcUu4XxqKzbo29dod/lLXm/ex40fETWUMo=;
+	b=dI4tRhoHxTTjCrNg8zo0s4FluhbLtbiLysDEFl5MbhCuQU6AtKqBK57p5p/d03gRYJSz
+	 hVd9NaFuoOuw2KTT7Mf7e4IUbcWRk0KNqCPxiG7OGE/vWd2BO2ycL2IsxalphFTiX99A6
+	 ryvPqZGZWLbr9OUEifpE7mcFZIBjGk1T3LIR+2vwjnS0d0clqZQE91yos3HENHCEUNiUA
+	 wKT5znSe4fI/AozAYIUGFWB+CEI/znFY1MZhjefGQdeDSfeYLbmnpfYAnmKEn7iaNmOnV
+	 U54+tN6zGcMdE4jL3fD1bdJNQD8xXSyVhpFjkr1LTMFwbAnxhZmMLUaUoC/syS9z5IA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=deq.rocks;
-	spf=none smtp.mailfrom=deq.rocks;
-	dkim=pass header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=JDlRC5Om;
-	arc=none smtp.remote-ip=91.216.248.212
-Received: from bulk0.mail-out.lima-city.de (bulk0.mail-out.lima-city.de [91.216.248.212])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ScV7YY8s;
+	arc=none smtp.remote-ip=209.85.222.176
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7250E606A33B;
-	Fri, 27 Nov 2026 13:25:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7250E606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=deq.rocks
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=deq.rocks
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C09606A31F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 13:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7C09606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deq.rocks header.i=@deq.rocks header.a=rsa-sha256 header.s=securedbylima-20251205 header.b=JDlRC5Om
-From: Andre Eikmeyer <dev@deq.rocks>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=deq.rocks;
-	s=securedbylima-20251205; t=1795785920;
-	bh=TcBeTqLGTExh6I9MDQ76n82pUzUi9GtHBR4398Cq9mc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JDlRC5OmA7NjROGZoc80uQ9schmw770AHJ5teHGRBWuDWu4PEO/KD8RUeExlpSRId
-	 BNwB9rn2wjQZzyWtfvDnPtY35dMGiPStsvoVWhH99gVA7S/pKQG8R/Cgos9kkdV+h6
-	 PZlEP2tNys1XE/YpIMwCQY5Zxw8U5jGtkoJHyGBUVXp86+1KlosHRTti+cvmnKY1Vv
-	 uVXOHH/vhmVH+0orJUKpxMLqiR/pvMDa+EdiFaNwZKtlxDXPwzC0e4lf8U1C3DpoAf
-	 yg3FSPgeQx/ES9gFOzc2AUX6pxFVm3xq01pylFWLfokDfXJq7RxpLzqmVF+Hre9StO
-	 trFs9XVzkcE4A==
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	sven@kernel.org,
-	j@jannau.net,
-	neal@gompa.dev,
-	asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Sasha Finkelstein <k@chaosmail.tech>,
-	Myria Sarvay <myrialsarvay@gmail.com>,
-	Andre Eikmeyer <dev@deq.rocks>,
-	Yossef Osman <Yossef.Osman@proton.me>,
-	Aditya Garg <aditya.garg@linux.dev>
-Subject: [PATCH v3 1/2] Bluetooth: btbcm: raise ACL priority on Apple Broadcom controllers
-Date: Fri, 27 Nov 2026 14:25:12 +0100
-Message-ID: <20261127132513.262754-2-dev@deq.rocks>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261127132513.262754-1-dev@deq.rocks>
-References: <20261127132513.262754-1-dev@deq.rocks>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ScV7YY8s
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-94962d80d34so467972085a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 05:29:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795786189; x=1796390989; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=zpgo3Tj55tcUu4XxqKzbo29dod/lLXm/ex40fETWUMo=;
+        b=ScV7YY8s3jAE0qZcapT2EB4+mTW95rbgsuJ7Xf4KE+3zWlBLVly7VxCtNYYPP5t8tF
+         aq6It11xfb5+HkoneuYDwH0YjnVUJtJplsVZLIK0Hw6fqBHETfk0Oue+UrEUw+jUQ2ko
+         CZ3nJxOJ/c7HPq2AAEtslsWCFfjH2Aj3CEwefjOdXnGsiW3bZMS74pn/COfAzxqqYO75
+         y9KMt+eFd59YMEc3AM26kN+A/6qXyowGwrGca0KPqBWHouiJv3+aSnoOTIOJGNLSNvVU
+         gKSuDm983bovQm/GT/6NHMf4Tf5bYbhhizX8z7JlSlhF31PojNufV/YkV3VSVg/3E196
+         DdqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795786189; x=1796390989;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version
+         :content-type:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=zpgo3Tj55tcUu4XxqKzbo29dod/lLXm/ex40fETWUMo=;
+        b=n0PRNer+vGEMjRZnu/iPAwksJUQUfT8pd5M7qFVrx0MZA0IhbD6s5jVSElQpGgESBn
+         kPjvIGuy3Z/PvyjnzXb3DXBbDAhPzsuMdqSVdAKaSqurXbZHN+AaJyHkpZSRqQSACWH4
+         U/Xk2TWBeRalOw8+n2tjuYNr3u3JMnYX1HsgTKTZN/DI6regBr1gM76rmw6jEyH1XLv/
+         YeQbn6LBDuoDIx9hbgO7IKCxadnDlaUMG8WFH4vSszx1qfH8MNOq7FJmcKifUiGAe8UJ
+         EWQz0to8kHswlyblvs04SB3e/T2YsD5ntA3bgAJRtIO5yjhEcn+rgSW1/D8W9vfFlYCX
+         7ZTw==
+X-Gm-Message-State: APuU4Z8VIZTtZYIhODjQ3uKTrDbYsv0fUez4uuuJEISuMgPb5jxlw3U0
+	+0DUMLnRfUCm+y1tz3NpnyXU1TwwiQOVhAMfPLCUn74Vd4nUQA2ZwwHcuTuZIA==
+X-Gm-Gg: AZFdTZf7vLHfKJWXMVWhdflG7F0PtszDxsCeSnmjXnRqe8b4Nkco0LmdjxEJY4s9Er9
+	bkPs2ap2hiqsRY9MGsSDeiyyfd4mobO99Z7KDjHe13n5PeNUAnO5+6esAAkPbP4giw+gtwJosRI
+	VQjJVU0TIafa810H/vgiGXqZ/hfQm3BBZR+uRwk4b1UQgVFnT5Ep81yxAy24Rj8pI7gn/ek+8xk
+	r+d7CRnDTdHxMumcl4ChYXx5FXbFGuzZlAESEwkXtEpX0bRxknGmkt3N6KfjHu7Zk5Z6TAE/9xF
+	sgXN9l1Z58MeYgZ75Be7sepO71STIGsKGmUiqnMEIgqynoCz3/kHngb4wAVzjEvGOTnj0DRlBxO
+	zQtzM1A9FLTP83xdQyrAyKJqMN+YUz/xielGsTSwuVLw69VoTjaA23iXf134fovg00dvB+I5tea
+	WRQpLfxO2LPsdPPI3jw+5xjqH52u2EgYh19xjF3ZEOgv0QAsZ+0Qf356LzJ9az9PCilCjnH9Vtr
+	D3sKPcz+Lr7jCT/Te6r6aNBTg8I2+ccafJ0Ei40/0jyyOXTKp4L+ULz/VguX5CV
+X-Received: by 2002:a05:620a:4012:b0:949:3365:7402 with SMTP id af79cd13be357-949ba9b8ee1mr4370691385a.17.1795786188789;
+        Fri, 27 Nov 2026 05:29:48 -0800 (PST)
+Received: from [172.17.0.2] ([172.210.143.65])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-94a017cfb46sm782431785a.28.2026.11.27.05.29.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Nov 2026 05:29:48 -0800 (PST)
+Message-ID: <6b0985cc.3cec8c74.32ff63.9845@mx.google.com>
+Date: Fri, 27 Nov 2026 05:29:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8483288770253086222=="
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -73,220 +88,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, dominique.martinet@atmark-techno.com
+Subject: RE: [6.1] Bluetooth: L2CAP: Fix corrupted list in hci_chan_del
+In-Reply-To: <20261127080307.3214776-1-dominique.martinet@atmark-techno.com>
+References: <20261127080307.3214776-1-dominique.martinet@atmark-techno.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On the MacBookPro15,1 (BCM4364B0 over UART) A2DP audio drops out as
-soon as WLAN runs on 2.4 GHz with traffic. The host keeps the eight ACL
-buffers of the controller filled, but the controller holds single ACL
-packets for 160-200 ms, so the sink runs dry.
+--===============8483288770253086222==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Sending the Broadcom vendor command 0xfc57 (HCI_BRCM_SET_ACL_PRIORITY,
-handle and priority, as used by the Android Broadcom vendor library) with
-priority high for the audio link stops the dropouts. Setting it back to
-normal brings them back right away. The BCM4377 of the MacBookAir9,1
-accepts the command as well.
+This is an automated email and please do not reply to this email.
 
-Raise the priority for every BR/EDR ACL link once its Connection Complete
-event arrives. This covers audio as well as HID links. hci_bcm does this
-on Apple machines only, hci_bcm4377 always, since it only runs on Apple
-machines. The PCIe driver receives events in hard interrupt context, so
-the command is queued from a work item.
+Dear Submitter,
 
-Tested-by: Yossef Osman <Yossef.Osman@proton.me>
-Tested-by: Aditya Garg <aditya.garg@linux.dev>
-Signed-off-by: Andre Eikmeyer <dev@deq.rocks>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: include/net/bluetooth/l2cap.h:666
+error: include/net/bluetooth/l2cap.h: patch does not apply
+error: patch failed: net/bluetooth/l2cap_core.c:119
+error: net/bluetooth/l2cap_core.c: patch does not apply
+error: patch failed: net/bluetooth/l2cap_sock.c:1395
+error: net/bluetooth/l2cap_sock.c: patch does not apply
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort".
+hint: Disable this message with "git config set advice.mergeConflict false"
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/Kconfig       |  1 +
- drivers/bluetooth/btbcm.c       | 71 +++++++++++++++++++++++++++++++++
- drivers/bluetooth/btbcm.h       |  7 ++++
- drivers/bluetooth/hci_bcm.c     | 18 ++++++++-
- drivers/bluetooth/hci_bcm4377.c |  3 ++
- 5 files changed, 98 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index b18482b5677..3e2426abdff 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -318,6 +318,7 @@ config BT_HCIBCM4377
- 	tristate "HCI BCM4377/4378/4387/4388 PCIe driver"
- 	depends on PCI
- 	select FW_LOADER
-+	select BT_BCM
- 	help
- 	  Support for Broadcom BCM4377/4378/4387/4388 Bluetooth chipsets
- 	  attached via PCIe. These are usually found in Apple machines.
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 23887f4cde6..88fe93b5d39 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -215,6 +215,77 @@ int btbcm_write_pcm_int_params(struct hci_dev *hdev,
- }
- EXPORT_SYMBOL_GPL(btbcm_write_pcm_int_params);
- 
-+#define BCM_SET_ACL_PRIORITY	0xfc57
-+#define BCM_ACL_PRIORITY_HIGH	0x01
-+
-+struct bcm_set_acl_priority {
-+	__le16	handle;
-+	u8	priority;
-+} __packed;
-+
-+struct btbcm_acl_priority_work {
-+	struct work_struct	work;
-+	struct hci_dev		*hdev;
-+	u16			handle;
-+};
-+
-+static int btbcm_set_acl_priority_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct bcm_set_acl_priority cp;
-+	int err;
-+
-+	cp.handle = cpu_to_le16(PTR_UINT(data));
-+	cp.priority = BCM_ACL_PRIORITY_HIGH;
-+
-+	err = __hci_cmd_sync_status(hdev, BCM_SET_ACL_PRIORITY, sizeof(cp),
-+				    &cp, HCI_CMD_TIMEOUT);
-+	if (err)
-+		bt_dev_warn(hdev, "BCM: setting ACL priority for handle 0x%4.4x failed (%d)",
-+			    le16_to_cpu(cp.handle), err);
-+	return err;
-+}
-+
-+static void btbcm_acl_priority_work(struct work_struct *work)
-+{
-+	struct btbcm_acl_priority_work *w =
-+		container_of(work, struct btbcm_acl_priority_work, work);
-+
-+	hci_cmd_sync_queue(w->hdev, btbcm_set_acl_priority_sync,
-+			   UINT_PTR(w->handle), NULL);
-+	hci_dev_put(w->hdev);
-+	kfree(w);
-+}
-+
-+/* Give every BR/EDR ACL link high priority in the controller as soon as it
-+ * is connected. Without it the BCM4364 coexistence arbitration lets 2.4 GHz
-+ * WLAN traffic delay ACL packets by up to 200 ms, which drops A2DP audio.
-+ */
-+void btbcm_set_acl_priority_on_connect(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_event_hdr *hdr = (void *)skb->data;
-+	struct hci_ev_conn_complete *ev;
-+	struct btbcm_acl_priority_work *w;
-+
-+	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT ||
-+	    skb->len < sizeof(*hdr) + sizeof(*ev) ||
-+	    hdr->evt != HCI_EV_CONN_COMPLETE)
-+		return;
-+
-+	ev = (void *)(skb->data + sizeof(*hdr));
-+	if (ev->status || ev->link_type != ACL_LINK)
-+		return;
-+
-+	w = kzalloc_obj(*w, GFP_ATOMIC);
-+	if (!w)
-+		return;
-+
-+	INIT_WORK(&w->work, btbcm_acl_priority_work);
-+	w->hdev = hci_dev_hold(hdev);
-+	w->handle = __le16_to_cpu(ev->handle);
-+	queue_work(system_dfl_wq, &w->work);
-+}
-+EXPORT_SYMBOL_GPL(btbcm_set_acl_priority_on_connect);
-+
- int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
- {
- 	const struct hci_command_hdr *cmd;
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index b4cb24231a2..a4d47b242e9 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -59,6 +59,8 @@ int btbcm_read_pcm_int_params(struct hci_dev *hdev,
- int btbcm_write_pcm_int_params(struct hci_dev *hdev,
- 			       const struct bcm_set_pcm_int_params *params);
- 
-+void btbcm_set_acl_priority_on_connect(struct hci_dev *hdev, struct sk_buff *skb);
-+
- int btbcm_setup_patchram(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
- 
-@@ -94,6 +96,11 @@ static inline int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw
- 	return -EOPNOTSUPP;
- }
- 
-+static inline void btbcm_set_acl_priority_on_connect(struct hci_dev *hdev,
-+						     struct sk_buff *skb)
-+{
-+}
-+
- static inline int btbcm_setup_patchram(struct hci_dev *hdev)
- {
- 	return 0;
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1f62a8c2fb3..d2fbaf7cfbc 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -147,6 +147,7 @@ struct bcm_device {
- 	bool			drive_rts_on_open;
- 	bool			no_uart_clock_set;
- 	bool			use_autobaud_mode;
-+	bool			acl_priority;
- 	u8			pcm_int_params[5];
- 	u32			max_autobaud_speed;
- };
-@@ -688,10 +689,21 @@ static int bcm_setup(struct hci_uart *hu)
- 	.lsize = 0, \
- 	.maxlen = BCM_TYPE52_SIZE
- 
-+static int bcm_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct bcm_data *bcm = hu->priv;
-+
-+	if (bcm->dev && bcm->dev->acl_priority)
-+		btbcm_set_acl_priority_on_connect(hdev, skb);
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
- 	{ H4_RECV_ACL,      .recv = hci_recv_frame },
- 	{ H4_RECV_SCO,      .recv = hci_recv_frame },
--	{ H4_RECV_EVENT,    .recv = hci_recv_frame },
-+	{ H4_RECV_EVENT,    .recv = bcm_recv_event },
- 	{ H4_RECV_ISO,      .recv = hci_recv_frame },
- 	{ BCM_RECV_LM_DIAG, .recv = hci_recv_diag  },
- 	{ BCM_RECV_NULL,    .recv = hci_recv_diag  },
-@@ -1094,8 +1106,10 @@ static int bcm_get_resources(struct bcm_device *dev)
- 
- 	dev->name = dev_name(dev->dev);
- 
--	if (x86_apple_machine && !bcm_apple_get_resources(dev))
-+	if (x86_apple_machine && !bcm_apple_get_resources(dev)) {
-+		dev->acl_priority = true;
- 		return 0;
-+	}
- 
- 	dev->txco_clk = bcm_get_txco(dev->dev);
- 	if (IS_ERR(dev->txco_clk))
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 72a9f269e8b..7900e8ca2fb 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -22,6 +22,8 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+#include "btbcm.h"
-+
- enum bcm4377_chip {
- 	BCM4377 = 0,
- 	BCM4378,
-@@ -689,6 +691,7 @@ static void bcm4377_handle_event(struct bcm4377_data *bcm4377,
- 
- 	memcpy(skb_put(skb, len), payload, len);
- 	hci_skb_pkt_type(skb) = type;
-+	btbcm_set_acl_priority_on_connect(bcm4377->hdev, skb);
- 	hci_recv_frame(bcm4377->hdev, skb);
- 
- out:
+
+--===============8483288770253086222==--
