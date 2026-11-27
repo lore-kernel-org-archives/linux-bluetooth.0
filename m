@@ -1,101 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795799458;
-	b=wNw6StgNuEw8TKXoAGfbac3I5A/lT8P/8K6lW0vkH8LL9WNA7gV+Ny4gborEEyESVPoY
-	 J1APw0dCIIOaeemVH6VMgeVS/v47wFKRl4KLAxV33SxlM919pY+CGOln7HYv7wJ9gghgB
-	 QETdNAt9frPMRWt8fKksw8DuCPfmhN4ms0OKyXX/Xm6GjSbdSstMZg0znS4rtBq6kmo2T
-	 +7VIhZXi/TnLJVuvjGfPUPUZ54OjHduMw+ntj2mozn3Sw3+w7/QR/BYkfmzysuUk08IAy
-	 I02Onnf0ZdQecVnnHSOwErofyB5F1lVmNWgAcltNHAuRN9ce7Soyer0PGMYnspfcPpQ==
+	t=1795805455;
+	b=aQMD37I1sc8EO5UmTmWIVUtSq6HS+qYlg5JKMZrE3RKYuqgsPij55wiw5CPW+EZZ6ILX
+	 IKKeVOZEBs0xJlDUP3yRKXl9IK9JD/tBgyP/MRbnS9oDv64Q1AQcVkkIxf6934uXmcKaV
+	 B/YFuvsR4ZxhJ7LqkBJ4qBcjxV8e5mvZUeoOyDUIRy3mq+UV/lmBBYR7t/SQun9yVXGYR
+	 O/S9JVEgvkr2jSTQjD9LwulOxy6DupLaajYNvj3YaDqfvaFUlw96a3778us7qopWMzjY1
+	 tJILc5L2k6bQSbOMI5Qs6XsnMR4LDP2j7u5zkZ918X/7f9utv8IshdoWrPcqsHzFPWw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795799458;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
-	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=J801ocWR+PWgCF7Q8X3DvWQxxQbFrrtxfSJW3RWQ/R4=;
-	b=1CNH9CkuCVPCOIgiU3lj5aBoxdCEpoM2LWHBxgrolLh6uISBEPE431ayJKIxm0EkLM+o
-	 OHhCwy2/TnUIqJzMAstoOPfhiAzAeLU97fwusVzITnemGqW9pBDMKwMzMm49vZGZO4i1P
-	 eW/8Yirh+hRXb6VUhI7Ssg8jwqc82Zqh+wS9LU1RGoZPwjLmi2tOeACYQC+Y/0Rm0yzcT
-	 lkTC5d6dyrwEeNotr4Scgk+UCopLrvGcUJE0D3uctwaILnJ9jnWgM2dP5AHsL/u0SM5pi
-	 dTvqkb3N8o5JGGK2g0s9H1bQcDT50GCP+pFDUoUmElFqINME1KFPH3/T8tp7BC1tC7Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795805455;
+	h=Received:DKIM-Signature:Received:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:From:Date:Subject:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=eDWfZws5sneXeyP6GwoVDYB3oqWDws2mo5yihewfqY4=;
+	b=G0UKgsa4Va6CLVydiZZrYvbDnw/tRehGdbxyJMo6day2j3v21N1lbJL4apl00nl47r5R
+	 lo8YgQKWO/tRi8+eJlezXzs95c5rROInamv4yto4Dau//UWq/BSM8hizN0PkyBhao9ily
+	 HXioCk71nlZNuPV0nQ778p0sL6v24dHDZvC+W/OjD81wu+ya7uLefogXEPcu037Y2BACr
+	 kI5zezhnVd2Tx95fDhNiDu4zNhGCzYA8dLPARDMGibRBWV1CgcPB+Cl5UEZeJPRgoBMji
+	 mcLQrSBI6qpXCQZTrinEMQ8e1pOgJNWh4lOmMxton2xuFymbIt2x5J+vp40EY3MEvQA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=aa+0saGX;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.45
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="l/EcS9/f";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A70606A31C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 18:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=l/EcS9/f
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795805455;
+	b=H/GCOS72HdF52pNSfHfHAsp+8xDar1zGdQAgVFXNGr1I70/Pm8tul9tAeE2Ltl3Pp3VL
+	 J9chSXuDBhSDc3dexwbsgNA2OKNQPYKh/oifY6RskM4JSHQRrLS4FV0HmyvVwMCDWLy9V
+	 AswDseyXHRXfe4eT6tcyV9BVSdZJDd1rYFmC0ue5I3g05r+uOlxhQ0BtXgY+XGyS6lgh5
+	 eqJTgIqJlQ8nGUqx4ZT62076s2x73i0U9OObmnqSY14UXPPI6DsYZ62QHaNFT9aefn2Hp
+	 Hu/G+a8pjTDJNMPSQaYljP66psmyt0SiwlESTDSDSGQFV6Xt+T2jfWypqGYbKFJwcDQ==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795805455;
+	h=DKIM-Signature:Received:MIME-Version:Content-Type:Message-Id:
+	 X-B4-Tracking:X-Change-ID:From:Date:Subject:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=eDWfZws5sneXeyP6GwoVDYB3oqWDws2mo5yihewfqY4=;
+	b=srukHFspmWRrjGl+kxC767osP1Xe7mMb0C/yZd7ZwZmTUM9VxWjGZGLLtQCtpGabH98H
+	 PLnfjx1aUecXR6AT+Vthk2khOCtQJT5Qn0IxP6Eh0KupbdEm//gRjB6cthOoO0Vfg3YAC
+	 wQ8CCJRxtybWeYjQjEUvNCv/cz6QfdGL8r5OZ2QhIGYQX1uc7YkDnFueCYhZKWIWQlBoj
+	 T80Smg2kiFdP7W1VIwxfJiMl2wI1OdzGsq93+gxhtxVuXPCca0P5qQAy8HW20xktTauz4
+	 mqWMD+sEW0yKJr2CJSNOj/7EuBs4wKL5XjXr4Dcf9tBVXVipmFC67bBNaT6PBDw6DlQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A50F606A31C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 17:10:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A50F606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=aa+0saGX
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-67db5e13b0cso7487010d50.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Nov 2026 09:10:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795799457; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ahE2y/MvhUh2nDCyAnpRyp/BqMRDHNBc6ozjLesNjavF12Da5zRdVGvtdEB+zA1jtC
-         dTtgZy2MRrNEnxQ6oFJKNWoUXZgLFLD8E2sB+ZLTUNQZNrPKxlcjb5UtoWqkMzwBZUWO
-         flx5DPdDUpRdKtppL4nP36zIMGwbDRCR+D43mj2s5g/bBsXJAeg1aJtJJTizpuRfPuWC
-         r1GN8qU8zmRqawEwsF5TphJ7PRKrlFKUGQoIzbKwur7ByIh999N6v2bKOL1+L1tIc2et
-         9IWHL4wCGi55tT49s8e3e3DaNUV5MhuYZFLHuf42GcWDxDmvqIy7tiigdKNVwtQpSfiI
-         ipwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=J801ocWR+PWgCF7Q8X3DvWQxxQbFrrtxfSJW3RWQ/R4=;
-        fh=vIx0i739ZTR5XYuHCJoPRyUUyhS/CGB3cVdSCh8oQ+E=;
-        b=JH/wkfMvDCppZnRWIyuBk9SOXJOkGRnjhta9e6OO2ziLerYZWe5xuDnRXOE7FRBCON
-         SfTa/HvXCjibQcQVfDHmbKXYGfL9G0lOnokOORX+HJu+uU/YfnUvPOJa0ghiLLJ+A8Bo
-         pKgpHf4pdPIAVSyf3cOKfmWj3haFc6uPXhMp8PHIIXSCyYe+0o8nu/UO2UqTVkBPyYxk
-         ZUGIdk3fjdgTRGoOAh7o3fpC3k7n8Tu9dk5Xrl7HPVHeeh42emX4ehNDdNrlY7K8wWQP
-         k9hPVo6UCwBvke0Kfc8nzInTwpQvnRGQqCsIC0IaSBFAxifIB6o+i36fOU4ZWcy1un84
-         Q7Kg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795799457; x=1796404257; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=J801ocWR+PWgCF7Q8X3DvWQxxQbFrrtxfSJW3RWQ/R4=;
-        b=aa+0saGXJMgfRe/ogRH4iTZbCMGz3LzUTTkaH7126PBuNyWgBDBBfOf18ud7bRcFq9
-         IpTdBLp2OS0z8rjxeNfy8pspix3uq/UGd+EMCvoQez97kMdin+NWdhFfnZouQElGD7sS
-         KTihXIfbmZhhpRgxnRSZbxvzTWouLe05CZC98XIhDvhfCOjxLNhpsHHHOh2VHp1s0AhW
-         hCiog2q0aSv1RYev3xVBRbUNii9V7FV3KHsG9anv3vk1ZfLrGF0GPWXOfeiF9F+oL7Su
-         EtYducY14Ng6lkjFntRKYPt4L9OEaSJ2cknDP2hhNg20T5b+PXZGDtK9VDRVNbhneyIw
-         P2Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795799457; x=1796404257;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=J801ocWR+PWgCF7Q8X3DvWQxxQbFrrtxfSJW3RWQ/R4=;
-        b=nYC/mvN3IvpaBOxTQgonLv82K0IV/ELlPvCSTJ6P6io6PTwfeOTu8V3RVlYHiMoRAk
-         I79CREyuAFw7RTOOQ3GsXX2aT2iDHOjCAaMVU61h9i6AgFrKyQvZ+SyL91aybVEAbAum
-         n83reS8VMzPcVHGHDwi9bz6Hg5K0B2rORjEi0RRTnjP0FZG8gbYm62Uxr2stVKqhvKJa
-         AbLg42Vpn7Kv7Mo04EOsRtAbk7zZmMeZXEVbEn1bKA4Kd/IBU+UgDvAr3CyZeNkGsTpS
-         q1t/Rt40qSr29gy9yrV8bKMrEpMCJfUeL1+Nnvz9kKYmI7L89uj10XzLkH5o5QjNtm/G
-         cM/g==
-X-Gm-Message-State: APuU4Z89XUHLtyz4EkqT6sJNKs6u0/u8dfjyZ1v1JqWBE8O2iRyTpRZY
-	nH/L9OxYSIDSB5y/ONcqLvMYIzb8IJMvSRcTnCDF4ivA1MtxkTHCHGsidi5X92ZTblwTvXZCTv6
-	eDxYNNl5CL9B3KfRZJrNa/+FFkcQ4f2s=
-X-Gm-Gg: AZFdTZdcRwOHGy2tdoRghptN7cNEwmpq41c3ilz91ce4l2isupc79d90laH581xVQcS
-	8ntqjRXJ9Lp4kGPRIAhC4qEwGMej69HCf4j7ZGPlF1CkM2nN4EqVuDOQ2DK3JR1e95pbfeDYRTo
-	9E8YV0tdBjKQr4mclVx1NI/Jv3RND2JQSM7KvgD5cUxQiClUSplqZvloo2KTaUwZp7xL2tlcAkU
-	kBEfTud+Imfqpkh1ISyvUuu1R2nTYTBuW5QMIRHyNRwQ4KDT9Ra70oedbJ/vzlkrufpbV0NPNQz
-	ITk92945fmklkPE8jwExYxeA+BWuYhojeESSZeUCM/AsS6Eob0BGRwnA3s+LskVm8r4VVjFkJsl
-	pi9YbNt1fK75yTXYazjIfk5TTSYX+u/K5OoE60uJfxVZTRwm0xHIG50MhHAYW3HKAlRuuMcxoTI
-	RlGaktCNTJKiFihWm0HKyxehSw8MzkIlE4ChxnqxndiesuEMNXSW5ktNp6rDDEIJ9FJ/i4gX6sY
-	xv6npai
-X-Received: by 2002:a05:690e:4842:b0:67c:bd6:73ce with SMTP id
- 956f58d0204a3-67df44fb4e9mr5776548d50.89.1795799456965; Fri, 27 Nov 2026
- 09:10:56 -0800 (PST)
+	by smtp.kernel.org (Postfix) with ESMTPS id BC0181F00893;
+	Fri, 27 Nov 2026 18:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795805455;
+	bh=eDWfZws5sneXeyP6GwoVDYB3oqWDws2mo5yihewfqY4=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=l/EcS9/fs1VGXvSHa7q7Y94NH+rG6jqA/xrp8QkHQ0YRiwftoZ6pdlust+hfBtRM+
+	 mRv6hp2KZAgo7wUsepo1z1veswz1KwMDfzaQNPpYCxKM8Cts99oGNxFvEsFK+VR4fo
+	 4pW7FsNJikgUepY6D4wnFfD7cxGWxb0pHxjS8XAR+XUAXNffTotwoHHuMOIsGxh3yh
+	 g1KOpSNxzPj4XNNYMSO+10zQzdeUaB8+hmBwVL/Oq3Rc0xJ5JBi1B3XRNge1gahb1k
+	 5FjfMIHbrC3n4+PCMTNLOYC3s7iNVDDDO/EA65E7hABCj/Cu5VBh2JYAT7MLWMgNus
+	 X+DZEv5apzs6g==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 4B76D4DD1C;
+	Fri, 27 Nov 2026 18:50:54 +0000 (UTC)
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -105,70 +79,78 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-bluetooth+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261127054519.3146135-1-weihong.guan@gmail.com> <20261127164657.3505415-1-weihong.guan@gmail.com>
-In-Reply-To: <20261127164657.3505415-1-weihong.guan@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 27 Nov 2026 12:10:42 -0500
-X-Gm-Features: Aa3M54r51FxvXKD_1KPpS4UmZvVBUu9JOPPjtSMzFSgGxcRr6H8wqmLqJ_AkbkE
-Message-ID: <CABBYNZLOCfG449tJUnAGjN=PvLVFy4Vj=bgvSCMeFEQbnudA_g@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Unfiltered scan for peers outside
- resolving list
-To: Weihong Guan <weihong.guan@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Kyle Pepper <cochcoder@proton.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261127-bt-inqcache-v1-1-9610f88a2a49@certik.com>
+X-B4-Tracking: v=1; b=H4sIAKXPCWsC/yWMTQrCMBBGr1Jm7UATQalXEReZdGJGSqKZVITSu
+ 5vo8r3vZwPlIqxwGTYo/BaVnBqYwwA+unRnlLkx2NGejLFnpIqSXt75yOgNT2GcJ6ZwhLZ4Fg7
+ y+b1dgZaVa841wu0f6UoP9rW/9TI5ZaTiko9dKae51RfsHvb9C3WxRdiaAAAA
+X-Change-ID: 20261127-bt-inqcache-c1e9f0d9ebf3
+From: Dickson Wu via B4 Relay <devnull+dickson.wu.certik.com@kernel.org>
+Date: Fri, 27 Nov 2026 15:46:47 +0000
+Subject: [PATCH bluetooth] Bluetooth: hci_event: Requeue failed name
+ resolutions
+To: linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795805093; l=2025;
+ i=dickson.wu@certik.com; s=dickson-b4; h=from:subject:message-id;
+ bh=7k2grbbT9bxaYWonzyj9mudhJSGr/nMZ7k7ShM0xQpE=;
+ b=jG3DeROsDqtMrLtX/K8GoqCMToeXzflfF+imPHl1BhEJP4g31q1SBmDsvVrweK/A1LnQiTjs1
+ jl3dI3jr9FmCjat+xEnFcwDYrZekljx0SZOIyX47IPZEcAsG/ZXlaaH
+X-Developer-Key: i=dickson.wu@certik.com; a=ed25519;
+ pk=fxH7FS4FdojeJSGLJzgKdfO51Rvr4EW30yinj2mc1vg=
+X-Endpoint-Received: by B4 Relay for dickson.wu@certik.com/dickson-b4 with
+ auth_id=1647
+X-Original-From: Dickson Wu <dickson.wu@certik.com>
+Reply-To: dickson.wu@certik.com
+Content-Transfer-Encoding: 7bit
 
-Hi,
+From: Dickson Wu <dickson.wu@certik.com>
 
-On Fri, Nov 27, 2026 at 11:47=E2=80=AFAM Weihong Guan <weihong.guan@gmail.c=
-om> wrote:
->
-> Hi Luiz,
->
-> The CI's mgmt-tester fails four LL Privacy cases with this patch:
->
->   LL Privacy - Scan RPA - Auto-connect with IRK
->   LL Privacy - Scan RPA - Background report with IRK
->   LL Privacy - Add Device 2 (2 Devices to AL)
->   LL Privacy - Add Device 3 (AL is full)
->
-> They fail as designed, not by accident. Your BlueZ commit fa6ba55020
-> ("mgmt-tester: Add LL Privacy host-resolved RPA scan checks") expects a
-> peer with an IRK, added without HCI_CONN_FLAG_ADDRESS_RESOLUTION, to stay
-> in the accept list with filter policy 0x01, "since the controller
-> resolves RPAs". The patch changes exactly that case, so I would like to
-> ask which way you prefer before sending a v2.
->
-> What I see on hardware: without the flag, hci_le_add_resolve_list_sync()
-> returns early, so the peer's IRK never reaches the controller's resolving
-> list. The controller then cannot resolve the peer's RPA, and the accept
-> list holds only its identity address, so every advertisement from the RPA
-> is filtered out. A connect by identity to a bonded private peer never
-> completes (no connection in 15 s, resolv_list empty), on an nRF52840
-> (Zephyr hci_usb) and on a WCH CH583 running our open controller, as in
-> the patch's notes. With the flag set, the resolving list path works.
->
-> Two ways I can see:
->
-> 1. Keep this patch (an unflagged peer with an IRK is scanned unfiltered
->    and resolved by the host, as on a controller without LL privacy), and
->    I send a BlueZ patch updating the four cases to expect that.
->
-> 2. Leave the scan filtered, and instead put a peer with an IRK into the
->    resolving list on an LL privacy controller even without the flag, so
->    the accept list matches its resolved identity. That keeps these tests
->    as they are, but changes what the flag means, and the Set Device
->    Flags cases may need a look.
->
-> Is either of these what you had in mind, or is the flag meant to always
-> be set by userspace for such peers, making the unflagged case unsupported=
-?
+When a Remote Name Request fails, hci_check_pending_name() removes the
+inquiry entry from the resolve list and changes its state to
+NAME_NOT_KNOWN, but does not add it to the unknown list.
 
-Something is off here, afaik that flag shall always be set if LL
-Privacy is supported. If it is not then the resolving list shall not
-be used at all so the controller shouldn't be attempting to resolve
-anything.
+If an Extended Inquiry Result later supplies a complete name for the
+same address, hci_inquiry_cache_update() treats the NAME_NOT_KNOWN
+entry as linked and deletes it again. This corrupts the list in
+hci_rx_work.
 
---=20
-Luiz Augusto von Dentz
+Add the entry to the unknown list after the failed resolution, so a
+later result unlinks it exactly once.
+
+Fixes: c3e7c0d90b14 ("Bluetooth: Set name_state to unknown when entry name is empty")
+Cc: stable@vger.kernel.org
+Signed-off-by: Dickson Wu <dickson.wu@certik.com>
+---
+Reproduced under UML with KASAN and a vhci controller, on bluetooth-next
+f57f78086ab5 and on mainline 9437ee8b6cf6. The sequence is BR/EDR
+discovery, an EIR without a complete name, Confirm Name with
+name_known=0, the Remote Name Request failing with page timeout, then a
+second EIR for the same address with a complete name. The second
+inquiry was started with a raw HCI_Inquiry from uid 65534 with no
+capabilities, which hci_sec_filter allows. Stock and with the patch
+reverted fault in list_del() from hci_extended_inquiry_result_evt() in
+hci_rx_work. With the patch the guest stays up with no warning. The
+reproducer is available if it helps.
+
+This was found and the fix prepared with AI coding tools (OpenAI Codex
+agents, with review by Claude). I went over the analysis and the patch
+before signing off.
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a9b6a6ccaa03..c767e8d32217 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2582,6 +2582,8 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
+ 	list_del(&e->list);
+ 
+ 	e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
++	if (!name)
++		list_add(&e->list, &discov->unknown);
+ 	mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
+ 			 name, name_len);
+ 
+
