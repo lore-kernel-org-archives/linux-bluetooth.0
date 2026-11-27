@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795798934;
-	b=1blkmRMVpOQEOFWDcyw6Jq2Mml6BIGys8gtLUObFE1mK63sLqyo2MLCdxCELh41R2xpo
-	 PfelN6gnaCEpAlJ4tySyIruBjeaO12hU6Mm0zoAtYgne36PpRBlpiyfGQ2ZRRuzjV3oJ/
-	 HxcTlRuzwAlUO/NVB/6dE61eEfe54U2bShloEdwpPbiHEKsc7WpsbbqYnK8E+ThLWfB77
-	 HQjEVT3Qp9BpiOFB8vWvS8o68LBTQ6AQ9mIKsNdhJC5ulODmsSSuNwSg2fuSJi3pm14F9
-	 SAeX+7/wFesB7KLB0Fm1lSiz6G130vytQLmfZCFM6lq/sNZBBFpK4AdKzlDtfYCvdUg==
+	t=1795798946;
+	b=FKRtZcjCPkvoVRaMhk6GvwIJ2JReEJfStJQIgjrQr2OVRrAwdG7a31bbGANPjLuox/Sp
+	 yteVv/JFS10ae1vnyeAvVaqajMPUgi8NIXCeBkcohK2Edz9PGm4GEMgs2/oNJXSBz04cf
+	 ok5rpAHiFMpk0QjujzguiszYWvcSKYRlxFgOqmzAAUXU+JR+2430IbWe6AtNhF13Pphqd
+	 KXiN+MrU0bqTCgxcGNMKtKaplh2VlqKbN+IFZKLJR/XIHVpZP9SfeBMCP1hP6IM3fvqFV
+	 uDhognaKNdkjd971WlzgffawY1h5Mq9m9p8rsQ0Lulyjxkm76pJY20metnl+GHS6s4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795798934;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795798946;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=JmeBKnM5EkB+JVMoe/M6Hb5kobFiHhZOn7PpQ72bZh0=;
-	b=AJD8b8AkSGKcJFtbPEMLYOdGLdZKMMY69alvnoxLSQRfst5KXNeYzRSBeEoHo5Edm06d
-	 32rCjoJrUzzAZ/TzoxISf6Ejm0tWsvlWfXf0UAnNnvk4CLerGghCVskjy5SQfX1/3awTy
-	 fjhFKsHkkfKZSTsVWvaBlxNwgLUQVuWUHUt+tgB93AHjKPJ7j7MCaIEnMgsaG6B4R2glu
-	 gpzAzqiiGwAHBfbWNOrCLD20UNE06SK/79deFgCZTl7Su6V0Ga/6jIPWfXSuIkiXIzzZH
-	 UI/CKJg1HA3c1KHYUne+zDmIAMsOJYJhLuk150NXXm1a4xFLskkp02ycgtb1JK/QL8A==
+	bh=IZTo/mwZb4dZgzaOLgEEGpl25UQU8GxYF0PFzcr3j+s=;
+	b=M3H8u+mVAhcyUMjYCThpsg6NLAsMHK97WVz1R9KBKtWd1fYazMWfb5LqZlPg2gmPGJjX
+	 AgfRAcpotb8x0CCpwBsswQ4A4nefZnXkKZ8/Gma2cZ3Xc+Vw4A78u4g4XJMMp1NuGj3H7
+	 vI7BxtD/Se1Zv/5cNSZhiVQ26eXQAfBq6nnYp2hP4LLBJ0v89X6uKYAYIfujShQwLnjVB
+	 Qs0VWonKjK9bOhzRjHnfHismrhswaKxdYrtwfpYDwKOurvL0YlbJliWRIUOt/NZqsbFsC
+	 c9Cb1Db3NxD2hDGy8ZA0xHZbBqd5DAZFyO3oJRCsLr9dOvZ5wlqVPT28LAmdIGYKC6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BICnhE9D;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VcWPo0Ux;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03418606A335;
-	Fri, 27 Nov 2026 17:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD1B606A329;
+	Fri, 27 Nov 2026 17:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BICnhE9D
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1AA71F00927;
-	Fri, 27 Nov 2026 17:02:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VcWPo0Ux
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CD011F0089C;
+	Fri, 27 Nov 2026 17:02:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795798933;
-	bh=JmeBKnM5EkB+JVMoe/M6Hb5kobFiHhZOn7PpQ72bZh0=;
+	s=k20260515; t=1795798945;
+	bh=IZTo/mwZb4dZgzaOLgEEGpl25UQU8GxYF0PFzcr3j+s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=BICnhE9DMRpOrTSvT2WYPdrkSUHdg2GTorvjgb9yi5DexdMmLPeNpzriwqgkqJv7M
-	 UF8FXb0xdpo2svvYz6sP/DbQgGPoOn7dlom7tPxLRfJBvsEfMuSFPt663hM6qzYc5R
-	 o7OgtTJhFUv1WutV2qbCAOWjZua6/8STiY0Wh00ZsWdmjq8YXmPrOmojHp1qCuzFEZ
-	 QDDSmwrJvI3tvLOXmRZMMk+fVmhZDhn3l6/kXBJ0u2Uvg68VBTnj3QzwPDdK57MuCk
-	 G5pEnJAr3qRmUcpW2C8wSXxdBRdukkA3P3Iy2KhowbLVCQgt4QM6TWL+aQQyj5IFKD
-	 bUZt5h0C2pl3A==
+	b=VcWPo0Uxx5RkqFr8l7No6hlqEP/JoDWImgE0O9BNhVY/CAJNM4nIgvZ2J7PIgVI4X
+	 KJU9z8Zo+e2OCVqYgZuIDuMtSavNrkTy42Ric1QMMO/SUUbsXUNbZIurM/HpjMX+8w
+	 WDNIq5WRtC+EYyTXQ9Pml8XdEmopvO1JKvRNI5L7lB6Ly6J5U8aaHrQ4t4q1s2ME/o
+	 Lctv0DNek5M0fIjDhT6Ral+4/MPe8reotRXL6C3e+Rln9hunXLHnaga4/rY+TgXaeo
+	 qPtHkBRY6z0h9YxKgAwCMahzeUJcjxy8LszrswblsWnQEtpRDxeghDitlbUkpWwXxq
+	 aNoaC+KowKpoQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -52,14 +52,13 @@ Cc: Sasha Levin <sashal@kernel.org>,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: Re: [PATCH 6.12] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
-Date: Fri, 27 Nov 2026 12:01:11 -0500
-Message-ID: <2026-11-26-1-daily-reply-0023@kernel.org>
+Subject: Re: [PATCH 6.6] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
+Date: Fri, 27 Nov 2026 12:01:18 -0500
+Message-ID: <2026-11-26-1-daily-reply-0030@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261125093035.224140-1-petrvaganoff@gmail.com>
-References: <20261125093035.224140-1-petrvaganoff@gmail.com>
+In-Reply-To: <20261125093708.227125-1-petrvaganoff@gmail.com>
+References: <20261125093708.227125-1-petrvaganoff@gmail.com>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Post: <mailto:linux-bluetooth@vger.kernel.org>
@@ -75,7 +74,7 @@ Content-Transfer-Encoding: 8bit
 > the code may attempt to access some uninitilized/invalid memory past the
 > valid skb->data.
 
-Queued for 6.12, thanks.
+Queued for 6.6, thanks.
 
 -- 
 Thanks,
